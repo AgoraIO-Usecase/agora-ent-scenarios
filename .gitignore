@@ -1,0 +1,8 @@
+**/android/.gradle
+.DS_Store
+local.properties
+.idea
+Pods
+Podfile.lock
+**/*.xcworkspace/*
+**/xcuserdata

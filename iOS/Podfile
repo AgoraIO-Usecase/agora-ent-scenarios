@@ -1,0 +1,70 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+# platform :ios, '10.0'
+use_frameworks!
+inhibit_all_warnings!
+
+def all_pods
+  # 网络层
+  pod 'AFNetworking', '~> 4.0.1'
+  # 布局
+  pod 'Masonry', '~> 1.1.0'
+  pod 'HWPanModal', '~> 0.8.9'
+  # 刷新
+  pod 'MJRefresh', '~> 3.2.0'
+  # tips
+  pod 'MBProgressHUD', '~> 1.1.0'
+  pod 'SVProgressHUD'
+  # 加载图片
+  pod 'SDWebImage', '~> 5.0.3'
+  # Model
+  pod 'YYModel', '~> 1.0.4'
+  pod 'YYCache', '~> 1.0.4'
+  pod 'YYCategories', '~> 1.0.4'
+  pod 'libextobjc', '~> 0.4.1'
+  pod 'MJExtension'
+  # 键盘
+  pod 'IQKeyboardManager'
+  # 变色龙
+  pod 'ChameleonFramework'
+  #弹框
+  pod 'LEEAlert'
+  #滚动视图
+  pod 'JXCategoryView'
+  
+  
+  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
+#pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
+
+
+  #ThirdParty
+  pod 'HWWeakTimer'
+#  pod 'QMUI'
+  pod 'CRBoxInputView'
+#  pod 'Displayer'
+  pod 'YYText'
+  pod 'LSTPopView'
+  pod 'QMUIKit'
+  pod 'InputKit'
+  pod 'CYLTabBarController'
+#  pod 'ZQTCustomSwitch'
+
+  pod 'SocketRocket'
+  pod 'Fastboard'
+  pod 'Agora-Scene-Utils', '~> 1.0.8'
+  
+  #歌词组件
+  pod 'AgoraLyricsScore', '~> 1.0.8'
+  pod 'AgoraRtm_iOS'
+  
+  
+  # Swift Code Formatter
+  pod 'SwiftFormat/CLI'
+end
+
+target 'AgoraEntScenarios' do
+  all_pods
+end
+
+
+
