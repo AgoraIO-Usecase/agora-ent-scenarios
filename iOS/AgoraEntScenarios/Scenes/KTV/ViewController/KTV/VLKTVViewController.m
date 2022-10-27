@@ -247,7 +247,11 @@ VLPopScoreViewDelegate
         }
         //发送通知
         [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
-        [self popForceLeaveRoom];
+        [weakSelf popForceLeaveRoom];
+    }];
+    
+    [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe, VLRoomSelSongModel * songInfo) {
+//        [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
     }];
     
     [[AppContext ktvServiceImp] subscribeRtmMessageWithStatusChanged:^(AgoraRtmChannel * channel, AgoraRtmMessage * message, AgoraRtmMember * member) {
