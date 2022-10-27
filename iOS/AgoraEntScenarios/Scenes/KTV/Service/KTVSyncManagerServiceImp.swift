@@ -12,7 +12,7 @@ private let kSceneId = "scene_ktv"
 
 private let kSceneMVIndexKey = "scene_mv_index"
 /// 座位信息
-private let SYNC_MANAGER_SEAT_INFO = "seat_innfo"
+private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
@@ -167,7 +167,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = KeyCenter.Token!
-                    //                VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
+//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
                     let output = KTVJoinRoomOutputModel()
                     output.creator = userId
                     output.seatsArray = self.emptySeats()
@@ -323,16 +323,25 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func makeSongTop(withInput inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void) {
 //        assert(false)
-        guard let song = songList.filter({ $0.objectId == inputModel.objectId }).first else {
+        guard let topSong = songList.first,
+              let song = songList.filter({ $0.objectId == inputModel.objectId }).first
+        else {
             assertionFailure("make song to top not found! \(inputModel.songNo)")
             return
         }
-        let targetSort = (Int(songList.first?.sort ?? "-1") ?? 0) - 1
-        let origSort = song.sort
+
+        let targetSort = (minSort() ?? 0) - 1
         song.sort = "\(targetSort)"
-        updateChooseSong(songInfo: song) { error in
+
+        if topSong.objectId != song.objectId {
+            topSong.sort = "\(targetSort - 1)"
+            updateChooseSong(songInfo: topSong) { error in
+            }
         }
-        song.sort = origSort
+
+        updateChooseSong(songInfo: song) { error in
+            completion(error)
+        }
     }
 
     func subscribeUserListCount(changed changedBlock: @escaping (UInt) -> Void) {
@@ -543,8 +552,10 @@ extension KTVSyncManagerServiceImp {
             .update(key: "",
                     data: params,
                     success: { obj in
+                        print("updateUserCount success")
                     },
                     fail: { error in
+                        print("updateUserCount fail")
                     })
 
         userListCountDidChanged?(UInt(count))
@@ -770,6 +781,20 @@ extension KTVSyncManagerServiceImp {
 // MARK: Choose song operation
 
 extension KTVSyncManagerServiceImp {
+    private func minSort() -> Int? {
+        var sort: Int?
+        songList.forEach { model in
+            let _sort = Int(model.sort) ?? 0
+            sort = sort == nil ? _sort : min(sort!, _sort)
+        }
+
+        return sort
+    }
+
+    private func sortChooseSongList() {
+        songList = songList.sorted(by: { Int($0.sort)! < Int($1.sort)! })
+    }
+
     private func getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         guard let channelName = roomNo else {
             assertionFailure("channelName = nil")
@@ -782,8 +807,8 @@ extension KTVSyncManagerServiceImp {
                 guard let self = self else {
                     return
                 }
-                let songs = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
-                self.songList = songs.sorted(by: { $0.sort < $1.sort })
+                self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
+                self.sortChooseSongList()
                 finished(nil, self.songList)
             }, fail: { error in
                 print("error = \(error.description)")
@@ -807,10 +832,15 @@ extension KTVSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
-                        finished(nil)
+                        // TODO(wushengtao): missing callback
+//                        finished(nil)
                     }, fail: { error in
-                        finished(error)
+//                        finished(error)
+                        // TODO(wushengtao): missing callback
                     })
+
+        // TODO(wushengtao): mock
+        finished(nil)
     }
 
     private func addChooseSongInfo(songInfo: VLRoomSelSongModel, finished: @escaping (Error?) -> Void) {
@@ -847,15 +877,14 @@ extension KTVSyncManagerServiceImp {
                     success: {
                         // TODO(wsushengtao) callback foreach loop
 //                completion(nil)
+                        print("removeChooseSong success")
                     },
                     fail: { error in
                         completion(NSError(domain: error.message, code: error.code))
                     })
 
         // TODO(wushengtao)mock
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-            completion(nil)
-        }
+        completion(nil)
     }
 
     private func subscribeChooseSong(finished: @escaping () -> Void) {
@@ -874,7 +903,7 @@ extension KTVSyncManagerServiceImp {
                                return
                            }
                            self.songList.append(model)
-                           self.songList = self.songList.sorted(by: { $0.sort < $1.sort })
+                           self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
@@ -885,7 +914,7 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != model.objectId })
                            self.songList.append(model)
-                           self.songList = self.songList.sorted(by: { $0.sort < $1.sort })
+                           self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
