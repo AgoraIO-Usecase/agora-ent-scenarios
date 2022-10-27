@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		053998BE290A7222005143C7 /* VoiceChatRoomResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 053998BD290A7222005143C7 /* VoiceChatRoomResource.bundle */; };
+		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
@@ -298,6 +300,8 @@
 
 /* Begin PBXFileReference section */
 		0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		053998BD290A7222005143C7 /* VoiceChatRoomResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = VoiceChatRoomResource.bundle; sourceTree = "<group>"; };
+		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -728,6 +732,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		053998BA290A70CB005143C7 /* VoiceChatRoom */ = {
+			isa = PBXGroup;
+			children = (
+				053998BF290A731C005143C7 /* Model */,
+				053998BD290A7222005143C7 /* VoiceChatRoomResource.bundle */,
+			);
+			path = VoiceChatRoom;
+			sourceTree = "<group>";
+		};
+		053998BF290A731C005143C7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		053998C0290A81DC005143C7 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				053998C4290A83E0005143C7 /* HomeMenuCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		2EB00036923349BE247126CF /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -902,6 +930,7 @@
 		DD8416A729090C520026B624 /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				053998C0290A81DC005143C7 /* Cells */,
 				DD8416A829090C520026B624 /* VLHomeViewController.m */,
 				DD8416A929090C520026B624 /* VLHomeItemView.m */,
 				DD8416AA29090C520026B624 /* VLHomeItemModel.m */,
@@ -1054,6 +1083,7 @@
 		DD8416E429090C520026B624 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				053998BA290A70CB005143C7 /* VoiceChatRoom */,
 				DD8416E529090C520026B624 /* KTV */,
 				DD84175A29090C520026B624 /* Template */,
 			);
@@ -2061,6 +2091,7 @@
 				DD84177A29090C520026B624 /* product.js in Resources */,
 				DD8417C929090C520026B624 /* Template.bundle in Resources */,
 				DDA19A1328FFE579009D3E61 /* AgoraSyncManagerLocal.podspec in Resources */,
+				053998BE290A7222005143C7 /* VoiceChatRoomResource.bundle in Resources */,
 				DDA19A2128FFE579009D3E61 /* publish.sh in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
@@ -2257,6 +2288,7 @@
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
+				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
 				DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */,
 				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
 				DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */,
