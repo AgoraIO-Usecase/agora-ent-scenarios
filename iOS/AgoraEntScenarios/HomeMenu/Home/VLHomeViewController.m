@@ -50,7 +50,7 @@
 
 
 - (void)itemClickAction:(int)tagValue {
-    if (tagValue == 0) {
+    if (tagValue == 1) {
         VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
         [self.navigationController pushViewController:listVC animated:YES];
         VLLog(@"在线K歌房");
