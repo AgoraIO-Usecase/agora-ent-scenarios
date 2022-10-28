@@ -68,8 +68,9 @@ dependencies {
     implementation project(':common:lrcview')
     implementation project(':common:ui-widget')
 
-
-    runtimeOnly project(':scenes:ktv')
+    if(isProjectLibrary(':scenes:ktv')){
+        runtimeOnly project(':scenes:ktv')
+    }
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
