@@ -10,7 +10,6 @@ import YYCategories
 
 private let kSceneId = "scene_ktv"
 
-private let kSceneMVIndexKey = "scene_mv_index"
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
@@ -202,20 +201,24 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
-        let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        params["objectId"] = channelName
         SyncUtil
             .scene(id: channelName)?
-            .update(key: kSceneMVIndexKey,
+            .update(key: "",
                     data: params,
                     success: { object in
-                        guard let model = object.first, let model = VLRoomListModel.yy_model(withJSON: model.toJson()!) else {
-                            assertionFailure("udpate pkinfo fail")
+                        guard let model = object.first,
+                              let model = VLRoomListModel.yy_model(withJSON: model.toJson()!)
+                        else {
+                            print("udpate mv fail")
                             return
                         }
                         completion(nil)
                     }, fail: { error in
                         completion(error)
                     })
+        completion(nil)
     }
 
     func onSeat(withInput inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void) {
@@ -373,6 +376,33 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func subscribeRoomStatus(changed changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
+        return
+        guard let channelName = roomNo else {
+            assertionFailure("channelName = nil")
+            return
+        }
+        SyncUtil
+            .scene(id: channelName)?
+            .subscribe(key: "",
+                       onCreated: { _ in
+                       }, onUpdated: { [weak self] object in
+                           guard let jsonStr = object.toJson(),
+                                 let model = VLRoomListModel.yy_model(withJSON: jsonStr),
+                                 model.roomNo == channelName
+                           else {
+                               return
+                           }
+                           self?.roomStatusDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                       }, onDeleted: { [weak self] object in
+                           guard let jsonStr = object.toJson(),
+                                 let model = VLRoomListModel.yy_model(withJSON: jsonStr),
+                                 model.roomNo == channelName
+                           else {
+                               return
+                           }
+                           self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
+                       }, onSubscribed: {}, fail: { error in
+                       })
     }
 
     func subscribeChooseSong(changed changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
@@ -408,7 +438,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     }
 
     func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-        assertionFailure()
+//        assertionFailure()
     }
 
     func publishToSoloEvent() {
