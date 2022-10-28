@@ -83,7 +83,7 @@ typedef enum : NSUInteger {
 
 - (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
 
-- (void)updateUIWithSong:(VLRoomSelSongModel *)song onSeat:(BOOL)onSeat;
+- (void)updateUIWithSong:(VLRoomSelSongModel* _Nullable)song onSeat:(BOOL)onSeat;
 
 - (void)setJoinInViewHidden;
 
