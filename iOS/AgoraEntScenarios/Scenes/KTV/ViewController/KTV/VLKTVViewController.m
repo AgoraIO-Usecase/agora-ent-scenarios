@@ -235,17 +235,52 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusWithChanged:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
-        //房主关闭房间
-        if (status != KTVSubscribeDeleted) {
-            return;
+        
+        if (KTVSubscribeUpdated == status) {
+            //切换背景
+            
+            //will be mv bg did changed or room member count did changed
+            VLKTVSelBgModel* selBgModel = [VLKTVSelBgModel new];
+            selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
+            selBgModel.ifSelect = YES;
+            self.choosedBgModel = selBgModel;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.MVView changeBgViewByModel:selBgModel];
+            });
+        } else if (status == KTVSubscribeDeleted) {
+            //房主关闭房间
+            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.userNo]) {
+                return;
+            }
+            //发送通知
+            [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
+            [weakSelf popForceLeaveRoom];
         }
-        //发送通知
-        [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
-        [weakSelf popForceLeaveRoom];
     }];
     
-    [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe, VLRoomSelSongModel * songInfo) {
-//        [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
+    //callback if choose song list didchanged
+    [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
+        if (KTVSubscribeCreated == status) {
+            //收到点歌的消息
+            VLRoomSelSongModel *song = self.selSongsArray.firstObject;
+            if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
+                [self getChoosedSongsList:false onlyRefreshList:NO];
+            }
+            else {
+                [self getChoosedSongsList:false onlyRefreshList:YES];
+            }
+        } else if (KTVSubscribeDeleted == status) {
+            //切换歌曲
+            VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+            //playing song is top song, ignore reset
+            if ([selSongModel.songNo isEqualToString:self.currentPlayingSongNo]) {
+                return;
+            }
+            
+            weakSelf.currentPlayingSongNo = nil;
+            [weakSelf prepareNextSong];
+            [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
+        }
     }];
     
     [[AppContext ktvServiceImp] subscribeRtmMessageWithStatusChanged:^(AgoraRtmChannel * channel, AgoraRtmMessage * message, AgoraRtmMember * member) {
@@ -269,12 +304,13 @@ VLPopScoreViewDelegate
     [self.MVView loadLrcURL:lrc];
 //    [self.rtcMediaPlayer open:url startPos:0];
     NSInteger songCodeIntValue = [songCode integerValue];
-    if([self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue] == 0) {
+    NSInteger error = [self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue];
+    if(error == 0) {
         VLLog(@"Agora - loadMusicWithURL play music");
         [self playMusic:songCodeIntValue];
     }
     else {
-        [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
+        error = [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
     }
     VLLog(@"_rtcMediaPlayer--------是否静音:%d",[_rtcMediaPlayer getMute]);
 }
@@ -2162,7 +2198,7 @@ VLPopScoreViewDelegate
             [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
             [self popForceLeaveRoom];
             
-        } else*/ if ([dict[@"messageType"] intValue] == VLSendMessageTypeChooseSong) {//收到点歌的消息
+        } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeChooseSong) {//收到点歌的消息
             VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
             if(song == nil && [member.userId isEqualToString:VLUserCenter.user.id] == NO) {
                 [self getChoosedSongsList:false onlyRefreshList:NO];
@@ -2178,7 +2214,7 @@ VLPopScoreViewDelegate
             self.currentPlayingSongNo = nil;
             [self prepareNextSong];
             [self getChoosedSongsList:false onlyRefreshList:NO];
-        } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
+        } else*/ if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.MVView setJoinInViewHidden];
                 [self setUserJoinChorus:dict[@"userNo"]];
@@ -2192,7 +2228,7 @@ VLPopScoreViewDelegate
                 [self startSinging];
                 [self.MVView setJoinInViewHidden];
             });
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeChangeMVBg){ //切换背景
+        }else /*if([dict[@"messageType"] intValue] == VLSendMessageTypeChangeMVBg){ //切换背景
             VLKTVSelBgModel *selBgModel = [VLKTVSelBgModel new];
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%d",[dict[@"bgOption"] intValue]];
             selBgModel.ifSelect = YES;
@@ -2200,7 +2236,7 @@ VLPopScoreViewDelegate
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.MVView changeBgViewByModel:selBgModel];
             });
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeAudioMute){ //是否静音
+        }else*/ if([dict[@"messageType"] intValue] == VLSendMessageTypeAudioMute){ //是否静音
             VLRoomSeatModel *model = [VLRoomSeatModel new];
             model.userNo = dict[@"userNo"];
             model.id = dict[@"id"];
@@ -2663,7 +2699,8 @@ VLPopScoreViewDelegate
 
 - (void)startSingingIfNeed {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    if(!selSongModel.isChorus && self.currentPlayingSongNo == nil) {
+    if(!selSongModel.isChorus
+       && ![self.currentPlayingSongNo isEqualToString:selSongModel.songNo] ) {
         [self startSinging];
     }
 }

@@ -14,6 +14,7 @@
 #import "VLRoomListModel.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "VLGlobalHelper.h"
+#import "VLKTVSelBgModel.h"
 
 @interface KTVServiceImp()<AgoraRtmDelegate, AgoraRtmChannelDelegate>
 @property (nonatomic, strong) NSString* roomNo;
@@ -644,6 +645,7 @@
 }
 
 - (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock {
+    //using publishSongDidChangedEventWithOwnerStatus
     self.chooseSongDidChanged = changedBlock;
 }
 
@@ -943,6 +945,10 @@ messageReceived:(AgoraRtmMessage *)message
 //            else {
 //                [self getChoosedSongsList:false onlyRefreshList:YES];
 //            }
+            if (self.chooseSongDidChanged) {
+                //TODO(wushengtao): selSongsArray not found in KTVServiceImp
+                self.chooseSongDidChanged(KTVSubscribeCreated, nil);
+            }
         } else if([dict[@"messageType"] intValue] == VLSendMessageTypeChangeSong) { //切换歌曲
 //            NSLog(@"RTM(RECV) - userID: %@, VLUserNo: %@, my userID: %@", member.userId, VLUserCenter.user.userNo, VLUserCenter.user.id);
 ////            dispatch_async(dispatch_get_main_queue(), ^{
@@ -951,6 +957,10 @@ messageReceived:(AgoraRtmMessage *)message
 //            self.currentPlayingSongNo = nil;
 //            [self prepareNextSong];
 //            [self getChoosedSongsList:false onlyRefreshList:NO];
+            if (self.chooseSongDidChanged) {
+                //TODO(wushengtao): can not get selSongsArray in KTVServiceImp
+                self.chooseSongDidChanged(KTVSubscribeDeleted, nil);
+            }
         } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
 //            dispatch_async(dispatch_get_main_queue(), ^{
 //                [self.MVView setJoinInViewHidden];
@@ -966,13 +976,11 @@ messageReceived:(AgoraRtmMessage *)message
 //                [self.MVView setJoinInViewHidden];
 //            });
         }else if([dict[@"messageType"] intValue] == VLSendMessageTypeChangeMVBg){ //切换背景
-//            VLKTVSelBgModel *selBgModel = [VLKTVSelBgModel new];
-//            selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%d",[dict[@"bgOption"] intValue]];
-//            selBgModel.ifSelect = YES;
-//            self.choosedBgModel = selBgModel;
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                [self.MVView changeBgViewByModel:selBgModel];
-//            });
+            VLRoomListModel* roomInfo = [VLRoomListModel new];
+            roomInfo.bgOption = [dict[@"bgOption"] integerValue];
+            if (self.roomDidChanged) {
+                self.roomDidChanged(KTVSubscribeUpdated, roomInfo);
+            }
         }else if([dict[@"messageType"] intValue] == VLSendMessageTypeAudioMute){ //是否静音
 //            VLRoomSeatModel *model = [VLRoomSeatModel new];
 //            model.userNo = dict[@"userNo"];
