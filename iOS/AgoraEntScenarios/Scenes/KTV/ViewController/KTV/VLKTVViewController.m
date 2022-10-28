@@ -46,6 +46,7 @@
 #import "AgoraEntScenarios-Swift.h"
 @import LSTPopView;
 @import AgoraRtcKit;
+
 @import LEEAlert;
 @import YYCategories;
 @import SDWebImage;
@@ -91,10 +92,7 @@ VLBadNetWorkViewDelegate,
 //AgoraRtmChannelDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
-#if DEBUG
-#else
-AgoraMusicContentCenterEventHandler,
-#endif
+AgoraMusicContentCenterEventDelegate,
 VLPopScoreViewDelegate
 >
 
@@ -123,12 +121,8 @@ VLPopScoreViewDelegate
 //@property (nonatomic, strong) AgoraRtmChannel *rtmChannel;
 @property (nonatomic, strong) NSArray *selSongsArray;
 //@property (nonatomic, weak) id<AgoraRtcMediaPlayerProtocol> rtcMediaPlayer;
-#if DEBUG
-#warning need implementation
-#else
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
-#endif
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, assign) float currentTime;
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
@@ -274,32 +268,24 @@ VLPopScoreViewDelegate
 - (void)loadMusicWithURL:(NSString *)url lrc:(NSString *)lrc songCode:(NSString *)songCode {
     [self.MVView loadLrcURL:lrc];
 //    [self.rtcMediaPlayer open:url startPos:0];
-#if DEBUG
-#warning need implementation
-#else
     NSInteger songCodeIntValue = [songCode integerValue];
-    if([self.AgoraMcc isPreloadedWith:songCodeIntValue type:AgoraMusicContentCenterMediaTypeAudio resolution:nil] == 0) {
+    if([self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue] == 0) {
         VLLog(@"Agora - loadMusicWithURL play music");
         [self playMusic:songCodeIntValue];
     }
     else {
-        [self.AgoraMcc preloadWith:songCodeIntValue type:AgoraMusicContentCenterMediaTypeAudio resolution:nil];
+        [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
     }
     VLLog(@"_rtcMediaPlayer--------是否静音:%d",[_rtcMediaPlayer getMute]);
-#endif
 }
 
 - (void)playMusic:(NSInteger )songCode {
 //    [self.rtcMediaPlayer open:songCode startPos:0];
     VLLog(@"Agora - MediaPlayer playing %ld", songCode);
-#if DEBUG
-#warning need implementation
-#else
     if(self.rtcMediaPlayer != nil) {
-        [self.rtcMediaPlayer openMediaWithSongCode:songCode  type:AgoraMusicContentCenterMediaTypeAudio resolution:nil startPos:0];
+        [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
 //        [self playSongWithPlayer:self.rtcMediaPlayer];
     }
-#endif
 }
 
 - (void)dealWithSelBg {
@@ -530,26 +516,21 @@ VLPopScoreViewDelegate
 - (void) viewDidDisappear:(BOOL)animated
 {
     streamId = -1;
-#if DEBUG
-#warning need implementation
-#else
     self.rtcMediaPlayer = nil;
-#endif
+
     if(self.mediaPlayerConnection) {
         [self disableMediaChannel];
         self.mediaPlayerConnection = nil;
     }
-#if DEBUG
-#warning need implementation
-#else
+
     if(self.AgoraMcc) {
-        [self.AgoraMcc unregisterEventHandler];
+        [self.AgoraMcc registerEventDelegate:nil];
         VLLog(@"Agora - unregisterEventHandler");
         [AgoraMusicContentCenter destroy];
         VLLog(@"Agora - destroy MCC");
         self.AgoraMcc = nil;
     }
-#endif
+    
     [AgoraRtcEngineKit destroy];
     VLLog(@"Agora - destroy RTCEngine");
     [[NSNotificationCenter defaultCenter]removeObserver:self];
@@ -560,14 +541,10 @@ VLPopScoreViewDelegate
 
 /// 销毁播放器
 - (void)destroyMediaPlayer {
-#if DEBUG
-#warning need implementation
-#else
     [self.rtcMediaPlayer stop];
     VLLog(@"Agora - RTCMediaPlayer stop");
     [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
     VLLog(@"Agora - Destroy media player");
-#endif
 }
 
 //- (void)createChannel:(NSString *)channel {
@@ -620,11 +597,7 @@ VLPopScoreViewDelegate
 //                        joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
     AgoraRtcChannelMediaOptions *options = [AgoraRtcChannelMediaOptions new];
     options.publishCameraTrack = [AgoraRtcBoolOptional of:NO];
-#if DEBUG
-#warning need implementation
-#else
-    options.publishAudioTrack = [AgoraRtcBoolOptional of:ifRequestOnSeat];
-#endif
+    options.publishMicrophoneTrack = [AgoraRtcBoolOptional of:ifRequestOnSeat];
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
@@ -637,19 +610,16 @@ VLPopScoreViewDelegate
     }];
     [self.RTCkit setEnableSpeakerphone:YES];
     
-#if DEBUG
-#warning need implementation
-#else
     VLLog(@"Agora - Creating MCC with RTM token: %@", VLUserCenter.user.agoraRTMToken);
     AgoraMusicContentCenterConfig *contentCenterConfiguration = [[AgoraMusicContentCenterConfig alloc] init];
     contentCenterConfiguration.rtcEngine = self.RTCkit;
-    contentCenterConfiguration.appId = AGORA_APP_ID;
+    contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
     contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
 
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
-    [self.AgoraMcc registerEventHandler:self];
-#endif
+    [self.AgoraMcc registerEventDelegate:self];
+
     [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
@@ -1023,11 +993,7 @@ VLPopScoreViewDelegate
 - (void)enableMic
 {
     AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-#if DEBUG
-#warning need implementation
-#else
-    option.publishAudioTrack = [AgoraRtcBoolOptional of:self.isNowMicMuted];
-#endif
+    option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:self.isNowMicMuted];
     option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
     [self.RTCkit updateChannelWithMediaOptions:option];
 }
@@ -1036,11 +1002,7 @@ VLPopScoreViewDelegate
 - (void)bottomSetAudioMute:(NSInteger)ifMute{
     if (ifMute == 1) {
         AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-#if DEBUG
-#warning need implementation
-#else
-        option.publishAudioTrack = [AgoraRtcBoolOptional of:NO];
-#endif
+        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:NO];
         option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
         [self.RTCkit updateChannelWithMediaOptions:option];
         if(self.isEarOn) {
@@ -1050,11 +1012,7 @@ VLPopScoreViewDelegate
     }
     else{
         AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-#if DEBUG
-#warning need implementation
-#else
-        option.publishAudioTrack = [AgoraRtcBoolOptional of:YES];
-#endif
+        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:YES];
         option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
         [self.RTCkit updateChannelWithMediaOptions:option];
         if(self.isEarOn) {
@@ -1300,13 +1258,9 @@ VLPopScoreViewDelegate
     if([self ifChorusSinger:userNo]) {
         [self setSelfChorusUserNo:nil];
         if([userNo isEqualToString:VLUserCenter.user.userNo]) {
-#if DEBUG
-#warning need implementation
-#else
             if(self.rtcMediaPlayer != nil) {
                 [self.rtcMediaPlayer stop];
             }
-#endif
             [self resetPlayer];
             [self disableMediaChannel];
         }
@@ -1575,21 +1529,12 @@ VLPopScoreViewDelegate
 #pragma mark - MVViewDelegate
 
 - (NSTimeInterval)ktvMVViewMusicTotalTime {
-#if DEBUG
-#warning need implementation
-    return 0;
-#else
     NSTimeInterval time = [_rtcMediaPlayer getDuration];
     NSTimeInterval real = time / 1000;
     return real;
-#endif
 }
 
 - (NSTimeInterval)ktvMVViewMusicCurrentTime {
-#if DEBUG
-#warning need implementation
-    return 0;
-#else
     VLRoomSelSongModel *model = self.selSongsArray.firstObject;
     if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
         NSTimeInterval time = [_rtcMediaPlayer getPosition];
@@ -1598,7 +1543,6 @@ VLPopScoreViewDelegate
     }else{
         return self.currentTime;
     }
-#endif
 }
 
 // 打分实时回调
@@ -1609,21 +1553,13 @@ VLPopScoreViewDelegate
     if (type == VLKTVMVViewActionTypeSetParam) {
         [self showSettingView];
     } else if (type == VLKTVMVViewActionTypeMVPlay) { //播放
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer resume];
-#endif
 //        [self.rtcMediaPlayer play];
         [self.MVView start];
         //发送继续播放的消息
         [self sendPauseOrResumeMessage:0];
     } else if (type == VLKTVMVViewActionTypeMVPause) { //暂停
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer pause];
-#endif
         [self.MVView stop];
         //发送暂停的消息
         [self sendPauseOrResumeMessage:-1];
@@ -1679,18 +1615,10 @@ VLPopScoreViewDelegate
         })
         .LeeShow();
     } else if (type == VLKTVMVViewActionTypeSingOrigin) { // 原唱
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoR];
-#endif
         [self sendTrackModeMessage:0];
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoL];
-#endif
         [self sendTrackModeMessage:1];
     } else if (type == VLKTVMVViewActionTypeExit) {
         [self playNextSong:0];
@@ -1703,11 +1631,7 @@ VLPopScoreViewDelegate
     [self.MVView stop];
     [self.MVView reset];
     [self.MVView cleanMusicText];
-#if DEBUG
-#warning need implementation
-#else
     [self.rtcMediaPlayer stop];
-#endif
     [self resetPlayer];
 }
 
@@ -2069,11 +1993,7 @@ VLPopScoreViewDelegate
         // 调整当前播放的媒体资源的音调
         // 按半音音阶调整本地播放的音乐文件的音调，默认值为 0，即不调整音调。取值范围为 [-12,12]，每相邻两个值的音高距离相差半音。取值的绝对值越大，音调升高或降低得越多
         NSInteger value = setting.toneValue * 2 - 12;
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer setAudioPitch:value];
-#endif
     } else if (type == VLKTVValueDidChangedTypeSound) { // 音量
         // 调节音频采集信号音量、取值范围为 [0,400]
         // 0、静音 100、默认原始音量 400、原始音量的4倍、自带溢出保护
@@ -2086,15 +2006,11 @@ VLPopScoreViewDelegate
         // 官方文档是100 ？ SDK 是 400？？？？
         // 调节本地播放音量 取值范围为 [0,100]
         // 0、无声。 100、（默认）媒体文件的原始播放音量
-#if DEBUG
-#warning need implementation
-#else
         [self.rtcMediaPlayer adjustPlayoutVolume:value];
         
         // 调节远端用户听到的音量 取值范围[0、400]
         // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
         [self.rtcMediaPlayer adjustPublishSignalVolume:value];
-#endif
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
@@ -2422,22 +2338,15 @@ VLPopScoreViewDelegate
     if ([dict[@"cmd"] isEqualToString:@"setLrcTime"]) {  //同步歌词
         long type = [dict[@"time"] longValue];
         if(type == 0) {
-#if DEBUG
-#warning need implementation
-#else
             if (self.rtcMediaPlayer.getPlayerState == AgoraMediaPlayerStatePaused) {
                 [self.rtcMediaPlayer resume];
             }
-#endif
         }
         else if(type == -1) {
-#if DEBUG
-#warning need implementation
-#else
+
             if (self.rtcMediaPlayer.getPlayerState == AgoraMediaPlayerStatePlaying) {
                 [self.rtcMediaPlayer pause];
             }
-#endif
         }
         else {
             RtcMusicLrcMessage *musicLrcMessage = [RtcMusicLrcMessage vj_modelWithDictionary:dict];
@@ -2448,14 +2357,11 @@ VLPopScoreViewDelegate
             if (!_MVView.lrcView.isStart) {
                 [_MVView start];
             }
-#if DEBUG
-#warning need implementation
-#else
+
             NSInteger currentPos = [self.rtcMediaPlayer getPosition];
             if(labs(musicLrcMessage.time - currentPos) > 1000) {
                 [self.rtcMediaPlayer seekToPosition:musicLrcMessage.time];
             }
-#endif
         }
     }else if([dict[@"cmd"] isEqualToString:@"countdown"]){  //倒计时
         int leftSecond = [dict[@"time"] intValue];
@@ -2972,9 +2878,6 @@ VLPopScoreViewDelegate
 }
 
 #pragma mark - Lazy
-#if DEBUG
-#warning need implementation
-#else
 - (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
     if (!_rtcMediaPlayer) {
 //        _rtcMediaPlayer = [self.RTCkit createMediaPlayerWithDelegate:self];
@@ -2986,7 +2889,7 @@ VLPopScoreViewDelegate
     }
     return _rtcMediaPlayer;
 }
-#endif
+
 - (VLKTVSettingView *)settingView {
     if (!_settingView) {
         _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
@@ -2999,20 +2902,28 @@ VLPopScoreViewDelegate
 
 
 
-- (void)onLyricResult:(nonnull NSString *)requestId lyricUrl:(nonnull NSString *)lyricUrl {
+- (void)onLyricResult:(nonnull NSString *)requestId
+             lyricUrl:(nonnull NSString *)lyricUrl {
     
 }
-#if DEBUG
-#else
-- (void)onMusicChartsResult:(nonnull NSString *)requestId status:(AgoraMusicContentCenterStatusCode)status result:(nonnull NSArray<MusicChartInfo *> *)result {
+
+- (void)onMusicChartsResult:(nonnull NSString *)requestId
+                     status:(AgoraMusicContentCenterStatusCode)status
+                     result:(nonnull NSArray<AgoraMusicChartInfo *> *)result {
     VLLog(@"Music charts - ");
 }
 
-- (void)onMusicCollectionResult:(nonnull NSString *)requestId status:(AgoraMusicContentCenterStatusCode)status result:(nonnull AgoraMusicCollection *)result {
+- (void)onMusicCollectionResult:(nonnull NSString *)requestId
+                         status:(AgoraMusicContentCenterStatusCode)status
+                         result:(nonnull AgoraMusicCollection *)result {
     
 }
 
-- (void)onPreLoadEvent:(NSInteger)songCode percent:(NSInteger)percent status:(AgoraMusicContentCenterPreloadStatus)status msg:(nonnull NSString *)msg lyricUrl:(nonnull NSString *)lyricUrl {
+- (void)onPreLoadEvent:(NSInteger)songCode
+               percent:(NSInteger)percent
+                status:(AgoraMusicContentCenterPreloadStatus)status
+                   msg:(nonnull NSString *)msg
+              lyricUrl:(nonnull NSString *)lyricUrl {
     if (status == AgoraMusicContentCenterPreloadStatusOK) {
         VLLog(@"Agora - onPreLoadEvent, playMusic");
         [self playMusic:songCode];
@@ -3026,7 +2937,7 @@ VLPopScoreViewDelegate
         });
     }
 }
-#endif
+
 #pragma mark - Seperate media player channel control
 
 - (AgoraRtcConnection *)enableMediaChannel:(BOOL)doPublish {
@@ -3036,31 +2947,23 @@ VLPopScoreViewDelegate
     [option setPublishCustomAudioTrack:[AgoraRtcBoolOptional of:NO]];
     [option setEnableAudioRecordingOrPlayout:[AgoraRtcBoolOptional of:NO]];
     [option setAutoSubscribeAudio:[AgoraRtcBoolOptional of:NO]];
-#if DEBUG
-#warning need implementation
-#else
-    [option setPublishAudioTrack:[AgoraRtcBoolOptional of:NO]];
-#endif
+
+    [option setPublishMicrophoneTrack:[AgoraRtcBoolOptional of:NO]];
+
     [option setAutoSubscribeVideo:[AgoraRtcBoolOptional of:NO]];
-#if DEBUG
-#warning need implementation
-#else
+
     [option setPublishMediaPlayerId:[AgoraRtcIntOptional of:[self.rtcMediaPlayer getMediaPlayerId]]];
-#endif
     [option setPublishMediaPlayerAudioTrack:[AgoraRtcBoolOptional of:doPublish]];
     
     AgoraRtcConnection *connection = [AgoraRtcConnection new];
     connection.channelId = self.roomModel.roomNo;
     connection.localUid = [VLGlobalHelper getAgoraPlayerUserId:VLUserCenter.user.id];
-#if DEBUG
-#warning need implementation
-#else
+
     VLLog(@"Agora - Join channelex with token: %@, userid: %lu for channel: %@ for mediaplayer id: %d",
           VLUserCenter.user.agoraPlayerRTCToken,
           connection.localUid,
           connection.channelId,
           [self.rtcMediaPlayer getMediaPlayerId]);
-#endif
     
     int ret  = [self.RTCkit joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken
                                       connection:connection delegate:self
@@ -3084,7 +2987,8 @@ VLPopScoreViewDelegate
         return YES;
     }
     
-    int ret = [self.RTCkit leaveChannelEx:self.mediaPlayerConnection leaveChannelBlock:^(AgoraChannelStats* stat) {
+    int ret = [self.RTCkit leaveChannelEx:self.mediaPlayerConnection
+                        leaveChannelBlock:^(AgoraChannelStats* stat) {
         
     }];
     
@@ -3099,7 +3003,8 @@ VLPopScoreViewDelegate
     }
 }
 
-- (void)updateRemoteUserMuteStatus:(NSString *)userId doMute:(BOOL)doMute {
+- (void)updateRemoteUserMuteStatus:(NSString *)userId
+                            doMute:(BOOL)doMute {
     VLLog(@"Agora - updating UID: %@ to %d", userId, doMute);
     [self.RTCkit muteRemoteAudioStream:[VLGlobalHelper getAgoraPlayerUserId:userId] mute:doMute];
 }
