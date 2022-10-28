@@ -2596,8 +2596,7 @@ VLPopScoreViewDelegate
             weakSelf.chooseSongView.selSongsArray = weakSelf.selSongsArray; //刷新已点歌曲UI
         }
         
-        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-        if(selSongModel == nil || [weakSelf.selSongsArray count] <= 0) {
+        if([weakSelf.selSongsArray count] == 0) {
             [weakSelf.MVView updateUIWithSong:nil
                                        onSeat:[weakSelf currentUserIsOnSeat]];
             [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:nil];
@@ -2612,13 +2611,11 @@ VLPopScoreViewDelegate
             return;
         }
         
-        if (!(weakSelf.selSongsArray.count > 0)){
-            return;
-        }
-        
-        if(!selSongModel.isChorus && weakSelf.currentPlayingSongNo == nil) {
-            [weakSelf startSinging];
-        }
+//        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+//        if(!selSongModel.isChorus && weakSelf.currentPlayingSongNo == nil) {
+//            [weakSelf startSinging];
+//        }
+        [weakSelf startSingingIfNeed];
     }];
 //    NSDictionary *param = @{
 //        @"roomNo" : self.roomModel.roomNo
@@ -2662,6 +2659,13 @@ VLPopScoreViewDelegate
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     selSongModel.chorusNo = VLUserCenter.user.userNo;
     return;
+}
+
+- (void)startSingingIfNeed {
+    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+    if(!selSongModel.isChorus && self.currentPlayingSongNo == nil) {
+        [self startSinging];
+    }
 }
 
 - (void)startSinging {
