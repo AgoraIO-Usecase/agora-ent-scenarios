@@ -50,13 +50,24 @@
 
 
 - (void)itemClickAction:(int)tagValue {
-    if (tagValue == 1) {
-        VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
-        [self.navigationController pushViewController:listVC animated:YES];
-        VLLog(@"在线K歌房");
-    } else if (tagValue == 1) {
-
+    switch (tagValue) {
+        case 0:
+        {
+            VRRoomsViewController *roomVc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+            roomVc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:roomVc animated:YES];
+        }
+            break;
+        case 1:
+        {
+            VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
+            [self.navigationController pushViewController:listVC animated:YES];
+        }
+            break;
+        default:
+            break;
     }
+
 }
 
 @end
