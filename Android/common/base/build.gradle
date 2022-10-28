@@ -45,7 +45,7 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common:third-aar-libs')
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.multidex
@@ -55,16 +55,19 @@ dependencies {
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
-    implementation rootProject.ext.deps.rxjava2
+    api rootProject.ext.deps.rxjava2
     implementation rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.okhttp
     implementation rootProject.ext.deps.retrofit2
     implementation rootProject.ext.deps.retrofit2_adapter
-    implementation rootProject.ext.deps.gson
+    api rootProject.ext.deps.gson
 
     implementation rootProject.ext.deps.xlog
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
+
+    api rootProject.ext.deps.rtc
+    api rootProject.ext.deps.rtm
 
 }

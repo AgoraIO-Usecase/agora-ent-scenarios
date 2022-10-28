@@ -60,7 +60,7 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
             options.enableAudioRecordingOrPlayout = false;
             options.autoSubscribeAudio = false;
             options.autoSubscribeVideo = false;
-            options.publishAudioTrack = false;
+            options.publishMicrophoneTrack = false;
 
             if (role == Constants.CLIENT_ROLE_BROADCASTER) {
                 options.clientRoleType = role;
@@ -85,16 +85,16 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
         if (role == Constants.CLIENT_ROLE_BROADCASTER) {
             micOptions.clientRoleType = role;
             if (RoomManager.mMine.isSelfMuted == 0) {
-                micOptions.publishAudioTrack = true;
+                micOptions.publishMicrophoneTrack = true;
             }
         } else if (RoomManager.mMine.role != AgoraMember.Role.Listener) {
             micOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
             if (RoomManager.mMine.isSelfMuted == 0) {
-                micOptions.publishAudioTrack = true;
+                micOptions.publishMicrophoneTrack = true;
             }
         } else {
             micOptions.clientRoleType = role;
-            micOptions.publishAudioTrack = false;
+            micOptions.publishMicrophoneTrack = false;
         }
         RTCManager.getInstance().getRtcEngine().updateChannelMediaOptions(micOptions);
 
