@@ -314,7 +314,9 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
-    func chooseSong(withInput inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void) {
+    func chooseSong(withInput inputModel: KTVChooseSongInputModel,
+                    completion: @escaping (Error?) -> Void)
+    {
         let songInfo = VLRoomSelSongModel()
         songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
@@ -328,7 +330,12 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
-        addChooseSongInfo(songInfo: songInfo, finished: completion)
+        addChooseSongInfo(songInfo: songInfo) { error in
+            // TODO(wushengtao): fetch all list can not be changed if immediately invoke
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
+                completion(error)
+            }
+        }
     }
 
     func makeSongTop(withInput inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void) {
@@ -821,7 +828,8 @@ extension KTVSyncManagerServiceImp {
                 }
                 self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
                 self.sortChooseSongList()
-                finished(nil, self.songList)
+                let songList = self.songList
+                finished(nil, songList)
             }, fail: { error in
                 print("error = \(error.description)")
                 finished(error, nil)
