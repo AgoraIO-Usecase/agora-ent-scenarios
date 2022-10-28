@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- /storage/emulated/0/Download/${applicationId}/.beta/apk-->
+    <!--/storage/emulated/0/Android/data/${applicationId}/files/apk/-->
+    <!--    <external-path name="beta_external_path" path="Download/" />-->
+    <!--    <external-path name="beta_external_files_path" path="Android/data/" />-->
+    <!--    <external-path name="external_files" path="." />-->
+
+    <external-path
+        name="external_storage_root"
+        path="." />
+    <!-- /storage/emulated/0/Download/${applicationId}/.beta/apk-->
+    <external-path
+        name="beta_external_path"
+        path="Download/" />
+    <!--/storage/emulated/0/Android/data/${applicationId}/files/apk/-->
+    <external-path
+        name="beta_external_files_path"
+        path="Android/data/" />
+    <!-- external-path = /storage/emulated/0 -->
+    <external-path
+        name="files"
+        path="Android/data/com.xxx/file/" />
+    <!--报名底下的file-->
+
+    <external-path
+        name="external_image_files_path"
+        path="DCIM/" />
+
+    <!-- 代表cache目录下的所有文件-->
+    <cache-path
+        name="cache_path"
+        path="." />
+
+</paths>
