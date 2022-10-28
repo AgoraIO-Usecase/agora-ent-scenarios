@@ -982,7 +982,7 @@ public class RoomLivingViewModel extends SimpleRoomEventCallback {
                                 }
                                 getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_TOGGLE_MIC, true);
                                 ChannelMediaOptions options = new ChannelMediaOptions();
-                                options.publishAudioTrack = newValue;
+                                options.publishMicrophoneTrack = newValue;
 //                        options.publishMediaPlayerAudioTrack = true;
                                 RTCManager.getInstance().getRtcEngine().updateChannelMediaOptions(options);
                                 if (mMusicPlayer != null) {

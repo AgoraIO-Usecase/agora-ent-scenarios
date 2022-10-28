@@ -27,7 +27,6 @@ import java.util.Map;
 import io.agora.mediaplayer.IMediaPlayerObserver;
 import io.agora.mediaplayer.data.PlayerUpdatedInfo;
 import io.agora.mediaplayer.data.SrcInfo;
-import io.agora.musiccontentcenter.IAgoraMusicContentCenter;
 import io.agora.musiccontentcenter.IAgoraMusicPlayer;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.IRtcEngineEventHandler;
@@ -251,7 +250,8 @@ public abstract class BaseMusicPlayer extends IRtcEngineEventHandler implements 
         BaseMusicPlayer.mMusicModel = mMusicModel;
         mLogger.i("open() called with: mMusicModel = [%s]", mMusicModel);
         mPlayer.stop();
-        mPlayer.open(Long.parseLong(mMusicModel.songNo), IAgoraMusicContentCenter.MusicMediaType.AGORA_MEDIA_TYPE_AUDIO, null, 0);
+        //mPlayer.open(Long.parseLong(mMusicModel.songNo), IAgoraMusicPlayer.AGORA_MEDIA_TYPE_AUDIO, null, 0);
+        mPlayer.open(Long.parseLong(mMusicModel.songNo), 0);
         Log.d("cwtsw", "open了 歌曲");
         return 0;
     }

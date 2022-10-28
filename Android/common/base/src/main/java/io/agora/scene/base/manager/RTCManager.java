@@ -142,13 +142,19 @@ public final class RTCManager {
     }
 
     public boolean preLoad(String songNo) {
-        if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(songNo), IAgoraMusicContentCenter.MusicMediaType.AGORA_MEDIA_TYPE_AUDIO, null) != 0) {
-            iAgoraMusicContentCenter.preload(Long.parseLong(songNo),
-                    IAgoraMusicContentCenter.MusicMediaType.AGORA_MEDIA_TYPE_AUDIO, null);
+        if(iAgoraMusicContentCenter.isPreloaded(Long.parseLong(songNo)) != 0){
+            iAgoraMusicContentCenter.preload(Long.parseLong(songNo), null);
             return false;
-        } else {
+        }else {
             return true;
         }
+//        if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(songNo), IAgoraMusicContentCenter.MusicMediaType.AGORA_MEDIA_TYPE_AUDIO, null) != 0) {
+//            iAgoraMusicContentCenter.preload(Long.parseLong(songNo),
+//                    IAgoraMusicContentCenter.MusicMediaType.AGORA_MEDIA_TYPE_AUDIO, null);
+//            return false;
+//        } else {
+//            return true;
+//        }
     }
 
 
