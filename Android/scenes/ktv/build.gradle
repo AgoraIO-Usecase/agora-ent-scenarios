@@ -1,0 +1,67 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        flavorDimensions ""
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation project(":common:base")
+    implementation project(":common:lrcview")
+    implementation project(':common:ui-widget')
+
+    kapt rootProject.ext.deps.arouter_kapt
+    implementation rootProject.ext.deps.arouter
+
+    implementation rootProject.ext.deps.palette_ktx
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+
+    implementation rootProject.ext.deps.eventbus
+    implementation rootProject.ext.deps.xlog
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.fragment_ktx
+
+    implementation rootProject.ext.deps.rxjava2
+    implementation rootProject.ext.deps.gson
+
+}

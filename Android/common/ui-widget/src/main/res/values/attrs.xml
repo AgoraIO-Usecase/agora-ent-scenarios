@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="titleView">
+        <attr name="ctv_leftImageSrc" format="reference" />
+        <attr name="ctv_hideLeftImage" format="boolean" />
+        <attr name="ctv_leftText" format="string" />
+        <attr name="ctv_centerText" format="string" />
+        <attr name="ctv_centerTextColor" format="color" />
+        <attr name="ctv_rightText" format="string" />
+        <attr name="ctv_rightImageSrc" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SwipeCaptchaView">
+        <attr name="captchaWidth" format="dimension" />
+        <attr name="captchaHeight" format="dimension" />
+        <attr name="matchDeviation" format="dimension" />
+    </declare-styleable>
+</resources>
