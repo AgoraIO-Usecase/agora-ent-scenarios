@@ -118,15 +118,20 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateToken(channelName: channelName ?? "",
-                                                    uid: "\(UserInfo.userId)") {
-                    guard let self = self else {
+                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
+                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                    guard let self = self,
+                          let rtcToken = rtcToken,
+                          let rtmToken = rtmToken
+                    else {
+                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = KeyCenter.Token!
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
                     self.roomList?.append(roomInfo)
-                    //                VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
+//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
                     let output = KTVCreateRoomOutputModel()
                     output.name = inputModel.name
                     output.roomNo = roomInfo.roomNo
@@ -160,13 +165,18 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateToken(channelName: channelName ?? "",
-                                                    uid: "\(UserInfo.userId)") {
-                    guard let self = self else {
+                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
+                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                    guard let self = self,
+                          let rtcToken = rtcToken,
+                          let rtmToken = rtmToken
+                    else {
+                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = KeyCenter.Token!
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
 //                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
                     let output = KTVJoinRoomOutputModel()
                     output.creator = userId
@@ -330,6 +340,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             return
         }
 
+        // mark input song to top
         let targetSort = (minSort() ?? 0) - 1
         song.sort = "\(targetSort)"
 
@@ -339,6 +350,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             }
         }
 
+        // mark current playing song to top
         updateChooseSong(songInfo: song) { error in
             completion(error)
         }
