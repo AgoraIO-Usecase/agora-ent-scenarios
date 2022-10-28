@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.agora.entfulldemo"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode Integer.parseInt(project.APP_VERSION_CODE)
+        versionName project.APP_VERSION_NAME
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+    signingConfigs {
+        myConfig {
+            storeFile file('../keystore.key')
+            storePassword "965606"
+            keyAlias "agora"
+            keyPassword "965606"
+        }
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.myConfig
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.myConfig
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFileName =
+                    "AgoraKTV-${variant.name}" + "-v" + defaultConfig.versionCode + "-" +
+                            defaultConfig.versionName + ".apk"
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation project(':common:base')
+    implementation project(':common:lrcview')
+    implementation project(':common:ui-widget')
+
+
+    runtimeOnly project(':scenes:ktv')
+
+    kapt rootProject.ext.deps.arouter_kapt
+    implementation rootProject.ext.deps.arouter
+
+    //glide 图片加载
+    api rootProject.ext.deps.glide
+    kapt rootProject.ext.deps.glide_compiler
+
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.multidex
+    implementation rootProject.ext.deps.constraintlayout
+    implementation rootProject.ext.deps.v7
+    implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.eventbus
+    implementation rootProject.ext.deps.rxjava2
+    implementation rootProject.ext.deps.rxandroid2
+    implementation rootProject.ext.deps.retrofit2
+    implementation rootProject.ext.deps.retrofit2_adapter
+
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.fragment_ktx
+    implementation rootProject.ext.deps.ui_ktx
+    implementation rootProject.ext.deps.palette_ktx
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+
+    implementation rootProject.ext.deps.gson
+}

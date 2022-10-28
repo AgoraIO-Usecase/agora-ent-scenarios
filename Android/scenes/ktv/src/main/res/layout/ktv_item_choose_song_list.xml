@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/cover_item_song_list"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ktv_cornerNormalStyle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title_item_song_list"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="3dp"
+        android:ellipsize="marquee"
+        android:gravity="start|center_vertical"
+        android:singleLine="true"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/btn_item_song_list"
+        app:layout_constraintStart_toEndOf="@+id/cover_item_song_list"
+        app:layout_constraintTop_toTopOf="@id/cover_item_song_list" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOriginalSong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_frame_green_6d"
+        android:paddingHorizontal="3dp"
+        android:paddingVertical="0.5dp"
+        android:text="@string/ktv_room_original"
+        android:textColor="@color/green_6d"
+        android:textSize="9sp"
+        app:layout_constraintBottom_toBottomOf="@id/cover_item_song_list"
+        app:layout_constraintStart_toEndOf="@id/cover_item_song_list" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAccompany"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_frame_orange_e6"
+        android:paddingHorizontal="3dp"
+        android:paddingVertical="0.5dp"
+        android:text="@string/ktv_room_accompany"
+        android:textColor="@color/orange_e6"
+        android:textSize="9sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvOriginalSong"
+        app:layout_constraintStart_toEndOf="@id/tvOriginalSong"
+        app:layout_constraintTop_toTopOf="@id/tvOriginalSong" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_frame_blue_15"
+        android:paddingHorizontal="3dp"
+        android:paddingVertical="0.5dp"
+        android:text="@string/score"
+        android:textColor="@color/blue_15"
+        android:textSize="9sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvAccompany"
+        app:layout_constraintStart_toEndOf="@id/tvAccompany"
+        app:layout_constraintTop_toTopOf="@id/tvAccompany" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_item_song_list"
+        style="@style/def_btn_full"
+        android:layout_width="56dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="25dp"
+        android:text="@string/ktv_room_choose_song"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/cover_item_song_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/cover_item_song_list" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="14dp"
+        android:background="@color/white_20_percent"
+        app:layout_constraintTop_toBottomOf="@id/cover_item_song_list" />
+</androidx.constraintlayout.widget.ConstraintLayout>
