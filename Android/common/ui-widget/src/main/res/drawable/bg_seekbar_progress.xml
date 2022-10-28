@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--未加载的进度区域-->
+    <item
+        android:id="@android:id/background"
+        android:height="3dp"
+        android:gravity="center_vertical">
+        <shape>
+            <!--进度条的圆角-->
+            <corners android:radius="1.5dp" />
+            <!--未加载的进度区域颜色-->
+            <solid android:color="@color/white_20_percent" />
+        </shape>
+    </item>
+    <!--已经加载完的进度的区域-->
+    <item
+        android:id="@android:id/progress"
+        android:height="3dp"
+        android:gravity="center_vertical">
+        <clip>
+            <shape>
+                <!--进度条的圆角-->
+                <corners android:radius="1.5dp" />
+                <!--已经加载完的进度的颜色-->
+                <solid android:color="@color/white" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>
