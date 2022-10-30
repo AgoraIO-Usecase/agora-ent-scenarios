@@ -223,8 +223,8 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func onSeat(withInput inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void) {
         let seatInfo = getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
-        addSeatInfo(seatInfo: seatInfo) { error in
-        }
+        addSeatInfo(seatInfo: seatInfo,
+                    finished: completion)
     }
 
     func outSeat(withInput inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
@@ -420,7 +420,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     }
 
     func publishChooseSongEvent() {
-//        assert(false)
+//        assertionFailure()
         // replace with subscribeChooseSong()
     }
 
@@ -439,10 +439,12 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
 //        assertionFailure()
+        // replace with subscribeChooseSong()
     }
 
     func publishToSoloEvent() {
-        assertionFailure()
+//        assertionFailure()
+        markSoloSongIfNeed()
     }
 
     func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
@@ -454,7 +456,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     }
 
     func publishSingingScore(withTotalVolume totalVolume: Int) {
-//        assert(false)
+//        assertionFailure()
     }
 
     func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
@@ -937,6 +939,32 @@ extension KTVSyncManagerServiceImp {
         completion(nil)
     }
 
+    private func markCurrentSongIfNeed() {
+        guard let topSong = songList.first,
+              topSong.status == 0, // ready status
+              topSong.userNo == VLUserCenter.user.userNo
+        else {
+            return
+        }
+
+        topSong.status = 2
+        updateChooseSong(songInfo: topSong) { error in
+        }
+    }
+
+    private func markSoloSongIfNeed() {
+        guard let topSong = songList.first,
+              topSong.isChorus == true, // current is chorus
+              topSong.userNo == VLUserCenter.user.userNo
+        else {
+            return
+        }
+
+        topSong.isChorus = false
+        updateChooseSong(songInfo: topSong) { error in
+        }
+    }
+
     private func subscribeChooseSong(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
             assertionFailure("channelName = nil")
@@ -955,6 +983,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
+                           self.markCurrentSongIfNeed()
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
                                  let jsonStr = object.toJson(),
@@ -966,6 +995,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                           self.markCurrentSongIfNeed()
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
                                  let origSong = VLRoomSelSongModel.yy_model(withJSON: object.toJson()!)
@@ -974,6 +1004,7 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                            self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
+                           self.markCurrentSongIfNeed()
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
