@@ -125,7 +125,7 @@ extension VoiceRoomViewController {
         gift.portrait = VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar
         if let chatroom_id = self.roomInfo?.room?.chatroom_id,let uid = self.roomInfo?.room?.owner?.uid,let id = gift.gift_id,let name = gift.gift_name,let value = gift.gift_price,let count = gift.gift_count {
             self.notifyServerGiftInfo(id: id, count: count, uid: uid) {
-                VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id":id,"gift_name":name,"gift_price":value,"gift_count":count,"userNaem":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
+                VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id":id,"gift_name":name,"gift_price":value,"gift_count":count,"userName":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
                     guard let `self` = self else { return }
                     if error == nil,message != nil {
                         var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
