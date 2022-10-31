@@ -8,29 +8,25 @@
 import UIKit
 
 class VMUserListView: UIView {
-
-    private var tableView: UITableView = UITableView()
-    private var titleLabel: UILabel = UILabel()
-    private var conBtn: UIButton = UIButton()
-    private var audBtn: UIButton = UIButton()
-    private var imgView: UIImageView = UIImageView()
-    private var conLabel: UILabel = UILabel()
-    private var searchView: UIView = UIView()
-    private var serachImgView: UIImageView = UIImageView()
-    private var tf: UITextField = UITextField()
+    private var tableView: UITableView = .init()
+    private var titleLabel: UILabel = .init()
+    private var conBtn: UIButton = .init()
+    private var audBtn: UIButton = .init()
+    private var imgView: UIImageView = .init()
+    private var conLabel: UILabel = .init()
+    private var searchView: UIView = .init()
+    private var serachImgView: UIImageView = .init()
+    private var tf: UITextField = .init()
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = .white
+        backgroundColor = .white
         layoutUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func layoutUI() {
-        
-    }
-    
 
+    private func layoutUI() {}
 }
