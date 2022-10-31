@@ -260,20 +260,20 @@ VLPopScoreViewDelegate
     
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
-        if (KTVSubscribeCreated == status) {
+        if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
             //收到点歌的消息
             VLRoomSelSongModel *song = self.selSongsArray.firstObject;
             if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
-                [self getChoosedSongsList:false onlyRefreshList:NO];
+                [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
             }
             else {
-                [self getChoosedSongsList:false onlyRefreshList:YES];
+                [weakSelf getChoosedSongsList:false onlyRefreshList:YES];
             }
         } else if (KTVSubscribeDeleted == status) {
             //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-            //playing song is top song, ignore reset
-            if ([selSongModel.songNo isEqualToString:self.currentPlayingSongNo]) {
+            //removed song is top song, play next
+            if (![selSongModel.songNo isEqualToString:self.currentPlayingSongNo]) {
                 return;
             }
             
@@ -652,7 +652,7 @@ VLPopScoreViewDelegate
     contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
     contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
-
+    VLLog(@"AgoraMcc: %@, %@", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
     [self.AgoraMcc registerEventDelegate:self];
 
