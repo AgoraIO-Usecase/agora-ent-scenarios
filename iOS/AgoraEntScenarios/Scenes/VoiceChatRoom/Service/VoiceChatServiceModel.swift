@@ -15,25 +15,30 @@ class VoiceChatBaseInfo: NSObject {
 /// 用户信息
 @objcMembers
 class VoiceChatUsers: VoiceChatBaseInfo {
-    var userName: String = "User-\(UserInfo.userId)"                                //用户名称
-    var avatar: String = .init(format: "portrait%02d", Int.random(in: 1...14))      //用户头像
-    var userId: String = UserInfo.userId                                            //用户uid
+    var userName: String = "User-\(UserInfo.userId)"
+    var avatar: String = .init(format: "portrait%02d", Int.random(in: 1...14))
+    var userId: String = UserInfo.userId
+    //    var status: PKApplyInfoStatus? = .end
+    var timestamp: String = "".timeStamp16
+    var isEnableVideo: Bool? = false
+    var isEnableAudio: Bool? = false
 }
 
 enum VoiceChatRoomType: Int {
     case normal = 0     //普通语聊房
-    case spatial = 1    //空间音频
+    case spatial
 }
 
 /// 房间信息
 @objcMembers
 class VoiceChatRoom: VoiceChatBaseInfo {
-
-    var roomName: String = ""                                            //房间名
-    var type: VoiceChatRoomType = .normal                                //房间类型
-    var roomId: String = "\(arc4random_uniform(899999) + 100000)"        //房间Id
-    var userId: String = "\(UserInfo.userId)"                            //用户id
-    var createAt: Double = 0                                             //创建时间，与19700101时间比较的毫秒数
+    var roomName: String = ""
+    var type: VoiceChatRoomType = .normal
+    var roomId: String = "\(arc4random_uniform(899999) + 100000)"
+    var userId: String = "\(UserInfo.userId)"
+    var backgroundId: String = .init(format: "portrait%02d", Int.random(in: 1...2))
+    
+    var createAt: Double = 0      //创建时间，与19700101时间比较的毫秒数
 }
 
 /// 麦位信息
