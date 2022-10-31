@@ -9,10 +9,11 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VRRoomMenuBarCell: UICollectionViewCell {
+    
     static let selectedFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
-
+    
     static let normalFont = UIFont.systemFont(ofSize: 12, weight: .regular)
-
+    
     var item: VRRoomMenuBarEntity? {
         didSet {
             if let entity = self.item {
@@ -20,36 +21,40 @@ public class VRRoomMenuBarCell: UICollectionViewCell {
             }
         }
     }
-
-    lazy var content: UILabel = .init(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center)
-
-    override public init(frame: CGRect) {
+    
+    lazy var content: UILabel = {
+        UILabel(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center)
+    }()
+    
+    public override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .clear
-        contentView.addSubview(content)
+        self.contentView.backgroundColor = .clear
+        self.contentView.addSubview(self.content)
     }
-
-    @available(*, unavailable)
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override public func layoutSubviews() {
+    
+    public override func layoutSubviews() {
         super.layoutSubviews()
-        content.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
+        self.content.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
+    
 }
 
 extension VRRoomMenuBarCell {
+    
     func render(_ item: VRRoomMenuBarEntity) {
-        content.text = item.title + item.detail
+        self.content.text = item.title+item.detail
         var font = VRRoomMenuBarCell.normalFont
         var color = UIColor(0x6C7192)
         if item.selected {
             font = VRRoomMenuBarCell.selectedFont
             color = .darkText
         }
-        content.font = font
-        content.textColor = color
+        self.content.font = font
+        self.content.textColor = color
     }
+    
 }
