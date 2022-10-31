@@ -28,7 +28,7 @@ public final class LanguageManager: NSObject {
     override private init() {}
 
     lazy var bundle: Bundle = {
-        guard let bundlePath = Bundle.main.path(forResource: "VoiceChatRoomResource", ofType: "bundle"),let bundle = Bundle(path: bundlePath) else {
+        guard let bundlePath = Bundle.main.path(forResource: "VoiceChatRoomResource", ofType: "bundle"), let bundle = Bundle(path: bundlePath) else {
             assertionFailure("vrcm bundle == nil")
             return Bundle.main
         }
@@ -47,16 +47,16 @@ public final class LanguageManager: NSObject {
     }
 
     private func localValue(_ key: String) -> String {
-        self.bundle.localizedString(forKey: key, value: nil, table: nil)
+        bundle.localizedString(forKey: key, value: nil, table: nil)
     }
 
     private func setLanguage(_ type: LanguageType) {
-        self.lanuage = type.rawValue
+        lanuage = type.rawValue
         // 返回项目中 en.lproj 文件的路径
-        let path = self.bundle.path(forResource: type.rawValue, ofType: "lproj")
-        self.bundle = Bundle(path: path!)!
+        let path = bundle.path(forResource: type.rawValue, ofType: "lproj")
+        bundle = Bundle(path: path!)!
         if type == .Auto {
-            self.bundle = Bundle.main
+            bundle = Bundle.main
         }
     }
 }
