@@ -1,64 +1,9 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-}
+ext { app_is_modular = true }
+apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
-    compileSdkVersion rootProject.ext.android.compileSdkVersion
-
     defaultConfig {
         applicationId "com.agora.entfulldemo"
-        minSdkVersion rootProject.ext.android.minSdkVersion
-        targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode Integer.parseInt(project.APP_VERSION_CODE)
-        versionName project.APP_VERSION_NAME
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [AROUTER_MODULE_NAME: project.getName()]
-            }
-        }
-    }
-    signingConfigs {
-        myConfig {
-            storeFile file('../keystore.key')
-            storePassword "965606"
-            keyAlias "agora"
-            keyPassword "965606"
-        }
-    }
-    buildTypes {
-        debug {
-            minifyEnabled false
-            signingConfig signingConfigs.myConfig
-        }
-        release {
-            minifyEnabled false
-            signingConfig signingConfigs.myConfig
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-    buildFeatures {
-        viewBinding true
-    }
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFileName =
-                    "AgoraKTV-${variant.name}" + "-v" + defaultConfig.versionCode + "-" +
-                            defaultConfig.versionName + ".apk"
-        }
-    }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['src/main/jniLibs']
-        }
     }
 }
 
@@ -68,12 +13,9 @@ dependencies {
     implementation project(':common:lrcview')
     implementation project(':common:ui-widget')
 
-    if(isProjectLibrary(':scenes:ktv')){
+    if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
-
-    kapt rootProject.ext.deps.arouter_kapt
-    implementation rootProject.ext.deps.arouter
 
     //glide 图片加载
     api rootProject.ext.deps.glide
