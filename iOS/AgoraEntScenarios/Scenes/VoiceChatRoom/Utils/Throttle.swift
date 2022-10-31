@@ -42,15 +42,15 @@ public enum Throttler {
             work()
         }
 
-        if let _ = subjects[identifier] {
-            subjects[identifier]?!.send(work)
+        if let _ = self.subjects[identifier] {
+            self.subjects[identifier]?!.send(work)
         } else {
-            subjects[identifier] = PassthroughSubject<Work, Never>()
-            bags[identifier] = Bag()
+            self.subjects[identifier] = PassthroughSubject<Work, Never>()
+            self.bags[identifier] = Bag()
 
             let q = queue ?? .global()
 
-            subjects[identifier]?!
+            self.subjects[identifier]?!
                 .throttle(for: delay, scheduler: q, latest: shouldRunLatest)
                 .sink(receiveValue: { $0() })
                 .store(in: &bags[identifier]!)
