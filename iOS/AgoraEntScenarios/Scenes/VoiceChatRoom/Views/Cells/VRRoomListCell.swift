@@ -77,7 +77,7 @@ public final class VRRoomListCell: UITableViewCell {
         self.ownerName.setTitle("\(room.owner?.name ?? "")", for: .normal)
         self.seenCount.setTitle("\(room.member_count ?? 0)", for: .normal)
 //        self.ownerName.setImage(UIImage( room.owner?.portrait ?? ""), for: .normal)
-        self.ownerName.imageView?.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), placeholderImage: UIImage( room.owner?.portrait ?? ""), context: nil)
+        self.ownerName.imageView?.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
         print("avatar: \(room.owner?.portrait ?? "")")
         var image = UIImage( "normal_room")
         if (room.type ?? 0) == 1 {
