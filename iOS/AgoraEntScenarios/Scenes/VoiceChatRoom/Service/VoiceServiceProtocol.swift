@@ -52,7 +52,7 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     
     
     
-
+    
     /// 设置浏览人数
     /// - Parameters:
     ///   - visitCount: 浏览人数
@@ -68,8 +68,6 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
     func subscribeVisit(subscribeClosure: @escaping (VoiceChatSubscribeStatus, Int) -> Void)
-    
-    
     
     
     
@@ -163,6 +161,7 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     func approveMicSeatInvitation(invitation: VoiceChatMicSeatInvitation,
                                   completion: @escaping (Error?) -> Void)
         
+    
     /// 拒绝上麦邀请
     /// - Parameters:
     ///   - invitation: <#invitation description#>
@@ -170,15 +169,16 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     func rejectMicSeatInvitation(invitation: VoiceChatMicSeatInvitation,
                                  completion: @escaping (Error?) -> Void)
     
+    
     /// 获取所有上麦邀请
     /// - Parameter completion: <#completion description#>
     func getAllMicSeatInvitations(completion: @escaping (Error?, [VoiceChatMicSeatInvitation]?) -> Void)
+    
     
     /// 订阅上麦邀请变化
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
     func subscribeMicSeatInvitation(subscribeClosure: @escaping (VoiceChatSubscribeStatus, VoiceChatMicSeatInvitation) -> Void)
-    
     
     
     
@@ -189,6 +189,8 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     ///   - completion: <#completion description#>
     func sendChatMessage(message: VoiceChatMessage,
                          completion: ((Error) -> Void)?)
+    
+    
     
     /// 订阅聊天消息变化
     /// - Parameters:
@@ -202,7 +204,8 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     
     /// 获取收到礼物数量
     /// - Parameter completion: <#completion description#>
-    func getTotalGiftCount(completion: ((Error?, Int) -> Void)?)
+    func getTotalGift(completion: ((Error?, [VoiceChatGift]?) -> Void)?)
+    
     
     /// 发送礼物
     /// - Parameters:
@@ -210,14 +213,12 @@ protocol VoiceServiceProtocol: NSObjectProtocol {
     ///   - completion: <#completion description#>
     func sendGift(gift: VoiceChatGift, completion: ((Error?) -> Void)?)
     
-    /// 订阅收到礼物数量变化
+    
+    
+    /// 订阅礼物变化(目前只有增加)
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeTotalGiftCount(subscribeClosure: @escaping (Int) -> Void)
-    
-    
-    
-    
+    func subscribeGift(subscribeClosure: @escaping (VoiceChatSubscribeStatus, VoiceChatGift) -> Void)
     
     
     /// 更新公告
