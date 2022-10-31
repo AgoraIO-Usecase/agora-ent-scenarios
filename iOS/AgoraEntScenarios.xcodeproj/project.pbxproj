@@ -137,6 +137,8 @@
 		DD2A43E228FFCEE7004CEDCF /* AgoraEntScenariosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */; };
 		DD2A43EC28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */; };
 		DD2A43EE28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */; };
+		DD5C80DD290FD1B1004E0C46 /* VoiceChatServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5C80DA290FD1B1004E0C46 /* VoiceChatServiceModel.swift */; };
+		DD5C80DF290FD1B1004E0C46 /* VoiceServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5C80DC290FD1B1004E0C46 /* VoiceServiceProtocol.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -555,6 +557,8 @@
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITests.swift; sourceTree = "<group>"; };
 		DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		DD5C80DA290FD1B1004E0C46 /* VoiceChatServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatServiceModel.swift; sourceTree = "<group>"; };
+		DD5C80DC290FD1B1004E0C46 /* VoiceServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceServiceProtocol.swift; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -1008,6 +1012,7 @@
 		053998BA290A70CB005143C7 /* VoiceChatRoom */ = {
 			isa = PBXGroup;
 			children = (
+				DD5C80D9290FD1B1004E0C46 /* Service */,
 				057DD9C1290B9495001329E6 /* Compoment */,
 				0510B85A290B79E60063E57A /* Controllers */,
 				057DD9C7290B9495001329E6 /* Extensions */,
@@ -1310,6 +1315,15 @@
 				DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */,
 			);
 			path = AgoraEntScenariosUITests;
+			sourceTree = "<group>";
+		};
+		DD5C80D9290FD1B1004E0C46 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				DD5C80DA290FD1B1004E0C46 /* VoiceChatServiceModel.swift */,
+				DD5C80DC290FD1B1004E0C46 /* VoiceServiceProtocol.swift */,
+			);
+			path = Service;
 			sourceTree = "<group>";
 		};
 		DD84168629090C520026B624 /* Resource */ = {
@@ -2851,6 +2865,7 @@
 				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				0510B839290B77330063E57A /* VRSoundEffectsCell.swift in Sources */,
 				0510B82B290B730E0063E57A /* VoiceRoomChatModel.swift in Sources */,
+				DD5C80DF290FD1B1004E0C46 /* VoiceServiceProtocol.swift in Sources */,
 				DD8417BF29090C520026B624 /* VLHomeOnLineListView.m in Sources */,
 				057DDA0A290B9496001329E6 /* Notification+Presentation.swift in Sources */,
 				05FFE70C290F706C0024D22F /* VMSoundSelTableViewCell.swift in Sources */,
@@ -2920,6 +2935,7 @@
 				DD84179A29090C520026B624 /* VLKTVSelBgModel.m in Sources */,
 				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
 				0510B850290B799E0063E57A /* VRSoundEffectsList.swift in Sources */,
+				DD5C80DD290FD1B1004E0C46 /* VoiceChatServiceModel.swift in Sources */,
 				05FFE6F0290F706C0024D22F /* VoiceRoomGifterCell.swift in Sources */,
 				05FFE737290F74560024D22F /* AgoraChatRoomHeaderView.swift in Sources */,
 				0510B835290B77330063E57A /* VRCreateRoomCardCell.swift in Sources */,
@@ -3190,9 +3206,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
@@ -3208,8 +3224,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.enterprise.easeim;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3225,9 +3242,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "声网需要您开启相机功能，用于视频通话";
@@ -3243,8 +3260,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.enterprise.easeim;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
