@@ -24,14 +24,14 @@ public class VoiceRoomAlertViewController: UIViewController, PresentedViewType {
 
     public convenience init(compent: PresentedViewComponent, custom: UIView) {
         self.init()
-        self.presentedViewComponent = compent
-        self.customView = custom
+        presentedViewComponent = compent
+        customView = custom
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        if self.customView != nil {
-            self.view.addSubview(self.customView!)
+        if customView != nil {
+            view.addSubview(customView!)
         }
     }
 }

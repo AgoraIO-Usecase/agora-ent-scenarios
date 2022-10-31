@@ -7,49 +7,45 @@
 
 import UIKit
 
-
-
 class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
-    
-    private var rtcUserView: AgoraChatRoomBaseRtcUserView = AgoraChatRoomBaseRtcUserView()
-    
+    private var rtcUserView: AgoraChatRoomBaseRtcUserView = .init()
+
     public var cellType: AgoraChatRoomBaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
         didSet {
             rtcUserView.cellType = cellType
         }
     }
-    
+
     var clickBlock: ((Int) -> Void)?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     fileprivate func layoutUI() {
-        
-        rtcUserView.clickBlock = {[weak self] in
+        rtcUserView.clickBlock = { [weak self] in
             guard let clickBlock = self?.clickBlock else {
                 return
             }
             clickBlock(self!.tag)
         }
-        self.contentView.addSubview(rtcUserView)
-        
+        contentView.addSubview(rtcUserView)
+
         rtcUserView.snp.makeConstraints { make in
             make.left.right.bottom.top.equalTo(self.contentView)
         }
-        
     }
-    
+
     public func refreshUser(with mic: VRRoomMic) {
         let status = mic.status
-        var bgIcon: String = ""
+        var bgIcon = ""
         switch status {
         case -1:
             rtcUserView.iconView.isHidden = true
@@ -63,7 +59,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.bgIconView.isHidden = true
             rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
         case 1:
-            //需要区分有用户还是没有用户
+            // 需要区分有用户还是没有用户
             bgIcon = mic.member == nil ? "icons／solid／mute" : ""
             if mic.member != nil {
                 rtcUserView.micView.isHidden = false
@@ -103,9 +99,8 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         rtcUserView.nameBtn.setImage(UIImage(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }
-    
+
     public func refreshVolume(vol: Int) {
         rtcUserView.volume = vol
     }
 }
-
