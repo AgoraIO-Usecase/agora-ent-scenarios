@@ -22,8 +22,8 @@
 - (void)configRootViewController {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken,^{
-//        [self configurationQMUITemplate];
-//        [self configureKeyboard];
+        [self configurationQMUITemplate];
+        [self configureKeyboard];
     });
     if ([VLUserCenter center].isLogin) {
         [self vj_configureTabBarController];
