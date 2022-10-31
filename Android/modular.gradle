@@ -4,11 +4,9 @@
  * 2. 限制模块的资源名前缀
  *
  * 使用方法：
- * 1、在指定模块的build.gradle添加apply from: '../modular.gradle'
+ * 1、在指定模块的build.gradle添加apply from: "${modularGradlePath}"
  * 2、在apply from前配置是否模块化运行，如
- *  ext {
- *     ktv_is_modular = true
- *  }
+ *  ext { ktv_is_modular = true }*
  *  其中"ktv"要转成相当模块名下划线式的模块名称，不配置默认为false
  *  当为true时，AndroidManifest使用src/main/AndroidManifest_Modular.xml
  *  当为false时，AndroidManifest使用src/main/AndroidManifest.xml
@@ -34,9 +32,43 @@ def camel2underInner = {
         return ret;
 }
 
+def isModularKeyInner = {
+    project -> return "${camel2underInner(project.name)}_is_modular"
+}
+
 def isModularInner = {
-    def modularKey = "${camel2underInner(project.name)}_is_modular"
+    def modularKey = "${isModularKeyInner(project)}"
     return project.ext.find(modularKey) != null && project.ext.get(modularKey)
+}
+
+
+/**
+ * 判断一个模块是否存在并且是一个library
+ * 使用方法：
+ * 在build.gradle里添加
+ *   if(isProjectLibrary(':scenes:ktv')){*     runtimeOnly project(':scenes:ktv')
+ *}*/
+def isProjectLibraryInner = {
+    projectName ->
+        def _project = findProject(projectName)
+        def modularKey = ""
+        def modularVal = false
+        if (_project != null) {
+            modularKey = "${isModularKeyInner(_project)}"
+            String buildFilePath = "${_project.getProjectDir().absolutePath}/build.gradle";
+            FileInputStream fis = new FileInputStream(buildFilePath);
+            def lines = fis.readLines()
+            for (i in 0..<lines.size()) {
+                def line = lines.get(i);
+                if (line.contains(modularKey)) {
+                    modularVal = line.contains("true")
+                    break
+                }
+            }
+            fis.close()
+        }
+        System.println("isProjectLibrary($projectName) -- project=$_project -- $modularKey=$modularVal")
+        return !modularVal && _project != null;
 }
 
 apply plugin: 'kotlin-android'
@@ -48,6 +80,7 @@ if (isModularInner()) {
 }
 
 ext {
+    isProjectLibrary = isProjectLibraryInner
     isModular = isModularInner
 }
 
@@ -69,7 +102,7 @@ android {
     }
 
     signingConfigs {
-        release {
+        myConfig {
             storeFile new File(rootProject.rootDir.absolutePath + "/keystore.key")
             storePassword "965606"
             keyAlias "agora"
@@ -80,7 +113,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -88,7 +121,7 @@ android {
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -96,7 +129,11 @@ android {
     sourceSets {
         main {
             if (isModularInner()) {
-                manifest.srcFile 'src/main/AndroidManifest_Modular.xml'
+                if (new File('src/main/AndroidManifest_Modular.xml').exists()) {
+                    manifest.srcFile 'src/main/AndroidManifest_Modular.xml'
+                } else {
+                    manifest.srcFile 'src/main/AndroidManifest.xml'
+                }
             } else {
                 manifest.srcFile 'src/main/AndroidManifest.xml'
             }
@@ -114,12 +151,17 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     if (isModularInner()) {
         applicationVariants.all {
             variant ->
                 variant.outputs.all { output ->
-                    outputFileName = new File(project.name + "_" +
-                            defaultConfig.versionName + "_" +
+                    outputFileName = new File(rootProject.name + "_" +
+                            project.name + "_" +
+                            "v" + defaultConfig.versionName + "_" +
                             new Date().format("yyyy-MM-dd") + "_" +
                             buildType.name + ".apk")
                 }

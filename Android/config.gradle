@@ -4,26 +4,9 @@
  *
  ***************************************************/
 
-/**
- * 判断一个模块是否存在并且是一个library
- * 使用方法：
- * 在build.gradle里添加
- *   if(isProjectLibrary(':scenes:ktv')){
- *     runtimeOnly project(':scenes:ktv')
- *   }
- */
-def isProjectLibraryInner = {
-    projectName ->
-        def project = findProject(projectName);
-        if (project != null && project.getPlugins().findPlugin("'com.android.library'") != null) {
-            return true
-        }
-        return false;
-}
+
 
 ext {
-    isProjectLibrary = isProjectLibraryInner
-
     //对于v4、v7都依赖一个support包的版本，单独抽一个版本常量
     support_version = '29.0.0'
     glide_version = '4.11.0'
