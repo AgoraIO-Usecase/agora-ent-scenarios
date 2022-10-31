@@ -9,24 +9,21 @@ import UIKit
 import ZSwiftBaseLib
 
 class VRVerifyCodeNumberView: UIView {
-
     /// 光标颜色
     var cursorColor = UIColor(0x009FFF)
-    
-    lazy var numLabel: UILabel = {
-        UILabel(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center).font(.systemFont(ofSize: 18)).textColor(.darkText)
-    }()
-    
+
+    lazy var numLabel: UILabel = .init(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)).textAlignment(.center).font(.systemFont(ofSize: 18)).textColor(.darkText)
+
     /// 光标
     lazy var cursor: CAShapeLayer = {
         let shapeLayer = CAShapeLayer().fillColor(self.cursorColor.cgColor)
         shapeLayer.add(opacityAnimation, forKey: "kOpacityAnimation")
         return shapeLayer
     }()
-    
+
     /// 闪烁动画
     fileprivate var opacityAnimation: CABasicAnimation = {
-        let opacityAnimation = CABasicAnimation.init(keyPath: "opacity")
+        let opacityAnimation = CABasicAnimation(keyPath: "opacity")
         // 属性初始值
         opacityAnimation.fromValue = 1.0
         // 属性要到达的值
@@ -51,46 +48,46 @@ class VRVerifyCodeNumberView: UIView {
         opacityAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)
         return opacityAnimation
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubview(self.numLabel)
-        self.layer.addSublayer(self.cursor)
-        NotificationCenter.default.addObserver(self, selector: #selector(becomeActive),name: UIApplication.didBecomeActiveNotification, object: nil)
-        
+        addSubview(numLabel)
+        layer.addSublayer(cursor)
+        NotificationCenter.default.addObserver(self, selector: #selector(becomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+
         NotificationCenter.default.addObserver(self, selector: #selector(enterBack), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        let path = UIBezierPath.init(rect: CGRect.init(x: self.frame.size.width * 0.5, y: self.frame.size.height * 0.1, width: 1, height: self.frame.size.height * 0.7))
+        let path = UIBezierPath(rect: CGRect(x: frame.size.width * 0.5, y: frame.size.height * 0.1, width: 1, height: frame.size.height * 0.7))
         cursor.path = path.cgPath
     }
-    
+
     /// 去后台
     @objc fileprivate func enterBack() {
         // 移除动画
         cursor.removeAnimation(forKey: "kOpacityAnimation")
     }
-    
+
     /// 回前台
     @objc fileprivate func becomeActive() {
         // 重新添加动画
         cursor.add(opacityAnimation, forKey: "kOpacityAnimation")
     }
-    
+
+    @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
 }
 
 // MARK: - 供外部调用方法
+
 extension VRVerifyCodeNumberView {
     /// 设置光标是否隐藏
     ///
@@ -105,35 +102,33 @@ extension VRVerifyCodeNumberView {
             self.cursor.isHidden = isHidden
         }
     }
-    
+
     /// 验证码赋值，并修改线条颜色
     ///
     /// - Parameter num: 验证码
     func setNum(num: String?) {
         numLabel.text = num
     }
-    
+
     /// 设置底部线条是否为焦点
     ///
     /// - Parameter isFocus: 是否是焦点
     func setBottomLineFocus(isFocus: Bool) {
         if isFocus {
-        } else {
-        }
+        } else {}
     }
-    
+
     /// 获取当前的验证码
     ///
     /// - Returns: 验证码
     func getNum() -> String {
         return numLabel.text ?? ""
     }
-    
+
     /// 返回验证码值
     ///
     /// - Returns: 验证码数值
     func getNum() -> String? {
         return numLabel.text
     }
-
 }
