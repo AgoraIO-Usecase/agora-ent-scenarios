@@ -28,10 +28,18 @@ public final class LanguageManager: NSObject {
     override private init() {}
 
     lazy var bundle: Bundle = {
-        if NSLocale.preferredLanguages.first!.hasPrefix("zh") {
-            return Bundle(path: Bundle.voiceRoomBundle.path(forResource: "zh", ofType: "lproj") ?? Bundle.main.bundlePath) ?? Bundle.main
+        guard let bundlePath = Bundle.main.path(forResource: "VoiceChatRoomResource", ofType: "bundle"),let bundle = Bundle(path: bundlePath) else {
+            assertionFailure("vrcm bundle == nil")
+            return Bundle.main
         }
-        return Bundle(path: Bundle.voiceRoomBundle.path(forResource: "en", ofType: "lproj") ?? Bundle.main.bundlePath) ?? Bundle.main
+        guard var lang = NSLocale.preferredLanguages.first else { return Bundle.main }
+        if lang.contains("zh") {
+            lang = "zh-Hans"
+        } else {
+            lang = "en"
+        }
+        let path = bundle.path(forResource: lang, ofType: "lproj") ?? ""
+        return Bundle(path: path) ?? .main
     }()
 
     var currentLocal: Locale {
@@ -39,7 +47,7 @@ public final class LanguageManager: NSObject {
     }
 
     private func localValue(_ key: String) -> String {
-        self.bundle.localizedString(forKey: key, value: nil, table: "Localizable")
+        self.bundle.localizedString(forKey: key, value: nil, table: nil)
     }
 
     private func setLanguage(_ type: LanguageType) {
