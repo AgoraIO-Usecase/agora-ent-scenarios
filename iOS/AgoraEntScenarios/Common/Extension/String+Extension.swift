@@ -50,10 +50,6 @@ extension String {
 }
 
 extension String {
-    var localized: String { NSLocalizedString(self, comment: "") }
-}
-
-extension String {
     var timeStamp: String {
         let date = Date()
         let timeInterval = date.timeIntervalSince1970
