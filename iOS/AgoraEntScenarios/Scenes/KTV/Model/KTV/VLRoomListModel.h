@@ -19,8 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger bgOption;
 @property (nonatomic, copy) NSString *soundEffect;
 @property (nonatomic, copy) NSString *belCanto;
-@property (nonatomic, copy) NSString *createdAt;
-@property (nonatomic, copy) NSString *updatedAt;
+@property (nonatomic, copy, nullable) NSString *createdAt;
+@property (nonatomic, copy, nullable) NSString *updatedAt;
 @property (nonatomic, copy) NSString *status;
 @property (nonatomic, copy) NSString *deletedAt;
 @property (nonatomic, copy) NSString *roomPeopleNum;
