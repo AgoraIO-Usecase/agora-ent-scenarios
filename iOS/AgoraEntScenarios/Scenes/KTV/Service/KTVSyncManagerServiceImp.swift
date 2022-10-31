@@ -74,12 +74,15 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         initScene { [weak self] in
             SyncUtil.fetchAll { results in
                 print("result == \(results.compactMap { $0.toJson() })")
+                guard let self = self else {
+                    return
+                }
 
                 let dataArray = results.map({ info in
                     return VLRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
-                self?.roomList = dataArray
-                completion(nil, dataArray)
+                self.roomList = dataArray.sorted(by: { TimeInterval($0.updatedAt ?? $0.createdAt ?? "0") ?? 0 > TimeInterval($1.updatedAt ?? $0.createdAt ?? "0") ?? 0 })
+                completion(nil, self.roomList)
             } fail: { error in
                 completion(error, nil)
             }
@@ -98,6 +101,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
+        roomInfo.createdAt = "\(Date().timeIntervalSince1970)"
 //        roomInfo.soundEffect;
 //        roomInfo.belCanto;
 //        roomInfo.createdAt;
@@ -376,7 +380,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func subscribeRoomStatus(changed changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
-        return
+
         guard let channelName = roomNo else {
             assertionFailure("channelName = nil")
             return
@@ -584,7 +588,7 @@ extension KTVSyncManagerServiceImp {
         if roomPeopleNum == roomInfo.roomPeopleNum {
             return
         }
-        roomInfo.createdAt = Date().description
+        roomInfo.updatedAt = "\(Date().timeIntervalSince1970)"
         roomInfo.roomPeopleNum = roomPeopleNum
         var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
 //        SyncUtil
