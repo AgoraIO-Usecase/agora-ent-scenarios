@@ -46,7 +46,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':common:third-aar-libs')
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation
@@ -61,6 +60,7 @@ dependencies {
     implementation rootProject.ext.deps.retrofit2
     implementation rootProject.ext.deps.retrofit2_adapter
     api rootProject.ext.deps.gson
+    implementation rootProject.ext.deps.autosize
 
     implementation rootProject.ext.deps.xlog
 
