@@ -41,6 +41,7 @@ ext {
 
             xlog              : 'com.elvishew:xlog:1.6.1',
             gson              : 'com.google.code.gson:gson:2.8.7',
+            autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
             rtc               : 'io.agora.rtc:agora-special-full:4.0.0.9',
             rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.0.9',
