@@ -173,7 +173,7 @@ VLPopScoreViewDelegate
     [[AppContext ktvServiceImp] subscribeSeatListWithChanged:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息
-            for (VLRoomSeatModel *model in self.seatsArray) {
+            for (VLRoomSeatModel *model in weakSelf.seatsArray) {
                 if (model.onSeat == seatModel.onSeat) {
                     model.isMaster = seatModel.isMaster;
                     model.headUrl = seatModel.headUrl;
@@ -182,54 +182,54 @@ VLPopScoreViewDelegate
                     model.userNo = seatModel.userNo;
                     model.id = seatModel.id;
                     
-                    if([self ifMainSinger:model.userNo]) {
+                    if([weakSelf ifMainSinger:model.userNo]) {
                         model.ifSelTheSingSong = YES;
-                        [self.MVView setPlayerViewsHidden:NO nextButtonHidden:NO];
+                        [weakSelf.MVView setPlayerViewsHidden:NO nextButtonHidden:NO];
                     }
-                    VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+                    VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
                     if (song != nil && song.isChorus && [song.chorusNo isEqualToString:seatModel.userNo]) {
                         model.ifJoinedChorus = YES;
                     }
                 }
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.roomPersonView setSeatsArray:self.seatsArray];
+                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             });
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
-            VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
             
             // 被下麦用户刷新UI
             if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
-                [self.MVView updateUIWithUserOnSeat:NO song:song];
-                self.bottomView.hidden = YES;
+                [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
+                weakSelf.bottomView.hidden = YES;
                 // 取出对应模型、防止数组越界
-                [self setSelfAudience];
-                [self resetChorusStatus:seatModel.userNo];
+                [weakSelf setSelfAudience];
+                [weakSelf resetChorusStatus:seatModel.userNo];
                 
-                if (self.seatsArray.count - 1 >= seatModel.onSeat) {
+                if (weakSelf.seatsArray.count - 1 >= seatModel.onSeat) {
                     // 下麦重置占位模型
-                    VLRoomSeatModel *indexSeatModel = self.seatsArray[seatModel.onSeat];
+                    VLRoomSeatModel *indexSeatModel = weakSelf.seatsArray[seatModel.onSeat];
                     [indexSeatModel resetLeaveSeat];
                 }
                 
                 // If I was dropped off mic and I am current singer, then we should play next song.
                 if([/*member.userId*/seatModel.id isEqualToString:VLUserCenter.user.id] == NO && [self ifMainSinger:VLUserCenter.user.userNo]) {
-                    [self sendChangeSongMessage];
-                    [self prepareNextSong];
-                    [self getChoosedSongsList:false onlyRefreshList:NO];
+                    [weakSelf sendChangeSongMessage];
+                    [weakSelf prepareNextSong];
+                    [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
                 }
             } else{
-                for (VLRoomSeatModel *model in self.seatsArray) {
+                for (VLRoomSeatModel *model in weakSelf.seatsArray) {
                     if ([seatModel.userNo isEqualToString:model.userNo]) {
                         [model resetLeaveSeat];
-                        [self resetChorusStatus:seatModel.userNo];
+                        [weakSelf resetChorusStatus:seatModel.userNo];
                     }
                 }
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.roomPersonView setSeatsArray:self.seatsArray];
+                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             });
         }
     }];
@@ -243,13 +243,13 @@ VLPopScoreViewDelegate
             VLKTVSelBgModel* selBgModel = [VLKTVSelBgModel new];
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
             selBgModel.ifSelect = YES;
-            self.choosedBgModel = selBgModel;
+            weakSelf.choosedBgModel = selBgModel;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.MVView changeBgViewByModel:selBgModel];
+                [weakSelf.MVView changeBgViewByModel:selBgModel];
             });
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
-            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.userNo]) {
+            if ([roomInfo.creator isEqualToString:VLUserCenter.user.userNo]) {
                 return;
             }
             //发送通知
@@ -265,28 +265,28 @@ VLPopScoreViewDelegate
             if (KTVSubscribeUpdated == status) {
                 //有人加入合唱
                 if(songInfo.isChorus
-                   && songInfo.status == 0
+                   && weakSelf.currentPlayingSongNo == nil
                    && songInfo.chorusNo != nil) {
-                    [self.MVView setJoinInViewHidden];
-                    [self setUserJoinChorus:songInfo.chorusNo];
-                    if([self ifMainSinger:VLUserCenter.user.userNo]) {
-                        [self sendApplySendChorusMessage:songInfo.chorusNo];
+                    [weakSelf.MVView setJoinInViewHidden];
+                    [weakSelf setUserJoinChorus:songInfo.chorusNo];
+                    if([weakSelf ifMainSinger:VLUserCenter.user.userNo]) {
+                        [weakSelf sendApplySendChorusMessage:songInfo.chorusNo];
                     }
-                    [self joinChorusConfig:@""];
+                    [weakSelf joinChorusConfig:@""];
                     return;
                 }
                 
                 //观众看到打分
                 if (songInfo.status == 2) {
                     double voicePitch = songInfo.score;
-                    [self.MVView setVoicePitch:@[@(voicePitch)]];
+                    [weakSelf.MVView setVoicePitch:@[@(voicePitch)]];
                     return;
                 }
             }
             
             
             //收到点歌的消息
-            VLRoomSelSongModel *song = self.selSongsArray.firstObject;
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
             if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
                 [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
             }
@@ -300,7 +300,7 @@ VLPopScoreViewDelegate
             //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             //removed song is top song, play next
-            if (![selSongModel.songNo isEqualToString:self.currentPlayingSongNo]) {
+            if (![selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo]) {
                 return;
             }
             
