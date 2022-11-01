@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@mipmap/bg_player_default">
+
+    <io.agora.lrcview.PitchView
+        android:id="@+id/pitchView"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="26dp"
+        android:background="#02FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:pitchDoneTextColor="@color/white"
+        app:pitchInitialScore="0"
+        app:pitchNormalTextColor="@color/grey_d8" />
+
+    <io.agora.lrcview.LrcView
+        android:id="@+id/lrcView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#00000000"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
+        app:layout_constraintTop_toBottomOf="@+id/pitchView"
+        app:lrcCurrentTextColor="#FFE960"
+        app:lrcDividerHeight="8sp"
+        app:lrcLabel=" "
+        app:lrcNormalTextColor="@color/white"
+        app:lrcNormalTextSize="14sp"
+        app:lrcTextGravity="center"
+        app:lrcTextSize="18sp" />
+
+    <View
+        android:id="@+id/bgd_control_layout_lrc"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMusicStart"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="12dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:padding="0dp"
+        android:src="@mipmap/ktv_ic_pause"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivChangeSong"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="12dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:padding="0dp"
+        android:src="@mipmap/ic_play_next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivMusicStart" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/switchOriginal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:button="@mipmap/ic_original_song"
+        android:checked="true"
+        android:text="@string/ktv_room_original"
+        android:textColor="#9BA2AB"
+        app:layout_constraintBottom_toBottomOf="@id/ivMusicStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivMusicStart"
+        app:switchPadding="12dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ivMusicMenu"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="20dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:padding="0dp"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        app:icon="@mipmap/ktv_ic_settings"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="src_atop"
+        app:layout_constraintBottom_toBottomOf="@id/ivMusicStart"
+        app:layout_constraintEnd_toStartOf="@id/switchOriginal"
+        app:layout_constraintTop_toTopOf="@id/ivMusicStart" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/rlMusicControlMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="bgd_control_layout_lrc,switchOriginal,ivMusicMenu,ivMusicStart,ivChangeSong" />
+</androidx.constraintlayout.widget.ConstraintLayout>
