@@ -680,7 +680,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     contentCenterConfiguration.rtcEngine = self.RTCkit;
     contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
-    contentCenterConfiguration.rtmToken = @"006b792b33fc5f046ffa22776bf8d140e4dIABQiysIAh3GKattIqqGaVGbcUQ53+oufi2208EsAEOELAAAAAATk4E8EAB5anaPhgpiYwEA6AMAAAAA";//VLUserCenter.user.agoraRTMToken;
+    contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
     VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
     [self.AgoraMcc registerEventDelegate:self];
