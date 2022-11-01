@@ -292,6 +292,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         }
         //isChorus always true
         topSong.isChorus = inputModel.isChorus == "1" ? true : false
+//        topSong.status = 2
         topSong.chorusNo = VLUserCenter.user.userNo
         updateChooseSong(songInfo: topSong, finished: completion)
     }
@@ -408,10 +409,11 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                        }, onDeleted: { [weak self] object in
                            guard let jsonStr = object.toJson(),
                                  let model = VLRoomListModel.yy_model(withJSON: jsonStr),
-                                 model.roomNo == channelName
+                                 object.getId() == channelName
                            else {
                                return
                            }
+                           model.roomNo = channelName
                            self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
                        }, onSubscribed: {}, fail: { error in
                        })
