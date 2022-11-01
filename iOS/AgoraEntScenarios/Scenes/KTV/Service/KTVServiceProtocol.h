@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)publishToSoloEvent;
 - (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
-- (void)publishSingingScoreWithTotalVolume:(NSInteger)totalVolume;
+- (void)publishSingingScoreWithTotalVolume:(double)totalVolume;
 
 
 - (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock;
