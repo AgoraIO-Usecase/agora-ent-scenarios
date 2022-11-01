@@ -8,7 +8,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLRoomSelSongModel : VLBaseModel
-
+/// 合唱者userNo
 @property (nonatomic, copy) NSString *chorusNo;
 @property (nonatomic, copy) NSString *imageUrl;
 ///是否合唱
@@ -30,6 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *userId;
 ///点歌人昵称
 @property (nonatomic, copy) NSString *name;
+
+/// 得分
+@property (nonatomic, assign) double score;
 
 #pragma mark - 自定义字段
 /// 是否是自己点的歌曲
