@@ -284,8 +284,16 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         getChooseSongInfo(finished: completion)
     }
 
-    func joinChorus(withInput inputModel: KTVJoinChorusInputModel, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func joinChorus(withInput inputModel: KTVJoinChorusInputModel,
+                    completion: @escaping (Error?) -> Void) {
+        guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
+            assertionFailure()
+            return
+        }
+        //isChorus always true
+        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+        topSong.chorusNo = VLUserCenter.user.userNo
+        updateChooseSong(songInfo: topSong, finished: completion)
     }
 
     func getSongDetail(withInput inputModel: KTVSongDetailInputModel, completion: @escaping (Error?, KTVSongDetailOutputModel?) -> Void) {
@@ -452,15 +460,27 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     }
 
     func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+        //replace with joinChorusWithInput
+//        assertionFailure()
     }
 
     func publishSongOwner(withOwnerId userNo: String) {
-        assertionFailure()
+//        assertionFailure()
+        //ignore
     }
 
-    func publishSingingScore(withTotalVolume totalVolume: Int) {
+    func publishSingingScore(withTotalVolume totalVolume: Double) {
 //        assertionFailure()
+        guard let topSong = self.songList.first else {
+            assertionFailure()
+            return
+        }
+        
+        topSong.status = 2
+        topSong.score = totalVolume
+        updateChooseSong(songInfo: topSong) { error in
+            
+        }
     }
 
     func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {

@@ -261,6 +261,30 @@ VLPopScoreViewDelegate
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
+            
+            if (KTVSubscribeUpdated == status) {
+                //有人加入合唱
+                if(songInfo.isChorus
+                   && songInfo.status == 0
+                   && songInfo.chorusNo != nil) {
+                    [self.MVView setJoinInViewHidden];
+                    [self setUserJoinChorus:songInfo.chorusNo];
+                    if([self ifMainSinger:VLUserCenter.user.userNo]) {
+                        [self sendApplySendChorusMessage:songInfo.chorusNo];
+                    }
+                    [self joinChorusConfig:@""];
+                    return;
+                }
+                
+                //观众看到打分
+                if (songInfo.status == 2) {
+                    double voicePitch = songInfo.score;
+                    [self.MVView setVoicePitch:@[@(voicePitch)]];
+                    return;
+                }
+            }
+            
+            
             //收到点歌的消息
             VLRoomSelSongModel *song = self.selSongsArray.firstObject;
             if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
@@ -269,6 +293,9 @@ VLPopScoreViewDelegate
             else {
                 [weakSelf getChoosedSongsList:false onlyRefreshList:YES];
             }
+            
+            
+            
         } else if (KTVSubscribeDeleted == status) {
             //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
@@ -357,7 +384,9 @@ VLPopScoreViewDelegate
     VLLog(@"收到了数据流状态改变：：%lu",state);
 
 }
-- (void)rtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume {
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine
+reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
+      totalVolume:(NSInteger)totalVolume {
     if (speakers.count) {
         if([self ifMainSinger:VLUserCenter.user.userNo]) {
             double voicePitch = (double)totalVolume;
@@ -651,8 +680,8 @@ VLPopScoreViewDelegate
     contentCenterConfiguration.rtcEngine = self.RTCkit;
     contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
-    contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
-    VLLog(@"AgoraMcc: %@, %@", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
+    contentCenterConfiguration.rtmToken = @"006b792b33fc5f046ffa22776bf8d140e4dIABQiysIAh3GKattIqqGaVGbcUQ53+oufi2208EsAEOELAAAAAATk4E8EAB5anaPhgpiYwEA6AMAAAAA";//VLUserCenter.user.agoraRTMToken;
+    VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
     [self.AgoraMcc registerEventDelegate:self];
 
@@ -2214,7 +2243,7 @@ VLPopScoreViewDelegate
             self.currentPlayingSongNo = nil;
             [self prepareNextSong];
             [self getChoosedSongsList:false onlyRefreshList:NO];
-        } else*/ if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
+        } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.MVView setJoinInViewHidden];
                 [self setUserJoinChorus:dict[@"userNo"]];
@@ -2223,7 +2252,7 @@ VLPopScoreViewDelegate
                 }
                 [self joinChorusConfig:member.userId];
             });
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSoloSong){ //独唱
+        }else*/ if([dict[@"messageType"] intValue] == VLSendMessageTypeSoloSong){ //独唱
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self startSinging];
                 [self.MVView setJoinInViewHidden];
@@ -2263,12 +2292,11 @@ VLPopScoreViewDelegate
                     });
                 }   
             }
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSeeScore) { //观众看到打分
+        }/* else if([dict[@"messageType"] intValue] == VLSendMessageTypeSeeScore) { //观众看到打分
 //            [self.MVView MVViewSetVoicePitch:[dict[@"pitch"] doubleValue]];
             double voicePitch = [dict[@"pitch"] doubleValue];
             [self.MVView setVoicePitch:@[@(voicePitch)]];
-        }
-        else if([dict[@"messageType"] intValue] == VLSendMessageAuditFail) {
+        }*/ else if([dict[@"messageType"] intValue] == VLSendMessageAuditFail) {
             VLLog(@"Agora - Received audit message");
             if ([dict[@"userNo"] isEqualToString:VLUserCenter.user.userNo]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
