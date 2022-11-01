@@ -946,6 +946,7 @@ extension KTVSyncManagerServiceImp {
     private func markCurrentSongIfNeed() {
         guard let topSong = songList.first,
               topSong.status == 0, // ready status
+              topSong.isChorus == false,
               topSong.userNo == VLUserCenter.user.userNo
         else {
             return
@@ -965,6 +966,7 @@ extension KTVSyncManagerServiceImp {
         }
 
         topSong.isChorus = false
+        topSong.status = 2
         updateChooseSong(songInfo: topSong) { error in
         }
     }
