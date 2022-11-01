@@ -98,6 +98,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         roomInfo.isPrivate = inputModel.isPrivate.boolValue
         roomInfo.password = inputModel.password
         roomInfo.creator = VLUserCenter.user.userNo
+        roomInfo.creatorNo = VLUserCenter.user.userNo
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
@@ -292,7 +293,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         }
         //isChorus always true
         topSong.isChorus = inputModel.isChorus == "1" ? true : false
-//        topSong.status = 2
+        topSong.status = 2
         topSong.chorusNo = VLUserCenter.user.userNo
         updateChooseSong(songInfo: topSong, finished: completion)
     }
@@ -407,13 +408,11 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                            }
                            self?.roomStatusDidChanged?(KTVSubscribeUpdated.rawValue, model)
                        }, onDeleted: { [weak self] object in
-                           guard let jsonStr = object.toJson(),
-                                 let model = VLRoomListModel.yy_model(withJSON: jsonStr),
-                                 object.getId() == channelName
+                           guard let model = self?.roomList?.filter({ $0.roomNo == object.getId()}).first,
+                                 model.roomNo == channelName
                            else {
                                return
                            }
-                           model.roomNo = channelName
                            self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
                        }, onSubscribed: {}, fail: { error in
                        })
