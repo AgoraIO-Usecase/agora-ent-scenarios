@@ -106,7 +106,7 @@ class NetworkManager {
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token/generate", params: params, success: { response in
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token006/generate", params: params, success: { response in
             let data = response["data"] as? [String: String]
             let token = data?["token"]
             KeyCenter.Token = token
