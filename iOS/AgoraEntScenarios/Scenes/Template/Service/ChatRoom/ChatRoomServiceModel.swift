@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TemplateScene {
+struct ChatRoomScene {
     enum SubscribeStatus {
         case created
         case deleted

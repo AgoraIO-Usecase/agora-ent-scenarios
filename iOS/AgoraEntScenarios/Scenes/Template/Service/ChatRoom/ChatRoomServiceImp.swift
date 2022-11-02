@@ -12,8 +12,8 @@ class ChatRoomServiceImp: NSObject {
 }
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-    func join(roomName: String, completion: @escaping (SyncError?, TemplateScene.JoinResponse?) -> Void) {
-        let roomInfo = TemplateScene.LiveRoomInfo(roomName: roomName)
+    func join(roomName: String, completion: @escaping (SyncError?, ChatRoomScene.JoinResponse?) -> Void) {
+        let roomInfo = ChatRoomScene.LiveRoomInfo(roomName: roomName)
         let params = JSONObject.toJson(roomInfo)
 
         SyncUtil.joinScene(id: roomInfo.roomId,
@@ -23,7 +23,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
             self?.channelName = channelName
             NetworkManager.shared.generateToken(channelName: channelName ?? "", uid: "\(UserInfo.userId)") {
-                let resp = TemplateScene.JoinResponse(channelName: channelName ?? "", userId: "\(UserInfo.userId)")
+                let resp = ChatRoomScene.JoinResponse(channelName: channelName ?? "", userId: "\(UserInfo.userId)")
                 completion(nil, resp)
             }
         } fail: { error in
@@ -51,21 +51,21 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         SyncUtil.scene(id: channelName)?.deleteScenes()
     }
 
-    func addUser(user: TemplateScene.UsersModel, completion: @escaping (SyncError?, TemplateScene.UsersModel?) -> Void) {
+    func addUser(user: ChatRoomScene.UsersModel, completion: @escaping (SyncError?, ChatRoomScene.UsersModel?) -> Void) {
         guard let channelName = channelName else {
             assertionFailure("channelName = nil")
             return
         }
         let params = JSONObject.toJson(user)
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).add(data: params, success: { object in
-            let model = JSONObject.toModel(TemplateScene.UsersModel.self, value: object.toJson())
+            let model = JSONObject.toModel(ChatRoomScene.UsersModel.self, value: object.toJson())
             completion(nil, model)
         }, fail: { error in
             completion(error, nil)
         })
     }
 
-    func removeUser(user: TemplateScene.UsersModel, completion: @escaping (SyncError?, [TemplateScene.UsersModel]?) -> Void) {
+    func removeUser(user: ChatRoomScene.UsersModel, completion: @escaping (SyncError?, [ChatRoomScene.UsersModel]?) -> Void) {
         guard let channelName = channelName else {
             assertionFailure("channelName = nil")
             return
@@ -74,7 +74,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             .document(id: user.objectId ?? "")
             .delete(success: { results in
                 let datas = results.compactMap({ $0.toJson() })
-                    .compactMap({ JSONObject.toModel(TemplateScene.UsersModel.self, value: $0) })
+                    .compactMap({ JSONObject.toModel(ChatRoomScene.UsersModel.self, value: $0) })
                     .sorted(by: { $0.timestamp < $1.timestamp })
                 completion(nil, datas)
             }, fail: { error in
@@ -82,7 +82,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             })
     }
 
-    func updateUser(user: TemplateScene.UsersModel, completion: @escaping (SyncError?, TemplateScene.UsersModel?) -> Void) {
+    func updateUser(user: ChatRoomScene.UsersModel, completion: @escaping (SyncError?, ChatRoomScene.UsersModel?) -> Void) {
         guard let channelName = channelName else {
             assertionFailure("channelName = nil")
             return
@@ -90,7 +90,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .document(id: user.objectId ?? "")
             .update(key: "", data: JSONObject.toJson(user), success: { objects in
-                guard let object = objects.first, let model = JSONObject.toModel(TemplateScene.UsersModel.self, value: object.toJson()) else {
+                guard let object = objects.first, let model = JSONObject.toModel(ChatRoomScene.UsersModel.self, value: object.toJson()) else {
                     assertionFailure("user == nil")
                     return
                 }
@@ -100,14 +100,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             })
     }
 
-    func getUserStatus(completion: @escaping (SyncError?, [TemplateScene.UsersModel]?) -> Void) {
+    func getUserStatus(completion: @escaping (SyncError?, [ChatRoomScene.UsersModel]?) -> Void) {
         guard let channelName = channelName else {
             assertionFailure("channelName = nil")
             return
         }
         SyncUtil.scene(id: channelName)?.collection(className: SYNC_SCENE_ROOM_USER_COLLECTION).get(success: { results in
             let datas = results.compactMap({ $0.toJson() })
-                .compactMap({ JSONObject.toModel(TemplateScene.UsersModel.self, value: $0) })
+                .compactMap({ JSONObject.toModel(ChatRoomScene.UsersModel.self, value: $0) })
                 .sorted(by: { $0.timestamp < $1.timestamp })
             completion(nil, datas)
         }, fail: { error in
@@ -115,7 +115,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
 
-    func subscribeRoom(subscribeClosure: @escaping (TemplateScene.SubscribeStatus, TemplateScene.LiveRoomInfo?) -> Void,
+    func subscribeRoom(subscribeClosure: @escaping (ChatRoomScene.SubscribeStatus, ChatRoomScene.LiveRoomInfo?) -> Void,
                        onSubscribed: (() -> Void)?,
                        fail: ((SyncError) -> Void)?)
     {
@@ -125,20 +125,20 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         SyncUtil.scene(id: channelName)?.subscribe(key: "",
                                                    onCreated: { object in
-                                                       guard let model = JSONObject.toModel(TemplateScene.LiveRoomInfo.self, value: object.toJson()) else {
+                                                       guard let model = JSONObject.toModel(ChatRoomScene.LiveRoomInfo.self, value: object.toJson()) else {
                                                            assertionFailure("LiveRoomInfo == nil")
                                                            return
                                                        }
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.created, model)
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.created, model)
                                                    }, onUpdated: { object in
-                                                       guard let model = JSONObject.toModel(TemplateScene.LiveRoomInfo.self, value: object.toJson()) else {
+                                                       guard let model = JSONObject.toModel(ChatRoomScene.LiveRoomInfo.self, value: object.toJson()) else {
                                                            assertionFailure("LiveRoomInfo == nil")
                                                            return
                                                        }
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.updated, model)
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.updated, model)
                                                    }, onDeleted: { object in
-                                                       let model = JSONObject.toModel(TemplateScene.LiveRoomInfo.self, value: object.toJson())
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.deleted, model)
+                                                       let model = JSONObject.toModel(ChatRoomScene.LiveRoomInfo.self, value: object.toJson())
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.deleted, model)
                                                    }, onSubscribed: {
                                                        onSubscribed?()
                                                    }, fail: { error in
@@ -146,7 +146,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                                    })
     }
 
-    func subscribeUser(subscribeClosure: @escaping (TemplateScene.SubscribeStatus, TemplateScene.UsersModel?) -> Void,
+    func subscribeUser(subscribeClosure: @escaping (ChatRoomScene.SubscribeStatus, ChatRoomScene.UsersModel?) -> Void,
                        onSubscribed: (() -> Void)?,
                        fail: ((SyncError) -> Void)?)
     {
@@ -156,20 +156,20 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         SyncUtil.scene(id: channelName)?.subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
                                                    onCreated: { object in
-                                                       guard let model = JSONObject.toModel(TemplateScene.UsersModel.self, value: object.toJson()) else {
+                                                       guard let model = JSONObject.toModel(ChatRoomScene.UsersModel.self, value: object.toJson()) else {
                                                            assertionFailure("AgoraUsersModel == nil")
                                                            return
                                                        }
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.created, model)
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.created, model)
                                                    }, onUpdated: { object in
-                                                       guard let model = JSONObject.toModel(TemplateScene.UsersModel.self, value: object.toJson()) else {
+                                                       guard let model = JSONObject.toModel(ChatRoomScene.UsersModel.self, value: object.toJson()) else {
                                                            assertionFailure("AgoraUsersModel == nil")
                                                            return
                                                        }
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.updated, model)
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.updated, model)
                                                    }, onDeleted: { object in
-                                                       let model = JSONObject.toModel(TemplateScene.UsersModel.self, value: object.toJson())
-                                                       subscribeClosure(TemplateScene.SubscribeStatus.deleted, model)
+                                                       let model = JSONObject.toModel(ChatRoomScene.UsersModel.self, value: object.toJson())
+                                                       subscribeClosure(ChatRoomScene.SubscribeStatus.deleted, model)
                                                    }, onSubscribed: {
                                                        onSubscribed?()
                                                    }, fail: { error in

@@ -241,9 +241,6 @@
 		DD8417C729090C520026B624 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD84175929090C520026B624 /* KtvResource.bundle */; };
 		DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84175C29090C520026B624 /* TemplateSceneCreateController.swift */; };
 		DD8417C929090C520026B624 /* Template.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD84175D29090C520026B624 /* Template.bundle */; };
-		DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84175F29090C520026B624 /* TemplateServiceModel.swift */; };
-		DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176029090C520026B624 /* TemplateServiceImp.swift */; };
-		DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176129090C520026B624 /* TemplateServiceProtocol.swift */; };
 		DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198DF28FFE579009D3E61 /* ToastView.swift */; };
 		DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E028FFE579009D3E61 /* AlertManager.swift */; };
 		DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */; };
@@ -398,6 +395,9 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		E333F62F291244E90031B35F /* ChatRoomServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F62C291244E90031B35F /* ChatRoomServiceImp.swift */; };
+		E333F630291244E90031B35F /* ChatRoomServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F62D291244E90031B35F /* ChatRoomServiceModel.swift */; };
+		E333F631291244E90031B35F /* ChatRoomServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F62E291244E90031B35F /* ChatRoomServiceProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -734,9 +734,6 @@
 		DD84175929090C520026B624 /* KtvResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KtvResource.bundle; sourceTree = "<group>"; };
 		DD84175C29090C520026B624 /* TemplateSceneCreateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateSceneCreateController.swift; sourceTree = "<group>"; };
 		DD84175D29090C520026B624 /* Template.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Template.bundle; sourceTree = "<group>"; };
-		DD84175F29090C520026B624 /* TemplateServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceModel.swift; sourceTree = "<group>"; };
-		DD84176029090C520026B624 /* TemplateServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceImp.swift; sourceTree = "<group>"; };
-		DD84176129090C520026B624 /* TemplateServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceProtocol.swift; sourceTree = "<group>"; };
 		DDA198DF28FFE579009D3E61 /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		DDA198E028FFE579009D3E61 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHotSpotBtn.m; sourceTree = "<group>"; };
@@ -943,6 +940,9 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		E333F62C291244E90031B35F /* ChatRoomServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceImp.swift; sourceTree = "<group>"; };
+		E333F62D291244E90031B35F /* ChatRoomServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceModel.swift; sourceTree = "<group>"; };
+		E333F62E291244E90031B35F /* ChatRoomServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1790,9 +1790,7 @@
 		DD84175E29090C520026B624 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				DD84175F29090C520026B624 /* TemplateServiceModel.swift */,
-				DD84176029090C520026B624 /* TemplateServiceImp.swift */,
-				DD84176129090C520026B624 /* TemplateServiceProtocol.swift */,
+				E333F62B291244E90031B35F /* ChatRoom */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -2454,6 +2452,16 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
+		E333F62B291244E90031B35F /* ChatRoom */ = {
+			isa = PBXGroup;
+			children = (
+				E333F62C291244E90031B35F /* ChatRoomServiceImp.swift */,
+				E333F62D291244E90031B35F /* ChatRoomServiceModel.swift */,
+				E333F62E291244E90031B35F /* ChatRoomServiceProtocol.swift */,
+			);
+			path = ChatRoom;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2696,7 +2704,6 @@
 				DD8417AF29090C520026B624 /* VLChooseBelcantoView.m in Sources */,
 				057DD9FD290B9495001329E6 /* PresentationAnimation.swift in Sources */,
 				DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */,
-				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */,
@@ -2791,7 +2798,6 @@
 				057DDA01290B9495001329E6 /* Throttle.swift in Sources */,
 				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
-				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
 				DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */,
 				DD8417B629090C520026B624 /* VLPopScoreView.m in Sources */,
 				DD8417C529090C520026B624 /* VLKTVViewController.m in Sources */,
@@ -2889,6 +2895,7 @@
 				DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */,
 				DD8417A929090C520026B624 /* VLKTVSliderView.m in Sources */,
 				0510B866290B7A6E0063E57A /* VRNormalRoomsViewController.swift in Sources */,
+				E333F630291244E90031B35F /* ChatRoomServiceModel.swift in Sources */,
 				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				0510B86A290B7AE80063E57A /* VoiceRoomAlertViewController.swift in Sources */,
 				057DD9FF290B9495001329E6 /* CrossZoomAnimation.swift in Sources */,
@@ -2915,7 +2922,6 @@
 				DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */,
 				DDA19A5E28FFE57A009D3E61 /* EKRatingMessageView.swift in Sources */,
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
-				DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */,
 				DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */,
 				DD84179A29090C520026B624 /* VLKTVSelBgModel.m in Sources */,
 				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
@@ -2934,6 +2940,7 @@
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
+				E333F62F291244E90031B35F /* ChatRoomServiceImp.swift in Sources */,
 				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,
 				DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */,
 				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
@@ -2949,6 +2956,7 @@
 				DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */,
 				DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */,
 				05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */,
+				E333F631291244E90031B35F /* ChatRoomServiceProtocol.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD8417B129090C520026B624 /* VLSelectSongView.m in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
