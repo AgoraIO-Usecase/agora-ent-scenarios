@@ -53,6 +53,7 @@
 - (UICollectionView *)menuList {
     if (!_menuList) {
         _menuList = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:[self flowLayout]];
+        _menuList.backgroundColor = [UIColor whiteColor];
         _menuList.dataSource = self;
         _menuList.delegate = self;
         [_menuList registerClass:[HomeMenuCell class] forCellWithReuseIdentifier:@"HomeMenuCell"];
