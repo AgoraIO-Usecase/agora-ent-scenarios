@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.voice">
+
+    <application>
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomSplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomLiveActivity"
+            android:exported="false"
+            android:keepScreenOn="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomListActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomCreateActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomSoundSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+
+        <activity
+            android:name="io.agora.scene.voice.ui.activity.ChatroomDisclaimerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+    </application>
+
+</manifest>
