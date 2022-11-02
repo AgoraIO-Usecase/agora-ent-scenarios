@@ -22,7 +22,7 @@ extension TemplateServiceImp: TemplateServiceProtocol {
 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
             let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
             self?.channelName = channelName
-            NetworkManager.shared.generateToken(channelName: channelName ?? "", uid: "\(UserInfo.userId)") {
+            NetworkManager.shared.generateRTCToken(channelName: channelName ?? "", uid: "\(UserInfo.userId)") { token in
                 let resp = TemplateScene.JoinResponse(channelName: channelName ?? "", userId: "\(UserInfo.userId)")
                 completion(nil, resp)
             }
