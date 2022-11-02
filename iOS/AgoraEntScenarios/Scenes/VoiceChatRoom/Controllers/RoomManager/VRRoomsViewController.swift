@@ -13,7 +13,6 @@ let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
 @objc public final class VRRoomsViewController: VRBaseViewController {
-    
     private var index: Int = 0 {
         didSet {
             DispatchQueue.main.async {
@@ -28,42 +27,40 @@ let page_size = 15
 
     private var currentUser: VLLoginModel?
 
-    private lazy var background: UIImageView = {
-        UIImageView(frame: self.view.frame).image(UIImage("roomList")!)
-    }()
+    private lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
 
     private lazy var container: VoiceRoomPageContainer = {
         VoiceRoomPageContainer(frame: CGRect(x: 0, y: ZNavgationHeight, width: ScreenWidth, height: ScreenHeight - ZNavgationHeight - 10 - CGFloat(ZBottombarHeight) - 30), viewControllers: [self.normal]).backgroundColor(.clear)
     }()
 
-    private lazy var create: VRRoomCreateView = {
-        VRRoomCreateView(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
-    }()
+    private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
 
     @objc convenience init(user: VLLoginModel) {
         self.init()
-        self.currentUser = user
+        currentUser = user
         VoiceRoomIMManager.shared?.configIM(appkey: "52117440#955012")
+
         // MARK: - you can replace request host call this.
+
         VoiceRoomBusinessRequest.shared.changeHost(host: "http://a1-test-voiceroom.easemob.com")
         if user.hasVoiceRoomUserInfo {
-            self.mapUser(user: user)
+            mapUser(user: user)
         } else {
-            self.login()
+            login()
         }
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.navigation.title.text = LanguageManager.localValue(key: "Agora Chat Room")
+        navigation.title.text = LanguageManager.localValue(key: "Agora Chat Room")
     }
-    
+
     private func showContent() {
-        self.view.addSubViews([self.background, self.container, self.create])
-        self.view.bringSubviewToFront(self.navigation)
-        self.viewsAction()
-        self.childViewControllersEvent()
+        view.addSubViews([background, container, create])
+        view.bringSubviewToFront(navigation)
+        viewsAction()
+        childViewControllersEvent()
     }
 }
 
@@ -82,7 +79,7 @@ extension VRRoomsViewController {
     }
 
     private func login() {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": self.currentUser?.userNo ?? "", "portrait": self.currentUser?.headUrl ?? "", "name": self.currentUser?.name ?? ""], classType: VRUser.self) { user, error in
+        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": currentUser?.userNo ?? "", "portrait": currentUser?.headUrl ?? "", "name": currentUser?.name ?? ""], classType: VRUser.self) { user, error in
             if error == nil, user != nil {
                 self.currentUser?.hasVoiceRoomUserInfo = true
                 self.currentUser?.chat_uid = user?.chat_uid ?? ""
@@ -101,7 +98,7 @@ extension VRRoomsViewController {
     }
 
     private func viewsAction() {
-        self.create.action = { [weak self] in
+        create.action = { [weak self] in
             self?.navigationController?.pushViewController(VRCreateRoomViewController(), animated: true)
         }
 //        self.container.scrollClosure = { [weak self] in
@@ -118,7 +115,7 @@ extension VRRoomsViewController {
         if room.is_private ?? false {
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
-            self.presentViewController(vc)
+            presentViewController(vc)
             alert.actionEvents = {
                 if $0 == 31 {
                     room.roomPassword = alert.code
@@ -127,7 +124,7 @@ extension VRRoomsViewController {
                 vc.dismiss(animated: true)
             }
         } else {
-            self.loginIMThenPush(room: room)
+            loginIMThenPush(room: room)
         }
     }
 
@@ -173,7 +170,7 @@ extension VRRoomsViewController {
 //            self.menuBar.menuList.reloadData()
 //        }
 
-        self.normal.didSelected = { [weak self] in
+        normal.didSelected = { [weak self] in
             self?.entryRoom(room: $0)
         }
 //        self.normal.totalCountClosure = { [weak self] in

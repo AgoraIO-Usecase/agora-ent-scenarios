@@ -18,12 +18,11 @@ public enum CELL_BTN_TYPE {
 }
 
 class VMANISSUPTableViewCell: UITableViewCell {
-
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
-    public var titleLabel: UILabel = UILabel()
-    public var detailLabel: UILabel = UILabel()
-    private var noneBtn: UIButton = UIButton()
-    private var anisBtn: UIButton = UIButton()
+    public var titleLabel: UILabel = .init()
+    public var detailLabel: UILabel = .init()
+    private var noneBtn: UIButton = .init()
+    private var anisBtn: UIButton = .init()
     private var selBtn: UIButton!
     public var isTouchAble: Bool = false
     public var isAudience: Bool = false
@@ -33,7 +32,7 @@ class VMANISSUPTableViewCell: UITableViewCell {
             anisBtn.tag = cellTag
         }
     }
-    
+
     public var cellType: SUP_CELL_TYPE = .normal {
         didSet {
             if cellType == .normal {
@@ -45,7 +44,7 @@ class VMANISSUPTableViewCell: UITableViewCell {
             }
         }
     }
-    
+
     public var btn_state: CELL_BTN_TYPE = .none {
         didSet {
             if btn_state == .off {
@@ -53,109 +52,107 @@ class VMANISSUPTableViewCell: UITableViewCell {
                 noneBtn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
                 noneBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
                 noneBtn.layer.borderWidth = 1
-                
-                anisBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
-                anisBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+
+                anisBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
+                anisBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
                 anisBtn.layer.borderColor = UIColor.clear.cgColor
                 anisBtn.layer.borderWidth = 0
-                
+
                 selBtn = noneBtn
             } else if btn_state == .middle {
                 anisBtn.backgroundColor = .white
                 anisBtn.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
                 anisBtn.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
                 anisBtn.layer.borderWidth = 1
-                
-                noneBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
-                noneBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+
+                noneBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
+                noneBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
                 noneBtn.layer.borderColor = UIColor.clear.cgColor
                 noneBtn.layer.borderWidth = 0
-                
+
                 selBtn = anisBtn
             } else if btn_state == .none {
-                anisBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
-                anisBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+                anisBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
+                anisBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
                 anisBtn.layer.borderColor = UIColor.clear.cgColor
                 anisBtn.layer.borderWidth = 0
-                
-                noneBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
-                noneBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+
+                noneBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
+                noneBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
                 noneBtn.layer.borderColor = UIColor.clear.cgColor
                 noneBtn.layer.borderWidth = 0
                 selBtn = nil
             }
         }
     }
-    
-    public var resBlock:((Int) -> Void)?
-    
+
+    public var resBlock: ((Int) -> Void)?
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layoutUI()
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func layoutUI() {
         titleLabel.frame = CGRect(x: 20, y: 10, width: 200, height: 20)
         titleLabel.text = "TV Sound"
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         titleLabel.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
-        self.contentView.addSubview(titleLabel)
-        
+        contentView.addSubview(titleLabel)
+
         detailLabel.frame = CGRect(x: 20, y: 30, width: 150, height: 30)
         detailLabel.text = "Ex bird, car,subway sounds"
         detailLabel.font = UIFont.systemFont(ofSize: 11)
         detailLabel.numberOfLines = 0
         detailLabel.lineBreakMode = .byCharWrapping
-        detailLabel.textColor = UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1)
-        self.contentView.addSubview(detailLabel)
+        detailLabel.textColor = UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1)
+        contentView.addSubview(detailLabel)
         detailLabel.isHidden = true
-        
+
         noneBtn.frame = CGRect(x: screenWidth - 70, y: 12, width: 50, height: 30)
-        noneBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
+        noneBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
         noneBtn.setTitle("Without AINS".localized(), for: .normal)
-        noneBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+        noneBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         noneBtn.font(UIFont.systemFont(ofSize: 11))
         noneBtn.layer.cornerRadius = 3
         noneBtn.layer.masksToBounds = true
         noneBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        self.addSubview(noneBtn)
-        
+        addSubview(noneBtn)
+
         anisBtn.frame = CGRect(x: screenWidth - 130, y: 12, width: 50, height: 30)
-        anisBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
+        anisBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
         anisBtn.setTitle("With AINS".localized(), for: .normal)
-        anisBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+        anisBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
         anisBtn.font(UIFont.systemFont(ofSize: 11))
         anisBtn.layer.cornerRadius = 3
         anisBtn.layer.masksToBounds = true
         anisBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        self.addSubview(anisBtn)
-        
+        addSubview(anisBtn)
     }
-    
+
     @objc private func click(sender: UIButton) {
-        if sender == selBtn {return}
-        
-        guard let resBlock = resBlock else {return}
+        if sender == selBtn { return }
+
+        guard let resBlock = resBlock else { return }
         resBlock(sender.tag)
-        
-        if (!isTouchAble || isAudience) {return}
-        
+
+        if !isTouchAble || isAudience { return }
+
         sender.backgroundColor = .white
         sender.layer.borderColor = UIColor.HexColor(hex: 0x0A7AFF, alpha: 1).cgColor
         sender.setTitleColor(UIColor.HexColor(hex: 0x0A7AFF, alpha: 1), for: .normal)
         sender.layer.borderWidth = 1
         if selBtn != nil {
-            selBtn.backgroundColor = UIColor(red: 236/255.0, green: 236/255.0, blue: 236/255.0, alpha: 1)
-            selBtn.setTitleColor(UIColor(red: 151/255.0, green: 156/255.0, blue: 187/255.0, alpha: 1), for: .normal)
+            selBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
+            selBtn.setTitleColor(UIColor(red: 151 / 255.0, green: 156 / 255.0, blue: 187 / 255.0, alpha: 1), for: .normal)
             selBtn.layer.borderColor = UIColor.clear.cgColor
             selBtn.layer.borderWidth = 0
         }
         selBtn = sender
     }
-
-
 }

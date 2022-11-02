@@ -10,9 +10,8 @@ import YYCategories
 
 private let kSceneId = "scene_ktv"
 
-private let kSceneMVIndexKey = "scene_mv_index"
 /// 座位信息
-private let SYNC_MANAGER_SEAT_INFO = "seat_innfo"
+private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
@@ -75,12 +74,15 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         initScene { [weak self] in
             SyncUtil.fetchAll { results in
                 print("result == \(results.compactMap { $0.toJson() })")
+                guard let self = self else {
+                    return
+                }
 
                 let dataArray = results.map({ info in
                     return VLRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
-                self?.roomList = dataArray
-                completion(nil, dataArray)
+                self.roomList = dataArray.sorted(by: { TimeInterval($0.updatedAt ?? $0.createdAt ?? "0") ?? 0 > TimeInterval($1.updatedAt ?? $0.createdAt ?? "0") ?? 0 })
+                completion(nil, self.roomList)
             } fail: { error in
                 completion(error, nil)
             }
@@ -96,9 +98,11 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         roomInfo.isPrivate = inputModel.isPrivate.boolValue
         roomInfo.password = inputModel.password
         roomInfo.creator = VLUserCenter.user.userNo
+        roomInfo.creatorNo = VLUserCenter.user.userNo
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
+        roomInfo.createdAt = "\(Date().timeIntervalSince1970)"
 //        roomInfo.soundEffect;
 //        roomInfo.belCanto;
 //        roomInfo.createdAt;
@@ -118,15 +122,20 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateToken(channelName: channelName ?? "",
-                                                    uid: "\(UserInfo.userId)") {
-                    guard let self = self else {
+                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
+                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                    guard let self = self,
+                          let rtcToken = rtcToken,
+                          let rtmToken = rtmToken
+                    else {
+                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = KeyCenter.Token!
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
                     self.roomList?.append(roomInfo)
-                    //                VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
+//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
                     let output = KTVCreateRoomOutputModel()
                     output.name = inputModel.name
                     output.roomNo = roomInfo.roomNo
@@ -160,14 +169,19 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateToken(channelName: channelName ?? "",
-                                                    uid: "\(UserInfo.userId)") {
-                    guard let self = self else {
+                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
+                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                    guard let self = self,
+                          let rtcToken = rtcToken,
+                          let rtmToken = rtmToken
+                    else {
+                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = KeyCenter.Token!
-                    //                VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
+                    VLUserCenter.user.agoraRTCToken = rtcToken
+                    VLUserCenter.user.agoraRTMToken = rtmToken
+//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
                     let output = KTVJoinRoomOutputModel()
                     output.creator = userId
                     output.seatsArray = self.emptySeats()
@@ -192,34 +206,36 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
-        let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        params["objectId"] = channelName
         SyncUtil
             .scene(id: channelName)?
-            .update(key: kSceneMVIndexKey,
+            .update(key: "",
                     data: params,
                     success: { object in
-                        guard let model = object.first, let model = VLRoomListModel.yy_model(withJSON: model.toJson()!) else {
-                            assertionFailure("udpate pkinfo fail")
+                        guard let model = object.first else {
+                            print("udpate mv fail")
                             return
                         }
                         completion(nil)
                     }, fail: { error in
                         completion(error)
                     })
+        completion(nil)
     }
 
     func onSeat(withInput inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void) {
-        addSeatInfo(seatInfo: getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))) { error in
-        }
+        let seatInfo = getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
+        addSeatInfo(seatInfo: seatInfo,
+                    finished: completion)
     }
 
     func outSeat(withInput inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
-        let origSeatInfo = seatMap["\(inputModel.userOnSeat)"]!
-        let seatInfo = VLRoomSeatModel()
-        seatInfo.objectId = origSeatInfo.objectId
-        seatInfo.onSeat = origSeatInfo.onSeat
-        updateSeatInfo(seatInfo: seatInfo) { error in
+        let seatInfo = seatMap["\(inputModel.userOnSeat)"]!
+        removeSeat(seatInfo: seatInfo) { error in
+            // TODO(wushengtao): whitout callback
         }
+        completion(nil)
     }
 
     func leaveRoom(completion: @escaping (Error?) -> Void) {
@@ -227,12 +243,17 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             assertionFailure("channelName = nil")
             return
         }
-        deleteUser { error in
+        removeUser { error in
             // TODO(wushengtao): whitout callback
 //            self.updateUserCount(with: max(self.userList.count - 1, 0))
         }
-        // TODO(wushengtao): bacause of deleteUser can not recv callback, invoke immediately
+        // TODO(wushengtao): bacause of removeUser can not recv callback, invoke immediately
         updateUserCount(with: max(userList.count - 1, 0))
+
+        if let seat = seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
+            removeSeat(seatInfo: seat) { error in
+            }
+        }
 
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
@@ -244,7 +265,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             assertionFailure("channelName = nil")
             return
         }
-//        deleteUser { error in
+//        removeUser { error in
 //            //TODO(wushengtao): whitout callback
         ////            completion(error)
 //        }
@@ -255,15 +276,24 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     }
 
     func removeSong(withInput inputModel: KTVRemoveSongInputModel, completion: @escaping (Error?) -> Void) {
-        deleteChooseSong(songId: inputModel.objectId, completion: completion)
+        removeChooseSong(songId: inputModel.objectId, completion: completion)
     }
 
     func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         getChooseSongInfo(finished: completion)
     }
 
-    func joinChorus(withInput inputModel: KTVJoinChorusInputModel, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func joinChorus(withInput inputModel: KTVJoinChorusInputModel,
+                    completion: @escaping (Error?) -> Void) {
+        guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
+            assertionFailure()
+            return
+        }
+        //isChorus always true
+        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+        topSong.status = 2
+        topSong.chorusNo = VLUserCenter.user.userNo
+        updateChooseSong(songInfo: topSong, finished: completion)
     }
 
     func getSongDetail(withInput inputModel: KTVSongDetailInputModel, completion: @escaping (Error?, KTVSongDetailOutputModel?) -> Void) {
@@ -299,7 +329,9 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
-    func chooseSong(withInput inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void) {
+    func chooseSong(withInput inputModel: KTVChooseSongInputModel,
+                    completion: @escaping (Error?) -> Void)
+    {
         let songInfo = VLRoomSelSongModel()
         songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
@@ -313,21 +345,37 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
-        addChooseSongInfo(songInfo: songInfo, finished: completion)
+        addChooseSongInfo(songInfo: songInfo) { error in
+            // TODO(wushengtao): fetch all list can not be changed if immediately invoke
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
+                completion(error)
+            }
+        }
     }
 
     func makeSongTop(withInput inputModel: KTVMakeSongTopInputModel, completion: @escaping (Error?) -> Void) {
 //        assert(false)
-        guard let song = songList.filter({ $0.objectId == inputModel.objectId }).first else {
+        guard let topSong = songList.first,
+              let song = songList.filter({ $0.objectId == inputModel.objectId }).first
+        else {
             assertionFailure("make song to top not found! \(inputModel.songNo)")
             return
         }
-        let targetSort = (Int(songList.first?.sort ?? "-1") ?? 0) - 1
-        let origSort = song.sort
+
+        // mark input song to top
+        let targetSort = (minSort() ?? 0) - 1
         song.sort = "\(targetSort)"
-        updateChooseSong(songInfo: song) { error in
+
+        if topSong.objectId != song.objectId {
+            topSong.sort = "\(targetSort - 1)"
+            updateChooseSong(songInfo: topSong) { error in
+            }
         }
-        song.sort = origSort
+
+        // mark current playing song to top
+        updateChooseSong(songInfo: song) { error in
+            completion(error)
+        }
     }
 
     func subscribeUserListCount(changed changedBlock: @escaping (UInt) -> Void) {
@@ -340,6 +388,32 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func subscribeRoomStatus(changed changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
+
+        guard let channelName = roomNo else {
+            assertionFailure("channelName = nil")
+            return
+        }
+        SyncUtil
+            .scene(id: channelName)?
+            .subscribe(key: "",
+                       onCreated: { _ in
+                       }, onUpdated: { [weak self] object in
+                           guard let jsonStr = object.toJson(),
+                                 let model = VLRoomListModel.yy_model(withJSON: jsonStr),
+                                 model.roomNo == channelName
+                           else {
+                               return
+                           }
+                           self?.roomStatusDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                       }, onDeleted: { [weak self] object in
+                           guard let model = self?.roomList?.filter({ $0.roomNo == object.getId()}).first,
+                                 model.roomNo == channelName
+                           else {
+                               return
+                           }
+                           self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
+                       }, onSubscribed: {}, fail: { error in
+                       })
     }
 
     func subscribeChooseSong(changed changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
@@ -348,16 +422,34 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     // MARK: Deprecated protocol method
 
-    func mute(withMuteStatus mute: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func mute(withMuteStatus mute: Bool,
+              completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            assertionFailure()
+            return
+        }
+        
+        seatInfo.isSelfMuted = mute ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
     }
 
-    func openVideoStatus(withStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func openVideoStatus(withStatus openStatus: Bool,
+                         completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            assertionFailure()
+            return
+        }
+        
+        seatInfo.isVideoMuted = openStatus ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
     }
 
     func publishChooseSongEvent() {
-//        assert(false)
+//        assertionFailure()
         // replace with subscribeChooseSong()
     }
 
@@ -366,32 +458,45 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         // ignore
     }
 
-    func publishMuteEvent(withMuteStatus muteStatus: Int, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
+        // replace with muteWithMuteStatus
     }
 
-    func publishVideoOpenStatus(withStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
+        // replace with openVideoStatus()
     }
 
     func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-        assertionFailure()
+        // replace with subscribeChooseSong()
     }
 
     func publishToSoloEvent() {
-        assertionFailure()
+//        assertionFailure()
+        markSoloSongIfNeed()
     }
 
     func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+        //replace with joinChorusWithInput
+//        assertionFailure()
     }
 
     func publishSongOwner(withOwnerId userNo: String) {
-        assertionFailure()
+//        assertionFailure()
+        //ignore
     }
 
-    func publishSingingScore(withTotalVolume totalVolume: Int) {
-//        assert(false)
+    func publishSingingScore(withTotalVolume totalVolume: Double) {
+//        assertionFailure()
+        guard let topSong = self.songList.first else {
+            assertionFailure()
+            return
+        }
+        
+        topSong.status = 2
+        topSong.score = totalVolume
+        updateChooseSong(songInfo: topSong) { error in
+            
+        }
     }
 
     func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
@@ -485,7 +590,7 @@ extension KTVSyncManagerServiceImp {
                        })
     }
 
-    private func deleteUser(completion: @escaping (Error?) -> Void) {
+    private func removeUser(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             assertionFailure("channelName = nil")
             return
@@ -519,7 +624,7 @@ extension KTVSyncManagerServiceImp {
         if roomPeopleNum == roomInfo.roomPeopleNum {
             return
         }
-        roomInfo.createdAt = Date().description
+        roomInfo.updatedAt = "\(Date().timeIntervalSince1970)"
         roomInfo.roomPeopleNum = roomPeopleNum
         var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
 //        SyncUtil
@@ -538,8 +643,10 @@ extension KTVSyncManagerServiceImp {
             .update(key: "",
                     data: params,
                     success: { obj in
+                        print("updateUserCount success")
                     },
                     fail: { error in
+                        print("updateUserCount fail")
                     })
 
         userListCountDidChanged?(UInt(count))
@@ -587,9 +694,6 @@ extension KTVSyncManagerServiceImp {
     }
 
     private func autoOnSeatIfNeed() {
-        guard VLUserCenter.user.ifMaster else {
-            return
-        }
         subscribeSeats {}
 
         getSeatInfo { [weak self] error, list in
@@ -597,13 +701,29 @@ extension KTVSyncManagerServiceImp {
                 return
             }
 
-            let targetSeatInfo = self.getUserSeatInfo(seatIndex: 0)
-            if let seatInfo = self.seatMap["0"], seatInfo.objectId?.count ?? 0 > 0 {
-                targetSeatInfo.objectId = seatInfo.objectId
-                self.updateSeatInfo(seatInfo: targetSeatInfo) { error in
+            // mock callback
+            self.seatMap.forEach { (key: String, value: VLRoomSeatModel) in
+                if value.objectId == nil {
+                    return
+                }
+
+                self.seatListDidChanged?(KTVSubscribeCreated.rawValue, value)
+            }
+
+            // update seat info (user avater/nick name did changed) if seat existed
+            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
+                let targetSeatInfo = self.getUserSeatInfo(seatIndex: seat.onSeat)
+                targetSeatInfo.objectId = seat.objectId
+                self.updateSeat(seatInfo: targetSeatInfo) { error in
                 }
                 return
             }
+            guard VLUserCenter.user.ifMaster else {
+                return
+            }
+
+            // add master to first seat
+            let targetSeatInfo = self.getUserSeatInfo(seatIndex: 0)
             self.addSeatInfo(seatInfo: targetSeatInfo) { error in
             }
         }
@@ -633,10 +753,14 @@ extension KTVSyncManagerServiceImp {
             })
     }
 
-    private func updateSeatInfo(seatInfo: VLRoomSeatModel, finished: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo, let objectId = seatInfo.objectId else {
+    private func updateSeat(seatInfo: VLRoomSeatModel,
+                            finished: @escaping (Error?) -> Void)
+    {
+        guard let channelName = roomNo,
+              let objectId = seatInfo.objectId
+        else {
 //            assert(false, "channelName = nil")
-            print("addUserInfo channelName = nil")
+            print("updateSeatInfo channelName = nil")
             return
         }
 
@@ -647,13 +771,41 @@ extension KTVSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
+//                        finished(nil)
+                    }, fail: { error in
+//                        finished(NSError(domain: error.message, code: error.code))
+                    })
+        //TODO(wushengtao): callbacll never received, mock it
+        DispatchQueue.main.async {
+            finished(nil)
+        }
+    }
+
+    private func removeSeat(seatInfo: VLRoomSeatModel,
+                            finished: @escaping (Error?) -> Void)
+    {
+        guard let channelName = roomNo,
+              let objectId = seatInfo.objectId
+        else {
+//            assert(false, "channelName = nil")
+            print("removeSeat channelName = nil")
+            return
+        }
+
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_MANAGER_SEAT_INFO)
+            .delete(id: objectId,
+                    success: {
                         finished(nil)
                     }, fail: { error in
-                        finished(error)
+                        finished(NSError(domain: error.message, code: error.code))
                     })
     }
 
-    private func addSeatInfo(seatInfo: VLRoomSeatModel, finished: @escaping (Error?) -> Void) {
+    private func addSeatInfo(seatInfo: VLRoomSeatModel,
+                             finished: @escaping (Error?) -> Void)
+    {
         guard let channelName = roomNo else {
 //            assert(false, "channelName = nil")
             print("addUserInfo channelName = nil")
@@ -699,15 +851,17 @@ extension KTVSyncManagerServiceImp {
                            self.seatMap["\(model.onSeat)"] = model
                            self.seatListDidChanged?(KTVSubscribeUpdated.rawValue, model)
                        }, onDeleted: { [weak self] object in
-                           guard let self = self,
-                                 let model = VLRoomSeatModel.yy_model(withJSON: object.toJson()!)
-                           else {
+                           guard let self = self else {
+                               return
+                           }
+                           let objectId = object.getId()
+                           guard let origSeat = self.seatMap.filter({ $0.value.objectId == objectId }).first?.value else {
+                               print("delete seat not found")
                                return
                            }
                            let seat = VLRoomSeatModel()
-                           seat.onSeat = model.onSeat
-                           let origSeat = self.seatMap["\(model.onSeat)"]!
-                           self.seatMap["\(model.onSeat)"] = seat
+                           seat.onSeat = origSeat.onSeat
+                           self.seatMap["\(origSeat.onSeat)"] = seat
                            self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, origSeat)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
@@ -722,6 +876,20 @@ extension KTVSyncManagerServiceImp {
 // MARK: Choose song operation
 
 extension KTVSyncManagerServiceImp {
+    private func minSort() -> Int? {
+        var sort: Int?
+        songList.forEach { model in
+            let _sort = Int(model.sort) ?? 0
+            sort = sort == nil ? _sort : min(sort!, _sort)
+        }
+
+        return sort
+    }
+
+    private func sortChooseSongList() {
+        songList = songList.sorted(by: { Int($0.sort)! < Int($1.sort)! })
+    }
+
     private func getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         guard let channelName = roomNo else {
             assertionFailure("channelName = nil")
@@ -734,9 +902,10 @@ extension KTVSyncManagerServiceImp {
                 guard let self = self else {
                     return
                 }
-                let songs = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
-                self.songList = songs.sorted(by: { $0.sort < $1.sort })
-                finished(nil, self.songList)
+                self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
+                self.sortChooseSongList()
+                let songList = self.songList
+                finished(nil, songList)
             }, fail: { error in
                 print("error = \(error.description)")
                 finished(error, nil)
@@ -759,10 +928,15 @@ extension KTVSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
-                        finished(nil)
+                        // TODO(wushengtao): missing callback
+//                        finished(nil)
                     }, fail: { error in
-                        finished(error)
+//                        finished(error)
+                        // TODO(wushengtao): missing callback
                     })
+
+        // TODO(wushengtao): mock
+        finished(nil)
     }
 
     private func addChooseSongInfo(songInfo: VLRoomSelSongModel, finished: @escaping (Error?) -> Void) {
@@ -785,7 +959,7 @@ extension KTVSyncManagerServiceImp {
                  })
     }
 
-    private func deleteChooseSong(songId: String?, completion: @escaping (Error?) -> Void) {
+    private func removeChooseSong(songId: String?, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo,
               let objectId = songId
         else {
@@ -799,14 +973,41 @@ extension KTVSyncManagerServiceImp {
                     success: {
                         // TODO(wsushengtao) callback foreach loop
 //                completion(nil)
+                        print("removeChooseSong success")
                     },
                     fail: { error in
                         completion(NSError(domain: error.message, code: error.code))
                     })
 
         // TODO(wushengtao)mock
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-            completion(nil)
+        completion(nil)
+    }
+
+    private func markCurrentSongIfNeed() {
+        guard let topSong = songList.first,
+              topSong.status == 0, // ready status
+              topSong.isChorus == false,
+              topSong.userNo == VLUserCenter.user.userNo
+        else {
+            return
+        }
+
+        topSong.status = 2
+        updateChooseSong(songInfo: topSong) { error in
+        }
+    }
+
+    private func markSoloSongIfNeed() {
+        guard let topSong = songList.first,
+              topSong.isChorus == true, // current is chorus
+              topSong.userNo == VLUserCenter.user.userNo
+        else {
+            return
+        }
+
+        topSong.isChorus = false
+        topSong.status = 2
+        updateChooseSong(songInfo: topSong) { error in
         }
     }
 
@@ -826,8 +1027,9 @@ extension KTVSyncManagerServiceImp {
                                return
                            }
                            self.songList.append(model)
-                           self.songList = self.songList.sorted(by: { $0.sort < $1.sort })
+                           self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
+                           self.markCurrentSongIfNeed()
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
                                  let jsonStr = object.toJson(),
@@ -837,8 +1039,9 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != model.objectId })
                            self.songList.append(model)
-                           self.songList = self.songList.sorted(by: { $0.sort < $1.sort })
+                           self.sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                           self.markCurrentSongIfNeed()
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
                                  let origSong = VLRoomSelSongModel.yy_model(withJSON: object.toJson()!)
@@ -847,6 +1050,7 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                            self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
+                           self.markCurrentSongIfNeed()
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()

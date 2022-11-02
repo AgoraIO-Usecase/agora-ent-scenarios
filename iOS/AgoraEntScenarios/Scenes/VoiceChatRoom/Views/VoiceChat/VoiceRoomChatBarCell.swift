@@ -9,59 +9,50 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VoiceRoomChatBarCell: UICollectionViewCell {
-    
-    lazy var container: UIImageView = {
-        UIImageView(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height)).contentMode(.scaleAspectFit).backgroundColor(UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)).cornerRadius(self.contentView.frame.height/2.0)
-    }()
-    
-    lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height)).contentMode(.scaleAspectFill).backgroundColor(.clear)
-    }()
-    
+    lazy var container: UIImageView = .init(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height)).contentMode(.scaleAspectFit).backgroundColor(UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)).cornerRadius(self.contentView.frame.height / 2.0)
+
+    lazy var icon: UIImageView = .init(frame: CGRect(x: 0, y: 0, width: self.contentView.frame.width, height: self.contentView.frame.height)).contentMode(.scaleAspectFill).backgroundColor(.clear)
+
     let redDot = UIView().backgroundColor(.red).cornerRadius(3)
-    
-    public override init(frame: CGRect) {
+
+    override public init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.backgroundColor = .clear
-        self.contentView.addSubview(self.container)
-        self.contentView.addSubview(self.redDot)
-        self.contentView.addSubview(self.icon)
+        contentView.backgroundColor = .clear
+        contentView.addSubview(container)
+        contentView.addSubview(redDot)
+        contentView.addSubview(icon)
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func layoutSubviews() {
+
+    override public func layoutSubviews() {
         super.layoutSubviews()
-        let r = self.contentView.frame.width/2.0;
-        let length = CGFloat(ceilf(Float(r)/sqrt(2)))
-        self.redDot.frame = CGRect(x: self.frame.width/2.0+length, y: self.contentView.frame.height/2.0-length, width: 6, height: 6)
-        self.icon.frame =  CGRect(x: 7, y: 7, width: self.contentView.frame.width-14, height: self.contentView.frame.height-14)
+        let r = contentView.frame.width / 2.0
+        let length = CGFloat(ceilf(Float(r) / sqrt(2)))
+        redDot.frame = CGRect(x: frame.width / 2.0 + length, y: contentView.frame.height / 2.0 - length, width: 6, height: 6)
+        icon.frame = CGRect(x: 7, y: 7, width: contentView.frame.width - 14, height: contentView.frame.height - 14)
     }
-    
 }
 
-
 public class VoiceRoomEmojiCell: UICollectionViewCell {
-    
-    lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: 7, y: 7, width: self.contentView.frame.width-14, height: self.contentView.frame.height-14)).contentMode(.scaleAspectFit).backgroundColor(.white)
-    }()
-        
-    public override init(frame: CGRect) {
+    lazy var icon: UIImageView = .init(frame: CGRect(x: 7, y: 7, width: self.contentView.frame.width - 14, height: self.contentView.frame.height - 14)).contentMode(.scaleAspectFit).backgroundColor(.white)
+
+    override public init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.backgroundColor =  .white
-        self.contentView.addSubview(self.icon)
+        contentView.backgroundColor = .white
+        contentView.addSubview(icon)
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func layoutSubviews() {
+
+    override public func layoutSubviews() {
         super.layoutSubviews()
-        self.icon.frame =  CGRect(x: 7, y: 7, width: self.contentView.frame.width-14, height: self.contentView.frame.height-14)
+        icon.frame = CGRect(x: 7, y: 7, width: contentView.frame.width - 14, height: contentView.frame.height - 14)
     }
-    
 }

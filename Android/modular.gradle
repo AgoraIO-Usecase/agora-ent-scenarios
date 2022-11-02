@@ -1,0 +1,180 @@
+/***********************************************************************************
+ * 模块化运行脚本
+ * 1. 可以通过简单的配置来使module是单独成一个app运行还是当成一个library使用
+ * 2. 限制模块的资源名前缀
+ *
+ * 使用方法：
+ * 1、在指定模块的build.gradle添加apply from: "${modularGradlePath}"
+ * 2、在apply from前配置是否模块化运行，如
+ *  ext { ktv_is_modular = true }*
+ *  其中"ktv"要转成相当模块名下划线式的模块名称，不配置默认为false
+ *  当为true时，AndroidManifest使用src/main/AndroidManifest_Modular.xml
+ *  当为false时，AndroidManifest使用src/main/AndroidManifest.xml
+ * 3、可以在指定模块里通过 isModular() 判断当前是否是模块化运行
+ *
+ ***********************************************************************************/
+
+def camel2underInner = {
+    name ->
+        def ret = ""
+        def chars = name.getChars()
+        for (int i = 0; i < chars.length; i++) {
+            def c = chars[i]
+            if (c.isUpperCase()) {
+                if (i != 0 && !('K' == c && 'P' == chars[i - 1])) {
+                    ret += "_"
+                }
+                ret += c.toLowerCase()
+            } else {
+                ret += c
+            }
+        }
+        return ret;
+}
+
+def isModularKeyInner = {
+    project -> return "${camel2underInner(project.name)}_is_modular"
+}
+
+def isModularInner = {
+    def modularKey = "${isModularKeyInner(project)}"
+    return project.ext.find(modularKey) != null && project.ext.get(modularKey)
+}
+
+
+/**
+ * 判断一个模块是否存在并且是一个library
+ * 使用方法：
+ * 在build.gradle里添加
+ *   if(isProjectLibrary(':scenes:ktv')){*     runtimeOnly project(':scenes:ktv')
+ *}*/
+def isProjectLibraryInner = {
+    projectName ->
+        def _project = findProject(projectName)
+        def modularKey = ""
+        def modularVal = false
+        if (_project != null) {
+            modularKey = "${isModularKeyInner(_project)}"
+            String buildFilePath = "${_project.getProjectDir().absolutePath}/build.gradle";
+            FileInputStream fis = new FileInputStream(buildFilePath);
+            def lines = fis.readLines()
+            for (i in 0..<lines.size()) {
+                def line = lines.get(i);
+                if (line.contains(modularKey)) {
+                    modularVal = line.contains("true")
+                    break
+                }
+            }
+            fis.close()
+        }
+        System.println("isProjectLibrary($projectName) -- project=$_project -- $modularKey=$modularVal")
+        return !modularVal && _project != null;
+}
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+if (isModularInner()) {
+    apply plugin: 'com.android.application'
+} else {
+    apply plugin: 'com.android.library'
+}
+
+ext {
+    isProjectLibrary = isProjectLibraryInner
+    isModular = isModularInner
+}
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode Integer.parseInt(project.APP_VERSION_CODE)
+        versionName project.APP_VERSION_NAME
+
+        consumerProguardFiles "consumer-rules.pro"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+
+    signingConfigs {
+        myConfig {
+            storeFile new File(rootProject.rootDir.absolutePath + "/keystore.key")
+            storePassword "965606"
+            keyAlias "agora"
+            keyPassword "965606"
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.myConfig
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled true
+            signingConfig signingConfigs.myConfig
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isModularInner()) {
+                if (new File('src/main/AndroidManifest_Modular.xml').exists()) {
+                    manifest.srcFile 'src/main/AndroidManifest_Modular.xml'
+                } else {
+                    manifest.srcFile 'src/main/AndroidManifest.xml'
+                }
+            } else {
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+            }
+        }
+    }
+
+    resourcePrefix camel2underInner(project.name)
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    if (isModularInner()) {
+        applicationVariants.all {
+            variant ->
+                variant.outputs.all { output ->
+                    outputFileName = new File(rootProject.name + "_" +
+                            project.name + "_" +
+                            "v" + defaultConfig.versionName + "_" +
+                            new Date().format("yyyy-MM-dd") + "_" +
+                            buildType.name + ".apk")
+                }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+
+    kapt rootProject.ext.deps.arouter_kapt
+    implementation rootProject.ext.deps.arouter
+}
+
+
+
