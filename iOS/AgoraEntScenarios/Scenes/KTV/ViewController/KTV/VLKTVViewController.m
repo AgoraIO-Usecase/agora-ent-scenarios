@@ -171,7 +171,8 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListWithChanged:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
-        if (status == KTVSubscribeCreated) {
+        //TODO(wushengtao): add model will return KTVSubscribeUpdated
+        if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息
             for (VLRoomSeatModel *model in weakSelf.seatsArray) {
                 if (model.onSeat == seatModel.onSeat) {
@@ -195,15 +196,17 @@ VLPopScoreViewDelegate
             dispatch_async(dispatch_get_main_queue(), ^{
                 [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             });
-        } else if (status == KTVSubscribeUpdated) {
-            //是否打开视频 & 是否静音
-            for (VLRoomSeatModel *model in self.seatsArray) {
-                if ([seatModel.userNo isEqualToString:model.userNo]) {
-                    model.isVideoMuted = seatModel.isVideoMuted;
-                    model.isSelfMuted = seatModel.isSelfMuted;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.roomPersonView updateSeatsByModel:model];
-                    });
+            
+            if (status == KTVSubscribeUpdated) {
+                //是否打开视频 & 是否静音
+                for (VLRoomSeatModel *model in self.seatsArray) {
+                    if ([seatModel.userNo isEqualToString:model.userNo]) {
+                        model.isVideoMuted = seatModel.isVideoMuted;
+                        model.isSelfMuted = seatModel.isSelfMuted;
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self.roomPersonView updateSeatsByModel:model];
+                        });
+                    }
                 }
             }
         } else if (status == KTVSubscribeDeleted) {
