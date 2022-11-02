@@ -5,35 +5,30 @@
 //  Created by 朱继超 on 2022/8/29.
 //
 
+import KakaJSON
 import UIKit
 import ZSwiftBaseLib
-import KakaJSON
 
-
-public class VoiceRoomError: Error,Convertible {
-    
+public class VoiceRoomError: Error, Convertible {
     var code: String?
     var message: String?
-    
-    required public init() {
-        
-    }
-    
+
+    public required init() {}
+
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
 }
 
 @objc public class VoiceRoomBusinessRequest: NSObject {
-    
     @UserDefault("VoiceRoomBusinessUserToken", defaultValue: "") public var userToken
-    
+
     @objc public static let shared = VoiceRoomBusinessRequest()
-    
+
     public func changeHost(host: String) {
         VoiceRoomRequest.shared.configHost(url: host)
     }
-    
+
     /// Description send a request contain generic
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -42,30 +37,32 @@ public class VoiceRoomError: Error,Convertible {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    public func sendRequest<T:Convertible>(
+    public func sendRequest<T: Convertible>(
         method: VoiceRoomRequestHTTPMethod,
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((T?,Error?) -> Void)) -> URLSessionTask? {
+        params: [String: Any],
+        callBack: @escaping ((T?, Error?) -> Void)
+    ) -> URLSessionTask? {
         print(params)
 
-        let headers = ["Authorization":self.userToken,"Content-Type":"application/json"]
+        let headers = ["Authorization": userToken, "Content-Type": "application/json"]
         let task = VoiceRoomRequest.shared.constructRequest(method: method, uri: uri, params: params, headers: headers) { data, response, error in
             DispatchQueue.main.async {
-                if error == nil,response?.statusCode ?? 0 == 200 {
-                    callBack(model(from: data?.z.toDictionary() ?? [:], type: T.self) as? T,error)
+                if error == nil, response?.statusCode ?? 0 == 200 {
+                    callBack(model(from: data?.z.toDictionary() ?? [:], type: T.self) as? T, error)
                 } else {
                     if error == nil {
                         let someError = model(from: data?.z.toDictionary() ?? [:], type: VoiceRoomError.self) as? Error
-                        callBack(nil,someError)
+                        callBack(nil, someError)
                     } else {
-                        callBack(nil,error)
+                        callBack(nil, error)
                     }
                 }
             }
         }
         return task
     }
+
     /// Description send a request
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -77,31 +74,31 @@ public class VoiceRoomError: Error,Convertible {
     public func sendRequest(
         method: VoiceRoomRequestHTTPMethod,
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String,Any>?,Error?) -> Void)) -> URLSessionTask? {
-        let headers = ["Authorization":self.userToken,"Content-Type":"application/json"]
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        let headers = ["Authorization": userToken, "Content-Type": "application/json"]
         let task = VoiceRoomRequest.shared.constructRequest(method: method, uri: uri, params: params, headers: headers) { data, response, error in
-            if error == nil,response?.statusCode ?? 0 == 200 {
-                callBack(data?.z.toDictionary(),nil)
+            if error == nil, response?.statusCode ?? 0 == 200 {
+                callBack(data?.z.toDictionary(), nil)
             } else {
                 if error == nil {
                     let someError = model(from: data?.z.toDictionary() ?? [:], type: VoiceRoomError.self) as? Error
-                    callBack(nil,someError)
+                    callBack(nil, someError)
                 } else {
-                    callBack(nil,error)
+                    callBack(nil, error)
                 }
             }
         }
         return task
     }
-
 }
 
-//MARK: - rest request
+// MARK: - rest request
+
 public extension VoiceRoomBusinessRequest {
-    
-    //MARK: - generic uri request
-    
+    // MARK: - generic uri request
+
     /// Description send a get request contain generic
     /// - Parameters:
     ///   - uri: The part spliced after the host.For example,"/xxx/xxx"
@@ -109,13 +106,14 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendGETRequest<U:Convertible>(
+    func sendGETRequest<U: Convertible>(
         uri: String,
-        params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .get, uri: uri, params: params, callBack: callBack)
+        params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .get, uri: uri, params: params, callBack: callBack)
     }
-    
+
     /// Description send a post request contain generic
     /// - Parameters:
     ///   - uri: The part spliced after the host.For example,"/xxx/xxx"
@@ -123,12 +121,13 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendPOSTRequest<U:Convertible>(
-        uri: String,params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .post, uri: uri, params: params, callBack: callBack)
+    func sendPOSTRequest<U: Convertible>(
+        uri: String, params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .post, uri: uri, params: params, callBack: callBack)
     }
-    
+
     /// Description send a put request contain generic
     /// - Parameters:
     ///   - uri: The part spliced after the host.For example,"/xxx/xxx"
@@ -136,12 +135,13 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendPUTRequest<U:Convertible>(
-        uri: String,params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .put, uri: uri, params: params, callBack: callBack)
+    func sendPUTRequest<U: Convertible>(
+        uri: String, params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .put, uri: uri, params: params, callBack: callBack)
     }
-    
+
     /// Description send a delete request contain generic
     /// - Parameters:
     ///   - uri: The part spliced after the host.For example,"/xxx/xxx"
@@ -149,13 +149,15 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendDELETERequest<U:Convertible>(
-        uri: String,params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .delete, uri: uri, params: params, callBack: callBack)
+    func sendDELETERequest<U: Convertible>(
+        uri: String, params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .delete, uri: uri, params: params, callBack: callBack)
     }
-    
-    //MARK: - generic api request
+
+    // MARK: - generic api request
+
     /// Description send a get request contain generic
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -163,13 +165,14 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendGETRequest<U:Convertible>(
+    func sendGETRequest<U: Convertible>(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .get, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .get, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a post request contain generic
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -177,13 +180,14 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendPOSTRequest<U:Convertible>(
+    func sendPOSTRequest<U: Convertible>(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .post, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .post, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a put request contain generic
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -191,13 +195,14 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendPUTRequest<U:Convertible>(
+    func sendPUTRequest<U: Convertible>(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .put, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .put, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a delete request contain generic
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -205,14 +210,16 @@ public extension VoiceRoomBusinessRequest {
     ///   - callBack: response callback the tuple that made of generic and error.
     /// - Returns: Request task,what if you can determine its status or cancel it .
     @discardableResult
-    func sendDELETERequest<U:Convertible>(
+    func sendDELETERequest<U: Convertible>(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,classType:U.Type,
-        callBack:@escaping ((U?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .delete, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any], classType: U.Type,
+        callBack: @escaping ((U?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .delete, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
-    //MARK: - no generic uri request
+
+    // MARK: - no generic uri request
+
     /// Description send a get request
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -224,10 +231,12 @@ public extension VoiceRoomBusinessRequest {
     @objc
     func sendGETRequest(
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .get, uri: uri, params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .get, uri: uri, params: params, callBack: callBack)
     }
+
     /// Description send a post request
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -239,10 +248,12 @@ public extension VoiceRoomBusinessRequest {
     @objc
     func sendPOSTRequest(
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .post, uri: uri, params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .post, uri: uri, params: params, callBack: callBack)
     }
+
     /// Description send a put request
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -254,10 +265,12 @@ public extension VoiceRoomBusinessRequest {
     @objc
     func sendPUTRequest(
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .put, uri: uri, params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .put, uri: uri, params: params, callBack: callBack)
     }
+
     /// Description send a delete request
     /// - Parameters:
     ///   - method: VoiceRoomRequestHTTPMethod
@@ -269,12 +282,14 @@ public extension VoiceRoomBusinessRequest {
     @objc
     func sendDELETERequest(
         uri: String,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .delete, uri: uri, params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .delete, uri: uri, params: params, callBack: callBack)
     }
-    
-    //MARK: - no generic api request
+
+    // MARK: - no generic api request
+
     /// Description send a get request
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -284,11 +299,12 @@ public extension VoiceRoomBusinessRequest {
     @discardableResult
     func sendGETRequest(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .get, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .get, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a post request
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -298,11 +314,12 @@ public extension VoiceRoomBusinessRequest {
     @discardableResult
     func sendPOSTRequest(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .post, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .post, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a put request
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -312,11 +329,12 @@ public extension VoiceRoomBusinessRequest {
     @discardableResult
     func sendPUTRequest(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .put, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .put, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description send a delete request
     /// - Parameters:
     ///   - api: The part spliced after the host.For example,"/xxx/xxx".Package with VoiceRoomBusinessApi.
@@ -326,28 +344,29 @@ public extension VoiceRoomBusinessRequest {
     @discardableResult
     func sendDELETERequest(
         api: VoiceRoomBusinessApi,
-        params: Dictionary<String, Any>,
-        callBack:@escaping ((Dictionary<String, Any>?,Error?) -> Void)) -> URLSessionTask? {
-        self.sendRequest(method: .delete, uri: self.convertApi(api: api), params: params, callBack: callBack)
+        params: [String: Any],
+        callBack: @escaping (([String: Any]?, Error?) -> Void)
+    ) -> URLSessionTask? {
+        sendRequest(method: .delete, uri: convertApi(api: api), params: params, callBack: callBack)
     }
-    
+
     /// Description convert api to uri
     /// - Parameter api: VoiceRoomBusinessApi
     /// - Returns: uri string
     func convertApi(api: VoiceRoomBusinessApi) -> String {
         var uri = "/voice/room"
         switch api {
-        case .login(_):
+        case .login:
             uri = "/user/login/device"
-        case let .fetchRoomList(cursor,pageSize,type):
+        case let .fetchRoomList(cursor, pageSize, type):
             uri += "/list?limit=\(pageSize)"
             if !cursor.isEmpty {
                 uri += "&cursor=\(cursor)"
             }
-            if type != nil,let idx = type {
+            if type != nil, let idx = type {
                 uri += "&type=\(idx)"
             }
-        case .createRoom(_):
+        case .createRoom:
             uri += "/create"
         case let .fetchRoomInfo(roomId):
             uri += "/\(roomId)"
@@ -417,5 +436,3 @@ public extension VoiceRoomBusinessRequest {
         return uri
     }
 }
-
-

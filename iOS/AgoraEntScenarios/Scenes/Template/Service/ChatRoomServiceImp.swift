@@ -7,11 +7,11 @@
 
 import Foundation
 
-class TemplateServiceImp: NSObject {
+class ChatRoomServiceImp: NSObject {
     var channelName: String?
 }
 
-extension TemplateServiceImp: TemplateServiceProtocol {
+extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func join(roomName: String, completion: @escaping (SyncError?, TemplateScene.JoinResponse?) -> Void) {
         let roomInfo = TemplateScene.LiveRoomInfo(roomName: roomName)
         let params = JSONObject.toJson(roomInfo)

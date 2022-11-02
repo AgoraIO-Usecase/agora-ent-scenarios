@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol TemplateServiceProtocol: NSObjectProtocol {
+protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 加入房间
     /// - Parameters:
     ///   - roomName: 房间名
@@ -62,4 +62,19 @@ protocol TemplateServiceProtocol: NSObjectProtocol {
 
     /// 取消监听
     func unsubscribe()
+
+    /// 获取房间详情
+    /// - Parameters:
+    ///
+    //  func fetchRoomDetail()
+
+    /// 申请上卖
+    /// - Parameters:
+    ///
+    // func fetchRoomDetail()
+
+    /// 换麦
+    /// - Parameters:
+    ///
+    // func changeMic(from: Int, to: Int)
 }
