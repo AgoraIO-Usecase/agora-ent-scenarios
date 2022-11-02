@@ -213,9 +213,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             .update(key: "",
                     data: params,
                     success: { object in
-                        guard let model = object.first,
-                              let model = VLRoomListModel.yy_model(withJSON: model.toJson()!)
-                        else {
+                        guard let model = object.first else {
                             print("udpate mv fail")
                             return
                         }
@@ -424,12 +422,30 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     // MARK: Deprecated protocol method
 
-    func mute(withMuteStatus mute: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func mute(withMuteStatus mute: Bool,
+              completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            assertionFailure()
+            return
+        }
+        
+        seatInfo.isSelfMuted = mute ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
     }
 
-    func openVideoStatus(withStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func openVideoStatus(withStatus openStatus: Bool,
+                         completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            assertionFailure()
+            return
+        }
+        
+        seatInfo.isVideoMuted = openStatus ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
     }
 
     func publishChooseSongEvent() {
@@ -442,16 +458,15 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         // ignore
     }
 
-    func publishMuteEvent(withMuteStatus muteStatus: Int, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
+        // replace with muteWithMuteStatus
     }
 
-    func publishVideoOpenStatus(withStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-        assertionFailure()
+    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
+        // replace with openVideoStatus()
     }
 
     func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-//        assertionFailure()
         // replace with subscribeChooseSong()
     }
 
@@ -756,10 +771,14 @@ extension KTVSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
-                        finished(nil)
+//                        finished(nil)
                     }, fail: { error in
-                        finished(NSError(domain: error.message, code: error.code))
+//                        finished(NSError(domain: error.message, code: error.code))
                     })
+        //TODO(wushengtao): callbacll never received, mock it
+        DispatchQueue.main.async {
+            finished(nil)
+        }
     }
 
     private func removeSeat(seatInfo: VLRoomSeatModel,
