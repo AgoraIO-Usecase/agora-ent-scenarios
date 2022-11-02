@@ -76,11 +76,11 @@
     _selSongsArray = selSongsArray;
     if (selSongsArray.count > 0) {
         self.choosedCountLabel.hidden = NO;
-        self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
-        [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
     }else{
         self.choosedCountLabel.hidden = YES;
     }
+    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
+    self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
 - (NSArray *)validateSelSongArray {
