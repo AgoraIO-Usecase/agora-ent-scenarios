@@ -159,15 +159,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)publishChooseSongEvent;
 - (void)leaveChannel;
-- (void)publishMuteEventWithMuteStatus:(NSInteger)muteStatus
+- (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
                             completion:(void(^)(NSError* _Nullable))completion;
-- (void)publishVideoOpenStatusWithStatus:(BOOL)openStatus
-                              completion:(void(^)(NSError* _Nullable))completion;
+- (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
+                                 completion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongDidChangedEventWithOwnerStatus:(BOOL)isMaster;
 - (void)publishToSoloEvent;
 - (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
-- (void)publishSingingScoreWithTotalVolume:(NSInteger)totalVolume;
+- (void)publishSingingScoreWithTotalVolume:(double)totalVolume;
 
 
 - (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock;

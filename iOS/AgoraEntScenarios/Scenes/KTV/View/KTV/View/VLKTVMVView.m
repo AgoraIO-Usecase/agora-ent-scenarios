@@ -259,7 +259,7 @@
     }
 }
 
-- (void)updateUIWithSong:(VLRoomSelSongModel *)song onSeat:(BOOL)onSeat {
+- (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
     [self updateUIWithUserOnSeat:onSeat song:song];
     if (!song) return;
 //    self.scoreLabel.text = @"0";

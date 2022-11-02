@@ -8,6 +8,11 @@
 import UIKit
 
 class NetworkManager {
+    enum AgoraTokenType: Int {
+        case rtc = 1
+        case rtm = 2
+    }
+
     enum HTTPMethods: String {
         case GET
         case POST
@@ -34,13 +39,60 @@ class NetworkManager {
     private init() {}
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
 
-    func generateToken(channelName: String, uid: String, success: @escaping () -> Void) {
-        generateToken(channelName: channelName, uid: uid) { _ in
-            success()
+    func generateRTCToken(channelName: String,
+                          uid: String,
+                          success: @escaping (String?) -> Void)
+    {
+        generateToken(channelName: channelName,
+                      uid: uid,
+                      type: .rtc,
+                      success: success)
+    }
+
+    func generateRTMToken(channelName: String,
+                          uid: String,
+                          success: @escaping (String?) -> Void)
+    {
+        generateToken(channelName: channelName,
+                      uid: uid,
+                      type: .rtm,
+                      success: success)
+    }
+
+    /// get rtc token & rtmtoken
+    /// - Parameters:
+    ///   - channelName: <#channelName description#>
+    ///   - uid: <#uid description#>
+    ///   - success: {"rtc token", "rtm token"}
+    func generateAllToken(channelName: String,
+                          uid: String,
+                          success: @escaping (String?, String?) -> Void)
+    {
+        let group = DispatchGroup()
+        var token: (String?, String?) = (nil, nil)
+        group.enter()
+        generateRTMToken(channelName: channelName,
+                         uid: uid) { rtmToken in
+            token.1 = rtmToken
+            group.leave()
+        }
+        group.enter()
+        generateRTCToken(channelName: channelName,
+                         uid: uid) { rtcToken in
+            token.0 = rtcToken
+            group.leave()
+        }
+
+        group.notify(queue: DispatchQueue.main) {
+            success(token.0, token.1)
         }
     }
 
-    func generateToken(channelName: String, uid: String, success: @escaping (String?) -> Void) {
+    func generateToken(channelName: String,
+                       uid: String,
+                       type: AgoraTokenType,
+                       success: @escaping (String?) -> Void)
+    {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
             success(nil)
             return
@@ -51,10 +103,10 @@ class NetworkManager {
                       "expire": 900,
                       "src": "iOS",
                       "ts": "".timeStamp,
-                      "type": 1,
+                      "type": type.rawValue,
                       "uid": uid] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token/generate", params: params, success: { response in
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token006/generate", params: params, success: { response in
             let data = response["data"] as? [String: String]
             let token = data?["token"]
             KeyCenter.Token = token

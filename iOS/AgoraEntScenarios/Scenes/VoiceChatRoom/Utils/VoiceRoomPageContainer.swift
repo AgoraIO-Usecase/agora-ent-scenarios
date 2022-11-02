@@ -7,14 +7,13 @@
 
 import UIKit
 
-public class VoiceRoomPageContainer: UIView, UIPageViewControllerDataSource,UIPageViewControllerDelegate {
-    
-    var scrollClosure: ((Int)->())?
-    
+public class VoiceRoomPageContainer: UIView, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    var scrollClosure: ((Int) -> Void)?
+
     var controllers: [UIViewController]?
-    
+
     var nextViewController: UIViewController?
-    
+
     var index = 0 {
         didSet {
             DispatchQueue.main.async {
@@ -24,7 +23,7 @@ public class VoiceRoomPageContainer: UIView, UIPageViewControllerDataSource,UIPa
             }
         }
     }
-    
+
     lazy var pageController: UIPageViewController = {
         let page = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         page.view.backgroundColor = .clear
@@ -33,55 +32,54 @@ public class VoiceRoomPageContainer: UIView, UIPageViewControllerDataSource,UIPa
         return page
     }()
 
-    public override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
     }
-    
-    convenience init(frame: CGRect,viewControllers: [UIViewController]) {
+
+    convenience init(frame: CGRect, viewControllers: [UIViewController]) {
         self.init(frame: frame)
-        self.controllers = viewControllers
-        self.pageController.setViewControllers([viewControllers[0]], direction: .forward, animated: false)
-        self.addSubview(self.pageController.view)
-        self.pageController.view.translatesAutoresizingMaskIntoConstraints = false
-        self.pageController.view.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        self.pageController.view.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-        self.pageController.view.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-        self.pageController.view.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        controllers = viewControllers
+        pageController.setViewControllers([viewControllers[0]], direction: .forward, animated: false)
+        addSubview(pageController.view)
+        pageController.view.translatesAutoresizingMaskIntoConstraints = false
+        pageController.view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        pageController.view.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+        pageController.view.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
+        pageController.view.topAnchor.constraint(equalTo: topAnchor).isActive = true
     }
-    
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }
 
-extension VoiceRoomPageContainer {
-    
-    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        self.controllers?[safe: self.index-1]
+public extension VoiceRoomPageContainer {
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        controllers?[safe: index - 1]
     }
-    
-    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        self.controllers?[safe: self.index+1]
+
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        controllers?[safe: index + 1]
     }
-    
-    public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        if finished,self.controllers?.count ?? 0 > 0 {
-            for (idx,vc) in self.controllers!.enumerated() {
-                if vc == self.nextViewController {
-                    self.index = idx
+
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        if finished, controllers?.count ?? 0 > 0 {
+            for (idx, vc) in controllers!.enumerated() {
+                if vc == nextViewController {
+                    index = idx
                     break
                 }
             }
-            if self.scrollClosure != nil {
-                self.scrollClosure!(self.index)
+            if scrollClosure != nil {
+                scrollClosure!(index)
             }
         } else {
-            self.nextViewController = previousViewControllers.first
+            nextViewController = previousViewControllers.first
         }
     }
-    
-    public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
-        self.nextViewController = pendingViewControllers.first
+
+    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+        nextViewController = pendingViewControllers.first
     }
 }
