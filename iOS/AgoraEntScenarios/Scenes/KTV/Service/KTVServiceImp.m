@@ -722,13 +722,13 @@
     VLLog(@"Agora - Leave RTM channel");
 }
 
-- (void)publishMuteEventWithMuteStatus:(NSInteger)muteStatus
+- (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
                             completion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *dict = @{
         @"messageType": @(VLSendMessageTypeAudioMute),
         @"userNo": VLUserCenter.user.userNo,
         @"id": VLUserCenter.user.id,
-        @"isSelfMuted" : @(muteStatus),
+        @"isSelfMuted" : @(muteStatus ? 1 : 0),
         @"platform": @"1",
         @"roomNo": [self getRoomNo]
     };
@@ -747,8 +747,8 @@
     }];
 }
 
-- (void)publishVideoOpenStatusWithStatus:(BOOL)openStatus
-                              completion:(void(^)(NSError* _Nullable))completion {
+- (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
+                                 completion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *dict = @{
         @"messageType": @(VLSendMessageTypeVideoIfOpen),
         @"userNo": VLUserCenter.user.userNo,

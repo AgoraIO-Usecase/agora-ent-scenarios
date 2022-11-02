@@ -105,7 +105,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     if (sender.tag == VLKTVBottomBtnClickTypeAudio) {
         [[AppContext ktvServiceImp] muteWithMuteStatus:self.isSelfMuted == 1 ? NO : YES
                                             completion:^(NSError * error) {
-            if (error == nil) {
+            if (error != nil) {
                 return;
             }
             
@@ -171,7 +171,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 //        }];
     
     }else if (sender.tag == VLKTVBottomBtnClickTypeVideo){
-        [[AppContext ktvServiceImp] openVideoStatusWithStatus:self.isVideoMuted == 1 ? NO : YES
+        [[AppContext ktvServiceImp] openVideoStatusWithStatus:self.isVideoMuted == 0 ? YES : NO
                                                    completion:^(NSError * error) {
             if (error != nil) {
                 return;
