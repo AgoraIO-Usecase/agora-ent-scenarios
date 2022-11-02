@@ -311,8 +311,13 @@ VLPopScoreViewDelegate
             
             
         } else if (KTVSubscribeDeleted == status) {
-            //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
+                [weakSelf getChoosedSongsList:NO onlyRefreshList:YES];
+                return;
+            }
+            
+            //切换歌曲
             //removed song is top song, play next
             if (![selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo]) {
                 return;
@@ -320,7 +325,7 @@ VLPopScoreViewDelegate
             
             weakSelf.currentPlayingSongNo = nil;
             [weakSelf prepareNextSong];
-            [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
+            [weakSelf getChoosedSongsList:NO onlyRefreshList:NO];
         }
     }];
     
@@ -2686,6 +2691,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
         
         if(onlyRefreshList) {
+            [weakSelf startSingingIfNeed];
             return;
         }
         
