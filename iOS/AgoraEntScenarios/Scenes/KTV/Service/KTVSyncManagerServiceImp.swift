@@ -254,6 +254,9 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             removeSeat(seatInfo: seat) { error in
             }
         }
+        
+        //remove current user's choose song
+        removeAllUsersChooseSong()
 
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
@@ -488,7 +491,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     func publishSingingScore(withTotalVolume totalVolume: Double) {
 //        assertionFailure()
         guard let topSong = self.songList.first else {
-            assertionFailure()
+//            assertionFailure()
             return
         }
         
@@ -958,6 +961,16 @@ extension KTVSyncManagerServiceImp {
                      finished(error)
                  })
     }
+    
+    private func removeAllUsersChooseSong() {
+        let userSongLists = self.songList.filter({ $0.userNo == VLUserCenter.user.userNo})
+        userSongLists.forEach { model in
+            self.removeChooseSong(songId: model.objectId) { error in
+                
+            }
+        }
+        
+    }
 
     private func removeChooseSong(songId: String?, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo,
@@ -1044,7 +1057,7 @@ extension KTVSyncManagerServiceImp {
                            self.markCurrentSongIfNeed()
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
-                                 let origSong = VLRoomSelSongModel.yy_model(withJSON: object.toJson()!)
+                                 let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
                            else {
                                return
                            }
