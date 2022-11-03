@@ -392,7 +392,54 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
             completion(error)
         }
     }
+    
+    
+    func becomeSolo() {
+        markSoloSongIfNeed()
+    }
+    
+    func mute(withMuteStatus mute: Bool,
+              completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            agoraAssert("mute seat not found")
+            return
+        }
+        
+        seatInfo.isSelfMuted = mute ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
+    }
 
+    func openVideoStatus(withStatus openStatus: Bool,
+                         completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            agoraAssert("open video seat not found")
+            return
+        }
+        
+        seatInfo.isVideoMuted = openStatus ? 1 : 0
+        updateSeat(seatInfo: seatInfo, finished: completion)
+    }
+    
+    
+    func updateSingingScore(withTotalVolume totalVolume: Double) {
+//        assertionFailure()
+        guard let topSong = self.songList.first else {
+//            assertionFailure()
+            return
+        }
+        
+        topSong.status = 2
+        topSong.score = totalVolume
+        updateChooseSong(songInfo: topSong) { error in
+            
+        }
+    }
+
+    //MARK: subscribe
     func subscribeUserListCount(changed changedBlock: @escaping (UInt) -> Void) {
         userListCountDidChanged = changedBlock
     }
@@ -435,88 +482,47 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         chooseSongDidChanged = changedBlock
     }
 
+
+    
+
     // MARK: Deprecated protocol method
-
-    func mute(withMuteStatus mute: Bool,
-              completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
-            .first?.value else {
-            agoraAssert("mute seat not found")
-            return
-        }
-        
-        seatInfo.isSelfMuted = mute ? 1 : 0
-        updateSeat(seatInfo: seatInfo, finished: completion)
-    }
-
-    func openVideoStatus(withStatus openStatus: Bool,
-                         completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
-            .first?.value else {
-            agoraAssert("open video seat not found")
-            return
-        }
-        
-        seatInfo.isVideoMuted = openStatus ? 1 : 0
-        updateSeat(seatInfo: seatInfo, finished: completion)
-    }
-
-    func publishChooseSongEvent() {
-//        assertionFailure()
-        // replace with subscribeChooseSong()
-    }
-
-    func leaveChannel() {
-//        assert(false)
-        // ignore
-    }
-
-    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
-        // replace with muteWithMuteStatus
-    }
-
-    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-        // replace with openVideoStatus()
-    }
-
-    func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-        // replace with subscribeChooseSong()
-    }
-
-    func publishToSoloEvent() {
-//        assertionFailure()
-        markSoloSongIfNeed()
-    }
-
-    func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
-        //replace with joinChorusWithInput
-//        assertionFailure()
-    }
-
-    func publishSongOwner(withOwnerId userNo: String) {
-//        assertionFailure()
-        //ignore
-    }
-
-    func publishSingingScore(withTotalVolume totalVolume: Double) {
-//        assertionFailure()
-        guard let topSong = self.songList.first else {
-//            assertionFailure()
-            return
-        }
-        
-        topSong.status = 2
-        topSong.score = totalVolume
-        updateChooseSong(songInfo: topSong) { error in
-            
-        }
-    }
-
-    func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
-//        assert(false)
-    }
+//    func publishChooseSongEvent() {
+////        assertionFailure()
+//        // replace with subscribeChooseSong()
+//    }
+//
+//    func leaveChannel() {
+////        assert(false)
+//        // ignore
+//    }
+//
+//    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
+//        // replace with muteWithMuteStatus
+//    }
+//
+//    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
+//        // replace with openVideoStatus()
+//    }
+//
+//    func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
+//        // replace with subscribeChooseSong()
+//    }
+//
+//
+//    func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
+//        //replace with joinChorusWithInput
+////        assertionFailure()
+//    }
+//
+//    func publishSongOwner(withOwnerId userNo: String) {
+////        assertionFailure()
+//        //ignore
+//    }
+//
+//
+//    func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
+////        assert(false)
+//    }
 }
 
 // MARK: User operation

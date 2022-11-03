@@ -630,26 +630,19 @@
     }];
 }
 
-#pragma mark subscribe
-
-- (void)subscribeUserListCountWithChanged:(void (^)(NSUInteger))changedBlock {
-    self.userListCountDidChanged = changedBlock;
+- (void)becomeSolo {
+    NSDictionary *dict = @{
+        @"messageType":@(VLSendMessageTypeSoloSong),
+        @"platform":@"1",
+        @"roomNo": [self getRoomNo]
+    };
+    NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
+    AgoraRtmRawMessage *roaMessage = [[AgoraRtmRawMessage alloc]initWithRawData:messageData description:@""];
+    [self.rtmChannel sendMessage:roaMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
+        if (errorCode == 0) {
+        }
+    }];
 }
-
-- (void)subscribeSeatListWithChanged:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock {
-    self.seatListDidChanged = changedBlock;
-}
-
-- (void)subscribeRoomStatusWithChanged:(void (^)(NSUInteger, VLRoomListModel*))changedBlock {
-    self.roomDidChanged = changedBlock;
-}
-
-- (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock {
-    //using publishSongDidChangedEventWithOwnerStatus
-    self.chooseSongDidChanged = changedBlock;
-}
-
-#pragma mark Deprecated method
 
 - (void)muteWithMuteStatus:(BOOL)mute
                 completion:(void(^)(NSError* _Nullable))completion {
@@ -698,6 +691,45 @@
         completion(error);
     }];
 }
+
+- (void)updateSingingScoreWithTotalVolume:(double)totalVolume {
+    NSDictionary *dict = @{
+        @"messageType": @(VLSendMessageTypeSeeScore),
+        @"pitch": @(totalVolume),
+        @"platform": @"1",
+        @"userNo": VLUserCenter.user.userNo,
+        @"roomNo": [self getRoomNo]
+    };
+    NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
+    AgoraRtmRawMessage *roaMessage = [[AgoraRtmRawMessage alloc]initWithRawData:messageData description:@""];
+    [self.rtmChannel sendMessage:roaMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
+        if (errorCode == 0) {
+
+        }
+    }];
+}
+
+#pragma mark subscribe
+
+- (void)subscribeUserListCountWithChanged:(void (^)(NSUInteger))changedBlock {
+    self.userListCountDidChanged = changedBlock;
+}
+
+- (void)subscribeSeatListWithChanged:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock {
+    self.seatListDidChanged = changedBlock;
+}
+
+- (void)subscribeRoomStatusWithChanged:(void (^)(NSUInteger, VLRoomListModel*))changedBlock {
+    self.roomDidChanged = changedBlock;
+}
+
+- (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock {
+    //using publishSongDidChangedEventWithOwnerStatus
+    self.chooseSongDidChanged = changedBlock;
+}
+
+#pragma mark Deprecated method
+
 
 - (void)publishChooseSongEvent {
     //发送消息
@@ -794,20 +826,6 @@
     }];
 }
 
-- (void)publishToSoloEvent {
-    NSDictionary *dict = @{
-        @"messageType":@(VLSendMessageTypeSoloSong),
-        @"platform":@"1",
-        @"roomNo": [self getRoomNo]
-    };
-    NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
-    AgoraRtmRawMessage *roaMessage = [[AgoraRtmRawMessage alloc]initWithRawData:messageData description:@""];
-    [self.rtmChannel sendMessage:roaMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
-        if (errorCode == 0) {
-        }
-    }];
-}
-
 - (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *dict = @{
         @"messageType":@(VLSendMessageTypeTellSingerSomeBodyJoin),
@@ -847,24 +865,6 @@
     [self.rtmChannel sendMessage:roaMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
         if (errorCode == 0) {
             VLLog(@"发送通知合唱用户信息成功");
-        }
-    }];
-}
-
-
-- (void)publishSingingScoreWithTotalVolume:(double)totalVolume {
-    NSDictionary *dict = @{
-        @"messageType": @(VLSendMessageTypeSeeScore),
-        @"pitch": @(totalVolume),
-        @"platform": @"1",
-        @"userNo": VLUserCenter.user.userNo,
-        @"roomNo": [self getRoomNo]
-    };
-    NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
-    AgoraRtmRawMessage *roaMessage = [[AgoraRtmRawMessage alloc]initWithRawData:messageData description:@""];
-    [self.rtmChannel sendMessage:roaMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
-        if (errorCode == 0) {
-
         }
     }];
 }
