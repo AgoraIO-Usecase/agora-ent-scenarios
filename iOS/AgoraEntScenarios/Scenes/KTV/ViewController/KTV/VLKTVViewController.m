@@ -899,7 +899,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)roomerCloseRoom {
-    [[AppContext ktvServiceImp] removeRoomWithCompletion:^(NSError * error) {
+    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
         if (error != nil) {
             return;
         }
