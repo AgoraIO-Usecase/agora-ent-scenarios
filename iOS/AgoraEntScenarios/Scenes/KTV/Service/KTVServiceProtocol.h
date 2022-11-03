@@ -91,7 +91,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeSongWithInput:(KTVRemoveSongInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
-
 /// 获取选择歌曲列表
 /// @param completion <#completion description#>
 - (void)getChoosedSongsListWithCompletion:(void(^)(NSError* _Nullable, NSArray<VLRoomSelSongModel*>* _Nullable))completion;
@@ -121,42 +120,53 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)chooseSongWithInput:(KTVChooseSongInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
-
-
 /// 置顶歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
 - (void)makeSongTopWithInput:(KTVMakeSongTopInputModel*)inputModel
                   completion:(void(^)(NSError* _Nullable))completion;
 
+
+/// 当前歌曲合唱改为赌场得意
+- (void)becomeSolo;
+
+/// 设置麦位静音
+/// @param mute YES: 开启静音 NO: 关闭静音
+/// @param completion <#completion description#>
+- (void)muteWithMuteStatus:(BOOL)mute
+                completion:(void(^)(NSError* _Nullable))completion;
+
+/// 打开麦位摄像头
+/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
+/// @param completion <#completion description#>
+- (void)openVideoStatusWithStatus: (BOOL)openStatus
+                       completion:(void(^)(NSError* _Nullable))completion;
+
+/// 更新得分
+/// @param totalVolume <#totalVolume description#>
+- (void)updateSingingScoreWithTotalVolume:(double)totalVolume;
+
 //subscribe
 
-
-/// user count did changed
+/// 订阅用户变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeUserListCountWithChanged:(void(^)(NSUInteger))changedBlock;
 
-/// seat list did changed
+/// 订阅麦位变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeSeatListWithChanged:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock;
 
-/// room status did changed
+/// 订阅房间状态变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeRoomStatusWithChanged:(void (^)(NSUInteger, VLRoomListModel*))changedBlock;
 
-
-/// song did changed
+/// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
 
 
 // Deprecated method
-- (void)muteWithMuteStatus:(BOOL)mute
-                completion:(void(^)(NSError* _Nullable))completion;
-
-- (void)openVideoStatusWithStatus: (BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
-
+@optional
 - (void)publishChooseSongEvent;
 - (void)leaveChannel;
 - (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
@@ -164,11 +174,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
                                  completion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongDidChangedEventWithOwnerStatus:(BOOL)isMaster;
-- (void)publishToSoloEvent;
+
 - (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
-- (void)publishSingingScoreWithTotalVolume:(double)totalVolume;
-
 
 - (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock;
 @end
