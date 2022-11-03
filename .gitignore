@@ -6,3 +6,4 @@ Pods
 Podfile.lock
 **/*.xcworkspace/*
 **/xcuserdata
+KeyCenter.swift
