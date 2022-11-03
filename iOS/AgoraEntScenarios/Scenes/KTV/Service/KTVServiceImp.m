@@ -722,13 +722,13 @@
     VLLog(@"Agora - Leave RTM channel");
 }
 
-- (void)publishMuteEventWithMuteStatus:(NSInteger)muteStatus
+- (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
                             completion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *dict = @{
         @"messageType": @(VLSendMessageTypeAudioMute),
         @"userNo": VLUserCenter.user.userNo,
         @"id": VLUserCenter.user.id,
-        @"isSelfMuted" : @(muteStatus),
+        @"isSelfMuted" : @(muteStatus ? 1 : 0),
         @"platform": @"1",
         @"roomNo": [self getRoomNo]
     };
@@ -747,8 +747,8 @@
     }];
 }
 
-- (void)publishVideoOpenStatusWithStatus:(BOOL)openStatus
-                              completion:(void(^)(NSError* _Nullable))completion {
+- (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
+                                 completion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *dict = @{
         @"messageType": @(VLSendMessageTypeVideoIfOpen),
         @"userNo": VLUserCenter.user.userNo,
@@ -852,7 +852,7 @@
 }
 
 
-- (void)publishSingingScoreWithTotalVolume:(NSInteger)totalVolume {
+- (void)publishSingingScoreWithTotalVolume:(double)totalVolume {
     NSDictionary *dict = @{
         @"messageType": @(VLSendMessageTypeSeeScore),
         @"pitch": @(totalVolume),
@@ -922,21 +922,18 @@ messageReceived:(AgoraRtmMessage *)message
                 self.seatListDidChanged(KTVSubscribeCreated, seatModel);
             }
             return;
-            
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeDropSeat){  // 下麦消息
+        } else if([dict[@"messageType"] intValue] == VLSendMessageTypeDropSeat){  // 下麦消息
             // 下麦模型
             VLRoomSeatModel *seatModel = [VLRoomSeatModel vj_modelWithDictionary:dict];
             if (self.seatListDidChanged) {
                 self.seatListDidChanged(KTVSubscribeDeleted, seatModel);
             }
             return;
-            
         } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeCloseRoom) {  //房主关闭房间
             if (self.roomDidChanged) {
                 self.roomDidChanged(KTVSubscribeDeleted, nil);
             }
             return;
-            
         } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeChooseSong) {  //收到点歌的消息
 //            VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
 //            if(song == nil && [member.userId isEqualToString:VLUserCenter.user.id] == NO) {
@@ -949,6 +946,7 @@ messageReceived:(AgoraRtmMessage *)message
                 //TODO(wushengtao): selSongsArray not found in KTVServiceImp
                 self.chooseSongDidChanged(KTVSubscribeCreated, nil);
             }
+            return;
         } else if([dict[@"messageType"] intValue] == VLSendMessageTypeChangeSong) { //切换歌曲
 //            NSLog(@"RTM(RECV) - userID: %@, VLUserNo: %@, my userID: %@", member.userId, VLUserCenter.user.userNo, VLUserCenter.user.id);
 ////            dispatch_async(dispatch_get_main_queue(), ^{
@@ -961,6 +959,7 @@ messageReceived:(AgoraRtmMessage *)message
                 //TODO(wushengtao): can not get selSongsArray in KTVServiceImp
                 self.chooseSongDidChanged(KTVSubscribeDeleted, nil);
             }
+            return;
         } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
 //            dispatch_async(dispatch_get_main_queue(), ^{
 //                [self.MVView setJoinInViewHidden];
@@ -970,6 +969,13 @@ messageReceived:(AgoraRtmMessage *)message
 //                }
 //                [self joinChorusConfig:member.userId];
 //            });
+            if (self.chooseSongDidChanged) {
+                VLRoomSelSongModel* songModel = [VLRoomSelSongModel new];
+                songModel.isChorus = YES;
+                songModel.chorusNo = dict[@"userNo"];
+                self.chooseSongDidChanged(KTVSubscribeUpdated, songModel);
+            }
+            return;
         }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSoloSong){ //独唱
 //            dispatch_async(dispatch_get_main_queue(), ^{
 //                [self startSinging];
@@ -981,6 +987,7 @@ messageReceived:(AgoraRtmMessage *)message
             if (self.roomDidChanged) {
                 self.roomDidChanged(KTVSubscribeUpdated, roomInfo);
             }
+            return;
         }else if([dict[@"messageType"] intValue] == VLSendMessageTypeAudioMute){ //是否静音
 //            VLRoomSeatModel *model = [VLRoomSeatModel new];
 //            model.userNo = dict[@"userNo"];
@@ -1009,8 +1016,15 @@ messageReceived:(AgoraRtmMessage *)message
 //                }
 //            }
         }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSeeScore) { //观众看到打分
-//            double voicePitch = [dict[@"pitch"] doubleValue];
 //            [self.MVView setVoicePitch:@[@(voicePitch)]];
+            if (self.chooseSongDidChanged) {
+                double voicePitch = [dict[@"pitch"] doubleValue];
+                VLRoomSelSongModel* songModel = [VLRoomSelSongModel new];
+                songModel.userNo = dict[@"userNo"];
+                songModel.score = voicePitch;
+                self.chooseSongDidChanged(KTVSubscribeUpdated, songModel);
+            }
+            return;
         }
         else if([dict[@"messageType"] intValue] == VLSendMessageAuditFail) {
 //            VLLog(@"Agora - Received audit message");

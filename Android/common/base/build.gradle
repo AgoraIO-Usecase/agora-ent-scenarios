@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        flavorDimensions ""
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+        buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
+        buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
+        buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
+        buildConfigField "String", "APP_VERSION_NAME", "\"${APP_VERSION_NAME}\""
+        buildConfigField "String", "APP_VERSION_CODE", "\"${APP_VERSION_CODE}\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.multidex
+    implementation rootProject.ext.deps.annotation
+    implementation rootProject.ext.deps.eventbus
+    implementation rootProject.ext.deps.material
+
+    kapt rootProject.ext.deps.arouter_kapt
+    implementation rootProject.ext.deps.arouter
+    api rootProject.ext.deps.rxjava2
+    implementation rootProject.ext.deps.rxandroid2
+    implementation rootProject.ext.deps.okhttp
+    implementation rootProject.ext.deps.retrofit2
+    implementation rootProject.ext.deps.retrofit2_adapter
+    api rootProject.ext.deps.gson
+    implementation rootProject.ext.deps.autosize
+
+    implementation rootProject.ext.deps.xlog
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+
+    api rootProject.ext.deps.rtc
+    api rootProject.ext.deps.rtm
+
+}
