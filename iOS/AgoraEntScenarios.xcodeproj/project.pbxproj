@@ -137,7 +137,7 @@
 		A8B561952912486C004F34D1 /* UIColor+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561942912486C004F34D1 /* UIColor+Show.swift */; };
 		A8B5619929125125004F34D1 /* UIFont+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619829125125004F34D1 /* UIFont+Show.swift */; };
 		A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */; };
-		A8B5619D2912675C004F34D1 /* ShowLivePreViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619C2912675C004F34D1 /* ShowLivePreViewVC.swift */; };
+		A8B5619D2912675C004F34D1 /* ShowCreateLiveVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */; };
 		A8B5619F29127724004F34D1 /* ShowCreateLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */; };
 		A8B561A329136863004F34D1 /* UIButton+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561A229136863004F34D1 /* UIButton+Show.swift */; };
 		A8B561A629136BF7004F34D1 /* ShowRoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */; };
@@ -149,7 +149,6 @@
 		DD2A43E228FFCEE7004CEDCF /* AgoraEntScenariosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */; };
 		DD2A43EC28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */; };
 		DD2A43EE28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */; };
-		DD5C80E92910BB95004E0C46 /* showResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD5C80E22910BB95004E0C46 /* showResource.bundle */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -564,7 +563,7 @@
 		A8B561942912486C004F34D1 /* UIColor+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Show.swift"; sourceTree = "<group>"; };
 		A8B5619829125125004F34D1 /* UIFont+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Show.swift"; sourceTree = "<group>"; };
 		A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowEmptyView.swift; sourceTree = "<group>"; };
-		A8B5619C2912675C004F34D1 /* ShowLivePreViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowLivePreViewVC.swift; sourceTree = "<group>"; };
+		A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveVC.swift; sourceTree = "<group>"; };
 		A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveView.swift; sourceTree = "<group>"; };
 		A8B561A229136863004F34D1 /* UIButton+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Show.swift"; sourceTree = "<group>"; };
 		A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListView.swift; sourceTree = "<group>"; };
@@ -580,7 +579,6 @@
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITests.swift; sourceTree = "<group>"; };
 		DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		DD5C80E22910BB95004E0C46 /* showResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = showResource.bundle; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -1278,6 +1276,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A88D14282913BEB900F5DF6A /* CreateLive */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */,
+			);
+			path = CreateLive;
+			sourceTree = "<group>";
+		};
 		A8B5617F2910FB19004F34D1 /* Show */ = {
 			isa = PBXGroup;
 			children = (
@@ -1295,7 +1301,7 @@
 			isa = PBXGroup;
 			children = (
 				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
-				A8B5619C2912675C004F34D1 /* ShowLivePreViewVC.swift */,
+				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1303,8 +1309,8 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
-				A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1419,70 +1425,6 @@
 				DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */,
 			);
 			path = AgoraEntScenariosUITests;
-			sourceTree = "<group>";
-		};
-		DD5C80E02910BB95004E0C46 /* Show */ = {
-			isa = PBXGroup;
-			children = (
-				DD5C80E12910BB95004E0C46 /* Config */,
-				DD5C80E22910BB95004E0C46 /* showResource.bundle */,
-				DD5C80E32910BB95004E0C46 /* Utils */,
-				DD5C80E42910BB95004E0C46 /* Controller */,
-				DD5C80E52910BB95004E0C46 /* Common */,
-				DD5C80E62910BB95004E0C46 /* Model */,
-				DD5C80E72910BB95004E0C46 /* View */,
-				DD5C80E82910BB95004E0C46 /* Service */,
-			);
-			path = Show;
-			sourceTree = "<group>";
-		};
-		DD5C80E12910BB95004E0C46 /* Config */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Config;
-			sourceTree = "<group>";
-		};
-		DD5C80E32910BB95004E0C46 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		DD5C80E42910BB95004E0C46 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		DD5C80E52910BB95004E0C46 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
-		DD5C80E62910BB95004E0C46 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		DD5C80E72910BB95004E0C46 /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		DD5C80E82910BB95004E0C46 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Service;
 			sourceTree = "<group>";
 		};
 		DD84168629090C520026B624 /* Resource */ = {
@@ -3112,7 +3054,7 @@
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
-				A8B5619D2912675C004F34D1 /* ShowLivePreViewVC.swift in Sources */,
+				A8B5619D2912675C004F34D1 /* ShowCreateLiveVC.swift in Sources */,
 				DDA19A3C28FFE57A009D3E61 /* UIView+QuickLayout.swift in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */,

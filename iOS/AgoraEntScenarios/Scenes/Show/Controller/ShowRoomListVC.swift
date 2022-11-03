@@ -49,7 +49,7 @@ class ShowRoomListVC: ShowBaseViewController {
     
     // 创建房间
     private func createRoom(){
-        let preVC = ShowLivePreViewVC()
+        let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
         preNC.modalPresentationStyle = .overCurrentContext
