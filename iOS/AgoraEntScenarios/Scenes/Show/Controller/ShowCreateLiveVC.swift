@@ -8,7 +8,7 @@
 import UIKit
 import AgoraRtcKit
 
-class ShowLivePreViewVC: UIViewController {
+class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
@@ -72,6 +72,7 @@ class ShowLivePreViewVC: UIViewController {
         
         // 创建房间
         createView = ShowCreateLiveView()
+        createView.delegate = self
         view.addSubview(createView)
         createView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -103,4 +104,24 @@ class ShowLivePreViewVC: UIViewController {
     @objc private func didClickCancelButton(){
         dismiss(animated: true)
     }
+}
+
+extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
+    
+    func onClickCameraBtnAction() {
+        
+    }
+    
+    func onClickBeautyBtnAction() {
+        
+    }
+    
+    func onClickQualityBtnAction() {
+        
+    }
+    
+    func onClickStartBtnAction() {
+        
+    }
+
 }

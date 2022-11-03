@@ -7,8 +7,16 @@
 
 import UIKit
 
+protocol ShowCreateLiveViewDelegate: NSObjectProtocol {
+    func onClickCameraBtnAction()
+    func onClickBeautyBtnAction()
+    func onClickQualityBtnAction()
+    func onClickStartBtnAction()
+}
 
 class ShowCreateLiveView: UIView {
+
+    weak var delegate: ShowCreateLiveViewDelegate?
     
     private var roomBgImgView: UIImageView!
     private var nameTextField: UITextField!
@@ -101,12 +109,6 @@ class ShowCreateLiveView: UIView {
             make.height.equalTo(254)
         }
         
-        // 翻转摄像头
-        
-        // 美化
-        
-        // 画质
-        
         // tips
         let tipsLabel = UILabel()
         let tipsText = " 本产品仅用于功能体验，单次直播时长不超过20mins"
@@ -140,9 +142,60 @@ class ShowCreateLiveView: UIView {
             make.width.equalTo(230)
             make.height.equalTo(btnHeight)
         }
+        
+        // 中间按钮
+        layoutButtonArray()
     }
     
+    private func createButton(imgName: String, title: String) ->UIButton {
+        let button = UIButton(type: .custom)
+        let imageView = UIImageView(image: UIImage.show_sceneImage(name: imgName))
+        button.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.left.top.right.equalToSuperview()
+        }
+        let label = UILabel()
+        label.font = .show_M_12
+        label.textColor = .show_main_text
+        label.text = title
+        label.textAlignment = .center
+        button.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.left.bottom.right.equalToSuperview()
+            make.top.equalTo(imageView.snp.bottom).offset(3)
+        }
+        addSubview(button)
+        return button
+    }
     
+    private func layoutButtonArray(){
+        // 翻转摄像头
+        let cameraButton = createButton(imgName: "show_create_camera", title: "翻转")
+        cameraButton.addTarget(self, action: #selector(didClickCameraButton), for: .touchUpInside)
+        
+        // 美化
+        let beautyButton = createButton(imgName: "show_create_beauty", title: "美化")
+        beautyButton.addTarget(self, action: #selector(didClickBeautyButton), for: .touchUpInside)
+        
+        // 画质
+        let qualityButton = createButton(imgName: "show_create_quality", title: "画质")
+        qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
+        
+        let buttonArray = [cameraButton, beautyButton, qualityButton]
+        let count = buttonArray.count
+        let itemSpace: CGFloat = 50
+        let itemWidth: CGFloat = 30
+        let baseLeft: CGFloat = (Screen.width - itemSpace * CGFloat(count - 1) - itemWidth * CGFloat(count)) / 2
+        var i = 0
+        for button in buttonArray {
+            button.snp.makeConstraints { make in
+                make.left.equalTo(baseLeft + CGFloat(i) * (itemWidth + itemSpace))
+                make.bottom.equalTo(-174)
+                make.width.equalTo(itemWidth)
+            }
+            i += 1
+        }
+    }
 }
 
 extension ShowCreateLiveView {
@@ -152,8 +205,23 @@ extension ShowCreateLiveView {
         ToastView.show(text: "已拷贝至剪切板")
     }
     
+    // 点击翻转按钮
+    @objc private func didClickCameraButton(){
+        delegate?.onClickCameraBtnAction()
+    }
+    
+    // 点击美化按钮
+    @objc private func didClickBeautyButton(){
+        delegate?.onClickBeautyBtnAction()
+    }
+    
+    // 点击画质按钮
+    @objc private func didClickQualityButton(){
+        delegate?.onClickQualityBtnAction()
+    }
+    
     // 点击开始直播按钮
     @objc private func didClickStartButton(){
-        
+        delegate?.onClickStartBtnAction()
     }
 }
