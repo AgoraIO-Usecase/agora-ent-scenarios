@@ -17,7 +17,8 @@
 #import "VLKTVSelBgModel.h"
 
 @interface KTVServiceImp()<AgoraRtmDelegate, AgoraRtmChannelDelegate>
-@property (nonatomic, strong) NSString* roomNo;
+@property (nonatomic, copy) NSString* roomNo;
+@property (nonatomic, copy) NSString* roomCreator;
 @property (nonatomic, strong) AgoraRtmChannel *rtmChannel;
 
 @property (nonatomic, copy, nullable) void(^userListCountDidChanged)(NSUInteger);
@@ -197,6 +198,7 @@
                         NSArray *seatsArray = response.data[@"roomUserInfoDTOList"];
                         outputModel.seatsArray = [self configureSeatsWithArray:seatsArray songArray:nil];
                         weakSelf.roomNo = outputModel.roomNo;
+                        weakSelf.roomCreator = response.data[@"creatorNo"];
                         completion(nil, outputModel);
                     }];
                 }else{
@@ -257,6 +259,7 @@
                 }
                 [AgoraRtm setStatus:LoginStatusOnline];
                 weakSelf.roomNo = inputModel.roomNo;
+                weakSelf.roomCreator = response.data[@"creatorNo"];
                 //处理座位信息
                 NSArray *seatsArray = response.data[@"roomUserInfoDTOList"];
                 NSArray *songArray = response.data[@"roomSongInfoDTOS"];
@@ -403,32 +406,32 @@
 
 
 - (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion {
-    NSDictionary *param = @{
-        @"roomNo": [self getRoomNo],//self.roomModel.roomNo,
-        @"userNo": [self getUserNo],//VLUserCenter.user.userNo
-    };
-    [VLAPIRequest getRequestURL:kURLRoomOut
-                      parameter:param
-                        showHUD:NO
-                        success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {
-            completion(nil);
-            return;
-        }
-        
-        completion([NSError errorWithDomain:response.message code:response.code userInfo:nil]);
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        completion(error);
-    }];
-}
-
-
-- (void)removeRoomWithCompletion:(void(^)(NSError* _Nullable))completion {
     NSString* roomNo = [self getRoomNo];
     NSDictionary *param = @{
         @"roomNo": roomNo,//self.roomModel.roomNo,
         @"userNo": [self getUserNo],//VLUserCenter.user.userNo
     };
+    
+    
+    //current user is room owner, remove room
+    if (![self.roomCreator isEqualToString:[VLUserCenter.user userNo]]) {
+        [VLAPIRequest getRequestURL:kURLRoomOut
+                          parameter:param
+                            showHUD:NO
+                            success:^(VLResponseDataModel * _Nonnull response) {
+            if (response.code == 0) {
+                completion(nil);
+                return;
+            }
+            
+            completion([NSError errorWithDomain:response.message code:response.code userInfo:nil]);
+        } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+            completion(error);
+        }];
+        
+        return;;
+    }
+
     [VLAPIRequest getRequestURL:kURLRoomClose
                       parameter:param
                         showHUD:NO
