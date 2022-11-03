@@ -114,8 +114,9 @@ extension UIImageView {
     }
 }
 
+
 extension UITextField {
-    var placeholder: EKProperty.LabelContent {
+    var ek_placeholder: EKProperty.LabelContent {
         set {
             attributedPlaceholder = NSAttributedString(
                 string: newValue.text,
@@ -132,7 +133,7 @@ extension UITextField {
 
     var textFieldContent: EKProperty.TextFieldContent {
         set {
-            placeholder = newValue.placeholder
+            ek_placeholder = newValue.placeholder
             keyboardType = newValue.keyboardType
             textColor = newValue.textStyle.color(for: traitCollection)
             font = newValue.textStyle.font
