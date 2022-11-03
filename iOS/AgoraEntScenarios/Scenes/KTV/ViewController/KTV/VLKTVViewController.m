@@ -171,9 +171,10 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListWithChanged:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
+        //TODO(wushengtao): add model will return KTVSubscribeUpdated
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息
-            for (VLRoomSeatModel *model in self.seatsArray) {
+            for (VLRoomSeatModel *model in weakSelf.seatsArray) {
                 if (model.onSeat == seatModel.onSeat) {
                     model.isMaster = seatModel.isMaster;
                     model.headUrl = seatModel.headUrl;
@@ -182,54 +183,67 @@ VLPopScoreViewDelegate
                     model.userNo = seatModel.userNo;
                     model.id = seatModel.id;
                     
-                    if([self ifMainSinger:model.userNo]) {
+                    if([weakSelf ifMainSinger:model.userNo]) {
                         model.ifSelTheSingSong = YES;
-                        [self.MVView setPlayerViewsHidden:NO nextButtonHidden:NO];
+                        [weakSelf.MVView setPlayerViewsHidden:NO nextButtonHidden:NO];
                     }
-                    VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+                    VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
                     if (song != nil && song.isChorus && [song.chorusNo isEqualToString:seatModel.userNo]) {
                         model.ifJoinedChorus = YES;
                     }
                 }
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.roomPersonView setSeatsArray:self.seatsArray];
+                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             });
+            
+            if (status == KTVSubscribeUpdated) {
+                //是否打开视频 & 是否静音
+                for (VLRoomSeatModel *model in self.seatsArray) {
+                    if ([seatModel.userNo isEqualToString:model.userNo]) {
+                        model.isVideoMuted = seatModel.isVideoMuted;
+                        model.isSelfMuted = seatModel.isSelfMuted;
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self.roomPersonView updateSeatsByModel:model];
+                        });
+                    }
+                }
+            }
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
-            VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
             
             // 被下麦用户刷新UI
             if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
-                [self.MVView updateUIWithUserOnSeat:NO song:song];
-                self.bottomView.hidden = YES;
+                [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
+                weakSelf.bottomView.hidden = YES;
                 // 取出对应模型、防止数组越界
-                [self setSelfAudience];
-                [self resetChorusStatus:seatModel.userNo];
+                [weakSelf setSelfAudience];
+                [weakSelf resetChorusStatus:seatModel.userNo];
                 
-                if (self.seatsArray.count - 1 >= seatModel.onSeat) {
+                if (weakSelf.seatsArray.count - 1 >= seatModel.onSeat) {
                     // 下麦重置占位模型
-                    VLRoomSeatModel *indexSeatModel = self.seatsArray[seatModel.onSeat];
+                    VLRoomSeatModel *indexSeatModel = weakSelf.seatsArray[seatModel.onSeat];
                     [indexSeatModel resetLeaveSeat];
                 }
                 
                 // If I was dropped off mic and I am current singer, then we should play next song.
                 if([/*member.userId*/seatModel.id isEqualToString:VLUserCenter.user.id] == NO && [self ifMainSinger:VLUserCenter.user.userNo]) {
-                    [self sendChangeSongMessage];
-                    [self prepareNextSong];
-                    [self getChoosedSongsList:false onlyRefreshList:NO];
+                    [weakSelf sendChangeSongMessage];
+                    [weakSelf prepareNextSong];
+                    [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
                 }
             } else{
-                for (VLRoomSeatModel *model in self.seatsArray) {
+                for (VLRoomSeatModel *model in weakSelf.seatsArray) {
                     if ([seatModel.userNo isEqualToString:model.userNo]) {
                         [model resetLeaveSeat];
-                        [self resetChorusStatus:seatModel.userNo];
+                        [weakSelf resetChorusStatus:seatModel.userNo];
                     }
                 }
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.roomPersonView setSeatsArray:self.seatsArray];
+                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             });
         }
     }];
@@ -243,13 +257,13 @@ VLPopScoreViewDelegate
             VLKTVSelBgModel* selBgModel = [VLKTVSelBgModel new];
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
             selBgModel.ifSelect = YES;
-            self.choosedBgModel = selBgModel;
+            weakSelf.choosedBgModel = selBgModel;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.MVView changeBgViewByModel:selBgModel];
+                [weakSelf.MVView changeBgViewByModel:selBgModel];
             });
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
-            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.userNo]) {
+            if ([roomInfo.creator isEqualToString:VLUserCenter.user.userNo]) {
                 return;
             }
             //发送通知
@@ -261,19 +275,46 @@ VLPopScoreViewDelegate
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
+            
+            if (KTVSubscribeUpdated == status) {
+                //有人加入合唱
+                if(songInfo.isChorus
+                   && weakSelf.currentPlayingSongNo == nil
+                   && songInfo.chorusNo != nil) {
+                    [weakSelf.MVView setJoinInViewHidden];
+                    [weakSelf setUserJoinChorus:songInfo.chorusNo];
+                    if([weakSelf ifMainSinger:VLUserCenter.user.userNo]) {
+                        [weakSelf sendApplySendChorusMessage:songInfo.chorusNo];
+                    }
+                    [weakSelf joinChorusConfig:@""];
+                    return;
+                }
+                
+                //观众看到打分
+                if (songInfo.status == 2) {
+                    double voicePitch = songInfo.score;
+                    [weakSelf.MVView setVoicePitch:@[@(voicePitch)]];
+                    return;
+                }
+            }
+            
+            
             //收到点歌的消息
-            VLRoomSelSongModel *song = self.selSongsArray.firstObject;
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
             if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
                 [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
             }
             else {
                 [weakSelf getChoosedSongsList:false onlyRefreshList:YES];
             }
+            
+            
+            
         } else if (KTVSubscribeDeleted == status) {
             //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             //removed song is top song, play next
-            if (![selSongModel.songNo isEqualToString:self.currentPlayingSongNo]) {
+            if (![selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo]) {
                 return;
             }
             
@@ -357,7 +398,9 @@ VLPopScoreViewDelegate
     VLLog(@"收到了数据流状态改变：：%lu",state);
 
 }
-- (void)rtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume {
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine
+reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
+      totalVolume:(NSInteger)totalVolume {
     if (speakers.count) {
         if([self ifMainSinger:VLUserCenter.user.userNo]) {
             double voicePitch = (double)totalVolume;
@@ -652,7 +695,7 @@ VLPopScoreViewDelegate
     contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
     contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
-    VLLog(@"AgoraMcc: %@, %@", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
+    VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
     [self.AgoraMcc registerEventDelegate:self];
 
@@ -1079,7 +1122,7 @@ VLPopScoreViewDelegate
 
 - (void)bottomAudionBtnAction:(NSInteger)ifMute {
     
-    [[AppContext ktvServiceImp] publishMuteEventWithMuteStatus:ifMute
+    [[AppContext ktvServiceImp] publishMuteEventWithMuteStatus: ifMute == 1 ? YES : NO
                                                     completion:^(NSError * error) {
         if (error != nil) {
             return;
@@ -1133,8 +1176,8 @@ VLPopScoreViewDelegate
 
 // 开启视频事件回调
 - (void)bottomVideoBtnAction:(NSInteger)ifOpen {
-    [[AppContext ktvServiceImp] publishVideoOpenStatusWithStatus:ifOpen
-                                                      completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] publishVideoOpenEventWithOpenStatus:ifOpen
+                                                         completion:^(NSError * error) {
         if (error != nil) {
             return;;
         }
@@ -2214,7 +2257,7 @@ VLPopScoreViewDelegate
             self.currentPlayingSongNo = nil;
             [self prepareNextSong];
             [self getChoosedSongsList:false onlyRefreshList:NO];
-        } else*/ if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
+        } else if ([dict[@"messageType"] intValue] == VLSendMessageTypeTellSingerSomeBodyJoin) {//有人加入合唱
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.MVView setJoinInViewHidden];
                 [self setUserJoinChorus:dict[@"userNo"]];
@@ -2223,7 +2266,7 @@ VLPopScoreViewDelegate
                 }
                 [self joinChorusConfig:member.userId];
             });
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSoloSong){ //独唱
+        }else*/ if([dict[@"messageType"] intValue] == VLSendMessageTypeSoloSong){ //独唱
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self startSinging];
                 [self.MVView setJoinInViewHidden];
@@ -2263,12 +2306,11 @@ VLPopScoreViewDelegate
                     });
                 }   
             }
-        }else if([dict[@"messageType"] intValue] == VLSendMessageTypeSeeScore) { //观众看到打分
+        }/* else if([dict[@"messageType"] intValue] == VLSendMessageTypeSeeScore) { //观众看到打分
 //            [self.MVView MVViewSetVoicePitch:[dict[@"pitch"] doubleValue]];
             double voicePitch = [dict[@"pitch"] doubleValue];
             [self.MVView setVoicePitch:@[@(voicePitch)]];
-        }
-        else if([dict[@"messageType"] intValue] == VLSendMessageAuditFail) {
+        }*/ else if([dict[@"messageType"] intValue] == VLSendMessageAuditFail) {
             VLLog(@"Agora - Received audit message");
             if ([dict[@"userNo"] isEqualToString:VLUserCenter.user.userNo]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
