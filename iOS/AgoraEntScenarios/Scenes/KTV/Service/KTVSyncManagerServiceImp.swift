@@ -15,6 +15,18 @@ private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
+private func agoraAssert(_ message: String) {
+    agoraAssert(false, message)
+}
+
+private func agoraAssert(_ condition: Bool, _ message: String) {
+    #if DEBUG
+    assert(condition, message)
+    #else
+    
+    #endif
+}
+
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
     private var roomList: [VLRoomListModel]?
     private var userList: [VLLoginModel] = .init()
@@ -45,7 +57,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     private func getRoomNo() -> String {
         guard let roomNo = roomNo else {
-            assertionFailure("roomNo == nil")
+            agoraAssert("roomNo == nil")
             return ""
         }
 
@@ -128,7 +140,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                           let rtcToken = rtcToken,
                           let rtmToken = rtmToken
                     else {
-                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
@@ -155,7 +167,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                   completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
     {
         guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
-            assertionFailure()
+            agoraAssert("join Room fail")
             return
         }
 
@@ -175,7 +187,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                           let rtcToken = rtcToken,
                           let rtmToken = rtmToken
                     else {
-                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
@@ -202,7 +214,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
         else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
@@ -240,7 +252,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         removeUser { error in
@@ -265,7 +277,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
     func removeRoom(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
 //        removeUser { error in
@@ -289,7 +301,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
     func joinChorus(withInput inputModel: KTVJoinChorusInputModel,
                     completion: @escaping (Error?) -> Void) {
         guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
-            assertionFailure()
+            agoraAssert("join Chorus fail")
             return
         }
         //isChorus always true
@@ -317,7 +329,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
             guard let resp = response.data as? [String: Any],
                   let data = resp["data"] as? [String: Any]
             else {
-                assertionFailure("response.data unknown format!")
+                agoraAssert("response.data unknown format!")
                 return
             }
             outputModel.lyric = data["lyric"] as! String
@@ -361,7 +373,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         guard let topSong = songList.first,
               let song = songList.filter({ $0.objectId == inputModel.objectId }).first
         else {
-            assertionFailure("make song to top not found! \(inputModel.songNo)")
+            agoraAssert("make song to top not found! \(inputModel.songNo)")
             return
         }
 
@@ -393,7 +405,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         roomStatusDidChanged = changedBlock
 
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -430,7 +442,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.userNo })
             .first?.value else {
-            assertionFailure()
+            agoraAssert("mute seat not found")
             return
         }
         
@@ -443,7 +455,7 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.userNo })
             .first?.value else {
-            assertionFailure()
+            agoraAssert("open video seat not found")
             return
         }
         
@@ -526,7 +538,7 @@ extension KTVSyncManagerServiceImp {
 
     private func getUserInfo(finished: @escaping (Error?, [VLLoginModel]?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -565,7 +577,7 @@ extension KTVSyncManagerServiceImp {
 
     private func subscribeOnlineUsers(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -595,7 +607,7 @@ extension KTVSyncManagerServiceImp {
 
     private func removeUser(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         let objectId = userList.filter({ $0.userNo == UserInfo.userId && $0.objectId != nil }).first?.objectId ?? ""
@@ -734,7 +746,7 @@ extension KTVSyncManagerServiceImp {
 
     private func getSeatInfo(finished: @escaping (Error?, [VLRoomSeatModel]?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -895,7 +907,7 @@ extension KTVSyncManagerServiceImp {
 
     private func getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -976,7 +988,7 @@ extension KTVSyncManagerServiceImp {
         guard let channelName = roomNo,
               let objectId = songId
         else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
@@ -1026,7 +1038,7 @@ extension KTVSyncManagerServiceImp {
 
     private func subscribeChooseSong(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
+            agoraAssert("channelName = nil")
             return
         }
         SyncUtil
