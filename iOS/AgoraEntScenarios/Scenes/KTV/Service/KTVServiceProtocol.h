@@ -80,11 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param completion <#completion description#>
 - (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
 
-/// 删除房间
-/// @param completion <#completion description#>
-- (void)removeRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
-
-
 /// 删除歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
