@@ -25,7 +25,6 @@
 @property (nonatomic, copy, nullable) void(^seatListDidChanged)(KTVSubscribe, VLRoomSeatModel*);
 @property (nonatomic, copy, nullable) void(^roomDidChanged)(KTVSubscribe, VLRoomListModel*);
 @property (nonatomic, copy, nullable) void(^chooseSongDidChanged)(KTVSubscribe, VLRoomSelSongModel*);
-@property (nonatomic, copy, nullable) void(^messageDidChanged)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*);
 @end
 
 @implementation KTVServiceImp
@@ -872,10 +871,6 @@
     }];
 }
 
-- (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock {
-    self.messageDidChanged = changedBlock;
-}
-
 @end
 
 @interface KTVServiceImp(AgoraRtm)
@@ -1039,10 +1034,7 @@ messageReceived:(AgoraRtmMessage *)message
         }
         
         
-        if (self.messageDidChanged == nil) {
-            return;
-        }
-        self.messageDidChanged(channel, message, member);
+        NSAssert(false, @"not implements");
     }
 }
 
