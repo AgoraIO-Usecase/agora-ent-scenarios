@@ -129,47 +129,6 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
                 [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
             }
         }];
-        
-//        NSString *setStatus = @"";
-//        if(self.isSelfMuted == 1) {
-//            setStatus = @"0";
-//        }
-//        else {
-//            setStatus = @"1";
-//        }
-//        NSDictionary *param = @{
-//            @"roomNo": self.roomNo,
-//            @"userNo": VLUserCenter.user.userNo,
-//            @"setStatus": setStatus
-//        };
-//        [VLAPIRequest getRequestURL:kURLIfSetMute parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//            if (response.code == 0) {
-//                if (self.isSelfMuted == 1) {
-//                    self.isSelfMuted = 0;
-//                }
-//                else{
-//                    self.isSelfMuted = 1;
-//                }
-//                if (self.delegate && [self.delegate respondsToSelector:@selector(bottomAudionBtnAction:)]) {
-//                    [self.delegate bottomAudionBtnAction:self.isSelfMuted];
-//                }
-//                if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
-//                    [self.delegate bottomSetAudioMute:self.isSelfMuted];
-//                }
-//
-//                if (self.isSelfMuted == 0){
-//                    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-//                }
-//                else{
-//                    [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
-//                }
-//
-//
-//            }
-//        } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//        }];
-    
     }else if (sender.tag == VLKTVBottomBtnClickTypeVideo){
         [[AppContext ktvServiceImp] openVideoStatusWithStatus:self.isVideoMuted == 0 ? YES : NO
                                                    completion:^(NSError * error) {
@@ -196,43 +155,6 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
                 [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
             }
         }];
-        
-//        NSString *setStatus = @"";
-//        if(self.isVideoMuted == 1) {
-//            setStatus = @"0";
-//        }
-//        else {
-//            setStatus = @"1";
-//        }
-//        NSDictionary *param = @{
-//            @"roomNo": self.roomNo,
-//            @"userNo": VLUserCenter.user.userNo,
-//            @"setStatus": setStatus
-//        };
-//        [VLAPIRequest getRequestURL:kURLIfOpenVido parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//            if (response.code == 0) {
-//                if (self.isVideoMuted == 1) {
-//                    self.isVideoMuted = 0;
-//                }
-//                else{
-//                    self.isVideoMuted = 1;
-//                }
-//                if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
-//                    [self.delegate bottomSetVideoMute:self.isVideoMuted];
-//                }
-//                if (self.delegate && [self.delegate respondsToSelector:@selector(bottomVideoBtnAction:)]) {
-//                    [self.delegate bottomVideoBtnAction:self.isVideoMuted];
-//                }
-//                if (self.isVideoMuted == 1) {
-//                    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
-//                }
-//                else{
-//                    [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-//                }
-//            }
-//        } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//            
-//        }];
     }else{
         if (self.delegate && [self.delegate respondsToSelector:@selector(bottomBtnsClickAction: withSender:)]) {
             [self.delegate bottomBtnsClickAction:sender.tag withSender:sender];

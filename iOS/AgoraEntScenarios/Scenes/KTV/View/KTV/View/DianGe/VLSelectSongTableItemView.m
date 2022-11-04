@@ -125,65 +125,6 @@
         }];
 
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" :self.roomNo
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLChoosedSongs parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            self.selSongsArray = [VLRoomSelSongModel vj_modelArrayWithJson:response.data];
-//            NSDictionary *param = @{
-//                @"type":@(pageType),
-//                @"size":@(20),
-//                @"current":@(self.page)
-//            };
-//
-//            [VLAPIRequest getRequestURL:kURLGetSongsList parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [self.tableView.mj_header endRefreshing];
-//                    self.page += 1;
-//                    NSArray *tempArray = response.data[@"records"];
-//                    NSArray *modelsArray = [VLSongItmModel vj_modelArrayWithJson:tempArray];
-//                    if (ifRefresh) {
-//                        [self.songsMuArray removeAllObjects];
-//                        self.songsMuArray = modelsArray.mutableCopy;
-//                        if (modelsArray.count > 0) {
-//                            self.tableView.mj_footer.hidden = NO;
-//                        }else{
-//                            self.tableView.mj_footer.hidden = YES;
-//                        }
-//                    }else{
-//                        for (VLSongItmModel *model in modelsArray) {
-//                            [self.songsMuArray addObject:model];
-//                        }
-//                    }
-//
-//                    for (VLSongItmModel *itemModel in self.songsMuArray) {
-//                        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
-//                            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
-//                                itemModel.ifChoosed = YES;
-//                            }
-//                        }
-//                    }
-//
-//                    [self.tableView reloadData];
-//                    if (modelsArray.count < 5) {
-//                        [self.tableView.mj_footer endRefreshingWithNoMoreData];
-//                    }else{
-//                        [self.tableView.mj_footer endRefreshing];
-//                    }
-//                }else{
-//                    [self.tableView.mj_header endRefreshing];
-//                }
-//
-//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//                [self.tableView.mj_header endRefreshing];
-//            }];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 #pragma mark -- UITableViewDataSource UITableViewDelegate
@@ -217,7 +158,6 @@
     
     model.ifChorus = self.ifChorus;
     
-    
     KTVChooseSongInputModel* inputModel = [KTVChooseSongInputModel new];
     inputModel.isChorus = model.ifChorus;
     inputModel.songName = model.songName;
@@ -235,29 +175,6 @@
         [self dianGeSuccessWithModel:model];
         [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
     }];
-    
-    
-//    NSDictionary *param = @{
-//        @"isChorus" : @(self.ifChorus),
-//        @"roomNo": self.roomNo,
-//        @"songName":model.songName,
-//        @"songNo":model.songNo,
-////        @"songUrl":model.songUrl,
-//        @"userNo":VLUserCenter.user.userNo
-//    };
-//    [VLAPIRequest getRequestURL:kURLChooseSong parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            //点歌完成发送通知
-//            [self dianGeSuccessWithModel:model];
-//
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
-//        }
-//        else {
-//            [self dianGeFailedWithModel:model];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [self dianGeFailedWithModel:model];
-//    }];
 }
 
 - (void)dianGeFailedWithModel:(VLSongItmModel *)songItemModel {
