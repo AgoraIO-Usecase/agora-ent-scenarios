@@ -12,6 +12,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -19,7 +20,6 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import java.util.Random;
 
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.PagePilotManager;
@@ -51,7 +51,6 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
         roomCreateViewModel = new ViewModelProvider(this).get(RoomCreateViewModel.class);
-        roomCreateViewModel.setLifecycleOwner(this);
         setRandomRoomTitleAndCover();
     }
 
@@ -99,19 +98,16 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         getBinding().superLayout.setOnClickListener(view -> {
             hideInput();
         });
-        roomCreateViewModel.setISingleCallback((type, o) -> {
-            if (type == KtvConstant.CALLBACK_TYPE_ROOM_CREATE_FAIL) {
-                hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_CREATE_SUCCESS) {
-                PagePilotManager.pageRoomLiving();
-                finish();
-                hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_JOIN_SUCCESS) {
-                finish();
-                hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_JOIN_FAIL) {
-                finish();
-                hideLoadingView();
+        roomCreateViewModel.createRoomResult.observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    PagePilotManager.pageRoomLiving();
+                    finish();
+                    hideLoadingView();
+                }else{
+                    hideLoadingView();
+                }
             }
         });
         getBinding().cbOpen.setOnCheckedChangeListener((compoundButton, b) -> {
@@ -196,7 +192,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         } else {
             isPrivate = 1;
         }
-        roomCreateViewModel.requestCreateRoom(isPrivate, roomName, password, userNo, bgOption);
+        roomCreateViewModel.createRoom(isPrivate, roomName, password, userNo, bgOption);
     }
 
     /**
