@@ -81,7 +81,8 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     }
 
     // MARK: protocol method
-
+    
+    // MARK: room info
     func getRoomList(withPage page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
         initScene { [weak self] in
             SyncUtil.fetchAll { results in
@@ -207,6 +208,21 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
             }
         }
     }
+    
+    func leaveRoom(completion: @escaping (Error?) -> Void) {
+        guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
+            agoraAssert("leaveRoom channelName = nil")
+            return
+        }
+        
+        //current user is room owner, remove room
+        if roomInfo.creator == VLUserCenter.user.userNo {
+            _removeRoom(completion: completion)
+            return
+        }
+        _leaveRoom(completion: completion)
+    }
+
 
     func changeMVCover(withInput inputModel: KTVChangeMVCoverInputModel,
                        completion: @escaping (Error?) -> Void)
@@ -235,7 +251,8 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                     })
         completion(nil)
     }
-
+    
+    // MARK: mic seat
     func onSeat(withInput inputModel: KTVOnSeatInputModel, completion: @escaping (Error?) -> Void) {
         let seatInfo = _getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
         _addSeatInfo(seatInfo: seatInfo,
@@ -249,21 +266,37 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         }
         completion(nil)
     }
-
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
-        guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
-            agoraAssert("leaveRoom channelName = nil")
+    
+    func mute(withMuteStatus mute: Bool,
+              completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            agoraAssert("mute seat not found")
             return
         }
         
-        //current user is room owner, remove room
-        if roomInfo.creator == VLUserCenter.user.userNo {
-            _removeRoom(completion: completion)
-            return
-        }
-        _leaveRoom(completion: completion)
+        seatInfo.isSelfMuted = mute ? 1 : 0
+        _updateSeat(seatInfo: seatInfo,
+                    finished: completion)
     }
 
+    func openVideoStatus(withStatus openStatus: Bool,
+                         completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .first?.value else {
+            agoraAssert("open video seat not found")
+            return
+        }
+        
+        seatInfo.isVideoMuted = openStatus ? 1 : 0
+        _updateSeat(seatInfo: seatInfo,
+                    finished: completion)
+    }
+
+    
+    // MARK: choose songs
     func removeSong(withInput inputModel: KTVRemoveSongInputModel,
                     completion: @escaping (Error?) -> Void) {
         _removeChooseSong(songId: inputModel.objectId,
@@ -373,38 +406,10 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     }
     
     
+    //MARK: about lyrics
     func becomeSolo() {
         _markSoloSongIfNeed()
     }
-    
-    func mute(withMuteStatus mute: Bool,
-              completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
-            .first?.value else {
-            agoraAssert("mute seat not found")
-            return
-        }
-        
-        seatInfo.isSelfMuted = mute ? 1 : 0
-        _updateSeat(seatInfo: seatInfo,
-                    finished: completion)
-    }
-
-    func openVideoStatus(withStatus openStatus: Bool,
-                         completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
-            .first?.value else {
-            agoraAssert("open video seat not found")
-            return
-        }
-        
-        seatInfo.isVideoMuted = openStatus ? 1 : 0
-        _updateSeat(seatInfo: seatInfo,
-                    finished: completion)
-    }
-    
     
     func updateSingingScore(withTotalVolume totalVolume: Double) {
 //        assertionFailure()

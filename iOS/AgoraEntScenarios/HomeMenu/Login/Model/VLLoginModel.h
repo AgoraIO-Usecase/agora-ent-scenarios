@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *sex;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *token;
-@property (nonatomic, copy) NSString *id;
+@property (nonatomic, copy) NSString *id;  //uid
 
 //自己是否是房主
 @property (nonatomic, assign) BOOL ifMaster;
