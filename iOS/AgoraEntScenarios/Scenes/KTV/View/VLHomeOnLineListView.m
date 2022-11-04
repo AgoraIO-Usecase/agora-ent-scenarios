@@ -97,51 +97,6 @@
             self.emptyView.hidden = NO;
         }
     }];
-    
-//    NSDictionary *param = @{
-//        @"size" : @(10),
-//        @"current": @(self.page)
-//    };
-//    [VLAPIRequest postRequestURL:kURLGetRoolList parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            [self.listCollectionView.mj_header endRefreshing];
-//            self.page += 1;
-//            NSArray *array = [VLRoomListModel vj_modelArrayWithJson:response.data[@"records"]];
-//            
-//            if (ifRefresh) {
-//                [self.roomListModeArray removeAllObjects];
-//                self.roomListModeArray = array.mutableCopy;
-//                if (array.count > 0) {
-//                    self.listCollectionView.mj_footer.hidden = NO;
-//                }else{
-//                    self.listCollectionView.mj_footer.hidden = YES;
-//                }
-//            }else{
-//                for (VLRoomListModel *model in array) {
-//                    [self.roomListModeArray addObject:model];
-//                }
-//            }
-//            [self.listCollectionView reloadData];
-//            if (array.count < 10) {
-//                [self.listCollectionView.mj_footer endRefreshing];
-//                self.listCollectionView.mj_footer.hidden = YES;
-//            }else{
-//                [self.listCollectionView.mj_footer endRefreshing];
-//            }
-//            if(self.roomListModeArray.count > 0) {
-//                self.emptyView.hidden = YES;
-//            }
-//            else {
-//                self.emptyView.hidden = NO;
-//            }
-//        }else{
-//            [self.listCollectionView.mj_header endRefreshing];
-//            [self.listCollectionView.mj_footer endRefreshing];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [self.listCollectionView.mj_header endRefreshing];
-//        [self.listCollectionView.mj_footer endRefreshing];
-//    }];
 }
 
 - (void)exitRoomEvent {
