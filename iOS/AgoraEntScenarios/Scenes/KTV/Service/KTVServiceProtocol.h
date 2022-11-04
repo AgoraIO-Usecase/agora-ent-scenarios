@@ -192,7 +192,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
 - (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
 
-- (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock;
 @end
 
 NS_ASSUME_NONNULL_END
