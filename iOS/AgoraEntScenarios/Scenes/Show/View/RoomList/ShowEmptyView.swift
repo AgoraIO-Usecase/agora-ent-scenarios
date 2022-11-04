@@ -34,7 +34,7 @@ class ShowEmptyView: UIView {
         descLabel = UILabel()
         descLabel.textColor = .show_empty_desc
         descLabel.font = .show_R_14
-        descLabel.text = "当前暂无主播开播"
+        descLabel.text = "当前暂无主播开播".show_localized
         addSubview(descLabel)
         descLabel.snp.makeConstraints { make in
             make.bottom.equalToSuperview()

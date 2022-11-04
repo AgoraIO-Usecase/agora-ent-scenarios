@@ -129,6 +129,10 @@
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
+		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
+		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
+		A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */; };
 		A8B561842910FDB8004F34D1 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */; };
 		A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */; };
 		A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5618929111052004F34D1 /* ShowBaseViewController.swift */; };
@@ -139,7 +143,6 @@
 		A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */; };
 		A8B5619D2912675C004F34D1 /* ShowCreateLiveVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */; };
 		A8B5619F29127724004F34D1 /* ShowCreateLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */; };
-		A8B561A329136863004F34D1 /* UIButton+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561A229136863004F34D1 /* UIButton+Show.swift */; };
 		A8B561A629136BF7004F34D1 /* ShowRoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
@@ -555,6 +558,10 @@
 		05FFE73F290F752C0024D22F /* VMSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMSoundView.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
+		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
+		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
+		A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceCell.swift; sourceTree = "<group>"; };
 		A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
 		A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListCell.swift; sourceTree = "<group>"; };
 		A8B5618929111052004F34D1 /* ShowBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBaseViewController.swift; sourceTree = "<group>"; };
@@ -565,7 +572,6 @@
 		A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowEmptyView.swift; sourceTree = "<group>"; };
 		A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveVC.swift; sourceTree = "<group>"; };
 		A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveView.swift; sourceTree = "<group>"; };
-		A8B561A229136863004F34D1 /* UIButton+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Show.swift"; sourceTree = "<group>"; };
 		A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListView.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1284,6 +1290,23 @@
 			path = CreateLive;
 			sourceTree = "<group>";
 		};
+		A88D142F2914C13500F5DF6A /* Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
+			);
+			path = Beauty;
+			sourceTree = "<group>";
+		};
+		A88D14302914C13E00F5DF6A /* Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */,
+				A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */,
+			);
+			path = Beauty;
+			sourceTree = "<group>";
+		};
 		A8B5617F2910FB19004F34D1 /* Show */ = {
 			isa = PBXGroup;
 			children = (
@@ -1300,6 +1323,7 @@
 		A8B561802910FB2A004F34D1 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				A88D14302914C13E00F5DF6A /* Beauty */,
 				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
 				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
 			);
@@ -1309,6 +1333,7 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A88D142F2914C13500F5DF6A /* Beauty */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
 			);
@@ -1342,7 +1367,6 @@
 		A8B5618F29112E33004F34D1 /* VIew */ = {
 			isa = PBXGroup;
 			children = (
-				A8B561A229136863004F34D1 /* UIButton+Show.swift */,
 			);
 			path = VIew;
 			sourceTree = "<group>";
@@ -1353,6 +1377,7 @@
 				A8B5619129121FA5004F34D1 /* UIImage+Show.swift */,
 				A8B561942912486C004F34D1 /* UIColor+Show.swift */,
 				A8B5619829125125004F34D1 /* UIFont+Show.swift */,
+				A88D14292914B0A300F5DF6A /* NSString+Show.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2927,6 +2952,7 @@
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				0510B865290B7A6E0063E57A /* VRAllRoomsViewController.swift in Sources */,
 				057DDA06290B9495001329E6 /* PresentationSegue.swift in Sources */,
+				A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */,
 				A8B561952912486C004F34D1 /* UIColor+Show.swift in Sources */,
 				057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */,
 				057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */,
@@ -2971,6 +2997,7 @@
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
 				DD8417AA29090C520026B624 /* VLKTVKindsView.m in Sources */,
 				0510B856290B799E0063E57A /* VRRoomCreateView.swift in Sources */,
+				A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */,
 				DDA19A3F28FFE57A009D3E61 /* QLUtils.swift in Sources */,
 				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				0510B839290B77330063E57A /* VRSoundEffectsCell.swift in Sources */,
@@ -3104,6 +3131,7 @@
 				DDA19A6228FFE57A009D3E61 /* EKImageNoteMessageView.swift in Sources */,
 				0510B82A290B730E0063E57A /* VoiceRoomGiftEntity.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
+				A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */,
 				DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */,
 				DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */,
 				057DDA03290B9495001329E6 /* PresentedViewType.swift in Sources */,
@@ -3123,6 +3151,7 @@
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
+				A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
@@ -3130,7 +3159,6 @@
 				DD8417B829090C520026B624 /* VLKTVTopView.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				05FFE6FE290F706C0024D22F /* VoiceRoomChatView.swift in Sources */,
-				A8B561A329136863004F34D1 /* UIButton+Show.swift in Sources */,
 				057DD9F6290B9495001329E6 /* UIImageBundleExtension.swift in Sources */,
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,

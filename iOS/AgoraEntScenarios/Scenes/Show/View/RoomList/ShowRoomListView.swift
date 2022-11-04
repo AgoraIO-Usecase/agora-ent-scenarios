@@ -51,9 +51,10 @@ class ShowRoomListView: UIView {
         let btnHeight: CGFloat = 48
         let createButton = UIButton(type: .custom)
         createButton.setTitleColor(.white, for: .normal)
-        createButton.setTitle("创建房间", for: .normal)
+        createButton.setTitle("创建房间".show_localized, for: .normal)
         createButton.setImage(UIImage.show_sceneImage(name: "show_create_add"), for: .normal)
-        createButton.setDirection(.left, offset: 5)
+        createButton.imageEdgeInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
+        createButton.titleEdgeInsets(UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
         createButton.backgroundColor = .show_btn_bg
         createButton.titleLabel?.font = .show_btn_title
         createButton.layer.cornerRadius = btnHeight * 0.5
