@@ -64,6 +64,11 @@
             [self.navigationController pushViewController:listVC animated:YES];
         }
             break;
+        case 2:
+        {
+            ShowRoomListVC *listVC = [ShowRoomListVC new];
+            [self.navigationController pushViewController:listVC animated:YES];
+        }
         default:
             break;
     }

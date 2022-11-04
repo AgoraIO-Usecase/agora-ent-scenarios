@@ -129,6 +129,21 @@
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
+		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
+		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
+		A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */; };
+		A8B561842910FDB8004F34D1 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */; };
+		A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */; };
+		A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5618929111052004F34D1 /* ShowBaseViewController.swift */; };
+		A8B5618C29111258004F34D1 /* showResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A8B5618B29111258004F34D1 /* showResource.bundle */; };
+		A8B5619229121FA5004F34D1 /* UIImage+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619129121FA5004F34D1 /* UIImage+Show.swift */; };
+		A8B561952912486C004F34D1 /* UIColor+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561942912486C004F34D1 /* UIColor+Show.swift */; };
+		A8B5619929125125004F34D1 /* UIFont+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619829125125004F34D1 /* UIFont+Show.swift */; };
+		A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */; };
+		A8B5619D2912675C004F34D1 /* ShowCreateLiveVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */; };
+		A8B5619F29127724004F34D1 /* ShowCreateLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */; };
+		A8B561A629136BF7004F34D1 /* ShowRoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -137,7 +152,6 @@
 		DD2A43E228FFCEE7004CEDCF /* AgoraEntScenariosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */; };
 		DD2A43EC28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */; };
 		DD2A43EE28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */; };
-		DD5C80E92910BB95004E0C46 /* showResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD5C80E22910BB95004E0C46 /* showResource.bundle */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -544,6 +558,21 @@
 		05FFE73F290F752C0024D22F /* VMSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMSoundView.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
+		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
+		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
+		A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceCell.swift; sourceTree = "<group>"; };
+		A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
+		A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListCell.swift; sourceTree = "<group>"; };
+		A8B5618929111052004F34D1 /* ShowBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBaseViewController.swift; sourceTree = "<group>"; };
+		A8B5618B29111258004F34D1 /* showResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = showResource.bundle; sourceTree = "<group>"; };
+		A8B5619129121FA5004F34D1 /* UIImage+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Show.swift"; sourceTree = "<group>"; };
+		A8B561942912486C004F34D1 /* UIColor+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Show.swift"; sourceTree = "<group>"; };
+		A8B5619829125125004F34D1 /* UIFont+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Show.swift"; sourceTree = "<group>"; };
+		A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowEmptyView.swift; sourceTree = "<group>"; };
+		A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveVC.swift; sourceTree = "<group>"; };
+		A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCreateLiveView.swift; sourceTree = "<group>"; };
+		A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListView.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -556,7 +585,6 @@
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITests.swift; sourceTree = "<group>"; };
 		DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		DD5C80E22910BB95004E0C46 /* showResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = showResource.bundle; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -1254,6 +1282,116 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A88D14282913BEB900F5DF6A /* CreateLive */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */,
+			);
+			path = CreateLive;
+			sourceTree = "<group>";
+		};
+		A88D142F2914C13500F5DF6A /* Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
+			);
+			path = Beauty;
+			sourceTree = "<group>";
+		};
+		A88D14302914C13E00F5DF6A /* Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */,
+				A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */,
+			);
+			path = Beauty;
+			sourceTree = "<group>";
+		};
+		A8B5617F2910FB19004F34D1 /* Show */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5618729111022004F34D1 /* Common */,
+				A8B561902912080C004F34D1 /* Utils */,
+				A8B561822910FB40004F34D1 /* Model */,
+				A8B561812910FB35004F34D1 /* View */,
+				A8B561802910FB2A004F34D1 /* Controller */,
+				A8B5618B29111258004F34D1 /* showResource.bundle */,
+			);
+			path = Show;
+			sourceTree = "<group>";
+		};
+		A8B561802910FB2A004F34D1 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				A88D14302914C13E00F5DF6A /* Beauty */,
+				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
+				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		A8B561812910FB35004F34D1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				A88D142F2914C13500F5DF6A /* Beauty */,
+				A88D14282913BEB900F5DF6A /* CreateLive */,
+				A8B561A429136BD7004F34D1 /* RoomList */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		A8B561822910FB40004F34D1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		A8B5618729111022004F34D1 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5618F29112E33004F34D1 /* VIew */,
+				A8B561882911102C004F34D1 /* ViewController */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		A8B561882911102C004F34D1 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5618929111052004F34D1 /* ShowBaseViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		A8B5618F29112E33004F34D1 /* VIew */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = VIew;
+			sourceTree = "<group>";
+		};
+		A8B561902912080C004F34D1 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				A8B5619129121FA5004F34D1 /* UIImage+Show.swift */,
+				A8B561942912486C004F34D1 /* UIColor+Show.swift */,
+				A8B5619829125125004F34D1 /* UIFont+Show.swift */,
+				A88D14292914B0A300F5DF6A /* NSString+Show.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		A8B561A429136BD7004F34D1 /* RoomList */ = {
+			isa = PBXGroup;
+			children = (
+				A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */,
+				A8B5619A29125EEA004F34D1 /* ShowEmptyView.swift */,
+				A8B561A529136BF7004F34D1 /* ShowRoomListView.swift */,
+			);
+			path = RoomList;
+			sourceTree = "<group>";
+		};
 		DD2A43BE28FFCEE7004CEDCF = {
 			isa = PBXGroup;
 			children = (
@@ -1312,70 +1450,6 @@
 				DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */,
 			);
 			path = AgoraEntScenariosUITests;
-			sourceTree = "<group>";
-		};
-		DD5C80E02910BB95004E0C46 /* Show */ = {
-			isa = PBXGroup;
-			children = (
-				DD5C80E12910BB95004E0C46 /* Config */,
-				DD5C80E22910BB95004E0C46 /* showResource.bundle */,
-				DD5C80E32910BB95004E0C46 /* Utils */,
-				DD5C80E42910BB95004E0C46 /* Controller */,
-				DD5C80E52910BB95004E0C46 /* Common */,
-				DD5C80E62910BB95004E0C46 /* Model */,
-				DD5C80E72910BB95004E0C46 /* View */,
-				DD5C80E82910BB95004E0C46 /* Service */,
-			);
-			path = Show;
-			sourceTree = "<group>";
-		};
-		DD5C80E12910BB95004E0C46 /* Config */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Config;
-			sourceTree = "<group>";
-		};
-		DD5C80E32910BB95004E0C46 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		DD5C80E42910BB95004E0C46 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		DD5C80E52910BB95004E0C46 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
-		DD5C80E62910BB95004E0C46 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		DD5C80E72910BB95004E0C46 /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		DD5C80E82910BB95004E0C46 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Service;
 			sourceTree = "<group>";
 		};
 		DD84168629090C520026B624 /* Resource */ = {
@@ -1628,7 +1702,7 @@
 		DD8416E429090C520026B624 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				DD5C80E02910BB95004E0C46 /* Show */,
+				A8B5617F2910FB19004F34D1 /* Show */,
 				053998BA290A70CB005143C7 /* VoiceChatRoom */,
 				DD8416E529090C520026B624 /* KTV */,
 				DD84175A29090C520026B624 /* Template */,
@@ -2632,7 +2706,7 @@
 				DD84176429090C520026B624 /* intro.css in Resources */,
 				DD84177229090C520026B624 /* ic_chat.png in Resources */,
 				DD84176329090C520026B624 /* util.js in Resources */,
-				DD5C80E92910BB95004E0C46 /* showResource.bundle in Resources */,
+				A8B5618C29111258004F34D1 /* showResource.bundle in Resources */,
 				DD84176C29090C520026B624 /* ic_game.png in Resources */,
 				DD84176E29090C520026B624 /* tab_discover.png in Resources */,
 				DD84177A29090C520026B624 /* product.js in Resources */,
@@ -2739,6 +2813,7 @@
 				057DD9F5290B9495001329E6 /* UIViewToastExtension.swift in Sources */,
 				057DDA07290B9496001329E6 /* VRVerifyCodeNumberView.swift in Sources */,
 				DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */,
+				A8B561842910FDB8004F34D1 /* ShowRoomListVC.swift in Sources */,
 				DDA199E528FFE579009D3E61 /* UILabel+Font.m in Sources */,
 				057DD9F8290B9495001329E6 /* PresentationController.swift in Sources */,
 				05FFE71E290F73670024D22F /* VoiceRoomHelpViewController.swift in Sources */,
@@ -2788,6 +2863,7 @@
 				DDA19A5B28FFE57A009D3E61 /* EKAlertMessage.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
+				A8B5619F29127724004F34D1 /* ShowCreateLiveView.swift in Sources */,
 				0510B868290B7A6E0063E57A /* VRSpatialSoundViewController.swift in Sources */,
 				DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
@@ -2855,10 +2931,12 @@
 				0510B829290B730E0063E57A /* VoiceRoomAudiencesEntity.swift in Sources */,
 				05FFE70B290F706C0024D22F /* VMSliderTableViewCell.swift in Sources */,
 				DD8417C329090C520026B624 /* KTVServiceImp.m in Sources */,
+				A8B5619229121FA5004F34D1 /* UIImage+Show.swift in Sources */,
 				DD8417BA29090C520026B624 /* VLPopOnLineTypeView.m in Sources */,
 				057DDA01290B9495001329E6 /* Throttle.swift in Sources */,
 				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
+				A8B5619929125125004F34D1 /* UIFont+Show.swift in Sources */,
 				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
 				DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */,
 				DD8417B629090C520026B624 /* VLPopScoreView.m in Sources */,
@@ -2870,15 +2948,19 @@
 				0510B852290B799E0063E57A /* VRCreateRoomView.swift in Sources */,
 				DD8417A029090C520026B624 /* VLKTVBottomView.m in Sources */,
 				DD8417BE29090C520026B624 /* VLHomeOnLineListCCell.m in Sources */,
+				A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */,
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				0510B865290B7A6E0063E57A /* VRAllRoomsViewController.swift in Sources */,
 				057DDA06290B9495001329E6 /* PresentationSegue.swift in Sources */,
+				A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */,
+				A8B561952912486C004F34D1 /* UIColor+Show.swift in Sources */,
 				057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */,
 				057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */,
 				05FFE6FF290F706C0024D22F /* VMSwitchTableViewCell.swift in Sources */,
 				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
 				0510B855290B799E0063E57A /* BaseNavigationView.swift in Sources */,
 				0510B854290B799E0063E57A /* VREmptyView.swift in Sources */,
+				A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */,
 				DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
@@ -2915,6 +2997,7 @@
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
 				DD8417AA29090C520026B624 /* VLKTVKindsView.m in Sources */,
 				0510B856290B799E0063E57A /* VRRoomCreateView.swift in Sources */,
+				A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */,
 				DDA19A3F28FFE57A009D3E61 /* QLUtils.swift in Sources */,
 				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				0510B839290B77330063E57A /* VRSoundEffectsCell.swift in Sources */,
@@ -2998,6 +3081,7 @@
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
+				A8B5619D2912675C004F34D1 /* ShowCreateLiveVC.swift in Sources */,
 				DDA19A3C28FFE57A009D3E61 /* UIView+QuickLayout.swift in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
 				DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */,
@@ -3014,6 +3098,7 @@
 				DDA19A3428FFE57A009D3E61 /* EKStyleView.swift in Sources */,
 				DDA19A4228FFE57A009D3E61 /* UIView+Shadow.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
+				A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */,
 				DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */,
 				DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */,
 				05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */,
@@ -3039,12 +3124,14 @@
 				05FFE6FD290F706C0024D22F /* VMNorSetTableViewCell.swift in Sources */,
 				DD8417B229090C520026B624 /* VLSelectSongTableItemView.m in Sources */,
 				DD8417A229090C520026B624 /* VLDropOnLineView.m in Sources */,
+				A8B561A629136BF7004F34D1 /* ShowRoomListView.swift in Sources */,
 				05FFE731290F74560024D22F /* AgoraMicVolView.swift in Sources */,
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
 				DDA19A4A28FFE57A009D3E61 /* EKAttributes+Duration.swift in Sources */,
 				DDA19A6228FFE57A009D3E61 /* EKImageNoteMessageView.swift in Sources */,
 				0510B82A290B730E0063E57A /* VoiceRoomGiftEntity.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
+				A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */,
 				DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */,
 				DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */,
 				057DDA03290B9495001329E6 /* PresentedViewType.swift in Sources */,
@@ -3064,6 +3151,7 @@
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
+				A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
@@ -3261,7 +3349,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3300,7 +3388,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
