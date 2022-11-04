@@ -9,7 +9,7 @@ import Foundation
 
 private let cSceneId = "scene_ChatRoom"
 
-public enum   {
+public enum updateRoomState {
     case activeAlien
     case announcement
     case robotVoleme
@@ -149,22 +149,18 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     ///
     func cancelApply(_ roomId: String,
                      completion: @escaping (Error?, Bool) -> Void)
-}
 
-// 房间外面需要用到syncManager
-extension ChatRoomServiceProtocol {
-    
     /// 获取房间列表
     /// - Parameters:
     ///   - page: 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
     ///   - completion: 完成回调   (错误信息， 房间列表)
     func fetchRoomList(page: Int,
-                     completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
+                     completion: @escaping (Error?, [VRRoomEntity]?) -> Void)
     
     /// 创建房间
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: VoiceChatRoom,
-                    completion: @escaping (SyncError?, VRRoomInfo?) -> Void)
+   func createRoom(room: VRRoomEntity,
+                        completion: @escaping (SyncError?) -> Void)
 }
