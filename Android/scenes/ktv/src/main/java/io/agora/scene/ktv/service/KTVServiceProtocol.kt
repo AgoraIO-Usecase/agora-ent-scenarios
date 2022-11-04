@@ -37,7 +37,8 @@ interface KTVServiceProtocol {
      * 上麦
      */
     fun onSeatWithInput(
-        inputModel: KTVOnSeatInputModel, completion: (error: Exception?) -> Unit
+        inputModel: KTVOnSeatInputModel,
+        completion: (error: Exception?) -> Unit
     )
 
     /**

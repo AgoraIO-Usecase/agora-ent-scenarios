@@ -1,4 +1,4 @@
-package io.agora.scene.base.bean.room;
+package io.agora.scene.ktv.manager.bean;
 
 public class RTCMessageBean {
     public long total;
