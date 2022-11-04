@@ -18,10 +18,10 @@ import androidx.palette.graphics.Palette;
 import io.agora.lrcview.LrcView;
 import io.agora.lrcview.PitchView;
 import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.manager.RoomManager;
 
 /**
  * 歌词控制View

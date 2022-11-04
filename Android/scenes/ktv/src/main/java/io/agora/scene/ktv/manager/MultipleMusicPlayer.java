@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -27,6 +27,7 @@ import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.data.model.AgoraMember;
 import io.agora.scene.base.data.model.AgoraRoom;
 import io.agora.scene.base.event.PreLoadEvent;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
