@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,12 +25,13 @@ import io.agora.rtc2.RtcEngineEx;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.api.apiutils.GsonUtils;
-import io.agora.scene.base.bean.room.RTCMessageBean;
-import io.agora.scene.base.bean.room.RTMMessageBean;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.ISingleCallback;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.event.PreLoadEvent;
+import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.ktv.manager.bean.RTCMessageBean;
+import io.agora.scene.ktv.manager.bean.RTMMessageBean;
 
 /**
  * RTC控制
