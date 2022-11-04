@@ -311,8 +311,13 @@ VLPopScoreViewDelegate
             
             
         } else if (KTVSubscribeDeleted == status) {
-            //切换歌曲
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
+                [weakSelf getChoosedSongsList:NO onlyRefreshList:YES];
+                return;
+            }
+            
+            //切换歌曲
             //removed song is top song, play next
             if (![selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo]) {
                 return;
@@ -320,14 +325,15 @@ VLPopScoreViewDelegate
             
             weakSelf.currentPlayingSongNo = nil;
             [weakSelf prepareNextSong];
-            [weakSelf getChoosedSongsList:false onlyRefreshList:NO];
+            [weakSelf getChoosedSongsList:NO onlyRefreshList:NO];
         }
     }];
     
-    [[AppContext ktvServiceImp] subscribeRtmMessageWithStatusChanged:^(AgoraRtmChannel * channel, AgoraRtmMessage * message, AgoraRtmMember * member) {
-        [weakSelf channel:channel messageReceived:message fromMember:member];
-    }];
-    
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(subscribeRtmMessageWithStatusChanged:)]) {
+        [[AppContext ktvServiceImp] subscribeRtmMessageWithStatusChanged:^(AgoraRtmChannel * channel, AgoraRtmMessage * message, AgoraRtmMember * member) {
+            [weakSelf channel:channel messageReceived:message fromMember:member];
+        }];
+    }
 }
 
 -(BOOL)isOnSeat{
@@ -405,7 +411,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         if([self ifMainSinger:VLUserCenter.user.userNo]) {
             double voicePitch = (double)totalVolume;
             [self.MVView setVoicePitch:@[@(voicePitch)]];
-            [[AppContext ktvServiceImp] publishSingingScoreWithTotalVolume:totalVolume];
+            [[AppContext ktvServiceImp] updateSingingScoreWithTotalVolume:totalVolume];
 //            NSDictionary *dict = @{
 //                @"messageType":@(VLSendMessageTypeSeeScore),
 //                @"pitch":@(totalVolume),
@@ -645,6 +651,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 - (void)joinRTCChannelIfRequestOnSeat:(BOOL)ifRequestOnSeat {
     [self.RTCkit leaveChannel:nil];
     [AgoraRtcEngineKit destroy];
+//    [AgoraMusicContentCenter destroy];
     self.RTCkit = nil;
     
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
@@ -716,7 +723,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)leaveChannel {
-    [[AppContext ktvServiceImp] leaveChannel];
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(leaveChannel)]) {
+        [[AppContext ktvServiceImp] leaveChannel];
+    }
 //    [self.rtmChannel leaveWithCompletion:^(AgoraRtmLeaveChannelErrorCode errorCode) {
 //        VLLog(@"leave channel error: %ld", (long)errorCode);
 //    }];
@@ -890,7 +899,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)roomerCloseRoom {
-    [[AppContext ktvServiceImp] removeRoomWithCompletion:^(NSError * error) {
+    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
         if (error != nil) {
             return;
         }
@@ -1122,25 +1131,27 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)bottomAudionBtnAction:(NSInteger)ifMute {
     
-    [[AppContext ktvServiceImp] publishMuteEventWithMuteStatus: ifMute == 1 ? YES : NO
-                                                    completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        VLRoomSeatModel *model = [VLRoomSeatModel new];
-        model.userNo = VLUserCenter.user.userNo;
-        model.isSelfMuted = ifMute;
-        for (VLRoomSeatModel *seatModel in self.seatsArray) {
-            if ([seatModel.userNo isEqualToString:model.userNo]) {
-                seatModel.isSelfMuted = model.isSelfMuted;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.roomPersonView updateSeatsByModel:seatModel];
-                });
-                break;
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishMuteEventWithMuteStatus:completion:)]) {
+        [[AppContext ktvServiceImp] publishMuteEventWithMuteStatus: ifMute == 1 ? YES : NO
+                                                        completion:^(NSError * error) {
+            if (error != nil) {
+                return;
             }
-        }
-    }];
+            
+            VLRoomSeatModel *model = [VLRoomSeatModel new];
+            model.userNo = VLUserCenter.user.userNo;
+            model.isSelfMuted = ifMute;
+            for (VLRoomSeatModel *seatModel in self.seatsArray) {
+                if ([seatModel.userNo isEqualToString:model.userNo]) {
+                    seatModel.isSelfMuted = model.isSelfMuted;
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.roomPersonView updateSeatsByModel:seatModel];
+                    });
+                    break;
+                }
+            }
+        }];
+    }
     
 //    NSDictionary *dict = @{
 //        @"messageType":@(VLSendMessageTypeAudioMute),
@@ -1176,6 +1187,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 // 开启视频事件回调
 - (void)bottomVideoBtnAction:(NSInteger)ifOpen {
+    if (![[AppContext ktvServiceImp] respondsToSelector:@selector(publishVideoOpenEventWithOpenStatus:completion:)]) {
+        return;
+    }
     [[AppContext ktvServiceImp] publishVideoOpenEventWithOpenStatus:ifOpen
                                                          completion:^(NSError * error) {
         if (error != nil) {
@@ -1779,6 +1793,10 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)sendChangeSongMessage {
+    if (![[AppContext ktvServiceImp] respondsToSelector:@selector(publishSongDidChangedEventWithOwnerStatus:)]) {
+        return;
+    }
+    
     NSString *isMasterInterrupt = nil;
     if([self ifMainSinger:VLUserCenter.user.userNo] == NO && [self ifIAmRoomMaster]) {
         isMasterInterrupt = @"1";
@@ -1870,7 +1888,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 //发送独唱的消息
 - (void)sendSoloMessage {
-    [[AppContext ktvServiceImp] publishToSoloEvent];
+    [[AppContext ktvServiceImp] becomeSolo];
 //    NSDictionary *dict = @{
 //        @"messageType":@(VLSendMessageTypeSoloSong),
 //        @"platform":@"1",
@@ -1911,13 +1929,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 //发送加入合唱的消息
 - (void)sendJoinInSongMessage {
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] publishJoinToChorusWithCompletion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        [weakSelf setUserJoinChorus:VLUserCenter.user.userNo];
-    }];
+    
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishJoinToChorusWithCompletion:)]) {
+        VL(weakSelf);
+        [[AppContext ktvServiceImp] publishJoinToChorusWithCompletion:^(NSError * error) {
+            if (error != nil) {
+                return;
+            }
+            [weakSelf setUserJoinChorus:VLUserCenter.user.userNo];
+        }];
+    }
+    
 //    NSDictionary *dict = @{
 //        @"messageType":@(VLSendMessageTypeTellSingerSomeBodyJoin),
 //        @"uid":VLUserCenter.user.id ? VLUserCenter.user.id : @"1",
@@ -1941,7 +1963,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)sendApplySendChorusMessage:(NSString *)singerUserNo {
-    [[AppContext ktvServiceImp] publishSongOwnerWithOwnerId:singerUserNo];
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishSongOwnerWithOwnerId:)]) {
+        [[AppContext ktvServiceImp] publishSongOwnerWithOwnerId:singerUserNo];
+    }
 //    NSDictionary *dict = @{
 //        @"messageType":@(VLSendMessageTypeTellJoinUID),
 //        @"userNo": singerUserNo,
@@ -2634,7 +2658,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)sendDianGeMessage {
     //发送消息
-    [[AppContext ktvServiceImp] publishChooseSongEvent];
+    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishChooseSongEvent)]) {
+        [[AppContext ktvServiceImp] publishChooseSongEvent];
+    }
 //    NSDictionary *dict = @{
 //        @"messageType":@(VLSendMessageTypeChooseSong),
 //        @"platform":@"1",
@@ -2686,6 +2712,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
         
         if(onlyRefreshList) {
+            [weakSelf startSingingIfNeed];
             return;
         }
         
