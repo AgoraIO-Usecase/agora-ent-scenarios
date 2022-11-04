@@ -174,45 +174,7 @@
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
-        
     }];
-//    [VLAPIRequest getRequestURL:kURLGetInRoom parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//
-//            [AgoraRtm updateDelegate:self];
-//            if ([response.data[@"creatorNo"] isEqualToString:VLUserCenter.user.userNo]) { //自己是房主
-//                VLUserCenter.user.ifMaster = YES;
-//            }else{
-//                VLUserCenter.user.ifMaster = NO;
-//            }
-//            listModel.creator = response.data[@"creatorNo"];
-//            VLUserCenter.user.agoraRTCToken = response.data[@"agoraRTCToken"];
-//            VLUserCenter.user.agoraRTMToken = response.data[@"agoraRTMToken"];
-//            VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
-//
-////            [AgoraRtm setCurrent:VLUserCenter.user.name];
-//            //登录RTM
-//            [AgoraRtm.kit loginByToken:VLUserCenter.user.agoraRTMToken user:VLUserCenter.user.id completion:^(AgoraRtmLoginErrorCode errorCode) {
-//                if (!(errorCode == AgoraRtmLoginErrorOk || errorCode == AgoraRtmLoginErrorAlreadyLogin)) {
-//                    VLLog(@"加入RTM失败");
-//                    return;
-//                }
-//                [AgoraRtm setStatus:LoginStatusOnline];
-//                //处理座位信息
-//                NSArray *seatsArray = response.data[@"roomUserInfoDTOList"];
-//                NSArray *songArray = response.data[@"roomSongInfoDTOS"];
-//                VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-//                ktvVC.roomModel = listModel;
-//                ktvVC.seatsArray = [self configureSeatsWithArray:seatsArray songArray:songArray];
-//                [self.navigationController pushViewController:ktvVC animated:YES];
-//            }];
-//        }else{
-//            [VLToast toast:response.message];
-//        }
-//
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
-//    }];
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

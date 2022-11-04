@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol KTVServiceProtocol <NSObject>
 
 
+/// room info
+
 /// 获取房间列表
 /// @param page <#page description#>
 /// @param completion <#completion description#>
@@ -58,11 +60,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)joinRoomWithInput:(KTVJoinRoomInputModel*)inputModel
                completion:(void (^)(NSError* _Nullable, KTVJoinRoomOutputModel*_Nullable))completion;
 
-/// 切换MV封面
-/// @param inputModel <#inputModel description#>
+/// 离开房间
 /// @param completion <#completion description#>
-- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
-                    completion:(void(^)(NSError* _Nullable))completion;
+- (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
+
+
+
+
+// mic seat
 
 /// 上麦
 /// @param inputModel <#inputModel description#>
@@ -76,11 +81,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)outSeatWithInput:(KTVOutSeatInputModel*)inputModel
               completion:(void(^)(NSError* _Nullable))completion;
 
-/// 离开房间
+/// 设置麦位静音
+/// @param mute YES: 开启静音 NO: 关闭静音
 /// @param completion <#completion description#>
-- (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
+- (void)muteWithMuteStatus:(BOOL)mute
+                completion:(void(^)(NSError* _Nullable))completion;
 
-/// 删除歌曲
+/// 打开麦位摄像头
+/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
+/// @param completion <#completion description#>
+- (void)openVideoStatusWithStatus: (BOOL)openStatus
+                       completion:(void(^)(NSError* _Nullable))completion;
+
+
+
+
+
+
+//choose songs
+
+/// 删除选中歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
 - (void)removeSongWithInput:(KTVRemoveSongInputModel*)inputModel
@@ -89,12 +109,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取选择歌曲列表
 /// @param completion <#completion description#>
 - (void)getChoosedSongsListWithCompletion:(void(^)(NSError* _Nullable, NSArray<VLRoomSelSongModel*>* _Nullable))completion;
-
-/// 加入合唱
-/// @param inputModel <#inputModel description#>
-/// @param completion <#completion description#>
-- (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
-                 completion:(void(^)(NSError* _Nullable))completion;
 
 /// 歌曲详情
 /// @param inputModel <#inputModel description#>
@@ -122,24 +136,29 @@ NS_ASSUME_NONNULL_BEGIN
                   completion:(void(^)(NSError* _Nullable))completion;
 
 
-/// 当前歌曲合唱改为赌场得意
+
+
+//lyrics
+
+/// 加入合唱
+/// @param inputModel <#inputModel description#>
+/// @param completion <#completion description#>
+- (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
+                 completion:(void(^)(NSError* _Nullable))completion;
+
+/// 当前歌曲合唱改为独唱
 - (void)becomeSolo;
 
-/// 设置麦位静音
-/// @param mute YES: 开启静音 NO: 关闭静音
+/// 切换MV封面
+/// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)muteWithMuteStatus:(BOOL)mute
+- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
                 completion:(void(^)(NSError* _Nullable))completion;
-
-/// 打开麦位摄像头
-/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
-/// @param completion <#completion description#>
-- (void)openVideoStatusWithStatus: (BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
 
 /// 更新得分
 /// @param totalVolume <#totalVolume description#>
 - (void)updateSingingScoreWithTotalVolume:(double)totalVolume;
+
 
 //subscribe
 
