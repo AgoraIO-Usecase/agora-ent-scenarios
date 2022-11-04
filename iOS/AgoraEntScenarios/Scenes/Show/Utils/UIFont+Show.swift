@@ -39,6 +39,10 @@ extension UIFont {
         show_regularFontSize(11)
     }
     
+    @objc static var show_R_12: UIFont? {
+        show_regularFontSize(12)
+    }
+    
     @objc static var show_R_14: UIFont? {
         show_regularFontSize(14)
     }

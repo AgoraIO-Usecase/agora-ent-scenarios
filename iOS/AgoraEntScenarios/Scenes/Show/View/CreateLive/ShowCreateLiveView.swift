@@ -17,10 +17,16 @@ protocol ShowCreateLiveViewDelegate: NSObjectProtocol {
 class ShowCreateLiveView: UIView {
 
     weak var delegate: ShowCreateLiveViewDelegate?
+    var hideBottomViews = false {
+        didSet {
+            self.coverView.isHidden = hideBottomViews
+        }
+    }
     
     private var roomBgImgView: UIImageView!
     private var nameTextField: UITextField!
     private var roomIdLabel: UILabel!
+    private var coverView: UIImageView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,7 +67,7 @@ class ShowCreateLiveView: UIView {
         // 名称
         nameTextField = UITextField()
         roomInfoCoverVeiw.addSubview(nameTextField)
-        nameTextField.placeholder = "请输入房间名称"
+        nameTextField.placeholder = "请输入房间名称".show_localized
         nameTextField.text = "Chat with Eve tonight and"
         nameTextField.font = .show_M_15
         nameTextField.textColor = .show_main_text
@@ -101,7 +107,8 @@ class ShowCreateLiveView: UIView {
         }
         
         // 蒙版
-        let coverView = UIImageView()
+        coverView = UIImageView()
+        coverView.isUserInteractionEnabled = true
         coverView.image = UIImage.show_sceneImage(name: "show_list_cover")
         addSubview(coverView)
         coverView.snp.makeConstraints { make in
@@ -111,7 +118,7 @@ class ShowCreateLiveView: UIView {
         
         // tips
         let tipsLabel = UILabel()
-        let tipsText = " 本产品仅用于功能体验，单次直播时长不超过20mins"
+        let tipsText = "本产品仅用于功能体验，单次直播时长不超过20mins".show_localized
         let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_create_tips")!)
         attachment.bounds = CGRect(x: 0, y: -2, width: 11, height: 11)
         let attriTipsImg = NSAttributedString(attachment: attachment)
@@ -120,7 +127,7 @@ class ShowCreateLiveView: UIView {
         tipsLabel.attributedText = attriTips
         tipsLabel.font = .show_R_11
         tipsLabel.textColor = .show_main_text
-        addSubview(tipsLabel)
+        coverView.addSubview(tipsLabel)
         tipsLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(-134)
@@ -129,12 +136,12 @@ class ShowCreateLiveView: UIView {
         // 开始直播
         let btnHeight: CGFloat = 48
         let startButton = UIButton(type: .custom)
-        startButton.setTitle("开始直播", for: .normal)
+        startButton.setTitle("开始直播".show_localized, for: .normal)
         startButton.backgroundColor = .show_btn_bg
         startButton.titleLabel?.font = .show_btn_title
         startButton.layer.cornerRadius = btnHeight * 0.5
         startButton.layer.masksToBounds = true
-        addSubview(startButton)
+        coverView.addSubview(startButton)
         startButton.addTarget(self, action: #selector(didClickStartButton), for: .touchUpInside)
         startButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -150,6 +157,7 @@ class ShowCreateLiveView: UIView {
     private func createButton(imgName: String, title: String) ->UIButton {
         let button = UIButton(type: .custom)
         let imageView = UIImageView(image: UIImage.show_sceneImage(name: imgName))
+        imageView.contentMode = .center
         button.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.left.top.right.equalToSuperview()
@@ -164,27 +172,27 @@ class ShowCreateLiveView: UIView {
             make.left.bottom.right.equalToSuperview()
             make.top.equalTo(imageView.snp.bottom).offset(3)
         }
-        addSubview(button)
+        coverView.addSubview(button)
         return button
     }
     
     private func layoutButtonArray(){
         // 翻转摄像头
-        let cameraButton = createButton(imgName: "show_create_camera", title: "翻转")
+        let cameraButton = createButton(imgName: "show_create_camera", title: "翻转".show_localized)
         cameraButton.addTarget(self, action: #selector(didClickCameraButton), for: .touchUpInside)
         
         // 美化
-        let beautyButton = createButton(imgName: "show_create_beauty", title: "美化")
+        let beautyButton = createButton(imgName: "show_create_beauty", title: "美化".show_localized)
         beautyButton.addTarget(self, action: #selector(didClickBeautyButton), for: .touchUpInside)
         
         // 画质
-        let qualityButton = createButton(imgName: "show_create_quality", title: "画质")
+        let qualityButton = createButton(imgName: "show_create_quality", title: "画质".show_localized)
         qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
         
         let buttonArray = [cameraButton, beautyButton, qualityButton]
         let count = buttonArray.count
-        let itemSpace: CGFloat = 50
-        let itemWidth: CGFloat = 30
+        let itemSpace: CGFloat = 40
+        let itemWidth: CGFloat = 40
         let baseLeft: CGFloat = (Screen.width - itemSpace * CGFloat(count - 1) - itemWidth * CGFloat(count)) / 2
         var i = 0
         for button in buttonArray {
@@ -202,7 +210,7 @@ extension ShowCreateLiveView {
     // 点击复制按钮
     @objc private func didClickCopyButton(){
         UIPasteboard.general.string = roomIdLabel.text
-        ToastView.show(text: "已拷贝至剪切板")
+        ToastView.show(text: "已拷贝至剪切板".show_localized)
     }
     
     // 点击翻转按钮

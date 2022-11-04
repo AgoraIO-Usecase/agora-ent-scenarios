@@ -43,7 +43,7 @@ class ShowCreateLiveVC: UIViewController {
         
         let titleLabel = UILabel()
         view.addSubview(titleLabel)
-        titleLabel.text = "秀场直播"
+        titleLabel.text = "秀场直播".show_localized
         titleLabel.textColor = .show_main_text
         titleLabel.font = .show_navi_title
         titleLabel.snp.makeConstraints { make in
@@ -109,15 +109,21 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickCameraBtnAction() {
-        
+        agoraKit?.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
-        
+        createView.hideBottomViews = true
+        let beautyVC = ShowBeautySettingVC()
+        beautyVC.modalPresentationStyle = .overCurrentContext
+        present(beautyVC, animated: true)
+        beautyVC.dismissed = { [weak self] in
+            self?.createView.hideBottomViews = false
+        }
     }
     
     func onClickQualityBtnAction() {
-        
+        createView.hideBottomViews = true
     }
     
     func onClickStartBtnAction() {
