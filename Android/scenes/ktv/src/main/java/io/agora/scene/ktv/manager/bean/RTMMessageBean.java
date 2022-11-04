@@ -1,6 +1,7 @@
-package io.agora.scene.base.bean.room;
+package io.agora.scene.ktv.manager.bean;
 
-import io.agora.scene.base.manager.RoomManager;
+
+import io.agora.scene.ktv.manager.RoomManager;
 
 public class RTMMessageBean {
     //消息类型

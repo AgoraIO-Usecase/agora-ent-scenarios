@@ -24,19 +24,15 @@ import io.agora.rtc2.Constants;
 import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.bean.room.RTMMessageBean;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.data.model.AgoraMember;
 import io.agora.scene.base.event.NetWorkEvent;
-import io.agora.scene.base.manager.RTCManager;
-import io.agora.scene.base.manager.RTMManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.ktv.R;
-import io.agora.scene.ktv.databinding.ActivityRoomLivingBinding;
+import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.dialog.MoreDialog;
 import io.agora.scene.ktv.dialog.MusicSettingDialog;
@@ -44,6 +40,10 @@ import io.agora.scene.ktv.dialog.RoomChooseSongDialog;
 import io.agora.scene.ktv.dialog.UserLeaveSeatMenuDialog;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.holder.RoomPeopleHolder;
+import io.agora.scene.ktv.manager.RTCManager;
+import io.agora.scene.ktv.manager.RTMManager;
+import io.agora.scene.ktv.manager.RoomManager;
+import io.agora.scene.ktv.manager.bean.RTMMessageBean;
 import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.dialog.CloseRoomDialog;
@@ -54,7 +54,7 @@ import io.agora.scene.widget.utils.UiUtils;
  * 房间主页
  */
 @Route(path = PagePathConstant.pageRoomLiving)
-public class RoomLivingActivity extends BaseViewBindingActivity<ActivityRoomLivingBinding> implements OnItemClickListener<AgoraMember> {
+public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomLivingBinding> implements OnItemClickListener<AgoraMember> {
     private RoomLivingViewModel roomLivingViewModel;
     private MoreDialog moreDialog;
     private MusicSettingDialog musicSettingDialog;
@@ -67,8 +67,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<ActivityRoomLivi
     private AgoraMember mAgoraMember = null;
 
     @Override
-    protected ActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityRoomLivingBinding.inflate(inflater);
+    protected KtvActivityRoomLivingBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return KtvActivityRoomLivingBinding.inflate(inflater);
     }
 
     @Override
