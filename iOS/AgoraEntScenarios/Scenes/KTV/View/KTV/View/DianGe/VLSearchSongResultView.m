@@ -179,28 +179,6 @@
             [self dianGeFailedWithModel:model];
         }
     }];
-    
-//    NSDictionary *param = @{
-//        @"isChorus" : @(self.ifChorus),
-//        @"roomNo": self.roomNo,
-//        @"songName":model.songName,
-//        @"songNo":model.songNo,
-//        @"songUrl":model.songUrl,
-//        @"userNo":VLUserCenter.user.userNo
-//    };
-//    [VLAPIRequest getRequestURL:kURLChooseSong parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            //点歌完成发送通知
-//            [self dianGeSuccessWithModel:model];
-//            
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
-//        }
-//        else {
-//            [self dianGeFailedWithModel:model];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [self dianGeFailedWithModel:model];
-//    }];
 }
 
 - (void)dianGeFailedWithModel:(VLSongItmModel *)songItemModel {
