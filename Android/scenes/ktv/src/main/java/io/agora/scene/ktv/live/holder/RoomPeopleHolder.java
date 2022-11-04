@@ -19,11 +19,11 @@ import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.data.model.AgoraMember;
-import io.agora.scene.base.manager.RTCManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
+import io.agora.scene.ktv.manager.RTCManager;
+import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemRoomSpeakerBinding, AgoraMember> {

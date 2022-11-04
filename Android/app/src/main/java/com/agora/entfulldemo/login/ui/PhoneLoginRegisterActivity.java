@@ -21,7 +21,6 @@ import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.utils.CountDownTimerUtils;
 import io.agora.scene.base.utils.StringUtils;
 import io.agora.scene.base.utils.ToastUtils;
@@ -55,7 +54,7 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<Activity
         phoneLoginViewModel.setLifecycleOwner(this);
         phoneLoginViewModel.setISingleCallback((var1, var2) -> {
             if (var1 == KtvConstant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS) {
-                RoomManager.getInstance().loginOut();
+                // RoomManager.getInstance().loginOut();
                 PagePilotManager.pageMainHome();
                 finish();
             }

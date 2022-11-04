@@ -143,7 +143,8 @@
         android:padding="5dp"
         android:src="@mipmap/ic_more"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/cbVideo" />
+        app:layout_constraintStart_toEndOf="@id/cbVideo"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivNotOnMic"

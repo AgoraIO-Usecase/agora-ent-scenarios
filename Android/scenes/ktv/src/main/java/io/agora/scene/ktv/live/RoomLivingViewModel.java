@@ -13,6 +13,7 @@ import static io.agora.scene.base.KtvConstant.MESSAGE_ROOM_TYPE_SYNCHRO_PITCH;
 import static io.agora.scene.base.KtvConstant.MESSAGE_ROOM_TYPE_SYSTEM_EXAMINE_TIP;
 import static io.agora.scene.base.KtvConstant.MESSAGE_ROOM_TYPE_TO_MUTE;
 import static io.agora.scene.base.KtvConstant.MESSAGE_ROOM_TYPE_TO_VIDEO;
+import static io.agora.scene.ktv.manager.RoomManager.ROOM_TYPE_ON_RTM_JOIN_SUCCESS;
 
 import android.content.Context;
 import android.util.Log;
@@ -43,24 +44,24 @@ import io.agora.scene.base.api.apiutils.SchedulersUtil;
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.bean.room.RTMMessageBean;
 import io.agora.scene.base.data.model.AgoraMember;
 import io.agora.scene.base.data.model.AgoraRoom;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.event.PlayerStatusEvent;
 import io.agora.scene.base.event.ReceivedMessageEvent;
-import io.agora.scene.base.manager.BaseMusicPlayer;
-import io.agora.scene.base.manager.MultipleMusicPlayer;
-import io.agora.scene.base.manager.RTCManager;
-import io.agora.scene.base.manager.RTMManager;
-import io.agora.scene.base.manager.RoomManager;
-import io.agora.scene.base.manager.SimpleRoomEventCallback;
-import io.agora.scene.base.manager.SingleMusicPlayer;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.dialog.MusicSettingBean;
 import io.agora.scene.ktv.dialog.MusicSettingDialog;
+import io.agora.scene.ktv.manager.BaseMusicPlayer;
+import io.agora.scene.ktv.manager.MultipleMusicPlayer;
+import io.agora.scene.ktv.manager.RTCManager;
+import io.agora.scene.ktv.manager.RTMManager;
+import io.agora.scene.ktv.manager.RoomManager;
+import io.agora.scene.ktv.manager.SimpleRoomEventCallback;
+import io.agora.scene.ktv.manager.SingleMusicPlayer;
+import io.agora.scene.ktv.manager.bean.RTMMessageBean;
 import io.agora.scene.ktv.widget.LrcControlView;
 import io.reactivex.disposables.Disposable;
 
@@ -103,7 +104,7 @@ public class RoomLivingViewModel extends SimpleRoomEventCallback {
      */
     public void joinRoom() {
         RoomManager.getInstance().joinRoom((type, o) -> {
-            if (type == 0) {
+            if (type == ROOM_TYPE_ON_RTM_JOIN_SUCCESS) {
                 requestGetRoomInfo(agoraRoom.password);
             } else if (type == RoomManager.ROOM_TYPE_ON_MUSIC_EMPTY) {
                 onMusicEmpty();

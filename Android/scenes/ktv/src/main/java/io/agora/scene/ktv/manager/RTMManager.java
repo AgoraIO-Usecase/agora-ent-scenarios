@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.util.Log;
 
@@ -22,6 +22,7 @@ import io.agora.scene.base.agora.ChatManager;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.ReceivedMessageEvent;
 import io.agora.scene.base.listener.EventListener;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 
 /**
