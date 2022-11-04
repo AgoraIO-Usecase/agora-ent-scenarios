@@ -20,11 +20,11 @@ import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.data.model.BaseMusicModel;
 import io.agora.scene.base.data.model.MusicModelNew;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentSongListBinding;
 import io.agora.scene.ktv.databinding.KtvItemChooseSongListBinding;
 import io.agora.scene.ktv.live.holder.ChooseSongViewHolder;
+import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.widget.utils.AnimUtils;
 
 /**

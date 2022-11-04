@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentTransaction;
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.data.model.AgoraMember;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogMoreBinding;
@@ -23,6 +22,7 @@ import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.live.fragment.dialog.BeautyVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.EffectVoiceFragment;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
+import io.agora.scene.ktv.manager.RoomManager;
 
 public class MoreDialog extends BaseBottomSheetDialogFragment<KtvDialogMoreBinding> {
     public static final String TAG = "MoreDialog";

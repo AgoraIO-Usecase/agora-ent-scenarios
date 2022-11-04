@@ -1,18 +1,22 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.elvishew.xlog.Logger;
 import com.elvishew.xlog.XLog;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,19 +24,20 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.agora.mediaplayer.IMediaPlayer;
 import io.agora.mediaplayer.IMediaPlayerObserver;
 import io.agora.mediaplayer.data.PlayerUpdatedInfo;
 import io.agora.mediaplayer.data.SrcInfo;
+import io.agora.musiccontentcenter.IAgoraMusicPlayer;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.event.PlayerStatusEvent;
+import io.agora.scene.base.event.PreLoadEvent;
 
-public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implements IMediaPlayerObserver {
+public abstract class BaseMusicPlayer extends IRtcEngineEventHandler implements IMediaPlayerObserver {
     protected final Logger.Builder mLogger = XLog.tag("MusicPlayer");
 
-    protected final Context mContext;
+    public final Context mContext;
     protected int mRole = Constants.CLIENT_ROLE_BROADCASTER;
 
     //主唱同步歌词给其他人
@@ -43,7 +48,7 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     protected boolean mStopDisplayLrc = true;
     private Thread mDisplayThread;
 
-    protected IMediaPlayer mPlayer;
+    protected IAgoraMusicPlayer mPlayer;
 
     private static volatile long mRecvedPlayPosition = 0;//播放器播放position，ms
     private static volatile Long mLastRecvPlayPosTime = null;
@@ -84,6 +89,8 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
         }
     }
 
+    public boolean isStartPlay = false;
+    public int uid = 0;
     protected final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -128,7 +135,11 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
                     onReceivedCountdown(uid, time);
                 }
             } else if (msg.what == ACTION_ON_RECEIVED_PLAY) {
-                onReceivedStatusPlay((Integer) msg.obj);
+                isStartPlay = true;
+                uid = (Integer) msg.obj;
+                if (mStatus == Status.Opened) {
+                    onReceivedStatusPlay(uid);
+                }
             } else if (msg.what == ACTION_ON_RECEIVED_PAUSE) {
                 onReceivedStatusPause((Integer) msg.obj);
             } else if (msg.what == ACTION_ON_RECEIVED_SYNC_TIME) {
@@ -157,7 +168,7 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
         }
     };
 
-    public BaseMusicPlayerOld(Context mContext, int role, IMediaPlayer mPlayer) {
+    public BaseMusicPlayer(Context mContext, int role, IAgoraMusicPlayer mPlayer) {
         this.mContext = mContext;
         this.mPlayer = mPlayer;
         reset();
@@ -166,6 +177,14 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
 
         RTCManager.getInstance().getRtcEngine().addHandler(this);
         switchRole(role);
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(@Nullable PreLoadEvent event) {
+        if (!RoomManager.getInstance().mMusicModel.isChorus) {
+            open(RoomManager.getInstance().mMusicModel);
+        }
     }
 
     private void reset() {
@@ -189,7 +208,7 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     public abstract void prepare(@NonNull MemberMusicModel music);
 
     public void playByListener(@NonNull MemberMusicModel mMusicModel) {
-        BaseMusicPlayerOld.mMusicModel = mMusicModel;
+        BaseMusicPlayer.mMusicModel = mMusicModel;
         startDisplayLrc();
     }
 
@@ -209,14 +228,14 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
             return -3;
         }
 
-        File fileMusic = mMusicModel.fileMusic;
-        if (fileMusic.exists() == false) {
-            mLogger.e("open error: fileMusic is not exists");
-            return -4;
-        }
+//        File fileMusic = mMusicModel.fileMusic;
+//        if (fileMusic.exists() == false) {
+//            mLogger.e("open error: fileMusic is not exists");
+//            return -4;
+//        }
 
         File fileLrc = mMusicModel.fileLrc;
-        if (fileLrc.exists() == false) {
+        if (fileLrc == null || !fileLrc.exists()) {
             mLogger.e("open error: fileLrc is not exists");
             return -5;
         }
@@ -228,33 +247,42 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
         stopDisplayLrc();
 
         mAudioTrackIndex = 1;
-        BaseMusicPlayerOld.mMusicModel = mMusicModel;
+        BaseMusicPlayer.mMusicModel = mMusicModel;
         mLogger.i("open() called with: mMusicModel = [%s]", mMusicModel);
-        mPlayer.open(fileMusic.getAbsolutePath(), 0);
+        mPlayer.stop();
+        //mPlayer.open(Long.parseLong(mMusicModel.songNo), IAgoraMusicPlayer.AGORA_MEDIA_TYPE_AUDIO, null, 0);
+        mPlayer.open(Long.parseLong(mMusicModel.songNo), 0);
+        Log.d("cwtsw", "open了 歌曲");
         return 0;
     }
 
     protected void play() {
         mLogger.i("play() called");
 //        if (!mStatus.isAtLeast(Status.Opened)) {
+//            Log.d("cwtsw", "多人 isAtLeast(Status.Opened");
 //            return;
 //        }
 
-        if (mStatus == Status.Started)
-            return;
+//        if (mStatus == Status.Started) {
+//            Log.d("cwtsw", "多人 Status.Started");
+//            return;
+//        }
 
         mStatus = Status.Started;
         mPlayer.play();
+        Log.d("cwtsw", "多人 mPlayer.play()");
         mLogger.i("play() called___");
         EventBus.getDefault().post(new PlayerStatusEvent(true));
     }
 
     public void stop() {
+        Log.d("cwtsw", "mPlayer stop called");
         mLogger.i("stop() called");
         if (!mStatus.isAtLeast(Status.Started)) {
             return;
         }
-
+        mStatus = Status.Stopped;
+        Log.d("cwtsw", "mPlayer stop 多人");
         mPlayer.stop();
     }
 
@@ -329,12 +357,33 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
         RTCManager.getInstance().getRtcEngine().sendStreamMessage(streamId, jsonMsg.toString().getBytes());
     }
 
+    public void resetVolume() {
+        if (micVolume != musicVolume) {
+            micOldVolume = micVolume;
+            setMicVolume(musicVolume);
+        }
+    }
+
+    private int musicVolume = 40;
+    private int micVolume = 40;
+    private int micOldVolume = 40;
+
     public void setMusicVolume(int v) {
+        musicVolume = v;
         mPlayer.adjustPlayoutVolume(v);
         mPlayer.adjustPublishSignalVolume(v);
     }
 
+    public void setOldMicVolume() {
+        setMicVolume(micOldVolume);
+    }
+
     public void setMicVolume(int v) {
+        if (RoomManager.mMine.isSelfMuted == 1) {
+            micOldVolume = v;
+            return;
+        }
+        micVolume = v;
         RTCManager.getInstance().getRtcEngine().adjustRecordingSignalVolume(v);
     }
 
@@ -357,6 +406,8 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     }
 
     protected void startDisplayLrc() {
+        if (mDisplayThread != null) return;
+        Log.d("cwtsw", "startDisplayLrc");
         mStopDisplayLrc = false;
         mDisplayThread = new Thread(new Runnable() {
             @Override
@@ -408,7 +459,6 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
                     if (mPlayer == null) {
                         break;
                     }
-
                     if (mLastRecvPlayPosTime != null && mStatus == Status.Started) {
                         sendSyncLrc(lrcId, duration, mRecvedPlayPosition);
                     }
@@ -451,6 +501,7 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     }
 
     protected void startPublish() {
+        if (mMusicModel == null) return;
         startSyncLrc(String.valueOf(mMusicModel.songNo), mPlayer.getDuration());
     }
 
@@ -464,12 +515,19 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
         mLogger.e("onStreamMessageError() called with: uid = [%s], streamId = [%s], error = [%s], missed = [%s], cached = [%s]", uid, streamId, error, missed, cached);
     }
 
+//    private long receiveMessageTime = 0L;
+
     @Override
     public void onStreamMessage(int uid, int streamId, byte[] data) {
+//        if (System.currentTimeMillis() - receiveMessageTime < 800) {
+//            return;
+//        }
+//        receiveMessageTime = System.currentTimeMillis();
         JSONObject jsonMsg;
         try {
             String strMsg = new String(data);
             jsonMsg = new JSONObject(strMsg);
+            mLogger.d("收到BaseMusicPlayer消息 = " + strMsg + " streamId = " + streamId);
             if (jsonMsg.getString("cmd").equals("setLrcTime")) {
                 long position = jsonMsg.getLong("time");
                 if (position == 0) {
@@ -533,6 +591,7 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     }
 
     protected void onReceivedSetLrcTime(int uid, long position) {
+        Log.d("cwtsw", "onReceivedSetLrcTime " + position);
         mRecvedPlayPosition = position;
         mLastRecvPlayPosTime = System.currentTimeMillis();
     }
@@ -583,7 +642,9 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
 
     @Override
     public void onPositionChanged(long position) {
-        mRecvedPlayPosition = position;
+        if (RoomManager.getInstance().isMyMusic()) {
+            mRecvedPlayPosition = position;
+        }
         mLastRecvPlayPosTime = System.currentTimeMillis();
     }
 
@@ -594,7 +655,6 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
 
     @Override
     public void onPreloadEvent(String src, io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent event) {
-
     }
 
 
@@ -641,7 +701,6 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
     protected void onMusicOpenCompleted() {
         mLogger.i("onMusicOpenCompleted() called");
         mStatus = Status.Opened;
-
         play();
         startDisplayLrc();
         mHandler.obtainMessage(ACTION_ON_MUSIC_OPENCOMPLETED, mPlayer.getDuration()).sendToTarget();
@@ -691,11 +750,11 @@ public abstract class BaseMusicPlayerOld extends IRtcEngineEventHandler implemen
 
     private void onMusicCompleted() {
         mLogger.i("onMusicCompleted() called");
+        mHandler.obtainMessage(ACTION_ON_MUSIC_COMPLETED).sendToTarget();
         mPlayer.stop();
         stopDisplayLrc();
         stopPublish();
         reset();
-        mHandler.obtainMessage(ACTION_ON_MUSIC_COMPLETED).sendToTarget();
         EventBus.getDefault().post(new PlayerStatusEvent(false));
     }
 

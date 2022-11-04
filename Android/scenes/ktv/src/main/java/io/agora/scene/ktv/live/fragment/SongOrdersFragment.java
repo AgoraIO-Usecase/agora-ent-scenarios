@@ -13,11 +13,11 @@ import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentSongOrderListBinding;
 import io.agora.scene.ktv.databinding.KtvItemChoosedSongListBinding;
 import io.agora.scene.ktv.live.holder.ChosenSongViewHolder;
+import io.agora.scene.ktv.manager.RoomManager;
 
 /**
  * 已点歌单列表
