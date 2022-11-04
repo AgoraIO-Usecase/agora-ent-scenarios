@@ -22,7 +22,7 @@ def all_pods
   pod 'YYModel', '~> 1.0.4'
   pod 'YYCache', '~> 1.0.4'
   pod 'YYCategories', '~> 1.0.4'
-  pod 'libextobjc', '~> 0.4.1'
+#  pod 'libextobjc', '~> 0.4.1'
   pod 'MJExtension'
   # 键盘
   pod 'IQKeyboardManager'
@@ -52,7 +52,7 @@ def all_pods
 #  pod 'ZQTCustomSwitch'
 
   pod 'SocketRocket'
-  pod 'Fastboard'
+#  pod 'Fastboard'
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
