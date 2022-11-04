@@ -47,6 +47,7 @@ ext {
             rtc_special_voice : 'io.agora.rtc:agora-special-voice:4.0.0.9',
             rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.0.9',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.0.7',
 
             // android native libraries
             core_ktx           : "androidx.core:core-ktx:1.7.0",
