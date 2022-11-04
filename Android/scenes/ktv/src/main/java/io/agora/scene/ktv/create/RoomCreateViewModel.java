@@ -10,10 +10,10 @@ import java.util.List;
 
 import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.data.model.AgoraRoom;
-import io.agora.scene.base.manager.RTMManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.ktv.manager.RTMManager;
+import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.ktv.service.KTVCreateRoomInputModel;
 import io.agora.scene.ktv.service.KTVJoinRoomInputModel;
 import io.agora.scene.ktv.service.KTVServiceImp;
@@ -99,6 +99,11 @@ public class RoomCreateViewModel extends AndroidViewModel {
         ktvServiceProtocol.joinRoomWithInput(new KTVJoinRoomInputModel(roomNo, password), (e, ktvJoinRoomOutputModel) -> {
             if(e == null && ktvJoinRoomOutputModel != null){
                 // success
+
+                AgoraRoom room = new AgoraRoom();
+                room.roomNo = roomNo;
+                room.creatorNo = ktvJoinRoomOutputModel.getCreator();
+                RoomManager.getInstance().setAgoraRoom(room);
 
                 KtvConstant.RTM_TOKEN = ktvJoinRoomOutputModel.getAgoraRTMToken();
                 KtvConstant.RTC_TOKEN = ktvJoinRoomOutputModel.getAgoraRTCToken();

@@ -19,12 +19,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.base.event.MusicListChangeEvent;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogChooseSongBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.live.fragment.SongOrdersFragment;
 import io.agora.scene.ktv.live.fragment.SongsFragment;
+import io.agora.scene.ktv.manager.RoomManager;
 
 /**
  * 点歌菜单
