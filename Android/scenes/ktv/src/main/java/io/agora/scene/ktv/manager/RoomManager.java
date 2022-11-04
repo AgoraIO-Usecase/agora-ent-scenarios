@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.util.Log;
 
@@ -23,7 +23,6 @@ import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.bean.room.RTMMessageBean;
 import io.agora.scene.base.component.ISingleCallback;
 import io.agora.scene.base.data.model.AgoraMember;
 import io.agora.scene.base.data.model.AgoraRoom;
@@ -31,7 +30,9 @@ import io.agora.scene.base.data.model.MusicModelNew;
 import io.agora.scene.base.data.sync.AgoraException;
 import io.agora.scene.base.event.MusicListChangeEvent;
 import io.agora.scene.base.listener.EventListener;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.ktv.manager.bean.RTMMessageBean;
 
 /**
  * 房间控制
@@ -44,6 +45,7 @@ public final class RoomManager {
     public static final int ROOM_TYPE_ON_MEMBER_JOINED_CHORUS = 1003;
     public static final int ROOM_TYPE_ON_MEMBER_APPLY_JOIN_CHORUS = 1004;
     public static final int ROOM_TYPE_ON_RTM_COUNT_UPDATE = 1005;
+    public static final int ROOM_TYPE_ON_RTM_JOIN_SUCCESS = 0;
 
     private static class SingletonHolder {
         private static final RoomManager INSTANCE = new RoomManager();
@@ -341,7 +343,7 @@ public final class RoomManager {
         @Override
         public void onSuccess() {
             isRTMSuccess = true;
-            iSingleCallback.onSingleCallback(0, null);
+            iSingleCallback.onSingleCallback(ROOM_TYPE_ON_RTM_JOIN_SUCCESS, null);
         }
 
         @Override

@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;

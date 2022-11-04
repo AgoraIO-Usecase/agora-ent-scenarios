@@ -19,16 +19,16 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.bean.Page;
 import io.agora.scene.base.bean.PageModel;
-import io.agora.scene.base.bean.room.RTMMessageBean;
 import io.agora.scene.base.component.BaseRequestViewModel;
 import io.agora.scene.base.data.model.BaseMusicModel;
 import io.agora.scene.base.data.model.MusicModelNew;
 import io.agora.scene.base.event.ReceivedMessageEvent;
-import io.agora.scene.base.manager.RTMManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.dialog.RoomChooseSongDialog;
+import io.agora.scene.ktv.manager.RTMManager;
+import io.agora.scene.ktv.manager.RoomManager;
+import io.agora.scene.ktv.manager.bean.RTMMessageBean;
 import io.reactivex.disposables.Disposable;
 
 public class SongsViewModel extends BaseRequestViewModel {
