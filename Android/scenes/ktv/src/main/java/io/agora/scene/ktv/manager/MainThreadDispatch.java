@@ -1,4 +1,4 @@
-package io.agora.scene.base.manager;
+package io.agora.scene.ktv.manager;
 
 import android.os.Bundle;
 import android.os.Handler;

@@ -30,7 +30,6 @@ import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.manager.RTCManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.FileUtils;
 import io.agora.scene.base.utils.SPUtil;
@@ -61,8 +60,8 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.setLifecycleOwner(this);
 
-        String sdkVersionString = RTCManager.getInstance().getAgoraRTCSdkVersion();
-        getBinding().tvVersion.setText(getString(R.string.version_is, versionString, sdkVersionString));
+        // String sdkVersionString = RTCManager.getInstance().getAgoraRTCSdkVersion();
+        // getBinding().tvVersion.setText(getString(R.string.version_is, versionString, sdkVersionString));
     }
 
     @SuppressLint("SetTextI18n")

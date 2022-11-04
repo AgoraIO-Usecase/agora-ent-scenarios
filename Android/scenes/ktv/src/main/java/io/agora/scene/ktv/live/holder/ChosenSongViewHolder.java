@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemChoosedSongListBinding;
+import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
