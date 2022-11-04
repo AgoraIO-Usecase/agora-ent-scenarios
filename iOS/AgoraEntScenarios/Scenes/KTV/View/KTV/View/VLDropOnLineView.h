@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol VLDropOnLineViewDelegate <NSObject>
 
 @optional
-- (void)dropOnLineAction:(VLRoomSeatModel *)seatModel;
+- (void)dropOnLineAction:(VLRoomSeatModel * __nullable)seatModel;
 
 @end
 
