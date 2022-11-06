@@ -59,11 +59,11 @@ public final class RoomManager {
 
     private final Map<String, AgoraMember> memberHashMap = new ConcurrentHashMap<>();
 
-    public volatile static AgoraRoom mRoom;
-    public volatile static AgoraMember owner;
-    public volatile static AgoraMember mMine;
+    public volatile static AgoraRoom mRoom = new AgoraRoom();
+    public volatile static AgoraMember owner = new AgoraMember();
+    public volatile static AgoraMember mMine = new AgoraMember();
 
-    public volatile MemberMusicModel mMusicModel;
+    public volatile MemberMusicModel mMusicModel = new MemberMusicModel();
 
     private boolean isRTMSuccess = false;
     private boolean isRTCSuccess = false;
@@ -131,7 +131,7 @@ public final class RoomManager {
         } else {
             role = Constants.CLIENT_ROLE_AUDIENCE;
         }
-        RTCManager.getInstance().joinRTC(mRoom.roomNo, mMine.getStreamId(), role);
+        RTCManager.getInstance().joinRTC(KtvConstant.RTC_TOKEN, mRoom.roomNo, mMine.getStreamId(), role);
     }
 
     public void loadMemberStatus() {

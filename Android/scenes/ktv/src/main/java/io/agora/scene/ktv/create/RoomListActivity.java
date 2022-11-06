@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -24,6 +23,7 @@ import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
 import io.agora.scene.ktv.databinding.ItemRoomListBinding;
+import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.service.VLRoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 
@@ -51,12 +51,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     private void loadRoomList() {
         SPUtil.putBoolean(KtvConstant.IS_AGREE, true);
         roomCreateViewModel.loadRooms();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        roomCreateViewModel.logOutRTM();
     }
 
     @Override
@@ -104,15 +98,12 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
                 getBinding().btnCreateRoom2.setVisibility(View.GONE);
             }
         });
-        roomCreateViewModel.joinRoomResult.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    PagePilotManager.pageRoomLiving();
-                }else{
-                    ToastUtils.showToast("密码不正确");
-                    setDarkStatusIcon(isBlackDarkStatus());
-                }
+        roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
+            if (ktvJoinRoomOutputModel == null) {
+                ToastUtils.showToast("密码不正确");
+                setDarkStatusIcon(isBlackDarkStatus());
+            } else {
+                RoomLivingActivity.launch(RoomListActivity.this, ktvJoinRoomOutputModel);
             }
         });
         getBinding().smartRefreshLayout.setOnRefreshListener(refreshLayout -> {

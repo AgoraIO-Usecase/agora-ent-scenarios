@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.data.model.AgoraMember;
 import io.agora.scene.base.utils.KTVUtil;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding;
@@ -30,10 +29,10 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvDialogUserSeatMenuBin
         return KtvDialogUserSeatMenuBinding.inflate(layoutInflater);
     }
 
-    public void setAgoraMember(AgoraMember agoraMember) {
-        getBinding().tvName.setText(agoraMember.name);
+    public void setAgoraMember(String name, String headUrl) {
+        getBinding().tvName.setText(name);
         Glide.with(getContext())
-                .load(agoraMember.headUrl).error(R.mipmap.userimage)
+                .load(headUrl).error(R.mipmap.userimage)
                 .into(getBinding().ivUser);
     }
 
