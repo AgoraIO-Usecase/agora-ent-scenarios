@@ -100,12 +100,12 @@ public final class RTCManager {
         });
     }
 
-    public void initMcc() {
+    public void initMcc(long uid, String rtmToken) {
         MusicContentCenterConfiguration contentCenterConfiguration
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
-        contentCenterConfiguration.mccUid = UserManager.getInstance().getUser().id;
-        contentCenterConfiguration.rtmToken = KtvConstant.RTM_TOKEN;
+        contentCenterConfiguration.mccUid = uid;
+        contentCenterConfiguration.rtmToken = rtmToken;
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
         iAgoraMusicContentCenter.registerEventHandler(new IMusicContentCenterEventHandler() {
@@ -159,7 +159,7 @@ public final class RTCManager {
     }
 
 
-    public void joinRTC(String roomId, Long steamId, int role) {
+    public void joinRTC(String token, String channelId, Long uid, int role) {
         getRtcEngine().setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
         getRtcEngine().enableAudio();
         getRtcEngine().enableAudioVolumeIndication(30, 10, true);
@@ -169,7 +169,7 @@ public final class RTCManager {
         getRtcEngine().setParameters("{\"rtc.audio_fec\":[3,2]}");
         getRtcEngine().setParameters("{\"rtc.audio_resend\":false}");
         getRtcEngine().setClientRole(role);
-        int ret = getRtcEngine().joinChannel(KtvConstant.RTC_TOKEN, roomId, null, steamId.intValue());
+        int ret = getRtcEngine().joinChannel(token, channelId, null, uid.intValue());
         if (ret != Constants.ERR_OK) {
             mLoggerRTC.e("joinRTC() called error " + ret);
         } else {

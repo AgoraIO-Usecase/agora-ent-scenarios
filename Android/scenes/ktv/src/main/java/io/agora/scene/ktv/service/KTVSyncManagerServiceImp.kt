@@ -7,6 +7,11 @@ import io.agora.scene.base.BuildConfig
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 
+/**
+ * 使用SyncManager进行数据交互
+ *
+ *
+ */
 class KTVSyncManagerServiceImp(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
@@ -19,7 +24,10 @@ class KTVSyncManagerServiceImp(
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
-    override fun getRoomListWithPage(
+
+    // ========= 房间相关 =====================
+
+    override fun getRoomList(
         completion: (error: Exception?, list: List<VLRoomListModel>?) -> Unit
     ) {
         initScene {
@@ -78,12 +86,26 @@ class KTVSyncManagerServiceImp(
         }
     }
 
+    override fun leaveRoomWithCompletion(completion: (error: Exception?) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
     override fun changeMVCoverWithInput(
         inputModel: KTVChangeMVCoverInputModel,
         completion: (error: Exception?) -> Unit
     ) {
         TODO("Not yet implemented")
     }
+
+    override fun subscribeRoomStatusWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun subscribeUserListCountWithChanged(changedBlock: (count: Int) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    // =================== 麦位相关 ===============================
 
     override fun onSeatWithInput(
         inputModel: KTVOnSeatInputModel,
@@ -93,17 +115,34 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun outSeatWithInput(
-        inputModel: KTVOnSeatInputModel,
+        inputModel: KTVOutSeatInputModel,
         completion: (error: Exception?) -> Unit
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun leaveRoomWithCompletion(completion: (error: Exception?) -> Unit) {
+    override fun muteWithMuteStatus(isSelfMuted: Int, completion: (error: Exception?) -> Unit) {
         TODO("Not yet implemented")
     }
 
-    override fun removeRoomWithCompletion(completion: (error: Exception?) -> Unit) {
+    override fun openVideoStatusWithStatus(
+        isVideoMuted: Int,
+        completion: (error: Exception?) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun subscribeSeatListWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSeatModel?) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+
+    // ============= 歌曲相关 =============================
+
+    override fun getSongDetailWithInput(
+        inputModel: KTVSongDetailInputModel,
+        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
+    ) {
         TODO("Not yet implemented")
     }
 
@@ -114,20 +153,13 @@ class KTVSyncManagerServiceImp(
         TODO("Not yet implemented")
     }
 
-    override fun getChoosedSongsListWithCompletion(completion: (error: Exception?, list: List<VLRoomSelSongModel>) -> Unit) {
+    override fun getChoosedSongsListWithCompletion(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
         TODO("Not yet implemented")
     }
 
-    override fun joinChorusWithInput(
-        inputModel: KTVJoinChorusInputModel,
+    override fun switchSongWithInput(
+        inputModel: KTVSwitchSongInputModel,
         completion: (error: Exception?) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getSongDetailWithInput(
-        inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
     ) {
         TODO("Not yet implemented")
     }
@@ -153,72 +185,18 @@ class KTVSyncManagerServiceImp(
         TODO("Not yet implemented")
     }
 
-    override fun subscribeUserListCountWithChanged(changedBlock: (count: Int) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun subscribeSeatListWithChanged(changedBlock: (Int, VLRoomSeatModel) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun subscribeRoomStatusWithChanged(changedBlock: (Int, VLRoomListModel) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun subscribeChooseSongWithChanged(changedBlock: (Int, VLRoomSelSongModel) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun muteWithMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun openVideoStatusWithStatus(
-        openStatus: Boolean,
+    override fun joinChorusWithInput(
+        inputModel: KTVJoinChorusInputModel,
         completion: (error: Exception?) -> Unit
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun publishChooseSongEvent() {
+    override fun becomeSolo() {
         TODO("Not yet implemented")
     }
 
-    override fun leaveChannel() {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishMuteEventWithMuteStatus(
-        muteStatus: Boolean,
-        completion: (error: Exception?) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishVideoOpenEventWithOpenStatus(
-        openStatus: Boolean,
-        completion: (error: Exception?) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishSongDidChangedEventWithOwnerStatus(isMaster: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishToSoloEvent() {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishJoinToChorusWithCompletion(completion: (error: Exception?) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishSongOwnerWithOwnerId(userNo: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun publishSingingScoreWithTotalVolume(totalVolume: Double) {
+    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel) -> Unit) {
         TODO("Not yet implemented")
     }
 
