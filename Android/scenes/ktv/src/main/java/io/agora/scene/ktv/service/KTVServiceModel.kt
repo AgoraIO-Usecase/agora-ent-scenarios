@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.service
 
 import io.agora.scene.base.R
+import io.agora.scene.base.bean.MemberMusicModel
 
 data class VLRoomListModel(
     val name: String,
@@ -63,27 +64,27 @@ data class VLRoomSeatModel(
 
     // SyncManager独有，用来更新和删除数据
     var objectId: String? = null
-)
+): java.io.Serializable
 
 
 data class KTVCreateRoomInputModel(
-    val belCanto: String,
     val icon: String,
     val isPrivate: Int,
     val name: String,
     val password: String,
-    val soundEffect: String,
     val userNo: String,
+
+    // the params below may can be deleted?
+    val belCanto: String = "",
+    val soundEffect: String = "",
 )
 
 data class KTVCreateRoomOutputModel(
-    val name: String,
-    val roomNo: String,
-    val seatsArray: List<VLRoomSeatModel>?,
-    val agoraRTMToken: String,
-    val agoraRTCToken: String,
-    val agoraPlayerRTCToken: String
+    val roomNo: String?,
+    val password: String?,
 )
+
+
 
 data class KTVJoinRoomInputModel(
     val roomNo: String,
@@ -91,12 +92,16 @@ data class KTVJoinRoomInputModel(
 )
 
 data class KTVJoinRoomOutputModel(
-    val creator: String,
+    val roomName: String,
+    val roomNo: String,
+    val creatorNo: String,
+    val bgOption: String,
     val seatsArray: List<VLRoomSeatModel>?,
+
     val agoraRTMToken: String,
     val agoraRTCToken: String,
-    val agoraPlayerRTCToken: String
-)
+    val agoraPlayerRTCToken: String,
+): java.io.Serializable
 
 
 data class KTVChangeMVCoverInputModel(
@@ -105,6 +110,14 @@ data class KTVChangeMVCoverInputModel(
 
 data class KTVOnSeatInputModel(
     val seatIndex: Int
+)
+
+data class KTVOutSeatInputModel(
+    val userNo: String,
+    val userId: String,
+    val userName: String,
+    val userHeadUrl: String,
+    val userOnSeat: Int,
 )
 
 data class KTVRemoveSongInputModel(
@@ -120,7 +133,7 @@ data class VLRoomSelSongModel(
     // 是否合唱
     val isChorus: Boolean,
     //是否原唱
-    val isOriginal: String,
+    val isOriginal: Int,
     val singer: String,
     val songName: String,
     val songNo: String,
@@ -128,7 +141,7 @@ data class VLRoomSelSongModel(
     // 歌词
     val lyric: String,
     // 排序
-    val sort: String,
+    val sort: Int,
     // 0 未开始 1.已唱 2.正在唱
     val status: Int,
     // 是谁点的歌
@@ -141,11 +154,30 @@ data class VLRoomSelSongModel(
     // 是否是自己点的歌曲
     val isOwnSong: Boolean,
 
-    var objectId: String?
-)
+    var objectId: String? = null
+) {
+    // TODO remove it
+    fun toMemberMusicModel(): MemberMusicModel{
+        return MemberMusicModel().apply {
+            chorusNo = this@VLRoomSelSongModel.chorusNo
+            imageUrl = this@VLRoomSelSongModel.imageUrl
+            isChorus = this@VLRoomSelSongModel.isChorus
+            isOriginal = this@VLRoomSelSongModel.isOriginal
+            singer = this@VLRoomSelSongModel.singer
+            songName = this@VLRoomSelSongModel.songName
+            songNo = this@VLRoomSelSongModel.songNo
+            songUrl = this@VLRoomSelSongModel.songUrl
+            lrc = this@VLRoomSelSongModel.lyric
+            sort = this@VLRoomSelSongModel.sort
+            status = this@VLRoomSelSongModel.status
+            userNo = this@VLRoomSelSongModel.userNo
+            user1Id = this@VLRoomSelSongModel.userId
+            name = this@VLRoomSelSongModel.name
+        }
+    }
+}
 
 data class KTVJoinChorusInputModel(
-    val isChorus: String,
     val songNo: String
 )
 
@@ -158,6 +190,12 @@ data class KTVSongDetailOutputModel(
     val songNo: String,
     val lyric: String,
     val songUrl: String
+)
+
+data class KTVSwitchSongInputModel(
+    val userNo:String,
+    val songNo: String,
+    val roomNo: String
 )
 
 data class KTVChooseSongInputModel(
