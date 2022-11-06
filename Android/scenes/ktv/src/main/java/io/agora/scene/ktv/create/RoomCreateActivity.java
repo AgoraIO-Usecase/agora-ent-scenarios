@@ -12,7 +12,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -22,11 +21,11 @@ import java.util.Random;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
-import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.ActivityRoomCreateBinding;
+import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
@@ -98,16 +97,20 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         getBinding().superLayout.setOnClickListener(view -> {
             hideInput();
         });
-        roomCreateViewModel.createRoomResult.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    PagePilotManager.pageRoomLiving();
-                    finish();
-                    hideLoadingView();
-                }else{
-                    hideLoadingView();
-                }
+        roomCreateViewModel.joinRoomResult.observe(this, out -> {
+            if(out != null){
+                RoomLivingActivity.launch(RoomCreateActivity.this, out);
+                finish();
+                hideLoadingView();
+            }else{
+                hideLoadingView();
+            }
+        });
+        roomCreateViewModel.createRoomResult.observe(this, out -> {
+            if(out != null){
+                roomCreateViewModel.joinRoom(out.getRoomNo(), out.getPassword());
+            }else{
+                hideLoadingView();
             }
         });
         getBinding().cbOpen.setOnCheckedChangeListener((compoundButton, b) -> {
