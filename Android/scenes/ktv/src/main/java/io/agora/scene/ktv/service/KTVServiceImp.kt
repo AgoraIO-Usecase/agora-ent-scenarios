@@ -21,6 +21,7 @@ import io.reactivex.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.util.concurrent.CountDownLatch
 
 /**
  * 使用Restful API和RTM进行数据交互
@@ -48,7 +49,9 @@ class KTVServiceImp : KTVServiceProtocol {
         VLSendMessageAuditFail("20");
     }
 
+    @Volatile
     private var roomNo: String? = null
+
     private var creatorNo: String? = null
     private var chorusSongNo: String? = null
 
@@ -140,7 +143,18 @@ class KTVServiceImp : KTVServiceProtocol {
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     ) {
         if (roomNo != null) {
-            return
+            val letchCount = CountDownLatch(1)
+            leaveRoomWithCompletion {
+                if (it != null) {
+                    roomNo = null
+                }
+                letchCount.countDown()
+            }
+            letchCount.await();
+            if(roomNo != null){
+                completion.invoke(RuntimeException("Last room exit! $roomNo"), null)
+                return
+            }
         }
         roomNo = inputModel.roomNo;
         ApiManager.getInstance().requestGetRoomInfo(inputModel.roomNo, inputModel.password)
@@ -212,10 +226,12 @@ class KTVServiceImp : KTVServiceProtocol {
         val roomNo = roomNo ?: return
         val creatorNo = creatorNo ?: return
 
-        // logout rtm
-        RTMManager.getInstance().levelRTMRoom();
-        RTMManager.getInstance().doLogoutRTM()
-        EventBus.getDefault().unregister(this@KTVServiceImp)
+        val exitRtmRun : ()->Unit = {
+            // logout rtm
+            RTMManager.getInstance().levelRTMRoom();
+            RTMManager.getInstance().doLogoutRTM()
+            EventBus.getDefault().unregister(this@KTVServiceImp)
+        }
 
         if (UserManager.getInstance().user.userNo.equals(creatorNo)) {
             // creator: remove room
@@ -233,6 +249,8 @@ class KTVServiceImp : KTVServiceProtocol {
 
                         this@KTVServiceImp.roomNo = null
 
+                        exitRtmRun.invoke()
+
                         completion.invoke(null)
                     }
 
@@ -245,10 +263,12 @@ class KTVServiceImp : KTVServiceProtocol {
 
                             this@KTVServiceImp.roomNo = null
 
+                            exitRtmRun.invoke()
+
                             completion.invoke(null)
                         } else {
                             completion.invoke(t)
-                            ToastUtils.showToast(t!!.message)
+                            ToastUtils.showToast(t.message)
                         }
                     }
                 })
@@ -272,6 +292,7 @@ class KTVServiceImp : KTVServiceProtocol {
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
                         this@KTVServiceImp.roomNo = null
+                        exitRtmRun.invoke()
 
                         completion.invoke(null)
                         // TODO 切歌给其他人
