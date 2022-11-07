@@ -14,7 +14,6 @@ import io.agora.scene.base.data.model.AgoraRoom
 import io.agora.scene.base.event.ReceivedMessageEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.ktv.dialog.RoomChooseSongDialog
 import io.agora.scene.ktv.manager.RTMManager
 import io.agora.scene.ktv.manager.RoomManager
 import io.agora.scene.ktv.manager.bean.RTMMessageBean
@@ -54,6 +53,7 @@ class KTVServiceImp : KTVServiceProtocol {
     private var creatorNo: String? = null
     private var chorusSongNo: String? = null
     private var localSeatModel: VLRoomSeatModel? = null
+    private var selSongModel: VLRoomSelSongModel? = null
 
     private var roomStatusSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit)? =
         null
@@ -61,7 +61,7 @@ class KTVServiceImp : KTVServiceProtocol {
         null
     private var seatListChangeSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomSeatModel?) -> Unit)? =
         null
-    private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel) -> Unit)? =
+    private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit)? =
         null
 
     // ================== 房间相关 ===========================
@@ -700,6 +700,29 @@ class KTVServiceImp : KTVServiceProtocol {
                     override fun onSuccess(data: BaseResponse<String?>?) {
                         Log.d("cwtsw", "删除歌曲");
                         completion.invoke(null)
+
+                        selSongModel = VLRoomSelSongModel(
+                            "",
+                            "",
+                            false,
+                            0,
+                            "",
+                            "",
+                            inputModel.songNo,
+                            "",
+                            "",
+                            inputModel.sort.toInt(),
+                            0,
+                            "",
+                            "",
+                            "",
+                            0.0,
+                            false
+                        )
+                        chooseSongSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                            this@KTVServiceImp.selSongModel
+                        )
                     }
 
                     override fun onFailure(t: ApiException?) {
@@ -722,9 +745,16 @@ class KTVServiceImp : KTVServiceProtocol {
         TODO("Not yet implemented")
     }
 
+    private var isChooseSong = false
+
     override fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
     ) {
+        if (isChooseSong) {
+            return
+        }
+        isChooseSong = true
+
         val isChorus : Int = if (inputModel.isChorus) 1 else 0
         ApiManager.getInstance().requestChooseSong(inputModel.imageUrl, isChorus, 0, inputModel.singer, inputModel.songName,
                 inputModel.songNo, inputModel.imageUrl, UserManager.getInstance().user.userNo, roomNo)
@@ -740,10 +770,34 @@ class KTVServiceImp : KTVServiceProtocol {
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
                         completion.invoke(null)
+
+//                        selSongModel = VLRoomSelSongModel(
+//                            "",
+//                            inputModel.imageUrl,
+//                            inputModel.isChorus,
+//                            0,
+//                            inputModel.singer,
+//                            inputModel.songName,
+//                            inputModel.songNo,
+//                            "",
+//                            "",
+//                            0,
+//                            0,
+//                            UserManager.getInstance().user.userNo,
+//                            "",
+//                            "",
+//                            0.0,
+//                            false
+//                        )
+                        chooseSongSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            null
+                        )
                     }
 
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t)
+                        isChooseSong = false
                     }
                 }
             );
@@ -767,6 +821,29 @@ class KTVServiceImp : KTVServiceProtocol {
                     RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
                     completion.invoke(null)
+
+                    selSongModel = VLRoomSelSongModel(
+                        "",
+                        "",
+                        false,
+                        0,
+                        "",
+                        "",
+                        inputModel.songNo,
+                        "",
+                        "",
+                        inputModel.sort.toInt(),
+                        0,
+                        "",
+                        "",
+                        "",
+                        0.0,
+                        false
+                    )
+                    chooseSongSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                        this@KTVServiceImp.selSongModel
+                    )
                 }
 
                 override fun onFailure(t: ApiException?) {
@@ -839,7 +916,7 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
 
-    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel) -> Unit) {
+    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
     }
 
@@ -933,6 +1010,52 @@ class KTVServiceImp : KTVServiceProtocol {
                         bean.isSelfMuted,
                         bean.isVideoMuted,
                         false,
+                        false
+                    )
+                )
+            }
+            VLSendMessageType.VLSendMessageTypeChooseSong.value -> {
+                chooseSongSubscriber?.invoke(
+                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                    VLRoomSelSongModel(
+                        "",
+                        "",
+                        false,
+                        0,
+                        "",
+                        bean.songName,
+                        bean.songNo,
+                        "",
+                        "",
+                        0,
+                        0,
+                        bean.userNo,
+                        "",
+                        bean.name,
+                        0.0,
+                        false
+                    )
+                )
+            }
+            VLSendMessageType.VLSendMessageTypeChangeSong.value -> {
+                chooseSongSubscriber?.invoke(
+                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                    VLRoomSelSongModel(
+                        "",
+                        "",
+                        false,
+                        0,
+                        "",
+                        bean.songName,
+                        bean.songNo,
+                        "",
+                        "",
+                        0,
+                        0,
+                        bean.userNo,
+                        "",
+                        bean.name,
+                        0.0,
                         false
                     )
                 )
