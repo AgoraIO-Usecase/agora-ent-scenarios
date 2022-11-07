@@ -136,6 +136,30 @@ VLPopScoreViewDelegate
 
 @implementation VLKTVViewController
 
+#pragma mark lazy
+- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
+    if (!_rtcMediaPlayer) {
+//        _rtcMediaPlayer = [self.RTCkit createMediaPlayerWithDelegate:self];
+        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
+        // 调节本地播放音量。0-100
+         [_rtcMediaPlayer adjustPlayoutVolume:200];
+//         调节远端用户听到的音量。0-400
+         [_rtcMediaPlayer adjustPublishSignalVolume:200];
+    }
+    return _rtcMediaPlayer;
+}
+
+- (VLKTVSettingView *)settingView {
+    if (!_settingView) {
+        _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
+        _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
+        [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+        _settingView.delegate = self;
+    }
+    return _settingView;
+}
+
+#pragma mark view lifecycles
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
@@ -145,9 +169,56 @@ VLPopScoreViewDelegate
     
     [self addServiceHandler];
     
-    if (VLUserCenter.user.ifMaster
-        || [self.roomModel.creator isEqualToString:VLUserCenter.user.userNo]
-        || [self isOnSeat]) { //自己是房间的创建者
+    // setup view
+    [self setBackgroundImage:@"ktv_temp_mainbg"];
+    
+    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
+    [self.view addSubview:bgView];
+    //头部视图
+    VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight+10, SCREEN_WIDTH, 22+20+14) withDelegate:self];
+    [self.view addSubview:topView];
+    self.topView = topView;
+    topView.listModel = self.roomModel;
+    
+    //MV视图(显示歌词...)
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)*0.67) withDelegate:self];
+    [self.view addSubview:self.MVView];
+    
+    //房间麦位视图
+    VLRoomPersonView *personView = [[VLRoomPersonView alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26) withDelegate:self withRTCkit:self.RTCkit];
+    self.roomPersonView = personView;
+    [self.roomPersonView setSeatsArray:self.seatsArray];
+    [self.view addSubview:personView];
+    
+    //底部按钮视图
+    VLKTVBottomView *bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    self.bottomView = bottomView;
+    bottomView.backgroundColor = UIColorClear;
+//    self.bottomView.hidden = YES;
+    [self.view addSubview:bottomView];
+    
+    //空位上麦视图
+    VLTouristOnLineView *requestOnLineView = [[VLTouristOnLineView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
+    self.requestOnLineView = requestOnLineView;
+    [self.view addSubview:requestOnLineView];
+    
+    if (VLUserCenter.user.ifMaster) {
+        self.bottomView.hidden = NO;
+        self.requestOnLineView.hidden = YES;
+    }else{
+        BOOL ifOnSeat = NO;
+        for (VLRoomSeatModel *model in self.seatsArray) {
+            if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
+                ifOnSeat = YES;
+            }
+        }
+        self.bottomView.hidden = !ifOnSeat;
+        self.requestOnLineView.hidden = ifOnSeat;
+    }
+    
+    //start join
+    if (VLUserCenter.user.ifMaster || [self.roomModel.creator isEqualToString:VLUserCenter.user.userNo] || [self isOnSeat]) { //自己是房间的创建者
         [self joinRTCChannelIfRequestOnSeat:YES];
     }else{
         [self joinRTCChannelIfRequestOnSeat:NO];
@@ -158,6 +229,68 @@ VLPopScoreViewDelegate
     //处理背景
     [self dealWithSelBg];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [UIViewController popGestureClose:self];
+    
+    _isEarOn = NO;
+    //请求已点歌曲
+    [self userFirstGetInRoom];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [UIViewController popGestureOpen:self];
+    [self leaveChannel];
+    [self leaveRTCChannel];
+    [[UIApplication sharedApplication] setIdleTimerDisabled: NO];
+}
+
+- (void) viewDidDisappear:(BOOL)animated
+{
+    streamId = -1;
+    self.rtcMediaPlayer = nil;
+
+    if(self.mediaPlayerConnection) {
+        [self disableMediaChannel];
+        self.mediaPlayerConnection = nil;
+    }
+
+    if(self.AgoraMcc) {
+        [self.AgoraMcc registerEventDelegate:nil];
+        VLLog(@"Agora - unregisterEventHandler");
+        [AgoraMusicContentCenter destroy];
+        VLLog(@"Agora - destroy MCC");
+        self.AgoraMcc = nil;
+    }
+    
+    [AgoraRtcEngineKit destroy];
+    VLLog(@"Agora - destroy RTCEngine");
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
+
+- (void)dealloc {
+}
+
+- (void)configNavigationBar:(UINavigationBar *)navigationBar {
+    [super configNavigationBar:navigationBar];
+}
+- (BOOL)preferredNavigationBarHidden {
+    return true;
+}
+// 是否允许手动滑回 @return true 是、 false否
+- (BOOL)forceEnableInteractivePopGestureRecognizer {
+    return NO;
+}
+
+#pragma mark service handler
+- (void)addNotification {
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianGeSuccessEvent:) name:kDianGeSuccessNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(makeTopSuccessEvent) name:kMakeTopNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(deleteSuccessEvent) name:kDeleteSuccessNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateSelSongEvent) name:kUpdateSelSongArrayNotification object:nil];
 }
 
 - (void)addServiceHandler {
@@ -326,6 +459,129 @@ VLPopScoreViewDelegate
     }];
 }
 
+#pragma mark view helpers
+- (void)dealWithSelBg {
+    if (self.roomModel.bgOption) {
+        VLKTVSelBgModel *selBgModel = [VLKTVSelBgModel new];
+        selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%d",(int)self.roomModel.bgOption];
+        selBgModel.ifSelect = YES;
+        self.choosedBgModel = selBgModel;
+        [self.MVView changeBgViewByModel:self.choosedBgModel];
+    }
+}
+
+//更换MV背景
+- (void)popSelMVBgView {
+    CGFloat popViewH = (SCREEN_WIDTH-60)/3.0*0.75*3+100+kSafeAreaBottomHeight;
+    VLPopSelBgView *changeBgView = [[VLPopSelBgView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
+    changeBgView.selBgModel = self.choosedBgModel;
+    
+    self.popSelBgView = [self setPopCommenSettingWithContentView:changeBgView ifClickBackDismiss:YES];
+    [self.popSelBgView pop];
+}
+
+//弹出更多
+- (void)popSelMoreView {
+    CGFloat popViewH = 190+kSafeAreaBottomHeight;
+    VLPopMoreSelView *moreView = [[VLPopMoreSelView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
+    
+    self.popMoreView = [self setPopCommenSettingWithContentView:moreView ifClickBackDismiss:YES];
+    [self.popMoreView pop];
+}
+
+//弹出下麦视图
+- (void)popDropLineViewWithSeatModel:(VLRoomSeatModel *)seatModel {
+    CGFloat popViewH = 212+kSafeAreaBottomHeight+32;
+    VLDropOnLineView *dropLineView = [[VLDropOnLineView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
+    dropLineView.seatModel = seatModel;
+    
+    self.dropLineView = [self setPopCommenSettingWithContentView:dropLineView ifClickBackDismiss:YES];
+    [self.dropLineView pop];
+}
+
+//弹出美声视图
+- (void)popBelcantoView {
+    CGFloat popViewH = 175+kSafeAreaBottomHeight;
+    VLChooseBelcantoView *belcantoView = [[VLChooseBelcantoView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
+    belcantoView.selBelcantoModel = self.selBelcantoModel;
+    self.belcantoView = [self setPopCommenSettingWithContentView:belcantoView ifClickBackDismiss:YES];
+    [self.belcantoView pop];
+}
+
+//弹出点歌视图
+- (void)popUpChooseSongView:(BOOL)ifChorus {
+    CGFloat popViewH = SCREEN_HEIGHT*0.7;
+    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self withRoomNo:self.roomModel.roomNo ifChorus:ifChorus];
+    self.chooseSongView = chooseSongView;
+    self.chooseSongView.selSongsArray = self.selSongsArray;
+    self.popChooseSongView = [self setPopCommenSettingWithContentView:chooseSongView ifClickBackDismiss:YES];
+    self.popChooseSongView.isAvoidKeyboard = NO;
+    [self.popChooseSongView pop];
+}
+
+//弹出音效
+- (void)popSetSoundEffectView {
+    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
+    if(_soundEffectView == nil) {
+        _soundEffectView = [[VLsoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
+    }
+    
+    self.popSoundEffectView = [self setPopCommenSettingWithContentView:self.soundEffectView ifClickBackDismiss:YES];
+    [self.popSoundEffectView pop];
+}
+
+//网络差视图
+- (void)popBadNetWrokTipView {
+    CGFloat popViewH = 276;
+    VLBadNetWorkView *badNetView = [[VLBadNetWorkView alloc]initWithFrame:CGRectMake(40, 0, SCREEN_WIDTH-80, popViewH) withDelegate:self];
+    
+    LSTPopView *popView = [LSTPopView initWithCustomView:badNetView parentView:self.view popStyle:LSTPopStyleFade dismissStyle:LSTDismissStyleFade];
+    popView.hemStyle = LSTHemStyleCenter;
+    popView.popDuration = 0.5;
+    popView.dismissDuration = 0.5;
+    popView.cornerRadius = 20;
+    self.popBadNetWorkView = popView;
+    popView.isClickFeedback = NO;
+    
+    [self.popBadNetWorkView pop];
+}
+
+//公共弹窗视图设置
+- (LSTPopView *)setPopCommenSettingWithContentView:(UIView *)contentView ifClickBackDismiss:(BOOL)dismiss{
+    LSTPopView *popView = [LSTPopView initWithCustomView:contentView parentView:self.view popStyle:LSTPopStyleSmoothFromBottom dismissStyle:LSTDismissStyleSmoothToBottom];
+    popView.hemStyle = LSTHemStyleBottom;
+    popView.popDuration = 0.5;
+    popView.dismissDuration = 0.5;
+    popView.cornerRadius = 20;
+    LSTPopViewWK(popView)
+    if (dismiss) {
+        popView.isClickFeedback = YES;
+        popView.bgClickBlock = ^{
+            [wk_popView dismiss];
+        };
+    }else{
+        popView.isClickFeedback = NO;
+    }
+    popView.rectCorners = UIRectCornerTopLeft | UIRectCornerTopRight;
+    
+    return  popView;
+    
+}
+
+- (void)showSettingView {
+    [YGViewDisplayer popupBottom:self.settingView setupBlock:^(YGViewDisplayOptions * _Nonnull options) {
+        options.screenInteraction = YGViewDisplayOptionsUserInteractionDismiss;
+        options.safeArea = YGViewDisplayOptionsSafeAreaOverridden;
+        options.backgroundColor = [UIColor clearColor];
+        options.screenBackgroundColor = [UIColor colorWithWhite:0 alpha:0.5];
+    }];
+}
+
+- (void)dismissSettingView {
+    [YGViewDisplayer dismiss:self.settingView completionHandler:^{}];
+}
+
+#pragma mark helper apis
 -(BOOL)isOnSeat{
     for (VLRoomSeatModel *seatModel in self.seatsArray) {
         if (seatModel.id != nil) {
@@ -358,16 +614,6 @@ VLPopScoreViewDelegate
     if(self.rtcMediaPlayer != nil) {
         [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
 //        [self playSongWithPlayer:self.rtcMediaPlayer];
-    }
-}
-
-- (void)dealWithSelBg {
-    if (self.roomModel.bgOption) {
-        VLKTVSelBgModel *selBgModel = [VLKTVSelBgModel new];
-        selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%d",(int)self.roomModel.bgOption];
-        selBgModel.ifSelect = YES;
-        self.choosedBgModel = selBgModel;
-        [self.MVView changeBgViewByModel:self.choosedBgModel];
     }
 }
 
@@ -559,74 +805,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     };
 }
 
-#pragma mark - zzzzz
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [UIViewController popGestureClose:self];
-    
-    _isEarOn = NO;
-    //请求已点歌曲
-    [self userFirstGetInRoom];
-}
-
+#pragma mark - rtc utils
 - (void)resetMicAndCameraStatus
 {
     _isNowMicMuted = NO;
     _isNowCameraMuted = YES;
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [UIViewController popGestureOpen:self];
-    [self leaveChannel];
-    [self leaveRTCChannel];
-    [[UIApplication sharedApplication] setIdleTimerDisabled: NO];
-}
-
-- (void)addNotification {
-    [[NSNotificationCenter defaultCenter]addObserver:self
-                                            selector:@selector(dianGeSuccessEvent:)
-                                                name:kDianGeSuccessNotification
-                                              object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self
-                                            selector:@selector(makeTopSuccessEvent)
-                                                name:kMakeTopNotification
-                                              object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self
-                                            selector:@selector(deleteSuccessEvent)
-                                                name:kDeleteSuccessNotification
-                                              object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self
-                                            selector:@selector(updateSelSongEvent)
-                                                name:kUpdateSelSongArrayNotification
-                                              object:nil];
-}
-
-- (void) viewDidDisappear:(BOOL)animated
-{
-    streamId = -1;
-    self.rtcMediaPlayer = nil;
-
-    if(self.mediaPlayerConnection) {
-        [self disableMediaChannel];
-        self.mediaPlayerConnection = nil;
-    }
-
-    if(self.AgoraMcc) {
-        [self.AgoraMcc registerEventDelegate:nil];
-        VLLog(@"Agora - unregisterEventHandler");
-        [AgoraMusicContentCenter destroy];
-        VLLog(@"Agora - destroy MCC");
-        self.AgoraMcc = nil;
-    }
-    
-    [AgoraRtcEngineKit destroy];
-    VLLog(@"Agora - destroy RTCEngine");
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
-}
-
-- (void)dealloc {
 }
 
 /// 销毁播放器
@@ -684,7 +867,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         VLLog(@"Agora - 加入RTC成功");
        
-        [self setUpUI];
+//        [self setUpUI];
+//        [AgoraRtm updateDelegate:self];
     }];
     [self.RTCkit setEnableSpeakerphone:YES];
     
@@ -714,6 +898,15 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
 }
 
+
+- (void)enableMic
+{
+    AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
+    option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:self.isNowMicMuted];
+    option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
+    [self.RTCkit updateChannelWithMediaOptions:option];
+}
+
 - (void)leaveChannel {
     if ([[AppContext ktvServiceImp] respondsToSelector:@selector(leaveChannel)]) {
         [[AppContext ktvServiceImp] leaveChannel];
@@ -726,77 +919,85 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }];
 }
 
-- (void)setUpUI {
-    [self setBackgroundImage:@"ktv_temp_mainbg"];
+- (AgoraRtcConnection *)enableMediaChannel:(BOOL)doPublish {
+    AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
+    [option setClientRoleType:[AgoraRtcIntOptional of:AgoraClientRoleBroadcaster]];
+    [option setPublishCameraTrack:[AgoraRtcBoolOptional of:NO]];
+    [option setPublishCustomAudioTrack:[AgoraRtcBoolOptional of:NO]];
+    [option setEnableAudioRecordingOrPlayout:[AgoraRtcBoolOptional of:NO]];
+    [option setAutoSubscribeAudio:[AgoraRtcBoolOptional of:NO]];
+
+    [option setPublishMicrophoneTrack:[AgoraRtcBoolOptional of:NO]];
+
+    [option setAutoSubscribeVideo:[AgoraRtcBoolOptional of:NO]];
+
+    [option setPublishMediaPlayerId:[AgoraRtcIntOptional of:[self.rtcMediaPlayer getMediaPlayerId]]];
+    [option setPublishMediaPlayerAudioTrack:[AgoraRtcBoolOptional of:doPublish]];
     
-    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
-    [self.view addSubview:bgView];
-    //头部视图
-    VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight+10, SCREEN_WIDTH, 22+20+14)
-                                                  withDelegate:self];
-    [self.view addSubview:topView];
-    self.topView = topView;
-    topView.listModel = self.roomModel;
+    AgoraRtcConnection *connection = [AgoraRtcConnection new];
+    connection.channelId = self.roomModel.roomNo;
+    connection.localUid = [VLGlobalHelper getAgoraPlayerUserId:VLUserCenter.user.id];
+
+    VLLog(@"Agora - Join channelex with token: %@, userid: %lu for channel: %@ for mediaplayer id: %d",
+          VLUserCenter.user.agoraPlayerRTCToken,
+          connection.localUid,
+          connection.channelId,
+          [self.rtcMediaPlayer getMediaPlayerId]);
     
-    //MV视图(显示歌词...)
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)*0.67)
-                                       withDelegate:self];
-    [self.view addSubview:self.MVView];
+    int ret  = [self.RTCkit joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken
+                                      connection:connection delegate:self
+                                    mediaOptions:option
+                                     joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
+        VLLog(@"Agora - Join channel ex succ");
+    }];
     
-    //房间麦位视图
-    VLRoomPersonView *personView = [[VLRoomPersonView alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26)
-                                                             withDelegate:self
-                                                               withRTCkit:self.RTCkit];
-    self.roomPersonView = personView;
-    [self.roomPersonView setSeatsArray:self.seatsArray];
-    [self.view addSubview:personView];
-    
-    //底部按钮视图
-    VLKTVBottomView *bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40)
-                                                           withDelegate:self
-                                                             withRoomNo:self.roomModel.roomNo
-                                                               withData:self.seatsArray];
-    self.bottomView = bottomView;
-    bottomView.backgroundColor = UIColorClear;
-//    self.bottomView.hidden = YES;
-    [self.view addSubview:bottomView];
-    
-    //空位上麦视图
-    VLTouristOnLineView *requestOnLineView = [[VLTouristOnLineView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56)
-                                                                          withDelegate:self];
-    self.requestOnLineView = requestOnLineView;
-    [self.view addSubview:requestOnLineView];
-    
-    if (VLUserCenter.user.ifMaster) {
-        self.bottomView.hidden = NO;
-        self.requestOnLineView.hidden = YES;
-    }else{
-        BOOL ifOnSeat = NO;
-        for (VLRoomSeatModel *model in self.seatsArray) {
-            if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
-                ifOnSeat = YES;
-            }
-        }
-        self.bottomView.hidden = !ifOnSeat;
-        self.requestOnLineView.hidden = ifOnSeat;
+    if(ret == 0) {
+        VLLog(@"Agora - Join media player connection succ");
+        return connection;
+    }
+    else {
+        VLLog(@"Agora - Join media player connection failed");
+        return nil;
     }
 }
 
-#pragma mark - Public Methods
-- (void)configNavigationBar:(UINavigationBar *)navigationBar {
-    [super configNavigationBar:navigationBar];
-}
-- (BOOL)preferredNavigationBarHidden {
-    return true;
-}
-// 是否允许手动滑回 @return true 是、 false否
-- (BOOL)forceEnableInteractivePopGestureRecognizer {
-    return NO;
+- (BOOL)disableMediaChannel {
+    if(self.mediaPlayerConnection == nil) {
+        return YES;
+    }
+    
+    int ret = [self.RTCkit leaveChannelEx:self.mediaPlayerConnection
+                        leaveChannelBlock:^(AgoraChannelStats* stat) {
+        
+    }];
+    
+    if(ret == 0) {
+        self.mediaPlayerConnection = nil;
+        VLLog(@"Agora - Leave media channel succ");
+        return YES;
+    }
+    else {
+        VLLog(@"Agora - Leave media channel failed");
+        return NO;
+    }
 }
 
-#pragma mark -- delegate Event
-- (void)closeBtnAction {
+- (void)updateRemoteUserMuteStatus:(NSString *)userId
+                            doMute:(BOOL)doMute {
+    VLLog(@"Agora - updating UID: %@ to %d", userId, doMute);
+    [self.RTCkit muteRemoteAudioStream:[VLGlobalHelper getAgoraPlayerUserId:userId] mute:doMute];
+}
+
+- (void)resetPlayer
+{
+    VLLog(@"Agora - updating unmute all user");
+    self.mutedRemoteUserId = nil;
+    [self.RTCkit muteAllRemoteAudioStreams:NO];
+}
+
+#pragma mark -- VLKTVTopViewDelegate
+- (void)onVLKTVTopViewCloseBtnTapped {
+    //TODO
     if (VLUserCenter.user.ifMaster) { //自己是房主关闭房间
         [LEEAlert alert].config
         .LeeAddTitle(^(UILabel *label) {
@@ -835,8 +1036,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
             action.font = UIFontBoldMake(16);
             action.clickBlock = ^{
-                [weakSelf destroyMediaPlayer];
-                [weakSelf roomerCloseRoom];
+                [weakSelf leaveRoom];
             };
         })
         .LeeShow();
@@ -887,36 +1087,16 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 if(song != nil && song.isOwnSong) {
                     [weakSelf ktvMVViewDidClick:VLKTVMVViewActionTypeExit];
                 }
-                [weakSelf otherPersonExitRoom];
+                [weakSelf leaveMicSeat:^{
+                    [weakSelf leaveRoom];
+                }];
             };
         })
         .LeeShow();
     }
 }
 
-- (void)roomerCloseRoom {
-    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        //发送通知
-        [[NSNotificationCenter defaultCenter] postNotificationName:kExitRoomNotification
-                                                            object:nil];
-  
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for (BaseViewController *vc in self.navigationController.childViewControllers) {
-                if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                    [self.navigationController popToViewController:vc
-                                                          animated:YES];
-                }
-            }
-        });
-    }];
-}
-
-- (void)otherPersonExitRoom {
-    
+- (void)leaveMicSeat:(void (^)(void))completion {
     BOOL ifOnSeat = NO;
     NSInteger seatIndex = -1;
     for (VLRoomSeatModel *model in self.seatsArray) {
@@ -942,17 +1122,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             if (error != nil) {
                 return;
             }
-            
+
             VLLog(@"发送下麦消息成功");
             [VLUserCenter clearUserRoomInfo];
-            [self userOutRoom];
+            completion();
         }];
     }else{
-        [self userOutRoom];
+        completion();
     }
 }
 
-- (void)userOutRoom {
+- (void)leaveRoom {
     VL(weakSelf);
     [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
         if (error != nil) {
@@ -969,7 +1149,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }];
 }
 
-
+#pragma mark - VLPopMoreSelViewDelegate
 - (void)moreItemBtnAction:(VLKTVMoreBtnClickType)typeValue {
     switch (typeValue) {
         case VLKTVMoreBtnClickTypeBelcanto:
@@ -992,15 +1172,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-- (void)enableMic
-{
-    AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-    option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:self.isNowMicMuted];
-    option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-    [self.RTCkit updateChannelWithMediaOptions:option];
-}
-
-#pragma mark --底部按钮的点击事件
+#pragma mark - VLKTVBottomViewDelegate
 - (void)bottomSetAudioMute:(NSInteger)ifMute{
     if (ifMute == 1) {
         AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
@@ -1036,11 +1208,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [self.RTCkit muteLocalVideoStream:YES];
         _isNowCameraMuted = YES;
     }
-}
-
-- (BOOL)ifMyCameraIsOpened
-{
-    return self.isNowCameraMuted ? NO : YES;
 }
 
 - (void)bottomAudionBtnAction:(NSInteger)ifMute {
@@ -1109,7 +1276,29 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-#pragma mark --切换MV背景
+#pragma mark - VLRoomPersonViewDelegate
+- (BOOL)ifMyCameraIsOpened
+{
+    return self.isNowCameraMuted?NO:YES;
+}
+
+- (void)seatItemClickAction:(VLRoomSeatModel *)model withIndex:(NSInteger)seatIndex{
+    [self requestOnSeatWithIndex:seatIndex];
+}
+
+//房主让某人下线
+- (void)roomMasterMakePersonDropOnLineWithIndex:(NSInteger)seatIndex withDropType:(VLRoomSeatDropType)type{
+    VLRoomSeatModel *seatModel = self.seatsArray[seatIndex];
+//    if (self.selSongsArray.count > 0) {
+//        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+//        if ([selSongModel.userNo isEqualToString:seatModel.userNo]) {   //当前点的歌
+//            return;
+//        }
+//    }
+    [self popDropLineViewWithSeatModel:seatModel];
+}
+
+#pragma mark - VLPopSelBgViewDelegate
 - (void)bgItemClickAction:(VLKTVSelBgModel *)selBgModel index:(NSInteger)index {
     
     KTVChangeMVCoverInputModel* inputModel = [KTVChangeMVCoverInputModel new];
@@ -1132,10 +1321,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }];
 }
 
+#pragma mark - VLPopOnLineTypeViewDelegate
 - (void)backBtnAction {
     [self.popOnLineTypeView dismiss];
 }
 
+#pragma mark - VLChooseBelcantoViewDelegate
 - (void)belcantoBackBtnAction {
     [self.belcantoView dismiss];
 }
@@ -1157,8 +1348,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-- (void)disableTransmission{
-}
 
 // Reset chorus to audience
 - (void)resetChorusStatus:(NSString *)userNo {
@@ -1177,7 +1366,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-#pragma mark --某人下麦
+#pragma mark VLDropOnLineViewDelegate
 - (void)dropOnLineAction:(VLRoomSeatModel *)seatModel {
     NSString *userNo = (seatModel!=nil ? seatModel.userNo : VLUserCenter.user.userNo);
     NSString *userHeadUrl = (seatModel!=nil ? seatModel.headUrl : VLUserCenter.user.headUrl);
@@ -1237,150 +1426,20 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 //美声点击事件
+//感觉没用到
 - (void)itemClickAction:(VLBelcantoModel *)model {
     self.selBelcantoModel = model;
 }
 
+#pragma mark VLBadNetWorkViewDelegate
 //网络差知道了点击事件
 - (void)knowBtnClickAction {
     [self.popBadNetWorkView dismiss];
 }
 
+#pragma mark VLTouristOnLineViewDelegate
 //上麦方式
 - (void)requestOnlineAction {
-}
-
-//更换MV背景
-- (void)popSelMVBgView {
-    CGFloat popViewH = (SCREEN_WIDTH-60)/3.0*0.75*3+100+kSafeAreaBottomHeight;
-    VLPopSelBgView *changeBgView = [[VLPopSelBgView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                           withDelegate:self];
-    changeBgView.selBgModel = self.choosedBgModel;
-    
-    self.popSelBgView = [self setPopCommenSettingWithContentView:changeBgView
-                                              ifClickBackDismiss:YES];
-    [self.popSelBgView pop];
-}
-
-//弹出更多
-- (void)popSelMoreView {
-    CGFloat popViewH = 190+kSafeAreaBottomHeight;
-    VLPopMoreSelView *moreView = [[VLPopMoreSelView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                           withDelegate:self];
-    
-    self.popMoreView = [self setPopCommenSettingWithContentView:moreView
-                                             ifClickBackDismiss:YES];
-    [self.popMoreView pop];
-}
-
-//弹出下麦视图
-- (void)popDropLineViewWithSeatModel:(VLRoomSeatModel *)seatModel {
-    CGFloat popViewH = 212+kSafeAreaBottomHeight+32;
-    VLDropOnLineView *dropLineView = [[VLDropOnLineView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                               withDelegate:self];
-    dropLineView.seatModel = seatModel;
-    
-    self.dropLineView = [self setPopCommenSettingWithContentView:dropLineView
-                                              ifClickBackDismiss:YES];
-    [self.dropLineView pop];
-}
-
-//弹出美声视图
-- (void)popBelcantoView {
-    CGFloat popViewH = 175+kSafeAreaBottomHeight;
-    VLChooseBelcantoView *belcantoView = [[VLChooseBelcantoView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                       withDelegate:self];
-    belcantoView.selBelcantoModel = self.selBelcantoModel;
-    self.belcantoView = [self setPopCommenSettingWithContentView:belcantoView
-                                              ifClickBackDismiss:YES];
-    [self.belcantoView pop];
-}
-
-//弹出点歌视图
-- (void)popUpChooseSongView:(BOOL)ifChorus {
-    CGFloat popViewH = SCREEN_HEIGHT*0.7;
-    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                       withDelegate:self
-                                                                         withRoomNo:self.roomModel.roomNo
-                                                                           ifChorus:ifChorus];
-    self.chooseSongView = chooseSongView;
-    self.chooseSongView.selSongsArray = self.selSongsArray;
-    self.popChooseSongView = [self setPopCommenSettingWithContentView:chooseSongView
-                                                   ifClickBackDismiss:YES];
-    self.popChooseSongView.isAvoidKeyboard = NO;
-    [self.popChooseSongView pop];
-}
-
-//弹出音效
-- (void)popSetSoundEffectView {
-    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    if(_soundEffectView == nil) {
-        _soundEffectView = [[VLsoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                      withDelegate:self];
-    }
-    
-    self.popSoundEffectView = [self setPopCommenSettingWithContentView:self.soundEffectView
-                                                    ifClickBackDismiss:YES];
-    [self.popSoundEffectView pop];
-}
-
-//网络差视图
-- (void)popBadNetWrokTipView {
-    CGFloat popViewH = 276;
-    VLBadNetWorkView *badNetView = [[VLBadNetWorkView alloc] initWithFrame:CGRectMake(40, 0, SCREEN_WIDTH-80, popViewH)
-                                                              withDelegate:self];
-    
-    LSTPopView *popView = [LSTPopView initWithCustomView:badNetView
-                                              parentView:self.view
-                                                popStyle:LSTPopStyleFade
-                                            dismissStyle:LSTDismissStyleFade];
-    popView.hemStyle = LSTHemStyleCenter;
-    popView.popDuration = 0.5;
-    popView.dismissDuration = 0.5;
-    popView.cornerRadius = 20;
-    self.popBadNetWorkView = popView;
-    popView.isClickFeedback = NO;
-    
-    [self.popBadNetWorkView pop];
-}
-
-//公共弹窗视图设置
-- (LSTPopView *)setPopCommenSettingWithContentView:(UIView *)contentView
-                                ifClickBackDismiss:(BOOL)dismiss{
-    LSTPopView *popView = [LSTPopView initWithCustomView:contentView
-                                              parentView:self.view
-                                                popStyle:LSTPopStyleSmoothFromBottom
-                                            dismissStyle:LSTDismissStyleSmoothToBottom];
-    popView.hemStyle = LSTHemStyleBottom;
-    popView.popDuration = 0.5;
-    popView.dismissDuration = 0.5;
-    popView.cornerRadius = 20;
-    LSTPopViewWK(popView)
-    if (dismiss) {
-        popView.isClickFeedback = YES;
-        popView.bgClickBlock = ^{
-            [wk_popView dismiss];
-        };
-    }else{
-        popView.isClickFeedback = NO;
-    }
-    popView.rectCorners = UIRectCornerTopLeft | UIRectCornerTopRight;
-    
-    return  popView;
-    
-}
-
-- (void)showSettingView {
-    [YGViewDisplayer popupBottom:self.settingView setupBlock:^(YGViewDisplayOptions * _Nonnull options) {
-        options.screenInteraction = YGViewDisplayOptionsUserInteractionDismiss;
-        options.safeArea = YGViewDisplayOptionsSafeAreaOverridden;
-        options.backgroundColor = [UIColor clearColor];
-        options.screenBackgroundColor = [UIColor colorWithWhite:0 alpha:0.5];
-    }];
-}
-
-- (void)dismissSettingView {
-    [YGViewDisplayer dismiss:self.settingView completionHandler:^{}];
 }
 
 // Play song locally and update UI
@@ -1404,7 +1463,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - MVViewDelegate
-
 - (NSTimeInterval)ktvMVViewMusicTotalTime {
     NSTimeInterval time = [_rtcMediaPlayer getDuration];
     NSTimeInterval real = time / 1000;
@@ -1772,7 +1830,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - VLKTVSettingViewDelegate
-
 - (void)settingViewSettingChanged:(VLKTVSettingModel *)setting
               valueDidChangedType:(VLKTVValueDidChangedType)type {
     if (type == VLKTVValueDidChangedTypeEar) { // 耳返设置
@@ -2026,9 +2083,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark -- 房间麦位点击事件(上麦)
-- (void)seatItemClickAction:(VLRoomSeatModel *)model withIndex:(NSInteger)seatIndex{
-    [self requestOnSeatWithIndex:seatIndex];
-}
 
 - (void)requestOnSeatWithIndex:(NSInteger)index {
     
@@ -2081,19 +2135,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             [weakSelf bottomSetAudioMute:0];
         });
     }];
-}
-
-//房主让某人下线
-- (void)roomMasterMakePersonDropOnLineWithIndex:(NSInteger)seatIndex
-                                   withDropType:(VLRoomSeatDropType)type{
-    VLRoomSeatModel *seatModel = self.seatsArray[seatIndex];
-//    if (self.selSongsArray.count > 0) {
-//        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-//        if ([selSongModel.userNo isEqualToString:seatModel.userNo]) {   //当前点的歌
-//            return;
-//        }
-//    }
-    [self popDropLineViewWithSeatModel:seatModel];
 }
 
 #pragma mark --
@@ -2292,28 +2333,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - Lazy
-- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
-    if (!_rtcMediaPlayer) {
-//        _rtcMediaPlayer = [self.RTCkit createMediaPlayerWithDelegate:self];
-        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
-        // 调节本地播放音量。0-100
-         [_rtcMediaPlayer adjustPlayoutVolume:200];
-//         调节远端用户听到的音量。0-400
-         [_rtcMediaPlayer adjustPublishSignalVolume:200];
-    }
-    return _rtcMediaPlayer;
-}
-
-- (VLKTVSettingView *)settingView {
-    if (!_settingView) {
-        _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
-        _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
-        [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
-        _settingView.delegate = self;
-    }
-    return _settingView;
-}
-
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
     
@@ -2349,85 +2368,4 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         });
     }
 }
-
-#pragma mark - Seperate media player channel control
-
-- (AgoraRtcConnection *)enableMediaChannel:(BOOL)doPublish {
-    AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
-    [option setClientRoleType:AgoraClientRoleBroadcaster];
-    [option setPublishCameraTrack:[AgoraRtcBoolOptional of:NO]];
-    [option setPublishCustomAudioTrack:[AgoraRtcBoolOptional of:NO]];
-    [option setEnableAudioRecordingOrPlayout:[AgoraRtcBoolOptional of:NO]];
-    [option setAutoSubscribeAudio:[AgoraRtcBoolOptional of:NO]];
-
-    [option setPublishMicrophoneTrack:[AgoraRtcBoolOptional of:NO]];
-
-    [option setAutoSubscribeVideo:[AgoraRtcBoolOptional of:NO]];
-
-    [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
-    [option setPublishMediaPlayerAudioTrack:[AgoraRtcBoolOptional of:doPublish]];
-    
-    AgoraRtcConnection *connection = [AgoraRtcConnection new];
-    connection.channelId = self.roomModel.roomNo;
-    connection.localUid = [VLGlobalHelper getAgoraPlayerUserId:VLUserCenter.user.id];
-
-    VLLog(@"Agora - Join channelex with token: %@, userid: %lu for channel: %@ for mediaplayer id: %d",
-          VLUserCenter.user.agoraPlayerRTCToken,
-          connection.localUid,
-          connection.channelId,
-          [self.rtcMediaPlayer getMediaPlayerId]);
-    
-    int ret  = [self.RTCkit joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken
-                                      connection:connection
-                                        delegate:self
-                                    mediaOptions:option
-                                     joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - Join channel ex succ");
-    }];
-    
-    if(ret == 0) {
-        VLLog(@"Agora - Join media player connection succ");
-        return connection;
-    }
-    else {
-        VLLog(@"Agora - Join media player connection failed");
-        return nil;
-    }
-}
-
-- (BOOL)disableMediaChannel {
-    if(self.mediaPlayerConnection == nil) {
-        return YES;
-    }
-    
-    int ret = [self.RTCkit leaveChannelEx:self.mediaPlayerConnection
-                        leaveChannelBlock:^(AgoraChannelStats* stat) {
-        
-    }];
-    
-    if(ret == 0) {
-        self.mediaPlayerConnection = nil;
-        VLLog(@"Agora - Leave media channel succ");
-        return YES;
-    }
-    else {
-        VLLog(@"Agora - Leave media channel failed");
-        return NO;
-    }
-}
-
-- (void)updateRemoteUserMuteStatus:(NSString *)userId
-                            doMute:(BOOL)doMute {
-    VLLog(@"Agora - updating UID: %@ to %d", userId, doMute);
-    [self.RTCkit muteRemoteAudioStream:[VLGlobalHelper getAgoraPlayerUserId:userId]
-                                  mute:doMute];
-}
-
-- (void)resetPlayer
-{
-    VLLog(@"Agora - updating unmute all user");
-    self.mutedRemoteUserId = nil;
-    [self.RTCkit muteAllRemoteAudioStreams:NO];
-}
-
 @end
