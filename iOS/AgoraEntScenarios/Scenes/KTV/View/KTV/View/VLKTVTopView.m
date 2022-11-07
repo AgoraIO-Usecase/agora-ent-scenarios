@@ -36,7 +36,7 @@
     
     VLHotSpotBtn *closeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(SCREEN_WIDTH-27-20, logoImgView.top, 20, 20)];
     [closeBtn setImage:[UIImage sceneImageWithName:@"ktv_close_icon"] forState:UIControlStateNormal];
-    [closeBtn addTarget:self action:@selector(closeBtnEvent) forControlEvents:UIControlEventTouchUpInside];
+    [closeBtn addTarget:self action:@selector(closeBtnEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:closeBtn];
     
     self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(logoImgView.right+5, logoImgView.centerY-11, 120, 22)];
@@ -60,9 +60,9 @@
 }
 
 #pragma mark --Event
-- (void)closeBtnEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVTopViewCloseBtnTapped)]) {
-        [self.delegate onVLKTVTopViewCloseBtnTapped];
+- (void)closeBtnEvent:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVTopView:closeBtnTapped:)]) {
+        [self.delegate onVLKTVTopView:self closeBtnTapped:sender];
     }
 }
 
