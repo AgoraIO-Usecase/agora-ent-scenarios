@@ -74,6 +74,8 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.id integerValue] == [VLUserCenter.user.id integerValue]) {
+            //is self
+            //TODO
             self.isSelfMuted = info.isSelfMuted;
             self.isVideoMuted = info.isVideoMuted;
 
@@ -89,83 +91,105 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
             else{
                 [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
             }
-            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
-                [self.delegate bottomSetAudioMute:info.isSelfMuted];
-            }
-            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
-                [self.delegate bottomSetVideoMute:info.isVideoMuted];
-            }
+//            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
+//                [self.delegate bottomSetAudioMute:info.isSelfMuted];
+//            }
+//            if (self.delegate && [self.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
+//                [self.delegate bottomSetVideoMute:info.isVideoMuted];
+//            }
             break;
         }
     }
 }
 
 - (void)bottomBtnClickEvent:(VLHotSpotBtn *)sender {
-    VL(weakSelf);
-    if (sender.tag == VLKTVBottomBtnClickTypeAudio) {
-        [[AppContext ktvServiceImp] muteWithMuteStatus:self.isSelfMuted == 1 ? NO : YES
-                                            completion:^(NSError * error) {
-            if (error != nil) {
-                return;
-            }
-            
-            if (weakSelf.isSelfMuted == 1) {
-                weakSelf.isSelfMuted = 0;
-            }
-            else{
-                weakSelf.isSelfMuted = 1;
-            }
-            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomAudionBtnAction:)]) {
-                [weakSelf.delegate bottomAudionBtnAction:weakSelf.isSelfMuted];
-            }
-            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
-                [weakSelf.delegate bottomSetAudioMute:weakSelf.isSelfMuted];
-            }
-
-            if (weakSelf.isSelfMuted == 0){
-                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
-            }
-            else{
-                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
-            }
-        }];
-    }else if (sender.tag == VLKTVBottomBtnClickTypeVideo){
-        [[AppContext ktvServiceImp] openVideoStatusWithStatus:self.isVideoMuted == 0 ? YES : NO
-                                                   completion:^(NSError * error) {
-            if (error != nil) {
-                return;
-            }
-            
-            if (weakSelf.isVideoMuted == 1) {
-                weakSelf.isVideoMuted = 0;
-            }
-            else{
-                weakSelf.isVideoMuted = 1;
-            }
-            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
-                [weakSelf.delegate bottomSetVideoMute:self.isVideoMuted];
-            }
-            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomVideoBtnAction:)]) {
-                [weakSelf.delegate bottomVideoBtnAction:self.isVideoMuted];
-            }
-            if (weakSelf.isVideoMuted == 1) {
-                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
-            }
-            else{
-                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
-            }
-        }];
-    }else{
-        if (self.delegate && [self.delegate respondsToSelector:@selector(bottomBtnsClickAction: withSender:)]) {
-            [self.delegate bottomBtnsClickAction:sender.tag withSender:sender];
-        }
+//    VL(weakSelf);
+//    if (sender.tag == VLKTVBottomBtnClickTypeAudio) {
+//        [[AppContext ktvServiceImp] muteWithMuteStatus:self.isSelfMuted == 1 ? NO : YES
+//                                            completion:^(NSError * error) {
+//            if (error != nil) {
+//                return;
+//            }
+//
+//            if (weakSelf.isSelfMuted == 1) {
+//                weakSelf.isSelfMuted = 0;
+//            }
+//            else{
+//                weakSelf.isSelfMuted = 1;
+//            }
+//            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomAudionBtnAction:)]) {
+//                [weakSelf.delegate bottomAudionBtnAction:weakSelf.isSelfMuted];
+//            }
+//            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomSetAudioMute:)]) {
+//                [weakSelf.delegate bottomSetAudioMute:weakSelf.isSelfMuted];
+//            }
+//
+//            if (weakSelf.isSelfMuted == 0){
+//                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
+//            }
+//            else{
+//                [weakSelf.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
+//            }
+//        }];
+//    }else if (sender.tag == VLKTVBottomBtnClickTypeVideo){
+//        [[AppContext ktvServiceImp] openVideoStatusWithStatus:self.isVideoMuted == 0 ? YES : NO
+//                                                   completion:^(NSError * error) {
+//            if (error != nil) {
+//                return;
+//            }
+//
+//            if (weakSelf.isVideoMuted == 1) {
+//                weakSelf.isVideoMuted = 0;
+//            }
+//            else{
+//                weakSelf.isVideoMuted = 1;
+//            }
+//            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomSetVideoMute:)]) {
+//                [weakSelf.delegate bottomSetVideoMute:self.isVideoMuted];
+//            }
+//            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bottomVideoBtnAction:)]) {
+//                [weakSelf.delegate bottomVideoBtnAction:self.isVideoMuted];
+//            }
+//            if (weakSelf.isVideoMuted == 1) {
+//                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
+//            }
+//            else{
+//                [weakSelf.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+//            }
+//        }];
+//    }else{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVBottomView:btnTapped:withValues:)]) {
+        [self.delegate onVLKTVBottomView:self btnTapped:sender withValues:sender.tag];
     }
+//    }
     
 }
 
-- (bool)isAudioMute
+//- (bool)isAudioMute
+//{
+//    return (self.isSelfMuted == 1 ? YES : NO);
+//}
+
+- (void)updateAudioBtn:(BOOL)audioMuted
 {
-    return (self.isSelfMuted == 1 ? YES : NO);
+    self.isSelfMuted = audioMuted;
+    if (!audioMuted) {
+        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
+    }
+    else{
+        [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
+    }
+}
+
+- (void)updateVideoBtn:(BOOL)videoMuted
+{
+    self.isVideoMuted = videoMuted;
+    if (!videoMuted) {
+        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
+    }
+    else{
+        [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_muteIcon"] forState:UIControlStateNormal];
+    }
 }
 
 - (void)resetBtnStatus
