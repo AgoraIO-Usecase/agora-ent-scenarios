@@ -106,7 +106,9 @@ class NetworkManager {
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token006/generate", params: params, success: { response in
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token006/generate",
+                                          params: params,
+                                          success: { response in
             let data = response["data"] as? [String: String]
             let token = data?["token"]
             KeyCenter.Token = token
@@ -116,6 +118,55 @@ class NetworkManager {
         }, failure: { error in
             print(error)
             success(nil)
+            ToastView.hidden()
+        })
+    }
+    
+    
+    /// generator easemob im token & uid
+    /// - Parameters:
+    ///   - channelName: <#channelName description#>
+    ///   - nickName: <#nickName description#>
+    ///   - password: <#password description#>
+    ///   - uid: <#uid description#>
+    ///   - success: success description {roomid, uid}
+    func generateIMConfig(channelName: String,
+                          nickName: String,
+                          password: String,
+                          uid: String,
+                          success: @escaping (String?, String?) -> Void) {
+        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
+            success(nil, nil)
+            return
+        }
+        let chatParams = [
+            "name": channelName,
+            "description": "test",
+            "owner": uid,
+        ]
+        let userParams = [
+            "username": uid,
+            "password": password,
+            "nickname": nickName,
+        ]
+        let params = ["appId": KeyCenter.AppId,
+                      "chat": chatParams,
+                      "src": "iOS",
+                      "traceId": NSString.withUUID().md5,
+                      "user": userParams] as [String: Any]
+        ToastView.showWait(text: "loading...", view: nil)
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
+                                          params: params,
+                                          success: { response in
+            let data = response["data"] as? [String: String]
+            let roomId = data?["chatId"]
+            let userName = data?["userName"]
+            print(response)
+            success(roomId, userName)
+            ToastView.hidden()
+        }, failure: { error in
+            print(error)
+            success(nil, nil)
             ToastView.hidden()
         })
     }
@@ -175,7 +226,8 @@ class NetworkManager {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         if method == .POST {
-            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [], options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
+            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [],
+                                                           options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
         }
         let curl = request.cURL(pretty: true)
         debugPrint("curl == \(curl)")
