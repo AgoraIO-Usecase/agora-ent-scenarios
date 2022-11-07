@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.api.ApiManager
+import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 
@@ -23,6 +25,8 @@ class KTVSyncManagerServiceImp(
     private var syncUtilsInited = false
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    private var mSceneReference : SceneReference? = null
 
 
     // ========= 房间相关 =====================
@@ -76,7 +80,7 @@ class KTVSyncManagerServiceImp(
         initScene {
             Sync.Instance().joinScene(inputModel.roomNo, object: Sync.JoinSceneCallback{
                 override fun onSuccess(sceneReference: SceneReference?) {
-
+                    mSceneReference = sceneReference
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -150,11 +154,34 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVRemoveSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        //SyncManager collectionKey:SYNC_MANAGER_CHOOSE_SONG_INFO
+        mSceneReference?.collection("choose_song")?.delete(inputModel.objectId, object: Sync.Callback{
+            override fun onSuccess() {
+                runOnMainThread { completion.invoke(null) }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                runOnMainThread { completion.invoke(exception) }
+            }
+        })
     }
 
     override fun getChoosedSongsListWithCompletion(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
-        TODO("Not yet implemented")
+        mSceneReference?.collection("choose_song")?.get(object: Sync.DataListCallback{
+            override fun onSuccess(result: MutableList<IObject>?) {
+                val ret = ArrayList<VLRoomSelSongModel>()
+                result?.forEach {
+                    val obj = it.toObject(VLRoomSelSongModel::class.java)
+                    obj.objectId = it.id
+                    ret.add(obj)
+                }
+                runOnMainThread { completion.invoke(null, ret) }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                runOnMainThread { completion.invoke(exception, null) }
+            }
+        })
     }
 
     override fun switchSongWithInput(
@@ -168,14 +195,47 @@ class KTVSyncManagerServiceImp(
         inputModel: VLRoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        var param: HashMap<String, Object> = HashMap<String, Object>()
+        //TODO
+        mSceneReference?.collection("choose_song")?.update(inputModel.objectId, param, object: Sync.Callback{
+            override fun onSuccess() {
+                runOnMainThread { completion.invoke(null) }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                runOnMainThread { completion.invoke(exception) }
+            }
+        })
     }
 
     override fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        var songInfo = VLRoomSelSongModel()
+        songInfo.imageUrl = inputModel.imageUrl
+        songInfo.isChorus = inputModel.isChorus
+        songInfo.singer = inputModel.singer
+        songInfo.songName = inputModel.songName
+        songInfo.songNo = inputModel.songNo
+        songInfo.songUrl = inputModel.songUrl
+        songInfo.userNo = UserManager.getInstance().getUser().userNo
+        songInfo.userId = UserManager.getInstance().getUser().id.toString();
+        songInfo.name = UserManager.getInstance().getUser().name
+
+        //TODO SetSort
+        var param: HashMap<String, Object> = HashMap<String, Object>()
+        //TODO
+        //SyncManager collectionKey:SYNC_MANAGER_CHOOSE_SONG_INFO
+        mSceneReference?.collection("choose_song")?.add(param, object: Sync.DataItemCallback{
+            override fun onSuccess(result: IObject) {
+                runOnMainThread { completion.invoke(null) }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                runOnMainThread { completion.invoke(exception) }
+            }
+        })
     }
 
     override fun makeSongTopWithInput(
