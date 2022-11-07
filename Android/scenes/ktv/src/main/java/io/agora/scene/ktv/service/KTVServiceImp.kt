@@ -14,6 +14,7 @@ import io.agora.scene.base.data.model.AgoraRoom
 import io.agora.scene.base.event.ReceivedMessageEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.ktv.dialog.RoomChooseSongDialog
 import io.agora.scene.ktv.manager.RTMManager
 import io.agora.scene.ktv.manager.RoomManager
 import io.agora.scene.ktv.manager.bean.RTMMessageBean
@@ -689,7 +690,23 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun removeSongWithInput(
         inputModel: KTVRemoveSongInputModel, completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        ApiManager.getInstance().requestDeleteSong(
+            inputModel.sort.toInt(), inputModel.songNo, UserManager.getInstance().user.userNo, roomNo)
+            .compose(applyApiSchedulers()).subscribe(
+                object : ApiSubscriber<BaseResponse<String?>?>() {
+                    override fun onSubscribe(d: Disposable) {
+                    }
+
+                    override fun onSuccess(data: BaseResponse<String?>?) {
+                        Log.d("cwtsw", "删除歌曲");
+                        completion.invoke(null)
+                    }
+
+                    override fun onFailure(t: ApiException?) {
+                        completion.invoke(t)
+                    }
+                }
+            );
     }
 
     override fun getSongDetailWithInput(
@@ -708,13 +725,55 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        val isChorus : Int = if (inputModel.isChorus) 1 else 0
+        ApiManager.getInstance().requestChooseSong(inputModel.imageUrl, isChorus, 0, inputModel.singer, inputModel.songName,
+                inputModel.songNo, inputModel.imageUrl, UserManager.getInstance().user.userNo, roomNo)
+            .compose(applyApiSchedulers()).subscribe(
+                object : ApiSubscriber<BaseResponse<String?>?>() {
+                    override fun onSubscribe(d: Disposable) {
+                    }
+
+                    override fun onSuccess(data: BaseResponse<String?>?) {
+                        val bean = RTMMessageBean();
+                        bean.messageType = KtvConstant.MESSAGE_ROOM_TYPE_CHOOSE_SONG;
+                        bean.roomNo = roomNo;
+                        RTMManager.getInstance().sendMessage(gson.toJson(bean))
+
+                        completion.invoke(null)
+                    }
+
+                    override fun onFailure(t: ApiException?) {
+                        completion.invoke(t)
+                    }
+                }
+            );
     }
 
     override fun makeSongTopWithInput(
         inputModel: KTVMakeSongTopInputModel, completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        ApiManager.getInstance().requestTopSong(inputModel.sort.toInt(), inputModel.songNo, UserManager.getInstance().user.userNo, roomNo)
+        .compose(applyApiSchedulers()).subscribe(
+            object : ApiSubscriber<BaseResponse<String?>?>() {
+                override fun onSubscribe(d: Disposable) {
+                }
+
+                override fun onSuccess(data: BaseResponse<String?>?) {
+                    val bean = RTMMessageBean();
+                    bean.headUrl = UserManager.getInstance().getUser().headUrl;
+                    bean.messageType = KtvConstant.MESSAGE_ROOM_TYPE_ON_SEAT;
+                    bean.userNo = UserManager.getInstance().getUser().userNo;
+                    bean.name = UserManager.getInstance().getUser().name;
+                    RTMManager.getInstance().sendMessage(gson.toJson(bean))
+
+                    completion.invoke(null)
+                }
+
+                override fun onFailure(t: ApiException?) {
+                    completion.invoke(t)
+                }
+            }
+        );
     }
 
 
