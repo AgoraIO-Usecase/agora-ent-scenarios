@@ -28,6 +28,11 @@ class KTVSyncManagerServiceImp(
 
     private var mSceneReference : SceneReference? = null
 
+    private var selSongModel: VLRoomSelSongModel? = null
+
+    private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit)? =
+        null
+
 
     // ========= 房间相关 =====================
 
@@ -212,16 +217,24 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVChooseSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        var songInfo = VLRoomSelSongModel()
-        songInfo.imageUrl = inputModel.imageUrl
-        songInfo.isChorus = inputModel.isChorus
-        songInfo.singer = inputModel.singer
-        songInfo.songName = inputModel.songName
-        songInfo.songNo = inputModel.songNo
-        songInfo.songUrl = inputModel.songUrl
-        songInfo.userNo = UserManager.getInstance().getUser().userNo
-        songInfo.userId = UserManager.getInstance().getUser().id.toString();
-        songInfo.name = UserManager.getInstance().getUser().name
+        var songInfo = VLRoomSelSongModel(
+            "",
+            inputModel.imageUrl,
+            inputModel.isChorus,
+            0,
+            inputModel.singer,
+            "",
+            inputModel.songNo,
+            "",
+            "",
+            0,
+            0,
+            UserManager.getInstance().getUser().userNo,
+            UserManager.getInstance().getUser().id.toString(),
+            UserManager.getInstance().getUser().name,
+            0.0,
+            false
+        )
 
         //TODO SetSort
         var param: HashMap<String, Object> = HashMap<String, Object>()
@@ -256,8 +269,8 @@ class KTVSyncManagerServiceImp(
         TODO("Not yet implemented")
     }
 
-    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel) -> Unit) {
-        TODO("Not yet implemented")
+    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit) {
+        chooseSongSubscriber = changedBlock
     }
 
 
