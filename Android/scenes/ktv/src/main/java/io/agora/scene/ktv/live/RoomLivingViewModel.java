@@ -256,7 +256,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void exitRoom() {
         ktvServiceProtocol.leaveRoomWithCompletion(e -> {
             if (e == null) {
-                roomDeleteLiveData.postValue(true);
+                roomDeleteLiveData.postValue(false);
             } else {
                 ToastUtils.showToast(e.getMessage());
             }
@@ -297,10 +297,13 @@ public class RoomLivingViewModel extends ViewModel {
         if (seatsArray != null) {
             for (VLRoomSeatModel vlRoomSeatModel : seatsArray) {
                 if(vlRoomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)){
-                    seatLocalLiveData.postValue(vlRoomSeatModel);
+                    seatLocalLiveData.setValue(vlRoomSeatModel);
                     break;
                 }
             }
+        }
+        if (seatLocalLiveData.getValue() == null) {
+            seatLocalLiveData.setValue(null);
         }
 
         ktvServiceProtocol.subscribeSeatListWithChanged((ktvSubscribe, vlRoomSeatModel) -> {
