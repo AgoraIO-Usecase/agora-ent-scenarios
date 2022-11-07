@@ -21,7 +21,6 @@ import io.reactivex.disposables.Disposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.concurrent.CountDownLatch
 
 /**
  * 使用Restful API和RTM进行数据交互
@@ -142,20 +141,10 @@ class KTVServiceImp : KTVServiceProtocol {
         inputModel: KTVJoinRoomInputModel,
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     ) {
-        if (roomNo != null) {
-            val letchCount = CountDownLatch(1)
-            leaveRoomWithCompletion {
-                if (it != null) {
-                    roomNo = null
-                }
-                letchCount.countDown()
-            }
-            letchCount.await();
-            if(roomNo != null){
-                completion.invoke(RuntimeException("Last room exit! $roomNo"), null)
-                return
-            }
-        }
+//        if (roomNo != null) {
+//            completion.invoke(RuntimeException("Last room exit success! $roomNo"), null)
+//            return
+//        }
         roomNo = inputModel.roomNo;
         ApiManager.getInstance().requestGetRoomInfo(inputModel.roomNo, inputModel.password)
             .compose(applyApiSchedulers())
@@ -192,8 +181,13 @@ class KTVServiceImp : KTVServiceProtocol {
                     // login RTM to get real message
                     KtvConstant.RTM_TOKEN = data.data!!.agoraRTMToken
                     RTMManager.getInstance().doLoginRTM()
-                    EventBus.getDefault().register(this@KTVServiceImp) // receive rtm messsage
                     RTMManager.getInstance().joinRTMRoom(roomNo)
+                    try {
+                        EventBus.getDefault().register(this@KTVServiceImp)
+                    } catch (e: Exception) {
+                        // do nothing
+                    }
+
 
                     data.data!!.apply {
                         completion.invoke(
