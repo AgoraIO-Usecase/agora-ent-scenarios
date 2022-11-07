@@ -409,6 +409,9 @@
 		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
 		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
 		DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */; };
+		DDBF788C2918D5920001855B /* ShowServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF78892918D5920001855B /* ShowServiceModel.swift */; };
+		DDBF788D2918D5920001855B /* ShowSyncManagerServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */; };
+		DDBF788E2918D5920001855B /* ShowServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
@@ -968,6 +971,9 @@
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
 		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
+		DDBF78892918D5920001855B /* ShowServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowServiceModel.swift; sourceTree = "<group>"; };
+		DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSyncManagerServiceImp.swift; sourceTree = "<group>"; };
+		DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowServiceProtocol.swift; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -1310,9 +1316,9 @@
 		A8B5617F2910FB19004F34D1 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				DDBF78882918D5920001855B /* Service */,
 				A8B5618729111022004F34D1 /* Common */,
 				A8B561902912080C004F34D1 /* Utils */,
-				A8B561822910FB40004F34D1 /* Model */,
 				A8B561812910FB35004F34D1 /* View */,
 				A8B561802910FB2A004F34D1 /* Controller */,
 				A8B5618B29111258004F34D1 /* showResource.bundle */,
@@ -1338,13 +1344,6 @@
 				A8B561A429136BD7004F34D1 /* RoomList */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		A8B561822910FB40004F34D1 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		A8B5618729111022004F34D1 /* Common */ = {
@@ -2585,6 +2584,16 @@
 			path = ZQTCustomSwitch;
 			sourceTree = "<group>";
 		};
+		DDBF78882918D5920001855B /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				DDBF78892918D5920001855B /* ShowServiceModel.swift */,
+				DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */,
+				DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {
 			isa = PBXGroup;
 			children = (
@@ -2872,6 +2881,7 @@
 				DD84179C29090C520026B624 /* VLRoomPersonIteimCCell.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
 				05FFE705290F706C0024D22F /* VoiceRoomPopView.swift in Sources */,
+				DDBF788D2918D5920001855B /* ShowSyncManagerServiceImp.swift in Sources */,
 				DDA19A5F28FFE57A009D3E61 /* EKNotificationMessageView.swift in Sources */,
 				DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */,
 				05FFE70E290F706C0024D22F /* VoiceRoomAlertContainer.swift in Sources */,
@@ -2960,6 +2970,7 @@
 				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
 				0510B855290B799E0063E57A /* BaseNavigationView.swift in Sources */,
 				0510B854290B799E0063E57A /* VREmptyView.swift in Sources */,
+				DDBF788C2918D5920001855B /* ShowServiceModel.swift in Sources */,
 				A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */,
 				DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
@@ -3029,6 +3040,7 @@
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
 				057DD9F1290B9495001329E6 /* UIColor+extension.swift in Sources */,
 				05FFE706290F706C0024D22F /* VoiceRoomGiftView.swift in Sources */,
+				DDBF788E2918D5920001855B /* ShowServiceProtocol.swift in Sources */,
 				05FFE723290F73670024D22F /* VoiceRoomViewController+ChatBar.swift in Sources */,
 				05FFE70A290F706C0024D22F /* VMAudioSettingView.swift in Sources */,
 				05FFE730290F74560024D22F /* AgoraChatRoom3DMoveUserView.swift in Sources */,
@@ -3349,7 +3361,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3388,7 +3400,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
