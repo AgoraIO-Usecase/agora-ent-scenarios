@@ -340,7 +340,7 @@ public class RoomLivingViewModel extends ViewModel {
                     value.add(index, vlRoomSeatModel);
                     seatListLiveData.postValue(value);
 
-                    if(vlRoomSeatModel.getUserNo().equals(UserManager.getInstance().getUser())){
+                    if(vlRoomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)){
                         seatLocalLiveData.postValue(vlRoomSeatModel);
                     }
                 }
@@ -361,10 +361,12 @@ public class RoomLivingViewModel extends ViewModel {
                 }
                 seatListLiveData.postValue(value);
 
+                if(vlRoomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)){
+                    seatLocalLiveData.postValue(null);
+                }
+
 
                 if (vlRoomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                    // myself
-                    seatLocalLiveData.postValue(vlRoomSeatModel);
 
                     if (mMusicPlayer != null) {
                         mMusicPlayer.switchRole(Constants.CLIENT_ROLE_AUDIENCE);
@@ -417,7 +419,9 @@ public class RoomLivingViewModel extends ViewModel {
                     // success
                     RTCManager.getInstance().getRtcEngine()
                             .setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
-                    mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
+                    if(mMusicPlayer != null){
+                        mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
+                    }
                 } else {
                     // failure
                     ToastUtils.showToast(e.getMessage());
