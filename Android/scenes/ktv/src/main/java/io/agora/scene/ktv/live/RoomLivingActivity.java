@@ -107,7 +107,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         VLRoomSeatModel agoraMember = mRoomSpeakerAdapter.dataList.get(position);
                         if (agoraMember == null) {
                             VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
-                            if (seatLocal == null || seatLocal.getOnSeat() <= 0) {
+                            if (seatLocal == null || seatLocal.getOnSeat() < 0) {
                                 roomLivingViewModel.haveSeat(position);
                                 requestRecordPermission();
                             }
@@ -248,13 +248,19 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
-            boolean isOnSeat = seatModel != null;
+            boolean isOnSeat = seatModel != null && seatModel.getOnSeat() >= 0;
             getBinding().groupBottomView.setVisibility(isOnSeat ? View.VISIBLE : View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(isOnSeat ? View.GONE : View.VISIBLE);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
             for (VLRoomSeatModel seatModel : seatModels) {
-                onMemberJoin(seatModel);
+                VLRoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getOnSeat());
+                if(oSeatModel == null
+                        || oSeatModel.isSelfMuted() != seatModel.isSelfMuted()
+                        || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()){
+                    mRoomSpeakerAdapter.dataList.set(seatModel.getOnSeat(), seatModel);
+                    mRoomSpeakerAdapter.notifyItemChanged(seatModel.getOnSeat());
+                }
             }
             for (VLRoomSeatModel seatModel : mRoomSpeakerAdapter.dataList) {
                 if (seatModel == null) {
@@ -526,17 +532,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
 
-    private void onVideoStatusChange(VLRoomSeatModel member) {
-        for (int i = 0; i < mRoomSpeakerAdapter.dataList.size(); i++) {
-            VLRoomSeatModel currentMember = mRoomSpeakerAdapter.dataList.get(i);
-            if (currentMember != null && currentMember.getUserNo().equals(member.getUserNo())) {
-                mRoomSpeakerAdapter.dataList.set(i, member);
-                mRoomSpeakerAdapter.notifyItemChanged(i);
-                break;
-            }
-        }
-    }
-
     public void closeMenuDialog() {
         setDarkStatusIcon(isBlackDarkStatus());
         moreDialog.dismiss();
@@ -616,20 +611,19 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         return false;
     }
 
-    private boolean isOpenSelfVideo = false;
+    private Runnable toggleVideoRun;
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        isOpenSelfVideo = true;
+        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen ? 1: 0);
         requestCameraPermission();
     }
 
     @Override
     public void getPermissions() {
-        if (isOpenSelfVideo) {
-            // mRoomSpeakerAdapter.notifyItemChanged(RoomManager.mMine.onSeat);
-            // roomLivingViewModel.toggleSelfVideo(RoomManager.mMine.isVideoMuted);
-            isOpenSelfVideo = false;
+        if (toggleVideoRun != null) {
+            toggleVideoRun.run();
+            toggleVideoRun = null;
         }
         VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
         if (seatLocal != null && seatLocal.isSelfMuted() == 0) {
@@ -646,13 +640,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         VLRoomSeatModel temp = mRoomSpeakerAdapter.getItemData(member.getOnSeat());
         if (temp != null) {
             mRoomSpeakerAdapter.dataList.set(member.getOnSeat(), null);
-            mRoomSpeakerAdapter.notifyItemChanged(member.getOnSeat());
-        }
-    }
-
-    private void onMemberJoin(@NonNull VLRoomSeatModel member) {
-        if (mRoomSpeakerAdapter.getItemData(member.getOnSeat()) == null) {
-            mRoomSpeakerAdapter.dataList.set(member.getOnSeat(), member);
             mRoomSpeakerAdapter.notifyItemChanged(member.getOnSeat());
         }
     }
