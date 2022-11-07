@@ -12,16 +12,10 @@ typedef enum : NSUInteger {
     
 } VLRoomSeatDropType;
 #define viewTag 99999
-@class VLRoomSeatModel;
+@class VLRoomSeatModel, VLRoomPersonView;
 @protocol VLRoomPersonViewDelegate <NSObject>
 
-@optional
-
-- (void)seatItemClickAction:(VLRoomSeatModel *)model withIndex:(NSInteger)seatIndex;
-//下麦
-- (void)roomMasterMakePersonDropOnLineWithIndex:(NSInteger)seatIndex withDropType:(VLRoomSeatDropType)type;
-
-- (BOOL)ifMyCameraIsOpened;
+- (void)onVLRoomPersonView:(VLRoomPersonView*)view seatItemTappedWithModel:(VLRoomSeatModel *)model atIndex:(NSInteger)seatIndex;
 
 @end
 
