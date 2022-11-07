@@ -43,7 +43,7 @@ class ShowCreateLiveVC: UIViewController {
         
         let titleLabel = UILabel()
         view.addSubview(titleLabel)
-        titleLabel.text = "秀场直播".show_localized
+        titleLabel.text = "navi_title_show_live".show_localized
         titleLabel.textColor = .show_main_text
         titleLabel.font = .show_navi_title
         titleLabel.snp.makeConstraints { make in
@@ -124,6 +124,12 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickQualityBtnAction() {
         createView.hideBottomViews = true
+        let vc = ShowSelectQualityVC()
+        vc.modalPresentationStyle = .overCurrentContext
+        present(vc, animated: true)
+        vc.dismissed = { [weak self] in
+            self?.createView.hideBottomViews = false
+        }
     }
     
     func onClickStartBtnAction() {

@@ -17,7 +17,7 @@ class ShowRoomListVC: ShowBaseViewController {
     }
     
     override func configNavigationBar(_ navigationBar: UINavigationBar) {
-        setNaviTitleName("秀场直播".show_localized)
+        setNaviTitleName("navi_title_show_live".show_localized)
         setBackBtn()
     }
     

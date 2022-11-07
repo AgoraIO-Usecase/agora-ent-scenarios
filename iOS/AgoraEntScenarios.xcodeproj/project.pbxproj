@@ -129,6 +129,9 @@
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD1F2918C87C00A41D8D /* UIView+Show.swift */; };
+		A845AD222918D24600A41D8D /* ShowSelectQualityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */; };
+		A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -561,6 +564,9 @@
 		05FFE73F290F752C0024D22F /* VMSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMSoundView.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A845AD1F2918C87C00A41D8D /* UIView+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Show.swift"; sourceTree = "<group>"; };
+		A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityVC.swift; sourceTree = "<group>"; };
+		A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityCell.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1292,25 +1298,20 @@
 			isa = PBXGroup;
 			children = (
 				A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */,
+				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
+				A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */,
 			);
 			path = CreateLive;
 			sourceTree = "<group>";
 		};
-		A88D142F2914C13500F5DF6A /* Beauty */ = {
-			isa = PBXGroup;
-			children = (
-				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
-			);
-			path = Beauty;
-			sourceTree = "<group>";
-		};
-		A88D14302914C13E00F5DF6A /* Beauty */ = {
+		A88D14302914C13E00F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
 				A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */,
 				A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */,
+				A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */,
 			);
-			path = Beauty;
+			path = CreateLive;
 			sourceTree = "<group>";
 		};
 		A8B5617F2910FB19004F34D1 /* Show */ = {
@@ -1329,7 +1330,7 @@
 		A8B561802910FB2A004F34D1 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				A88D14302914C13E00F5DF6A /* Beauty */,
+				A88D14302914C13E00F5DF6A /* CreateLive */,
 				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
 				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
 			);
@@ -1339,7 +1340,6 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				A88D142F2914C13500F5DF6A /* Beauty */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
 			);
@@ -1377,6 +1377,7 @@
 				A8B561942912486C004F34D1 /* UIColor+Show.swift */,
 				A8B5619829125125004F34D1 /* UIFont+Show.swift */,
 				A88D14292914B0A300F5DF6A /* NSString+Show.swift */,
+				A845AD1F2918C87C00A41D8D /* UIView+Show.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2877,6 +2878,7 @@
 				DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84179929090C520026B624 /* VLBelcantoModel.m in Sources */,
+				A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */,
 				05FFE734290F74560024D22F /* AgoraChatRoom3DRtcView.swift in Sources */,
 				DD84179C29090C520026B624 /* VLRoomPersonIteimCCell.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
@@ -2893,6 +2895,7 @@
 				DD84179E29090C520026B624 /* VLChoosedSongTCell.m in Sources */,
 				DD8417AC29090C520026B624 /* VLPopMoreSelView.m in Sources */,
 				DD84177E29090C520026B624 /* VLHomeView.m in Sources */,
+				A845AD222918D24600A41D8D /* ShowSelectQualityVC.swift in Sources */,
 				DDA199E428FFE579009D3E61 /* VLDeviceUtils.m in Sources */,
 				0510B838290B77330063E57A /* VRRoomListCell.swift in Sources */,
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
@@ -3161,6 +3164,7 @@
 				DDA19A6528FFE57A009D3E61 /* EKAccessoryNoteMessageView.swift in Sources */,
 				05FFE704290F706C0024D22F /* VoiceRoomInviteCell.swift in Sources */,
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
+				A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
 				A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */,
