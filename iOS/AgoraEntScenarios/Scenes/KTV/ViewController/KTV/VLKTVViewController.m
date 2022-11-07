@@ -805,6 +805,107 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     };
 }
 
+#pragma mark - action utils / business
+- (void)muteLocalAudio:(BOOL)mute {
+    if (mute) {
+        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
+        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:NO];
+        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
+        [self.RTCkit updateChannelWithMediaOptions:option];
+        if(self.isEarOn) {
+            [self.RTCkit enableInEarMonitoring:NO];
+        }
+        self.isNowMicMuted = YES;
+    }
+    else{
+        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
+        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:YES];
+        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
+        [self.RTCkit updateChannelWithMediaOptions:option];
+        if(self.isEarOn) {
+            [self.RTCkit enableInEarMonitoring:YES];
+        }
+        self.isNowMicMuted = NO;
+    }
+    [self.bottomView updateAudioBtn:self.isNowMicMuted];
+    [self.MVView validateSingType];
+}
+
+- (void)muteLocalVideo:(BOOL)mute {
+    if (!mute) {
+        [self.RTCkit enableLocalVideo:YES];
+        [self.RTCkit muteLocalVideoStream:NO];
+        _isNowCameraMuted = NO;
+    }
+    else{
+        [self.RTCkit enableLocalVideo:NO];
+        [self.RTCkit muteLocalVideoStream:YES];
+        _isNowCameraMuted = YES;
+    }
+    [self.bottomView updateVideoBtn:self.isNowCameraMuted];
+}
+
+- (void)toggleLocalAudio {
+    [self muteLocalAudio:!self.isNowMicMuted];
+}
+
+- (void)toggleLocalVideo {
+    [self muteLocalVideo:!self.isNowCameraMuted];
+}
+
+- (void)leaveMicSeat:(void (^)(void))completion {
+    BOOL ifOnSeat = NO;
+    NSInteger seatIndex = -1;
+    for (VLRoomSeatModel *model in self.seatsArray) {
+        if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
+            ifOnSeat = YES;
+            seatIndex = model.onSeat;
+        }
+    }
+    if (ifOnSeat) { //在麦位
+        KTVOutSeatInputModel* inputModel = [KTVOutSeatInputModel new];
+        inputModel.userNo = VLUserCenter.user.userNo;
+        inputModel.userId = VLUserCenter.user.id;
+        inputModel.userName = VLUserCenter.user.name;
+        inputModel.userHeadUrl = VLUserCenter.user.headUrl ? VLUserCenter.user.headUrl:@"";
+        inputModel.userOnSeat = seatIndex;
+        [[AppContext ktvServiceImp] outSeatWithInput:inputModel
+                                          completion:^(NSError * error) {
+            if (error.code == 20007) {
+                // 房间已关闭
+                [self popForceLeaveRoom];
+                return;
+            }
+            if (error != nil) {
+                return;
+            }
+
+            VLLog(@"发送下麦消息成功");
+            [VLUserCenter clearUserRoomInfo];
+            completion();
+        }];
+    }else{
+        completion();
+    }
+}
+
+- (void)leaveRoom {
+    VL(weakSelf);
+    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
+        if (error != nil) {
+            return;
+        }
+        
+        [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
+        [weakSelf destroyMediaPlayer];
+        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
+                [weakSelf.navigationController popToViewController:vc animated:YES];
+            }
+        }
+    }];
+}
+
 #pragma mark - rtc utils
 - (void)resetMicAndCameraStatus
 {
@@ -898,15 +999,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
 }
 
-
-- (void)enableMic
-{
-    AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-    option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:self.isNowMicMuted];
-    option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-    [self.RTCkit updateChannelWithMediaOptions:option];
-}
-
 - (void)leaveChannel {
     if ([[AppContext ktvServiceImp] respondsToSelector:@selector(leaveChannel)]) {
         [[AppContext ktvServiceImp] leaveChannel];
@@ -996,7 +1088,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark -- VLKTVTopViewDelegate
-- (void)onVLKTVTopViewCloseBtnTapped {
+- (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     //TODO
     if (VLUserCenter.user.ifMaster) { //自己是房主关闭房间
         [LEEAlert alert].config
@@ -1096,69 +1188,14 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-- (void)leaveMicSeat:(void (^)(void))completion {
-    BOOL ifOnSeat = NO;
-    NSInteger seatIndex = -1;
-    for (VLRoomSeatModel *model in self.seatsArray) {
-        if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
-            ifOnSeat = YES;
-            seatIndex = model.onSeat;
-        }
-    }
-    if (ifOnSeat) { //在麦位
-        KTVOutSeatInputModel* inputModel = [KTVOutSeatInputModel new];
-        inputModel.userNo = VLUserCenter.user.userNo;
-        inputModel.userId = VLUserCenter.user.id;
-        inputModel.userName = VLUserCenter.user.name;
-        inputModel.userHeadUrl = VLUserCenter.user.headUrl ? VLUserCenter.user.headUrl:@"";
-        inputModel.userOnSeat = seatIndex;
-        [[AppContext ktvServiceImp] outSeatWithInput:inputModel
-                                          completion:^(NSError * error) {
-            if (error.code == 20007) {
-                // 房间已关闭
-                [self popForceLeaveRoom];
-                return;
-            }
-            if (error != nil) {
-                return;
-            }
-
-            VLLog(@"发送下麦消息成功");
-            [VLUserCenter clearUserRoomInfo];
-            completion();
-        }];
-    }else{
-        completion();
-    }
-}
-
-- (void)leaveRoom {
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
-        [weakSelf destroyMediaPlayer];
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
-            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                [weakSelf.navigationController popToViewController:vc animated:YES];
-            }
-        }
-    }];
-}
-
 #pragma mark - VLPopMoreSelViewDelegate
-- (void)moreItemBtnAction:(VLKTVMoreBtnClickType)typeValue {
+- (void)onVLKTVMoreSelView:(VLPopMoreSelView *)view btnTapped:(id)sender withValue:(VLKTVMoreBtnClickType)typeValue {
     switch (typeValue) {
         case VLKTVMoreBtnClickTypeBelcanto:
             [self.popMoreView dismiss];
             [self popBelcantoView];
             break;
         case VLKTVMoreBtnClickTypeSound:
-//            [self.popMoreView dismiss];
-
             [self.popMoreView dismiss];
             [self popSetSoundEffectView];
             break;
@@ -1173,93 +1210,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - VLKTVBottomViewDelegate
-- (void)bottomSetAudioMute:(NSInteger)ifMute{
-    if (ifMute == 1) {
-        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:NO];
-        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-        [self.RTCkit updateChannelWithMediaOptions:option];
-        if(self.isEarOn) {
-            [self.RTCkit enableInEarMonitoring:NO];
-        }
-        self.isNowMicMuted = YES;
-    }
-    else{
-        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:YES];
-        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-        [self.RTCkit updateChannelWithMediaOptions:option];
-        if(self.isEarOn) {
-            [self.RTCkit enableInEarMonitoring:YES];
-        }
-        self.isNowMicMuted = NO;
-    }
-    [self.MVView validateSingType];
-}
-
-- (void)bottomSetVideoMute:(NSInteger)ifOpen{
-    if (ifOpen == 1) {
-        [self.RTCkit enableLocalVideo:YES];
-        [self.RTCkit muteLocalVideoStream:NO];
-        _isNowCameraMuted = NO;
-    }
-    else{
-        [self.RTCkit enableLocalVideo:NO];
-        [self.RTCkit muteLocalVideoStream:YES];
-        _isNowCameraMuted = YES;
-    }
-}
-
-- (void)bottomAudionBtnAction:(NSInteger)ifMute {
-    
-    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishMuteEventWithMuteStatus:completion:)]) {
-        [[AppContext ktvServiceImp] publishMuteEventWithMuteStatus: ifMute == 1 ? YES : NO
-                                                        completion:^(NSError * error) {
-            if (error != nil) {
-                return;
-            }
-            
-            VLRoomSeatModel *model = [VLRoomSeatModel new];
-            model.userNo = VLUserCenter.user.userNo;
-            model.isSelfMuted = ifMute;
-            for (VLRoomSeatModel *seatModel in self.seatsArray) {
-                if ([seatModel.userNo isEqualToString:model.userNo]) {
-                    seatModel.isSelfMuted = model.isSelfMuted;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.roomPersonView updateSeatsByModel:seatModel];
-                    });
-                    break;
-                }
-            }
-        }];
-    }
-}
-
-// 开启视频事件回调
-- (void)bottomVideoBtnAction:(NSInteger)ifOpen {
-    if (![[AppContext ktvServiceImp] respondsToSelector:@selector(publishVideoOpenEventWithOpenStatus:completion:)]) {
-        return;
-    }
-    [[AppContext ktvServiceImp] publishVideoOpenEventWithOpenStatus:ifOpen
-                                                         completion:^(NSError * error) {
-        if (error != nil) {
-            return;;
-        }
-        
-        for (VLRoomSeatModel *seatModel in self.seatsArray) {
-            if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
-                seatModel.isVideoMuted = ifOpen;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.roomPersonView updateSeatsByModel:seatModel];
-                });
-            }
-        }
-    }];
-}
-
-- (void)bottomBtnsClickAction:(VLKTVBottomBtnClickType)tagValue
-                   withSender:(nonnull VLHotSpotBtn *)sender{
-    switch (tagValue) {
+- (void)onVLKTVBottomView:(VLKTVBottomView *)view btnTapped:(id)sender withValues:(VLKTVBottomBtnClickType)typeValue {
+    switch (typeValue) {
         case VLKTVBottomBtnClickTypeMore:  //更多
 //            [self popSelMVBgView];
             [self popSelMoreView];
@@ -1270,37 +1222,52 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         case VLKTVBottomBtnClickTypeChoose:
             [self popUpChooseSongView:NO];
             break;
-            
+        case VLKTVBottomBtnClickTypeAudio:
+            [self toggleLocalAudio];
+            break;
+        case VLKTVBottomBtnClickTypeVideo:
+            [self toggleLocalVideo];
+            break;
         default:
             break;
     }
 }
 
 #pragma mark - VLRoomPersonViewDelegate
-- (BOOL)ifMyCameraIsOpened
-{
-    return self.isNowCameraMuted?NO:YES;
-}
-
-- (void)seatItemClickAction:(VLRoomSeatModel *)model withIndex:(NSInteger)seatIndex{
-    [self requestOnSeatWithIndex:seatIndex];
-}
-
-//房主让某人下线
-- (void)roomMasterMakePersonDropOnLineWithIndex:(NSInteger)seatIndex withDropType:(VLRoomSeatDropType)type{
-    VLRoomSeatModel *seatModel = self.seatsArray[seatIndex];
-//    if (self.selSongsArray.count > 0) {
-//        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-//        if ([selSongModel.userNo isEqualToString:seatModel.userNo]) {   //当前点的歌
-//            return;
-//        }
-//    }
-    [self popDropLineViewWithSeatModel:seatModel];
+- (void)onVLRoomPersonView:(VLRoomPersonView *)view seatItemTappedWithModel:(VLRoomSeatModel *)model atIndex:(NSInteger)seatIndex {
+    if(VLUserCenter.user.ifMaster) {
+        //is owner
+        if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
+            //self, return
+            return;
+        }
+        if (model.userNo.length > 0) {
+            return [self popDropLineViewWithSeatModel:model];
+        }
+    } else {
+        if (model.userNo.length > 0) {
+            //occupied
+            if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {//点击的是自己
+                return [self popDropLineViewWithSeatModel:model];
+            }
+        }else{
+            //empty
+            BOOL ifOnSeat = NO;
+            for (VLRoomSeatModel *model in self.seatsArray) {
+                if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
+                    ifOnSeat = YES;
+                }
+            }
+            if (!ifOnSeat) {
+                //not yet seated
+                [self requestOnSeatWithIndex:seatIndex];
+            }
+        }
+    }
 }
 
 #pragma mark - VLPopSelBgViewDelegate
 - (void)bgItemClickAction:(VLKTVSelBgModel *)selBgModel index:(NSInteger)index {
-    
     KTVChangeMVCoverInputModel* inputModel = [KTVChangeMVCoverInputModel new];
 //    inputModel.roomNo = self.roomModel.roomNo;
     inputModel.mvIndex = index;
@@ -2083,7 +2050,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark -- 房间麦位点击事件(上麦)
-
 - (void)requestOnSeatWithIndex:(NSInteger)index {
     
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
@@ -2127,18 +2093,13 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             [weakSelf.bottomView resetBtnStatus];
             [weakSelf.MVView updateUIWithUserOnSeat:YES
                                                song:weakSelf.selSongsArray.firstObject];
-            if(![weakSelf ifIAmRoomMaster]) {
-                [weakSelf enableMic];
-            }
             [weakSelf.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-            
-            [weakSelf bottomSetAudioMute:0];
+            [weakSelf muteLocalAudio:false];
         });
     }];
 }
 
 #pragma mark --
-
 - (void)dianGeSuccessEvent:(NSNotification *)notification {
     VLSongItmModel* model = (VLSongItmModel *)[notification object];
     

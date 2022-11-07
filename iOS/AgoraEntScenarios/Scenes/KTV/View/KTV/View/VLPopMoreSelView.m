@@ -73,8 +73,8 @@
 }
 
 - (void)itemBtnClickEvent:(UIButton *)itemBtn {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(moreItemBtnAction:)]) {
-        [self.delegate moreItemBtnAction:itemBtn.tag];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVMoreSelView:btnTapped:withValue:)]) {
+        [self.delegate onVLKTVMoreSelView:self btnTapped:itemBtn withValue:itemBtn.tag];
     }
 }
 

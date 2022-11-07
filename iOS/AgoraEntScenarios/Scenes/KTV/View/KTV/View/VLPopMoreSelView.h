@@ -12,10 +12,10 @@ typedef enum : NSUInteger {
 } VLKTVMoreBtnClickType;
 
 NS_ASSUME_NONNULL_BEGIN
+@class VLPopMoreSelView;
 @protocol VLPopMoreSelViewDelegate <NSObject>
 
-@optional
-- (void)moreItemBtnAction:(VLKTVMoreBtnClickType)typeValue;
+- (void)onVLKTVMoreSelView:(VLPopMoreSelView*)view btnTapped:(id)sender withValue:(VLKTVMoreBtnClickType)typeValue;
 
 @end
 
