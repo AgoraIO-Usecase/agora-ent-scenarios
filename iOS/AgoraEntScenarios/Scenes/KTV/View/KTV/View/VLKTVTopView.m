@@ -61,8 +61,8 @@
 
 #pragma mark --Event
 - (void)closeBtnEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(closeBtnAction)]) {
-        [self.delegate closeBtnAction];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLKTVTopViewCloseBtnTapped)]) {
+        [self.delegate onVLKTVTopViewCloseBtnTapped];
     }
 }
 
