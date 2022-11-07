@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol VLKTVTopViewDelegate <NSObject>
 
 @optional
-- (void)closeBtnAction;
+- (void)onVLKTVTopViewCloseBtnTapped;
 
 @end
 
