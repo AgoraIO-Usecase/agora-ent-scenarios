@@ -236,13 +236,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 setPlayerBgFromMsg(Integer.parseInt(ktvJoinRoomOutputModel.getBgOption()));
             }
         });
-        roomLivingViewModel.roomDeleteLiveData.observe(this, deleted -> {
-            if (deleted) {
-                if(!roomLivingViewModel.isRoomOwner()){
-                    showCreatorExitDialog();
-                }else{
-                    finish();
-                }
+        roomLivingViewModel.roomDeleteLiveData.observe(this, deletedByCreator -> {
+            if (deletedByCreator) {
+                showCreatorExitDialog();
+            } else {
+                finish();
             }
         });
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
@@ -250,7 +248,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
-            boolean isOnSeat = seatModel.getOnSeat() > 0;
+            boolean isOnSeat = seatModel != null;
             getBinding().groupBottomView.setVisibility(isOnSeat ? View.VISIBLE : View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(isOnSeat ? View.GONE : View.VISIBLE);
         });
@@ -259,7 +257,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 onMemberJoin(seatModel);
             }
             for (VLRoomSeatModel seatModel : mRoomSpeakerAdapter.dataList) {
-                if(seatModel == null){
+                if (seatModel == null) {
                     continue;
                 }
                 boolean exist = false;
@@ -274,7 +272,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
             }
         });
-
 
 
         // 歌词相关
