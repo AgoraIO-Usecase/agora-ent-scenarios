@@ -50,9 +50,9 @@ class KTVServiceImp : KTVServiceProtocol {
 
     @Volatile
     private var roomNo: String? = null
-
     private var creatorNo: String? = null
     private var chorusSongNo: String? = null
+    private var localSeatModel: VLRoomSeatModel? = null
 
     private var roomStatusSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit)? =
         null
@@ -141,10 +141,6 @@ class KTVServiceImp : KTVServiceProtocol {
         inputModel: KTVJoinRoomInputModel,
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     ) {
-//        if (roomNo != null) {
-//            completion.invoke(RuntimeException("Last room exit success! $roomNo"), null)
-//            return
-//        }
         roomNo = inputModel.roomNo;
         ApiManager.getInstance().requestGetRoomInfo(inputModel.roomNo, inputModel.password)
             .compose(applyApiSchedulers())
@@ -156,21 +152,23 @@ class KTVServiceImp : KTVServiceProtocol {
                 override fun onSuccess(data: BaseResponse<AgoraRoom>) {
                     val seatsArray = ArrayList<VLRoomSeatModel>()
                     data.data?.roomUserInfoDTOList?.forEach {
-                        seatsArray.add(
-                            VLRoomSeatModel(
-                                it.isMaster,
-                                it.headUrl,
-                                it.userNo,
-                                it.id.toString(),
-                                it.name,
-                                it.onSeat,
-                                false,
-                                it.isSelfMuted,
-                                it.isVideoMuted,
-                                false,
-                                false
-                            )
+                        val element = VLRoomSeatModel(
+                            it.isMaster,
+                            it.headUrl,
+                            it.userNo,
+                            it.id.toString(),
+                            it.name,
+                            it.onSeat,
+                            false,
+                            it.isSelfMuted,
+                            it.isVideoMuted,
+                            false,
+                            false
                         )
+                        if (element.userNo.equals(UserManager.getInstance().user.userNo)) {
+                            localSeatModel = element
+                        }
+                        seatsArray.add(element)
                     }
 
 
@@ -217,10 +215,17 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
     override fun leaveRoomWithCompletion(completion: (error: Exception?) -> Unit) {
-        val roomNo = roomNo ?: return
-        val creatorNo = creatorNo ?: return
+        if (roomNo == null) {
+            completion.invoke(RuntimeException("No room joined!"))
+            return
+        }
 
-        val exitRtmRun : ()->Unit = {
+        val resetRun: () -> Unit = {
+            this@KTVServiceImp.roomNo = null
+            this@KTVServiceImp.creatorNo = null
+            this@KTVServiceImp.chorusSongNo = null
+            this@KTVServiceImp.localSeatModel = null
+
             // logout rtm
             RTMManager.getInstance().levelRTMRoom();
             RTMManager.getInstance().doLogoutRTM()
@@ -241,10 +246,7 @@ class KTVServiceImp : KTVServiceProtocol {
                         bean.roomNo = roomNo
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
-                        this@KTVServiceImp.roomNo = null
-
-                        exitRtmRun.invoke()
-
+                        resetRun.invoke()
                         completion.invoke(null)
                     }
 
@@ -255,10 +257,7 @@ class KTVServiceImp : KTVServiceProtocol {
                             bean.roomNo = roomNo
                             RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
-                            this@KTVServiceImp.roomNo = null
-
-                            exitRtmRun.invoke()
-
+                            resetRun.invoke()
                             completion.invoke(null)
                         } else {
                             completion.invoke(t)
@@ -285,8 +284,7 @@ class KTVServiceImp : KTVServiceProtocol {
                         bean.name = UserManager.getInstance().user.name
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
-                        this@KTVServiceImp.roomNo = null
-                        exitRtmRun.invoke()
+                        resetRun.invoke()
 
                         completion.invoke(null)
                         // TODO 切歌给其他人
@@ -305,6 +303,10 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun changeMVCoverWithInput(
         inputModel: KTVChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
     ) {
+        if (roomNo == null) {
+            completion.invoke(RuntimeException("No room joined!"))
+            return
+        }
         ApiManager.getInstance()
             .requestRoomInfoEdit(roomNo, null, inputModel.mvIndex.toString(), null).compose(
                 applyApiSchedulers()
@@ -322,6 +324,27 @@ class KTVServiceImp : KTVServiceProtocol {
                     bean.bgOption = inputModel.mvIndex.toString()
                     RTMManager.getInstance().sendMessage(gson.toJson(bean))
                     completion.invoke(null)
+
+                    roomStatusSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, VLRoomListModel(
+                            "",
+                            false,
+                            "",
+                            bean.userNo,
+                            bean.roomNo,
+                            0,
+                            bean.bgOption,
+                            "",
+                            "",
+                            "",
+                            "",
+                            0,
+                            "",
+                            0,
+                            "",
+                            ""
+                        )
+                    )
                 }
 
                 override fun onFailure(t: ApiException?) {
@@ -344,6 +367,10 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun onSeatWithInput(
         inputModel: KTVOnSeatInputModel, completion: (error: Exception?) -> Unit
     ) {
+        if (localSeatModel != null) {
+            completion.invoke(RuntimeException("The user has been on seat!"))
+            return
+        }
         ApiManager.getInstance()
             .requestRoomHaveSeatRoomInfo(
                 roomNo,
@@ -370,21 +397,22 @@ class KTVServiceImp : KTVServiceProtocol {
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
                         completion.invoke(null)
+                        localSeatModel = VLRoomSeatModel(
+                            bean.userNo.equals(creatorNo),
+                            bean.headUrl,
+                            bean.userNo,
+                            bean.id.toString(),
+                            bean.name,
+                            bean.onSeat,
+                            false,
+                            bean.isSelfMuted,
+                            bean.isVideoMuted,
+                            false,
+                            false
+                        )
                         seatListChangeSubscriber?.invoke(
                             KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                            VLRoomSeatModel(
-                                bean.userNo.equals(creatorNo),
-                                bean.headUrl,
-                                bean.userNo,
-                                bean.id.toString(),
-                                bean.name,
-                                bean.onSeat,
-                                false,
-                                bean.isSelfMuted,
-                                bean.isVideoMuted,
-                                false,
-                                false
-                            )
+                            localSeatModel
                         )
                     }
 
@@ -397,6 +425,10 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun outSeatWithInput(
         inputModel: KTVOutSeatInputModel, completion: (error: Exception?) -> Unit
     ) {
+        if (localSeatModel == null) {
+            completion.invoke(RuntimeException("The user has been out seat!"))
+            return
+        }
         ApiManager.getInstance().requestRoomLeaveSeatRoomInfo(roomNo, inputModel.userNo)
             .compose(
                 applyApiSchedulers()
@@ -434,6 +466,8 @@ class KTVServiceImp : KTVServiceProtocol {
                                 false
                             )
                         )
+
+                        localSeatModel = null
                     }
 
                     override fun onFailure(t: ApiException?) {
@@ -443,6 +477,11 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
     override fun muteWithMuteStatus(isSelfMuted: Int, completion: (error: Exception?) -> Unit) {
+        if (localSeatModel == null) {
+            completion.invoke(RuntimeException("The user has been out seat!"))
+            return
+        }
+        val localSeatModel = localSeatModel ?: return
         //同步静音状态
         ApiManager.getInstance()
             .requestToggleMic(isSelfMuted, UserManager.getInstance().user.userNo, roomNo)
@@ -453,16 +492,35 @@ class KTVServiceImp : KTVServiceProtocol {
                     }
 
                     override fun onSuccess(data: BaseResponse<String>) {
+                        this@KTVServiceImp.localSeatModel = VLRoomSeatModel(
+                            localSeatModel.isMaster,
+                            localSeatModel.headUrl,
+                            localSeatModel.userNo,
+                            localSeatModel.id,
+                            localSeatModel.name,
+                            localSeatModel.onSeat,
+                            localSeatModel.joinSing,
+                            isSelfMuted,
+                            localSeatModel.isVideoMuted,
+                            localSeatModel.ifSelTheSingSong,
+                            localSeatModel.ifJoinedChorus
+                        )
+
                         //发送通知
                         val bean = RTMMessageBean()
                         bean.messageType = VLSendMessageType.VLSendMessageTypeAudioMute.value
                         bean.userNo = UserManager.getInstance().user.userNo
                         bean.roomNo = roomNo
                         bean.isSelfMuted = isSelfMuted
+                        bean.isVideoMuted = localSeatModel.isVideoMuted
                         bean.id = UserManager.getInstance().user.id
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
                         completion.invoke(null)
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                            this@KTVServiceImp.localSeatModel
+                        )
                     }
 
                     override fun onFailure(t: ApiException?) {
@@ -475,6 +533,11 @@ class KTVServiceImp : KTVServiceProtocol {
     override fun openVideoStatusWithStatus(
         isVideoMuted: Int, completion: (error: Exception?) -> Unit
     ) {
+        if (localSeatModel == null) {
+            completion.invoke(RuntimeException("The user has been out seat!"))
+            return
+        }
+        val localSeatModel = localSeatModel ?: return
         ApiManager.getInstance()
             .requestOpenCamera(isVideoMuted, UserManager.getInstance().user.userNo, roomNo)
             .compose(applyApiSchedulers()).subscribe(
@@ -484,6 +547,20 @@ class KTVServiceImp : KTVServiceProtocol {
                     }
 
                     override fun onSuccess(data: BaseResponse<String>) {
+                        this@KTVServiceImp.localSeatModel = VLRoomSeatModel(
+                            localSeatModel.isMaster,
+                            localSeatModel.headUrl,
+                            localSeatModel.userNo,
+                            localSeatModel.id,
+                            localSeatModel.name,
+                            localSeatModel.onSeat,
+                            localSeatModel.joinSing,
+                            localSeatModel.isSelfMuted,
+                            isVideoMuted,
+                            localSeatModel.ifSelTheSingSong,
+                            localSeatModel.ifJoinedChorus
+                        )
+
                         //发送通知
                         val bean = RTMMessageBean()
                         bean.messageType = VLSendMessageType.VLSendMessageTypeVideoIfOpen.value
@@ -491,8 +568,14 @@ class KTVServiceImp : KTVServiceProtocol {
                         bean.id = UserManager.getInstance().user.id
                         bean.roomNo = roomNo
                         bean.isVideoMuted = isVideoMuted
+                        bean.isSelfMuted = localSeatModel.isSelfMuted
                         RTMManager.getInstance().sendMessage(gson.toJson(bean))
                         completion.invoke(null)
+
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                            this@KTVServiceImp.localSeatModel
+                        )
                     }
 
                     override fun onFailure(t: ApiException?) {
@@ -722,7 +805,22 @@ class KTVServiceImp : KTVServiceProtocol {
             VLSendMessageType.VLSendMessageTypeChangeMVBg.value -> {
                 roomStatusSubscriber?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, VLRoomListModel(
-                        "", false, "", "", "", 0, bean.bgOption, "", "", "", "", 0, "", 0, "", ""
+                        "",
+                        false,
+                        "",
+                        bean.userNo,
+                        bean.roomNo,
+                        0,
+                        bean.bgOption,
+                        "",
+                        "",
+                        "",
+                        "",
+                        0,
+                        "",
+                        0,
+                        "",
+                        ""
                     )
                 )
             }
@@ -747,6 +845,24 @@ class KTVServiceImp : KTVServiceProtocol {
             VLSendMessageType.VLSendMessageTypeDropSeat.value -> {
                 seatListChangeSubscriber?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                    VLRoomSeatModel(
+                        bean.userNo.equals(creatorNo),
+                        bean.headUrl,
+                        bean.userNo,
+                        bean.id.toString(),
+                        bean.name,
+                        bean.onSeat,
+                        false,
+                        bean.isSelfMuted,
+                        bean.isVideoMuted,
+                        false,
+                        false
+                    )
+                )
+            }
+            VLSendMessageType.VLSendMessageTypeAudioMute.value -> {
+                seatListChangeSubscriber?.invoke(
+                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
                     VLRoomSeatModel(
                         bean.userNo.equals(creatorNo),
                         bean.headUrl,
