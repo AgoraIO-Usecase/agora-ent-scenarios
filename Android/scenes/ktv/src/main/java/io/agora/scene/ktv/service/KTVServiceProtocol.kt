@@ -175,7 +175,7 @@ interface KTVServiceProtocol {
      * song did changed
      */
     fun subscribeChooseSongWithChanged(
-        changedBlock: (KTVSubscribe, VLRoomSelSongModel) -> Unit
+        changedBlock: (KTVSubscribe, VLRoomSelSongModel?) -> Unit
     )
 
 }

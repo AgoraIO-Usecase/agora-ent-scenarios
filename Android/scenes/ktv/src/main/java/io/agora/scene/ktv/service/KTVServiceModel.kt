@@ -128,47 +128,48 @@ data class KTVRemoveSongInputModel(
 
 data class VLRoomSelSongModel(
     // 合唱者userNo
-    var chorusNo: String? = null,
-    var imageUrl: String? = null,
+    val chorusNo: String,
+    val imageUrl: String,
     // 是否合唱
-    var isChorus: Boolean? = null,
+    val isChorus: Boolean,
     //是否原唱
-    var isOriginal: Int? = null,
-    var singer: String? = null,
-    var songName: String? = null,
-    var songNo: String? = null,
-    var songUrl: String? = null,
+    val isOriginal: Int,
+    val singer: String,
+    val songName: String,
+    val songNo: String,
+    val songUrl: String,
     // 歌词
-    var lyric: String? = null,
+    val lyric: String,
     // 排序
-    var sort: Int? = null,
+    val sort: Int,
     // 0 未开始 1.已唱 2.正在唱
-    var status: Int? = null,
+    val status: Int,
     // 是谁点的歌
-    var userNo: String? = null,
-    var userId: String? = null,
+    val userNo: String,
+    val userId: String,
     // 点歌人昵称
-    var name : String? = null,
+    val name : String,
     // 得分
-    var score: Double? = null,
+    val score: Double,
     // 是否是自己点的歌曲
-    var isOwnSong: Boolean? = null,
+    val isOwnSong: Boolean,
 
     var objectId: String? = null
 ) {
     // TODO remove it
     fun toMemberMusicModel(): MemberMusicModel{
         return MemberMusicModel().apply {
+            chorusNo = this@VLRoomSelSongModel.chorusNo
             imageUrl = this@VLRoomSelSongModel.imageUrl
-            //isChorus = this@VLRoomSelSongModel.isChorus
-            //isOriginal = this@VLRoomSelSongModel.isOriginal
+            isChorus = this@VLRoomSelSongModel.isChorus
+            isOriginal = this@VLRoomSelSongModel.isOriginal
             singer = this@VLRoomSelSongModel.singer
             songName = this@VLRoomSelSongModel.songName
             songNo = this@VLRoomSelSongModel.songNo
             songUrl = this@VLRoomSelSongModel.songUrl
-            //lrc = this@VLRoomSelSongModel.lyric
-            //sort = this@VLRoomSelSongModel.sort
-            //status = this@VLRoomSelSongModel.status
+            lrc = this@VLRoomSelSongModel.lyric
+            sort = this@VLRoomSelSongModel.sort
+            status = this@VLRoomSelSongModel.status
             userNo = this@VLRoomSelSongModel.userNo
             user1Id = this@VLRoomSelSongModel.userId
             name = this@VLRoomSelSongModel.name
