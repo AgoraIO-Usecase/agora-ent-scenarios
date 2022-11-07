@@ -23,6 +23,14 @@ class ShowCreateLiveView: UIView {
         }
     }
     
+    let roomNo: String = "ID: \(arc4random_uniform(899999) + 100000)"
+    let roomBg: String = "\(Int.random(in: 1...3))"
+    var roomName: String? {
+        get{
+            return nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
     private var roomBgImgView: UIImageView!
     private var nameTextField: UITextField!
     private var roomIdLabel: UILabel!
@@ -56,7 +64,7 @@ class ShowCreateLiveView: UIView {
         roomBgImgView.contentMode = .scaleAspectFill
         roomBgImgView.clipsToBounds = true
         roomBgImgView.layer.cornerRadius = 10
-        roomBgImgView.sd_setImage(with: URL(string: "https://img0.baidu.com/it/u=3375911127,635571288&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1667494800&t=87178e90d06a726eeb8df88b51a3dfe0"))
+        roomBgImgView.image = UIImage.show_sceneImage(name: "show_room_bg_\(roomBg)")
         roomInfoCoverVeiw.addSubview(roomBgImgView)
         roomBgImgView.snp.makeConstraints { make in
             make.left.equalTo(10)
@@ -68,7 +76,6 @@ class ShowCreateLiveView: UIView {
         nameTextField = UITextField()
         roomInfoCoverVeiw.addSubview(nameTextField)
         nameTextField.placeholder = "create_name_text_field_placeholder".show_localized
-        nameTextField.text = "Chat with Eve tonight and"
         nameTextField.font = .show_M_15
         nameTextField.textColor = .show_main_text
         nameTextField.snp.makeConstraints { make in
@@ -76,6 +83,7 @@ class ShowCreateLiveView: UIView {
             make.top.equalTo(18)
             make.right.equalTo(-50)
         }
+        nameTextField.becomeFirstResponder()
         
         // 编辑按钮
         let editButton = UIButton(type: .custom)
@@ -87,7 +95,7 @@ class ShowCreateLiveView: UIView {
         }
         // 房间号
         roomIdLabel = UILabel()
-        roomIdLabel.text = "ID: 1235414"
+        roomIdLabel.text = roomNo
         roomIdLabel.font = .show_R_10
         roomIdLabel.textColor = .show_main_text
         roomInfoCoverVeiw.addSubview(roomIdLabel)

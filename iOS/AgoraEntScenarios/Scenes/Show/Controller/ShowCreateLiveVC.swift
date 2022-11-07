@@ -14,6 +14,15 @@ class ShowCreateLiveVC: UIViewController {
     private var localView: UIView!
     
     private var agoraKit: AgoraRtcEngineKit?
+    private var selectedResolution = 0
+    private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
+        return AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
+                                       frameRate: .fps30,
+                                       bitrate: AgoraVideoBitrateStandard,
+                                       orientationMode: .fixedPortrait,
+                                       mirrorMode: .auto)
+    }()
+    
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
        let config = AgoraRtcEngineConfig()
         config.appId = KeyCenter.AppId
@@ -21,6 +30,7 @@ class ShowCreateLiveVC: UIViewController {
         config.areaCode = .global
         return config
     }()
+    
     private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
        let option = AgoraRtcChannelMediaOptions()
         option.publishMicrophoneTrack = true
@@ -83,12 +93,7 @@ class ShowCreateLiveVC: UIViewController {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
 //        agoraKit?.setLogFile(LogUtils.sdkLogPath())
         agoraKit?.setClientRole(.broadcaster)
-        agoraKit?.setVideoEncoderConfiguration(
-            AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
-                                           frameRate: .fps30,
-                                           bitrate: AgoraVideoBitrateStandard,
-                                           orientationMode: .fixedPortrait,
-                                           mirrorMode: .auto))
+        agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
         let canvas = AgoraRtcVideoCanvas()
@@ -125,15 +130,31 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickQualityBtnAction() {
         createView.hideBottomViews = true
         let vc = ShowSelectQualityVC()
+        vc.defalutSelectIndex = selectedResolution
         vc.modalPresentationStyle = .overCurrentContext
         present(vc, animated: true)
         vc.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
+        vc.selectedItem = {[weak self] resolution,index in
+            guard let wSelf = self else { return }
+            wSelf.selectedResolution = index
+            wSelf.videoEncoderConfig.dimensions = CGSize(width: resolution.width, height: resolution.height)
+            wSelf.agoraKit?.setVideoEncoderConfiguration(wSelf.videoEncoderConfig)
+        }
     }
     
     func onClickStartBtnAction() {
-        
+        let room = ShowRoomListModel()
+        room.roomName = createView.roomName
+        room.roomNo = createView.roomNo
+        room.thumbnailId = createView.roomBg
+        room.ownerId = VLUserCenter.user.userNo
+        room.ownerAvater = ""
+        room.createdAt = Date().timeIntervalSince1970
+        AppContext.showServiceImp.createRoom(room: room) { err, detailModel in
+            
+        }
     }
 
 }

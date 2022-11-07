@@ -9,9 +9,18 @@ import UIKit
 
 class ShowRoomListView: UIView {
     
+    var roomList = [ShowRoomListModel]() {
+        didSet {
+            collectionView.reloadData()
+            emptyView.isHidden = roomList.count > 0
+        }
+    }
+    
     var clickCreateButtonAction: (()->())?
+    var joinRoomAction: ((_ room: ShowRoomListModel)->())?
+    
     var collectionView: UICollectionView!
-    var emptyView: ShowEmptyView!
+    private var emptyView: ShowEmptyView!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -79,12 +88,19 @@ class ShowRoomListView: UIView {
 extension ShowRoomListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return roomList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
+        let room = roomList[indexPath.item]
+        cell.setBgImge(room.thumbnailId ?? "0", name: room.roomName, id: room.roomNo, count: room.roomUserCount)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let room = roomList[indexPath.item]
+        joinRoomAction?(room)
     }
     
 }

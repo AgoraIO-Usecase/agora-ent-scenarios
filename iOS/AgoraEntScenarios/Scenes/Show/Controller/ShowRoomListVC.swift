@@ -21,9 +21,14 @@ class ShowRoomListVC: ShowBaseViewController {
         setBackBtn()
     }
     
+    deinit {
+        AppContext.unloadShowServiceImp()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+        getRoomList()
         addRefresh()
     }
     
@@ -41,6 +46,9 @@ class ShowRoomListVC: ShowBaseViewController {
         roomListView.clickCreateButtonAction = { [weak self] in
             self?.createRoom()
         }
+        roomListView.joinRoomAction = { [weak self] room in
+            self?.joinRoom(room)
+        }
         view.addSubview(roomListView)
         roomListView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -56,10 +64,24 @@ class ShowRoomListVC: ShowBaseViewController {
         present(preNC, animated: true)
     }
     
+    // 加入放开
+    private func joinRoom(_ room: ShowRoomListModel){
+        
+    }
+    
+    private func getRoomList() {
+        AppContext.showServiceImp.getRoomList(page: 1) { [weak self] error, roomList in
+            if let list = roomList {
+                self?.roomListView.roomList = list
+            }
+            self?.roomListView.collectionView.mj_header?.endRefreshing()
+        }
+    }
+    
     // 下拉刷新
     private func addRefresh(){
-        roomListView.collectionView.mj_header = MJRefreshNormalHeader(refreshingBlock: {
-            
+        roomListView.collectionView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
+            self?.getRoomList()
         })
     }
 }
