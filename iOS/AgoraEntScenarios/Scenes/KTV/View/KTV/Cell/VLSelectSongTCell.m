@@ -53,7 +53,7 @@
     self.chooseBtn = [[UIButton alloc]init];
     [self.chooseBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.chooseBtn.titleLabel.font = UIFontMake(12.0);
-    [self.chooseBtn setTitle:@"点歌" forState:UIControlStateNormal];
+    [self.chooseBtn setTitle:NSLocalizedString(@"点歌", nil) forState:UIControlStateNormal];
     [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     self.chooseBtn.layer.cornerRadius = 14;
     self.chooseBtn.layer.masksToBounds = YES;

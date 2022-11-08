@@ -128,6 +128,10 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) NSString *mutedRemoteUserId;
 @property (nonatomic, strong) NSString *currentPlayingSongNo;
 
+
+/// agora mcc request lyrics id
+@property (nonatomic, copy, nullable) NSString* mccRequestId;
+
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
@@ -135,6 +139,21 @@ VLPopScoreViewDelegate
 @end
 
 @implementation VLKTVViewController
+
+
+#pragma mark setter
+- (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
+    
+    [_AgoraMcc registerEventDelegate:nil];
+    [[AppContext shared] unregisterEventDelegate:self];
+//    [AgoraMusicContentCenter destroy];
+    _AgoraMcc = AgoraMcc;
+    if (_AgoraMcc != nil) {
+        [[AppContext shared] registerEventDelegate:self];
+        [_AgoraMcc registerEventDelegate:[AppContext shared]];
+    }
+    [[AppContext shared] setAgoraMcc:AgoraMcc];
+}
 
 #pragma mark lazy
 - (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
@@ -259,7 +278,7 @@ VLPopScoreViewDelegate
     }
 
     if(self.AgoraMcc) {
-        [self.AgoraMcc registerEventDelegate:nil];
+//        [self.AgoraMcc registerEventDelegate:nil];
         VLLog(@"Agora - unregisterEventHandler");
         [AgoraMusicContentCenter destroy];
         VLLog(@"Agora - destroy MCC");
@@ -593,7 +612,7 @@ VLPopScoreViewDelegate
     return NO;
 }
 
-- (void)loadMusicWithURL:(NSString *)url lrc:(NSString *)lrc songCode:(NSString *)songCode {
+- (void)loadMusicWithLrcUrl:(NSString *)lrc songCode:(NSString *)songCode {
     [self.MVView loadLrcURL:lrc];
 //    [self.rtcMediaPlayer open:url startPos:0];
     NSInteger songCodeIntValue = [songCode integerValue];
@@ -981,7 +1000,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
     VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
-    [self.AgoraMcc registerEventDelegate:self];
+//    [self.AgoraMcc registerEventDelegate:self];
 
     [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
@@ -2202,26 +2221,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     
     self.currentPlayingSongNo = selSongModel.songNo;
     
-    KTVSongDetailInputModel* inputModel = [KTVSongDetailInputModel new];
-    inputModel.lyricType = 0;
-    inputModel.songNo = selSongModel.songNo;
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getSongDetailWithInput:inputModel
-                                            completion:^(NSError * error, KTVSongDetailOutputModel * outputModel) {
-        if (error != nil) {
-            return;
-        }
-        
-        selSongModel.lyric = outputModel.lyric;//response.data[@"data"][@"lyric"];
-        selSongModel.songUrl = outputModel.songUrl;//response.data[@"data"][@"playUrl"];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-            [weakSelf loadMusicWithURL:selSongModel.songUrl lrc:selSongModel.lyric
-                              songCode:selSongModel.songNo];
-        });
-        [weakSelf.MVView updateUIWithUserOnSeat:NO
-                                           song:selSongModel];
-    }];
+    self.mccRequestId =
+    [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
 }
 
 - (void)choosedSongsListToChangeUI {
@@ -2263,25 +2264,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
         if (selSongModel.status == 2) { //歌曲正在播放
             //请求歌词和歌曲
-            KTVSongDetailInputModel* inputModel = [KTVSongDetailInputModel new];
-            inputModel.lyricType = 0;
-            inputModel.songNo = selSongModel.songNo;
-            [[AppContext ktvServiceImp] getSongDetailWithInput:inputModel
-                                                    completion:^(NSError * error, KTVSongDetailOutputModel * outputModel) {
-                if (error != nil) {
-                    return;
-                }
-                
-                selSongModel.lyric = outputModel.lyric;
-                selSongModel.songUrl = outputModel.songUrl;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-                    [weakSelf loadMusicWithURL:selSongModel.songUrl
-                                           lrc:selSongModel.lyric
-                                      songCode:selSongModel.songNo];
-                });
-            }];
+            self.mccRequestId =
+            [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
         }
     }];
 }
@@ -2297,6 +2281,20 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
     
+    if (![requestId isEqualToString: self.mccRequestId]
+        || [lyricUrl length] == 0) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+        selSongModel.lyric = lyricUrl;
+        [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+        [self loadMusicWithLrcUrl:selSongModel.lyric
+                         songCode:selSongModel.songNo];
+        [self.MVView updateUIWithUserOnSeat:NO
+                                       song:selSongModel];
+    });
 }
 
 - (void)onMusicChartsResult:(nonnull NSString *)requestId

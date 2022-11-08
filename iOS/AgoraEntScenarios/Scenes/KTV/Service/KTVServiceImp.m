@@ -533,33 +533,6 @@
     }];
 }
 
-- (void)getSongDetailWithInput:(KTVSongDetailInputModel*)inputModel
-                    completion:(void(^)(NSError* _Nullable, KTVSongDetailOutputModel* _Nullable))completion {
-    NSDictionary *param = @{
-        @"lyricType": @(inputModel.lyricType),
-        @"songCode": inputModel.songNo
-    };
-    
-    [VLAPIRequest getRequestURL:kURLSongDetail
-                      parameter:param
-                        showHUD:NO
-                        success:^(VLResponseDataModel * _Nonnull response) {
-        if (response.code == 0) {     //拿到歌曲和歌词
-            KTVSongDetailOutputModel* outputModel = [KTVSongDetailOutputModel new];
-            outputModel.songNo = inputModel.songNo;
-            outputModel.lyric = response.data[@"data"][@"lyric"];
-            outputModel.songUrl = response.data[@"data"][@"playUrl"];
-            completion(nil, outputModel);
-            return;
-        }
-        
-        completion([NSError errorWithDomain:response.message code:response.code userInfo:nil], nil);
-    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-        completion(error, nil);
-    }];
-}
-
-
 - (void)markSongDidPlayWithInput: (VLRoomSelSongModel*)inputModel
                       completion:(void(^)(NSError* _Nullable))completion {
     NSDictionary *param = @{
@@ -592,7 +565,6 @@
         @"roomNo": [self getRoomNo],
         @"songName": inputModel.songName,
         @"songNo": inputModel.songNo,
-        @"songUrl": inputModel.songUrl,
         @"userNo":VLUserCenter.user.userNo
     };
     [VLAPIRequest getRequestURL:kURLChooseSong

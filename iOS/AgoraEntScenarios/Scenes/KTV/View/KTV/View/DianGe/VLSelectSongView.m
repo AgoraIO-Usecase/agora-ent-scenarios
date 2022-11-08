@@ -14,7 +14,12 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLSelectSongView ()<JXCategoryViewDelegate,JXCategoryListContainerViewDelegate,VLSearchSongResultViewDelegate,UITextFieldDelegate>
+@interface VLSelectSongView ()<
+JXCategoryViewDelegate,
+JXCategoryListContainerViewDelegate,
+VLSearchSongResultViewDelegate,
+UITextFieldDelegate
+>
 
 @property(nonatomic, weak) id <VLSelectSongViewDelegate>delegate;
 @property (nonatomic, strong) UIView *bgView;
@@ -33,7 +38,10 @@
 
 @implementation VLSelectSongView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSelectSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus{
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLSelectSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -64,25 +72,35 @@
     self.searchTF.tintColor = UIColorMakeWithHex(@"#2753FF");
     self.searchTF.returnKeyType = UIReturnKeySearch;
     self.searchTF.delegate = self;
-    [self.searchTF addTarget:self action:@selector(textChangeAction)forControlEvents:UIControlEventEditingChanged];
-    self.searchTF.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.searchTF.placeholder attributes:@{NSForegroundColorAttributeName:UIColorMakeWithHex(@"#979CBB")}];
+    [self.searchTF addTarget:self
+                      action:@selector(textChangeAction)
+            forControlEvents:UIControlEventEditingChanged];
+    self.searchTF.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.searchTF.placeholder
+                                                                          attributes:@{NSForegroundColorAttributeName:UIColorMakeWithHex(@"#979CBB")}];
     [bgView addSubview:self.searchTF];
     
     VLHotSpotBtn *clearButton = [self.searchTF valueForKey:@"_clearButton"];
     //frame必须设置 否则 点击删除键后 clearButton 会变小（系统默认是19*19）
     clearButton.frame = CGRectMake(0, 0, 20, 20);
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"] forState:UIControlStateNormal];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"] forState:UIControlStateHighlighted];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"] forState:UIControlStateSelected];
+    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+                 forState:UIControlStateNormal];
+    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+                 forState:UIControlStateHighlighted];
+    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+                 forState:UIControlStateSelected];
     
     //取消
-    VLHotSpotBtn *cancelButton = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-50, bgView.top, 30, 40)];
-    [cancelButton setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
-    [cancelButton setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
+    VLHotSpotBtn *cancelButton = [[VLHotSpotBtn alloc] initWithFrame:CGRectMake(self.width-50, bgView.top, 30, 40)];
+    [cancelButton setTitle:NSLocalizedString(@"取消", nil)
+                  forState:UIControlStateNormal];
+    [cancelButton setTitleColor:UIColorMakeWithHex(@"#C6C4DE")
+                       forState:UIControlStateNormal];
     cancelButton.titleLabel.font = UIFontMake(14);
     self.cancelButton = cancelButton;
     self.cancelButton.hidden = YES;
-    [cancelButton addTarget:self action:@selector(cancelBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+    [cancelButton addTarget:self
+                     action:@selector(cancelBtnClickEvent)
+           forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
     
     
@@ -114,7 +132,10 @@
     self.categoryView.listContainer = self.listContainerView;
     
     //搜索结果
-    self.resultView = [[VLSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+    self.resultView = [[VLSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
+                                                      withDelegate:self
+                                                        withRoomNo:self.roomNo
+                                                          ifChorus:self.ifChorus];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
 }
@@ -143,7 +164,9 @@
 }
 // 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
 - (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
-    VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0) withRooNo:self.roomNo ifChorus:self.ifChorus];
+    VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
+                                                                                    withRooNo:self.roomNo
+                                                                                     ifChorus:self.ifChorus];
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
     return selSongView;
 }
