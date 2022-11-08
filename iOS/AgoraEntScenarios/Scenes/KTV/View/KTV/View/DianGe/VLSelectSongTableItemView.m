@@ -130,8 +130,10 @@ AgoraMusicContentCenterEventDelegate
         
         self.selSongsArray = songArray;
        
+        NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
+        NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
         self.requestId =
-        [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:pageType + 2
+        [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
                                                                     page:self.page
                                                                 pageSize:20
                                                               jsonOption:nil];
