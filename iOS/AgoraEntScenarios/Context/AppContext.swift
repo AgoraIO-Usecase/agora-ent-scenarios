@@ -37,10 +37,6 @@ import Foundation
         return KeyCenter.Certificate
     }
 
-    @objc func appToken() -> String? {
-        return KeyCenter.Token
-    }
-
     @objc func appHostUrl() -> String {
         return KeyCenter.HostUrl
     }

@@ -7,7 +7,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -49,7 +49,8 @@
     CGFloat margin = VLREALVALUE_WIDTH(20);
     CGFloat itemW = (SCREEN_WIDTH-3*margin)/2.0;
     
-    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] title:NSLocalizedString(@"音频上麦", nil)];
+    QMUIButton *audioBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"]
+                                                            title:KTVLocalizedString(@"音频上麦")];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
     audioBtn.imagePosition = QMUIButtonImagePositionLeft;
     audioBtn.spacingBetweenImageAndTitle = 16;
@@ -72,7 +73,8 @@
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
     
-    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] title:NSLocalizedString(@"视频上麦", nil)];
+    QMUIButton *videoBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"]
+                                                            title:KTVLocalizedString(@"视频上麦")];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
     videoBtn.imagePosition = QMUIButtonImagePositionLeft;
     videoBtn.spacingBetweenImageAndTitle = 16;

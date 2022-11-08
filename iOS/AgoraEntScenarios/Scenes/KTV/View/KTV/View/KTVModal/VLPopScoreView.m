@@ -7,6 +7,7 @@
 #import "UIView+VL.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import Masonry;
 
@@ -122,7 +123,7 @@
 - (UILabel *)scoreLabel {
     if (!_scoreLabel) {
         _scoreLabel = [[UILabel alloc] init];
-        _scoreLabel.text = NSLocalizedString(@"99", nil);
+        _scoreLabel.text = KTVLocalizedString(@"99");
         _scoreLabel.font = VLUIFontMake(30);
         _scoreLabel.textColor = [UIColor whiteColor];
     }
@@ -132,7 +133,7 @@
 - (UILabel *)scoreTitleLabel {
     if (!_scoreTitleLabel) {
         _scoreTitleLabel = [[UILabel alloc] init];
-        _scoreTitleLabel.text = NSLocalizedString(@"你的总分", nil);
+        _scoreTitleLabel.text = KTVLocalizedString(@"你的总分");
         _scoreTitleLabel.font = VLUIFontMake(14);
         _scoreTitleLabel.textColor = [UIColor whiteColor];
     }
@@ -177,7 +178,7 @@
         _confirmButton.layer.cornerRadius = 20;
         _confirmButton.layer.masksToBounds = YES;
         [_confirmButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-        [_confirmButton setTitle:NSLocalizedString(@"好的", nil) forState:UIControlStateNormal];
+        [_confirmButton setTitle:KTVLocalizedString(@"好的") forState:UIControlStateNormal];
         _confirmButton.titleLabel.font = UIFontBoldMake(16);
         [_confirmButton setTitleColor:UIColorWhite forState:UIControlStateNormal];
         [_confirmButton addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
