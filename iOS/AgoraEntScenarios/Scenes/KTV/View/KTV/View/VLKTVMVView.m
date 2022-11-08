@@ -21,7 +21,7 @@
 @import Masonry;
 
 @class QMUIButton;
-@interface VLKTVMVView () <AgoraLrcViewDelegate, AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () < AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -341,31 +341,36 @@
 - (void)soloBtnClickAction {
     [self.soloTimer invalidate];
     self.soloTimer = nil;
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
         self.soloSongView.hidden = YES;
-        [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeSolo];
+        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeSolo];
     }
 }
 
 #pragma mark - 合唱代理
-
 - (void)robViewChorusAction {
     //抢麦
-    if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
-        if([self.delegate ktvIsMyselfOnSeat]) {
-            [self.robMicroPhoneTimer invalidate];
-            self.robMicroPhoneTimer = nil;
-            if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
-                self.robMicrophoneView.hidden = YES;
-                [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeJoinChorus];
-            }
-        }
-        else {
-            if([self.delegate respondsToSelector:@selector(ktvNotifyUserNotOnSeat)]) {
-                [self.delegate ktvNotifyUserNotOnSeat];
-            }
-        }
+    [self.robMicroPhoneTimer invalidate];
+    self.robMicroPhoneTimer = nil;
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
+        self.robMicrophoneView.hidden = YES;
+        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeJoinChorus];
     }
+//    if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
+//        if([self.delegate ktvIsMyselfOnSeat]) {
+//            [self.robMicroPhoneTimer invalidate];
+//            self.robMicroPhoneTimer = nil;
+//            if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
+//                self.robMicrophoneView.hidden = YES;
+//                [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeJoinChorus];
+//            }
+//        }
+//        else {
+//            if([self.delegate respondsToSelector:@selector(ktvNotifyUserNotOnSeat)]) {
+//                [self.delegate ktvNotifyUserNotOnSeat];
+//            }
+//        }
+//    }
 }
 
 
@@ -449,43 +454,6 @@
     }
 }
 
-#pragma mark - AgoraLrcViewDelegate
-
-- (NSTimeInterval)getPlayerCurrentTime {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicCurrentTime)]) {
-        self.currentTime = [self.delegate ktvMVViewMusicCurrentTime];
-        return self.currentTime;
-    }
-    return self.currentTime;
-}
-
-- (NSTimeInterval)getTotalTime {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicTotalTime)]) {
-        return [self.delegate ktvMVViewMusicTotalTime];
-    }
-    return 0;
-}
-
-- (void)seekToTimeWithTime:(NSTimeInterval)time {
-//    VLLog(@"\n歌词组件---定位到指定的播放位置：%f",time);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicSeekToTime:)]) {
-        [self.delegate ktvMVViewMusicSeekToTime:time];
-    }
-}
-
-- (void)agoraWordPitchWithPitch:(NSInteger)pitch totalCount:(NSInteger)totalCount {
-//    VLLog(@"\n歌词组件获取每个歌词文字的标准%ld,%ld",pitch,totalCount);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicAgoraWordPitch:totoalCount:)]) {
-        [self.delegate ktvMVViewMusicAgoraWordPitch:pitch totoalCount:totalCount];
-    }
-}
-
-- (void)currentPlayerLrcWithLrc:(NSString *)lrc progress:(CGFloat)progress {
-//    VLLog(@"\n歌词组件---播放歌词\n%@\n%f",lrc,progress);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicLrc:progress:)]) {
-        [self.delegate ktvMVViewMusicLrc:lrc progress:progress];
-    }
-}
 
 #pragma mark -
 
