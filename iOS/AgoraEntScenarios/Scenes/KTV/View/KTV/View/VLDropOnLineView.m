@@ -71,8 +71,8 @@
 }
 
 - (void)dropLineBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(dropOnLineAction:)]) {
-        [self.delegate dropOnLineAction:self.seatModel];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLDropOnLineView:action:)]) {
+        [self.delegate onVLDropOnLineView:self action:self.seatModel];
     }
 }
 

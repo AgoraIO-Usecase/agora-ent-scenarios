@@ -350,6 +350,7 @@
 #pragma mark - 合唱代理
 
 - (void)robViewChorusAction {
+    //抢麦
     if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
         if([self.delegate ktvIsMyselfOnSeat]) {
             [self.robMicroPhoneTimer invalidate];
