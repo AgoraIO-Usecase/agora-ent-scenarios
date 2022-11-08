@@ -21,7 +21,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 加入房间
     /// - Parameters:
     ///
-    func joinRoom(_ roomId: String,
+    func joinRoom(roomId: String,user: VRUser,
                   completion: @escaping (Error?, Bool) -> Void)
     
     /// 离开房间
@@ -51,7 +51,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 发送礼物
     /// - Parameters:
     ///
-    func sendGift(_ giftInfo: (String, String, Int, String),
+    func sendGift(_ giftInfo: VoiceRoomGiftEntity,
                   completion: @escaping (Error?, Bool) -> Void)
 
     /// 获取礼物列表
@@ -63,68 +63,64 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 获取人员列表
     /// - Parameters:
     ///
-    func fetchRoomMembers(_ roomInfo: (String, String?, Int),
-                             completion: @escaping (Error?, VRUsers?) -> Void)
+    func fetchRoomMembers(chatroom_id: String, completion: @escaping (Error?, VRUsers?) -> Void)
 
     /// 激活机器人,修改公告，修改机器人音量
     /// - Parameters:
     ///
-    func modifyRoomInfo(_ info: (String, Any, updateRoomState),
+    func modifyRoomInfo(chatroom_id: String,key: String,value: String,
                         completion: @escaping (Error?, Bool) -> Void)
 
     /// 禁言指定麦位
     /// - Parameters:
     ///
-    func forbidMic(_ micInfo: (String, Int),
+    func forbidMic(chatroom_id: String,mic_index: Int,
                    completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消禁言指定麦位
     /// - Parameters:
-    ///
-    func unForbidMic(_ micInfo: (String, Int),
+    /// 
+    func unForbidMic(chatroom_id: String,mic_index: Int,
                      completion: @escaping (Error?, Bool) -> Void)
 
     /// 锁麦
     /// - Parameters:
     ///
-    func lockMic(_ micInfo: (String, Int),
+    func lockMic(chatroom_id: String,mic_index: Int,
                  completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消锁麦
     /// - Parameters:
     ///
-    func unLockMic(_ micInfo: (String, Int),
+    func unLockMic(chatroom_id: String,mic_index: Int,
                    completion: @escaping (Error?, Bool) -> Void)
 
     /// 踢用户下麦
     /// - Parameters:
     ///
-    func kickOff(_ micInfo: (String, Int),
+    func kickOff(chatroom_id: String,mic_index: Int,
                  completion: @escaping (Error?, Bool) -> Void)
 
     /// 下麦
     /// - Parameters:
     ///
-    func leaveMic(_ micInfo: (String, Int),
+    func leaveMic(chatroom_id: String,mic_index: Int,
                   completion: @escaping (Error?, Bool) -> Void)
 
     /// mute
     /// - Parameters:
     ///
-    func muteLocal(_ micInfo: (String, Int),
-                   completion: @escaping (Error?, Bool) -> Void)
+    func muteLocal(chatroom_id: String,mic_index: Int,completion: @escaping (Error?, Bool) -> Void)
 
     /// unmute
     /// - Parameters:
     ///
-    func unmuteLocal(_ micInfo: (String, Int),
-                     completion: @escaping (Error?, Bool) -> Void)
+    func unmuteLocal(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void)
 
     /// 换麦
     /// - Parameters:
     ///
-    func changeMic(_ micInfo: (String, Int, Int),
-                   completion: @escaping (Error?, Bool) -> Void)
+    func changeMic(user: VRUser,old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消邀请
     /// - Parameters:
@@ -135,19 +131,19 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 接受邀请
     /// - Parameters:
     ///
-    func agreeInvite(_ roomId: String,
+    func agreeInvite(_ roomId: String,_ user: VRUser,
                      completion: @escaping (Error?, Bool) -> Void)
 
     /// 申请上麦
     /// - Parameters:
     ///
-    func submitApply(_ micInfo: (String, Int?),
+    func submitApply(chat_user: VRUser,
                      completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消上麦
     /// - Parameters:
     ///
-    func cancelApply(_ roomId: String,
+    func cancelApply(chat_uid: String,
                      completion: @escaping (Error?, Bool) -> Void)
 
     /// 获取房间列表
