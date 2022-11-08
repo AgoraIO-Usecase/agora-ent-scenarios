@@ -9,16 +9,24 @@ import Foundation
 
 extension UIFont {
     
-    @objc static func show_regularFontSize(_ size: CGFloat) ->UIFont? {
+    @objc private static func show_regularFontSize(_ size: CGFloat) ->UIFont? {
         UIFont(name: "PingFangSC-Regular", size: size)
     }
     
-    @objc static func show_MediumFontSize(_ size: CGFloat) ->UIFont? {
+    @objc private static func show_MediumFontSize(_ size: CGFloat) ->UIFont? {
         UIFont(name: "PingFangSC-Medium", size: size)
     }
     
-    @objc static func show_SemiboldFontSize(_ size: CGFloat) ->UIFont?{
+    @objc private static func show_SemiboldFontSize(_ size: CGFloat) ->UIFont?{
         UIFont(name: "PingFangSC-Semibold", size: size)
+    }
+    
+    @objc static var show_chat_user_name: UIFont? {
+        UIFont(name: "PingFangSC-Semibold", size: 13)
+    }
+    
+    @objc static var show_chat_msg: UIFont? {
+        UIFont(name: "PingFangSC-Regular", size: 13)
     }
     
     // 中等
@@ -26,11 +34,19 @@ extension UIFont {
         show_MediumFontSize(12)
     }
     
+    @objc static var show_M_14: UIFont? {
+        show_MediumFontSize(14)
+    }
+    
     @objc static var show_M_15: UIFont? {
         show_MediumFontSize(15)
     }
     
     // 常规
+    @objc static var show_R_9: UIFont? {
+        show_regularFontSize(9)
+    }
+    
     @objc static var show_R_10: UIFont? {
         show_regularFontSize(10)
     }
@@ -55,4 +71,6 @@ extension UIFont {
     @objc static var show_btn_title: UIFont? {
         show_SemiboldFontSize(16)
     }
+    
+    
 }

@@ -134,6 +134,11 @@
 		A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */; };
 		A845AD262918FAB300A41D8D /* AppContext+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD252918FAB300A41D8D /* AppContext+Show.swift */; };
 		A845AD282919263200A41D8D /* ShowLiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD272919263200A41D8D /* ShowLiveViewController.swift */; };
+		A845AD2B291A024100A41D8D /* ShowRoomInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */; };
+		A845AD2D291A163200A41D8D /* ShowRoomMembersCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */; };
+		A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */; };
+		A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */; };
+		A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -571,6 +576,11 @@
 		A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityCell.swift; sourceTree = "<group>"; };
 		A845AD252918FAB300A41D8D /* AppContext+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+Show.swift"; sourceTree = "<group>"; };
 		A845AD272919263200A41D8D /* ShowLiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowLiveViewController.swift; sourceTree = "<group>"; };
+		A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomInfoView.swift; sourceTree = "<group>"; };
+		A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomMembersCountView.swift; sourceTree = "<group>"; };
+		A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomBottomBar.swift; sourceTree = "<group>"; };
+		A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomLiveView.swift; sourceTree = "<group>"; };
+		A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomChatCell.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1298,6 +1308,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A845AD29291A01F700A41D8D /* Live */ = {
+			isa = PBXGroup;
+			children = (
+				A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */,
+				A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */,
+				A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */,
+				A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */,
+				A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */,
+			);
+			path = Live;
+			sourceTree = "<group>";
+		};
 		A88D14282913BEB900F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
@@ -1345,6 +1367,7 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A845AD29291A01F700A41D8D /* Live */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
 			);
@@ -2891,6 +2914,7 @@
 				05FFE705290F706C0024D22F /* VoiceRoomPopView.swift in Sources */,
 				DDBF788D2918D5920001855B /* ShowSyncManagerServiceImp.swift in Sources */,
 				DDA19A5F28FFE57A009D3E61 /* EKNotificationMessageView.swift in Sources */,
+				A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */,
 				DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */,
 				05FFE70E290F706C0024D22F /* VoiceRoomAlertContainer.swift in Sources */,
 				DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */,
@@ -2967,6 +2991,7 @@
 				0510B852290B799E0063E57A /* VRCreateRoomView.swift in Sources */,
 				DD8417A029090C520026B624 /* VLKTVBottomView.m in Sources */,
 				DD8417BE29090C520026B624 /* VLHomeOnLineListCCell.m in Sources */,
+				A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */,
 				A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */,
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				0510B865290B7A6E0063E57A /* VRAllRoomsViewController.swift in Sources */,
@@ -3009,6 +3034,7 @@
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */,
 				DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */,
+				A845AD2B291A024100A41D8D /* ShowRoomInfoView.swift in Sources */,
 				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
 				DDA19A1128FFE579009D3E61 /* Log.swift in Sources */,
 				0510B84F290B799E0063E57A /* VRSoundTypeCard.swift in Sources */,
@@ -3026,6 +3052,7 @@
 				0510B82B290B730E0063E57A /* VoiceRoomChatModel.swift in Sources */,
 				DD8417BF29090C520026B624 /* VLHomeOnLineListView.m in Sources */,
 				057DDA0A290B9496001329E6 /* Notification+Presentation.swift in Sources */,
+				A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */,
 				05FFE70C290F706C0024D22F /* VMSoundSelTableViewCell.swift in Sources */,
 				0510B867290B7A6E0063E57A /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
@@ -3081,6 +3108,7 @@
 				0510B853290B799E0063E57A /* VRCreateRoomInputView.swift in Sources */,
 				DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */,
 				0510B823290B72FC0063E57A /* VRRoomEntity.swift in Sources */,
+				A845AD2D291A163200A41D8D /* ShowRoomMembersCountView.swift in Sources */,
 				DD8417AD29090C520026B624 /* VLKTVMVView.m in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */,
