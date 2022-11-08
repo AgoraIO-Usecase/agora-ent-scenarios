@@ -36,7 +36,7 @@
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
     [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
-    [backBtn addTarget:self action:@selector(backBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
@@ -109,9 +109,9 @@
     }
 }
 
-- (void)backBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(backBtnAction)]) {
-        [self.delegate backBtnAction];
+- (void)backBtnClickEvent:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLPopOnLineTypeView:backBtnTapped:)]) {
+        [self.delegate onVLPopOnLineTypeView:self backBtnTapped:sender];
     }
 }
 
