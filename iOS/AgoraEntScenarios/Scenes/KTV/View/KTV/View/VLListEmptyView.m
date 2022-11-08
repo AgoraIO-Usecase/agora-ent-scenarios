@@ -5,7 +5,7 @@
 
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h""
+#import "AgoraEntScenarios-Swift.h"
 @import QMUIKit;
 @import YYCategories;
 
