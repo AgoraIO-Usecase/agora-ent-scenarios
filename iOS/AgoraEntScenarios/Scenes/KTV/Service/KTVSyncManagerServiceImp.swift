@@ -158,6 +158,13 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                     self._autoOnSeatIfNeed()
                     self._subscribeChooseSong {}
                 }
+                
+                NetworkManager.shared.generateIMConfig(channelName: channelName!,
+                                                       nickName: VLUserCenter.user.name,
+                                                       password: "pwd12345",
+                                                       uid: "\(UserInfo.userId)") { a, n in
+                    
+                }
             } fail: { error in
                 completion(error, nil)
             }
@@ -321,36 +328,6 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                           finished: completion)
     }
 
-    func getSongDetail(withInput inputModel: KTVSongDetailInputModel,
-                       completion: @escaping (Error?, KTVSongDetailOutputModel?) -> Void) {
-        let param = [
-            "lyricType": inputModel.lyricType,
-            "songCode": inputModel.songNo,
-        ] as [String: Any]
-        VLAPIRequest.getURL("/api-room/songs/getSongOnline",
-                            parameter: param,
-                            showHUD: true) { response in
-            if response.code != 0 {
-                completion(NSError(domain: response.message, code: response.code), nil)
-                return
-            }
-
-            let outputModel = KTVSongDetailOutputModel()
-            outputModel.songNo = inputModel.songNo
-            guard let resp = response.data as? [String: Any],
-                  let data = resp["data"] as? [String: Any]
-            else {
-                agoraAssert("response.data unknown format!")
-                return
-            }
-            outputModel.lyric = data["lyric"] as! String
-            outputModel.songUrl = data["playUrl"] as! String
-            completion(nil, outputModel)
-        } failure: { error, task in
-            completion(error, nil)
-        }
-    }
-
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
         _updateChooseSong(songInfo: inputModel, finished: completion)
@@ -363,7 +340,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
         songInfo.songNo = inputModel.songNo
-        songInfo.songUrl = inputModel.songUrl
+//        songInfo.songUrl = inputModel.songUrl
         songInfo.imageUrl = inputModel.imageUrl
         songInfo.singer = inputModel.singer
         songInfo.status = 0
