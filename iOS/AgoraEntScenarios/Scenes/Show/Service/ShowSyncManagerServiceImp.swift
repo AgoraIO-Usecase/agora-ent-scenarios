@@ -115,6 +115,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     completion(nil, output)
                     self._subscribeOnlineUsers {}
                     self._addUserIfNeed()
+                    self.roomList?.append(room)
                 }
             } fail: { error in
                 completion(error, nil)

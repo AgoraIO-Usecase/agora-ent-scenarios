@@ -64,9 +64,20 @@ class ShowRoomListVC: ShowBaseViewController {
         present(preNC, animated: true)
     }
     
-    // 加入放开
+    // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        
+        AppContext.showServiceImp.joinRoom(room: room) {[weak self] error, detailModel in
+            if error == nil {
+                guard let roomNo = room.roomNo else {
+                    print("roomNo == nil")
+                    return
+                }
+                let vc = ShowLiveViewController()
+                vc.channleName = roomNo
+                vc.modalPresentationStyle = .overCurrentContext
+                self?.present(vc, animated: true)
+            }
+        }
     }
     
     private func getRoomList() {

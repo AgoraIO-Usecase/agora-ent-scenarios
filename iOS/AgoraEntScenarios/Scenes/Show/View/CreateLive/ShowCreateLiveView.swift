@@ -23,7 +23,7 @@ class ShowCreateLiveView: UIView {
         }
     }
     
-    let roomNo: String = "ID: \(arc4random_uniform(899999) + 100000)"
+    let roomNo: String = "\(arc4random_uniform(899999) + 100000)"
     let roomBg: String = "\(Int.random(in: 1...3))"
     var roomName: String? {
         get{
@@ -95,7 +95,7 @@ class ShowCreateLiveView: UIView {
         }
         // 房间号
         roomIdLabel = UILabel()
-        roomIdLabel.text = roomNo
+        roomIdLabel.text = "ID: " + roomNo
         roomIdLabel.font = .show_R_10
         roomIdLabel.textColor = .show_main_text
         roomInfoCoverVeiw.addSubview(roomIdLabel)
