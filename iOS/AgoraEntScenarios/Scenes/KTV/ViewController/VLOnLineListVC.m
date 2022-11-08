@@ -20,6 +20,7 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
+#import "KTVMacro.h"
 @import LEEAlert;
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
@@ -49,7 +50,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:NSLocalizedString(@"在线K歌房", nil)];
+    [self setNaviTitleName:KTVLocalizedString(@"在线K歌房")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -104,9 +105,9 @@
         __block UITextField *TF = nil;
         
         [LEEAlert alert].config
-        .LeeTitle(NSLocalizedString(@"输入密码", nil))
+        .LeeTitle(KTVLocalizedString(@"输入密码"))
         .LeeAddTextField(^(UITextField *textField) {
-            textField.placeholder = NSLocalizedString(@"请输入房间密码", nil);
+            textField.placeholder = KTVLocalizedString(@"请输入房间密码");
             textField.textColor = UIColorBlack;
             textField.clearButtonMode=UITextFieldViewModeWhileEditing;
             textField.font = UIFontMake(15);
@@ -131,7 +132,7 @@
         .LeeAddAction(^(LEEAction *action) {
             VL(weakSelf);
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"确认", nil);
+            action.title = KTVLocalizedString(@"确认");
             action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
             action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
             action.cornerRadius = 20;

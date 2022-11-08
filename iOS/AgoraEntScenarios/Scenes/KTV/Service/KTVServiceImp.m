@@ -12,7 +12,7 @@
 #import "AgoraRtm.h"
 #import "VLMacroDefine.h"
 #import "VLRoomListModel.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 #import "VLGlobalHelper.h"
 #import "VLKTVSelBgModel.h"
 
@@ -53,16 +53,16 @@
     AgoraRtmChannel *rtmChannel = [AgoraRtm.kit createChannelWithId:channel delegate:self];
     
     if (!rtmChannel) {
-//        [VLToast toast:NSLocalizedString(@"加入频道失败", nil)];
-        NSAssert(false, [@"加入频道失败" toSceneLocalization]);
+//        [VLToast toast:KTVLocalizedString(@"加入频道失败")];
+        NSAssert(false, KTVLocalizedString(@"加入频道失败"));
         return;
     }
     
     [rtmChannel joinWithCompletion:^(AgoraRtmJoinChannelErrorCode errorCode) {
         if (errorCode != AgoraRtmJoinChannelErrorOk) {
-            NSString* errorMsg = [NSString stringWithFormat:@"%@:%ld", [@"加入频道失败" toSceneLocalization], errorCode];
+            NSString* errorMsg = [NSString stringWithFormat:@"%@:%ld", KTVLocalizedString(@"加入频道失败"), errorCode];
             NSAssert(false, errorMsg);
-//            [VLToast toast:[NSString stringWithFormat:NSLocalizedString(@"加入频道失败:%ld", nil), errorCode]];
+//            [VLToast toast:[NSString stringWithFormat:KTVLocalizedString(@"加入频道失败:%ld"), errorCode]];
         }
     }];
     
@@ -201,12 +201,14 @@
                         completion(nil, outputModel);
                     }];
                 }else{
-//                    [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
-                    completion([NSError errorWithDomain:[@"加入房间失败" toSceneLocalization] code:response.code userInfo:nil], nil);
+//                    [VLToast toast:KTVLocalizedString(@"加入房间失败")];
+                    completion([NSError errorWithDomain:KTVLocalizedString(@"加入房间失败")
+                                                   code:response.code userInfo:nil],
+                               nil);
                 }
                 
             } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//                [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
+//                [VLToast toast:KTVLocalizedString(@"加入房间失败")];
                 completion(error, nil);
             }];
             
@@ -215,7 +217,7 @@
             completion([NSError errorWithDomain:response.message code:response.code userInfo:nil], nil);
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [VLToast toast:NSLocalizedString(@"创建房间失败", nil)];
+//        [VLToast toast:KTVLocalizedString(@"创建房间失败")];
         completion(error, nil);
     }];
 }
@@ -309,7 +311,7 @@
             completion([NSError errorWithDomain:response.message code:response.code userInfo:nil]);
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [VLToast toast:NSLocalizedString(@"修改背景失败", nil)];
+//        [VLToast toast:KTVLocalizedString(@"修改背景失败")];
         completion(error);
     }];
 }
@@ -1000,7 +1002,7 @@ messageReceived:(AgoraRtmMessage *)message
 //            VLLog(@"Agora - Received audit message");
 //            if ([dict[@"userNo"] isEqualToString:VLUserCenter.user.userNo]) {
 //                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [VLToast toast:NSLocalizedString(@"您的行为存在涉嫌违法违规内容，请规范行为。", nil)];
+//                    [VLToast toast:KTVLocalizedString(@"您的行为存在涉嫌违法违规内容，请规范行为。")];
 //                });
 //            }
         }

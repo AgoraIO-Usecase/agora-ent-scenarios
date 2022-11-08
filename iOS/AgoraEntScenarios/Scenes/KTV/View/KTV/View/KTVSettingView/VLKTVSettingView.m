@@ -9,6 +9,7 @@
 #import "VLKTVSliderView.h"
 #import "VLKTVKindsView.h"
 #import "VLFontUtils.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import QMUIKit;
 
@@ -159,7 +160,7 @@
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = NSLocalizedString(@"控制台", nil);
+        _titleLabel.text = KTVLocalizedString(@"控制台");
         _titleLabel.font = VLUIFontMake(16);
         _titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     }
@@ -169,8 +170,8 @@
 - (VLKTVSwitcherView *)soundSwitcher {
     if (!_soundSwitcher) {
         _soundSwitcher = [[VLKTVSwitcherView alloc] init];
-        _soundSwitcher.titleLabel.text = NSLocalizedString(@"耳返", nil);
-        _soundSwitcher.subText = NSLocalizedString(@"请插入耳机使用耳返功能", nil);
+        _soundSwitcher.titleLabel.text = KTVLocalizedString(@"耳返");
+        _soundSwitcher.subText = KTVLocalizedString(@"请插入耳机使用耳返功能");
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
@@ -179,7 +180,7 @@
 - (VLKTVSwitcherView *)mvSwitcher {
     if (!_mvSwitcher) {
         _mvSwitcher = [[VLKTVSwitcherView alloc] init];
-        _mvSwitcher.titleLabel.text = NSLocalizedString(@"MV", nil);
+        _mvSwitcher.titleLabel.text = KTVLocalizedString(@"MV");
         _mvSwitcher.delegate = self;
     }
     return _mvSwitcher;
@@ -188,7 +189,7 @@
 - (VLKTVTonesView *)tonesView {
     if (!_tonesView) {
         _tonesView = [[VLKTVTonesView alloc] initWithMaxLevel:12 currentLevel:6];
-        _tonesView.titleLabel.text = NSLocalizedString(@"升降调", nil);
+        _tonesView.titleLabel.text = KTVLocalizedString(@"升降调");
         _tonesView.delegate = self;
     }
     return _tonesView;
@@ -197,7 +198,7 @@
 - (VLKTVSliderView *)soundSlider {
     if (!_soundSlider) {
         _soundSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _soundSlider.titleLabel.text = NSLocalizedString(@"音量", nil);
+        _soundSlider.titleLabel.text = KTVLocalizedString(@"音量");
         _soundSlider.delegate = self;
     }
     return _soundSlider;
@@ -206,7 +207,7 @@
 - (VLKTVSliderView *)accSlider {
     if (!_accSlider) {
         _accSlider = [[VLKTVSliderView alloc] initWithMax:1 min:0];
-        _accSlider.titleLabel.text = NSLocalizedString(@"伴奏", nil);
+        _accSlider.titleLabel.text = KTVLocalizedString(@"伴奏");
         _accSlider.delegate = self;
     }
     return _accSlider;

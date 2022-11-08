@@ -938,6 +938,7 @@
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
 		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
+		DDBF7890291A45120001855B /* KTVMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -1587,6 +1588,7 @@
 		DD8416E529090C520026B624 /* KTV */ = {
 			isa = PBXGroup;
 			children = (
+				DDBF788F291A44FD0001855B /* Utils */,
 				DD8416E629090C520026B624 /* Model */,
 				DD8416FA29090C520026B624 /* View */,
 				DD84174829090C520026B624 /* Service */,
@@ -2450,6 +2452,14 @@
 				DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */,
 			);
 			path = ZQTCustomSwitch;
+			sourceTree = "<group>";
+		};
+		DDBF788F291A44FD0001855B /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				DDBF7890291A45120001855B /* KTVMacro.h */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {

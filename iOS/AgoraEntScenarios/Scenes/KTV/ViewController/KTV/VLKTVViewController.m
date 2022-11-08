@@ -42,7 +42,7 @@
 //#import "VLAPIRequest.h"
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import LSTPopView;
 @import AgoraRtcKit;
 
@@ -1112,19 +1112,19 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     if (VLUserCenter.user.ifMaster) { //自己是房主关闭房间
         [LEEAlert alert].config
         .LeeAddTitle(^(UILabel *label) {
-            label.text = NSLocalizedString(@"解散房间", nil);
+            label.text = KTVLocalizedString(@"解散房间");
             label.textColor = UIColorMakeWithHex(@"#040925");
             label.font = UIFontBoldMake(16);
         })
         .LeeAddContent(^(UILabel *label) {
-            label.text = NSLocalizedString(@"确定解散该房间吗？", nil);
+            label.text = KTVLocalizedString(@"确定解散该房间吗？");
             label.textColor = UIColorMakeWithHex(@"#6C7192");
             label.font = UIFontMake(14);
             
         })
         .LeeAddAction(^(LEEAction *action) {
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"取消", nil);
+            action.title = KTVLocalizedString(@"取消");
             action.titleColor = UIColorMakeWithHex(@"#000000");
             action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
             action.cornerRadius = 20;
@@ -1139,7 +1139,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         .LeeAddAction(^(LEEAction *action) {
             VL(weakSelf);
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"确定", nil);
+            action.title = KTVLocalizedString(@"确定");
             action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
             action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
             action.cornerRadius = 20;
@@ -1154,19 +1154,19 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }else{
         [LEEAlert alert].config
         .LeeAddTitle(^(UILabel *label) {
-            label.text = NSLocalizedString(@"退出房间", nil);
+            label.text = KTVLocalizedString(@"退出房间");
             label.textColor = UIColorMakeWithHex(@"#040925");
             label.font = UIFontBoldMake(16);
         })
         .LeeAddContent(^(UILabel *label) {
-            label.text = NSLocalizedString(@"确定退出该房间吗？", nil);
+            label.text = KTVLocalizedString(@"确定退出该房间吗？");
             label.textColor = UIColorMakeWithHex(@"#6C7192");
             label.font = UIFontMake(14);
             
         })
         .LeeAddAction(^(LEEAction *action) {
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"取消", nil);
+            action.title = KTVLocalizedString(@"取消");
             action.titleColor = UIColorMakeWithHex(@"#000000");
             action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
             action.cornerRadius = 20;
@@ -1181,7 +1181,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         .LeeAddAction(^(LEEAction *action) {
             VL(weakSelf);
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"确定", nil);
+            action.title = KTVLocalizedString(@"确定");
             action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
             action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
             action.cornerRadius = 20;
@@ -1489,19 +1489,19 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
         [LEEAlert alert].config
         .LeeAddTitle(^(UILabel *label) {
-            label.text = NSLocalizedString(@"切换歌曲", nil);
+            label.text = KTVLocalizedString(@"切换歌曲");
             label.textColor = UIColorMakeWithHex(@"#040925");
             label.font = UIFontBoldMake(16);
         })
         .LeeAddContent(^(UILabel *label) {
-            label.text = NSLocalizedString(@"切换下一首歌曲？", nil);
+            label.text = KTVLocalizedString(@"切换下一首歌曲？");
             label.textColor = UIColorMakeWithHex(@"#6C7192");
             label.font = UIFontMake(14);
             
         })
         .LeeAddAction(^(LEEAction *action) {
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"取消", nil);
+            action.title = KTVLocalizedString(@"取消");
             action.titleColor = UIColorMakeWithHex(@"#000000");
             action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
             action.cornerRadius = 20;
@@ -1516,7 +1516,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         .LeeAddAction(^(LEEAction *action) {
             VL(weakSelf);
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"确定", nil);
+            action.title = KTVLocalizedString(@"确定");
             action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
             action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
             action.cornerRadius = 20;
@@ -1676,7 +1676,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)ktvNotifyUserNotOnSeat {
-    [VLToast toast:NSLocalizedString(@"请先上坐", nil)];
+    [VLToast toast:KTVLocalizedString(@"请先上坐")];
 }
 
 - (void)ktvMVViewDidClickSingType:(VLKTVMVViewSingActionType)singType {
@@ -1941,14 +1941,14 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 - (void)popForceLeaveRoom {
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = NSLocalizedString(@"房主已解散房间,请确认离开房间", nil);
+        label.text = KTVLocalizedString(@"房主已解散房间,请确认离开房间");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"确定", nil);
+        action.title = KTVLocalizedString(@"确定");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -2324,7 +2324,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
     else {
         dispatch_main_async_safe(^{
-            [VLToast toast:NSLocalizedString(@"加载歌曲失败", nil)];
+            [VLToast toast:KTVLocalizedString(@"加载歌曲失败")];
         });
     }
 }
