@@ -133,6 +133,7 @@
 		7F6BE3DF2919ED4900F6714D /* VLPopScoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DA2919ED4900F6714D /* VLPopScoreView.m */; };
 		7F6BE3E02919ED4900F6714D /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */; };
 		7F6BE3E12919ED4900F6714D /* VLPopOnLineTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */; };
+		7F6BE3E4291A2B6600F6714D /* VLTouristOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -216,7 +217,6 @@
 		DD8417AA29090C520026B624 /* VLKTVKindsView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84171A29090C520026B624 /* VLKTVKindsView.m */; };
 		DD8417AB29090C520026B624 /* VLKTVItemBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84171B29090C520026B624 /* VLKTVItemBaseView.m */; };
 		DD8417AD29090C520026B624 /* VLKTVMVView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84171F29090C520026B624 /* VLKTVMVView.m */; };
-		DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172029090C520026B624 /* VLTouristOnLineView.m */; };
 		DD8417AF29090C520026B624 /* VLChooseBelcantoView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172129090C520026B624 /* VLChooseBelcantoView.m */; };
 		DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172629090C520026B624 /* VLChoosedSongView.m */; };
 		DD8417B129090C520026B624 /* VLSelectSongView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172729090C520026B624 /* VLSelectSongView.m */; };
@@ -551,6 +551,8 @@
 		7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopSelBgView.m; sourceTree = "<group>"; };
 		7F6BE3DC2919ED4900F6714D /* VLPopMoreSelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopMoreSelView.h; sourceTree = "<group>"; };
 		7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopOnLineTypeView.m; sourceTree = "<group>"; };
+		7F6BE3E2291A2B6600F6714D /* VLTouristOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLTouristOnLineView.h; sourceTree = "<group>"; };
+		7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLTouristOnLineView.m; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -683,7 +685,6 @@
 		DD84171B29090C520026B624 /* VLKTVItemBaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVItemBaseView.m; sourceTree = "<group>"; };
 		DD84171C29090C520026B624 /* VLKTVSwitcherView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSwitcherView.h; sourceTree = "<group>"; };
 		DD84171F29090C520026B624 /* VLKTVMVView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVMVView.m; sourceTree = "<group>"; };
-		DD84172029090C520026B624 /* VLTouristOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLTouristOnLineView.m; sourceTree = "<group>"; };
 		DD84172129090C520026B624 /* VLChooseBelcantoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLChooseBelcantoView.m; sourceTree = "<group>"; };
 		DD84172229090C520026B624 /* VLRobMicrophoneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRobMicrophoneView.h; sourceTree = "<group>"; };
 		DD84172329090C520026B624 /* VLNoBodyOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLNoBodyOnLineView.h; sourceTree = "<group>"; };
@@ -711,7 +712,6 @@
 		DD84173F29090C520026B624 /* VLRobMicrophoneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRobMicrophoneView.m; sourceTree = "<group>"; };
 		DD84174029090C520026B624 /* VLNoBodyOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLNoBodyOnLineView.m; sourceTree = "<group>"; };
 		DD84174129090C520026B624 /* VLChooseBelcantoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLChooseBelcantoView.h; sourceTree = "<group>"; };
-		DD84174229090C520026B624 /* VLTouristOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLTouristOnLineView.h; sourceTree = "<group>"; };
 		DD84174329090C520026B624 /* VLCreateRoomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCreateRoomView.m; sourceTree = "<group>"; };
 		DD84174429090C520026B624 /* VLHomeOnLineListCCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHomeOnLineListCCell.m; sourceTree = "<group>"; };
 		DD84174529090C520026B624 /* VLHomeOnLineListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHomeOnLineListView.m; sourceTree = "<group>"; };
@@ -1670,6 +1670,8 @@
 		DD84170429090C520026B624 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7F6BE3E2291A2B6600F6714D /* VLTouristOnLineView.h */,
+				7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */,
 				7F6BE3D52919ED4900F6714D /* KTVModal */,
 				DD84170629090C520026B624 /* VLsoundEffectView.m */,
 				DD84170729090C520026B624 /* VLKTVBottomView.m */,
@@ -1680,7 +1682,6 @@
 				DD84170D29090C520026B624 /* VLRoomPersonView.h */,
 				DD84170E29090C520026B624 /* KTVSettingView */,
 				DD84171F29090C520026B624 /* VLKTVMVView.m */,
-				DD84172029090C520026B624 /* VLTouristOnLineView.m */,
 				DD84172129090C520026B624 /* VLChooseBelcantoView.m */,
 				DD84172229090C520026B624 /* VLRobMicrophoneView.h */,
 				DD84172329090C520026B624 /* VLNoBodyOnLineView.h */,
@@ -1698,7 +1699,6 @@
 				DD84173F29090C520026B624 /* VLRobMicrophoneView.m */,
 				DD84174029090C520026B624 /* VLNoBodyOnLineView.m */,
 				DD84174129090C520026B624 /* VLChooseBelcantoView.h */,
-				DD84174229090C520026B624 /* VLTouristOnLineView.h */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2898,6 +2898,7 @@
 				05FFE70A290F706C0024D22F /* VMAudioSettingView.swift in Sources */,
 				05FFE730290F74560024D22F /* AgoraChatRoom3DMoveUserView.swift in Sources */,
 				DD84179D29090C520026B624 /* VLSelectSongTCell.m in Sources */,
+				7F6BE3E4291A2B6600F6714D /* VLTouristOnLineView.m in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
 				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
@@ -2964,7 +2965,6 @@
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				7F6BE3DF2919ED4900F6714D /* VLPopScoreView.m in Sources */,
 				DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */,
-				DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */,
 				05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD8417B129090C520026B624 /* VLSelectSongView.m in Sources */,
