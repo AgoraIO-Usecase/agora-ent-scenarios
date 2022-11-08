@@ -13,6 +13,7 @@
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import MJRefresh;
 
@@ -162,7 +163,7 @@ AgoraMusicContentCenterEventDelegate
 
 - (void)dianGeWithModel:(VLSongItmModel*)model {
     if(model == nil || model.songNo == nil || model.songName == nil ) {
-        [VLToast toast:NSLocalizedString(@"点歌失败，请重试", nil)];
+        [VLToast toast:KTVLocalizedString(@"点歌失败，请重试")];
         return;
     }
     
