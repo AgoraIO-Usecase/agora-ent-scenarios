@@ -773,7 +773,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 //                VLLog(@"didChangedToPosition-----%@,%ld",playerKit,position);
                 NSDictionary *dict = @{
                     @"cmd":@"setLrcTime",
-                    @"duration":@([self ktvMVViewMusicTotalTime]),
+                    @"duration":@([self getTotalTime]),
                     @"time":@(position),
                 };
                 [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
@@ -1078,7 +1078,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [self.roomPersonView setSeatsArray:self.seatsArray];
         [self.dropLineView dismiss];
     }];
-
+}
 
 #pragma mark - rtc utils
 - (void)resetMicAndCameraStatus
@@ -1475,11 +1475,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index {
-    <#code#>
-}
-
-
-- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndx:(NSInteger)index {
     self.selBelcantoModel = model;
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
                         scenario:AgoraAudioScenarioGameStreaming];
