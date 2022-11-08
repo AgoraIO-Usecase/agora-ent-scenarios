@@ -271,8 +271,8 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         completion(nil)
     }
     
-    func mute(withMuteStatus mute: Bool,
-              completion: @escaping (Error?) -> Void) {
+    func openAudioStatus(withStatus openStatus: Bool,
+                         completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
             .filter({ $0.value.userNo == VLUserCenter.user.userNo })
             .first?.value else {
@@ -280,7 +280,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
             return
         }
         
-        seatInfo.isSelfMuted = mute ? 1 : 0
+        seatInfo.isSelfMuted = openStatus ? 0 : 1
         _updateSeat(seatInfo: seatInfo,
                     finished: completion)
     }

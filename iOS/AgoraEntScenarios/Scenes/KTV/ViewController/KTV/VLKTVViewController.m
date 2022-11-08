@@ -848,6 +848,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
     [self.bottomView updateAudioBtn:self.isNowMicMuted];
     [self.MVView validateSingType];
+    
+    [[AppContext ktvServiceImp] openAudioStatusWithStatus:!mute
+                                               completion:^(NSError * error) {
+        
+    }];
 }
 
 - (void)muteLocalVideo:(BOOL)mute {
@@ -862,6 +867,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         _isNowCameraMuted = YES;
     }
     [self.bottomView updateVideoBtn:self.isNowCameraMuted];
+    
+    [[AppContext ktvServiceImp] openVideoStatusWithStatus:!mute
+                                               completion:^(NSError * error) {
+        
+    }];
 }
 
 - (void)toggleLocalAudio {

@@ -620,9 +620,9 @@
     }];
 }
 
-- (void)muteWithMuteStatus:(BOOL)mute
-                completion:(void(^)(NSError* _Nullable))completion {
-    NSString *setStatus = mute ? @"1" : @"0";
+- (void)openAudioStatusWithStatus:(BOOL)openStatus
+                       completion:(void (^)(NSError * _Nullable))completion {
+    NSString *setStatus = openStatus ? @"0" : @"1";
 
     NSDictionary *param = @{
         @"roomNo": [self getRoomNo],
