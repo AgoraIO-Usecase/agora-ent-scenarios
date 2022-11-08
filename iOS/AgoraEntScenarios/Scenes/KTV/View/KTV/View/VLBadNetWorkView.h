@@ -8,8 +8,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @protocol VLBadNetWorkViewDelegate <NSObject>
 
-@optional
-- (void)knowBtnClickAction;
+- (void)onVLBadNetworkView:(VLBadNetWorkView*)view dismiss:(id)sender;
 
 @end
 
