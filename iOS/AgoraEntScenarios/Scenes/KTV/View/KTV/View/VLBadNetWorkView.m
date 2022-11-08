@@ -49,9 +49,9 @@
     
 }
 
-- (void)knowBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(knowBtnClickAction)]) {
-        [self.delegate knowBtnClickAction];
+- (void)knowBtnClickEvent:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLBadNetworkView:dismiss:)]) {
+        [self.delegate onVLBadNetworkView:self dismiss:sender];
     }
 }
 
