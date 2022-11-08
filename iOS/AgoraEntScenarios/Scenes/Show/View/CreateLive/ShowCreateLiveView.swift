@@ -231,7 +231,6 @@ extension ShowCreateLiveView {
     
     // 点击开始直播按钮
     @objc private func didClickStartButton(){
-//        delegate?.onClickStartBtnAction()
-        AlertManager.show(view: ShowApplyAndInviteView(), alertPostion: .bottom)
+        delegate?.onClickStartBtnAction()
     }
 }
