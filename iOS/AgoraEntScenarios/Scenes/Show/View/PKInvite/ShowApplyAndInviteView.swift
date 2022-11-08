@@ -1,0 +1,150 @@
+//
+//  ShowApplyView.swift
+//  AgoraEntScenarios
+//
+//  Created by zhaoyongqiang on 2022/11/8.
+//
+
+import UIKit
+import Agora_Scene_Utils
+
+class ShowApplyAndInviteView: UIView {
+    private lazy var segmentView: ShowSegmentView = {
+        let segmentView = ShowSegmentView(frame: CGRect(x: 10,
+                                                        y: 23,
+                                                        width: Screen.width,
+                                                        height: 44),
+                                          segmentStyle: .init(),
+                                          titles: ["申请消息", "连麦邀请"])
+        segmentView.style.indicatorStyle = .line
+        segmentView.style.indicatorHeight = 2
+        segmentView.style.indicatorColor = UIColor(hex: "#7A59FB")
+        segmentView.style.indicatorWidth = 64
+        segmentView.selectedTitleColor = .black
+        segmentView.titlePendingHorizontal = 50
+        segmentView.normalTitleColor = UIColor(hex: "#6D7291")
+        segmentView.valueChange = { [weak self] index in
+            print("index === \(index)")
+        }
+        return segmentView
+    }()
+    private lazy var statckView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.alignment = .fill
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+        stackView.spacing = 0
+        return stackView
+    }()
+    private lazy var tipsContainerView: AGEView = {
+        let view = AGEView()
+        return view
+    }()
+    private lazy var tipsView: AGEView = {
+        let view = AGEView()
+        view.backgroundColor = UIColor(hex: "#F4F6F9")
+        view.cornerRadius(5)
+        return view
+    }()
+    private lazy var tipsLabel: AGELabel = {
+        let label = AGELabel(colorStyle: .black, fontStyle: .middle)
+        label.text = "与主播gdsklgjlgPK中"
+        return label
+    }()
+    private lazy var endButton: AGEButton = {
+        let button = AGEButton()
+        button.setTitle("结束".show_localized, for: .normal)
+        button.setTitleColor(UIColor(hex: "#684BF2"), for: .normal)
+        let image = UIImage(systemName: "xmark.circle")?.withTintColor(UIColor(hex: "#684BF2"),
+                                                                       renderingMode: .alwaysOriginal)
+        button.setImage(image, for: .normal, postion: .right, spacing: 5)
+        button.addTarget(self, action: #selector(onTapEndButton(sender:)), for: .touchUpInside)
+        return button
+    }()
+    private lazy var tableView: AGETableView = {
+        let view = AGETableView()
+        view.rowHeight = 67
+        view.emptyTitle = "暂无主播在线".show_localized
+        view.emptyTitleColor = UIColor(hex: "#989DBA")
+        view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
+        view.delegate = self
+        view.register(ShowPKInviteViewCell.self,
+                      forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
+        view.dataArray = (0...10).map({ $0 })
+        return view
+    }()
+    private var tipsViewHeightCons: NSLayoutConstraint?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupUI() {
+        layer.cornerRadius = 10
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        layer.masksToBounds = true
+        backgroundColor = .white
+        translatesAutoresizingMaskIntoConstraints = false
+        tipsView.translatesAutoresizingMaskIntoConstraints = false
+        tipsLabel.translatesAutoresizingMaskIntoConstraints = false
+        endButton.translatesAutoresizingMaskIntoConstraints = false
+        statckView.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(segmentView)
+        tipsView.addSubview(tipsLabel)
+        tipsView.addSubview(endButton)
+        addSubview(statckView)
+        tipsContainerView.addSubview(tipsView)
+        statckView.addArrangedSubview(tipsContainerView)
+        statckView.addArrangedSubview(tableView)
+        
+        widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
+                
+        statckView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        statckView.topAnchor.constraint(equalTo: segmentView.bottomAnchor,
+                                        constant: 13).isActive = true
+        statckView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        statckView.bottomAnchor.constraint(equalTo: bottomAnchor,
+                                           constant: -Screen.safeAreaBottomHeight()).isActive = true
+        statckView.heightAnchor.constraint(equalToConstant: 340).isActive = true
+        
+        tipsViewHeightCons = tipsContainerView.heightAnchor.constraint(equalToConstant: 40)
+        tipsViewHeightCons?.isActive = true
+        tipsView.leadingAnchor.constraint(equalTo: tipsContainerView.leadingAnchor,
+                                          constant: 20).isActive = true
+        tipsView.trailingAnchor.constraint(equalTo: tipsContainerView.trailingAnchor,
+                                           constant: -20).isActive = true
+        tipsView.topAnchor.constraint(equalTo: tipsContainerView.topAnchor).isActive = true
+        tipsView.bottomAnchor.constraint(equalTo: tipsContainerView.bottomAnchor).isActive = true
+        
+        tipsLabel.leadingAnchor.constraint(equalTo: tipsView.leadingAnchor,
+                                           constant: 10).isActive = true
+        tipsLabel.centerYAnchor.constraint(equalTo: tipsView.centerYAnchor).isActive = true
+        
+        endButton.centerYAnchor.constraint(equalTo: tipsView.centerYAnchor).isActive = true
+        endButton.trailingAnchor.constraint(equalTo: tipsView.trailingAnchor,
+                                            constant: -13).isActive = true
+    }
+    
+    @objc
+    private func onTapEndButton(sender: AGEButton) {
+        tipsViewHeightCons?.constant = 0
+        tipsViewHeightCons?.isActive = true
+        UIView.animate(withDuration: 0.25) {
+            self.layoutIfNeeded()
+        }
+    }
+}
+extension ShowApplyAndInviteView: AGETableViewDelegate {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
+                                                 for: indexPath)
+        
+        return cell
+    }
+}

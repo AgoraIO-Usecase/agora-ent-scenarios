@@ -8,7 +8,7 @@
 import UIKit
 import Agora_Scene_Utils
 
-class PKInviteView: UIView {
+class ShowPKInviteView: UIView {
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "PK邀请".show_localized
@@ -54,8 +54,8 @@ class PKInviteView: UIView {
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
-        view.register(PKInviteViewCell.self,
-                      forCellWithReuseIdentifier: PKInviteViewCell.description())
+        view.register(ShowPKInviteViewCell.self,
+                      forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
         view.dataArray = (0...10).map({ $0 })
         return view
     }()
@@ -97,23 +97,29 @@ class PKInviteView: UIView {
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 23).isActive = true
         
         statckView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        statckView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 13).isActive = true
+        statckView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,
+                                        constant: 13).isActive = true
         statckView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        statckView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Screen.safeAreaBottomHeight()).isActive = true
+        statckView.bottomAnchor.constraint(equalTo: bottomAnchor,
+                                           constant: -Screen.safeAreaBottomHeight()).isActive = true
         statckView.heightAnchor.constraint(equalToConstant: 340).isActive = true
         
         pkTipsViewHeightCons = pkTipsContainerView.heightAnchor.constraint(equalToConstant: 40)
         pkTipsViewHeightCons?.isActive = true
-        pkTipsView.leadingAnchor.constraint(equalTo: pkTipsContainerView.leadingAnchor, constant: 20).isActive = true
-        pkTipsView.trailingAnchor.constraint(equalTo: pkTipsContainerView.trailingAnchor, constant: -20).isActive = true
+        pkTipsView.leadingAnchor.constraint(equalTo: pkTipsContainerView.leadingAnchor,
+                                            constant: 20).isActive = true
+        pkTipsView.trailingAnchor.constraint(equalTo: pkTipsContainerView.trailingAnchor,
+                                             constant: -20).isActive = true
         pkTipsView.topAnchor.constraint(equalTo: pkTipsContainerView.topAnchor).isActive = true
         pkTipsView.bottomAnchor.constraint(equalTo: pkTipsContainerView.bottomAnchor).isActive = true
         
-        pkTipsLabel.leadingAnchor.constraint(equalTo: pkTipsView.leadingAnchor, constant: 10).isActive = true
+        pkTipsLabel.leadingAnchor.constraint(equalTo: pkTipsView.leadingAnchor,
+                                             constant: 10).isActive = true
         pkTipsLabel.centerYAnchor.constraint(equalTo: pkTipsView.centerYAnchor).isActive = true
         
         endButton.centerYAnchor.constraint(equalTo: pkTipsView.centerYAnchor).isActive = true
-        endButton.trailingAnchor.constraint(equalTo: pkTipsView.trailingAnchor, constant: -13).isActive = true
+        endButton.trailingAnchor.constraint(equalTo: pkTipsView.trailingAnchor,
+                                            constant: -13).isActive = true
     }
     
     @objc
@@ -125,15 +131,16 @@ class PKInviteView: UIView {
         }
     }
 }
-extension PKInviteView: AGETableViewDelegate {
+extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: PKInviteViewCell.description(), for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
+                                                 for: indexPath)
         
         return cell
     }
 }
 
-enum PKInviteStatus: CaseIterable {
+enum ShowPKInviteStatus: CaseIterable {
     case invite
     case pking
     case refused
@@ -160,7 +167,7 @@ enum PKInviteStatus: CaseIterable {
     }
 }
 
-class PKInviteViewCell: UITableViewCell {
+class ShowPKInviteViewCell: UITableViewCell {
     private lazy var avatarImageView: AGEImageView = {
         let imageView = AGEImageView(type: .avatar)
         imageView.image = UIImage.show_sceneImage(name: "show_default_avatar")
@@ -178,6 +185,7 @@ class PKInviteViewCell: UITableViewCell {
         button.setTitle("邀请".show_localized, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.addTargetFor(self, action: #selector(onTapStatusButton(sender:)), for: .touchUpInside)
         return button
     }()
     private lazy var lineView: AGEView = {
@@ -221,5 +229,10 @@ class PKInviteViewCell: UITableViewCell {
         lineView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         lineView.trailingAnchor.constraint(equalTo: statusButton.trailingAnchor).isActive = true
         lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+    
+    @objc
+    private func onTapStatusButton(sender: UIButton) {
+        print("sender == \(sender.titleLabel?.text ?? "")")
     }
 }
