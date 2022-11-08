@@ -935,6 +935,28 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }];
 }
 
+
+// TODO
+// Play song locally and update UI
+- (void)playSongWithPlayer:(id<AgoraRtcMediaPlayerProtocol>)player {
+    if (self.selSongsArray.count > 0) {
+        VLRoomSelSongModel *model = self.selSongsArray.firstObject;
+        if ([model.userNo isEqualToString:VLUserCenter.user.userNo] ||
+                ([self ifChorusSinger:VLUserCenter.user.userNo]
+                 && [model.chorusNo isEqualToString:VLUserCenter.user.userNo])) {
+            [player play];
+            
+            [_MVView start];
+            [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+            
+            if ([self ifMainSinger:VLUserCenter.user.userNo]
+                && self.selSongsArray.count) {
+                [self tellSeverTheCurrentPlaySongWithModel:self.selSongsArray.firstObject];
+            }
+        }
+    }
+}
+
 #pragma mark - rtc utils
 - (void)resetMicAndCameraStatus
 {
@@ -1365,7 +1387,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark VLDropOnLineViewDelegate
-- (void)dropOnLineAction:(VLRoomSeatModel *)seatModel {
+- (void)onVLDropOnLineView:(VLDropOnLineView *)view action:(VLRoomSeatModel *)seatModel {
     NSString *userNo = (seatModel!=nil ? seatModel.userNo : VLUserCenter.user.userNo);
     NSString *userHeadUrl = (seatModel!=nil ? seatModel.headUrl : VLUserCenter.user.headUrl);
     NSString *userName = (seatModel!=nil ? seatModel.name : VLUserCenter.user.name);
@@ -1423,41 +1445,15 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }];
 }
 
-//美声点击事件
-//感觉没用到
-- (void)itemClickAction:(VLBelcantoModel *)model {
-    self.selBelcantoModel = model;
-}
-
 #pragma mark VLBadNetWorkViewDelegate
 //网络差知道了点击事件
-- (void)knowBtnClickAction {
+- (void)onVLBadNetworkView:(id)view dismiss:(id)sender {
     [self.popBadNetWorkView dismiss];
 }
 
 #pragma mark VLTouristOnLineViewDelegate
 //上麦方式
 - (void)requestOnlineAction {
-}
-
-// Play song locally and update UI
-- (void)playSongWithPlayer:(id<AgoraRtcMediaPlayerProtocol>)player {
-    if (self.selSongsArray.count > 0) {
-        VLRoomSelSongModel *model = self.selSongsArray.firstObject;
-        if ([model.userNo isEqualToString:VLUserCenter.user.userNo] ||
-                ([self ifChorusSinger:VLUserCenter.user.userNo]
-                 && [model.chorusNo isEqualToString:VLUserCenter.user.userNo])) {
-            [player play];
-            
-            [_MVView start];
-            [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-            
-            if ([self ifMainSinger:VLUserCenter.user.userNo]
-                && self.selSongsArray.count) {
-                [self tellSeverTheCurrentPlaySongWithModel:self.selSongsArray.firstObject];
-            }
-        }
-    }
 }
 
 #pragma mark - MVViewDelegate
