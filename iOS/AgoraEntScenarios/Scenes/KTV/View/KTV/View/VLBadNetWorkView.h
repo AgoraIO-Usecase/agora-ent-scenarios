@@ -6,6 +6,7 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+@class VLBadNetWorkView;
 @protocol VLBadNetWorkViewDelegate <NSObject>
 
 - (void)onVLBadNetworkView:(VLBadNetWorkView*)view dismiss:(id)sender;
