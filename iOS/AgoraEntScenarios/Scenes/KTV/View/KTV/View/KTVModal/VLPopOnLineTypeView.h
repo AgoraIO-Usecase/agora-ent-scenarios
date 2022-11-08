@@ -7,10 +7,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLPopOnLineTypeView;
 @protocol VLPopOnLineTypeViewDelegate <NSObject>
 
-@optional
-- (void)backBtnAction;
+- (void)onVLPopOnLineTypeView:(VLPopOnLineTypeView*)view backBtnTapped:(id)sender;
 
 @end
 
