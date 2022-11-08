@@ -81,11 +81,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)outSeatWithInput:(KTVOutSeatInputModel*)inputModel
               completion:(void(^)(NSError* _Nullable))completion;
 
-/// 设置麦位静音
-/// @param mute YES: 开启静音 NO: 关闭静音
+/// 设置麦位声音
+/// @param openStatus YES: 开启声音 NO: 关闭声音
 /// @param completion <#completion description#>
-- (void)muteWithMuteStatus:(BOOL)mute
-                completion:(void(^)(NSError* _Nullable))completion;
+- (void)openAudioStatusWithStatus:(BOOL)openStatus
+                       completion:(void(^)(NSError* _Nullable))completion;
 
 /// 打开麦位摄像头
 /// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
@@ -171,7 +171,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
-
 
 // Deprecated method
 @optional
