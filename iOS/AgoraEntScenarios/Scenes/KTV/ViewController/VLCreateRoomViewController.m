@@ -17,7 +17,7 @@
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
@@ -47,7 +47,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:NSLocalizedString(@"创建房间", nil)];
+    [self setNaviTitleName:KTVLocalizedString(@"创建房间")];
     [self setBackBtn];
 }
 
