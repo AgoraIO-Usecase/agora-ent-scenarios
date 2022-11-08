@@ -4,12 +4,11 @@
 //
 
 #import <UIKit/UIKit.h>
-@class VLKTVSelBgCell,VLKTVSelBgModel;
+@class VLKTVSelBgCell,VLKTVSelBgModel,VLPopSelBgView;
 
 @protocol VLPopSelBgViewDelegate <NSObject>
 
-@optional
-- (void)bgItemClickAction:(VLKTVSelBgModel *)selBgModel index:(NSInteger)index;
+- (void)onVLPopSelBgView:(VLPopSelBgView*)view tappedWithAction:(VLKTVSelBgModel *)selBgModel atIndex:(NSInteger)index;
 
 @end
 
