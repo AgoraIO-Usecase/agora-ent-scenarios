@@ -9,7 +9,7 @@
 #import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import YYCategories;
 @import SDWebImage;
 
@@ -151,7 +151,7 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d号麦", nil),(int)indexPath.row+1];
+        cell.nickNameLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
@@ -163,7 +163,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = NSLocalizedString(@"房主", nil);
+    cell.roomerLabel.text = KTVLocalizedString(@"房主");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{

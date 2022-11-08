@@ -5,6 +5,7 @@
 
 #import "VLKTVKindsView.h"
 #import "VLKTVKindsCell.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import QMUIKit;
 
@@ -112,15 +113,15 @@
 
 + (NSArray<VLKTVKindsModel *> *)kinds {
     NSArray *titlesArray = @[
-        NSLocalizedString(@"原唱", nil),
-        NSLocalizedString(@"KTV", nil),
-        NSLocalizedString(@"演唱会", nil),
-        NSLocalizedString(@"录音棚", nil),
-        NSLocalizedString(@"留声机", nil),
-        NSLocalizedString(@"空旷", nil),
-        NSLocalizedString(@"空灵", nil),
-        NSLocalizedString(@"流行", nil),
-        NSLocalizedString(@"R&B", nil)];
+        KTVLocalizedString(@"原唱"),
+        KTVLocalizedString(@"KTV"),
+        KTVLocalizedString(@"演唱会"),
+        KTVLocalizedString(@"录音棚"),
+        KTVLocalizedString(@"留声机"),
+        KTVLocalizedString(@"空旷"),
+        KTVLocalizedString(@"空灵"),
+        KTVLocalizedString(@"流行"),
+        KTVLocalizedString(@"R&B")];
     NSArray *imagesArray = @[@"ktv_ console_setting1",@"ktv_ console_setting2",@"ktv_ console_setting3",@"ktv_ console_setting4",@"ktv_ console_setting1",@"ktv_ console_setting2",@"ktv_ console_setting3",@"ktv_ console_setting4",@"ktv_ console_setting1"];
     NSMutableArray *array = [NSMutableArray array];
     for (int i = 0; i <titlesArray.count ; i++) {

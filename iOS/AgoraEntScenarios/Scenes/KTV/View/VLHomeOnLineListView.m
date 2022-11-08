@@ -10,7 +10,7 @@
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "VLAPIRequest.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;
 @import MJRefresh;
@@ -163,7 +163,8 @@
 - (QMUIButton *)createBtn {
     if (!_createBtn) {
         
-        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"] title:NSLocalizedString(@"创建房间", nil)];
+        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
+                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;

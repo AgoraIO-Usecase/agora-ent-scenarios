@@ -14,7 +14,7 @@
 #import "VLUserCenter.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 
 @import QMUIKit;
 @import YYCategories;
@@ -372,12 +372,12 @@
     button.selected = !button.selected;
     self.singType = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
     if (button.selected) {
-        [self.originBtn setTitle:NSLocalizedString(@"原唱", nil) forState:UIControlStateNormal];
-        [self.originBtn setTitle:NSLocalizedString(@"原唱", nil) forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     }
     else {
-        [self.originBtn setTitle:NSLocalizedString(@"伴奏", nil) forState:UIControlStateNormal];
-        [self.originBtn setTitle:NSLocalizedString(@"伴奏", nil) forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
     
     [self validateSingType];
@@ -595,7 +595,7 @@
 
 - (QMUIButton *)originBtn {
     if (!_originBtn) {
-        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:NSLocalizedString(@"原唱", nil)];
+        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
         _originBtn.imagePosition = QMUIButtonImagePositionLeft;
         _originBtn.spacingBetweenImageAndTitle = 2;
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -623,7 +623,7 @@
         _scoreLabel = [[UILabel alloc] init];
         _scoreLabel.font = VLUIFontMake(15);
         _scoreLabel.textColor = [UIColor whiteColor];
-        _scoreLabel.text = NSLocalizedString(@"0", nil);
+        _scoreLabel.text = KTVLocalizedString(@"0");
     }
     return _scoreLabel;
 }
@@ -633,7 +633,7 @@
         _scoreUnitLabel = [[UILabel alloc] init];
         _scoreUnitLabel.font = VLUIFontMake(10);
         _scoreUnitLabel.textColor = [UIColor whiteColor];
-        _scoreUnitLabel.text = NSLocalizedString(@"分", nil);
+        _scoreUnitLabel.text = KTVLocalizedString(@"分");
     }
     return _scoreUnitLabel;
 }

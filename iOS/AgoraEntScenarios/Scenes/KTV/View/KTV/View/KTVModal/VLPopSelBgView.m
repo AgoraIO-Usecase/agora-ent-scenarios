@@ -7,7 +7,7 @@
 #import "VLKTVSelBgModel.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -36,7 +36,7 @@
     self.picsModelArray = [VLKTVSelBgModel vj_modelArrayWithJson:self.picsArray];
 
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = NSLocalizedString(@"MV", nil);
+    titleLabel.text = KTVLocalizedString(@"MV");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
