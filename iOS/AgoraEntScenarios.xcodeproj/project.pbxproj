@@ -1736,14 +1736,14 @@
 		DD84174829090C520026B624 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				DD84174929090C520026B624 /* KTVServiceModel.h */,
 				DD84174A29090C520026B624 /* KTVSyncManagerServiceImp.swift */,
-				DD84174B29090C520026B624 /* KTVServiceImp.h */,
-				DD84174C29090C520026B624 /* AppContext+KTV.m */,
 				DD84174D29090C520026B624 /* KTVServiceProtocol.h */,
+				DD84174929090C520026B624 /* KTVServiceModel.h */,
 				DD84174E29090C520026B624 /* KTVServiceModel.m */,
+				DD84174B29090C520026B624 /* KTVServiceImp.h */,
 				DD84174F29090C520026B624 /* KTVServiceImp.m */,
 				DD84175029090C520026B624 /* AppContext+KTV.h */,
+				DD84174C29090C520026B624 /* AppContext+KTV.m */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -3193,7 +3193,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GM72UGLGZW;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3233,7 +3233,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GM72UGLGZW;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
