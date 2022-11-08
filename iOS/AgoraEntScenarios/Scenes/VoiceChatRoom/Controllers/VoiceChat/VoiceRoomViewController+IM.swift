@@ -9,6 +9,7 @@ import AgoraChat
 import Foundation
 import KakaJSON
 import UIKit
+import ZSwiftBaseLib
 
 // MARK: - VoiceRoomIMDelegate
 
@@ -52,14 +53,14 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         if let id = meta?["gift_id"], id == "VoiceRoomGift9" {
             rocketAnimation()
         }
-        requestRankList()
+        self.requestRankList()
     }
 
     func receiveApplySite(roomId: String, meta: [String: String]?) {
         if VoiceRoomUserInfo.shared.user?.uid ?? "" != roomInfo?.room?.owner?.uid ?? "" {
             return
         }
-        chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
+        self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
     }
 
     func receiveInviteSite(roomId: String, meta: [String: String]?) {
@@ -68,7 +69,7 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         if VoiceRoomUserInfo.shared.user?.uid ?? "" != user?.uid ?? "" {
             return
         }
-        showInviteMicAlert()
+        self.showInviteMicAlert()
     }
 
     func refuseInvite(roomId: String, meta: [String: String]?) {
@@ -76,8 +77,8 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "" {
             return
         }
-        chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
-        view.makeToast("User \(user.name ?? "")" + "rejected Invitation".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
+        self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
+        self.view.makeToast("User \(user.name ?? "")" + "rejected Invitation".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
     }
 
     func userJoinedRoom(roomId: String, username: String, ext: [String: Any]?) {
@@ -95,13 +96,12 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
                 roomInfo = info
             }
         }
-        convertShowText(userName: username, content: LanguageManager.localValue(key: "Joined"), joined: true)
+        self.convertShowText(userName: username, content: LanguageManager.localValue(key: "Joined"), joined: true)
     }
 
     func announcementChanged(roomId: String, content: String) {
-        view.makeToast("Voice room announcement changed!", point: toastPoint, title: nil, image: nil, completion: nil)
-        guard let _ = roomInfo?.room else { return }
-        roomInfo?.room!.announcement = content
+        self.view.makeToast("Voice room announcement changed!", point: toastPoint, title: nil, image: nil, completion: nil)
+        self.roomInfo?.room?.announcement = content
     }
 
     func userBeKicked(roomId: String, reason: AgoraChatroomBeKickedReason) {
@@ -115,19 +115,19 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         @unknown default:
             break
         }
-        view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
+        self.view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
         if reason == .destroyed || reason == .beRemoved || reason == .offline {
             var destroyed = false
             if reason == .destroyed {
                 destroyed = true
                 NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
             }
-            didHeaderAction(with: .back, destroyed: destroyed)
+            self.didHeaderAction(with: .back, destroyed: destroyed)
         }
     }
 
     func roomAttributesDidUpdated(roomId: String, attributeMap: [String: String]?, from fromId: String) {
-        updateMic(attributeMap, fromId: fromId)
+        self.updateMic(attributeMap, fromId: fromId)
     }
 
     func roomAttributesDidRemoved(roomId: String, attributes: [String]?, from fromId: String) {}
@@ -142,6 +142,7 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
 
             let status = mic.status
             let mic_index = mic.mic_index
+            VoiceRoomIMManager.shared?.mics?[mic.mic_index] = mic
             if !isOwner {
                 refreshHandsUp(status: status)
                 if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
