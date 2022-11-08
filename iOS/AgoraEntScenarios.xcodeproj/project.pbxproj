@@ -416,7 +416,9 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
-		E74A311D2919FBD700412D42 /* PKInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311C2919FBD700412D42 /* PKInviteView.swift */; };
+		E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */; };
+		E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */; };
+		E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3120291A46DD00412D42 /* ShowSegmentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -980,7 +982,9 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
-		E74A311C2919FBD700412D42 /* PKInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKInviteView.swift; sourceTree = "<group>"; };
+		E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPKInviteView.swift; sourceTree = "<group>"; };
+		E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyAndInviteView.swift; sourceTree = "<group>"; };
+		E74A3120291A46DD00412D42 /* ShowSegmentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSegmentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2610,7 +2614,9 @@
 		E74A311B2919FBA700412D42 /* PKInvite */ = {
 			isa = PBXGroup;
 			children = (
-				E74A311C2919FBD700412D42 /* PKInviteView.swift */,
+				E74A3120291A46DD00412D42 /* ShowSegmentView.swift */,
+				E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */,
+				E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */,
 			);
 			path = PKInvite;
 			sourceTree = "<group>";
@@ -2860,6 +2866,7 @@
 				057DD9FD290B9495001329E6 /* PresentationAnimation.swift in Sources */,
 				DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */,
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
+				E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */,
@@ -2876,7 +2883,7 @@
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
 				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
-				E74A311D2919FBD700412D42 /* PKInviteView.swift in Sources */,
+				E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */,
 				05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */,
 				DD8417BC29090C520026B624 /* VLNoBodyOnLineView.m in Sources */,
 				05FFE710290F706C0024D22F /* PopTip+Draw.swift in Sources */,
@@ -3123,6 +3130,7 @@
 				DDA19A4228FFE57A009D3E61 /* UIView+Shadow.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */,
+				E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */,
 				DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */,
 				DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */,
 				05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */,
