@@ -146,11 +146,11 @@
 
 - (void)playClick:(UIButton *)button {
     button.selected = !button.selected;
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
         if (button.selected) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVPlay];
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVPlay];
         } else {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVPause];
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVPause];
         }
     }
 }
@@ -158,12 +158,12 @@
 - (void)buttonClick:(UIButton *)sender {
     // 设置参数
     if (sender == self.subtitleBtn) {
-        if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeSetParam];
+        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeSetParam];
         }
     } else if (sender == self.nextButton) {
-        if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVNext];
+        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVNext];
         }
     }
 }
@@ -292,8 +292,8 @@
                 self.soloTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
                     leftSecond -= 1;
                     weakSelf.soloSongView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
-                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(ktvMVViewTimerCountDown:)]) {
-                        [weakSelf.delegate ktvMVViewTimerCountDown:leftSecond];
+                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(onKTVMVView:timerCountDown:)]) {
+                        [weakSelf.delegate onKTVMVView:self timerCountDown:leftSecond];
                     }
                     if (leftSecond == 0) {
                         //倒计时结束、执行独唱（销毁定时器）
@@ -391,8 +391,8 @@
 
 - (void)validateSingType
 {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-        [self.delegate ktvMVViewDidClick:self.singType];
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+        [self.delegate onKTVMVView:self btnTappedWithActionType:self.singType];
     }
 }
 
@@ -435,8 +435,8 @@
     self.totalLines += 1;
     self.totalScore = cumulativeScore;
     VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicScore:)]) {
-        [self.delegate ktvMVViewMusicScore:realScore];
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
+        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
     }
 }
 
