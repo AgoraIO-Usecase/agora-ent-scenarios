@@ -85,8 +85,8 @@
     VLKTVSelBgModel *selBgModel = self.picsModelArray[indexPath.row];
     selBgModel.ifSelect = YES;
     [self.collectionView reloadData];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(bgItemClickAction: index:)]) {
-        [self.delegate bgItemClickAction:selBgModel index:indexPath.item];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLPopSelBgView:tappedWithAction:atIndex:)]) {
+        [self.delegate onVLPopSelBgView:self tappedWithAction:selBgModel atIndex:indexPath.item];
     }
 }
 

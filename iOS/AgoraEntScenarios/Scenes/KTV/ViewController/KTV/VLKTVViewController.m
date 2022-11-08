@@ -1286,7 +1286,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - VLPopSelBgViewDelegate
-- (void)bgItemClickAction:(VLKTVSelBgModel *)selBgModel index:(NSInteger)index {
+-(void)onVLPopSelBgView:(VLPopSelBgView *)view tappedWithAction:(VLKTVSelBgModel *)selBgModel atIndex:(NSInteger)index {
     KTVChangeMVCoverInputModel* inputModel = [KTVChangeMVCoverInputModel new];
 //    inputModel.roomNo = self.roomModel.roomNo;
     inputModel.mvIndex = index;
@@ -1308,16 +1308,18 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - VLPopOnLineTypeViewDelegate
-- (void)backBtnAction {
+//can move to view internal
+- (void)onVLPopOnLineTypeView:(VLPopOnLineTypeView *)view backBtnTapped:(id)sender {
     [self.popOnLineTypeView dismiss];
 }
 
 #pragma mark - VLChooseBelcantoViewDelegate
-- (void)belcantoBackBtnAction {
+//can move to view internal
+- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view backBtnTapped:(id)sender {
     [self.belcantoView dismiss];
 }
 
-- (void)belcantoItemClickAction:(VLBelcantoModel *)model withIndx:(NSInteger)index {
+- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndx:(NSInteger)index {
     self.selBelcantoModel = model;
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
                         scenario:AgoraAudioScenarioGameStreaming];
@@ -1728,7 +1730,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - Util functions to check user character for current song.
-
 - (BOOL)ifMainSinger:(NSString *)userNo {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     if (selSongModel != nil && [selSongModel.userNo isEqualToString:userNo]) {

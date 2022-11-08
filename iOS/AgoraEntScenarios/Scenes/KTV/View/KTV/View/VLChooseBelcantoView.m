@@ -74,9 +74,9 @@
     
 }
 
-- (void)backBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(belcantoBackBtnAction)]) {
-        [self.delegate belcantoBackBtnAction];
+- (void)backBtnClickEvent:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLChooseBelcantoView:backBtnTapped:)]) {
+        [self.delegate onVLChooseBelcantoView:self backBtnTapped:sender];
     }
 }
 
@@ -99,8 +99,8 @@
     selBgModel.ifSelect = YES;
     self.indexValue = indexPath.item;
     [self.collectionView reloadData];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(belcantoItemClickAction:withIndx:)]) {
-        [self.delegate belcantoItemClickAction:selBgModel withIndx:indexPath.row];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLChooseBelcantoView:itemTapped:withIndex:)]) {
+        [self.delegate onVLChooseBelcantoView:self itemTapped:selBgModel withIndex:indexPath.row];
     }
 }
 
