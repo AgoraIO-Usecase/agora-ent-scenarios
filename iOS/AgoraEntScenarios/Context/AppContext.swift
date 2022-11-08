@@ -11,6 +11,7 @@ import Foundation
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
+    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
 
     @objc func getLang() -> String {
         guard let lang = NSLocale.preferredLanguages.first else {
