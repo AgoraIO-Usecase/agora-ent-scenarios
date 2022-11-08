@@ -7,6 +7,7 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import Masonry;
 @import YYCategories;
@@ -31,7 +32,7 @@
 - (void)setupView {
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = NSLocalizedString(@"更多操作", nil);
+    titleLabel.text = KTVLocalizedString(@"更多操作");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -45,9 +46,9 @@
     
     NSArray *itemsArray = @[@"ktv_more_belcantoIcon",@"ktv_more_soundIcon",@"ktv_more_mvIcon"];
     NSArray *titlesArray = @[
-        NSLocalizedString(@"美声", nil),
-        NSLocalizedString(@"音效", nil),
-        NSLocalizedString(@"MV", nil)];
+        KTVLocalizedString(@"美声"),
+        KTVLocalizedString(@"音效"),
+        KTVLocalizedString(@"MV")];
     for (int i=0; i<itemsArray.count; i++) {
         UIView *itemBgView = [[UIView alloc]initWithFrame:CGRectMake(leftMargin+(itemWH+middleMargin)*i, itemY, itemWH, itemWH)];
         itemBgView.layer.cornerRadius = itemWH*0.5;
