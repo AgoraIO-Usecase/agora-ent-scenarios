@@ -773,7 +773,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 //                VLLog(@"didChangedToPosition-----%@,%ld",playerKit,position);
                 NSDictionary *dict = @{
                     @"cmd":@"setLrcTime",
-                    @"duration":@([self ktvMVViewMusicTotalTime]),
+                    @"duration":@([self getTotalTime]),
                     @"time":@(position),
                 };
                 [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
@@ -1009,6 +1009,75 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self deleteSongEvent:self.selSongsArray.firstObject
         isMasterInterrupt:isMasterInterrupt];
     VLLog(@"RTC media player stop");
+}
+
+#pragma mark private method
+- (void)_leaveSeat {
+    VLRoomSeatModel* seatModel = [VLRoomSeatModel new];
+    seatModel.userNo = VLUserCenter.user.userNo;
+    seatModel.headUrl = VLUserCenter.user.headUrl;
+    seatModel.name = VLUserCenter.user.name;
+    seatModel.id = VLUserCenter.user.id;
+    seatModel.onSeat = YES;
+    [self _leaveSeatWithSeatModel: seatModel];
+}
+
+- (void)_leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel {
+    NSString *userNo = seatModel.userNo;
+    NSString *userHeadUrl = seatModel.headUrl;
+    NSString *userName = seatModel.name;
+    NSString *userid = seatModel.id;
+    NSInteger userOnSeat = seatModel.onSeat;
+    
+    if(seatModel!= nil && seatModel.id == VLUserCenter.user.id) {
+        if(seatModel.isVideoMuted == 1) {
+            [self.RTCkit stopPreview];
+        }
+    }
+    
+    KTVOutSeatInputModel* inputModel = [KTVOutSeatInputModel new];
+    inputModel.userNo = userNo;
+    inputModel.userId = userid;
+    inputModel.userName = userName;
+    inputModel.userHeadUrl = userHeadUrl;
+    inputModel.userOnSeat = userOnSeat;
+    [[AppContext ktvServiceImp] outSeatWithInput:inputModel
+                                      completion:^(NSError * error) {
+        if (error != nil) {
+            return;
+        }
+        
+        //房主自己手动更新视图
+        if ([userNo isEqualToString:VLUserCenter.user.userNo]) {//如果自己主动下麦
+            [self.MVView updateUIWithUserOnSeat:NO
+                                           song:self.selSongsArray.firstObject];
+            [self.MVView setPlayerViewsHidden:YES
+                             nextButtonHidden:YES];
+            self.bottomView.hidden = YES;
+            self.requestOnLineView.hidden = NO;
+            if([self ifMainSinger:VLUserCenter.user.userNo]) {
+                [self playNextSong:0];
+            }
+            
+            [self resetMicAndCameraStatus];
+            
+            [self setSelfAudience];
+        }
+        else if([self ifIAmRoomMaster]
+                && [self ifMainSinger:userNo]==YES) {
+            [self playNextSong:1];
+        }
+        
+        [self resetChorusStatus:userNo];
+        
+        for (VLRoomSeatModel *model in self.seatsArray) {
+            if (model.onSeat == userOnSeat) {
+                [model resetLeaveSeat];
+            }
+        }
+        [self.roomPersonView setSeatsArray:self.seatsArray];
+        [self.dropLineView dismiss];
+    }];
 }
 
 #pragma mark - rtc utils
@@ -1277,7 +1346,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             action.clickBlock = ^{
                 if([weakSelf currentUserIsOnSeat]) {
                     // Drop mic first
-                    [weakSelf dropOnLineAction:nil];
+                    [weakSelf _leaveSeat];
                 }
                 [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
                 VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
@@ -1406,11 +1475,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index {
-    <#code#>
-}
-
-
-- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndx:(NSInteger)index {
     self.selBelcantoModel = model;
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
                         scenario:AgoraAudioScenarioGameStreaming];
@@ -1447,61 +1511,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLDropOnLineView *)view action:(VLRoomSeatModel *)seatModel {
-    NSString *userNo = (seatModel!=nil ? seatModel.userNo : VLUserCenter.user.userNo);
-    NSString *userHeadUrl = (seatModel!=nil ? seatModel.headUrl : VLUserCenter.user.headUrl);
-    NSString *userName = (seatModel!=nil ? seatModel.name : VLUserCenter.user.name);
-    NSString *userid = (seatModel!=nil ? seatModel.id : VLUserCenter.user.id);
-    NSInteger userOnSeat = (seatModel!=nil ? seatModel.onSeat : YES);
-    
-    if(seatModel!= nil && seatModel.id == VLUserCenter.user.id) {
-        if(seatModel.isVideoMuted == 1) {
-            [self.RTCkit stopPreview];
-        }
-    }
-    
-    KTVOutSeatInputModel* inputModel = [KTVOutSeatInputModel new];
-    inputModel.userNo = userNo;
-    inputModel.userId = userid;
-    inputModel.userName = userName;
-    inputModel.userHeadUrl = userHeadUrl;
-    inputModel.userOnSeat = userOnSeat;
-    [[AppContext ktvServiceImp] outSeatWithInput:inputModel
-                                      completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        //房主自己手动更新视图
-        if ([userNo isEqualToString:VLUserCenter.user.userNo]) {//如果自己主动下麦
-            [self.MVView updateUIWithUserOnSeat:NO
-                                           song:self.selSongsArray.firstObject];
-            [self.MVView setPlayerViewsHidden:YES
-                             nextButtonHidden:YES];
-            self.bottomView.hidden = YES;
-            self.requestOnLineView.hidden = NO;
-            if([self ifMainSinger:VLUserCenter.user.userNo]) {
-                [self playNextSong:0];
-            }
-            
-            [self resetMicAndCameraStatus];
-            
-            [self setSelfAudience];
-        }
-        else if([self ifIAmRoomMaster]
-                && [self ifMainSinger:userNo]==YES) {
-            [self playNextSong:1];
-        }
-        
-        [self resetChorusStatus:userNo];
-        
-        for (VLRoomSeatModel *model in self.seatsArray) {
-            if (model.onSeat == userOnSeat) {
-                [model resetLeaveSeat];
-            }
-        }
-        [self.roomPersonView setSeatsArray:self.seatsArray];
-        [self.dropLineView dismiss];
-    }];
+    [self _leaveSeatWithSeatModel:seatModel];
 }
 
 #pragma mark VLBadNetWorkViewDelegate
