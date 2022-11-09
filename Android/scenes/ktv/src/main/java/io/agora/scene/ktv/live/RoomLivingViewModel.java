@@ -600,12 +600,15 @@ public class RoomLivingViewModel extends ViewModel {
             getSongChosenList();
             return null;
         });
+
+        getSongChosenList();
     }
 
     /**
      * 获取歌曲列表
      */
     public LiveData<List<VLRoomSelSongModel>> getSongList(SongType type, int page) {
+        // TODO 改成从RTC中获取歌曲列表
         MutableLiveData<List<VLRoomSelSongModel>> liveData = new MutableLiveData<>();
         ApiManager.getInstance().requestGetSongsList(page, type.value)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
@@ -677,6 +680,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 搜索歌曲
      */
     public LiveData<List<VLRoomSelSongModel>> searchSong(String condition) {
+        // TODO 改成从RTC中搜索歌曲
         MutableLiveData<List<VLRoomSelSongModel>> liveData = new MutableLiveData<>();
         PageModel pageModel = new PageModel();
         pageModel.page = new Page();
@@ -833,6 +837,13 @@ public class RoomLivingViewModel extends ViewModel {
                 // success
                 songsOrderedLiveData.postValue(data);
 
+                if(data.size() > 0){
+                    VLRoomSelSongModel value = songPlayingLiveData.getValue();
+                    if(value == null){
+                        songPlayingLiveData.postValue(data.get(0));
+                    }
+                }
+
             } else {
                 // failed
                 if (e != null) {
@@ -872,21 +883,18 @@ public class RoomLivingViewModel extends ViewModel {
         ), e -> {
             if (e == null) {
                 // success
-                VLRoomSelSongModel songPlaying = songPlayingLiveData.getValue();
                 List<VLRoomSelSongModel> orderedSongs = songsOrderedLiveData.getValue();
 
                 if (orderedSongs == null) {
                     return null;
                 }
 
-                if (songPlaying != null) {
-                    Iterator<VLRoomSelSongModel> iterator = orderedSongs.iterator();
-                    while (iterator.hasNext()) {
-                        VLRoomSelSongModel next = iterator.next();
-                        if (next.getSongNo().equals(songPlaying.getSongNo())) {
-                            iterator.remove();
-                            break;
-                        }
+                Iterator<VLRoomSelSongModel> iterator = orderedSongs.iterator();
+                while (iterator.hasNext()) {
+                    VLRoomSelSongModel next = iterator.next();
+                    if (next.getSongNo().equals(musicModel.getSongNo())) {
+                        iterator.remove();
+                        break;
                     }
                 }
 
