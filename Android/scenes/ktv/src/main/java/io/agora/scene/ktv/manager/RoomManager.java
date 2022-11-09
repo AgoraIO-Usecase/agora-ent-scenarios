@@ -270,7 +270,7 @@ public final class RoomManager {
             singers.add(model.userNo);
         } else if (mMusicModel.getType() == MemberMusicModel.SingType.Chorus) {
             singers.add(model.userNo);
-            singers.add(model.user1Id);
+            singers.add(model.userId);
         }
         iSingleCallback.onSingleCallback(ROOM_TYPE_ON_MUSIC_CHANGED, null);
 
@@ -412,7 +412,7 @@ public final class RoomManager {
             return false;
         }
 
-        return ObjectsCompat.equals(mMusicModel.user1Id, mUser.userNo);
+        return ObjectsCompat.equals(mMusicModel.userId, mUser.userNo);
     }
 
     public boolean isMainSinger(@NonNull AgoraMember member) {
