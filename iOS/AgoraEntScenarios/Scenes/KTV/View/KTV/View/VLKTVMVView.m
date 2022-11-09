@@ -22,7 +22,9 @@
 
 @class QMUIButton;
 @interface VLKTVMVView () < AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
-
+{
+    BOOL _lrcReadyToStart;
+}
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
 @property (nonatomic, strong) UILabel *musicTitleLabel;
@@ -404,6 +406,10 @@
 
 - (void)downloadLrcFinishedWithUrl:(NSString *)url {
     VLLog(@"\n歌词下载完成\n%@",url);
+    if (_lrcReadyToStart) {
+        _lrcReadyToStart = NO;
+        [self _startLrc];
+    }
 }
 
 - (void)downloadLrcProgressWithUrl:(NSString *)url progress:(double)progress {
@@ -454,6 +460,13 @@
     }
 }
 
+#pragma mark private method
+- (void)_startLrc {
+    [_lrcView start];
+    self.totalLines = 0;
+    self.totalScore = 0.0f;
+}
+
 
 #pragma mark -
 
@@ -462,16 +475,17 @@
 }
 
 - (void)start {
-    [_lrcView start];
-    self.totalLines = 0;
-    self.totalScore = 0.0f;
+    //waitting for lrc download success
+    _lrcReadyToStart = YES;
 }
 
 - (void)stop {
+    _lrcReadyToStart = NO;
     [_lrcView stop];
 }
 
 - (void)reset {
+    _lrcReadyToStart = NO;
     [_lrcView reset];
 }
 
