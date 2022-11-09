@@ -8,6 +8,7 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 
+
 /**
  * 使用SyncManager进行数据交互
  *
@@ -271,7 +272,8 @@ class KTVSyncManagerServiceImp(
                         isSelfMuted, // update this
                         originSeatInfo.isVideoMuted,
                         originSeatInfo.ifSelTheSingSong,
-                        originSeatInfo.ifJoinedChorus
+                        originSeatInfo.ifJoinedChorus,
+                        originSeatInfo.objectId
                     )
                     _updateSeat(seatInfo, completion)
                 }
@@ -298,7 +300,8 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.isSelfMuted,
                         isVideoMuted, // update this
                         originSeatInfo.ifSelTheSingSong,
-                        originSeatInfo.ifJoinedChorus
+                        originSeatInfo.ifJoinedChorus,
+                        originSeatInfo.objectId
                     )
                     _updateSeat(seatInfo, completion)
                 }
@@ -378,7 +381,58 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVMakeSongTopInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        val topSong = songList[0]
+        val userSongList = songList.filter { it.objectId == inputModel?.objectId } as ArrayList<VLRoomSelSongModel>
+        if (userSongList.count() > 0) {
+            val song = userSongList[0]
+
+            // mark input song to top
+            val targetSort = 0//(_minSort() ?? 0) -1
+            val songInfo = VLRoomSelSongModel(
+                topSong.chorusNo,
+                topSong.imageUrl,
+                topSong.isChorus,
+                topSong.isOriginal,
+                topSong.singer,
+                topSong.songName,
+                topSong.songNo,
+                topSong.songUrl,
+                topSong.lyric,
+                targetSort,
+                topSong.status,
+                topSong.userNo,
+                topSong.userId,
+                topSong.name,
+                topSong.score,
+                topSong.isOwnSong,
+                topSong.objectId
+            )
+
+            if (topSong.objectId != song.objectId) {
+                val songInfo = VLRoomSelSongModel(
+                    topSong.chorusNo,
+                    topSong.imageUrl,
+                    topSong.isChorus,
+                    topSong.isOriginal,
+                    topSong.singer,
+                    topSong.songName,
+                    topSong.songNo,
+                    topSong.songUrl,
+                    topSong.lyric,
+                    targetSort -1,
+                    topSong.status,
+                    topSong.userNo,
+                    topSong.userId,
+                    topSong.name,
+                    topSong.score,
+                    topSong.isOwnSong,
+                    topSong.objectId
+                )
+                _updateChooseSong(songInfo, {})
+            }
+
+            _updateChooseSong(songInfo, {})
+        }
     }
 
     override fun joinChorusWithInput(
@@ -777,7 +831,8 @@ class KTVSyncManagerServiceImp(
             songInfo.userId,
             songInfo.name,
             songInfo.score,
-            songInfo.isOwnSong
+            songInfo.isOwnSong,
+            songInfo.objectId
         )
         //SyncManager collectionKey:SYNC_MANAGER_CHOOSE_SONG_INFO
         mSceneReference?.collection("choose_song")?.add(songInfo, object: Sync.DataItemCallback{
@@ -811,11 +866,59 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun _markCurrentSongIfNeed() {
-
+        if (songList.size > 0) {
+            val topSong = songList[0]
+            if (topSong.status == 0 && topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
+                val songInfo = VLRoomSelSongModel(
+                    topSong.chorusNo,
+                    topSong.imageUrl,
+                    topSong.isChorus,
+                    topSong.isOriginal,
+                    topSong.singer,
+                    topSong.songName,
+                    topSong.songNo,
+                    topSong.songUrl,
+                    topSong.lyric,
+                    topSong.sort,
+                    2,
+                    topSong.userNo,
+                    topSong.userId,
+                    topSong.name,
+                    topSong.score,
+                    topSong.isOwnSong,
+                    topSong.objectId
+                )
+                _updateChooseSong(songInfo, {})
+            }
+        }
     }
 
     private fun _markSoloSongIfNeed() {
-
+        if (songList.size > 0) {
+            val topSong = songList[0]
+            if (topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
+                val songInfo = VLRoomSelSongModel(
+                    topSong.chorusNo,
+                    topSong.imageUrl,
+                    false,
+                    topSong.isOriginal,
+                    topSong.singer,
+                    topSong.songName,
+                    topSong.songNo,
+                    topSong.songUrl,
+                    topSong.lyric,
+                    topSong.sort,
+                    2,
+                    topSong.userNo,
+                    topSong.userId,
+                    topSong.name,
+                    topSong.score,
+                    topSong.isOwnSong,
+                    topSong.objectId
+                )
+                _updateChooseSong(songInfo, {})
+            }
+        }
     }
 
     private fun _subscribeChooseSong(completion: () -> Unit) {
@@ -826,11 +929,23 @@ class KTVSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 val songInfo = item?.toObject(VLRoomSelSongModel::class.java)
-
+                if (songInfo != null) {
+                    songList = songList.filter { it.objectId != songInfo.objectId } as ArrayList<VLRoomSelSongModel>
+                    songList.add(songInfo)
+                    _sortChooseSongList()
+                    chooseSongSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, songInfo)
+                    _markCurrentSongIfNeed()
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-
+                val userSongList = songList.filter { it.objectId == item?.id } as ArrayList<VLRoomSelSongModel>
+                if (userSongList.count() > 0) {
+                    val originSong = userSongList[0]
+                    songList = songList.filter { it.objectId != originSong.objectId } as ArrayList<VLRoomSelSongModel>
+                    chooseSongSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted, originSong)
+                    _markCurrentSongIfNeed()
+                }
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
