@@ -10,8 +10,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLRoomListModel;
 @protocol VLPopChooseSongViewDelegate <NSObject>
 
-@optional
-
 
 @end
 
@@ -20,8 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus;
 
 @property (nonatomic, strong) NSArray *selSongsArray;
-
-- (NSArray *)validateSelSongArray;
 
 @end
 
