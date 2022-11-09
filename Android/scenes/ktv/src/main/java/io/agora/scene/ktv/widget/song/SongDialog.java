@@ -109,14 +109,19 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
                 }
             }
         });
+        setChosenSongCount(0);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         mBinding.radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             if (i == R.id.rBtnChooseSong) {
                 mBinding.pager.setCurrentItem(0);
-            } else {
+            } else if(i == R.id.rBtnChorus){
                 mBinding.pager.setCurrentItem(1);
             }
         });
-        setChosenSongCount(0);
     }
 
     /**
@@ -207,6 +212,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     private void setChosenSongCount(int count) {
+        if(mBinding == null){
+            return;
+        }
         if (count > 0) {
             mBinding.tvChoosedSongCount.setVisibility(View.VISIBLE);
             if (count > 99) {
