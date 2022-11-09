@@ -171,20 +171,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
-
-// Deprecated method
-@optional
-- (void)publishChooseSongEvent;
-- (void)leaveChannel;
-- (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
-                            completion:(void(^)(NSError* _Nullable))completion;
-- (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
-                                 completion:(void(^)(NSError* _Nullable))completion;
-- (void)publishSongDidChangedEventWithOwnerStatus:(BOOL)isMaster;
-
-- (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
-- (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
-
 @end
 
 NS_ASSUME_NONNULL_END
