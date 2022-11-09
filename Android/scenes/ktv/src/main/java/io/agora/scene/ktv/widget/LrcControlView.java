@@ -221,7 +221,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     public void setScoreControlView() {
         if (RoomManager.getInstance().mMusicModel != null && RoomManager.getInstance().mMusicModel.isChorus) {
             if (RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)
-                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.user1Id)) {
+                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userId)) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
             } else {
                 mBinding.scoreControlView.setVisibility(GONE);
