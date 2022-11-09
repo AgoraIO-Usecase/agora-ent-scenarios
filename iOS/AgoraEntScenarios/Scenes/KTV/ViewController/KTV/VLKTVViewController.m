@@ -92,7 +92,6 @@ AgoraLrcViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 AgoraMusicContentCenterEventDelegate,
-
 VLPopScoreViewDelegate
 >
 
@@ -207,8 +206,6 @@ VLPopScoreViewDelegate
         [self joinRTCChannelIfRequestOnSeat:NO];
     }
     
-    //添加通知
-    [self addNotification];
     //处理背景
     [self dealWithSelBg];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
@@ -279,10 +276,6 @@ VLPopScoreViewDelegate
 
 
 #pragma mark service handler
-- (void)addNotification {
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshChoosedSongList:) name:kChoosedSongListChangedNotification object:nil];
-}
-
 - (void)addServiceHandler {
     VL(weakSelf);
     [[AppContext ktvServiceImp] subscribeUserListCountWithChanged:^(NSUInteger count) {
@@ -1950,14 +1943,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         
         if (weakSelf.chooseSongView) {
-            weakSelf.chooseSongView.selSongsArray = weakSelf.selSongsArray; //刷新已点歌曲UI
+            weakSelf.chooseSongView.selSongsArray = songArray; //刷新已点歌曲UI
         }
         //刷新MV里的视图
         [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
                                    onSeat:[weakSelf currentUserIsOnSeat]];
         
         [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:[weakSelf.selSongsArray count] == 0 ? nil : weakSelf.selSongsArray];;
-        if([weakSelf.selSongsArray count] == 0) {
+        if([weakSelf.selSongsArray count] > 0) {
             [self startSingingIfNeed];
         }
         
