@@ -133,8 +133,8 @@
         self.deleteBtn.hidden = YES;
     }
     
-    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]];
-    
+    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]
+                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
 }
 
 
