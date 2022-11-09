@@ -62,7 +62,7 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
             if (member.getUserNo().equals(mMusicModel.userNo)) {
                 mBinding.tvZC.setText("主唱");
                 mBinding.tvZC.setVisibility(View.VISIBLE);
-            } else if (member.getUserNo().equals(mMusicModel.user1Id) || member.getUserNo().equals(mMusicModel.chorusNo)) {
+            } else if (member.getUserNo().equals(mMusicModel.userId) || member.getUserNo().equals(mMusicModel.chorusNo)) {
                 mBinding.tvZC.setText("合唱");
                 mBinding.tvZC.setVisibility(View.VISIBLE);
             } else {
