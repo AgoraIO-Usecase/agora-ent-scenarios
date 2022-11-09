@@ -17,7 +17,6 @@
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
-@property (nonatomic, strong) VLKTVSwitcherView *mvSwitcher;
 @property (nonatomic, strong) VLKTVTonesView *tonesView;
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
@@ -49,7 +48,6 @@
     }
     
     self.soundSwitcher.on = self.setting.soundOn;
-    self.mvSwitcher.on = self.setting.mvOn;
     self.soundSlider.value = self.setting.soundValue;
     self.accSlider.value = self.setting.accValue;
 }
@@ -57,7 +55,6 @@
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
-    [self addSubview:self.mvSwitcher];
     [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
@@ -75,14 +72,9 @@
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
     
-    [self.mvSwitcher mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
-    }];
-    
     [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.mvSwitcher.mas_bottom).offset(25);
+        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
         make.height.mas_equalTo(26);
     }];
     
@@ -175,15 +167,6 @@
         _soundSwitcher.delegate = self;
     }
     return _soundSwitcher;
-}
-
-- (VLKTVSwitcherView *)mvSwitcher {
-    if (!_mvSwitcher) {
-        _mvSwitcher = [[VLKTVSwitcherView alloc] init];
-        _mvSwitcher.titleLabel.text = KTVLocalizedString(@"MV");
-        _mvSwitcher.delegate = self;
-    }
-    return _mvSwitcher;
 }
 
 - (VLKTVTonesView *)tonesView {
