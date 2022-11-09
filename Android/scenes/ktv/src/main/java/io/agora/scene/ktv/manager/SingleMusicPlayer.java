@@ -75,7 +75,7 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
                 options.clientRoleType = role;
                 options.publishMediaPlayerAudioTrack = false;
             }
-            joinChannelEX(options);
+            joinChannelEX(channelName, options);
 //        RTCManager.getInstance().getRtcEngine().updateChannelMediaOptions(options);
             RTCManager.getInstance().getRtcEngine().muteRemoteAudioStream(RoomManager.mMine.id.intValue()*10 + 1, true);
         }
@@ -105,13 +105,13 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
     private RtcConnection mRtcConnection;
     private String channelName = null;
 
-    private void joinChannelEX(ChannelMediaOptions options) {
+    private void joinChannelEX(String channelName, ChannelMediaOptions options) {
         Log.d("cwtsw", "joinChannelEX");
-        channelName = RoomManager.getInstance().getRoom().roomNo;
+        this.channelName = channelName;
 //        options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
         mRtcConnection = new RtcConnection();
-        mRtcConnection.channelId = RoomManager.getInstance().getRoom().roomNo;
-        mRtcConnection.localUid = RoomManager.mMine.id.intValue() * 10 + 1;
+        mRtcConnection.channelId = channelName;
+        mRtcConnection.localUid = UserManager.getInstance().getUser().id.intValue() * 10 + 1;
         mLogger.d("joinChannelEx with token: %s, for uid: %d, channelId: %s", KtvConstant.PLAYER_TOKEN, mRtcConnection.localUid, mRtcConnection.channelId);
         RTCManager.getInstance().getRtcEngine().joinChannelEx(KtvConstant.PLAYER_TOKEN, mRtcConnection, options, new IRtcEngineEventHandler() {
             @Override
@@ -137,7 +137,7 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
     }
 
     @Override
-    public void prepare(@NonNull MemberMusicModel music) {
+    public void prepare( @NonNull MemberMusicModel music) {
         User mUser = UserManager.getInstance().getUser();
         if (mUser == null) {
             return;

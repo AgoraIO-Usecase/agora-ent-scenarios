@@ -94,11 +94,6 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             return;
         }
 
-        AgoraRoom mRoom = RoomManager.getInstance().getRoom();
-        if (mRoom == null) {
-            return;
-        }
-
         if (ObjectsCompat.equals(music.userNo, mUser.userNo)) {
             if (music.userStatus == MemberMusicModel.UserStatus.Ready) {
                 onMemberJoinedChorus(music);
@@ -127,10 +122,6 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
         if (mUser == null) {
             return;
         }
-
-        AgoraRoom mRoom = RoomManager.getInstance().getRoom();
-        assert mRoom != null;
-        channelName = mRoom.roomNo;
 
         ChannelMediaOptions options = new ChannelMediaOptions();
         options.clientRoleType = mRole;
