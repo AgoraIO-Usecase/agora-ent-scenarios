@@ -103,7 +103,6 @@
         if (error != nil) {
             return;
         }
-        [[NSNotificationCenter defaultCenter]postNotificationName:kChoosedSongListChangedNotification object:nil];
     }];
 }
 
@@ -130,8 +129,6 @@
         if (error != nil) {
             return;
         }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:kChoosedSongListChangedNotification object:nil];
     }];
 }
 
