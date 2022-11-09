@@ -186,8 +186,6 @@ AgoraMusicContentCenterEventDelegate
         if (error.code == 0) {
             //点歌完成发送通知
             [self dianGeSuccessWithModel:model];
-            
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
         }
         else {
             [self dianGeFailedWithModel:model];
