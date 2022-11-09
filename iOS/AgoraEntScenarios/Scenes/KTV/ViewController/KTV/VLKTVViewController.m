@@ -266,7 +266,6 @@ VLPopScoreViewDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [UIViewController popGestureOpen:self];
-    [self leaveChannel];
     [self leaveRTCChannel];
     [[UIApplication sharedApplication] setIdleTimerDisabled: NO];
 }
@@ -383,9 +382,8 @@ VLPopScoreViewDelegate
                 
                 // If I was dropped off mic and I am current singer, then we should play next song.
                 if([/*member.userId*/seatModel.id isEqualToString:VLUserCenter.user.id] == NO && [self ifMainSinger:VLUserCenter.user.userNo]) {
-                    [weakSelf sendChangeSongMessage];
                     [weakSelf prepareNextSong];
-                    [weakSelf getChoosedSongsList:false];
+                    [weakSelf getChoosedSongsList];
                 }
             } else{
                 for (VLRoomSeatModel *model in weakSelf.seatsArray) {
@@ -435,9 +433,6 @@ VLPopScoreViewDelegate
                    && songInfo.chorusNo != nil) {
                     [weakSelf.MVView setJoinInViewHidden];
                     [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                    if([weakSelf ifMainSinger:VLUserCenter.user.userNo]) {
-                        [weakSelf sendApplySendChorusMessage:songInfo.chorusNo];
-                    }
                     [weakSelf joinChorusConfig:@""];
                     return;
                 }
@@ -454,10 +449,10 @@ VLPopScoreViewDelegate
             //收到点歌的消息
             VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
             if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
-                [weakSelf getChoosedSongsList:false];
+                [weakSelf getChoosedSongsList];
             }
             else {
-                [weakSelf getChoosedSongsList:false];
+                [weakSelf getChoosedSongsList];
             }
             
             
@@ -465,19 +460,21 @@ VLPopScoreViewDelegate
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
-                [weakSelf getChoosedSongsList:NO];
+                [weakSelf getChoosedSongsList];
                 return;
             }
             
             //切换歌曲
-            //removed song is top song, play next
-            if (![selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo]) {
-                return;
+            /*
+             1. removed song is top song, play next
+             2. waitting for play, play next
+             */
+            BOOL removedSongIsPlaying = [selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo];
+            BOOL isWaitingForPlay = [weakSelf.currentPlayingSongNo length] == 0;
+            if (removedSongIsPlaying || isWaitingForPlay) {
+                [weakSelf prepareNextSong];
+                [weakSelf getChoosedSongsList];
             }
-            
-            weakSelf.currentPlayingSongNo = nil;
-            [weakSelf prepareNextSong];
-            [weakSelf getChoosedSongsList:NO];
         }
     }];
 }
@@ -592,7 +589,6 @@ VLPopScoreViewDelegate
                 for (BaseViewController *vc in self.navigationController.childViewControllers) {
                     if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                         [weakSelf destroyMediaPlayer];
-                        [weakSelf leaveChannel];
                         [weakSelf leaveRTCChannel];
                         [weakSelf.navigationController popToViewController:vc animated:YES];
                     }
@@ -1274,12 +1270,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
 }
 
-- (void)leaveChannel {
-    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(leaveChannel)]) {
-        [[AppContext ktvServiceImp] leaveChannel];
-    }
-}
-
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         VLLog(@"Agora - Leave RTC channel");
@@ -1753,15 +1743,14 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     if (singType == VLKTVMVViewSingActionTypeSolo) {
         [self startSinging];
         //发送独唱的消息
-        [self sendSoloMessage];
+        [self becomeSolo];
     } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
         if(![self currentUserIsOnSeat]) {
             [VLToast toast:KTVLocalizedString(@"请先上坐")];
         } else {
             [self setMyselfJoinChorusSong];
             [self startSinging];
-            [self sendJoinInSongMessage]; //发送加入合唱的消息
-            [self sendJoinInSongAPI];
+            [self joinChorus]; //发送加入合唱的消息
         }
     }
 }
@@ -1952,20 +1941,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark --
+//TODO: remove it?
 - (void)dianGeSuccessEvent:(NSNotification *)notification {
-    VLSongItmModel* model = (VLSongItmModel *)[notification object];
-    
-    [self sendDianGeMessage];
-    [self getChoosedSongsList:model.ifChorus];
+    [self getChoosedSongsList];
 }
-
-- (void)sendDianGeMessage {
-    //发送消息
-    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishChooseSongEvent)]) {
-        [[AppContext ktvServiceImp] publishChooseSongEvent];
-    }
-}
-
 - (void)makeTopSuccessEvent {
     [self choosedSongsListToChangeUI];
 }
@@ -1978,7 +1957,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.selSongsArray = [self.chooseSongView validateSelSongArray];;
 }
 
-- (void)getChoosedSongsList:(BOOL)ifChorus {
+- (void)getChoosedSongsList {
     
     VL(weakSelf);
     [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
@@ -2149,22 +2128,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)sendChangeSongMessage {
-    if (![[AppContext ktvServiceImp] respondsToSelector:@selector(publishSongDidChangedEventWithOwnerStatus:)]) {
-        return;
-    }
-    
-    NSString *isMasterInterrupt = nil;
-    if([self ifMainSinger:VLUserCenter.user.userNo] == NO && [self ifIAmRoomMaster]) {
-        isMasterInterrupt = @"1";
-    }
-    else {
-        isMasterInterrupt = @"0";
-    }
-    
-    [[AppContext ktvServiceImp] publishSongDidChangedEventWithOwnerStatus:[isMasterInterrupt isEqualToString:@"1"]];
-}
-
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model isMasterInterrupt:(int)isMasterInterrupt {
     if(model == nil
        || self.roomModel == nil
@@ -2180,26 +2143,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        //发送点歌消息
-        if(([self ifMainSinger:VLUserCenter.user.userNo] && isMasterInterrupt != 1)
-           || ([self ifIAmRoomMaster] && isMasterInterrupt == 1)) {
-            [self sendChangeSongMessage];
-        }
-        
-        [self getChoosedSongsList:false];
     }];
 }
 
 //发送独唱的消息
-- (void)sendSoloMessage {
+- (void)becomeSolo {
     [[AppContext ktvServiceImp] becomeSolo];
 }
 
-- (void)sendJoinInSongAPI {
+- (void)joinChorus {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     
     KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
@@ -2208,26 +2160,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
                                          completion:^(NSError * error) {
     }];
-}
-
-//发送加入合唱的消息
-- (void)sendJoinInSongMessage {
-    
-    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishJoinToChorusWithCompletion:)]) {
-        VL(weakSelf);
-        [[AppContext ktvServiceImp] publishJoinToChorusWithCompletion:^(NSError * error) {
-            if (error != nil) {
-                return;
-            }
-            [weakSelf setUserJoinChorus:VLUserCenter.user.userNo];
-        }];
-    }
-}
-
-- (void)sendApplySendChorusMessage:(NSString *)singerUserNo {
-    if ([[AppContext ktvServiceImp] respondsToSelector:@selector(publishSongOwnerWithOwnerId:)]) {
-        [[AppContext ktvServiceImp] publishSongOwnerWithOwnerId:singerUserNo];
-    }
 }
 
 #pragma mark - Util functions to check user character for current song.

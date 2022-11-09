@@ -6,7 +6,6 @@
 //
 
 #import "AppContext+KTV.h"
-#import "KTVServiceImp.h"
 #import "AgoraEntScenarios-Swift.h"
 
 NSString* kServiceImpKey = @"ServiceImpKey";
