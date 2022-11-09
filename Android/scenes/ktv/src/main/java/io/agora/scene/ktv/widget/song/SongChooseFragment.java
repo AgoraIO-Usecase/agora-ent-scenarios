@@ -54,7 +54,7 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         getBinding().tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                getBinding().rvRankList.scrollToPosition(0);
+                mRankListAdapter.resetAll(null);
                 onSongsRefreshing(tab.getPosition());
             }
 
@@ -76,7 +76,6 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         while (iterator.hasNext()){
             Runnable next = iterator.next();
             next.run();
-            iterator.remove();
         }
     }
 
@@ -200,12 +199,25 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
 
         getBinding().smartRefreshLayout.setEnableLoadMore(true);
         getBinding().smartRefreshLayout.finishRefresh();
+        enableTabLayoutClick(true);
     }
 
     void setLoadMoreResult(List<SongItem> list, boolean hasMore) {
         mRankListAdapter.insertAll(list);
         getBinding().smartRefreshLayout.finishLoadMore();
         getBinding().smartRefreshLayout.setEnableLoadMore(hasMore);
+        enableTabLayoutClick(true);
+    }
+
+    private void enableTabLayoutClick(boolean enable){
+        KtvFragmentSongListBinding binding = getBinding();
+        if(binding == null){
+            return;
+        }
+        TabLayout tabLayout = binding.tabLayout;
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            tabLayout.getTabAt(i).view.setClickable(enable);
+        }
     }
 
 
@@ -222,12 +234,14 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
     }
 
     private void onSongsRefreshing(int tagIndex){
+        enableTabLayoutClick(false);
         if(listener != null){
             listener.onSongsRefreshing(tagIndex);
         }
     }
 
     private void onSongsLoadMore(int tagIndex){
+        enableTabLayoutClick(false);
         if(listener != null){
             listener.onSongsLoadMore(tagIndex);
         }

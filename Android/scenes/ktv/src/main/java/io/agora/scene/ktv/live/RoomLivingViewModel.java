@@ -753,13 +753,13 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 点歌
      */
-    public LiveData<Boolean> chooseSong(VLRoomSelSongModel songModel) {
+    public LiveData<Boolean> chooseSong(VLRoomSelSongModel songModel, boolean isChorus) {
         MutableLiveData<Boolean> liveData = new MutableLiveData<>();
         if(songModel == null){
             return liveData;
         }
         ktvServiceProtocol.chooseSongWithInput(
-                new KTVChooseSongInputModel(songModel.isChorus() ? 1 : 0,
+                new KTVChooseSongInputModel(isChorus ? 1 : 0,
                         songModel.getSongName(),
                         songModel.getSongNo(),
                         songModel.getSongUrl(),
