@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.dialog;
+package io.agora.scene.ktv.widget;
 
 public class MusicSettingBean {
     private final MusicSettingDialog.Callback mCallback;

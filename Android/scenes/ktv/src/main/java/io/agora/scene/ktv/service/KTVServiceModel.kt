@@ -24,7 +24,7 @@ data class VLRoomListModel(
 
     // SyncManager独有，用来更新和删除数据
     var objectId: String? = null
-){
+) {
     fun getCoverRes(): Int {
         if ("1" == icon) {
             return R.mipmap.icon_room_cover1
@@ -64,7 +64,7 @@ data class VLRoomSeatModel(
 
     // SyncManager独有，用来更新和删除数据
     var objectId: String? = null
-): java.io.Serializable
+) : java.io.Serializable
 
 
 data class KTVCreateRoomInputModel(
@@ -85,7 +85,6 @@ data class KTVCreateRoomOutputModel(
 )
 
 
-
 data class KTVJoinRoomInputModel(
     val roomNo: String,
     val password: String?,
@@ -101,7 +100,7 @@ data class KTVJoinRoomOutputModel(
     val agoraRTMToken: String,
     val agoraRTCToken: String,
     val agoraPlayerRTCToken: String,
-): java.io.Serializable
+) : java.io.Serializable
 
 
 data class KTVChangeMVCoverInputModel(
@@ -122,42 +121,37 @@ data class KTVOutSeatInputModel(
 
 data class KTVRemoveSongInputModel(
     val songNo: String,
-    val sort: String,
-    var objectId: String?
+    val sort: Int,
+    var objectId: String? = null
 )
 
 data class VLRoomSelSongModel(
-    // 合唱者userNo
-    val chorusNo: String,
-    val imageUrl: String,
-    // 是否合唱
-    val isChorus: Boolean,
-    //是否原唱
-    val isOriginal: Int,
-    val singer: String,
-    val songName: String,
-    val songNo: String,
-    val songUrl: String,
-    // 歌词
-    val lyric: String,
-    // 排序
-    val sort: Int,
-    // 0 未开始 1.已唱 2.正在唱
-    val status: Int,
-    // 是谁点的歌
-    val userNo: String,
-    val userId: String,
-    // 点歌人昵称
-    val name : String,
-    // 得分
-    val score: Double,
-    // 是否是自己点的歌曲
-    val isOwnSong: Boolean,
+    // 获取歌词列表返回的歌词信息
+    val songName: String,// 歌曲名
+    val songNo: String, // 歌词唯一标识
+    val songUrl: String, // mp3路径
+    val singer: String, // 演唱者
+    val lyric: String, // 歌词
+    val status: Int,// 0 未开始 1.已唱 2.正在唱
+    val imageUrl: String,// 歌曲封面
 
-    var objectId: String? = null
+    // 获取已点歌记返回的歌词信息，同时也包含上面信息
+    val userNo: String? = null,// 点歌人No
+    val userId: String? = null,// 点歌人id
+    val name: String? = null,// 点歌人昵称
+    val chorusNo: String? = null, // 合唱者userNo
+    val isChorus: Boolean = false, // 是否合唱
+    val isOriginal: Int = 0, //是否原唱
+    val sort: Int = 0,// 已点歌曲的播放顺序排序
+
+    // 自定义数据
+    val score: Double = 0.0,// 唱歌得分
+    val isOwnSong: Boolean = false,// 是否是自己点的歌曲
+    var objectId: String? = null // SyncManager数据唯一标识
 ) {
+
     // TODO remove it
-    fun toMemberMusicModel(): MemberMusicModel{
+    fun toMemberMusicModel(): MemberMusicModel {
         return MemberMusicModel().apply {
             chorusNo = this@VLRoomSelSongModel.chorusNo
             imageUrl = this@VLRoomSelSongModel.imageUrl
@@ -167,11 +161,11 @@ data class VLRoomSelSongModel(
             songName = this@VLRoomSelSongModel.songName
             songNo = this@VLRoomSelSongModel.songNo
             songUrl = this@VLRoomSelSongModel.songUrl
-            lrc = this@VLRoomSelSongModel.lyric
+            lyric = this@VLRoomSelSongModel.lyric
             sort = this@VLRoomSelSongModel.sort
             status = this@VLRoomSelSongModel.status
             userNo = this@VLRoomSelSongModel.userNo
-            user1Id = this@VLRoomSelSongModel.userId
+            userId = this@VLRoomSelSongModel.userId
             name = this@VLRoomSelSongModel.name
         }
     }
@@ -193,13 +187,13 @@ data class KTVSongDetailOutputModel(
 )
 
 data class KTVSwitchSongInputModel(
-    val userNo:String,
+    val userNo: String,
     val songNo: String,
     val roomNo: String
 )
 
 data class KTVChooseSongInputModel(
-    val isChorus: Boolean,
+    val isChorus: Int,
     val songName: String,
     val songNo: String,
     val songUrl: String,
@@ -209,6 +203,6 @@ data class KTVChooseSongInputModel(
 
 data class KTVMakeSongTopInputModel(
     val songNo: String,
-    val sort: String,
+    val sort: Int,
     var objectId: String?
 )
