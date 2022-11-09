@@ -139,6 +139,7 @@
 		A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */; };
 		A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */; };
 		A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */; };
+		A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD39291B82AE00A41D8D /* ShowChatModel.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -581,6 +582,7 @@
 		A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomBottomBar.swift; sourceTree = "<group>"; };
 		A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomLiveView.swift; sourceTree = "<group>"; };
 		A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomChatCell.swift; sourceTree = "<group>"; };
+		A845AD39291B82AE00A41D8D /* ShowChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1320,6 +1322,14 @@
 			path = Live;
 			sourceTree = "<group>";
 		};
+		A845AD38291B824400A41D8D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A845AD39291B82AE00A41D8D /* ShowChatModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		A88D14282913BEB900F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
@@ -1343,6 +1353,7 @@
 		A8B5617F2910FB19004F34D1 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				A845AD38291B824400A41D8D /* Models */,
 				DDBF78882918D5920001855B /* Service */,
 				A8B5618729111022004F34D1 /* Common */,
 				A8B561902912080C004F34D1 /* Utils */,
@@ -2891,6 +2902,7 @@
 				05FFE732290F74560024D22F /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				0510B825290B72FC0063E57A /* VRUser.swift in Sources */,
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
+				A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */,
 				DD8417A729090C520026B624 /* VLKTVSwitcherView.m in Sources */,
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
 				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,

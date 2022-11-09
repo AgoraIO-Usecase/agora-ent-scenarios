@@ -150,17 +150,13 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         room.roomNo = createView.roomNo
         room.thumbnailId = createView.roomBg
         room.ownerId = VLUserCenter.user.userNo
-        room.ownerAvater = ""
+        room.ownerAvater = VLUserCenter.user.headUrl
         room.createdAt = Date().timeIntervalSince1970
         AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
             let liveVC = ShowLiveViewController()
-            liveVC.currentUserId = room.ownerId!
-            liveVC.channleName = room.roomNo!
+            liveVC.room = detailModel
             liveVC.agoraKit = self?.agoraKit
             self?.navigationController?.pushViewController(liveVC, animated: false)
-//            AppContext.showServiceImp.getRoomList(page: 1) { error, list in
-//                
-//            }
         }
     }
 

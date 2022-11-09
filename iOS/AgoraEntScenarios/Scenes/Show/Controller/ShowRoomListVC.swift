@@ -68,12 +68,8 @@ class ShowRoomListVC: ShowBaseViewController {
     private func joinRoom(_ room: ShowRoomListModel){
         AppContext.showServiceImp.joinRoom(room: room) {[weak self] error, detailModel in
             if error == nil {
-                guard let roomNo = room.roomNo else {
-                    print("roomNo == nil")
-                    return
-                }
                 let vc = ShowLiveViewController()
-                vc.channleName = roomNo
+                vc.room = room
                 vc.modalPresentationStyle = .overCurrentContext
                 self?.present(vc, animated: true)
             }

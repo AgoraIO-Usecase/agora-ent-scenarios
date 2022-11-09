@@ -36,7 +36,7 @@ class ShowRoomChatCell: UITableViewCell {
     private func createSubviews(){
         contentView.backgroundColor = .clear
         backgroundColor = .clear
-        
+        transform = CGAffineTransformMakeRotation(Double.pi)
         contentView.addSubview(bgView)
         bgView.snp.makeConstraints { make in
             make.top.equalTo(5)

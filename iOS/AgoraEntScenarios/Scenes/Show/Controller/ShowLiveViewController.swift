@@ -10,12 +10,21 @@ import AgoraRtcKit
 
 class ShowLiveViewController: UIViewController {
 
-    var agoraKit: AgoraRtcEngineKit!
-    var channleName: String = ""
-    var currentUserId: String = ""
+    var room: ShowRoomListModel?
+    var agoraKit: AgoraRtcEngineKit?
+    
+    private var currentUserId: String {
+        get{
+            VLUserCenter.user.id
+        }
+    }
+
+    private var role: AgoraClientRole {
+        return room?.ownerId == VLUserCenter.user.userNo ? .broadcaster : .audience
+    }
     
     private lazy var liveView: ShowRoomLiveView = {
-        let view = ShowRoomLiveView()
+        let view = ShowRoomLiveView(isBroadcastor: role == .broadcaster)
         view.delegate = self
         return view
     }()
@@ -28,29 +37,16 @@ class ShowLiveViewController: UIViewController {
         return config
     }()
     
-    private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
-        let option = AgoraRtcChannelMediaOptions()
-        option.autoSubscribeAudio = true
-        option.autoSubscribeVideo = true
-        return option
-    }()
-    
-    /// 用户角色
-    public func getRole(uid: String) -> AgoraClientRole {
-//        uid == currentUserId ? .broadcaster : .audience
-        return .broadcaster
-    }
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
         setupAgoraKit()
-        joinChannel(channelName: channleName, uid: UInt(currentUserId) ?? 0)
+        joinChannel()
     }
     
     private func setupUI(){
+        liveView.room = room
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -61,33 +57,32 @@ class ShowLiveViewController: UIViewController {
         if agoraKit == nil {
             agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
         }else{
-            agoraKit.delegate = self            
+            agoraKit?.delegate = self
         }
         let roleOptions = AgoraClientRoleOptions()
-        roleOptions.audienceLatencyLevel = getRole(uid: currentUserId) == .audience ? .ultraLowLatency : .lowLatency
-        agoraKit?.setClientRole(getRole(uid: currentUserId), options: roleOptions)
+        roleOptions.audienceLatencyLevel = role == .audience ? .ultraLowLatency : .lowLatency
+        agoraKit?.setClientRole(role, options: roleOptions)
         agoraKit?.enableVideo()
         agoraKit?.enableAudio()
-        /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
     
-    private func joinChannel(channelName: String, uid: UInt) {
-        channelMediaOptions.clientRoleType = getRole(uid: "\(uid)")
-//        channelMediaOptions.publishMicrophoneTrack = getRole(uid: "\(uid)" == .broadcaster
-//        channelMediaOptions.publishCameraTrack = getRole(uid: "\(uid)" == .broadcaster
-        let result = agoraKit.joinChannel(byToken: KeyCenter.Token, channelId: channelName, info: nil, uid: uid, joinSuccess: nil)
+    private func joinChannel() {
+        guard let channelName = room?.roomNo, let uid: UInt = UInt(currentUserId) else {
+            return
+        }
+        
+        let result = agoraKit?.joinChannel(byToken: KeyCenter.Token, channelId: channelName, info: nil, uid: uid, joinSuccess: nil)
         if result == 0 {
-//            LogUtils.log(message: "进入房间", level: .info)
+            print("进入房间")
         }
         let canvas = AgoraRtcVideoCanvas()
         canvas.view = liveView.canvasView
         canvas.renderMode = .hidden
-        if getRole(uid: "\(uid)") == .broadcaster {
-            canvas.uid = uid
+        canvas.uid = uid
+        if role == .broadcaster {
             agoraKit?.setupLocalVideo(canvas)
         } else {
-            canvas.uid = UInt(currentUserId) ?? 0
             agoraKit?.setupRemoteVideo(canvas)
         }
         agoraKit?.startPreview()
@@ -140,9 +135,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
-    
-    func onClickSendMsgButton() {
-        
+    func onClickSendMsgButton(text: String) {
+        let model = ShowChatModel(userName: VLUserCenter.user.name, text: text)
+        liveView.addChatModel(model)
     }
     
     func onClickCloseButton() {
