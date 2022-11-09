@@ -66,6 +66,12 @@ data class VLRoomSeatModel(
     var objectId: String? = null
 ) : java.io.Serializable
 
+data class VLLoginModel(
+    val userNo: String,
+    // SyncManager独有，用来更新和删除数据
+    var objectId: String? = null
+): java.io.Serializable
+
 
 data class KTVCreateRoomInputModel(
     val icon: String,
