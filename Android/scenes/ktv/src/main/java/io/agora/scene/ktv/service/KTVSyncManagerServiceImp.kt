@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import io.agora.scene.base.BuildConfig
-import io.agora.scene.base.api.ApiManager
-import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 
@@ -217,24 +215,6 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVChooseSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        var songInfo = VLRoomSelSongModel(
-            "",
-            inputModel.imageUrl,
-            inputModel.isChorus,
-            0,
-            inputModel.singer,
-            "",
-            inputModel.songNo,
-            "",
-            "",
-            0,
-            0,
-            UserManager.getInstance().getUser().userNo,
-            UserManager.getInstance().getUser().id.toString(),
-            UserManager.getInstance().getUser().name,
-            0.0,
-            false
-        )
 
         //TODO SetSort
         var param: HashMap<String, Object> = HashMap<String, Object>()
