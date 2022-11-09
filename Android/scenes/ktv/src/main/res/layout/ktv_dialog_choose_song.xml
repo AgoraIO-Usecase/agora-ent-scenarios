@@ -15,6 +15,7 @@
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
+        android:checkedButton="@id/rBtnChooseSong"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatRadioButton
