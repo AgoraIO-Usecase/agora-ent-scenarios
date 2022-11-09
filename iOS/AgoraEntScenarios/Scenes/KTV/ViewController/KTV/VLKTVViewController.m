@@ -309,7 +309,7 @@ VLPopScoreViewDelegate
 
 #pragma mark service handler
 - (void)addNotification {
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianGeSuccessEvent:) name:kDianGeSuccessNotification object:nil];
+//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianGeSuccessEvent:) name:kDianGeSuccessNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(makeTopSuccessEvent) name:kMakeTopNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(deleteSuccessEvent) name:kDeleteSuccessNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateSelSongEvent) name:kUpdateSelSongArrayNotification object:nil];
@@ -445,18 +445,8 @@ VLPopScoreViewDelegate
                 }
             }
             
-            
             //收到点歌的消息
-            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-            if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
-                [weakSelf getChoosedSongsList];
-            }
-            else {
-                [weakSelf getChoosedSongsList];
-            }
-            
-            
-            
+            [weakSelf getChoosedSongsList];
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
@@ -1935,9 +1925,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark --
 //TODO: remove it?
-- (void)dianGeSuccessEvent:(NSNotification *)notification {
-    [self getChoosedSongsList];
-}
+//- (void)dianGeSuccessEvent:(NSNotification *)notification {
+//    [self getChoosedSongsList];
+//}
 - (void)makeTopSuccessEvent {
     [self choosedSongsListToChangeUI];
 }

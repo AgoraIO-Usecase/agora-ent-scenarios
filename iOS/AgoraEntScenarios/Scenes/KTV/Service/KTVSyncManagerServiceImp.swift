@@ -952,15 +952,10 @@ extension KTVSyncManagerServiceImp {
             .update(id: objectId,
                     data: params,
                     success: {
-                        // TODO(wushengtao): missing callback
-//                        finished(nil)
+                        finished(nil)
                     }, fail: { error in
-//                        finished(error)
-                        // TODO(wushengtao): missing callback
+                        finished(error)
                     })
-
-        // TODO(wushengtao): mock
-        finished(nil)
     }
 
     private func _addChooseSongInfo(songInfo: VLRoomSelSongModel, finished: @escaping (Error?) -> Void) {
@@ -1010,7 +1005,7 @@ extension KTVSyncManagerServiceImp {
                         print("removeChooseSong success")
                     },
                     fail: { error in
-                        completion(NSError(domain: error.message, code: error.code))
+//                        completion(NSError(domain: error.message, code: error.code))
                     })
 
         // TODO(wushengtao)mock
