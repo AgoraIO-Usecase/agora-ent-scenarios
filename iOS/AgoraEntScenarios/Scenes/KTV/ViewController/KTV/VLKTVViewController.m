@@ -118,7 +118,6 @@ VLPopScoreViewDelegate
 
 @property (nonatomic, strong) AgoraRtcChannelMediaOptions *mediaoption;
 
-@property (nonatomic, strong) NSArray *selSongsArray;
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
@@ -143,50 +142,11 @@ VLPopScoreViewDelegate
 
 @implementation VLKTVViewController
 
-
-#pragma mark setter
-- (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
-    
-    [_AgoraMcc registerEventDelegate:nil];
-    [[AppContext shared] unregisterEventDelegate:self];
-//    [AgoraMusicContentCenter destroy];
-    _AgoraMcc = AgoraMcc;
-    if (_AgoraMcc != nil) {
-        [[AppContext shared] registerEventDelegate:self];
-        [_AgoraMcc registerEventDelegate:[AppContext shared]];
-    }
-    [[AppContext shared] setAgoraMcc:AgoraMcc];
-}
-
-#pragma mark lazy
-- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
-    if (!_rtcMediaPlayer) {
-//        _rtcMediaPlayer = [self.RTCkit createMediaPlayerWithDelegate:self];
-        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
-        // 调节本地播放音量。0-100
-         [_rtcMediaPlayer adjustPlayoutVolume:200];
-//         调节远端用户听到的音量。0-400
-         [_rtcMediaPlayer adjustPublishSignalVolume:200];
-    }
-    return _rtcMediaPlayer;
-}
-
-- (VLKTVSettingView *)settingView {
-    if (!_settingView) {
-        _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
-        _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
-        [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
-        _settingView.delegate = self;
-    }
-    return _settingView;
-}
-
 #pragma mark view lifecycles
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
 
-    [self resetMicAndCameraStatus];
 //    [self createChannel:self.roomModel.roomNo];
     
     [self addServiceHandler];
@@ -260,7 +220,17 @@ VLPopScoreViewDelegate
     
     _isEarOn = NO;
     //请求已点歌曲
-    [self userFirstGetInRoom];
+    
+    VL(weakSelf);
+    [self refreshChoosedSongList:^{
+        //拿到当前歌的歌词去播放和同步歌词
+        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+        if (selSongModel.status == 2) { //歌曲正在播放
+            //请求歌词和歌曲
+            self.mccRequestId =
+            [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
+        }
+    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -307,12 +277,10 @@ VLPopScoreViewDelegate
     return NO;
 }
 
+
 #pragma mark service handler
 - (void)addNotification {
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianGeSuccessEvent:) name:kDianGeSuccessNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(makeTopSuccessEvent) name:kMakeTopNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(deleteSuccessEvent) name:kDeleteSuccessNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateSelSongEvent) name:kUpdateSelSongArrayNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshChoosedSongList:) name:kChoosedSongListChangedNotification object:nil];
 }
 
 - (void)addServiceHandler {
@@ -383,7 +351,7 @@ VLPopScoreViewDelegate
                 // If I was dropped off mic and I am current singer, then we should play next song.
                 if([/*member.userId*/seatModel.id isEqualToString:VLUserCenter.user.id] == NO && [self ifMainSinger:VLUserCenter.user.userNo]) {
                     [weakSelf prepareNextSong];
-                    [weakSelf getChoosedSongsList];
+                    [weakSelf refreshChoosedSongList:nil];
                 }
             } else{
                 for (VLRoomSeatModel *model in weakSelf.seatsArray) {
@@ -448,19 +416,14 @@ VLPopScoreViewDelegate
             
             //收到点歌的消息
             VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-            if(song == nil && [song.userId isEqualToString:VLUserCenter.user.id] == NO) {
-                [weakSelf getChoosedSongsList];
-            }
-            else {
-                [weakSelf getChoosedSongsList];
-            }
+            [weakSelf refreshChoosedSongList: nil];
             
             
             
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
-                [weakSelf getChoosedSongsList];
+                [weakSelf refreshChoosedSongList:nil];
                 return;
             }
             
@@ -473,7 +436,7 @@ VLPopScoreViewDelegate
             BOOL isWaitingForPlay = [weakSelf.currentPlayingSongNo length] == 0;
             if (removedSongIsPlaying || isWaitingForPlay) {
                 [weakSelf prepareNextSong];
-                [weakSelf getChoosedSongsList];
+                [weakSelf refreshChoosedSongList:nil];
             }
         }
     }];
@@ -533,7 +496,6 @@ VLPopScoreViewDelegate
     CGFloat popViewH = SCREEN_HEIGHT*0.7;
     VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self withRoomNo:self.roomModel.roomNo ifChorus:ifChorus];
     self.chooseSongView = chooseSongView;
-    self.chooseSongView.selSongsArray = self.selSongsArray;
     self.popChooseSongView = [self setPopCommenSettingWithContentView:chooseSongView ifClickBackDismiss:YES];
     self.popChooseSongView.isAvoidKeyboard = NO;
     [self.popChooseSongView pop];
@@ -1156,8 +1118,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 [self playNextSong:0];
             }
             
-            [self resetMicAndCameraStatus];
-            
             [self setSelfAudience];
         }
         else if([self ifIAmRoomMaster]
@@ -1178,12 +1138,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - rtc utils
-- (void)resetMicAndCameraStatus
-{
-    _isNowMicMuted = NO;
-    _isNowCameraMuted = YES;
-}
-
 /// 销毁播放器
 - (void)destroyMediaPlayer {
     [self.rtcMediaPlayer stop];
@@ -1936,50 +1890,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark --
-//TODO: remove it?
-- (void)dianGeSuccessEvent:(NSNotification *)notification {
-    [self getChoosedSongsList];
-}
-- (void)makeTopSuccessEvent {
-    [self choosedSongsListToChangeUI];
-}
-
-- (void)deleteSuccessEvent {
-    [self choosedSongsListToChangeUI];
-}
-
-- (void)updateSelSongEvent {
-    self.selSongsArray = [self.chooseSongView validateSelSongArray];;
-}
-
-- (void)getChoosedSongsList {
-    
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        weakSelf.selSongsArray = songArray;
-        if (weakSelf.chooseSongView) {
-            weakSelf.chooseSongView.selSongsArray = weakSelf.selSongsArray; //刷新已点歌曲UI
-        }
-        
-        if([weakSelf.selSongsArray count] == 0) {
-            [weakSelf.MVView updateUIWithSong:nil
-                                       onSeat:[weakSelf currentUserIsOnSeat]];
-            [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:nil];
-            return;
-        }
-        
-        [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
-                                   onSeat:[weakSelf currentUserIsOnSeat]];
-        [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
-        
-        [weakSelf startSingingIfNeed];
-    }];
-}
-
 - (void)setMyselfJoinChorusSong {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     selSongModel.chorusNo = VLUserCenter.user.userNo;
@@ -2032,14 +1942,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
 }
 
-- (void)choosedSongsListToChangeUI {
+- (void)refreshChoosedSongList:(void (^ _Nullable)(void))block{
     VL(weakSelf);
     [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
         if (error != nil) {
             return;
         }
         
-        weakSelf.selSongsArray = songArray;
         if (weakSelf.chooseSongView) {
             weakSelf.chooseSongView.selSongsArray = weakSelf.selSongsArray; //刷新已点歌曲UI
         }
@@ -2047,32 +1956,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
                                    onSeat:[weakSelf currentUserIsOnSeat]];
         
-    }];
-}
-
-- (void)userFirstGetInRoom {
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
+        [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:[weakSelf.selSongsArray count] == 0 ? nil : weakSelf.selSongsArray];;
+        if([weakSelf.selSongsArray count] == 0) {
+            [self startSingingIfNeed];
         }
         
-        weakSelf.selSongsArray = songArray;
-        if (weakSelf.chooseSongView) {
-            weakSelf.chooseSongView.selSongsArray = weakSelf.selSongsArray; //刷新已点歌曲UI
-        }
-        //刷新MV里的视图
-        [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
-                                   onSeat:[weakSelf currentUserIsOnSeat]];
-        if (!(weakSelf.selSongsArray.count > 0)) {
-            return;
-        }
-        //拿到当前歌的歌词去播放和同步歌词
-        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-        if (selSongModel.status == 2) { //歌曲正在播放
-            //请求歌词和歌曲
-            self.mccRequestId =
-            [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
+        if(block) {
+            block();
         }
     }];
 }
@@ -2279,6 +2169,50 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     }
     return onSeat;
+}
+
+#pragma mark - handy utils
+- (NSArray *)selSongsArray {
+    return self.chooseSongView.selSongsArray;
+}
+
+
+#pragma mark - setter
+- (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
+    
+    [_AgoraMcc registerEventDelegate:nil];
+    [[AppContext shared] unregisterEventDelegate:self];
+//    [AgoraMusicContentCenter destroy];
+    _AgoraMcc = AgoraMcc;
+    if (_AgoraMcc != nil) {
+        [[AppContext shared] registerEventDelegate:self];
+        [_AgoraMcc registerEventDelegate:[AppContext shared]];
+    }
+    [[AppContext shared] setAgoraMcc:AgoraMcc];
+}
+
+
+#pragma mark - lazy getter
+- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
+    if (!_rtcMediaPlayer) {
+//        _rtcMediaPlayer = [self.RTCkit createMediaPlayerWithDelegate:self];
+        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
+        // 调节本地播放音量。0-100
+         [_rtcMediaPlayer adjustPlayoutVolume:200];
+//         调节远端用户听到的音量。0-400
+         [_rtcMediaPlayer adjustPublishSignalVolume:200];
+    }
+    return _rtcMediaPlayer;
+}
+
+- (VLKTVSettingView *)settingView {
+    if (!_settingView) {
+        _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
+        _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
+        [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+        _settingView.delegate = self;
+    }
+    return _settingView;
 }
 
 @end

@@ -187,7 +187,7 @@ AgoraMusicContentCenterEventDelegate
             //点歌完成发送通知
             [self dianGeSuccessWithModel:model];
             
-            [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
+            [[NSNotificationCenter defaultCenter]postNotificationName:kChoosedSongListChangedNotification object:model];
         }
         else {
             [self dianGeFailedWithModel:model];

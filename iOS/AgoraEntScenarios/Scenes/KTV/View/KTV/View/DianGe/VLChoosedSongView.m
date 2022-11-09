@@ -17,7 +17,6 @@
 @interface VLChoosedSongView ()<UITableViewDataSource,UITableViewDelegate>
 
 @property(nonatomic, weak) id <VLChoosedSongViewDelegate>delegate;
-@property (nonatomic, strong) NSArray *selSongsArray;
 
 @property (nonatomic, strong) UITableView  *tableView;
 @property (nonatomic, copy) NSString *roomNo;
@@ -104,7 +103,7 @@
         if (error != nil) {
             return;
         }
-        [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
+        [[NSNotificationCenter defaultCenter]postNotificationName:kChoosedSongListChangedNotification object:nil];
     }];
 }
 
@@ -117,14 +116,8 @@
             return;
         }
         
-        weakSelf.selSongsArray = songArray;
-        [weakSelf.tableView reloadData];
-        [[NSNotificationCenter defaultCenter]postNotificationName:kUpdateSelSongArrayNotification object:weakSelf.selSongsArray];
+        [weakSelf setSelSongsUIWithArray:songArray];
     }];
-}
-
-- (NSArray *)getSelSongArray {
-    return self.selSongsArray;
 }
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
@@ -138,7 +131,7 @@
             return;
         }
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:kDeleteSuccessNotification object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kChoosedSongListChangedNotification object:nil];
     }];
 }
 
