@@ -157,11 +157,15 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickBeautyButton() {
-        
+        let beautyVC = ShowBeautySettingVC()
+        beautyVC.modalPresentationStyle = .overCurrentContext
+        present(beautyVC, animated: true)
     }
     
     func onClickMusicButton() {
-        
+        let vc = ShowMusicEffectVC()
+        vc.modalPresentationStyle = .overCurrentContext
+        present(vc, animated: true)
     }
     
     func onClickSettingButton() {
