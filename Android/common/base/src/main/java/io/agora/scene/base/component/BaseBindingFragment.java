@@ -33,5 +33,6 @@ public abstract class BaseBindingFragment<T extends ViewBinding> extends BaseFra
     public void onDestroy() {
         super.onDestroy();
         _binding = null;
+        rootView = null;
     }
 }
