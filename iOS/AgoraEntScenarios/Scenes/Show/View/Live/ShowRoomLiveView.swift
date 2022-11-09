@@ -8,11 +8,18 @@
 import UIKit
 
 protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate {
-    func onClickSendMsgButton()
+    func onClickSendMsgButton(text: String)
     func onClickCloseButton()
 }
 
 class ShowRoomLiveView: UIView {
+    
+    var room: ShowRoomListModel? {
+        didSet{
+            roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomNo, time: "")
+            countView.count = room?.roomUserCount ?? 1
+        }
+    }
     
     weak var delegate: ShowRoomLiveViewDelegate? {
         didSet{
@@ -20,7 +27,9 @@ class ShowRoomLiveView: UIView {
         }
     }
     var canvasView: UIView = UIView()
-
+    
+    private var chatArray = [ShowChatModel]()
+    
     private lazy var roomInfoView: ShowRoomInfoView = {
         let roomInfoView = ShowRoomInfoView()
         return roomInfoView
@@ -39,7 +48,7 @@ class ShowRoomLiveView: UIView {
     }()
     
     private lazy var bottomBar: ShowRoomBottomBar = {
-        let view = ShowRoomBottomBar()
+        let view = ShowRoomBottomBar(isBroadcastor: isBroadcastor)
         return view
     }()
     
@@ -52,11 +61,19 @@ class ShowRoomLiveView: UIView {
         tableView.allowsSelection = false
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 46
+        tableView.showsVerticalScrollIndicator = false
+        tableView.transform = CGAffineTransformMakeRotation(Double.pi)
         return tableView
     }()
     
     private lazy var chatTextField: UITextField = {
         let textField = UITextField()
+        textField.delegate = self
+        textField.isHidden = true
+        textField.font = .show_R_14
+        textField.textColor = .black
+        textField.returnKeyType = .send
+        textField.backgroundColor = .show_main_text
         return textField
     }()
     
@@ -69,8 +86,11 @@ class ShowRoomLiveView: UIView {
         return button
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    private var isBroadcastor = false
+    
+    init(isBroadcastor: Bool = false) {
+        super.init(frame: .zero)
+        self.isBroadcastor = isBroadcastor
         createSubviews()
     }
     
@@ -114,9 +134,9 @@ class ShowRoomLiveView: UIView {
         addSubview(chatTextField)
         chatTextField.snp.makeConstraints { make in
             make.left.equalTo(15)
-            make.right.equalTo(15)
+            make.right.equalTo(-15)
             make.height.equalTo(40)
-            make.top.equalTo(tableView.snp.bottom).offset(20)
+            make.top.equalTo(tableView.snp.bottom).offset(15)
         }
         
         addSubview(chatButton)
@@ -133,6 +153,8 @@ class ShowRoomLiveView: UIView {
     }
     
     @objc private func didClickChatButton() {
+        chatButton.isHidden = true
+        chatTextField.isHidden = false
         chatTextField.becomeFirstResponder()
     }
     
@@ -142,11 +164,18 @@ class ShowRoomLiveView: UIView {
 
 }
 
+extension ShowRoomLiveView {
+    func addChatModel(_ chatModel: ShowChatModel) {
+        chatArray.insert(chatModel, at: 0)
+        tableView.reloadData()
+        tableView.scrollToTop()
+    }
+}
 
 extension ShowRoomLiveView: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return chatArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -156,7 +185,25 @@ extension ShowRoomLiveView: UITableViewDelegate, UITableViewDataSource {
         if cell == nil {
             cell = ShowRoomChatCell(style: .default, reuseIdentifier: cellID)
         }
-        cell?.setUserName("撒量较大", msg: "hello everyone")
+        let chatModel = chatArray[indexPath.row]
+        cell?.setUserName(chatModel.userName, msg: chatModel.text)
         return cell!
+    }
+}
+
+extension ShowRoomLiveView: UITextFieldDelegate {
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.isHidden = true
+        chatButton.isHidden = false
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines), text.count > 0 {
+            delegate?.onClickSendMsgButton(text: text)
+        }
+        textField.text = nil
+        textField.resignFirstResponder()
+        return true
     }
 }

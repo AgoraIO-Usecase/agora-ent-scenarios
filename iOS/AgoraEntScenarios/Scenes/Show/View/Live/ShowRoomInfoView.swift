@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 private let bgViewHeight: CGFloat = 40
+private let imgViewHeight: CGFloat = 32
 
 class ShowRoomInfoView: UIView {
     
@@ -25,6 +26,8 @@ class ShowRoomInfoView: UIView {
     private lazy var headImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.contentMode = .scaleAspectFill
+        imgView.layer.cornerRadius = imgViewHeight * 0.5
+        imgView.clipsToBounds = true
         return imgView
     }()
     
@@ -74,9 +77,9 @@ class ShowRoomInfoView: UIView {
         
         addSubview(headImgView)
         headImgView.snp.makeConstraints { make in
-            make.top.equalTo(4)
+            make.left.equalTo(4)
             make.centerY.equalToSuperview()
-            make.width.height.equalTo(32)
+            make.width.height.equalTo(imgViewHeight)
         }
         
         addSubview(nameLabel)
@@ -100,14 +103,14 @@ class ShowRoomInfoView: UIView {
     }
     
     func setRoomInfo(avatar: String?, name: String?, id: String?, time: String?) {
-        headImgView.image = UIImage.show_sceneImage(name: "show_room_bg_0")
+        headImgView.sd_setImage(with: URL(string: avatar ?? ""))
         nameLabel.text = name
         idLabel.text = id
         let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_live_duration")!)
         attachment.bounds = CGRect(x: -4, y: 0, width: 6, height: 6)
         let attriTipsImg = NSAttributedString(attachment: attachment)
         let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
-        attriTips.append(NSAttributedString(string: "00:00:00"))
+        attriTips.append(NSAttributedString(string: " 00:00:00"))
         timeLabel.attributedText = attriTips
     }
 }
