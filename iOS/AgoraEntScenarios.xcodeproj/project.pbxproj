@@ -234,7 +234,6 @@
 		DD8417C029090C520026B624 /* KTVSyncManagerServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84174A29090C520026B624 /* KTVSyncManagerServiceImp.swift */; };
 		DD8417C129090C520026B624 /* AppContext+KTV.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84174C29090C520026B624 /* AppContext+KTV.m */; };
 		DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84174E29090C520026B624 /* KTVServiceModel.m */; };
-		DD8417C329090C520026B624 /* KTVServiceImp.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84174F29090C520026B624 /* KTVServiceImp.m */; };
 		DD8417C429090C520026B624 /* VLCreateRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84175229090C520026B624 /* VLCreateRoomViewController.m */; };
 		DD8417C529090C520026B624 /* VLKTVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84175529090C520026B624 /* VLKTVViewController.m */; };
 		DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84175829090C520026B624 /* VLOnLineListVC.m */; };
@@ -719,11 +718,9 @@
 		DD84174729090C520026B624 /* VLCreateRoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCreateRoomView.h; sourceTree = "<group>"; };
 		DD84174929090C520026B624 /* KTVServiceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVServiceModel.h; sourceTree = "<group>"; };
 		DD84174A29090C520026B624 /* KTVSyncManagerServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVSyncManagerServiceImp.swift; sourceTree = "<group>"; };
-		DD84174B29090C520026B624 /* KTVServiceImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVServiceImp.h; sourceTree = "<group>"; };
 		DD84174C29090C520026B624 /* AppContext+KTV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AppContext+KTV.m"; sourceTree = "<group>"; };
 		DD84174D29090C520026B624 /* KTVServiceProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVServiceProtocol.h; sourceTree = "<group>"; };
 		DD84174E29090C520026B624 /* KTVServiceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVServiceModel.m; sourceTree = "<group>"; };
-		DD84174F29090C520026B624 /* KTVServiceImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVServiceImp.m; sourceTree = "<group>"; };
 		DD84175029090C520026B624 /* AppContext+KTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AppContext+KTV.h"; sourceTree = "<group>"; };
 		DD84175229090C520026B624 /* VLCreateRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCreateRoomViewController.m; sourceTree = "<group>"; };
 		DD84175429090C520026B624 /* VLKTVViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVViewController.h; sourceTree = "<group>"; };
@@ -1750,8 +1747,6 @@
 				DD84174D29090C520026B624 /* KTVServiceProtocol.h */,
 				DD84174929090C520026B624 /* KTVServiceModel.h */,
 				DD84174E29090C520026B624 /* KTVServiceModel.m */,
-				DD84174B29090C520026B624 /* KTVServiceImp.h */,
-				DD84174F29090C520026B624 /* KTVServiceImp.m */,
 				DD84175029090C520026B624 /* AppContext+KTV.h */,
 				DD84174C29090C520026B624 /* AppContext+KTV.m */,
 			);
@@ -2804,7 +2799,6 @@
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
 				0510B829290B730E0063E57A /* VoiceRoomAudiencesEntity.swift in Sources */,
 				05FFE70B290F706C0024D22F /* VMSliderTableViewCell.swift in Sources */,
-				DD8417C329090C520026B624 /* KTVServiceImp.m in Sources */,
 				057DDA01290B9495001329E6 /* Throttle.swift in Sources */,
 				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
@@ -3211,7 +3205,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GM72UGLGZW;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3251,7 +3245,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GM72UGLGZW;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
