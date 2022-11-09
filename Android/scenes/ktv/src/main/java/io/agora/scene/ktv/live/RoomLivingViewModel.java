@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.live;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -61,29 +62,6 @@ public class RoomLivingViewModel extends ViewModel {
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
 
     /**
-     * 音乐播放器
-     */
-    private BaseMusicPlayer mMusicPlayer;
-
-    /**
-     * 播放器
-     */
-    protected IAgoraMusicPlayer mPlayer;
-
-    /**
-     * 播放器配置
-     */
-    MusicSettingBean mSetting;
-
-    /**
-     * 是否开启后台播放
-     */
-    private boolean isBackPlay = false;
-
-
-    private boolean isOpnEar = false;
-
-    /**
      * 房间信息
      */
     final MutableLiveData<KTVJoinRoomOutputModel> roomInfoLiveData;
@@ -116,7 +94,7 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<VLRoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
 
     /**
-     * 播放器信息
+     * Player/RTC信息
      */
     enum PlayerMusicStatus {
         ON_PREPARE,
@@ -127,7 +105,6 @@ public class RoomLivingViewModel extends ViewModel {
         ON_CHANGING_START,
         ON_CHANGING_END
     }
-
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
     final MutableLiveData<LrcData> playerMusicLrcDataLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
@@ -135,68 +112,23 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<Long> playerMusicPlayPositionChangeLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
 
-
-    private final BaseMusicPlayer.Callback playerMusicCallback = new BaseMusicPlayer.Callback() {
-
-        @Override
-        public void onPrepareResource() {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-        }
-
-        @Override
-        public void onResourceReady(@NonNull MemberMusicModel music) {
-            File lrcFile = music.fileLrc;
-            LrcData data = LrcLoadUtils.parse(lrcFile);
-            playerMusicLrcDataLiveData.postValue(data);
-        }
-
-        @Override
-        public void onMusicOpening() {
-        }
-
-        @Override
-        public void onMusicOpenCompleted(long duration) {
-            playerMusicOpenDurationLiveData.postValue(duration);
-        }
-
-        @Override
-        public void onMusicOpenError(int error) {
-
-        }
-
-        @Override
-        public void onMusicPlaying() {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-        }
-
-        @Override
-        public void onMusicPause() {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-        }
-
-        @Override
-        public void onMusicStop() {
-
-        }
-
-        @Override
-        public void onMusicCompleted() {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-            playerMusicPlayCompleteLiveData.postValue(RoomManager.getInstance().mMusicModel.userNo);
-            Log.d("cwtsw", "onMusicCompleted");
-            changeMusic();
-        }
-
-        @Override
-        public void onMusicPositionChanged(long position) {
-            playerMusicPlayPositionChangeLiveData.postValue(position);
-        }
-
-        @Override
-        public void onReceivedCountdown(int time) {
-            playerMusicCountDownLiveData.postValue(time);
-        }
-    };
+    /**
+     * 音乐播放器
+     */
+    private BaseMusicPlayer mMusicPlayer;
+    /**
+     * 播放器
+     */
+    protected IAgoraMusicPlayer mPlayer;
+    /**
+     * 播放器配置
+     */
+    MusicSettingBean mSetting;
+    /**
+     * 是否开启后台播放
+     */
+    private boolean isBackPlay = false;
+    private boolean isOpnEar = false;
 
     public RoomLivingViewModel(KTVJoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -207,22 +139,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void init() {
-        RTCManager.getInstance().initRTC();
-        RTCManager.getInstance().setRTCEvent((type, data) -> {
-
-        });
-        RTCManager.getInstance().joinRTC(
-                roomInfoLiveData.getValue().getAgoraRTCToken(),
-                roomInfoLiveData.getValue().getRoomNo(),
-                UserManager.getInstance().getUser().id,
-                isRoomOwner() ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE
-        );
-        RTCManager.getInstance().initMcc(
-                UserManager.getInstance().getUser().id,
-                roomInfoLiveData.getValue().getAgoraRTMToken()
-        );
-        mPlayer = RTCManager.getInstance().createMediaPlayer();
-
+        initRTCPlayer();
         initRoom();
         initSeats();
         initSongs();
@@ -245,7 +162,6 @@ public class RoomLivingViewModel extends ViewModel {
     // =============== 房间相关 ==========================
 
     public void initRoom() {
-        // RoomManager.getInstance().setAgoraRoom(ktvJoinRoomOutputModel.getData());
         if (isRoomOwner()) {
             RTCManager.getInstance().getRtcEngine().setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
         }
@@ -540,62 +456,6 @@ public class RoomLivingViewModel extends ViewModel {
     // ======== 歌曲相关 ============
 
     public void initSongs() {
-        mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
-            @Override
-            public void onEarChanged(boolean isEar) {
-                if (seatLocalLiveData.getValue().isSelfMuted() == 1) {
-                    isOpnEar = isEar;
-                    return;
-                }
-                RTCManager.getInstance().getRtcEngine().enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
-            }
-
-            @Override
-            public void onMicVolChanged(int vol) {
-                mMusicPlayer.setMicVolume(vol);
-            }
-
-            @Override
-            public void onMusicVolChanged(int vol) {
-                mMusicPlayer.setMusicVolume(vol);
-            }
-
-            @Override
-            public void onEffectChanged(int effect) {
-                RTCManager.getInstance().getRtcEngine().setAudioEffectPreset(getEffectIndex(effect));
-            }
-
-            @Override
-            public void onBeautifierPresetChanged(int effect) {
-                switch (effect) {
-                    case 0:
-                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
-                    case 1:
-                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
-                    case 2:
-                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
-                    case 3:
-                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
-                    case 4:
-                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
-                }
-            }
-
-            @Override
-            public void setAudioEffectParameters(int param1, int param2) {
-                if (param1 == 0) {
-                    RTCManager.getInstance().getRtcEngine().setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
-                } else {
-                    RTCManager.getInstance().getRtcEngine().setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
-                }
-            }
-
-            @Override
-            public void onToneChanged(int newToneValue) {
-                mMusicPlayer.setAudioMixingPitch(newToneValue);
-            }
-        });
-
         ktvServiceProtocol.subscribeChooseSongWithChanged((ktvSubscribe, songModel) -> {
             getSongChosenList();
             return null;
@@ -856,6 +716,87 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     /**
+     * 点击加入合唱
+     */
+    public void joinChorus() {
+        VLRoomSelSongModel musicModel = songPlayingLiveData.getValue();
+        if (musicModel == null) {
+            return;
+        }
+        if (!TextUtils.isEmpty(musicModel.getChorusNo())) {
+            return;
+        }
+
+        ktvServiceProtocol.joinChorusWithInput(new KTVJoinChorusInputModel(musicModel.getSongNo()), e -> {
+            if (e == null) {
+                songPlayingLiveData.postValue(new VLRoomSelSongModel(
+                        musicModel.getSongName(),
+                        musicModel.getSongNo(),
+                        musicModel.getSongUrl(),
+                        musicModel.getSinger(),
+                        musicModel.getLyric(),
+                        musicModel.getStatus(),
+
+                        musicModel.getImageUrl(),
+                        musicModel.getUserNo(),
+                        musicModel.getUserId(),
+                        musicModel.getName(),
+                        UserManager.getInstance().getUser().userNo,
+                        true,
+                        musicModel.isOriginal(),
+                        musicModel.getSort(),
+
+                        musicModel.getScore(),
+                        musicModel.isOwnSong(),
+
+                        musicModel.getObjectId()
+                ));
+                // success
+                mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
+            } else {
+                // failure
+                ToastUtils.showToast(e.getMessage());
+            }
+            return null;
+        });
+    }
+
+    /**
+     * 退出合唱
+     */
+    public void leaveChorus(Context context) {
+        VLRoomSelSongModel musicModel = songPlayingLiveData.getValue();
+        if (musicModel == null || TextUtils.isEmpty(musicModel.getChorusNo())) {
+            return;
+        }
+        musicStartPlay(context, musicModel);
+        ktvServiceProtocol.becomeSolo();
+
+        songPlayingLiveData.postValue(new VLRoomSelSongModel(
+                musicModel.getSongName(),
+                musicModel.getSongNo(),
+                musicModel.getSongUrl(),
+                musicModel.getSinger(),
+                musicModel.getLyric(),
+                musicModel.getStatus(),
+
+                musicModel.getImageUrl(),
+                musicModel.getUserNo(),
+                musicModel.getUserId(),
+                musicModel.getName(),
+                "",
+                false,
+                musicModel.isOriginal(),
+                musicModel.getSort(),
+
+                musicModel.getScore(),
+                musicModel.isOwnSong(),
+
+                musicModel.getObjectId()
+        ));
+    }
+
+    /**
      * 开始切歌
      */
     public void changeMusic() {
@@ -909,27 +850,81 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
+    // ============ Player/RTC/MPK相关 =====================
 
-    public void musicStartPlay(Context context, VLRoomSelSongModel music) {
-        musicStop();
-        int role;
-        if (music.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-            role = Constants.CLIENT_ROLE_BROADCASTER;
-        } else {
-            role = Constants.CLIENT_ROLE_AUDIENCE;
-        }
-        if (music.isChorus() || music.getStatus() == 2) {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-            mMusicPlayer = new SingleMusicPlayer(context, role, mPlayer);
-        } else {
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_WAIT_CHORUS);
-            mMusicPlayer = new MultipleMusicPlayer(context, role, mPlayer);
-        }
-        mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
-        mMusicPlayer.registerPlayerObserver(playerMusicCallback);
-        mMusicPlayer.prepare(music.toMemberMusicModel());
+    private void initRTCPlayer(){
+        RTCManager.getInstance().initRTC();
+        RTCManager.getInstance().setRTCEvent((type, data) -> {
+
+        });
+        RTCManager.getInstance().joinRTC(
+                roomInfoLiveData.getValue().getAgoraRTCToken(),
+                roomInfoLiveData.getValue().getRoomNo(),
+                UserManager.getInstance().getUser().id,
+                isRoomOwner() ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE
+        );
+        RTCManager.getInstance().initMcc(
+                UserManager.getInstance().getUser().id,
+                roomInfoLiveData.getValue().getAgoraRTMToken()
+        );
+        mPlayer = RTCManager.getInstance().createMediaPlayer();
+
+        mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
+            @Override
+            public void onEarChanged(boolean isEar) {
+                if (seatLocalLiveData.getValue().isSelfMuted() == 1) {
+                    isOpnEar = isEar;
+                    return;
+                }
+                RTCManager.getInstance().getRtcEngine().enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
+            }
+
+            @Override
+            public void onMicVolChanged(int vol) {
+                mMusicPlayer.setMicVolume(vol);
+            }
+
+            @Override
+            public void onMusicVolChanged(int vol) {
+                mMusicPlayer.setMusicVolume(vol);
+            }
+
+            @Override
+            public void onEffectChanged(int effect) {
+                RTCManager.getInstance().getRtcEngine().setAudioEffectPreset(getEffectIndex(effect));
+            }
+
+            @Override
+            public void onBeautifierPresetChanged(int effect) {
+                switch (effect) {
+                    case 0:
+                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
+                    case 1:
+                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
+                    case 2:
+                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
+                    case 3:
+                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
+                    case 4:
+                        RTCManager.getInstance().getRtcEngine().setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
+                }
+            }
+
+            @Override
+            public void setAudioEffectParameters(int param1, int param2) {
+                if (param1 == 0) {
+                    RTCManager.getInstance().getRtcEngine().setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
+                } else {
+                    RTCManager.getInstance().getRtcEngine().setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
+                }
+            }
+
+            @Override
+            public void onToneChanged(int newToneValue) {
+                mMusicPlayer.setAudioMixingPitch(newToneValue);
+            }
+        });
     }
-
 
     private int getEffectIndex(int index) {
         switch (index) {
@@ -954,6 +949,87 @@ public class RoomLivingViewModel extends ViewModel {
         }
         return Constants.AUDIO_EFFECT_OFF;
     }
+
+    public void musicStartPlay(Context context, VLRoomSelSongModel music) {
+        musicStop();
+        int role;
+        if (music.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+            role = Constants.CLIENT_ROLE_BROADCASTER;
+        } else {
+            role = Constants.CLIENT_ROLE_AUDIENCE;
+        }
+        if (music.isChorus() || music.getStatus() == 2) {
+            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
+            mMusicPlayer = new SingleMusicPlayer(context, role, mPlayer);
+        } else {
+            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_WAIT_CHORUS);
+            mMusicPlayer = new MultipleMusicPlayer(context, role, mPlayer);
+        }
+        mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
+        mMusicPlayer.registerPlayerObserver(new BaseMusicPlayer.Callback() {
+
+            @Override
+            public void onPrepareResource() {
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
+            }
+
+            @Override
+            public void onResourceReady(@NonNull MemberMusicModel music) {
+                File lrcFile = music.fileLrc;
+                LrcData data = LrcLoadUtils.parse(lrcFile);
+                playerMusicLrcDataLiveData.postValue(data);
+            }
+
+            @Override
+            public void onMusicOpening() {
+            }
+
+            @Override
+            public void onMusicOpenCompleted(long duration) {
+                playerMusicOpenDurationLiveData.postValue(duration);
+            }
+
+            @Override
+            public void onMusicOpenError(int error) {
+
+            }
+
+            @Override
+            public void onMusicPlaying() {
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+            }
+
+            @Override
+            public void onMusicPause() {
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+            }
+
+            @Override
+            public void onMusicStop() {
+
+            }
+
+            @Override
+            public void onMusicCompleted() {
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                playerMusicPlayCompleteLiveData.postValue(RoomManager.getInstance().mMusicModel.userNo);
+                Log.d("cwtsw", "onMusicCompleted");
+                changeMusic();
+            }
+
+            @Override
+            public void onMusicPositionChanged(long position) {
+                playerMusicPlayPositionChangeLiveData.postValue(position);
+            }
+
+            @Override
+            public void onReceivedCountdown(int time) {
+                playerMusicCountDownLiveData.postValue(time);
+            }
+        });
+        mMusicPlayer.prepare(music.toMemberMusicModel());
+    }
+
 
     /**
      * 音乐停止
@@ -995,48 +1071,6 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         mMusicPlayer.togglePlay();
-    }
-
-    /**
-     * 点击加入合唱
-     */
-    public void joinChorus() {
-        AgoraRoom mRoom = RoomManager.getInstance().getRoom();
-        if (mRoom == null) {
-            return;
-        }
-        VLRoomSelSongModel musicModel = songPlayingLiveData.getValue();
-        if (musicModel == null) {
-            return;
-        }
-//        User mUser = UserManager.getInstance().getUser();
-//        if (roomInfoLiveData.getValue().getCreatorNo().equals(RoomManager.mMine.userNo)) {
-//            RoomManager.mMine.role = AgoraMember.Role.Owner;
-//        }
-//        if (RoomManager.mMine.role == AgoraMember.Role.Listener) {
-//            ToastUtils.showToast(R.string.ktv_need_up);
-//            return;
-//        }
-
-        ktvServiceProtocol.joinChorusWithInput(new KTVJoinChorusInputModel(musicModel.getSongNo()), e -> {
-            if (e == null) {
-                // success
-                mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
-            } else {
-                // failure
-                ToastUtils.showToast(e.getMessage());
-            }
-            return null;
-        });
-    }
-
-    public void leaveChorus(Context context) {
-        VLRoomSelSongModel music = songPlayingLiveData.getValue();
-        if (music == null) {
-            return;
-        }
-        musicStartPlay(context, music);
-        ktvServiceProtocol.becomeSolo();
     }
 
 

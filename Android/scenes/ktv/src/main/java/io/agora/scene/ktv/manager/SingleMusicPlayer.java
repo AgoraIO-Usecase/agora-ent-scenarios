@@ -77,7 +77,7 @@ public class SingleMusicPlayer extends BaseMusicPlayer {
             }
             joinChannelEX(channelName, options);
 //        RTCManager.getInstance().getRtcEngine().updateChannelMediaOptions(options);
-            RTCManager.getInstance().getRtcEngine().muteRemoteAudioStream(RoomManager.mMine.id.intValue()*10 + 1, true);
+            RTCManager.getInstance().getRtcEngine().muteRemoteAudioStream(UserManager.getInstance().getUser().id.intValue()*10 + 1, true);
         }
 
         // Set mic connection.

@@ -237,10 +237,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onIdleStatus();
                 mRoomSpeakerAdapter.notifyDataSetChanged();
             }
-            if(mChooseSongDialog != null){
+            if (mChooseSongDialog != null) {
                 mChooseSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
             }
-            if(mChorusSongDialog != null){
+            if (mChorusSongDialog != null) {
                 mChorusSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
             }
         });
@@ -475,7 +475,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull VLRoomSelSongModel music) {
         getBinding().lrcControlView.setMusic(music);
-        if (music.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())
+                || UserManager.getInstance().getUser().userNo.equals(music.getChorusNo())) {
 //            RoomManager.mMine.role = AgoraMember.Role.Speaker;
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
         } else {
