@@ -1620,8 +1620,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 #pragma mark - AgoraLrcViewDelegate
 -(NSTimeInterval)getTotalTime{
     NSTimeInterval time = [_rtcMediaPlayer getDuration];
-    NSTimeInterval real = time / 1000;
-    return real;
+    return time;
 }
 
 - (NSTimeInterval)getPlayerCurrentTime
@@ -1629,8 +1628,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     VLRoomSelSongModel *model = self.selSongsArray.firstObject;
     if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
         NSTimeInterval time = [_rtcMediaPlayer getPosition];
-        NSTimeInterval real = time / 1000;
-        return real;
+        return time;
     }else{
         return self.currentTime;
     }
