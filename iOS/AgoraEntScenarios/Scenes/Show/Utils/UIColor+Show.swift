@@ -45,7 +45,7 @@ extension UIColor {
     }
     
     // 背景色
-    @objc static var show_beauty_setting_bg: UIColor {
+    @objc static var show_dark_cover_bg: UIColor {
         return UIColor.HexColor(hex: 0x151325, alpha: 0.85)
     }
     

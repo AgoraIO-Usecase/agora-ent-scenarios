@@ -140,6 +140,10 @@
 		A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */; };
 		A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */; };
 		A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD39291B82AE00A41D8D /* ShowChatModel.swift */; };
+		A845AD3C291BA74300A41D8D /* ShowMusicEffectVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */; };
+		A845AD40291BADCB00A41D8D /* ShowMusicTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */; };
+		A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */; };
+		A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -583,6 +587,10 @@
 		A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomLiveView.swift; sourceTree = "<group>"; };
 		A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomChatCell.swift; sourceTree = "<group>"; };
 		A845AD39291B82AE00A41D8D /* ShowChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
+		A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectVC.swift; sourceTree = "<group>"; };
+		A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicTableHeaderView.swift; sourceTree = "<group>"; };
+		A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
+		A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicItemCell.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1330,6 +1338,23 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		A845AD3D291BA7F200A41D8D /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		A845AD3E291BAD9900A41D8D /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */,
+				A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */,
+				A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
 		A88D14282913BEB900F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
@@ -1367,10 +1392,12 @@
 		A8B561802910FB2A004F34D1 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				A845AD3D291BA7F200A41D8D /* Setting */,
 				A88D14302914C13E00F5DF6A /* CreateLive */,
 				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
 				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
 				A845AD272919263200A41D8D /* ShowLiveViewController.swift */,
+				A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1378,6 +1405,7 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A845AD3E291BAD9900A41D8D /* Music */,
 				A845AD29291A01F700A41D8D /* Live */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
@@ -2895,6 +2923,8 @@
 				05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */,
 				DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */,
 				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
+				A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */,
+				A845AD40291BADCB00A41D8D /* ShowMusicTableHeaderView.swift in Sources */,
 				DD8417BD29090C520026B624 /* VLCreateRoomView.m in Sources */,
 				DD8417AB29090C520026B624 /* VLKTVItemBaseView.m in Sources */,
 				0510B824290B72FC0063E57A /* VRRoomMenuBarEntity.swift in Sources */,
@@ -3098,6 +3128,7 @@
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
 				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
+				A845AD3C291BA74300A41D8D /* ShowMusicEffectVC.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */,
 				DD8417A929090C520026B624 /* VLKTVSliderView.m in Sources */,
@@ -3232,6 +3263,7 @@
 				057DDA0C290B9778001329E6 /* AgoraSceneConfig.swift in Sources */,
 				DD84178B29090C520026B624 /* VLLoginViewController.m in Sources */,
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
+				A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */,
 				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 			);

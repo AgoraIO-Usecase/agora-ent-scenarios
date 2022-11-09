@@ -34,7 +34,7 @@ class ShowSelectQualityVC: UIViewController {
     // 背景
     private lazy var bgView: UIView = {
         let bgView = UIView()
-        bgView.backgroundColor = .show_beauty_setting_bg
+        bgView.backgroundColor = .show_dark_cover_bg
         return bgView
     }()
     
