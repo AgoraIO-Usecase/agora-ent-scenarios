@@ -102,7 +102,7 @@ class KTVSyncManagerServiceImp(
             scene.id = inputModel.name
             scene.userId = inputModel.userNo
 
-            val property: Map<String, String> = mapOf(
+            val property: Map<String, String?> = mapOf(
                 "name" to vlRoomListModel.name,
                 "isPravite" to isPrivate.toString(),
                 "password" to vlRoomListModel.password,
@@ -353,22 +353,13 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         var songInfo = VLRoomSelSongModel(
-            "",
-            inputModel.imageUrl,
-            inputModel.isChorus,
-            0,
+            inputModel.songName,
+            inputModel.songNo,
+            inputModel.songUrl,
             inputModel.singer,
             "",
-            inputModel.songNo,
-            "",
-            "",
             0,
-            0,
-            UserManager.getInstance().getUser().userNo,
-            UserManager.getInstance().getUser().id.toString(),
-            UserManager.getInstance().getUser().name,
-            0.0,
-            false
+            inputModel.imageUrl,
         )
         _addChooseSongInfo(songInfo, { error ->
             run {
@@ -389,44 +380,28 @@ class KTVSyncManagerServiceImp(
             // mark input song to top
             val targetSort = 0//(_minSort() ?? 0) -1
             val songInfo = VLRoomSelSongModel(
-                topSong.chorusNo,
-                topSong.imageUrl,
-                topSong.isChorus,
-                topSong.isOriginal,
-                topSong.singer,
                 topSong.songName,
                 topSong.songNo,
                 topSong.songUrl,
+                topSong.singer,
                 topSong.lyric,
-                targetSort,
                 topSong.status,
-                topSong.userNo,
-                topSong.userId,
-                topSong.name,
-                topSong.score,
-                topSong.isOwnSong,
-                topSong.objectId
+                topSong.imageUrl,
+
+                objectId = topSong.objectId
             )
 
             if (topSong.objectId != song.objectId) {
                 val songInfo = VLRoomSelSongModel(
-                    topSong.chorusNo,
-                    topSong.imageUrl,
-                    topSong.isChorus,
-                    topSong.isOriginal,
-                    topSong.singer,
                     topSong.songName,
                     topSong.songNo,
                     topSong.songUrl,
+                    topSong.singer,
                     topSong.lyric,
-                    targetSort -1,
                     topSong.status,
-                    topSong.userNo,
-                    topSong.userId,
-                    topSong.name,
-                    topSong.score,
-                    topSong.isOwnSong,
-                    topSong.objectId
+                    topSong.imageUrl,
+
+                    objectId = song.objectId
                 )
                 _updateChooseSong(songInfo, {})
             }
@@ -815,25 +790,6 @@ class KTVSyncManagerServiceImp(
 
     private fun _addChooseSongInfo(songInfo: VLRoomSelSongModel, completion: (error: Exception?) -> Unit) {
         //TODO SetSort
-        val songInfo = VLRoomSelSongModel(
-            songInfo.chorusNo,
-            songInfo.imageUrl,
-            songInfo.isChorus,
-            songInfo.isOriginal,
-            songInfo.singer,
-            songInfo.songName,
-            songInfo.songNo,
-            songInfo.songUrl,
-            songInfo.lyric,
-            0, //TODO
-            songInfo.status,
-            songInfo.userNo,
-            songInfo.userId,
-            songInfo.name,
-            songInfo.score,
-            songInfo.isOwnSong,
-            songInfo.objectId
-        )
         //SyncManager collectionKey:SYNC_MANAGER_CHOOSE_SONG_INFO
         mSceneReference?.collection("choose_song")?.add(songInfo, object: Sync.DataItemCallback{
             override fun onSuccess(result: IObject) {
@@ -870,23 +826,14 @@ class KTVSyncManagerServiceImp(
             val topSong = songList[0]
             if (topSong.status == 0 && topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
                 val songInfo = VLRoomSelSongModel(
-                    topSong.chorusNo,
-                    topSong.imageUrl,
-                    topSong.isChorus,
-                    topSong.isOriginal,
-                    topSong.singer,
                     topSong.songName,
                     topSong.songNo,
                     topSong.songUrl,
+                    topSong.singer,
                     topSong.lyric,
-                    topSong.sort,
-                    2,
-                    topSong.userNo,
-                    topSong.userId,
-                    topSong.name,
-                    topSong.score,
-                    topSong.isOwnSong,
-                    topSong.objectId
+                    topSong.status,
+                    topSong.imageUrl,
+                    objectId = topSong.objectId
                 )
                 _updateChooseSong(songInfo, {})
             }
@@ -898,23 +845,14 @@ class KTVSyncManagerServiceImp(
             val topSong = songList[0]
             if (topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
                 val songInfo = VLRoomSelSongModel(
-                    topSong.chorusNo,
-                    topSong.imageUrl,
-                    false,
-                    topSong.isOriginal,
-                    topSong.singer,
                     topSong.songName,
                     topSong.songNo,
                     topSong.songUrl,
+                    topSong.singer,
                     topSong.lyric,
-                    topSong.sort,
-                    2,
-                    topSong.userNo,
-                    topSong.userId,
-                    topSong.name,
-                    topSong.score,
-                    topSong.isOwnSong,
-                    topSong.objectId
+                    topSong.status,
+                    topSong.imageUrl,
+                    objectId = topSong.objectId
                 )
                 _updateChooseSong(songInfo, {})
             }
