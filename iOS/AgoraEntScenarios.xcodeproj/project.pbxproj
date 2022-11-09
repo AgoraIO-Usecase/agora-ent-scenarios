@@ -420,6 +420,8 @@
 		E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */; };
 		E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3120291A46DD00412D42 /* ShowSegmentView.swift */; };
 		E74A3123291A580100412D42 /* ShowApplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3122291A580100412D42 /* ShowApplyView.swift */; };
+		E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */; };
+		E74A3132291B929E00412D42 /* ShowRealTimeDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -987,6 +989,8 @@
 		E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyAndInviteView.swift; sourceTree = "<group>"; };
 		E74A3120291A46DD00412D42 /* ShowSegmentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSegmentView.swift; sourceTree = "<group>"; };
 		E74A3122291A580100412D42 /* ShowApplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyView.swift; sourceTree = "<group>"; };
+		E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowStatisticsInfo.swift; sourceTree = "<group>"; };
+		E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRealTimeDataView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1347,6 +1351,7 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E74A3124291B4DE700412D42 /* RealTime */,
 				E74A311B2919FBA700412D42 /* PKInvite */,
 				A88D142F2914C13500F5DF6A /* Beauty */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
@@ -2624,6 +2629,15 @@
 			path = PKInvite;
 			sourceTree = "<group>";
 		};
+		E74A3124291B4DE700412D42 /* RealTime */ = {
+			isa = PBXGroup;
+			children = (
+				E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */,
+				E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */,
+			);
+			path = RealTime;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2937,6 +2951,7 @@
 				05FFE71F290F73670024D22F /* VoiceRoomApplyUsersViewController.swift in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD8417BB29090C520026B624 /* VLRobMicrophoneView.m in Sources */,
+				E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */,
 				05FFE6F2290F706C0024D22F /* VMManagerView.swift in Sources */,
 				05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */,
 				DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */,
@@ -2960,6 +2975,7 @@
 				DDA19A5228FFE57A009D3E61 /* EKAttributes+Presets.swift in Sources */,
 				DD84178629090C520026B624 /* VLMineView.m in Sources */,
 				DD84179F29090C520026B624 /* VLsoundEffectView.m in Sources */,
+				E74A3132291B929E00412D42 /* ShowRealTimeDataView.swift in Sources */,
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
 				0510B829290B730E0063E57A /* VoiceRoomAudiencesEntity.swift in Sources */,
 				05FFE70B290F706C0024D22F /* VMSliderTableViewCell.swift in Sources */,
