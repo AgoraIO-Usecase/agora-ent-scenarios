@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Arrays;
 
-import io.agora.lrcview.PitchView;
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
@@ -28,17 +27,19 @@ import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
-import io.agora.scene.ktv.dialog.MoreDialog;
-import io.agora.scene.ktv.dialog.MusicSettingDialog;
-import io.agora.scene.ktv.dialog.RoomChooseSongDialog;
-import io.agora.scene.ktv.dialog.UserLeaveSeatMenuDialog;
 import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.holder.RoomPeopleHolder;
+import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
+import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.manager.RTCManager;
 import io.agora.scene.ktv.service.KTVJoinRoomOutputModel;
 import io.agora.scene.ktv.service.VLRoomSeatModel;
 import io.agora.scene.ktv.service.VLRoomSelSongModel;
 import io.agora.scene.ktv.widget.LrcControlView;
+import io.agora.scene.ktv.widget.MoreDialog;
+import io.agora.scene.ktv.widget.MusicSettingDialog;
+import io.agora.scene.ktv.widget.UserLeaveSeatMenuDialog;
+import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.dialog.CloseRoomDialog;
 import io.agora.scene.widget.dialog.CommonDialog;
@@ -58,6 +59,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private CommonDialog exitDialog;
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
+    private SongDialog mChooseSongDialog;
 
 
     public static void launch(Context context, KTVJoinRoomOutputModel roomInfo) {
@@ -151,81 +153,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
             roomLivingViewModel.toggleMic(b ? 0 : 1);
         });
-        getBinding().iBtnChorus.setOnClickListener(this::showChooseSongDialog);
-        getBinding().iBtnChooseSong.setOnClickListener(this::showChooseSongDialog);
+        getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
+        getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> {
             getBinding().groupResult.setVisibility(View.GONE);
         });
-        getBinding().lrcControlView.setOnLrcClickListener(new LrcControlView.OnLrcActionListener() {
-            @Override
-            public void onProgressChanged(long time) {
-                roomLivingViewModel.musicSeek(time);
-            }
-
-            @Override
-            public void onStartTrackingTouch() {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch() {
-
-            }
-
-            @Override
-            public void onSwitchOriginalClick() {
-                if (roomLivingViewModel.musicToggleOriginal()) {
-                    getBinding().lrcControlView.setSwitchOriginalChecked(true);
-                }
-            }
-
+        LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override
             public void onMenuClick() {
+                super.onMenuClick();
                 showMusicSettingDialog();
             }
 
             @Override
-            public void onPlayClick() {
-                roomLivingViewModel.musicToggleStart();
-            }
-
-            @Override
             public void onChangeMusicClick() {
+                super.onChangeMusicClick();
                 showChangeMusicDialog();
             }
-
-            @Override
-            public void onStartSing() {
-                roomLivingViewModel.leaveChorus(RoomLivingActivity.this);
-            }
-
-            @Override
-            public void onJoinChorus() {
-                roomLivingViewModel.joinChorus();
-            }
-
-            @Override
-            public void onWaitTimeOut() {
-                roomLivingViewModel.leaveChorus(RoomLivingActivity.this);
-            }
-
-            @Override
-            public void onCountTime(int time) {
-                roomLivingViewModel.musicCountDown(time);
-
-            }
-        });
-        getBinding().lrcControlView.setPitchViewOnActionListener(new PitchView.OnActionListener() {
-            @Override
-            public void onOriginalPitch(float pitch, int totalCount) {
-            }
-
-            @Override
-            public void onScore(double score, double cumulativeScore, double totalScore) {
-                getBinding().lrcControlView.updateScore(score);
-            }
-        });
+        };
+        getBinding().lrcControlView.setOnLrcClickListener(lrcActionListenerImpl);
+        getBinding().lrcControlView.setPitchViewOnActionListener(lrcActionListenerImpl);
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
 
 
@@ -255,9 +203,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
             for (VLRoomSeatModel seatModel : seatModels) {
                 VLRoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getOnSeat());
-                if(oSeatModel == null
+                if (oSeatModel == null
                         || oSeatModel.isSelfMuted() != seatModel.isSelfMuted()
-                        || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()){
+                        || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()) {
                     mRoomSpeakerAdapter.dataList.set(seatModel.getOnSeat(), seatModel);
                     mRoomSpeakerAdapter.notifyItemChanged(seatModel.getOnSeat());
                 }
@@ -287,6 +235,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
                 getBinding().lrcControlView.onIdleStatus();
                 mRoomSpeakerAdapter.notifyDataSetChanged();
+            }
+            if(mChooseSongDialog != null){
+                mChooseSongDialog.resetChosenSongList(SongActionListenerImpl.transSongModel(models));
             }
         });
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
@@ -537,13 +488,24 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         moreDialog.dismiss();
     }
 
-    private void showChooseSongDialog(View view) {
-        boolean isChorus = false;
-        if (view.getId() == R.id.iBtnChorus) {
-            isChorus = true;
+    private void showChorusSongDialog() {
+
+    }
+
+    private void showChooseSongDialog() {
+        if (mChooseSongDialog == null) {
+            mChooseSongDialog = new SongDialog();
+            mChooseSongDialog.setChosenControllable(true);
+            SongActionListenerImpl chooseSongListener =
+                    new SongActionListenerImpl(this,
+                            roomLivingViewModel);
+            mChooseSongDialog.setChooseSongTabsTitle(
+                    chooseSongListener.getSongTypeTitles(this),
+                    0);
+            mChooseSongDialog.setChooseSongListener(chooseSongListener);
+            roomLivingViewModel.getSongChosenList();
         }
-        new RoomChooseSongDialog(isChorus)
-                .show(getSupportFragmentManager(), RoomChooseSongDialog.TAG);
+        mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
     }
 
     private void showMoreDialog(View view) {
@@ -615,7 +577,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen ? 1: 0);
+        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen ? 1 : 0);
         requestCameraPermission();
     }
 
