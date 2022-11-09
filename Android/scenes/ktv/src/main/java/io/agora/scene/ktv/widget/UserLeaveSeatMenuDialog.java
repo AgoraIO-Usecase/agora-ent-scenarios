@@ -1,4 +1,4 @@
-package io.agora.scene.ktv.dialog;
+package io.agora.scene.ktv.widget;
 
 import android.content.Context;
 import android.view.Gravity;

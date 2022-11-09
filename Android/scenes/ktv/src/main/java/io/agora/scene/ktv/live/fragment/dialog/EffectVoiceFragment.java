@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.ktv.databinding.FragmentEffectVoiceBinding;
-import io.agora.scene.ktv.dialog.MusicSettingBean;
 import io.agora.scene.ktv.live.RoomLivingActivity;
+import io.agora.scene.ktv.widget.MusicSettingBean;
 
 public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectVoiceBinding> {
     public static final String TAG = "EffectVoiceFragment";

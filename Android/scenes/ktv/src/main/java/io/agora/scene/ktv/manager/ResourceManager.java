@@ -65,7 +65,7 @@ public final class ResourceManager {
                     @Override
                     public SingleSource<MemberMusicModel> apply(@NonNull KTVBaseResponse<MusicModelBase> model) throws Exception {
                         musicModel.songUrl = (model.getData().data.playUrl);
-                        musicModel.lrc = model.getData().data.lyric;
+                        musicModel.lyric = model.getData().data.lyric;
 
                         File fileMusic = new File(resourceRoot, musicModel.songNo);
                         File fileLrc;
@@ -85,7 +85,7 @@ public final class ResourceManager {
 
                         mLogger.i("prepareMusic down %s", musicModel);
                         if (onlyLrc) {
-                            Completable mCompletable = DataRepository.Instance().download(fileLrc, musicModel.lrc);
+                            Completable mCompletable = DataRepository.Instance().download(fileLrc, musicModel.lyric);
                             if (model.getData().data.lyric.endsWith("zip")) {
                                 mCompletable = mCompletable.andThen(Completable.create(new CompletableOnSubscribe() {
                                     @Override
@@ -100,7 +100,7 @@ public final class ResourceManager {
 
                             return mCompletable.andThen(Single.just(musicModel));
                         } else {
-                            Completable mCompletable = DataRepository.Instance().download(fileLrc, musicModel.lrc);
+                            Completable mCompletable = DataRepository.Instance().download(fileLrc, musicModel.lyric);
                             if (model.getData().data.lyric.endsWith("zip")) {
                                 mCompletable = mCompletable.andThen(Completable.create(new CompletableOnSubscribe() {
                                     @Override

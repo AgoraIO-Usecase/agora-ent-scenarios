@@ -103,13 +103,13 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             if (music.userStatus == MemberMusicModel.UserStatus.Ready) {
                 onMemberJoinedChorus(music);
             }
-        } else if (ObjectsCompat.equals(music.user1Id, mUser.userNo)) {
+        } else if (ObjectsCompat.equals(music.userId, mUser.userNo)) {
             onMemberJoinedChorus(music);
         } else {
             if (!TextUtils.isEmpty(music.userNo) && music.userStatus == MemberMusicModel.UserStatus.Ready
-                    && !TextUtils.isEmpty(music.user1Id) && music.user1Status == MemberMusicModel.UserStatus.Ready) {
+                    && !TextUtils.isEmpty(music.userId) && music.user1Status == MemberMusicModel.UserStatus.Ready) {
                 onMemberChorusReady(music);
-            } else if (!TextUtils.isEmpty(music.user1Id) && music.user1Status == MemberMusicModel.UserStatus.Idle) {
+            } else if (!TextUtils.isEmpty(music.userId) && music.user1Status == MemberMusicModel.UserStatus.Idle) {
                 onMemberJoinedChorus(music);
             } else if (!TextUtils.isEmpty(music.applyUser1Id)) {
                 onMemberApplyJoinChorus(music);
@@ -139,7 +139,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
         if (musicModelReady != null && ObjectsCompat.equals(musicModelReady.userNo, mUser.userNo)) {
             options.publishMediaPlayerAudioTrack = true;
             options.enableAudioRecordingOrPlayout = false;
-        } else if (ObjectsCompat.equals(musicModelReady.user1Id, mUser.userNo)) {
+        } else if (ObjectsCompat.equals(musicModelReady.userId, mUser.userNo)) {
             options.publishMediaPlayerAudioTrack = false;
             options.enableAudioRecordingOrPlayout = false;
         }
@@ -149,7 +149,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             if (musicModelReady.userbgId != null && musicModelReady.userbgId != 0) {
                 uid = musicModelReady.userbgId.intValue();
             }
-        } else if (musicModelReady != null && ObjectsCompat.equals(mUser.userNo, musicModelReady.user1Id)) {
+        } else if (musicModelReady != null && ObjectsCompat.equals(mUser.userNo, musicModelReady.userId)) {
             if (musicModelReady.user1bgId != null && musicModelReady.user1bgId != 0) {
                 uid = musicModelReady.user1bgId.intValue();
             }
@@ -258,7 +258,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
         //修改音乐的 applyUser1Id 为""
         //无回调
 
-        RoomManager.getInstance().mMusicModel.user1Id = music.applyUser1Id;
+        RoomManager.getInstance().mMusicModel.userId = music.applyUser1Id;
         RoomManager.getInstance().mMusicModel.applyUser1Id = "";
         RoomManager.getInstance().mMusicModel.user1bgId = music.user1bgId;
         onMemberJoinedChorus(music);
@@ -273,7 +273,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             return;
         }
         if (ObjectsCompat.equals(mUser.userNo, music.userNo)
-                || ObjectsCompat.equals(mUser.userNo, music.user1Id)) {
+                || ObjectsCompat.equals(mUser.userNo, music.userId)) {
             onPrepareResource();
             ResourceManager.Instance(mContext)
                     .download(music, true)
@@ -310,7 +310,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
         if (ObjectsCompat.equals(UserManager.getInstance().getUser().userNo, music.userNo)) {
             Log.d("cwtsw", "多人 open 我是主唱");
             joinChannelEX();
-        } else if (UserManager.getInstance().getUser().userNo.equals(music.user1Id)) {
+        } else if (UserManager.getInstance().getUser().userNo.equals(music.userId)) {
             startNetTestTask();
             joinChannelEX();
             musicModelReady.user1Status = MemberMusicModel.UserStatus.Ready;
@@ -371,13 +371,13 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
         if (music.userNo.equals(mUser.userNo)) {
             //唱歌人，主唱，joinChannel 需要屏蔽的uid
             RTCManager.getInstance().getRtcEngine().muteRemoteAudioStream(music.userbgId.intValue(), true);
-        } else if (music.user1Id.equals(mUser.userNo)) {
+        } else if (music.userId.equals(mUser.userNo)) {
             //唱歌人，陪唱人，joinChannel 需要屏蔽的uid
             RTCManager.getInstance().getRtcEngine().muteRemoteAudioStream(music.userbgId.intValue(), true);
         }
         Log.d("cwtsw", "多人 onMemberChorusReady");
         if (ObjectsCompat.equals(music.userNo, mUser.userNo)
-                || ObjectsCompat.equals(music.user1Id, mUser.userNo)) {
+                || ObjectsCompat.equals(music.userId, mUser.userNo)) {
             music.fileMusic = (musicModelReady.fileMusic);
             music.fileLrc = (musicModelReady.fileLrc);
 
@@ -436,7 +436,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             return;
         }
 
-        if (mUser.userNo.equals(mMemberMusicModel.user1Id) || mUser.userNo.equals(mMemberMusicModel.userNo)) {
+        if (mUser.userNo.equals(mMemberMusicModel.userId) || mUser.userNo.equals(mMemberMusicModel.userNo)) {
             //已经开始了 直接retrun;
             Log.d("cwtsw", "多人 相等");
 
@@ -474,7 +474,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
 
         if (ObjectsCompat.equals(mMemberMusicModel.userNo, mUser.userNo)) {
 
-        } else if (ObjectsCompat.equals(mMemberMusicModel.user1Id, mUser.userNo)) {
+        } else if (ObjectsCompat.equals(mMemberMusicModel.userId, mUser.userNo)) {
             pause();
         }
     }
@@ -493,7 +493,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
 
         if (ObjectsCompat.equals(mMemberMusicModel.userNo, mUser.userNo)) {
 
-        } else if (ObjectsCompat.equals(mMemberMusicModel.user1Id, mUser.userNo)) {
+        } else if (ObjectsCompat.equals(mMemberMusicModel.userId, mUser.userNo)) {
             //如果是暂停 则恢复
             if (mStatus == Status.Paused) {
                 resume();
@@ -541,7 +541,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             return;
         }
 
-        if (ObjectsCompat.equals(mMemberMusicModel.user1Id, mUser.userNo)) {
+        if (ObjectsCompat.equals(mMemberMusicModel.userId, mUser.userNo)) {
             long localTs = System.currentTimeMillis();
             netRtt = (localTs - testDelayTime) / 2;
             delayWithBrod = position + netRtt;
@@ -568,7 +568,7 @@ public class MultipleMusicPlayer extends BaseMusicPlayer {
             return;
         }
 
-        if (ObjectsCompat.equals(mMemberMusicModel.user1Id, mUser.userNo)) {
+        if (ObjectsCompat.equals(mMemberMusicModel.userId, mUser.userNo)) {
 //            selectAudioTrack(mode);
         }
     }
