@@ -39,37 +39,18 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "VLKTVMVView.h"
-//#import "VLAPIRequest.h"
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-#import <AgoraLyricsScore-Swift.h>
+#import "LEEAlert+KTVModal.h"
 @import LSTPopView;
 @import AgoraRtcKit;
-
+@import AgoraLyricsScore;
 @import LEEAlert;
 @import YYCategories;
 @import SDWebImage;
 
 typedef void (^sendStreamSuccess)(BOOL ifSuccess);
-
-//typedef enum : NSUInteger {
-//    VLSendMessageTypeOnSeat = 0,         // 上麦
-//    VLSendMessageTypeDropSeat = 1,       // 下麦
-//    VLSendMessageTypeChooseSong = 2,     // 点歌
-//    VLSendMessageTypeChangeSong = 3,     // 切歌
-//    VLSendMessageTypeCloseRoom = 4,      // 关闭房间
-//    VLSendMessageTypeChangeMVBg = 5,     // 切换MV背景
-//
-//    VLSendMessageTypeAudioMute= 9,      // 静音
-//    VLSendMessageTypeVideoIfOpen = 10,    // 摄像头
-//    VLSendMessageTypeTellSingerSomeBodyJoin = 11, //通知主唱有人加入合唱
-//    VLSendMessageTypeTellJoinUID = 12, //通知合唱者 主唱UID
-//    VLSendMessageTypeSoloSong = 13,  //独唱
-//    VLSendMessageTypeSeeScore = 14,   //观众看到分数
-//
-//    VLSendMessageAuditFail = 20,
-//} VLSendMessageType;
 
 static NSInteger streamId = -1;
 
@@ -406,9 +387,7 @@ VLPopScoreViewDelegate
             }
             
             //收到点歌的消息
-            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
             [weakSelf refreshChoosedSongList: nil];
-            
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
@@ -520,33 +499,16 @@ VLPopScoreViewDelegate
 
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
-    [LEEAlert alert].config
-        .LeeAddTitle(^(UILabel *label) {
-            label.text = KTVLocalizedString(@"房主已解散房间,请确认离开房间");
-            label.textColor = UIColorMakeWithHex(@"#040925");
-            label.font = UIFontBoldMake(16);
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            VL(weakSelf);
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"确定");
-            action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-            action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.font = UIFontBoldMake(16);
-            action.clickBlock = ^{
-                for (BaseViewController *vc in self.navigationController.childViewControllers) {
-                    if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                        [weakSelf destroyMediaPlayer];
-                        [weakSelf leaveRTCChannel];
-                        [weakSelf.navigationController popToViewController:vc animated:YES];
-                    }
-                }
-            };
-        })
-        .LeeShow();
+    VL(weakSelf);
+    [LEEAlert popForceLeaveRoomDialogWithCompletion:^{
+        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
+                [weakSelf destroyMediaPlayer];
+                [weakSelf leaveRTCChannel];
+                [weakSelf.navigationController popToViewController:vc animated:YES];
+            }
+        }
+    }];
 }
 
 //公共弹窗视图设置
@@ -1297,103 +1259,29 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
-    //TODO
+    VL(weakSelf);
     if (VLUserCenter.user.ifMaster) { //自己是房主关闭房间
-        [LEEAlert alert].config
-        .LeeAddTitle(^(UILabel *label) {
-            label.text = KTVLocalizedString(@"解散房间");
-            label.textColor = UIColorMakeWithHex(@"#040925");
-            label.font = UIFontBoldMake(16);
-        })
-        .LeeAddContent(^(UILabel *label) {
-            label.text = KTVLocalizedString(@"确定解散该房间吗？");
-            label.textColor = UIColorMakeWithHex(@"#6C7192");
-            label.font = UIFontMake(14);
-            
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"取消");
-            action.titleColor = UIColorMakeWithHex(@"#000000");
-            action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.font = UIFontBoldMake(16);
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.clickBlock = ^{
-                // 取消点击事件Block
-            };
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            VL(weakSelf);
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"确定");
-            action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-            action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.font = UIFontBoldMake(16);
-            action.clickBlock = ^{
-                [weakSelf leaveRoom];
-            };
-        })
-        .LeeShow();
+        [LEEAlert popRemoveRoomDialogWithCancelBlock:nil
+                                       withDoneBlock:^{
+            [weakSelf leaveRoom];
+        }];
     }else{
-        [LEEAlert alert].config
-        .LeeAddTitle(^(UILabel *label) {
-            label.text = KTVLocalizedString(@"退出房间");
-            label.textColor = UIColorMakeWithHex(@"#040925");
-            label.font = UIFontBoldMake(16);
-        })
-        .LeeAddContent(^(UILabel *label) {
-            label.text = KTVLocalizedString(@"确定退出该房间吗？");
-            label.textColor = UIColorMakeWithHex(@"#6C7192");
-            label.font = UIFontMake(14);
-            
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"取消");
-            action.titleColor = UIColorMakeWithHex(@"#000000");
-            action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.font = UIFontBoldMake(16);
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-            action.clickBlock = ^{
-                // 取消点击事件Block
-            };
-        })
-        .LeeAddAction(^(LEEAction *action) {
-            VL(weakSelf);
-            action.type = LEEActionTypeCancel;
-            action.title = KTVLocalizedString(@"确定");
-            action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-            action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-            action.cornerRadius = 20;
-            action.height = 40;
-            action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-            action.font = UIFontBoldMake(16);
-            action.clickBlock = ^{
-                if([weakSelf currentUserIsOnSeat]) {
-                    // Drop mic first
-                    [weakSelf _leaveSeat];
-                }
-                [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
-                VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
-                if(song != nil && song.isOwnSong) {
-                    //mvview action type exit
-                    [weakSelf playNextSong:0];
-                }
-                [weakSelf leaveMicSeat:^{
-                    [weakSelf leaveRoom];
-                }];
-            };
-        })
-        .LeeShow();
+        [LEEAlert popLeaveRoomDialogWithCancelBlock:nil
+                                      withDoneBlock:^{
+            if([weakSelf currentUserIsOnSeat]) {
+                // Drop mic first
+                [weakSelf _leaveSeat];
+            }
+            [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
+            VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+            if(song != nil && song.isOwnSong) {
+                //mvview action type exit
+                [weakSelf playNextSong:0];
+            }
+            [weakSelf leaveMicSeat:^{
+                [weakSelf leaveRoom];
+            }];
+        }];
     }
 }
 
@@ -1597,57 +1485,21 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         //发送暂停的消息
         [self sendPauseOrResumeMessage:-1];
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
-        [LEEAlert alert].config
-            .LeeAddTitle(^(UILabel *label) {
-                label.text = KTVLocalizedString(@"切换歌曲");
-                label.textColor = UIColorMakeWithHex(@"#040925");
-                label.font = UIFontBoldMake(16);
-            })
-            .LeeAddContent(^(UILabel *label) {
-                label.text = KTVLocalizedString(@"切换下一首歌曲？");
-                label.textColor = UIColorMakeWithHex(@"#6C7192");
-                label.font = UIFontMake(14);
+        VL(weakSelf);
+        [LEEAlert popSwitchSongDialogWithCancelBlock:nil
+                                       withDoneBlock:^{
+            if (weakSelf.selSongsArray.count >= 1) {
+                if([weakSelf ifIAmRoomMaster]
+                   && [weakSelf ifMainSinger:VLUserCenter.user.userNo] == NO) {
+                    [weakSelf playNextSong:1];
+                }
+                else {
+                    [weakSelf playNextSong:0];
+                }
                 
-            })
-            .LeeAddAction(^(LEEAction *action) {
-                action.type = LEEActionTypeCancel;
-                action.title = KTVLocalizedString(@"取消");
-                action.titleColor = UIColorMakeWithHex(@"#000000");
-                action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-                action.cornerRadius = 20;
-                action.height = 40;
-                action.font = UIFontBoldMake(16);
-                action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-                action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-                action.clickBlock = ^{
-                    // 取消点击事件Block
-                };
-            })
-            .LeeAddAction(^(LEEAction *action) {
-                VL(weakSelf);
-                action.type = LEEActionTypeCancel;
-                action.title = KTVLocalizedString(@"确定");
-                action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-                action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-                action.cornerRadius = 20;
-                action.height = 40;
-                action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-                action.font = UIFontBoldMake(16);
-                action.clickBlock = ^{
-                    if (weakSelf.selSongsArray.count >= 1) {
-                        if([weakSelf ifIAmRoomMaster]
-                           && [weakSelf ifMainSinger:VLUserCenter.user.userNo] == NO) {
-                            [weakSelf playNextSong:1];
-                        }
-                        else {
-                            [weakSelf playNextSong:0];
-                        }
-                        
-                        VLLog(@"---Change song---");
-                    }
-                };
-            })
-            .LeeShow();
+                VLLog(@"---Change song---");
+            }
+        }];
     } else if (type == VLKTVMVViewActionTypeSingOrigin) { // 原唱
         [self.rtcMediaPlayer selectAudioTrack:0];
         [self sendTrackModeMessage:0];
