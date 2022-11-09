@@ -1708,10 +1708,10 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             })
             .LeeShow();
     } else if (type == VLKTVMVViewActionTypeSingOrigin) { // 原唱
-        [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoR];
+        [self.rtcMediaPlayer selectAudioTrack:0];
         [self sendTrackModeMessage:0];
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
-        [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoL];
+        [self.rtcMediaPlayer selectAudioTrack:1];
         [self sendTrackModeMessage:1];
     } else if (type == VLKTVMVViewActionTypeExit) {
         [self playNextSong:0];
@@ -1902,14 +1902,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
     }
-    //    else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
-    //        if([dict[@"value"] intValue] == 0) {
-    //            [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoR];
-    //        }
-    //        else {
-    //            [self.rtcMediaPlayer setAudioDualMonoMode:AgoraAudioDualMonoL];
-    //        }
-    //    }
+//    else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
+//        [self.rtcMediaPlayer selectAudioTrack:[dict[@"value"] intValue]];
+//    }
 }
 
 // Network quality callbacks
