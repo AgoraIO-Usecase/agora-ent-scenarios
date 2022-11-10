@@ -21,10 +21,6 @@
 @end
 
 
-
-
-
-
 @interface VLKTVSelBgCell : UICollectionViewCell
 
 @property (nonatomic, strong) UIImageView *picImgView;
