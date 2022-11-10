@@ -7,28 +7,51 @@
 
 import Foundation
 
-public class Scene: Codable {
+public struct Scene: Codable {
     let id: String
     let userId: String
-    let property: [String: String]?
-
+    let property: [String : Any]?
+    
     public init(id: String,
                 userId: String,
-                property: [String: String]?)
-    {
+                property: [String : Any]?) {
         self.id = id
         self.userId = userId
         self.property = property
     }
-
+    
     func toJson() -> String {
-        var dict = [String: String]()
+        var dict = [String : Any]()
         dict["id"] = id
         dict["userId"] = userId
-        let _ = property?.map({ key, value in
+        let _ = self.property?.map({ (key,value) in
             dict[key] = value
         })
         return Utils.getJson(dict: dict as NSDictionary)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId
+        case property
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        userId = try values.decode(String.self, forKey: .userId)
+        let data = try values.decode(Data.self, forKey: .property)
+        property = try JSONSerialization.jsonObject(with: data,
+                                                    options: []) as? [String: Any]
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(userId, forKey: .userId)
+        let data = try JSONSerialization.data(withJSONObject: property ?? [:],
+                                              options: [])
+        try container.encode(data, forKey: .property)
     }
 }
 
@@ -39,29 +62,29 @@ class Attribute: IObject, Equatable {
     func getId() -> String {
         return key
     }
-
+    
     func getPropertyWith(key: String, type: Any.Type) -> Any? {
         let dict = Utils.getDict(text: object)
         return dict?[key]
     }
-
+    
     func toJson() -> String? {
         var dict = Utils.toDictionary(jsonString: object)
         dict["objectId"] = key
         return Utils.toJsonString(dict: dict)
     }
-
+    
     init(key: String, value: String) {
         self.key = key
-        object = value
+        self.object = value
     }
-
+    
     static func == (lhs: Attribute, rhs: Attribute) -> Bool {
         return lhs.object == rhs.object &&
-            lhs.key == rhs.key
+        lhs.key == rhs.key
     }
-
-    func toObject<T>() throws -> T? where T: Decodable {
+    
+    func toObject<T>() throws -> T? where T : Decodable {
         let jsonDecoder = JSONDecoder()
         if let data = object.data(using: .utf8) {
             return try jsonDecoder.decode(T.self, from: data)
@@ -72,7 +95,7 @@ class Attribute: IObject, Equatable {
 
 struct CollectionItem: Codable {
     let objectId: String
-
+    
     static func decodeWithString(jsonString: String, decoder: JSONDecoder) -> CollectionItem? {
         guard let data = jsonString.data(using: .utf8) else {
             Log.errorText(text: "json string can not be trans a data", tag: "CollectionItem.decodeWithString")
@@ -81,14 +104,17 @@ struct CollectionItem: Codable {
         do {
             let obj = try decoder.decode(CollectionItem.self, from: data)
             return obj
-        } catch {
-            Log.error(error: error as CustomStringConvertible, tag: "CollectionItem.decodeWithString")
+        } catch let error {
+            Log.error(error: error as CustomStringConvertible, tag:  "CollectionItem.decodeWithString")
             return nil
         }
     }
-
+    
     static func getObjId(jsonString: String, decoder: JSONDecoder) -> String? {
         let obj = CollectionItem.decodeWithString(jsonString: jsonString, decoder: decoder)
         return obj?.objectId
     }
 }
+
+
+
