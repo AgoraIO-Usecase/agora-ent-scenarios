@@ -15,6 +15,18 @@ private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
+private func agoraAssert(_ message: String) {
+    agoraAssert(false, message)
+}
+
+private func agoraAssert(_ condition: Bool, _ message: String) {
+    #if DEBUG
+    assert(condition, message)
+    #else
+    
+    #endif
+}
+
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
     private var roomList: [VLRoomListModel]?
     private var userList: [VLLoginModel] = .init()
@@ -122,13 +134,15 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
-                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
                     guard let self = self,
-                          let rtcToken = rtcToken,
-                          let rtmToken = rtmToken
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
-                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
@@ -169,13 +183,15 @@ private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
-                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
-                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
                     guard let self = self,
-                          let rtcToken = rtcToken,
-                          let rtmToken = rtmToken
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
-                        assert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
