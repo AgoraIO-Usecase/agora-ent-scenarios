@@ -110,13 +110,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param completion <#completion description#>
 - (void)getChoosedSongsListWithCompletion:(void(^)(NSError* _Nullable, NSArray<VLRoomSelSongModel*>* _Nullable))completion;
 
-
-/// 主唱告诉后台当前播放的歌曲
-/// @param inputModel <#inputModel description#>
-/// @param completion <#completion description#>
-- (void)markSongDidPlayWithInput: (VLRoomSelSongModel*)inputModel
-                      completion:(void(^)(NSError* _Nullable))completion;
-
 /// 点歌
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
