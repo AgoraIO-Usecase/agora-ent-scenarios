@@ -404,15 +404,15 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     }
 
     //MARK: subscribe
-    func subscribeUserListCount(changed changedBlock: @escaping (UInt) -> Void) {
+    func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
         userListCountDidChanged = changedBlock
     }
 
-    func subscribeSeatList(changed changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
+    func subscribeSeatListChanged(_ changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
         seatListDidChanged = changedBlock
     }
-
-    func subscribeRoomStatus(changed changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
+    
+    func subscribeRoomStatusChanged(_ changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
 
         guard let channelName = roomNo else {
@@ -442,51 +442,9 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                        })
     }
 
-    func subscribeChooseSong(changed changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
+    func subscribeChooseSongChanged(_ changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
         chooseSongDidChanged = changedBlock
     }
-
-
-    
-
-    // MARK: Deprecated protocol method
-//    func publishChooseSongEvent() {
-////        assertionFailure()
-//        // replace with subscribeChooseSong()
-//    }
-//
-//    func leaveChannel() {
-////        assert(false)
-//        // ignore
-//    }
-//
-//    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
-//        // replace with muteWithMuteStatus
-//    }
-//
-//    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-//        // replace with openVideoStatus()
-//    }
-//
-//    func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-//        // replace with subscribeChooseSong()
-//    }
-//
-//
-//    func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
-//        //replace with joinChorusWithInput
-////        assertionFailure()
-//    }
-//
-//    func publishSongOwner(withOwnerId userNo: String) {
-////        assertionFailure()
-//        //ignore
-//    }
-//
-//
-//    func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
-////        assert(false)
-//    }
 }
 
 
