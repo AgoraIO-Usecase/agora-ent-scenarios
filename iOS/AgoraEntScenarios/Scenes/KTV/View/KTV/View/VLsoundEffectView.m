@@ -7,6 +7,7 @@
 #import "ZQTCustomSwitch.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
+#import "LSTPopView+KTVModal.h"
 @import QMUIKit;
 @import YYCategories;
 @import ChameleonFramework;
@@ -260,9 +261,10 @@
 - (void)backBtnClickEvent {
     if ([self.delegate respondsToSelector:@selector(soundEffectViewBackBtnActionWithView:)]) {
         [self.delegate soundEffectViewBackBtnActionWithView:self];
-    } else {
-        
+        return;
     }
+    
+    [[LSTPopView getPopViewWithCustomView:self] dismiss];
 }
 
 @end
