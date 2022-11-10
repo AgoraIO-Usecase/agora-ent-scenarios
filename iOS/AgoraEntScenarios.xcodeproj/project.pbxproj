@@ -422,6 +422,7 @@
 		E74A3123291A580100412D42 /* ShowApplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3122291A580100412D42 /* ShowApplyView.swift */; };
 		E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */; };
 		E74A3132291B929E00412D42 /* ShowRealTimeDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */; };
+		E74A3135291B97DD00412D42 /* ShowToolMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -991,6 +992,7 @@
 		E74A3122291A580100412D42 /* ShowApplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyView.swift; sourceTree = "<group>"; };
 		E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowStatisticsInfo.swift; sourceTree = "<group>"; };
 		E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRealTimeDataView.swift; sourceTree = "<group>"; };
+		E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToolMenuView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1351,6 +1353,7 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E74A3133291B97C000412D42 /* ToolMenu */,
 				E74A3124291B4DE700412D42 /* RealTime */,
 				E74A311B2919FBA700412D42 /* PKInvite */,
 				A88D142F2914C13500F5DF6A /* Beauty */,
@@ -2638,6 +2641,14 @@
 			path = RealTime;
 			sourceTree = "<group>";
 		};
+		E74A3133291B97C000412D42 /* ToolMenu */ = {
+			isa = PBXGroup;
+			children = (
+				E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */,
+			);
+			path = ToolMenu;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3059,6 +3070,7 @@
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
 				DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */,
+				E74A3135291B97DD00412D42 /* ShowToolMenuView.swift in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
 				05FFE6F9290F706C0024D22F /* VMMuteView.swift in Sources */,
 				05FFE733290F74560024D22F /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
