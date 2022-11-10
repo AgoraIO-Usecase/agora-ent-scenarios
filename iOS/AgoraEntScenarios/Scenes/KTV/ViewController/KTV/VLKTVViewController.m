@@ -226,12 +226,12 @@ VLPopScoreViewDelegate
 #pragma mark service handler
 - (void)addServiceHandler {
     VL(weakSelf);
-    [[AppContext ktvServiceImp] subscribeUserListCountWithChanged:^(NSUInteger count) {
+    [[AppContext ktvServiceImp] subscribeUserListCountChangedWithBlock:^(NSUInteger count) {
         weakSelf.roomModel.roomPeopleNum = [NSString stringWithFormat:@"%ld", count];
         weakSelf.topView.listModel = weakSelf.roomModel;
     }];
     
-    [[AppContext ktvServiceImp] subscribeSeatListWithChanged:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
+    [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         //TODO(wushengtao): add model will return KTVSubscribeUpdated
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息
@@ -304,7 +304,7 @@ VLPopScoreViewDelegate
         }
     }];
     
-    [[AppContext ktvServiceImp] subscribeRoomStatusWithChanged:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
+    [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
         if (KTVSubscribeUpdated == status) {
             //切换背景
             
@@ -326,7 +326,7 @@ VLPopScoreViewDelegate
     }];
     
     //callback if choose song list didchanged
-    [[AppContext ktvServiceImp] subscribeChooseSongWithChanged:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
+    [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
             
             if (KTVSubscribeUpdated == status) {
@@ -831,7 +831,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         //自己在该位置刷新UI
         for (VLRoomSeatModel *model in weakSelf.seatsArray) {
             if (model.onSeat == index) {
-                model.isMaster = false;
+                model.isMaster = NO;
                 model.headUrl = VLUserCenter.user.headUrl;
                 model.onSeat = index;
                 model.name = VLUserCenter.user.name;
@@ -858,7 +858,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [weakSelf.MVView updateUIWithUserOnSeat:YES
                                            song:weakSelf.selSongsArray.firstObject];
         [weakSelf.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-        [weakSelf muteLocalAudio:false];
+        [weakSelf muteLocalAudio:NO];
     }];
 }
 
@@ -962,11 +962,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     self.isNowMicMuted = ![self isBroadcaster];
     self.isNowCameraMuted = YES;
     
-    AgoraVideoEncoderConfiguration *encoderConfiguration = [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
-                                                                                                      frameRate:AgoraVideoFrameRateFps7
-                                                                                                        bitrate:20
-                                                                                                orientationMode:AgoraVideoOutputOrientationModeFixedLandscape
-                                                                                                     mirrorMode:AgoraVideoMirrorModeAuto];
+    AgoraVideoEncoderConfiguration *encoderConfiguration =
+    [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
+                                               frameRate:AgoraVideoFrameRateFps7
+                                                 bitrate:20
+                                         orientationMode:AgoraVideoOutputOrientationModeFixedLandscape
+                                              mirrorMode:AgoraVideoMirrorModeAuto];
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
     
     
@@ -1526,7 +1527,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
                                    onSeat:weakSelf.isOnMicSeat];
         
-        [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:[weakSelf.selSongsArray count] == 0 ? nil : weakSelf.selSongsArray];;
+        [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
         if([weakSelf.selSongsArray count] > 0) {
             //TODO should be removed
             [self loadAndPlaySong];
@@ -1694,10 +1695,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (BOOL)isBroadcaster {
     return [self isRoomOwner] || self.isOnMicSeat;
 }
-
-//- (NSArray *)selSongsArray {
-//    return self.chooseSongView.selSongsArray;
-//}
 
 #pragma mark - setter
 - (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
