@@ -115,7 +115,7 @@ VLPopScoreViewDelegate
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
 
-    [self addServiceHandler];
+    [self subscribeServiceEvent];
     
     // setup view
     [self setBackgroundImage:@"ktv_temp_mainbg"];
@@ -224,7 +224,7 @@ VLPopScoreViewDelegate
 }
 
 #pragma mark service handler
-- (void)addServiceHandler {
+- (void)subscribeServiceEvent {
     VL(weakSelf);
     [[AppContext ktvServiceImp] subscribeUserListCountChangedWithBlock:^(NSUInteger count) {
         weakSelf.roomModel.roomPeopleNum = [NSString stringWithFormat:@"%ld", count];
@@ -727,7 +727,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model withRole:(KTVSingRole)role
 {
-    if(model.songNo == self.currentPlayingSongNo) {
+    if([model.songNo isEqualToString:self.currentPlayingSongNo]) {
         return;
     }
     
@@ -1528,11 +1528,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                    onSeat:weakSelf.isOnMicSeat];
         
         [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
-        if([weakSelf.selSongsArray count] > 0) {
-            //TODO should be removed
-            [self loadAndPlaySong];
-        }
-        
+        //TODO should be removed
+        [self loadAndPlaySong];
         if(block) {
             block();
         }
