@@ -720,7 +720,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if(model) {
+    if(model && model.status == 2) {
         [self loadAndPlaySongWithModel:model withRole:[model.userNo isEqual:VLUserCenter.user.userNo] ? KTVSingRoleMainSinger : KTVSingRoleAudience];
     }
 }
