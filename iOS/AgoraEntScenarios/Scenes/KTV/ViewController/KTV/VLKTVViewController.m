@@ -103,6 +103,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
+@property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 
 @end
@@ -195,7 +196,7 @@ VLPopScoreViewDelegate
     self.rtcMediaPlayer = nil;
 
     if(self.mediaPlayerConnection) {
-        [self disableMediaChannel];
+//        [self disableMediaChannel];
         self.mediaPlayerConnection = nil;
     }
 
@@ -628,25 +629,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 #pragma mark - action utils / business
 - (void)muteLocalAudio:(BOOL)mute {
     if (mute) {
-        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:NO];
-        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-        [self.RTCkit updateChannelWithMediaOptions:option];
         if(self.isEarOn) {
             [self.RTCkit enableInEarMonitoring:NO];
         }
         self.isNowMicMuted = YES;
     } else{
-        AgoraRtcChannelMediaOptions *option = [[AgoraRtcChannelMediaOptions alloc] init];
-        option.publishMicrophoneTrack = [AgoraRtcBoolOptional of:YES];
-        option.publishCameraTrack = [AgoraRtcBoolOptional of:(self.isNowCameraMuted?NO:YES)];
-        [self.RTCkit updateChannelWithMediaOptions:option];
         if(self.isEarOn) {
             [self.RTCkit enableInEarMonitoring:YES];
         }
         self.isNowMicMuted = NO;
     }
-    [self.bottomView updateAudioBtn:self.isNowMicMuted];
+    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
     [self.MVView validateSingType];
     
     [[AppContext ktvServiceImp] openAudioStatusWithStatus:!mute
@@ -657,15 +650,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 - (void)muteLocalVideo:(BOOL)mute {
     if (!mute) {
         [self.RTCkit enableLocalVideo:YES];
-        [self.RTCkit muteLocalVideoStream:NO];
-        _isNowCameraMuted = NO;
+        self.isNowCameraMuted = NO;
     } else {
         [self.RTCkit enableLocalVideo:NO];
-        [self.RTCkit muteLocalVideoStream:YES];
-        _isNowCameraMuted = YES;
+        self.isNowCameraMuted = YES;
     }
-    [self.bottomView updateVideoBtn:self.isNowCameraMuted];
-    
+    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
     [[AppContext ktvServiceImp] openVideoStatusWithStatus:!mute
                                                completion:^(NSError * error) {
     }];
@@ -751,8 +741,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             model.lyric = lyricUrl;
             [weakSelf.MVView loadLrcURL:lyricUrl];
             [weakSelf loadMusic:model.songNo withCallback:^{
-                
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
+                weakSelf.isPlayerPublish = YES;
+                [weakSelf.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
                 
                 [weakSelf.MVView start];
                 [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
@@ -768,6 +759,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
             model.lyric = lyricUrl;
             [weakSelf.MVView loadLrcURL:lyricUrl];
+            
+            weakSelf.isPlayerPublish = NO;
+            [weakSelf.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
             
             [weakSelf.MVView start];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
@@ -942,7 +936,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             }
             
             [self setSelfAudience];
-        } else if([self ifIAmRoomMaster]
+        } else if([self isRoomOwner]
                 && [self ifMainSinger:userNo]==YES) {
             [self playNextSong:1];
         }
@@ -973,8 +967,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 - (void)joinRTCChannel {
     [self.RTCkit leaveChannel:nil];
     [AgoraRtcEngineKit destroy];
-//    [AgoraMusicContentCenter destroy];
-    self.RTCkit = nil;
     
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
@@ -988,14 +980,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     
     [self.RTCkit enableVideo];
     [self.RTCkit enableLocalVideo:NO];
-    
     [self.RTCkit enableAudio];
     
-    if ([self isRoomOwner] || self.isOnMicSeat) {
-        [self setSelfBroadcaster];
-    }else{
-        [self setSelfAudience];
-    }
+    self.isNowMicMuted = ![self isBroadcaster];
+    self.isNowCameraMuted = NO;
+    
     AgoraVideoEncoderConfiguration *encoderConfiguration = [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
                                                                                                       frameRate:AgoraVideoFrameRateFps7
                                                                                                         bitrate:20
@@ -1004,15 +993,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
     
     
-    BOOL publishAudio = [self isRoomOwner] || self.isOnMicSeat;
     VLLog(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
-    AgoraRtcChannelMediaOptions *options = [AgoraRtcChannelMediaOptions new];
-    options.publishCameraTrack = [AgoraRtcBoolOptional of:NO];
-    options.publishMicrophoneTrack = [AgoraRtcBoolOptional of:publishAudio];
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
-                       mediaOptions:options
+                       mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         VLLog(@"Agora - 加入RTC成功");
        
@@ -1039,73 +1024,23 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self resetPlayer];
 }
 
-- (void)setSelfBroadcaster {
-    [self.RTCkit muteLocalVideoStream:NO];
-    [self.RTCkit muteLocalAudioStream:NO];
-    [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-}
-
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         VLLog(@"Agora - Leave RTC channel");
     }];
 }
 
-- (AgoraRtcConnection *)enableMediaChannel:(BOOL)doPublish {
+- (AgoraRtcChannelMediaOptions*)channelMediaOptions {
     AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
-    [option setClientRoleType:[AgoraRtcIntOptional of:AgoraClientRoleBroadcaster]];
-    [option setPublishCameraTrack:[AgoraRtcBoolOptional of:NO]];
-    [option setPublishCustomAudioTrack:[AgoraRtcBoolOptional of:NO]];
-    [option setEnableAudioRecordingOrPlayout:[AgoraRtcBoolOptional of:NO]];
-    [option setAutoSubscribeAudio:[AgoraRtcBoolOptional of:NO]];
-    [option setPublishMicrophoneTrack:[AgoraRtcBoolOptional of:NO]];
-    [option setAutoSubscribeVideo:[AgoraRtcBoolOptional of:NO]];
-    [option setPublishMediaPlayerId:[AgoraRtcIntOptional of:[self.rtcMediaPlayer getMediaPlayerId]]];
-    [option setPublishMediaPlayerAudioTrack:[AgoraRtcBoolOptional of:doPublish]];
-    
-    AgoraRtcConnection *connection = [AgoraRtcConnection new];
-    connection.channelId = self.roomModel.roomNo;
-    connection.localUid = [VLGlobalHelper getAgoraPlayerUserId:VLUserCenter.user.id];
-
-    VLLog(@"Agora - Join channelex with token: %@, userid: %lu for channel: %@ for mediaplayer id: %d",
-          VLUserCenter.user.agoraPlayerRTCToken,
-          connection.localUid,
-          connection.channelId,
-          [self.rtcMediaPlayer getMediaPlayerId]);
-    
-    int ret  = [self.RTCkit joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken
-                                      connection:connection delegate:self
-                                    mediaOptions:option
-                                     joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - Join channel ex succ");
-    }];
-    
-    if(ret == 0) {
-        VLLog(@"Agora - Join media player connection succ");
-        return connection;
-    } else {
-        VLLog(@"Agora - Join media player connection failed");
-        return nil;
-    }
-}
-
-- (BOOL)disableMediaChannel {
-    if(self.mediaPlayerConnection == nil) {
-        return YES;
-    }
-    
-    int ret = [self.RTCkit leaveChannelEx:self.mediaPlayerConnection
-                        leaveChannelBlock:^(AgoraChannelStats* stat) {
-    }];
-    
-    if(ret == 0) {
-        self.mediaPlayerConnection = nil;
-        VLLog(@"Agora - Leave media channel succ");
-        return YES;
-    } else {
-        VLLog(@"Agora - Leave media channel failed");
-        return NO;
-    }
+    [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
+    [option setPublishCameraTrack:!self.isNowCameraMuted];
+    [option setPublishMicrophoneTrack:!self.isNowMicMuted];
+    [option setPublishCustomAudioTrack:NO];
+    [option setAutoSubscribeAudio:NO];
+    [option setAutoSubscribeVideo:NO];
+    [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
+    [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
+    return option;
 }
 
 - (void)updateRemoteUserMuteStatus:(NSString *)userId
@@ -1263,18 +1198,18 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 // Reset chorus to audience
 - (void)resetChorusStatus:(NSString *)userNo {
-    if([self ifChorusSinger:userNo]) {
-        [self setSelfChorusUserNo:nil];
-        if([userNo isEqualToString:VLUserCenter.user.userNo]) {
-            if(self.rtcMediaPlayer != nil) {
-                [self.rtcMediaPlayer stop];
-            }
-            [self resetPlayer];
-            [self disableMediaChannel];
-        }
-    } else if(userNo == nil) {
-        [self setSelfChorusUserNo:nil];
-    }
+//    if([self ifChorusSinger:userNo]) {
+//        [self setSelfChorusUserNo:nil];
+//        if([userNo isEqualToString:VLUserCenter.user.userNo]) {
+//            if(self.rtcMediaPlayer != nil) {
+//                [self.rtcMediaPlayer stop];
+//            }
+//            [self resetPlayer];
+//            [self disableMediaChannel];
+//        }
+//    } else if(userNo == nil) {
+//        [self setSelfChorusUserNo:nil];
+//    }
 }
 
 #pragma mark VLDropOnLineViewDelegate
@@ -1330,7 +1265,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [LEEAlert popSwitchSongDialogWithCancelBlock:nil
                                        withDoneBlock:^{
             if (weakSelf.selSongsArray.count >= 1) {
-                if([weakSelf ifIAmRoomMaster]
+                if([weakSelf isRoomOwner]
                    && [weakSelf ifMainSinger:VLUserCenter.user.userNo] == NO) {
                     [weakSelf playNextSong:1];
                 } else {
@@ -1721,10 +1656,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return NO;
 }
 
-- (BOOL) ifIAmRoomMaster {
-    return (VLUserCenter.user.ifMaster ? YES : NO);
-}
-
 - (NSString *)getMainSingerUserNo {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     if(selSongModel != nil) {
@@ -1782,6 +1713,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return [self.roomModel.creator isEqualToString:VLUserCenter.user.userNo];
 }
 
+- (BOOL)isBroadcaster {
+    return [self isRoomOwner] || self.isOnMicSeat;
+}
+
 - (NSArray *)selSongsArray {
     return self.chooseSongView.selSongsArray;
 }
@@ -1818,6 +1753,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+}
+
+- (void)setIsNowMicMuted:(BOOL)isNowMicMuted
+{
+    _isNowMicMuted = isNowMicMuted;
+    [self.bottomView updateAudioBtn:isNowMicMuted];
+}
+
+- (void)setIsNowCameraMuted:(BOOL)isNowCameraMuted
+{
+    _isNowCameraMuted = isNowCameraMuted;
+    [self.bottomView updateVideoBtn:isNowCameraMuted];
 }
 
 #pragma mark - lazy getter
