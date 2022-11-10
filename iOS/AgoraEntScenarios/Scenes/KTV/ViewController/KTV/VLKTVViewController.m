@@ -101,6 +101,8 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 
+@property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
+
 @end
 
 @implementation VLKTVViewController
@@ -246,7 +248,7 @@ VLPopScoreViewDelegate
                         model.ifSelTheSingSong = YES;
                         [weakSelf.MVView setPlayerViewsHidden:NO nextButtonHidden:NO];
                     }
-                    VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
+                    VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
                     if (song != nil && song.isChorus && [song.chorusNo isEqualToString:seatModel.userNo]) {
                         model.ifJoinedChorus = YES;
                     }
@@ -270,7 +272,7 @@ VLPopScoreViewDelegate
             weakSelf.seatsArray = weakSelf.seatsArray;
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
-            VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
+            VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
             
             // 被下麦用户刷新UI
             if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
@@ -1047,7 +1049,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 [weakSelf _leaveSeat];
             }
             [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
-            VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+            VLRoomSelSongModel *song = self.selSongsArray.firstObject;
             if(song != nil && song.isOwnSong) {
                 //mvview action type exit
                 [weakSelf playNextSong:0];
@@ -1421,7 +1423,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     } else if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         int leftSecond = [dict[@"time"] intValue];
-        VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+        VLRoomSelSongModel *song = self.selSongsArray.firstObject;
         if(self.currentPlayingSongNo == nil) {
             [self.MVView receiveCountDown:leftSecond
                                    onSeat:self.isOnMicSeat
@@ -1519,6 +1521,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (weakSelf.chooseSongView) {
             weakSelf.chooseSongView.selSongsArray = songArray; //刷新已点歌曲UI
         }
+        weakSelf.selSongsArray = songArray;
         //刷新MV里的视图
         [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
                                    onSeat:weakSelf.isOnMicSeat];
@@ -1661,7 +1664,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark other
 - (void)setSelfChorusUserNo:(NSString *)userNo
 {
-    VLRoomSelSongModel *song = self.selSongsArray.count ? self.selSongsArray.firstObject : nil;
+    VLRoomSelSongModel *song = self.selSongsArray.firstObject;
     if(song != nil) {
         if(userNo == nil) {
             song.isChorus = NO;
@@ -1692,9 +1695,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return [self isRoomOwner] || self.isOnMicSeat;
 }
 
-- (NSArray *)selSongsArray {
-    return self.chooseSongView.selSongsArray;
-}
+//- (NSArray *)selSongsArray {
+//    return self.chooseSongView.selSongsArray;
+//}
 
 #pragma mark - setter
 - (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
