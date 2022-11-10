@@ -75,18 +75,19 @@
             return;
         }
         
-        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
-                              channelId:outputModel.roomNo
-                                   info:nil uid:[VLUserCenter.user.id integerValue]
-                            joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-            VLLog(@"Agora - 加入RTC成功");
-            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-        }];
+//        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
+//                              channelId:outputModel.roomNo
+//                                   info:nil uid:[VLUserCenter.user.id integerValue]
+//                            joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
+//            VLLog(@"Agora - 加入RTC成功");
+//            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
+//        }];
         //处理座位信息
         VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
         listModel.roomNo = outputModel.roomNo;
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
+        listModel.creatorNo = VLUserCenter.user.userNo;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
