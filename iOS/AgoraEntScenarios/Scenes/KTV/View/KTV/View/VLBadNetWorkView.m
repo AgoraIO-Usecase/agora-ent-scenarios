@@ -5,6 +5,7 @@
 
 #import "VLBadNetWorkView.h"
 #import "KTVMacro.h"
+#import "LSTPopView+KTVModal.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -52,7 +53,10 @@
 - (void)knowBtnClickEvent:(id)sender {
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLBadNetworkView:dismiss:)]) {
         [self.delegate onVLBadNetworkView:self dismiss:sender];
+        return;
     }
+    
+    [[LSTPopView getPopViewWithCustomView:self] dismiss];
 }
 
 @end

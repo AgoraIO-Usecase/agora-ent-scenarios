@@ -1100,7 +1100,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 #pragma mark - VLPopMoreSelViewDelegate
 - (void)onVLKTVMoreSelView:(VLPopMoreSelView *)view btnTapped:(id)sender withValue:(VLKTVMoreBtnClickType)typeValue {
-    [[LSTPopView getPopViewWithCustomView:view] dismiss];
     switch (typeValue) {
         case VLKTVMoreBtnClickTypeBelcanto:
             [self popBelcantoView];
@@ -1196,11 +1195,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 #pragma mark - VLChooseBelcantoViewDelegate
-//can move to view internal
-- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view backBtnTapped:(id)sender {
-    [[LSTPopView getPopViewWithCustomView:view] dismiss];
-}
-
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index {
     self.selBelcantoModel = model;
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
@@ -1239,12 +1233,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self _leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
     }];
-}
-
-#pragma mark VLBadNetWorkViewDelegate
-//网络差知道了点击事件
-- (void)onVLBadNetworkView:(id)view dismiss:(id)sender {
-    [[LSTPopView getPopViewWithCustomView:view] dismiss];
 }
 
 #pragma mark VLTouristOnLineViewDelegate
@@ -1420,10 +1408,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 //音效设置
-- (void)soundEffectViewBackBtnActionWithView:(VLsoundEffectView *)view {
-    [[LSTPopView getPopViewWithCustomView:view] dismiss];
-}
-
 - (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
     if (effectType == VLKTVSoundEffectTypeHeFeng) {
         [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];

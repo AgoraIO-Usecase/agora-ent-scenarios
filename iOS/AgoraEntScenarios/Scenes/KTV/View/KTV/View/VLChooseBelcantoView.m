@@ -8,6 +8,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
 #import "KTVMacro.h"
+#import "LSTPopView+KTVModal.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -77,7 +78,10 @@
 - (void)backBtnClickEvent:(id)sender {
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLChooseBelcantoView:backBtnTapped:)]) {
         [self.delegate onVLChooseBelcantoView:self backBtnTapped:sender];
+        return;
     }
+    
+    [[LSTPopView getPopViewWithCustomView:self] dismiss];
 }
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
