@@ -398,6 +398,7 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		DDE84336291CB91B009C762C /* LSTPopView+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -944,6 +945,8 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		DDE84334291CB91B009C762C /* LSTPopView+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LSTPopView+KTVModal.h"; sourceTree = "<group>"; };
+		DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LSTPopView+KTVModal.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1266,6 +1269,8 @@
 				7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */,
 				DDBF7891291BCECE0001855B /* LEEAlert+KTVModal.h */,
 				DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */,
+				DDE84334291CB91B009C762C /* LSTPopView+KTVModal.h */,
+				DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */,
 			);
 			path = KTVModal;
 			sourceTree = "<group>";
@@ -2765,6 +2770,7 @@
 				DDA19A4128FFE57A009D3E61 /* UIEdgeInsets+Utils.swift in Sources */,
 				DD84179729090C520026B624 /* AgoraRtm.m in Sources */,
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
+				DDE84336291CB91B009C762C /* LSTPopView+KTVModal.m in Sources */,
 				057DD9F3290B9495001329E6 /* UIButton+Extension.swift in Sources */,
 				05FFE711290F706C0024D22F /* VoiceRoomApplyAlert.swift in Sources */,
 				057DD9F7290B9495001329E6 /* String + Extension.swift in Sources */,

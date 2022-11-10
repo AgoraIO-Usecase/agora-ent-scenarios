@@ -12,15 +12,6 @@
 #import "VLBelcantoModel.h"
 #import "VLNoBodyOnLineView.h"
 #import "VLOnLineListVC.h"
-//弹框视图
-#import "VLPopSelBgView.h"
-#import "VLPopMoreSelView.h"
-#import "VLDropOnLineView.h"
-#import "VLPopOnLineTypeView.h"
-#import "VLChooseBelcantoView.h"
-#import "VLPopChooseSongView.h"
-#import "VLsoundEffectView.h"
-#import "VLBadNetWorkView.h"
 
 #import "VLKTVSettingView.h"
 #import "YGViewDisplayer.h"
@@ -43,7 +34,7 @@
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
 #import "LEEAlert+KTVModal.h"
-@import LSTPopView;
+#import "LSTPopView+KTVModal.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -62,7 +53,6 @@ VLPopSelBgViewDelegate,
 VLPopMoreSelViewDelegate,
 VLDropOnLineViewDelegate,
 VLTouristOnLineViewDelegate,
-VLPopOnLineTypeViewDelegate,
 VLChooseBelcantoViewDelegate,
 VLPopChooseSongViewDelegate,
 VLsoundEffectViewDelegate,
@@ -80,19 +70,11 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) VLKTVBottomView *bottomView;
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
 @property (nonatomic, strong) VLNoBodyOnLineView *noBodyOnLineView; // mv空页面
-@property (nonatomic, strong) LSTPopView *popSelBgView;       //切换MV背景
 @property (nonatomic, strong) VLKTVTopView *topView;
-@property (nonatomic, strong) LSTPopView *popMoreView;        //更多视图
-@property (nonatomic, strong) LSTPopView *dropLineView;       //下麦视图
-@property (nonatomic, strong) LSTPopView *popOnLineTypeView;  //上麦类型视图
-@property (nonatomic, strong) LSTPopView *belcantoView;       //美声视图
-@property (nonatomic, strong) LSTPopView *popChooseSongView;  //点歌
-@property (nonatomic, strong) LSTPopView *popSoundEffectView; //音效设置
-@property (nonatomic, strong) LSTPopView *popBadNetWorkView;  //网络差视图
 @property (nonatomic, strong) VLKTVSettingView *settingView;
 @property (nonatomic, strong) VLRoomPersonView *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLTouristOnLineView *requestOnLineView;//空位上麦
-@property (nonatomic, strong)  VLPopChooseSongView *chooseSongView; //点歌视图
+@property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLsoundEffectView *soundEffectView; // 音效视图
 
 @property (nonatomic, strong) AgoraRtcChannelMediaOptions *mediaoption;
@@ -158,7 +140,6 @@ VLPopScoreViewDelegate
     VLKTVBottomView *bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
     self.bottomView = bottomView;
     bottomView.backgroundColor = UIColorClear;
-//    self.bottomView.hidden = YES;
     [self.view addSubview:bottomView];
     
     //空位上麦视图
@@ -167,7 +148,7 @@ VLPopScoreViewDelegate
     [self.view addSubview:requestOnLineView];
     
     self.bottomView.hidden = !([self isRoomOwner] || self.isOnMicSeat);
-    self.requestOnLineView.hidden = ![self isRoomOwner] && self.isOnMicSeat;
+    self.requestOnLineView.hidden = !self.bottomView.hidden;
     
     //start join
     [self joinRTCChannel];
@@ -292,6 +273,7 @@ VLPopScoreViewDelegate
                 //当前的座位用户离开RTC通道
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
                 weakSelf.bottomView.hidden = YES;
+                weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
                 // 取出对应模型、防止数组越界
                 [weakSelf setSelfAudience];
                 [weakSelf resetChorusStatus:seatModel.userNo];
@@ -404,77 +386,52 @@ VLPopScoreViewDelegate
 
 //更换MV背景
 - (void)popSelMVBgView {
-    CGFloat popViewH = (SCREEN_WIDTH-60)/3.0*0.75*3+100+kSafeAreaBottomHeight;
-    VLPopSelBgView *changeBgView = [[VLPopSelBgView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
-    changeBgView.selBgModel = self.choosedBgModel;
-    
-    self.popSelBgView = [self setPopCommenSettingWithContentView:changeBgView ifClickBackDismiss:YES];
-    [self.popSelBgView pop];
+    [LSTPopView popSelMVBgViewWithParentView:self.view
+                                     bgModel:self.choosedBgModel
+                                withDelegate:self];
 }
 
 //弹出更多
 - (void)popSelMoreView {
-    CGFloat popViewH = 190+kSafeAreaBottomHeight;
-    VLPopMoreSelView *moreView = [[VLPopMoreSelView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
-    
-    self.popMoreView = [self setPopCommenSettingWithContentView:moreView ifClickBackDismiss:YES];
-    [self.popMoreView pop];
+    [LSTPopView popSelMoreViewWithParentView:self.view
+                                withDelegate:self];
 }
 
 //弹出下麦视图
 - (void)popDropLineViewWithSeatModel:(VLRoomSeatModel *)seatModel {
-    CGFloat popViewH = 212+kSafeAreaBottomHeight+32;
-    VLDropOnLineView *dropLineView = [[VLDropOnLineView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
-    dropLineView.seatModel = seatModel;
-    
-    self.dropLineView = [self setPopCommenSettingWithContentView:dropLineView ifClickBackDismiss:YES];
-    [self.dropLineView pop];
+    [LSTPopView popDropLineViewWithParentView:self.view
+                                withSeatModel:seatModel
+                                 withDelegate:self];
 }
 
 //弹出美声视图
 - (void)popBelcantoView {
-    CGFloat popViewH = 175+kSafeAreaBottomHeight;
-    VLChooseBelcantoView *belcantoView = [[VLChooseBelcantoView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
-    belcantoView.selBelcantoModel = self.selBelcantoModel;
-    self.belcantoView = [self setPopCommenSettingWithContentView:belcantoView ifClickBackDismiss:YES];
-    [self.belcantoView pop];
+    [LSTPopView popBelcantoViewWithParentView:self.view
+                            withBelcantoModel:self.selBelcantoModel
+                                 withDelegate:self];
 }
 
 //弹出点歌视图
 - (void)popUpChooseSongView:(BOOL)ifChorus {
-    CGFloat popViewH = SCREEN_HEIGHT*0.7;
-    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self withRoomNo:self.roomModel.roomNo ifChorus:ifChorus];
-    self.chooseSongView = chooseSongView;
-    self.popChooseSongView = [self setPopCommenSettingWithContentView:chooseSongView ifClickBackDismiss:YES];
-    self.popChooseSongView.isAvoidKeyboard = NO;
-    [self.popChooseSongView pop];
+    LSTPopView* popChooseSongView =
+    [LSTPopView popUpChooseSongViewWithParentView:self.view
+                                         isChorus:ifChorus
+                                       withRoomNo:self.roomModel.roomNo
+                                     withDelegate:self];
+    
+    self.chooseSongView = (VLPopChooseSongView*)popChooseSongView.currCustomView;
 }
 
 //弹出音效
 - (void)popSetSoundEffectView {
-    CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    if(_soundEffectView == nil) {
-        _soundEffectView = [[VLsoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:self];
-    }
-    
-    self.popSoundEffectView = [self setPopCommenSettingWithContentView:self.soundEffectView ifClickBackDismiss:YES];
-    [self.popSoundEffectView pop];
+    [LSTPopView popSetSoundEffectViewWithParentView:self.view
+                                       withDelegate:self];
 }
 
 //网络差视图
 - (void)popBadNetWrokTipView {
-    CGFloat popViewH = 276;
-    VLBadNetWorkView *badNetView = [[VLBadNetWorkView alloc]initWithFrame:CGRectMake(40, 0, SCREEN_WIDTH-80, popViewH) withDelegate:self];
-    
-    LSTPopView *popView = [LSTPopView initWithCustomView:badNetView parentView:self.view popStyle:LSTPopStyleFade dismissStyle:LSTDismissStyleFade];
-    popView.hemStyle = LSTHemStyleCenter;
-    popView.popDuration = 0.5;
-    popView.dismissDuration = 0.5;
-    popView.cornerRadius = 20;
-    self.popBadNetWorkView = popView;
-    popView.isClickFeedback = NO;
-    
-    [self.popBadNetWorkView pop];
+    [LSTPopView popBadNetWrokTipViewWithParentView:self.view
+                                      withDelegate:self];
 }
 
 //用户弹框离开房间
@@ -489,26 +446,6 @@ VLPopScoreViewDelegate
             }
         }
     }];
-}
-
-//公共弹窗视图设置
-- (LSTPopView *)setPopCommenSettingWithContentView:(UIView *)contentView ifClickBackDismiss:(BOOL)dismiss{
-    LSTPopView *popView = [LSTPopView initWithCustomView:contentView parentView:self.view popStyle:LSTPopStyleSmoothFromBottom dismissStyle:LSTDismissStyleSmoothToBottom];
-    popView.hemStyle = LSTHemStyleBottom;
-    popView.popDuration = 0.5;
-    popView.dismissDuration = 0.5;
-    popView.cornerRadius = 20;
-    LSTPopViewWK(popView)
-    if (dismiss) {
-        popView.isClickFeedback = YES;
-        popView.bgClickBlock = ^{
-            [wk_popView dismiss];
-        };
-    } else {
-        popView.isClickFeedback = NO;
-    }
-    popView.rectCorners = UIRectCornerTopLeft | UIRectCornerTopRight;
-    return  popView;
 }
 
 - (void)showSettingView {
@@ -881,8 +818,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 }
             }
             [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
-            weakSelf.requestOnLineView.hidden = YES;
             weakSelf.bottomView.hidden = NO;
+            weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
             [weakSelf.bottomView resetBtnStatus];
             [weakSelf.MVView updateUIWithUserOnSeat:YES
                                                song:weakSelf.selSongsArray.firstObject];
@@ -900,10 +837,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     seatModel.name = VLUserCenter.user.name;
     seatModel.id = VLUserCenter.user.id;
     seatModel.onSeat = YES;
-    [self _leaveSeatWithSeatModel: seatModel];
+    [self _leaveSeatWithSeatModel: seatModel withCompletion:nil];
 }
 
-- (void)_leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel {
+- (void)_leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
+                 withCompletion:(void(^ __nullable)(NSError*))completion {
     NSString *userNo = seatModel.userNo;
     NSString *userHeadUrl = seatModel.headUrl;
     NSString *userName = seatModel.name;
@@ -925,6 +863,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [[AppContext ktvServiceImp] outSeatWithInput:inputModel
                                       completion:^(NSError * error) {
         if (error != nil) {
+            if (completion) {
+                completion(error);
+            }
             return;
         }
         
@@ -935,7 +876,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             [self.MVView setPlayerViewsHidden:YES
                              nextButtonHidden:YES];
             self.bottomView.hidden = YES;
-            self.requestOnLineView.hidden = NO;
+            self.requestOnLineView.hidden = !self.bottomView.hidden;
             if([self ifMainSinger:VLUserCenter.user.userNo]) {
                 [self playNextSong:0];
             }
@@ -954,7 +895,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             }
         }
         [self.roomPersonView setSeatsArray:self.seatsArray];
-        [self.dropLineView dismiss];
+        if (completion) {
+            completion(nil);
+        }
     }];
 }
 
@@ -1147,20 +1090,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 #pragma mark - VLPopMoreSelViewDelegate
 - (void)onVLKTVMoreSelView:(VLPopMoreSelView *)view btnTapped:(id)sender withValue:(VLKTVMoreBtnClickType)typeValue {
+    [[LSTPopView getPopViewWithCustomView:view] dismiss];
     switch (typeValue) {
         case VLKTVMoreBtnClickTypeBelcanto:
-            [self.popMoreView dismiss];
             [self popBelcantoView];
             break;
         case VLKTVMoreBtnClickTypeSound:
-            [self.popMoreView dismiss];
             [self popSetSoundEffectView];
             break;
         case VLKTVMoreBtnClickTypeMV:
-            [self.popMoreView dismiss];
             [self popSelMVBgView];
             break;
-            
         default:
             break;
     }
@@ -1238,23 +1178,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.popSelBgView dismiss];
+            [[LSTPopView getPopViewWithCustomView:view] dismiss];
             weakSelf.choosedBgModel = selBgModel;
             [weakSelf.MVView changeBgViewByModel:selBgModel];
         });
     }];
 }
 
-#pragma mark - VLPopOnLineTypeViewDelegate
-//can move to view internal
-- (void)onVLPopOnLineTypeView:(VLPopOnLineTypeView *)view backBtnTapped:(id)sender {
-    [self.popOnLineTypeView dismiss];
-}
-
 #pragma mark - VLChooseBelcantoViewDelegate
 //can move to view internal
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view backBtnTapped:(id)sender {
-    [self.belcantoView dismiss];
+    [[LSTPopView getPopViewWithCustomView:view] dismiss];
 }
 
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index {
@@ -1292,13 +1226,15 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLDropOnLineView *)view action:(VLRoomSeatModel *)seatModel {
-    [self _leaveSeatWithSeatModel:seatModel];
+    [self _leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
+        [[LSTPopView getPopViewWithCustomView:view] dismiss];
+    }];
 }
 
 #pragma mark VLBadNetWorkViewDelegate
 //网络差知道了点击事件
 - (void)onVLBadNetworkView:(id)view dismiss:(id)sender {
-    [self.popBadNetWorkView dismiss];
+    [[LSTPopView getPopViewWithCustomView:view] dismiss];
 }
 
 #pragma mark VLTouristOnLineViewDelegate
@@ -1474,8 +1410,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 //音效设置
-- (void)soundEffectViewBackBtnAction {
-    [self.popSoundEffectView dismiss];
+- (void)soundEffectViewBackBtnActionWithView:(VLsoundEffectView *)view {
+    [[LSTPopView getPopViewWithCustomView:view] dismiss];
 }
 
 - (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
@@ -1830,8 +1766,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     _seatsArray = seatsArray;
     //update booleans
+    self.isOnMicSeat = NO;
     for (VLRoomSeatModel *seatModel in seatsArray) {
-        self.isOnMicSeat = seatModel.userNo != nil && [seatModel.userNo isEqual:VLUserCenter.user.userNo];
+        if (seatModel.userNo != nil && [seatModel.userNo isEqual:VLUserCenter.user.userNo]) {
+            self.isOnMicSeat = YES;
+            break;
+        }
     }
 }
 

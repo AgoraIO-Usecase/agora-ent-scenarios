@@ -30,7 +30,10 @@
 
 @implementation VLPopChooseSongView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus{
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
