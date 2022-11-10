@@ -32,7 +32,6 @@
 }
 
 - (void)setupView {
-    
     self.picsModelArray = [VLKTVSelBgModel vj_modelArrayWithJson:self.picsArray];
 
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
@@ -106,14 +105,22 @@
 
 - (NSArray *)picsArray {
     if (!_picsArray) {
-        _picsArray = @[@{@"imageName":@"ktv_mvbg0",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg1",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg2",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg3",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg4",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg5",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg6",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg7",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg8",@"ifSelect":@(false)}];
+        _picsArray = @[
+        @{@"imageName":@"ktv_mvbg0",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg1",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg2",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg3",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg4",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg5",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg6",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg7",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg8",@"ifSelect":@(false)}
+        ];
     }
     return _picsArray;
 }
 
-
 @end
-
 
 @implementation VLKTVSelBgCell
 
@@ -124,6 +131,7 @@
     }
     return self;
 }
+
 #pragma mark - Intial Methods
 - (void)setupView {
     
