@@ -264,6 +264,13 @@ VLPopScoreViewDelegate
                     }
                 }
             }
+            
+            //user on seat, show bottom view
+            if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
+                weakSelf.bottomView.hidden = NO;
+                weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
+            }
+            
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
             VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
@@ -272,8 +279,11 @@ VLPopScoreViewDelegate
             if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
+                
+                //user off seat, hide bottom view
                 weakSelf.bottomView.hidden = YES;
                 weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
+                
                 // 取出对应模型、防止数组越界
                 [weakSelf setSelfAudience];
                 [weakSelf resetChorusStatus:seatModel.userNo];
