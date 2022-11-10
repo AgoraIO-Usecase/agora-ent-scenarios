@@ -759,6 +759,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 //TODO why always NO?
                 [self.MVView updateUIWithUserOnSeat:NO
                                                song:model];
+                
+                //owner to update
+                [self markSongDidPlayWithModel:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
@@ -1619,6 +1622,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(block) {
             block();
         }
+    }];
+}
+
+//主唱告诉后台当前播放的歌曲
+- (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)selSongModel {
+    [[AppContext ktvServiceImp] markSongDidPlayWithInput:selSongModel
+                                              completion:^(NSError * error) {
     }];
 }
 

@@ -330,6 +330,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
+        inputModel.status = 2
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
@@ -1062,7 +1063,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self._sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
                                  let jsonStr = object.toJson(),
@@ -1074,7 +1075,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self._sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
                                  let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
@@ -1083,7 +1084,7 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                            self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
