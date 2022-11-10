@@ -28,7 +28,6 @@ import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.bean.Page;
 import io.agora.scene.base.bean.PageModel;
-import io.agora.scene.base.data.model.AgoraRoom;
 import io.agora.scene.base.data.model.BaseMusicModel;
 import io.agora.scene.base.data.model.MusicModelNew;
 import io.agora.scene.base.manager.UserManager;
@@ -801,11 +800,6 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void changeMusic() {
         Log.d("cwtsw", "changeMusic 切歌");
-        AgoraRoom mRoom = RoomManager.getInstance().getRoom();
-        if (mRoom == null) {
-            return;
-        }
-
         VLRoomSelSongModel musicModel = songPlayingLiveData.getValue();
         if (musicModel == null) {
             return;
@@ -820,7 +814,7 @@ public class RoomLivingViewModel extends ViewModel {
         ktvServiceProtocol.switchSongWithInput(new KTVSwitchSongInputModel(
                 UserManager.getInstance().getUser().userNo,
                 musicModel.getSongNo(),
-                mRoom.roomNo
+                roomInfoLiveData.getValue().getRoomNo()
         ), e -> {
             if (e == null) {
                 // success

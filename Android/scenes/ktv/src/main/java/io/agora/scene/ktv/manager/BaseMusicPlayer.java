@@ -642,10 +642,7 @@ public abstract class BaseMusicPlayer extends IRtcEngineEventHandler implements 
 
     @Override
     public void onPositionChanged(long position) {
-        if (RoomManager.getInstance().isMyMusic()) {
-            mRecvedPlayPosition = position;
-        }
-        mLastRecvPlayPosTime = System.currentTimeMillis();
+        mRecvedPlayPosition = position;
     }
 
     @Override
