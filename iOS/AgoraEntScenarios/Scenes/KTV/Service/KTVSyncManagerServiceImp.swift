@@ -268,6 +268,9 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         _removeSeat(seatInfo: seatInfo) { error in
             // TODO(wushengtao): whitout callback
         }
+        
+        //remove current user's choose song
+        _removeAllUserChooseSong()
         completion(nil)
     }
     
@@ -506,7 +509,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         //remove current user's choose song
-        _removeAllUsersChooseSong()
+        _removeAllUserChooseSong()
 
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
@@ -979,7 +982,7 @@ extension KTVSyncManagerServiceImp {
                  })
     }
     
-    private func _removeAllUsersChooseSong() {
+    private func _removeAllUserChooseSong() {
         let userSongLists = self.songList.filter({ $0.userNo == VLUserCenter.user.userNo})
         userSongLists.forEach { model in
             self._removeChooseSong(songId: model.objectId) { error in

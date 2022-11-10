@@ -9,7 +9,6 @@
 #import "VLRoomPersonView.h"
 #import "VLKTVBottomView.h"
 #import "VLTouristOnLineView.h"
-#import "VLBelcantoModel.h"
 #import "VLNoBodyOnLineView.h"
 #import "VLOnLineListVC.h"
 
@@ -294,12 +293,6 @@ VLPopScoreViewDelegate
                     // 下麦重置占位模型
                     VLRoomSeatModel *indexSeatModel = weakSelf.seatsArray[seatModel.onSeat];
                     [indexSeatModel resetLeaveSeat];
-                }
-                
-                // If I was dropped off mic and I am current singer, then we should play next song.
-                if([/*member.userId*/seatModel.id isEqualToString:VLUserCenter.user.id] == NO && [self ifMainSinger:VLUserCenter.user.userNo]) {
-                    [weakSelf prepareNextSong];
-                    [weakSelf refreshChoosedSongList:nil];
                 }
             } else{
                 for (VLRoomSeatModel *model in weakSelf.seatsArray) {
@@ -666,7 +659,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         [self.RTCkit enableLocalVideo:YES];
         [self.RTCkit muteLocalVideoStream:NO];
         _isNowCameraMuted = NO;
-    } else{
+    } else {
         [self.RTCkit enableLocalVideo:NO];
         [self.RTCkit muteLocalVideoStream:YES];
         _isNowCameraMuted = YES;
@@ -766,9 +759,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 //TODO why always NO?
                 [self.MVView updateUIWithUserOnSeat:NO
                                                song:model];
-                
-                //owner to update
-                [self tellSeverTheCurrentPlaySongWithModel:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
@@ -1308,9 +1298,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
         NSTimeInterval time = [_rtcMediaPlayer getPosition];
         return time;
-    } else{
-        return self.currentTime;
     }
+    
+    return self.currentTime;
 }
 
 #pragma mark - MVViewDelegate
@@ -1443,7 +1433,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-
 - (AgoraAudioEffectPreset)audioEffectPreset:(NSInteger)index {
     NSArray* audioEffectPresets = @[
         @(AgoraAudioEffectPresetOff),
@@ -1480,7 +1469,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
     VLLog(@"Agora - Setting effect type to %lu", effectType);
 }
-
 
 #pragma mark -- 收到RTC消息
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -1631,13 +1619,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(block) {
             block();
         }
-    }];
-}
-
-//主唱告诉后台当前播放的歌曲
-- (void)tellSeverTheCurrentPlaySongWithModel:(VLRoomSelSongModel *)selSongModel {
-    [[AppContext ktvServiceImp] markSongDidPlayWithInput:selSongModel
-                                              completion:^(NSError * error) {
     }];
 }
 
