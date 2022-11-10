@@ -21,14 +21,12 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 加入房间
     /// - Parameters:
     ///
-    func joinRoom(roomId: String,user: VRUser,
-                  completion: @escaping (Error?, Bool) -> Void)
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, VRRoomEntity?) -> Void)
     
     /// 离开房间
     /// - Parameters:
     ///
-    func leaveRoom(_ roomId: String,
-                   completion: @escaping (Error?, Bool) -> Void)
+    func leaveRoom(_ roomId: String, isOwner: Bool, completion: @escaping (Error?, Bool) -> Void)
     
     /// 获取房间详情
     /// - Parameters:
@@ -158,5 +156,5 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
    func createRoom(room: VRRoomEntity,
-                        completion: @escaping (SyncError?) -> Void)
+                        completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
 }
