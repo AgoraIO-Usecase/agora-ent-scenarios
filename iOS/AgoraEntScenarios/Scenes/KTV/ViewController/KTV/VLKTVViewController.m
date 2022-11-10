@@ -81,8 +81,6 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLsoundEffectView *soundEffectView; // 音效视图
 
-@property (nonatomic, strong) AgoraRtcChannelMediaOptions *mediaoption;
-
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
@@ -96,9 +94,6 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) NSString *currentPlayingSongNo;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
-
-/// agora mcc request lyrics id
-@property (nonatomic, copy, nullable) NSString* mccRequestId;
 
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) BOOL isNowMicMuted;
@@ -177,8 +172,7 @@ VLPopScoreViewDelegate
         VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
         if (selSongModel.status == 2) { //歌曲正在播放
             //请求歌词和歌曲
-            self.mccRequestId =
-            [self.AgoraMcc getLyricWithSongCode:[selSongModel.songNo integerValue] lyricType:0];
+            [self loadAndPlaySong];
         }
     }];
 }
@@ -803,25 +797,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
 }
 
-//- (void)playSongWithPlayer:(id<AgoraRtcMediaPlayerProtocol>)player {
-//    if (self.selSongsArray.count > 0) {
-//        VLRoomSelSongModel *model = self.selSongsArray.firstObject;
-//        if ([model.userNo isEqualToString:VLUserCenter.user.userNo] ||
-//                ([self ifChorusSinger:VLUserCenter.user.userNo]
-//                 && [model.chorusNo isEqualToString:VLUserCenter.user.userNo])) {
-//            [player play];
-//
-//            [_MVView start];
-//            [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-//
-//            if ([self ifMainSinger:VLUserCenter.user.userNo]
-//                && self.selSongsArray.count) {
-//                [self tellSeverTheCurrentPlaySongWithModel:self.selSongsArray.firstObject];
-//            }
-//        }
-//    }
-//}
-
 - (void)prepareNextSong {
     self.currentTime = 0;
     self.currentPlayingSongNo = nil;
@@ -983,7 +958,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [self.RTCkit enableAudio];
     
     self.isNowMicMuted = ![self isBroadcaster];
-    self.isNowCameraMuted = NO;
+    self.isNowCameraMuted = YES;
     
     AgoraVideoEncoderConfiguration *encoderConfiguration = [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
                                                                                                       frameRate:AgoraVideoFrameRateFps7
@@ -1036,8 +1011,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     [option setPublishCameraTrack:!self.isNowCameraMuted];
     [option setPublishMicrophoneTrack:!self.isNowMicMuted];
     [option setPublishCustomAudioTrack:NO];
-    [option setAutoSubscribeAudio:NO];
-    [option setAutoSubscribeVideo:NO];
+    [option setAutoSubscribeAudio:YES];
+    [option setAutoSubscribeVideo:YES];
     [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
     [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
     return option;
@@ -1710,7 +1685,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark - getter/handy utils
 - (BOOL)isRoomOwner {
-    return [self.roomModel.creator isEqualToString:VLUserCenter.user.userNo];
+    return [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.userNo];
 }
 
 - (BOOL)isBroadcaster {
