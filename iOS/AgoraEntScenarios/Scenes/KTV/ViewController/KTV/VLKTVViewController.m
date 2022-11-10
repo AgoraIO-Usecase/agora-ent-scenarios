@@ -248,9 +248,8 @@ VLPopScoreViewDelegate
                     }
                 }
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
-            });
+            
+            [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
             
             if (status == KTVSubscribeUpdated) {
                 //是否打开视频 & 是否静音
@@ -258,19 +257,13 @@ VLPopScoreViewDelegate
                     if ([seatModel.userNo isEqualToString:model.userNo]) {
                         model.isVideoMuted = seatModel.isVideoMuted;
                         model.isSelfMuted = seatModel.isSelfMuted;
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self.roomPersonView updateSeatsByModel:model];
-                        });
+                        [self.roomPersonView updateSeatsByModel:model];
                     }
                 }
             }
             
-            //user on seat, show bottom view
-            if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
-                weakSelf.bottomView.hidden = NO;
-                weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
-            }
-            
+            //refresh bottom bar
+            weakSelf.seatsArray = weakSelf.seatsArray;
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
             VLRoomSelSongModel *song = weakSelf.selSongsArray.count ? weakSelf.selSongsArray.firstObject : nil;
@@ -281,8 +274,7 @@ VLPopScoreViewDelegate
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
                 
                 //user off seat, hide bottom view
-                weakSelf.bottomView.hidden = YES;
-                weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
+                weakSelf.isOnMicSeat = NO;
                 
                 // 取出对应模型、防止数组越界
                 [weakSelf setSelfAudience];
@@ -307,9 +299,8 @@ VLPopScoreViewDelegate
                     }
                 }
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
-            });
+            
+            [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
         }
     }];
     
@@ -322,9 +313,7 @@ VLPopScoreViewDelegate
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
             selBgModel.ifSelect = YES;
             weakSelf.choosedBgModel = selBgModel;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.MVView changeBgViewByModel:selBgModel];
-            });
+            [weakSelf.MVView changeBgViewByModel:selBgModel];
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creator isEqualToString:VLUserCenter.user.userNo]) {
@@ -802,40 +791,37 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         }
         
         VLLog(@"发送上麦消息成功");
-        dispatch_async(dispatch_get_main_queue(), ^{ //自己在该位置刷新UI
-            for (VLRoomSeatModel *model in weakSelf.seatsArray) {
-                if (model.onSeat == index) {
-                    model.isMaster = false;
-                    model.headUrl = VLUserCenter.user.headUrl;
-                    model.onSeat = index;
-                    model.name = VLUserCenter.user.name;
-                    model.userNo = VLUserCenter.user.userNo;
-                    model.id = VLUserCenter.user.id;
-                    
-                    if([weakSelf ifMainSinger:VLUserCenter.user.userNo]) {
-                        model.ifSelTheSingSong = YES;
-                        [weakSelf.MVView setPlayerViewsHidden:NO
-                                             nextButtonHidden:NO];
-                    }
-                    
-                    VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-                    if(selSongModel != nil) {
-                        if (selSongModel.isChorus
-                            && [selSongModel.chorusNo isEqualToString:VLUserCenter.user.userNo]) {
-                            model.ifJoinedChorus = YES;
-                        }
+        //自己在该位置刷新UI
+        for (VLRoomSeatModel *model in weakSelf.seatsArray) {
+            if (model.onSeat == index) {
+                model.isMaster = false;
+                model.headUrl = VLUserCenter.user.headUrl;
+                model.onSeat = index;
+                model.name = VLUserCenter.user.name;
+                model.userNo = VLUserCenter.user.userNo;
+                model.id = VLUserCenter.user.id;
+                
+                if([weakSelf ifMainSinger:VLUserCenter.user.userNo]) {
+                    model.ifSelTheSingSong = YES;
+                    [weakSelf.MVView setPlayerViewsHidden:NO
+                                         nextButtonHidden:NO];
+                }
+                
+                VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+                if(selSongModel != nil) {
+                    if (selSongModel.isChorus
+                        && [selSongModel.chorusNo isEqualToString:VLUserCenter.user.userNo]) {
+                        model.ifJoinedChorus = YES;
                     }
                 }
             }
-            [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
-            weakSelf.bottomView.hidden = NO;
-            weakSelf.requestOnLineView.hidden = !weakSelf.bottomView.hidden;
-            [weakSelf.bottomView resetBtnStatus];
-            [weakSelf.MVView updateUIWithUserOnSeat:YES
-                                               song:weakSelf.selSongsArray.firstObject];
-            [weakSelf.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-            [weakSelf muteLocalAudio:false];
-        });
+        }
+        [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
+        [weakSelf.bottomView resetBtnStatus];
+        [weakSelf.MVView updateUIWithUserOnSeat:YES
+                                           song:weakSelf.selSongsArray.firstObject];
+        [weakSelf.RTCkit setClientRole:AgoraClientRoleBroadcaster];
+        [weakSelf muteLocalAudio:false];
     }];
 }
 
@@ -885,8 +871,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                                            song:self.selSongsArray.firstObject];
             [self.MVView setPlayerViewsHidden:YES
                              nextButtonHidden:YES];
-            self.bottomView.hidden = YES;
-            self.requestOnLineView.hidden = !self.bottomView.hidden;
             if([self ifMainSinger:VLUserCenter.user.userNo]) {
                 [self playNextSong:0];
             }
@@ -1186,11 +1170,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             return;
         }
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[LSTPopView getPopViewWithCustomView:view] dismiss];
-            weakSelf.choosedBgModel = selBgModel;
-            [weakSelf.MVView changeBgViewByModel:selBgModel];
-        });
+        [[LSTPopView getPopViewWithCustomView:view] dismiss];
+        weakSelf.choosedBgModel = selBgModel;
+        [weakSelf.MVView changeBgViewByModel:selBgModel];
     }];
 }
 
@@ -1659,9 +1641,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (selSongModel != nil && [selSongModel.userNo isEqualToString:userNo]) {
         return YES;
     }
-    else {
-        return NO;
-    }
+    
+    return NO;
 }
 
 - (BOOL)ifChorusSinger:(NSString *)userNo {
@@ -1670,9 +1651,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(selSongModel != nil && selSongModel.isChorus && [selSongModel.chorusNo isEqualToString:userNo]) {
         return YES;
     }
-    else {
-        return NO;
-    }
+    
+    return NO;
 }
 
 - (BOOL) ifIAmRoomMaster {
@@ -1684,9 +1664,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(selSongModel != nil) {
         return selSongModel.userNo;
     }
-    else {
-        return nil;
-    }
+    
+    return nil;
 }
 
 - (NSString *)getChrousSingerUserNo {
@@ -1694,9 +1673,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(selSongModel != nil && selSongModel.isChorus && selSongModel.chorusNo != nil) {
         return selSongModel.chorusNo;
     }
-    else {
-        return nil;
-    }
+    
+    return nil;
 }
 
 - (BOOL)isCurrentSongChorus {
@@ -1704,9 +1682,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(selSongModel != nil) {
         return selSongModel.isChorus;
     }
-    else {
-        return NO;
-    }
+    
+    return NO;
 }
 
 #pragma mark other
@@ -1760,13 +1737,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     _seatsArray = seatsArray;
     //update booleans
-    self.isOnMicSeat = NO;
+    BOOL isOnMicSeat = NO;
     for (VLRoomSeatModel *seatModel in seatsArray) {
         if (seatModel.userNo != nil && [seatModel.userNo isEqual:VLUserCenter.user.userNo]) {
-            self.isOnMicSeat = YES;
+            isOnMicSeat = YES;
             break;
         }
     }
+    self.isOnMicSeat = isOnMicSeat;
+}
+
+- (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
+    _isOnMicSeat = isOnMicSeat;
+    
+    self.bottomView.hidden = !_isOnMicSeat;
+    self.requestOnLineView.hidden = !self.bottomView.hidden;
 }
 
 #pragma mark - lazy getter
