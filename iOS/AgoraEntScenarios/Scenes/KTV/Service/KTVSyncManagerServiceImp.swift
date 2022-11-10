@@ -841,11 +841,12 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .add(data: params,
-                 success: { obj in
-                     finished(nil)
-                 }, fail: { error in
-                     finished(error)
-                 })
+                 success: {[weak self] obj in
+                self?.seatMap["\(seatInfo.onSeat)"] = seatInfo
+                finished(nil)
+            }, fail: { error in
+                finished(error)
+            })
     }
 
     private func _subscribeSeats(finished: @escaping () -> Void) {
