@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *sex;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *token;
-@property (nonatomic, copy) NSString *id;
+@property (nonatomic, copy) NSString *id;  //uid
 
 //自己是否是房主
 @property (nonatomic, assign) BOOL ifMaster;
@@ -33,6 +33,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *im_token;
 @property (nonatomic) NSString *authorization;
 @property (nonatomic) BOOL hasVoiceRoomUserInfo;
+
+
+
+
+//给各个场景保留的扩展字段
+@property (nonatomic, strong, readonly) NSMutableDictionary* extraDic;
 @end
 
 NS_ASSUME_NONNULL_END

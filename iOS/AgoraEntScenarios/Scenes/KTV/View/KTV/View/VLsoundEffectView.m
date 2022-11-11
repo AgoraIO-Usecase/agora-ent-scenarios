@@ -6,7 +6,7 @@
 #import "VLsoundEffectView.h"
 #import "ZQTCustomSwitch.h"
 #import "VLHotSpotBtn.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 @import ChameleonFramework;
@@ -52,14 +52,14 @@
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = NSLocalizedString(@"音效", nil);
+    titleLabel.text = KTVLocalizedString(@"音效");
     titleLabel.font = UIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
     
     UILabel *electronicLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, titleLabel.bottom+25, 55, 17)];
-    electronicLabel.text = NSLocalizedString(@"启用电音", nil);
+    electronicLabel.text = KTVLocalizedString(@"启用电音");
     electronicLabel.font = UIFontMake(13);
     electronicLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:electronicLabel];
@@ -69,7 +69,7 @@
     [self addSubview:self.openSwitch];
     
     UILabel *typeLabel = [[UILabel alloc]initWithFrame:CGRectMake(electronicLabel.left, electronicLabel.bottom+24, 55, 17)];
-    typeLabel.text = NSLocalizedString(@"选择调式", nil);
+    typeLabel.text = KTVLocalizedString(@"选择调式");
     typeLabel.font = UIFontMake(13);
     typeLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:typeLabel];
@@ -93,7 +93,7 @@
     [bgView addSubview:self.rotateImgView];
     
     self.heFengLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, self.rotateImgView.centerY-12, 26, 17)];
-    self.heFengLabel.text = NSLocalizedString(@"和风", nil);
+    self.heFengLabel.text = KTVLocalizedString(@"和风");
     self.heFengLabel.font = UIFontBoldMake(12);
     self.heFengLabel.textAlignment = NSTextAlignmentCenter;
     self.heFengLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
@@ -111,7 +111,7 @@
     [bgView addSubview:heFengBtn];
     
     self.xiaoDiaoLabel = [[UILabel alloc]initWithFrame:CGRectMake((220-26)*0.5, 15, 26, 17)];
-    self.xiaoDiaoLabel.text = NSLocalizedString(@"小调", nil);
+    self.xiaoDiaoLabel.text = KTVLocalizedString(@"小调");
     self.xiaoDiaoLabel.font = UIFontBoldMake(12);
     self.xiaoDiaoLabel.textAlignment = NSTextAlignmentCenter;
     self.xiaoDiaoLabel.textColor = UIColorMakeWithHex(@"#979CBB");
@@ -135,7 +135,7 @@
     [bgView addSubview:self.daDiaoView];
     
     self.daDiaoLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.daDiaoView.right+5, self.heFengLabel.top, 26, 17)];
-    self.daDiaoLabel.text = NSLocalizedString(@"大调", nil);
+    self.daDiaoLabel.text = KTVLocalizedString(@"大调");
     self.daDiaoLabel.font = UIFontBoldMake(12);
     self.daDiaoLabel.textAlignment = NSTextAlignmentCenter;
     self.daDiaoLabel.textColor = UIColorMakeWithHex(@"#979CBB");

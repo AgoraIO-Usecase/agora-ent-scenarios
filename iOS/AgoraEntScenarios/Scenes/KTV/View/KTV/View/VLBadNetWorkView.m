@@ -4,7 +4,7 @@
 //
 
 #import "VLBadNetWorkView.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -31,7 +31,7 @@
     [self addSubview:iconImgView];
     
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake((self.width-180)*0.5, iconImgView.bottom+5, 180, 20)];
-    lab.text = NSLocalizedString(@"本机网络差，无法加入合唱", nil);
+    lab.text = KTVLocalizedString(@"本机网络差，无法加入合唱");
     lab.font = UIFontMake(14);
     lab.textAlignment = NSTextAlignmentCenter;
     lab.textColor = UIColorMakeWithHex(@"#3C4267");
@@ -42,16 +42,16 @@
     knowBtn.layer.masksToBounds = YES;
     [knowBtn addTarget:self action:@selector(knowBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [knowBtn setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-    [knowBtn setTitle:NSLocalizedString(@"我知道了", nil) forState:UIControlStateNormal];
+    [knowBtn setTitle:KTVLocalizedString(@"我知道了") forState:UIControlStateNormal];
     [knowBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     knowBtn.titleLabel.font = UIFontBoldMake(16);
     [self addSubview:knowBtn];
     
 }
 
-- (void)knowBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(knowBtnClickAction)]) {
-        [self.delegate knowBtnClickAction];
+- (void)knowBtnClickEvent:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLBadNetworkView:dismiss:)]) {
+        [self.delegate onVLBadNetworkView:self dismiss:sender];
     }
 }
 

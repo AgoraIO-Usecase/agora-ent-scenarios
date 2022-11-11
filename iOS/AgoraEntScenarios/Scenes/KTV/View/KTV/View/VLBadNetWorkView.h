@@ -6,10 +6,10 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+@class VLBadNetWorkView;
 @protocol VLBadNetWorkViewDelegate <NSObject>
 
-@optional
-- (void)knowBtnClickAction;
+- (void)onVLBadNetworkView:(VLBadNetWorkView*)view dismiss:(id)sender;
 
 @end
 

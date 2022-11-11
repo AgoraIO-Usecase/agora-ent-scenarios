@@ -13,11 +13,15 @@
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import MJRefresh;
 
-@interface VLSelectSongTableItemView ()<UITableViewDataSource,UITableViewDelegate>
-
+@interface VLSelectSongTableItemView ()<
+UITableViewDataSource,
+UITableViewDelegate,
+AgoraMusicContentCenterEventDelegate
+>
 @property (nonatomic, strong) UITableView    *tableView;
 @property (nonatomic, strong) NSMutableArray *songsMuArray;
 @property (nonatomic, assign) NSInteger        page;
@@ -27,22 +31,31 @@
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
 
+
+@property (nonatomic, copy) NSString* requestId;
 @end
 
 @implementation VLSelectSongTableItemView
 
+- (void)dealloc {
+    [[AppContext shared] unregisterEventDelegate:self];
+}
 
-- (instancetype)initWithFrame:(CGRect)frame withRooNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus {
+- (instancetype)initWithFrame:(CGRect)frame
+                    withRooNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.page = 1;
         self.roomNo = roomNo;
         self.ifChorus = ifChorus;
         [self setupView];
+        [[AppContext shared] registerEventDelegate:self];
     }
     return self;
 }
 
+#pragma mark private method
 - (void)setupView {
     self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-20-22-15-40-40-4-20)];
     self.tableView.dataSource = self;
@@ -61,12 +74,52 @@
     }];
 }
 
+- (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
+    [self.tableView.mj_header endRefreshing];
+    if (songList.count == 0) {
+        return;
+    }
+    BOOL ifRefresh = self.page == 1 ? YES : NO;
+    self.page += 1;
+    NSArray *modelsArray = songList;
+    if (ifRefresh) {
+        [self.songsMuArray removeAllObjects];
+        self.songsMuArray = modelsArray.mutableCopy;
+        if (modelsArray.count > 0) {
+            self.tableView.mj_footer.hidden = NO;
+        }else{
+            self.tableView.mj_footer.hidden = YES;
+        }
+    }else{
+        for (VLSongItmModel *model in modelsArray) {
+            [self.songsMuArray addObject:model];
+        }
+    }
+    
+    for (VLSongItmModel *itemModel in self.songsMuArray) {
+        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
+            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
+                itemModel.ifChoosed = YES;
+            }
+        }
+    }
+    
+    [self.tableView reloadData];
+    if (modelsArray.count < 5) {
+        [self.tableView.mj_footer endRefreshingWithNoMoreData];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
+}
 
+
+#pragma mark public method
 - (UIView *)listView {
     return self;
 }
 
-- (void)loadDatasWithIndex:(NSInteger)pageType ifRefresh:(BOOL)ifRefresh{
+- (void)loadDatasWithIndex:(NSInteger)pageType
+                 ifRefresh:(BOOL)ifRefresh {
     self.pageType = pageType;
     self.page = ifRefresh ? 1 : self.page;
     
@@ -76,114 +129,15 @@
         }
         
         self.selSongsArray = songArray;
-        NSDictionary *param = @{
-            @"type":@(pageType),
-            @"size":@(20),
-            @"current":@(self.page)
-        };
-        
-        [VLAPIRequest getRequestURL:kURLGetSongsList parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-            if (response.code == 0) {
-                [self.tableView.mj_header endRefreshing];
-                self.page += 1;
-                NSArray *tempArray = response.data[@"records"];
-                NSArray *modelsArray = [VLSongItmModel vj_modelArrayWithJson:tempArray];
-                if (ifRefresh) {
-                    [self.songsMuArray removeAllObjects];
-                    self.songsMuArray = modelsArray.mutableCopy;
-                    if (modelsArray.count > 0) {
-                        self.tableView.mj_footer.hidden = NO;
-                    }else{
-                        self.tableView.mj_footer.hidden = YES;
-                    }
-                }else{
-                    for (VLSongItmModel *model in modelsArray) {
-                        [self.songsMuArray addObject:model];
-                    }
-                }
-                
-                for (VLSongItmModel *itemModel in self.songsMuArray) {
-                    for (VLRoomSelSongModel *selModel in self.selSongsArray) {
-                        if ([itemModel.songNo isEqualToString:selModel.songNo]) {
-                            itemModel.ifChoosed = YES;
-                        }
-                    }
-                }
-                
-                [self.tableView reloadData];
-                if (modelsArray.count < 5) {
-                    [self.tableView.mj_footer endRefreshingWithNoMoreData];
-                }else{
-                    [self.tableView.mj_footer endRefreshing];
-                }
-            }else{
-                [self.tableView.mj_header endRefreshing];
-            }
-            
-        } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-            [self.tableView.mj_header endRefreshing];
-        }];
-
+       
+        NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
+        NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
+        self.requestId =
+        [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
+                                                                    page:self.page
+                                                                pageSize:20
+                                                              jsonOption:nil];
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" :self.roomNo
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLChoosedSongs parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            self.selSongsArray = [VLRoomSelSongModel vj_modelArrayWithJson:response.data];
-//            NSDictionary *param = @{
-//                @"type":@(pageType),
-//                @"size":@(20),
-//                @"current":@(self.page)
-//            };
-//
-//            [VLAPIRequest getRequestURL:kURLGetSongsList parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [self.tableView.mj_header endRefreshing];
-//                    self.page += 1;
-//                    NSArray *tempArray = response.data[@"records"];
-//                    NSArray *modelsArray = [VLSongItmModel vj_modelArrayWithJson:tempArray];
-//                    if (ifRefresh) {
-//                        [self.songsMuArray removeAllObjects];
-//                        self.songsMuArray = modelsArray.mutableCopy;
-//                        if (modelsArray.count > 0) {
-//                            self.tableView.mj_footer.hidden = NO;
-//                        }else{
-//                            self.tableView.mj_footer.hidden = YES;
-//                        }
-//                    }else{
-//                        for (VLSongItmModel *model in modelsArray) {
-//                            [self.songsMuArray addObject:model];
-//                        }
-//                    }
-//
-//                    for (VLSongItmModel *itemModel in self.songsMuArray) {
-//                        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
-//                            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
-//                                itemModel.ifChoosed = YES;
-//                            }
-//                        }
-//                    }
-//
-//                    [self.tableView reloadData];
-//                    if (modelsArray.count < 5) {
-//                        [self.tableView.mj_footer endRefreshingWithNoMoreData];
-//                    }else{
-//                        [self.tableView.mj_footer endRefreshing];
-//                    }
-//                }else{
-//                    [self.tableView.mj_header endRefreshing];
-//                }
-//
-//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//                [self.tableView.mj_header endRefreshing];
-//            }];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 #pragma mark -- UITableViewDataSource UITableViewDelegate
@@ -211,18 +165,17 @@
 
 - (void)dianGeWithModel:(VLSongItmModel*)model {
     if(model == nil || model.songNo == nil || model.songName == nil ) {
-        [VLToast toast:NSLocalizedString(@"点歌失败，请重试", nil)];
+        [VLToast toast:KTVLocalizedString(@"点歌失败，请重试")];
         return;
     }
     
     model.ifChorus = self.ifChorus;
     
-    
     KTVChooseSongInputModel* inputModel = [KTVChooseSongInputModel new];
     inputModel.isChorus = model.ifChorus;
     inputModel.songName = model.songName;
     inputModel.songNo = model.songNo;
-    inputModel.songUrl = model.songUrl;
+//    inputModel.songUrl = model.songUrl;
     inputModel.imageUrl = model.imageUrl;
     inputModel.singer = model.singer;
     [[AppContext ktvServiceImp] chooseSongWithInput:inputModel
@@ -235,29 +188,6 @@
         [self dianGeSuccessWithModel:model];
         [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
     }];
-    
-    
-//    NSDictionary *param = @{
-//        @"isChorus" : @(self.ifChorus),
-//        @"roomNo": self.roomNo,
-//        @"songName":model.songName,
-//        @"songNo":model.songNo,
-////        @"songUrl":model.songUrl,
-//        @"userNo":VLUserCenter.user.userNo
-//    };
-//    [VLAPIRequest getRequestURL:kURLChooseSong parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            //点歌完成发送通知
-//            [self dianGeSuccessWithModel:model];
-//
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDianGeSuccessNotification object:model];
-//        }
-//        else {
-//            [self dianGeFailedWithModel:model];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [self dianGeFailedWithModel:model];
-//    }];
 }
 
 - (void)dianGeFailedWithModel:(VLSongItmModel *)songItemModel {
@@ -286,4 +216,52 @@
     return _songsMuArray;
 }
 
+
+#pragma mark AgoraMusicContentCenterDelegate
+- (void)onMusicChartsResult:(NSString *)requestId
+                     status:(AgoraMusicContentCenterStatusCode)status
+                     result:(NSArray<AgoraMusicChartInfo*> *)result {
+    if (![self.requestId isEqualToString:requestId]) {
+        return;
+    }
+}
+
+- (void)onMusicCollectionResult:(NSString *)requestId
+                         status:(AgoraMusicContentCenterStatusCode)status
+                         result:(AgoraMusicCollection *)result {
+    if (![self.requestId isEqualToString:requestId]) {
+        return;
+    }
+    
+    NSMutableArray* songArray = [NSMutableArray array];
+    [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        VLSongItmModel* model = [VLSongItmModel new];
+        model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
+        model.songName = obj.name;
+        model.singer = obj.singer;
+        model.imageUrl = obj.poster;
+        [songArray addObject:model];
+    }];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self appendDatasWithSongList:songArray];
+    });
+}
+
+- (void)onLyricResult:(NSString*)requestId
+             lyricUrl:(NSString*)lyricUrl {
+    if (![self.requestId isEqualToString:requestId]) {
+        return;
+    }
+    
+    
+}
+
+- (void)onPreLoadEvent:(NSInteger)songCode
+               percent:(NSInteger)percent
+                status:(AgoraMusicContentCenterPreloadStatus)status
+                   msg:(NSString *)msg
+              lyricUrl:(NSString *)lyricUrl {
+
+}
 @end

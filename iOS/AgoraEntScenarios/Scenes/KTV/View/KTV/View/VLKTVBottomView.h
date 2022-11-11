@@ -17,15 +17,10 @@ typedef enum : NSUInteger {
 } VLKTVBottomBtnClickType;
 
 NS_ASSUME_NONNULL_BEGIN
+@class VLKTVBottomView;
 @protocol VLKTVBottomViewDelegate <NSObject>
 
-@optional
-- (void)bottomAudionBtnAction:(NSInteger)ifMute;
-- (void)bottomVideoBtnAction:(NSInteger)ifOpen;
-- (void)bottomSetAudioMute:(NSInteger)ifMute;
-- (void)bottomSetVideoMute:(NSInteger)ifOpen;
-
-- (void)bottomBtnsClickAction:(VLKTVBottomBtnClickType)typeValue withSender:(VLHotSpotBtn *)sender;
+- (void)onVLKTVBottomView:(VLKTVBottomView*)view btnTapped:(id)sender withValues:(VLKTVBottomBtnClickType)typeValue;
 
 @end
 
@@ -33,7 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVBottomViewDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLRoomSeatModel *> *)seatsArray;
 
-- (bool)isAudioMute;
+- (void)updateAudioBtn:(BOOL)audioMuted;
+- (void)updateVideoBtn:(BOOL)videoMuted;
 - (void)resetBtnStatus;
 
 @end

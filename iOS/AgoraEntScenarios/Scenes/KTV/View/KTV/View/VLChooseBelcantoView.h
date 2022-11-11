@@ -4,19 +4,17 @@
 //
 
 #import <UIKit/UIKit.h>
-@class VLBelcantoModel,VLKTVBelcantoCell;
+@class VLBelcantoModel,VLKTVBelcantoCell,VLChooseBelcantoView;
 @protocol VLChooseBelcantoViewDelegate <NSObject>
 
-@optional
-- (void)belcantoBackBtnAction;
-- (void)belcantoItemClickAction:(VLBelcantoModel *)model withIndx:(NSInteger)index;
+- (void)onVLChooseBelcantoView:(VLChooseBelcantoView*)view backBtnTapped:(id)sender;
+- (void)onVLChooseBelcantoView:(VLChooseBelcantoView*)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index;
 
 @end
 
 @interface VLChooseBelcantoView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLChooseBelcantoViewDelegate>)delegate;
-
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
 
 @end

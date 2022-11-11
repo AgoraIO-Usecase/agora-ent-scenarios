@@ -7,6 +7,7 @@
 #import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 @import SDWebImage;
@@ -72,7 +73,8 @@
     [self.sortBtn addTarget:self action:@selector(sortBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.sortBtn];
     
-    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] title:NSLocalizedString(@"演唱中", nil)];
+    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
+                                                       title:KTVLocalizedString(@"演唱中")];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.singingBtn.spacingBetweenImageAndTitle = 4;
@@ -105,16 +107,16 @@
 - (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel {
     _selSongModel = selSongModel;
 //    if (selSongModel.isChorus) {
-//        self.typeLabel.text = NSLocalizedString(@"合唱", nil);
+//        self.typeLabel.text = KTVLocalizedString(@"合唱");
 //    }else{
-//        self.typeLabel.text = NSLocalizedString(@"独唱", nil);
+//        self.typeLabel.text = KTVLocalizedString(@"独唱");
 //    }
     self.nameLabel.text = selSongModel.songName;
     if(selSongModel.isChorus) {
-        self.chooserLabel.text = [NSString stringWithFormat:NSLocalizedString(@"合唱: %@", nil),selSongModel.name];
+        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"合唱: %@"), selSongModel.name];
     }
     else {
-        self.chooserLabel.text = [NSString stringWithFormat:NSLocalizedString(@"点唱: %@", nil),selSongModel.name];
+        self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
     }
     
     if (selSongModel.status == 0) {
@@ -131,8 +133,8 @@
         self.deleteBtn.hidden = YES;
     }
     
-    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]];
-    
+    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]
+                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
 }
 
 
