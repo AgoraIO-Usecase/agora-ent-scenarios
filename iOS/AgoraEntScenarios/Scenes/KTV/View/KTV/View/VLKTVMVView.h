@@ -82,8 +82,6 @@ typedef enum : NSUInteger {
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
 
-- (void)validateSingType;
-
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 
 #pragma mark - 歌词相关
