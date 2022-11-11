@@ -79,10 +79,10 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     for (VLKTVSelBgModel *model in self.picsModelArray) {
-        model.ifSelect = NO;
+        model.isSelect = NO;
     }
     VLKTVSelBgModel *selBgModel = self.picsModelArray[indexPath.row];
-    selBgModel.ifSelect = YES;
+    selBgModel.isSelect = YES;
     [self.collectionView reloadData];
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLPopSelBgView:tappedWithAction:atIndex:)]) {
         [self.delegate onVLPopSelBgView:self tappedWithAction:selBgModel atIndex:indexPath.item];
@@ -93,12 +93,12 @@
     _selBgModel = selBgModel;
     for (VLKTVSelBgModel *model in self.picsModelArray) {
         if ([_selBgModel.imageName isEqualToString:model.imageName]) {
-            model.ifSelect = YES;
+            model.isSelect = YES;
         }
     }
     if (!selBgModel) {
         VLKTVSelBgModel *picModel = self.picsModelArray.firstObject;
-        picModel.ifSelect = YES;
+        picModel.isSelect = YES;
     }
     [self.collectionView reloadData];
 }
@@ -147,7 +147,7 @@
 - (void)setSelBgModel:(VLKTVSelBgModel *)selBgModel {
     _selBgModel = selBgModel;
     self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
-    self.selIcon.hidden = !selBgModel.ifSelect;
+    self.selIcon.hidden = !selBgModel.isSelect;
 }
 
 @end

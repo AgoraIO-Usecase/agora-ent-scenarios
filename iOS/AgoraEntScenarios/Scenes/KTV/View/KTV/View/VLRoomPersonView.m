@@ -169,7 +169,7 @@
     }else{
         cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
     }
-    cell.singingBtn.hidden = !seatModel.ifSelTheSingSong;
+    cell.singingBtn.hidden = !seatModel.isSelTheSingSong;
     
     if (seatModel.isVideoMuted == 1) {
         cell.avatarImgView.hidden = YES;
@@ -187,7 +187,7 @@
         cell.muteImgView.hidden = NO;
     }
     
-    if(seatModel.ifJoinedChorus)
+    if(seatModel.isJoinedChorus)
         cell.joinChorusBtn.hidden = NO;
     else
         cell.joinChorusBtn.hidden = YES;
@@ -229,17 +229,17 @@
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             if ([seatModel.userNo isEqualToString:songModel.userNo]) {
-                seatModel.ifSelTheSingSong = YES;
+                seatModel.isSelTheSingSong = YES;
             }else{
-                seatModel.ifSelTheSingSong = NO;
+                seatModel.isSelTheSingSong = NO;
             }
-            seatModel.ifJoinedChorus = NO;
+            seatModel.isJoinedChorus = NO;
         }
         [self.personCollectionView reloadData];
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            seatModel.ifSelTheSingSong = NO;
-            seatModel.ifJoinedChorus = NO;
+            seatModel.isSelTheSingSong = NO;
+            seatModel.isJoinedChorus = NO;
         }
         [self.personCollectionView reloadData];
     }
