@@ -671,7 +671,7 @@ extension KTVSyncManagerServiceImp {
         seatInfo.isVideoMuted = 0
 
         /// 新增, 判断当前歌曲是否是自己点的
-        seatInfo.isSelTheSingSong = false
+        seatInfo.isOwner = false
 
         seatInfo.isJoinedChorus = false
 
