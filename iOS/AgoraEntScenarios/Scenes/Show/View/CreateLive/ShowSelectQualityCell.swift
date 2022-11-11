@@ -25,7 +25,6 @@ class ShowSelectQualityCell: UICollectionViewCell {
         label.font = .show_R_12
         label.textColor = .show_main_text
         label.numberOfLines = 2
-        label.text = "720P"
         return label
     }()
     
@@ -35,7 +34,6 @@ class ShowSelectQualityCell: UICollectionViewCell {
         label.font = .show_R_12
         label.textColor = .show_main_text
         label.numberOfLines = 2
-        label.text = "超清"
         return label
     }()
     

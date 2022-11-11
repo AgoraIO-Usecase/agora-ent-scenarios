@@ -44,6 +44,11 @@ extension UIColor {
         return UIColor.HexColor(hex: 0x000000, alpha: 0.25)
     }
     
+    // 音乐设置背景色
+    @objc static var show_music_item_bg: UIColor {
+        return UIColor.HexColor(hex: 0x000000, alpha: 0.35)
+    }
+    
     // 背景色
     @objc static var show_dark_cover_bg: UIColor {
         return UIColor.HexColor(hex: 0x151325, alpha: 0.85)
@@ -62,5 +67,15 @@ extension UIColor {
     // 红点颜色
     @objc static var show_chat_user_name: UIColor {
         return UIColor.HexColor(hex: 0xA6C4FF, alpha: 1)
+    }
+    
+    // 输入框背景
+    @objc static var show_chat_input_bg: UIColor {
+        return UIColor.HexColor(hex: 0xF1F3F8, alpha: 1)
+    }
+    
+    // 输入框文字
+    @objc static var show_chat_input_text: UIColor {
+        return UIColor.HexColor(hex: 0x3C4267, alpha: 1)
     }
 }

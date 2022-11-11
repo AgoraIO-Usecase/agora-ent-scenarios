@@ -43,6 +43,7 @@ class ShowLiveViewController: UIViewController {
         setupUI()
         setupAgoraKit()
         joinChannel()
+        subscribeChatMsg()
     }
     
     private func setupUI(){
@@ -86,8 +87,36 @@ class ShowLiveViewController: UIViewController {
             agoraKit?.setupRemoteVideo(canvas)
         }
         agoraKit?.startPreview()
-//        liveView.sendMessage(userName: UserInfo.uid, message: "Join_Live_Room".localized, messageType: .message)
+        sendMessageWithText("join_live_room".show_localized)
     }
+    
+    private func subscribeChatMsg(){
+        /*
+        AppContext.showServiceImp.subscribeMicSeatInvitation { [weak self] status, msg in
+            if let text = msg.message {
+                let model = ShowChatModel(userName: msg.userName ?? "", text: text)
+                self?.liveView.addChatModel(model)
+            }
+        }
+         */
+    }
+    
+    private func sendMessageWithText(_ text: String) {
+        let showMsg = ShowMessage()
+        showMsg.userId = VLUserCenter.user.id
+        showMsg.userName = VLUserCenter.user.name
+        showMsg.message = text
+        showMsg.createAt = Date().timeIntervalSince1970
+        /*
+        AppContext.showServiceImp.sendChatMessage(message: showMsg) { error in
+            print("发送消息状态 \(error.localizedDescription) text = \(text)")
+        }
+         */
+        let model = ShowChatModel(userName: VLUserCenter.user.name, text: text)
+        liveView.addChatModel(model)
+    }
+    
+    
 }
 
 
@@ -136,8 +165,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickSendMsgButton(text: String) {
-        let model = ShowChatModel(userName: VLUserCenter.user.name, text: text)
-        liveView.addChatModel(model)
+        sendMessageWithText(text)
     }
     
     func onClickCloseButton() {
@@ -171,6 +199,5 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickSettingButton() {
         
     }
-    
     
 }

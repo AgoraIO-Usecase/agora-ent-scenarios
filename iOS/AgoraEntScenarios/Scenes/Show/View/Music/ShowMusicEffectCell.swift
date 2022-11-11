@@ -79,10 +79,11 @@ class ShowMusicEffectCell: UITableViewCell {
         }
     }
     
-    func setTitle(_ title: String, dataArray: [CellData]) {
+    func setTitle(_ title: String, dataArray: [CellData], defaultSelectIndex: Int) {
         titleLabel.text = title
         self.dataArray = dataArray
         collectionView.reloadData()
+        collectionView.selectItem(at: IndexPath(item: defaultSelectIndex, section: 0), animated: true, scrollPosition: .left)
     }
 }
 
