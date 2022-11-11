@@ -244,7 +244,7 @@ VLPopScoreViewDelegate
             model.name = seatModel.name;
             model.userNo = seatModel.userNo;
             model.isVideoMuted = seatModel.isVideoMuted;
-            model.isSelfMuted = seatModel.isSelfMuted;
+            model.isAudioMuted = seatModel.isAudioMuted;
             //TODO ??
             model.rtcUid = seatModel.rtcUid;
             
@@ -751,6 +751,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
+- (void)cancelLoadAndPlay {
+    [self.lyricCallbacks removeAllObjects];
+    [self.musicCallbacks removeAllObjects];
+}
+
 - (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
     NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
     [self.lyricCallbacks setObject:block forKey:requestId];
@@ -788,6 +793,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.MVView cleanMusicText];
     [self.rtcMediaPlayer stop];
     [self resetPlayer];
+    [self cancelLoadAndPlay];
 }
 
 - (void)playNextSong:(int)isMasterInterrupt {

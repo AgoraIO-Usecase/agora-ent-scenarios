@@ -19,7 +19,7 @@
     self.name = @"";
     self.userNo = @"";
     self.rtcUid = nil;
-    self.isSelfMuted = 0;
+    self.isAudioMuted = 0;
     self.isVideoMuted = 0;
     self.isJoinedChorus = NO;
 }
