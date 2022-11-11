@@ -21,7 +21,7 @@
     self.id = nil;
     self.isSelfMuted = 0;
     self.isVideoMuted = 0;
-    self.ifJoinedChorus = NO;
+    self.isJoinedChorus = NO;
 }
 
 @end

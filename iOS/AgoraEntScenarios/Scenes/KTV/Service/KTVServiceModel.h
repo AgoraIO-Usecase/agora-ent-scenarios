@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString* userId;
 @property (nonatomic, copy) NSString* userName;
 @property (nonatomic, copy) NSString* userHeadUrl;
-@property (nonatomic, assign) NSInteger userOnSeat;
+@property (nonatomic, assign) NSInteger seatIndex;
 @end
 
 /// remove song input parameter
