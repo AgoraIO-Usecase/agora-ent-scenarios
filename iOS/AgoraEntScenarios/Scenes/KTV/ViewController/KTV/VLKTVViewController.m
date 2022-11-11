@@ -170,10 +170,8 @@ VLPopScoreViewDelegate
     [self refreshChoosedSongList:^{
         //拿到当前歌的歌词去播放和同步歌词
         VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-        if (selSongModel.status == 2) { //歌曲正在播放
-            //请求歌词和歌曲
-            [self loadAndPlaySong];
-        }
+        //请求歌词和歌曲
+        [self loadAndPlaySong];
     }];
 }
 
@@ -252,20 +250,14 @@ VLPopScoreViewDelegate
             
             if ([VLUserCenter.user.userNo isEqualToString:model.userNo]) {
                 BOOL isMainSinger = [weakSelf isMainSinger:model.userNo];
-                model.isSelTheSingSong = isMainSinger;
+                model.isOwner = isMainSinger;
                 
                 weakSelf.isOnMicSeat = YES;
-                
-                //TODO not myself?
-                [weakSelf.MVView setPlayerViewsHidden:!isMainSinger
-                                     nextButtonHidden:!isMainSinger];
             }
-            
-//            self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
             
             //TODO
             VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-            if (song != nil && song.isChorus && [song.chorusNo isEqualToString:seatModel.userNo]) {
+            if (song.isChorus && [song.chorusNo isEqualToString:seatModel.userNo]) {
                 model.isJoinedChorus = YES;
             }
             
@@ -279,11 +271,6 @@ VLPopScoreViewDelegate
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
-                
-                if([weakSelf isMainSinger:VLUserCenter.user.userNo]) {
-                    [weakSelf.MVView setPlayerViewsHidden:YES
-                                         nextButtonHidden:YES];
-                }
                 
                 //user leave seat, hide bottom bar
                 weakSelf.isOnMicSeat = NO;
@@ -322,6 +309,7 @@ VLPopScoreViewDelegate
     
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
+        //refresh first
         [weakSelf refreshChoosedSongList:nil];
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
             
@@ -337,9 +325,8 @@ VLPopScoreViewDelegate
                     return;
                 }
                 
-                if (weakSelf.currentPlayingSongNo == nil && songInfo.status == 2) {
-                    [weakSelf loadAndPlaySong];
-                }
+                [weakSelf loadAndPlaySong];
+                
                 //观众看到打分
                 if (songInfo.status == 2) {
                     double voicePitch = songInfo.score;
@@ -347,7 +334,6 @@ VLPopScoreViewDelegate
                     return;
                 }
             }
-            
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if ([selSongModel.songNo isEqualToString:songInfo.songNo]) {
@@ -555,7 +541,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         } else {
             RtcMusicLrcMessage *musicLrcMessage = [RtcMusicLrcMessage vj_modelWithDictionary:dict];
-            float postion = musicLrcMessage.time / 1000.0;
+            float postion = musicLrcMessage.time;
             self.currentTime = postion;
             
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
@@ -712,7 +698,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if (model == nil || [model waittingForChorus]) {
+    if (model == nil
+        || [model waittingForChorus]
+        || model.status != 2) {
         return;
     }
     
@@ -742,9 +730,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                song:model];
                 
                 //owner to update
-                if ([model waittingForChorus] || model.status == 2) {
-                    return;
-                }
                 [self markSongDidPlayWithModel:model];
             }];
         }];
@@ -1365,7 +1350,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //主唱告诉后台当前播放的歌曲
 - (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)model {
-    if (model.status == 2) {
+    if ([model waittingForChorus] || model.status == 2) {
         return;
     }
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
