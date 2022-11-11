@@ -1416,7 +1416,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         } else {
             RtcMusicLrcMessage *musicLrcMessage = [RtcMusicLrcMessage vj_modelWithDictionary:dict];
-            float postion = musicLrcMessage.time / 1000.0;
+            float postion = musicLrcMessage.time;
             self.currentTime = postion;
             
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
