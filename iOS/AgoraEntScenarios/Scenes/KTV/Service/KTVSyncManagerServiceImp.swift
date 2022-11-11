@@ -347,7 +347,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         songInfo.status = 0
         /// 是谁点的歌
         songInfo.userNo = VLUserCenter.user.userNo
-        songInfo.userId = UserInfo.userId
+//        songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
         _addChooseSongInfo(songInfo: songInfo) { error in
@@ -399,7 +399,6 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         topSong.status = 2
         topSong.score = totalVolume
         _updateChooseSong(songInfo: topSong) { error in
-            
         }
     }
 

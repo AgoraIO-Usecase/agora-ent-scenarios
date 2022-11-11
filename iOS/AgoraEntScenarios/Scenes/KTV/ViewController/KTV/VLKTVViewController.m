@@ -336,10 +336,13 @@ VLPopScoreViewDelegate
                    && songInfo.chorusNo != nil) {
                     [weakSelf.MVView setJoinInViewHidden];
                     [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                    [weakSelf loadAndPlaySong];
+                    [weakSelf markSongDidPlayWithModel:songInfo];
                     return;
                 }
                 
+                if (weakSelf.currentPlayingSongNo == nil && songInfo.status == 2) {
+                    [weakSelf loadAndPlaySong];
+                }
                 //观众看到打分
                 if (songInfo.status == 2) {
                     double voicePitch = songInfo.score;
@@ -349,7 +352,7 @@ VLPopScoreViewDelegate
             }
             
             //收到点歌的消息
-            [weakSelf refreshChoosedSongList: nil];
+            [weakSelf refreshChoosedSongList:nil];
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
@@ -720,9 +723,11 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if(model && model.status == 2) {
-        [self loadAndPlaySongWithModel:model withRole:[model.userNo isEqual:VLUserCenter.user.userNo] ? KTVSingRoleMainSinger : KTVSingRoleAudience];
+    if (model == nil || [model waittingForChorus]) {
+        return;
     }
+    
+    [self loadAndPlaySongWithModel:model withRole:[model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience];
 }
 
 - (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model withRole:(KTVSingRole)role
@@ -748,6 +753,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                                                song:model];
                 
                 //owner to update
+                if ([model waittingForChorus]) {
+                    return;
+                }
                 [self markSongDidPlayWithModel:model];
             }];
         }];
@@ -1051,7 +1059,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             }
             [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
             VLRoomSelSongModel *song = self.selSongsArray.firstObject;
-            if(song != nil && song.isOwnSong) {
+            if([song isSongOwner]) {
                 //mvview action type exit
                 [weakSelf playNextSong:0];
             }
@@ -1285,9 +1293,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)onKTVMVView:(VLKTVMVView *)view startSingType:(VLKTVMVViewSingActionType)singType {
-    // 独唱
-    if (singType == VLKTVMVViewSingActionTypeSolo) {
-        [self loadAndPlaySong];
+    if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱
+//        [self loadAndPlaySong];
         //发送独唱的消息
         [self becomeSolo];
     } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
@@ -1295,7 +1302,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             [VLToast toast:KTVLocalizedString(@"请先上坐")];
         } else {
             [self setMyselfJoinChorusSong];
-            [self loadAndPlaySong];
+//            [self loadAndPlaySong];
             [self joinChorus]; //发送加入合唱的消息
         }
     }
@@ -1529,7 +1536,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
         //TODO should be removed
-        [self loadAndPlaySong];
+//        [self loadAndPlaySong];
         if(block) {
             block();
         }
@@ -1537,8 +1544,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 //主唱告诉后台当前播放的歌曲
-- (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)selSongModel {
-    [[AppContext ktvServiceImp] markSongDidPlayWithInput:selSongModel
+- (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)model {
+    [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
                                               completion:^(NSError * error) {
     }];
 }
