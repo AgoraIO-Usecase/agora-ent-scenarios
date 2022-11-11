@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///昵称
 @property (nonatomic, copy) NSString *name;
 ///在哪个座位
-@property (nonatomic, assign) NSInteger onSeat;
+@property (nonatomic, assign) NSInteger seatIndex;
 ///是否合唱
 @property (nonatomic, assign) BOOL joinSing;
 ///是否自己静音
@@ -28,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger isVideoMuted;
 
 ///新增, 判断当前歌曲是否是自己点的
-@property (nonatomic, assign) BOOL ifSelTheSingSong;
+@property (nonatomic, assign) BOOL isSelTheSingSong;
 
-@property (nonatomic, assign) BOOL ifJoinedChorus;
+@property (nonatomic, assign) BOOL isJoinedChorus;
 
 
 

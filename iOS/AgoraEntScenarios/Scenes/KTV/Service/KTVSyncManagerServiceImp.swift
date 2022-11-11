@@ -264,7 +264,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     }
 
     func outSeat(withInput inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.userOnSeat)"]!
+        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
         _removeSeat(seatInfo: seatInfo) { error in
             // TODO(wushengtao): whitout callback
         }
@@ -645,7 +645,7 @@ extension KTVSyncManagerServiceImp {
         var seatArray = [VLRoomSeatModel]()
         for i in 0...7 {
             let seat = VLRoomSeatModel()
-            seat.onSeat = i
+            seat.seatIndex = i
 //            seat.objectId = "\(i)"
             seatArray.append(seat)
 
@@ -658,7 +658,7 @@ extension KTVSyncManagerServiceImp {
     private func _getUserSeatInfo(seatIndex: Int) -> VLRoomSeatModel {
         let user = VLUserCenter.user
         let seatInfo = VLRoomSeatModel()
-        seatInfo.onSeat = seatIndex
+        seatInfo.seatIndex = seatIndex
         seatInfo.id = user.id
         seatInfo.userNo = user.userNo
         seatInfo.headUrl = user.headUrl
@@ -671,9 +671,9 @@ extension KTVSyncManagerServiceImp {
         seatInfo.isVideoMuted = 0
 
         /// 新增, 判断当前歌曲是否是自己点的
-        seatInfo.ifSelTheSingSong = false
+        seatInfo.isSelTheSingSong = false
 
-        seatInfo.ifJoinedChorus = false
+        seatInfo.isJoinedChorus = false
 
         return seatInfo
     }
@@ -697,7 +697,7 @@ extension KTVSyncManagerServiceImp {
 
             // update seat info (user avater/nick name did changed) if seat existed
             if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.onSeat)
+                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
                 }
@@ -728,7 +728,7 @@ extension KTVSyncManagerServiceImp {
                 }
                 let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
                 seats.forEach { seat in
-                    self.seatMap["\(seat.onSeat)"] = seat
+                    self.seatMap["\(seat.seatIndex)"] = seat
                 }
 
                 finished(nil, seats)
@@ -803,7 +803,7 @@ extension KTVSyncManagerServiceImp {
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .add(data: params,
                  success: {[weak self] obj in
-                self?.seatMap["\(seatInfo.onSeat)"] = seatInfo
+                self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
                 finished(nil)
             }, fail: { error in
                 finished(error)
@@ -825,7 +825,7 @@ extension KTVSyncManagerServiceImp {
                            else {
                                return
                            }
-                           self.seatMap["\(model.onSeat)"] = model
+                           self.seatMap["\(model.seatIndex)"] = model
                            self.seatListDidChanged?(KTVSubscribeCreated.rawValue, model)
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
@@ -834,7 +834,7 @@ extension KTVSyncManagerServiceImp {
                            else {
                                return
                            }
-                           self.seatMap["\(model.onSeat)"] = model
+                           self.seatMap["\(model.seatIndex)"] = model
                            self.seatListDidChanged?(KTVSubscribeUpdated.rawValue, model)
                        }, onDeleted: { [weak self] object in
                            guard let self = self else {
@@ -846,8 +846,8 @@ extension KTVSyncManagerServiceImp {
                                return
                            }
                            let seat = VLRoomSeatModel()
-                           seat.onSeat = origSeat.onSeat
-                           self.seatMap["\(origSeat.onSeat)"] = seat
+                           seat.seatIndex = origSeat.seatIndex
+                           self.seatMap["\(origSeat.seatIndex)"] = seat
                            self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, origSeat)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
