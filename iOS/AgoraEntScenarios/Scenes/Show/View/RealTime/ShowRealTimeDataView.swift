@@ -23,7 +23,7 @@ class ShowRealTimeDataView: UIView {
     }()
     private lazy var closeButton: AGEButton = {
         let button = AGEButton(style: .systemImage(name: "xmark", imageColor: .white))
-        
+        button.addTarget(self, action: #selector(onTapCloseButton), for: .touchUpInside)
         return button
     }()
     
@@ -80,5 +80,10 @@ class ShowRealTimeDataView: UIView {
                                               constant: -19).isActive = true
         closeButton.topAnchor.constraint(equalTo: topAnchor,
                                          constant: 13).isActive = true
+    }
+    
+    @objc
+    private func onTapCloseButton() {
+        AlertManager.hiddenView()
     }
 }
