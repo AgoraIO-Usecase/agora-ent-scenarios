@@ -43,7 +43,7 @@
 }
 
 - (void)tapgesEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(requestOnlineAction)]) {
+    if ([self.delegate respondsToSelector:@selector(requestOnlineAction)]) {
         [self.delegate requestOnlineAction];
     }
 }
