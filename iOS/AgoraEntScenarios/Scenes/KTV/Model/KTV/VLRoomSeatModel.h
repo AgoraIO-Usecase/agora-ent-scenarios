@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *headUrl;
 ///userNO
 @property (nonatomic, copy) NSString *userNo;
-@property (nonatomic, copy) NSString *rtcUid;
+@property (nonatomic, copy, nullable) NSString *rtcUid;
 ///昵称
 @property (nonatomic, copy) NSString *name;
 ///在哪个座位
@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///是否合唱
 @property (nonatomic, assign) BOOL joinSing;
 ///是否自己静音
-@property (nonatomic, assign) NSInteger isSelfMuted;
+@property (nonatomic, assign) NSInteger isAudioMuted;
 ///是否开启视频
 @property (nonatomic, assign) NSInteger isVideoMuted;
 

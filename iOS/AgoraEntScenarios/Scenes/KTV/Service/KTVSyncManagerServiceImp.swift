@@ -283,7 +283,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
             return
         }
         
-        seatInfo.isSelfMuted = openStatus ? 0 : 1
+        seatInfo.isAudioMuted = openStatus ? 0 : 1
         _updateSeat(seatInfo: seatInfo,
                     finished: completion)
     }
@@ -666,7 +666,7 @@ extension KTVSyncManagerServiceImp {
         /// 是否合唱
         seatInfo.joinSing = false
         /// 是否自己静音
-        seatInfo.isSelfMuted = 0
+        seatInfo.isAudioMuted = 0
         /// 是否开启视频
         seatInfo.isVideoMuted = 0
 

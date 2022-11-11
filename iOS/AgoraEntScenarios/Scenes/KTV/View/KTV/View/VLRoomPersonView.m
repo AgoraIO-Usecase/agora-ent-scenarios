@@ -179,7 +179,7 @@
         cell.avatarImgView.hidden = NO;
         cell.avatarCoverBgView.hidden = NO;
     }
-    if (seatModel.isSelfMuted == 0) {
+    if (seatModel.isAudioMuted == 0) {
 //        NSLog(@"显示：：%@", seatModel.name);
         cell.muteImgView.hidden = YES;
     }else{
