@@ -46,7 +46,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
                            String name, String password,
                            String userNo, String icon) {
         ktvServiceProtocol.createRoomWithInput(new KTVCreateRoomInputModel(
-                icon, isPrivate, name, password, userNo, "", ""
+                icon, isPrivate, name, password, userNo
         ), (e, ktvCreateRoomOutputModel) -> {
             if (e == null && ktvCreateRoomOutputModel != null) {
                 // success

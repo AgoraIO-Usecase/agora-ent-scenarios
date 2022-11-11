@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.live.holder;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,7 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
         mBinding.tvZC.setVisibility(View.GONE);
         mBinding.tvRoomOwner.setVisibility(View.GONE);
         mBinding.ivMute.setVisibility(View.GONE);
-        if (member == null) {
+        if (member == null || TextUtils.isEmpty(member.getUserNo())) {
             mBinding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
             if (mBinding.superLayout.getChildAt(0) instanceof CardView) {
                 mBinding.superLayout.removeViewAt(0);

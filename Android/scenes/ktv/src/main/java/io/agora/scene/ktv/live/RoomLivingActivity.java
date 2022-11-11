@@ -99,6 +99,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                     .equals(UserManager.getInstance().getUser().userNo)) {
                                 showUserLeaveSeatMenuDialog(data);
                             }
+                        } else {
+                            onItemClick(view, position, viewType);
                         }
                     }
 
@@ -202,6 +204,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().groupEmptyPrompt.setVisibility(isOnSeat ? View.GONE : View.VISIBLE);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
+            if(seatModels == null){
+                return;
+            }
             for (VLRoomSeatModel seatModel : seatModels) {
                 VLRoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getOnSeat());
                 if (oSeatModel == null

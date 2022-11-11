@@ -4,48 +4,36 @@ import io.agora.scene.base.R
 import io.agora.scene.base.bean.MemberMusicModel
 
 data class VLRoomListModel(
-    val name: String,
-    val isPrivate: Boolean,
-    var password: String?,
-    val creator: String,
-    val roomNo: String,
-    val isChorus: Int,
-    val bgOption: String,
-    val soundEffect: String,
-    val belCanto: String,
-    val createdAt: String?,
-    val updatedAt: String?,
-    val status: Int,
-    val deletedAt: String?,
-    val roomPeopleNum: Int,
-    val icon: String,
-    // 新加字段 当前房间的创建者
-    val creatorNo: String,
+    val roomNo: String = "",
+    val name: String = "",
+    val icon: String = "",
+    val isPrivate: Boolean = false,
+    var password: String = "",
+    val creatorNo: String = "",
+    val createdAt: String = System.currentTimeMillis().toString(),
 
-    // SyncManager独有，用来更新和删除数据
-    var objectId: String? = null
+    /**
+     * 背景图
+     */
+    val bgOption: String = "",
+    /**
+     * 房间内人数
+     */
+    val roomPeopleNum: Int = 0,
 ) {
     fun getCoverRes(): Int {
-        if ("1" == icon) {
-            return R.mipmap.icon_room_cover1
-        } else if ("2" == icon) {
-            return R.mipmap.icon_room_cover2
-        } else if ("3" == icon) {
-            return R.mipmap.icon_room_cover3
-        } else if ("4" == icon) {
-            return R.mipmap.icon_room_cover4
-        } else if ("5" == icon) {
-            return R.mipmap.icon_room_cover5
-        } else if ("6" == icon) {
-            return R.mipmap.icon_room_cover6
-        } else if ("7" == icon) {
-            return R.mipmap.icon_room_cover7
-        } else if ("8" == icon) {
-            return R.mipmap.icon_room_cover8
-        } else if ("9" == icon) {
-            return R.mipmap.icon_room_cover9
+        return when (icon) {
+            "1" -> R.mipmap.icon_room_cover1
+            "2" -> R.mipmap.icon_room_cover2
+            "3" -> R.mipmap.icon_room_cover3
+            "4" -> R.mipmap.icon_room_cover4
+            "5" -> R.mipmap.icon_room_cover5
+            "6" -> R.mipmap.icon_room_cover6
+            "7" -> R.mipmap.icon_room_cover7
+            "8" -> R.mipmap.icon_room_cover8
+            "9" -> R.mipmap.icon_room_cover9
+            else -> R.mipmap.icon_room_cover1
         }
-        return R.mipmap.icon_room_cover1
     }
 }
 
@@ -61,16 +49,7 @@ data class VLRoomSeatModel(
     val isVideoMuted: Int,
     val ifSelTheSingSong: Boolean,
     val ifJoinedChorus: Boolean,
-
-    // SyncManager独有，用来更新和删除数据
-    var objectId: String? = null
 ) : java.io.Serializable
-
-data class VLLoginModel(
-    val userNo: String,
-    // SyncManager独有，用来更新和删除数据
-    var objectId: String? = null
-): java.io.Serializable
 
 
 data class KTVCreateRoomInputModel(
@@ -79,10 +58,6 @@ data class KTVCreateRoomInputModel(
     val name: String,
     val password: String,
     val userNo: String,
-
-    // the params below may can be deleted?
-    val belCanto: String = "",
-    val soundEffect: String = "",
 )
 
 data class KTVCreateRoomOutputModel(
@@ -102,6 +77,10 @@ data class KTVJoinRoomOutputModel(
     val creatorNo: String,
     val bgOption: String,
     val seatsArray: List<VLRoomSeatModel>?,
+    /**
+     * 房间内人数
+     */
+    val roomPeopleNum: Int,
 
     val agoraRTMToken: String,
     val agoraRTCToken: String,
@@ -128,7 +107,6 @@ data class KTVOutSeatInputModel(
 data class KTVRemoveSongInputModel(
     val songNo: String,
     val sort: Int,
-    var objectId: String? = null
 )
 
 data class VLRoomSelSongModel(
@@ -138,7 +116,6 @@ data class VLRoomSelSongModel(
     val songUrl: String, // mp3路径
     val singer: String, // 演唱者
     val lyric: String, // 歌词
-    val status: Int,// 0 未开始 1.已唱 2.正在唱
     val imageUrl: String,// 歌曲封面
 
     // 获取已点歌记返回的歌词信息，同时也包含上面信息
@@ -149,11 +126,6 @@ data class VLRoomSelSongModel(
     val isChorus: Boolean = false, // 是否合唱
     val isOriginal: Int = 0, //是否原唱
     val sort: Int = 0,// 已点歌曲的播放顺序排序
-
-    // 自定义数据
-    val score: Double = 0.0,// 唱歌得分
-    val isOwnSong: Boolean = false,// 是否是自己点的歌曲
-    var objectId: String? = null // SyncManager数据唯一标识
 ) {
 
     // TODO remove it
@@ -169,7 +141,6 @@ data class VLRoomSelSongModel(
             songUrl = this@VLRoomSelSongModel.songUrl
             lyric = this@VLRoomSelSongModel.lyric
             sort = this@VLRoomSelSongModel.sort
-            status = this@VLRoomSelSongModel.status
             userNo = this@VLRoomSelSongModel.userNo
             userId = this@VLRoomSelSongModel.userId
             name = this@VLRoomSelSongModel.name
@@ -182,7 +153,6 @@ data class KTVJoinChorusInputModel(
 )
 
 data class KTVSongDetailInputModel(
-    val lyricType: Int,
     val songNo: String
 )
 
@@ -193,9 +163,7 @@ data class KTVSongDetailOutputModel(
 )
 
 data class KTVSwitchSongInputModel(
-    val userNo: String,
-    val songNo: String,
-    val roomNo: String
+    val songNo: String
 )
 
 data class KTVChooseSongInputModel(
@@ -205,10 +173,10 @@ data class KTVChooseSongInputModel(
     val songUrl: String,
     val singer: String,
     val imageUrl: String,
+    val lyric: String,
 )
 
 data class KTVMakeSongTopInputModel(
     val songNo: String,
     val sort: Int,
-    var objectId: String?
 )

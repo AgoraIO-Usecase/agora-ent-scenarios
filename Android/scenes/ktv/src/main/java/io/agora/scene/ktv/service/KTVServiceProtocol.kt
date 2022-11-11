@@ -1,5 +1,8 @@
 package io.agora.scene.ktv.service
 
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.ToastUtils
+
 
 interface KTVServiceProtocol {
 
@@ -10,7 +13,13 @@ interface KTVServiceProtocol {
     }
 
     companion object {
-        private val instance by lazy { KTVServiceImp() }
+        private val instance by lazy {
+            // KTVServiceImp()
+            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
+                error?.message?.let { ToastUtils.showToast(it) }
+            }
+        }
+
         fun getImplInstance(): KTVServiceProtocol = instance
     }
 
@@ -127,7 +136,7 @@ interface KTVServiceProtocol {
      */
     fun getSongDetailWithInput(
         inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
+        completion: (error: Exception?, out: KTVSongDetailOutputModel?) -> Unit
     )
 
 
@@ -143,13 +152,6 @@ interface KTVServiceProtocol {
      */
     fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
-    )
-
-    /**
-     * 主唱告诉后台当前播放的歌曲
-     */
-    fun markSongDidPlayWithInput(
-        inputModel: VLRoomSelSongModel, completion: (error: Exception?) -> Unit
     )
 
     /**

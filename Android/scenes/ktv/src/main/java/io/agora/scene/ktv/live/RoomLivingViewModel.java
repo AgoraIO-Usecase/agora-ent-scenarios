@@ -161,6 +161,13 @@ public class RoomLivingViewModel extends ViewModel {
     // =============== 房间相关 ==========================
 
     public void initRoom() {
+        KTVJoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
+        if (_roomInfo == null) {
+            throw new RuntimeException("The roomInfo muse be not null before initSeats method calling!");
+        }
+
+        roomUserCountLiveData.postValue(_roomInfo.getRoomPeopleNum());
+
         if (isRoomOwner()) {
             RTCManager.getInstance().getRtcEngine().setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
         }
@@ -169,17 +176,20 @@ public class RoomLivingViewModel extends ViewModel {
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
                 roomDeleteLiveData.postValue(true);
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
-                KTVJoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
-                roomInfoLiveData.postValue(new KTVJoinRoomOutputModel(
-                        _roomInfo.getRoomName(),
-                        _roomInfo.getRoomNo(),
-                        _roomInfo.getCreatorNo(),
-                        vlRoomListModel.getBgOption(),
-                        _roomInfo.getSeatsArray(),
-                        _roomInfo.getAgoraRTMToken(),
-                        _roomInfo.getAgoraRTCToken(),
-                        _roomInfo.getAgoraPlayerRTCToken()
-                ));
+                KTVJoinRoomOutputModel _rroomInfo = roomInfoLiveData.getValue();
+                if (!vlRoomListModel.getBgOption().equals(_rroomInfo.getBgOption())) {
+                    roomInfoLiveData.postValue(new KTVJoinRoomOutputModel(
+                            _rroomInfo.getRoomName(),
+                            _rroomInfo.getRoomNo(),
+                            _rroomInfo.getCreatorNo(),
+                            vlRoomListModel.getBgOption(),
+                            _rroomInfo.getSeatsArray(),
+                            _rroomInfo.getRoomPeopleNum(),
+                            _rroomInfo.getAgoraRTMToken(),
+                            _rroomInfo.getAgoraRTCToken(),
+                            _rroomInfo.getAgoraPlayerRTCToken()
+                    ));
+                }
             }
             return null;
         });
@@ -270,9 +280,9 @@ public class RoomLivingViewModel extends ViewModel {
                 }
                 List<VLRoomSeatModel> value = new ArrayList<>(oValue);
                 int index = -1;
-                for (VLRoomSeatModel seat : value) {
-                    index++;
-                    if (seat.getOnSeat() == vlRoomSeatModel.getOnSeat()) {
+                for (int i = 0; i < value.size(); i++) {
+                    if (value.get(i).getOnSeat() == vlRoomSeatModel.getOnSeat()) {
+                        index = i;
                         break;
                     }
                 }
@@ -505,10 +515,9 @@ public class RoomLivingViewModel extends ViewModel {
                                                         record.songUrl,
                                                         record.singer,
                                                         record.lyric,
-                                                        record.status,
                                                         record.imageUrl,
 
-                                                        "", "", "", "", false, 0, 0, 0.0, false, ""
+                                                        "", "", "", "", false, 0, 0
                                                 );
                                             }
 
@@ -582,10 +591,9 @@ public class RoomLivingViewModel extends ViewModel {
                                                         record.songUrl,
                                                         record.singer,
                                                         record.lyric,
-                                                        record.status,
                                                         record.imageUrl,
 
-                                                        "", "", "", "", false, 0, 0, 0.0, false, ""
+                                                        "", "", "", "", false, 0, 0
                                                 );
                                             }
 
@@ -627,7 +635,8 @@ public class RoomLivingViewModel extends ViewModel {
                         songModel.getSongNo(),
                         songModel.getSongUrl(),
                         songModel.getSinger(),
-                        songModel.getImageUrl()),
+                        songModel.getImageUrl(),
+                        songModel.getLyric()),
                 e -> {
                     if (e == null) {
                         // success
@@ -651,7 +660,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         ktvServiceProtocol.removeSongWithInput(
-                new KTVRemoveSongInputModel(songModel.getSongNo(), songModel.getSort(), ""),
+                new KTVRemoveSongInputModel(songModel.getSongNo(), songModel.getSort()),
                 e -> {
                     if (e == null) {
                         // success: do nothing for subscriber dealing with the event already
@@ -674,8 +683,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         ktvServiceProtocol.makeSongTopWithInput(new KTVMakeSongTopInputModel(
                 songModel.getSongNo(),
-                songModel.getSort(),
-                ""
+                songModel.getSort()
         ), e -> {
             if(e == null){
                 // success: do nothing for subscriber dealing with the event already
@@ -734,7 +742,6 @@ public class RoomLivingViewModel extends ViewModel {
                         musicModel.getSongUrl(),
                         musicModel.getSinger(),
                         musicModel.getLyric(),
-                        musicModel.getStatus(),
 
                         musicModel.getImageUrl(),
                         musicModel.getUserNo(),
@@ -743,12 +750,7 @@ public class RoomLivingViewModel extends ViewModel {
                         UserManager.getInstance().getUser().userNo,
                         true,
                         musicModel.isOriginal(),
-                        musicModel.getSort(),
-
-                        musicModel.getScore(),
-                        musicModel.isOwnSong(),
-
-                        musicModel.getObjectId()
+                        musicModel.getSort()
                 ));
                 // success
                 mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
@@ -777,7 +779,6 @@ public class RoomLivingViewModel extends ViewModel {
                 musicModel.getSongUrl(),
                 musicModel.getSinger(),
                 musicModel.getLyric(),
-                musicModel.getStatus(),
 
                 musicModel.getImageUrl(),
                 musicModel.getUserNo(),
@@ -786,12 +787,7 @@ public class RoomLivingViewModel extends ViewModel {
                 "",
                 false,
                 musicModel.isOriginal(),
-                musicModel.getSort(),
-
-                musicModel.getScore(),
-                musicModel.isOwnSong(),
-
-                musicModel.getObjectId()
+                musicModel.getSort()
         ));
     }
 
@@ -812,9 +808,7 @@ public class RoomLivingViewModel extends ViewModel {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
 
         ktvServiceProtocol.switchSongWithInput(new KTVSwitchSongInputModel(
-                UserManager.getInstance().getUser().userNo,
-                musicModel.getSongNo(),
-                roomInfoLiveData.getValue().getRoomNo()
+                musicModel.getSongNo()
         ), e -> {
             if (e == null) {
                 // success
@@ -947,12 +941,12 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(Context context, VLRoomSelSongModel music) {
         musicStop();
         int role;
-        if (music.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())) {
             role = Constants.CLIENT_ROLE_BROADCASTER;
         } else {
             role = Constants.CLIENT_ROLE_AUDIENCE;
         }
-        if (music.isChorus() || music.getStatus() == 2) {
+        if (music.isChorus()) {
             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
             mMusicPlayer = new SingleMusicPlayer(context, role, mPlayer);
         } else {
