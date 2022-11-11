@@ -33,7 +33,7 @@
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLHomeOnLineListViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(exitRoomEvent) name:kExitRoomNotification object:nil];
+//        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(exitRoomEvent) name:kExitRoomNotification object:nil];
         self.delegate = delegate;
         [self setupView];
     }
@@ -99,9 +99,9 @@
     }];
 }
 
-- (void)exitRoomEvent {
-    [self getRoomListIfRefresh:YES];
-}
+//- (void)exitRoomEvent {
+//    [self getRoomListIfRefresh:YES];
+//}
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {

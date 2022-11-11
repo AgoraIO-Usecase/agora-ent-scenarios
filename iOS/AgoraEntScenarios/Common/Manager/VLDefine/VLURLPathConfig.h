@@ -7,7 +7,7 @@
 #define VLURLPathConfig_h
 
 //通知的字符串
-static NSString * const kExitRoomNotification = @"exitRoomNotification";
+//static NSString * const kExitRoomNotification = @"exitRoomNotification";
 static NSString * const kChoosedSongListChangedNotification = @"choosedSongListChangedNotification";
 
 #pragma mark - API

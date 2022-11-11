@@ -59,6 +59,7 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [VLUserCenter clearUserRoomInfo];
+    [self.listView getRoomListIfRefresh:YES];
 }
 
 - (void)setUpUI {
