@@ -336,7 +336,7 @@ VLPopScoreViewDelegate
             }
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-            if ([selSongModel.songNo isEqualToString:songInfo.songNo]) {
+            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
                 return;
             }
             
