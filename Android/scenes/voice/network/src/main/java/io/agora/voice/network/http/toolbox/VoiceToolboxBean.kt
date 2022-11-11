@@ -16,6 +16,8 @@ data class VRGenerateTokenResponse(
 
 data class VRCreateRoomResponse(
     val appId: String,
-    val chatId: String,
+    val chatId: String, // 聊天室ID, 这里返回环信的聊天室ID
+    val token: String, // 环信登录Token, 频道名使用聊天室I
     val userName: String,
+    val uid: String, // 用户ID, 这里返回环信的用户uuid
 ) : VoiceToolboxBaseResponse<VRCreateRoomResponse>()

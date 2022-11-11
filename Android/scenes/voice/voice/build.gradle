@@ -15,7 +15,7 @@ def final RELEASE_RTC_APP_ID = properties.getProperty('AGORA_APP_ID_RELEASE')
 def final RELEASE_RTC_APP_TOKEN = properties.getProperty('AGORA_APP_TOKEN_RELEASE')
 def final RELEASE_IM_APP_KEY = properties.getProperty('IM_APP_KEY_RELEASE')
 def final RELEASE__APP_SERVER_HOST = properties.getProperty('IM_APP_HOST_RELEASE')
-def final RELEASE_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_TEST_RELEASE')
+def final RELEASE_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_RELEASE')
 
 android {
 
