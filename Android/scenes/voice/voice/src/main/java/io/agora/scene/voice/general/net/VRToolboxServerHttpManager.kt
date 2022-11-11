@@ -128,6 +128,7 @@ class VRToolboxServerHttpManager {
 
         try {
             requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
+            requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
             val requestChat = JSONObject()
             requestChat.putOpt("name", chatroomName)
             requestChat.putOpt("description", chatroomNameDesc)
