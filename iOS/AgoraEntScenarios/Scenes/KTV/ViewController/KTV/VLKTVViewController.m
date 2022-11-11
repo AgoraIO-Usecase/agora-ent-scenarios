@@ -1354,15 +1354,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        if (weakSelf.chooseSongView) {
-            weakSelf.chooseSongView.selSongsArray = songArray; //刷新已点歌曲UI
-        }
         weakSelf.selSongsArray = songArray;
-        //刷新MV里的视图
-        [weakSelf.MVView updateUIWithSong:weakSelf.selSongsArray.firstObject
-                                   onSeat:weakSelf.isOnMicSeat];
-        
-        [weakSelf.roomPersonView updateSingBtnWithChoosedSongArray:weakSelf.selSongsArray];
         //TODO should be removed
 //        [self loadAndPlaySong];
         if(block) {
@@ -1603,6 +1595,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setIsEarOn:(BOOL)isEarOn
 {
     [self.settingView setIsEarOn:isEarOn];
+}
+
+- (void)setSelSongsArray:(NSArray<VLRoomSelSongModel *> *)selSongsArray
+{
+    _selSongsArray = selSongsArray;
+    
+    if (self.chooseSongView) {
+        self.chooseSongView.selSongsArray = selSongsArray; //刷新已点歌曲UI
+    }
+    //刷新MV里的视图
+    [self.MVView updateUIWithSong:self.selSongsArray.firstObject
+                               onSeat:self.isOnMicSeat];
+    
+    [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
 }
 
 #pragma mark - lazy getter
