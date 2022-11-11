@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *headUrl;
 ///userNO
 @property (nonatomic, copy) NSString *userNo;
-@property (nonatomic, copy) NSString *id;
+@property (nonatomic, copy) NSString *rtcUid;
 ///昵称
 @property (nonatomic, copy) NSString *name;
 ///在哪个座位

@@ -73,7 +73,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [self addSubview:heChangeBtn];
     
     for (VLRoomSeatModel *info in self.seatsArray) {
-        if ([info.id integerValue] == [VLUserCenter.user.id integerValue]) {
+        if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self
             //TODO
             self.isSelfMuted = info.isSelfMuted;

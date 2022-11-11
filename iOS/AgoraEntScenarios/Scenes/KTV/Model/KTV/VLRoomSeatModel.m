@@ -18,7 +18,7 @@
     self.headUrl = @"";
     self.name = @"";
     self.userNo = @"";
-    self.id = nil;
+    self.rtcUid = nil;
     self.isSelfMuted = 0;
     self.isVideoMuted = 0;
     self.isJoinedChorus = NO;
