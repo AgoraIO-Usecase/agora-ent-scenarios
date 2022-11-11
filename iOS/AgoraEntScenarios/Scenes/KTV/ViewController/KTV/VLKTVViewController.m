@@ -317,7 +317,7 @@ VLPopScoreViewDelegate
             }
             //发送通知
             //TODO don't use notification center
-            [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
+//            [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
             [weakSelf popForceLeaveRoom];
         }
     }];
@@ -744,7 +744,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
+//        [[NSNotificationCenter defaultCenter]postNotificationName:kExitRoomNotification object:nil];
         [weakSelf destroyMediaPlayer];
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
