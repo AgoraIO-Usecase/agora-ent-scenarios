@@ -95,7 +95,6 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
 
-@property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isPlayerPublish;
@@ -158,7 +157,7 @@ VLPopScoreViewDelegate
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
     //处理背景
-    [self dealWithSelBg];
+    [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
 }
 
@@ -166,7 +165,6 @@ VLPopScoreViewDelegate
     [super viewDidAppear:animated];
     [UIViewController popGestureClose:self];
     
-    _isEarOn = NO;
     //请求已点歌曲
     VL(weakSelf);
     [self refreshChoosedSongList:^{
@@ -371,7 +369,7 @@ VLPopScoreViewDelegate
 }
 
 #pragma mark view helpers
-- (void)dealWithSelBg {
+- (void)prepareBgImage {
     if (self.roomModel.bgOption) {
         VLKTVSelBgModel *selBgModel = [VLKTVSelBgModel new];
         selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%d",(int)self.roomModel.bgOption];
@@ -662,18 +660,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark - action utils / business
 - (void)muteLocalAudio:(BOOL)mute {
     if (mute) {
-        if(self.isEarOn) {
-            [self.RTCkit enableInEarMonitoring:NO];
-        }
         self.isNowMicMuted = YES;
     } else{
-        if(self.isEarOn) {
-            [self.RTCkit enableInEarMonitoring:YES];
-        }
         self.isNowMicMuted = NO;
     }
     [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
-    [self.MVView validateSingType];
     
     [[AppContext ktvServiceImp] openAudioStatusWithStatus:!mute
                                                completion:^(NSError * error) {
@@ -1237,7 +1228,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 4: 在耳返中添加降噪 audio filter。
         // AgoraEarMonitoringFilterNoiseSuppression
         // [self.RTCkit enableInEarMonitoring:setting.soundOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters | AgoraEarMonitoringFilterNoiseSuppression];
-        _isEarOn = setting.soundOn;
+        [self setIsEarOn: setting.soundOn];
+        
         if(self.isNowMicMuted) {
             [self.RTCkit enableInEarMonitoring:NO];
         } else {
@@ -1606,6 +1598,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     _isNowCameraMuted = isNowCameraMuted;
     [self.bottomView updateVideoBtn:isNowCameraMuted];
+}
+
+- (void)setIsEarOn:(BOOL)isEarOn
+{
+    [self.settingView setIsEarOn:isEarOn];
 }
 
 #pragma mark - lazy getter
