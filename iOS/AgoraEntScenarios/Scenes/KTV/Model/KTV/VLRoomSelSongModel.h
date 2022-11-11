@@ -27,19 +27,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger  status;
 ///是谁点的歌
 @property (nonatomic, copy) NSString *userNo;
-@property (nonatomic, copy) NSString *userId;
+//@property (nonatomic, copy) NSString *userId;
 ///点歌人昵称
 @property (nonatomic, copy) NSString *name;
 
 /// 得分
 @property (nonatomic, assign) double score;
 
-#pragma mark - 自定义字段
-/// 是否是自己点的歌曲
-@property (nonatomic, assign, readonly) bool isOwnSong;
-
 
 @property (nonatomic, copy, nullable) NSString* objectId;
+
+
+/// 是否是自己点的歌曲
+- (BOOL)isSongOwner;
+
+- (BOOL)waittingForChorus;
 @end
 
 NS_ASSUME_NONNULL_END
