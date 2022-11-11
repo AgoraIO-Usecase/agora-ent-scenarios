@@ -82,7 +82,7 @@ class ChatroomSplashActivity : BaseUiActivity<VoiceActivitySplashBinding>() {
                 if (BuildConfig.voice_env_is_test) "test" else "release",
                 UUID.randomUUID().toString(),
                 UserManager.getInstance().user.userNo,
-                "",
+                "12345678",
                 UserManager.getInstance().user.name,
                 callBack = object : VRDefaultValueCallBack<VRCreateRoomResponse> {
                     override fun onSuccess(response: VRCreateRoomResponse?) {
@@ -96,8 +96,8 @@ class ChatroomSplashActivity : BaseUiActivity<VoiceActivitySplashBinding>() {
     }
 
     private fun initSplashPage() {
-        ARouter.getInstance().build(RouterPath.ChatroomListPath).navigation()
-        finish()
+//        ARouter.getInstance().build(RouterPath.ChatroomListPath).navigation()
+//        finish()
     }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivitySplashBinding {
