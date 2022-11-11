@@ -299,6 +299,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
+        roomLivingViewModel.playerPitchLiveData.observe(this, pitch ->
+            getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue()));
+        roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
+                setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
 
 
 //        roomLivingViewModel.setISingleCallback((type, o) -> {
@@ -604,11 +608,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             toggleVideoRun.run();
             toggleVideoRun = null;
         }
-        VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
-        if (seatLocal != null && seatLocal.isSelfMuted() == 0) {
-            RTCManager.getInstance().getRtcEngine().disableAudio();
-            RTCManager.getInstance().getRtcEngine().enableAudio();
-        }
+        // TODO ?
+//        VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
+//        if (seatLocal != null && seatLocal.isSelfMuted() == 0) {
+//            RTCManager.getInstance().getRtcEngine().disableAudio();
+//            RTCManager.getInstance().getRtcEngine().enableAudio();
+//        }
     }
 
     private void onMemberLeave(@NonNull VLRoomSeatModel member) {
@@ -648,7 +653,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RTCManager.getInstance().getRtcEngine().enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
         roomLivingViewModel.release();
     }
 
