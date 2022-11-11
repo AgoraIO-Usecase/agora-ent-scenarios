@@ -69,7 +69,7 @@ public class MemberMusicModel {
 
     public String poster;
     public String song;
-    public String lrc;
+    public String lyric;
 
     public File fileMusic;
     public File fileLrc;
@@ -93,7 +93,7 @@ public class MemberMusicModel {
     public Long userbgId;
     public UserStatus userStatus;
 
-    public String user1Id;
+    public String userId;
     public Long user1bgId;
     public UserStatus user1Status;
 

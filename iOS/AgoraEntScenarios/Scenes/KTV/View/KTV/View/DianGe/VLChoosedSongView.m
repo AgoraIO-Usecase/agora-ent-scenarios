@@ -106,20 +106,6 @@
         }
         [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : self.roomNo,
-//        @"songNo": model.songNo,
-//        @"sort": model.sort
-//    };
-//    [VLAPIRequest getRequestURL:kURLRoomMakeSongTop parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-////            [self loadChoosedSongWithRoomNo:self.roomNo];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 - (void)loadChoosedSongWithRoomNo:(NSString *)roomNo {
@@ -135,20 +121,6 @@
         [weakSelf.tableView reloadData];
         [[NSNotificationCenter defaultCenter]postNotificationName:kUpdateSelSongArrayNotification object:weakSelf.selSongsArray];
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : roomNo
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLChoosedSongs parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            self.selSongsArray = [VLRoomSelSongModel vj_modelArrayWithJson:response.data];
-//            [self.tableView reloadData];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kUpdateSelSongArrayNotification object:self.selSongsArray];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 - (NSArray *)getSelSongArray {
@@ -168,21 +140,6 @@
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kDeleteSuccessNotification object:nil];
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : self.roomNo,
-//        @"songNo": model.songNo,
-//        @"sort":model.sort
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLDeleteSong parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-////            [self loadChoosedSongWithRoomNo:self.roomNo];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDeleteSuccessNotification object:nil];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 - (void)setSelSongsUIWithArray:(NSArray *)selSongsArray {

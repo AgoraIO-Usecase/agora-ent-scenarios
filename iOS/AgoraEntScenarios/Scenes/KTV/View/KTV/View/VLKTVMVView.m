@@ -14,14 +14,14 @@
 #import "VLUserCenter.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 
 @import QMUIKit;
 @import YYCategories;
 @import Masonry;
 
 @class QMUIButton;
-@interface VLKTVMVView () <AgoraLrcViewDelegate, AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () < AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -146,11 +146,11 @@
 
 - (void)playClick:(UIButton *)button {
     button.selected = !button.selected;
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
         if (button.selected) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVPlay];
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVPlay];
         } else {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVPause];
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVPause];
         }
     }
 }
@@ -158,12 +158,12 @@
 - (void)buttonClick:(UIButton *)sender {
     // 设置参数
     if (sender == self.subtitleBtn) {
-        if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeSetParam];
+        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeSetParam];
         }
     } else if (sender == self.nextButton) {
-        if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-            [self.delegate ktvMVViewDidClick:VLKTVMVViewActionTypeMVNext];
+        if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+            [self.delegate onKTVMVView:self btnTappedWithActionType:VLKTVMVViewActionTypeMVNext];
         }
     }
 }
@@ -292,8 +292,8 @@
                 self.soloTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
                     leftSecond -= 1;
                     weakSelf.soloSongView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",leftSecond];
-                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(ktvMVViewTimerCountDown:)]) {
-                        [weakSelf.delegate ktvMVViewTimerCountDown:leftSecond];
+                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(onKTVMVView:timerCountDown:)]) {
+                        [weakSelf.delegate onKTVMVView:self timerCountDown:leftSecond];
                     }
                     if (leftSecond == 0) {
                         //倒计时结束、执行独唱（销毁定时器）
@@ -341,30 +341,36 @@
 - (void)soloBtnClickAction {
     [self.soloTimer invalidate];
     self.soloTimer = nil;
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
         self.soloSongView.hidden = YES;
-        [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeSolo];
+        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeSolo];
     }
 }
 
 #pragma mark - 合唱代理
-
 - (void)robViewChorusAction {
-    if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
-        if([self.delegate ktvIsMyselfOnSeat]) {
-            [self.robMicroPhoneTimer invalidate];
-            self.robMicroPhoneTimer = nil;
-            if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
-                self.robMicrophoneView.hidden = YES;
-                [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeJoinChorus];
-            }
-        }
-        else {
-            if([self.delegate respondsToSelector:@selector(ktvNotifyUserNotOnSeat)]) {
-                [self.delegate ktvNotifyUserNotOnSeat];
-            }
-        }
+    //抢麦
+    [self.robMicroPhoneTimer invalidate];
+    self.robMicroPhoneTimer = nil;
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:startSingType:)]) {
+        self.robMicrophoneView.hidden = YES;
+        [self.delegate onKTVMVView:self startSingType:VLKTVMVViewSingActionTypeJoinChorus];
     }
+//    if([self.delegate respondsToSelector:@selector(ktvIsMyselfOnSeat)]) {
+//        if([self.delegate ktvIsMyselfOnSeat]) {
+//            [self.robMicroPhoneTimer invalidate];
+//            self.robMicroPhoneTimer = nil;
+//            if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClickSingType:)]) {
+//                self.robMicrophoneView.hidden = YES;
+//                [self.delegate ktvMVViewDidClickSingType:VLKTVMVViewSingActionTypeJoinChorus];
+//            }
+//        }
+//        else {
+//            if([self.delegate respondsToSelector:@selector(ktvNotifyUserNotOnSeat)]) {
+//                [self.delegate ktvNotifyUserNotOnSeat];
+//            }
+//        }
+//    }
 }
 
 
@@ -372,12 +378,12 @@
     button.selected = !button.selected;
     self.singType = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
     if (button.selected) {
-        [self.originBtn setTitle:NSLocalizedString(@"原唱", nil) forState:UIControlStateNormal];
-        [self.originBtn setTitle:NSLocalizedString(@"原唱", nil) forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     }
     else {
-        [self.originBtn setTitle:NSLocalizedString(@"伴奏", nil) forState:UIControlStateNormal];
-        [self.originBtn setTitle:NSLocalizedString(@"伴奏", nil) forState:UIControlStateSelected];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
     
     [self validateSingType];
@@ -385,8 +391,8 @@
 
 - (void)validateSingType
 {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewDidClick:)]) {
-        [self.delegate ktvMVViewDidClick:self.singType];
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+        [self.delegate onKTVMVView:self btnTappedWithActionType:self.singType];
     }
 }
 
@@ -429,8 +435,8 @@
     self.totalLines += 1;
     self.totalScore = cumulativeScore;
     VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicScore:)]) {
-        [self.delegate ktvMVViewMusicScore:realScore];
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
+        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
     }
 }
 
@@ -448,43 +454,6 @@
     }
 }
 
-#pragma mark - AgoraLrcViewDelegate
-
-- (NSTimeInterval)getPlayerCurrentTime {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicCurrentTime)]) {
-        self.currentTime = [self.delegate ktvMVViewMusicCurrentTime];
-        return self.currentTime;
-    }
-    return self.currentTime;
-}
-
-- (NSTimeInterval)getTotalTime {
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicTotalTime)]) {
-        return [self.delegate ktvMVViewMusicTotalTime];
-    }
-    return 0;
-}
-
-- (void)seekToTimeWithTime:(NSTimeInterval)time {
-//    VLLog(@"\n歌词组件---定位到指定的播放位置：%f",time);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicSeekToTime:)]) {
-        [self.delegate ktvMVViewMusicSeekToTime:time];
-    }
-}
-
-- (void)agoraWordPitchWithPitch:(NSInteger)pitch totalCount:(NSInteger)totalCount {
-//    VLLog(@"\n歌词组件获取每个歌词文字的标准%ld,%ld",pitch,totalCount);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicAgoraWordPitch:totoalCount:)]) {
-        [self.delegate ktvMVViewMusicAgoraWordPitch:pitch totoalCount:totalCount];
-    }
-}
-
-- (void)currentPlayerLrcWithLrc:(NSString *)lrc progress:(CGFloat)progress {
-//    VLLog(@"\n歌词组件---播放歌词\n%@\n%f",lrc,progress);
-    if ([self.delegate respondsToSelector:@selector(ktvMVViewMusicLrc:progress:)]) {
-        [self.delegate ktvMVViewMusicLrc:lrc progress:progress];
-    }
-}
 
 #pragma mark -
 
@@ -595,7 +564,7 @@
 
 - (QMUIButton *)originBtn {
     if (!_originBtn) {
-        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:NSLocalizedString(@"原唱", nil)];
+        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
         _originBtn.imagePosition = QMUIButtonImagePositionLeft;
         _originBtn.spacingBetweenImageAndTitle = 2;
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -623,7 +592,7 @@
         _scoreLabel = [[UILabel alloc] init];
         _scoreLabel.font = VLUIFontMake(15);
         _scoreLabel.textColor = [UIColor whiteColor];
-        _scoreLabel.text = NSLocalizedString(@"0", nil);
+        _scoreLabel.text = KTVLocalizedString(@"0");
     }
     return _scoreLabel;
 }
@@ -633,7 +602,7 @@
         _scoreUnitLabel = [[UILabel alloc] init];
         _scoreUnitLabel.font = VLUIFontMake(10);
         _scoreUnitLabel.textColor = [UIColor whiteColor];
-        _scoreUnitLabel.text = NSLocalizedString(@"分", nil);
+        _scoreUnitLabel.text = KTVLocalizedString(@"分");
     }
     return _scoreUnitLabel;
 }

@@ -48,44 +48,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etSearch">
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="27dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            app:tabTextColor="@color/def_text_grey_979"
+            app:tabSelectedTextColor="@color/white"
+            app:tabIndicatorColor="@color/blue_9F"
+            app:tabIndicatorGravity="bottom"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="scrollable" />
 
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/rBtnRand2"
-                style="@style/ktvSongRankBtnStyle"
-                android:layout_weight="1"
-                android:text="@string/song_rank_2" />
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/rBtnRand3"
-                style="@style/ktvSongRankBtnStyle"
-                android:layout_weight="1"
-                android:text="@string/song_rank_3" />
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/rBtnRand4"
-                style="@style/ktvSongRankBtnStyle"
-                android:layout_weight="1"
-                android:text="@string/song_rank_4" />
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/rBtnRand5"
-                style="@style/ktvSongRankBtnStyle"
-                android:layout_weight="1"
-                android:text="@string/song_rank_5" />
-        </RadioGroup>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivLine"
-            android:layout_width="18dp"
-            android:layout_height="2dp"
-            android:src="@drawable/bg_full_blue_4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/hScrollView" />
     </LinearLayout>
 
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
@@ -104,7 +78,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="1"
             tools:listitem="@layout/ktv_item_choose_song_list" />
 
         <com.scwang.smart.refresh.footer.ClassicsFooter
@@ -118,7 +93,8 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hScrollView"
         tools:listitem="@layout/ktv_item_choose_song_list" />

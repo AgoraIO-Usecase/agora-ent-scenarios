@@ -11,6 +11,7 @@ import Foundation
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
+    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
 
     @objc func getLang() -> String {
         guard let lang = NSLocale.preferredLanguages.first else {
@@ -34,10 +35,6 @@ import Foundation
 
     @objc func appCertificate() -> String? {
         return KeyCenter.Certificate
-    }
-
-    @objc func appToken() -> String? {
-        return KeyCenter.Token
     }
 
     @objc func appHostUrl() -> String {

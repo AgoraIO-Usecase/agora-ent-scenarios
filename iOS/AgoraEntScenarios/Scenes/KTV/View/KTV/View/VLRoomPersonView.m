@@ -9,7 +9,7 @@
 #import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
 #import "VLUserCenter.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import YYCategories;
 @import SDWebImage;
 
@@ -20,7 +20,6 @@
 @property (nonatomic, strong) UICollectionView *personCollectionView;
 
 @property (nonatomic, strong) NSMutableDictionary *roomSeatsViewArray;
-@property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 @end
 
 @implementation VLRoomPersonView
@@ -28,7 +27,6 @@
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRoomPersonViewDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit{
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
-        self.RTCkit = RTCkit;
         self.roomSeatsArray = [[NSMutableArray alloc]init];
         self.roomSeatsViewArray = [[NSMutableDictionary alloc]init];
         [self setupView];
@@ -79,18 +77,19 @@
             videoCanvas.uid = [seatModel.id integerValue];
             videoCanvas.view = renderView;
             videoCanvas.renderMode = AgoraVideoRenderModeHidden;
-            if ([seatModel.id isEqual:VLUserCenter.user.id]) {
-                [self.RTCkit setupLocalVideo:videoCanvas];
+            //TODO video display
+//            if ([seatModel.id isEqual:VLUserCenter.user.id]) {
+//                [self.RTCkit setupLocalVideo:videoCanvas];
 //                [self.RTCkit enableVideo];
-                if (self.delegate && [self.delegate respondsToSelector:@selector(ifMyCameraIsOpened)]) {
-                    if([self.delegate ifMyCameraIsOpened]) {
-                        [self.RTCkit startPreview];
-                    }
-                }
-            }
-            else{
-                [self.RTCkit setupRemoteVideo:videoCanvas];
-            }
+//                if (self.delegate && [self.delegate respondsToSelector:@selector(ifMyCameraIsOpened)]) {
+//                    if([self.delegate ifMyCameraIsOpened]) {
+//                        [self.RTCkit startPreview];
+//                    }
+//                }
+//            }
+//            else{
+//                [self.RTCkit setupRemoteVideo:videoCanvas];
+//            }
             [self.roomSeatsViewArray setObject:renderView forKey:seatModel.id];
         }
     }
@@ -111,18 +110,18 @@
                 videoCanvas.uid = [seatModel.id integerValue];
                 videoCanvas.view = renderView;
                 videoCanvas.renderMode = AgoraVideoRenderModeHidden;
-                if ([model.id isEqual:VLUserCenter.user.id]) {
-//                    [self.RTCkit enableVideo];
-                    [self.RTCkit setupLocalVideo:videoCanvas];
-                    if (self.delegate && [self.delegate respondsToSelector:@selector(ifMyCameraIsOpened)]) {
-                        if([self.delegate ifMyCameraIsOpened]) {
-                            [self.RTCkit startPreview];
-                        }
-                    }
-                }
-                else{
-                    [self.RTCkit setupRemoteVideo:videoCanvas];
-                }
+//                if ([model.id isEqual:VLUserCenter.user.id]) {
+////                    [self.RTCkit enableVideo];
+//                    [self.RTCkit setupLocalVideo:videoCanvas];
+//                    if (self.delegate && [self.delegate respondsToSelector:@selector(ifMyCameraIsOpened)]) {
+//                        if([self.delegate ifMyCameraIsOpened]) {
+//                            [self.RTCkit startPreview];
+//                        }
+//                    }
+//                }
+//                else{
+//                    [self.RTCkit setupRemoteVideo:videoCanvas];
+//                }
                 [self.roomSeatsViewArray setObject:renderView forKey:seatModel.id];
                 [self.roomSeatsArray removeObject:seatModel];
                 [self.roomSeatsArray insertObject:model atIndex:i];
@@ -152,7 +151,7 @@
     if (seatModel.name.length > 0) {
         cell.nickNameLabel.text = seatModel.name;
     }else{
-        cell.nickNameLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d号麦", nil),(int)indexPath.row+1];
+        cell.nickNameLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%d号麦"), (int)indexPath.row + 1];
     }
     if (seatModel.isMaster) {
         cell.avatarImgView.layer.borderWidth = 2.0;
@@ -164,7 +163,7 @@
         cell.nickNameLabel.textColor = UIColorMakeWithHex(@"#AEABD0");
         cell.avatarImgView.layer.borderColor = UIColorClear.CGColor;
     }
-    cell.roomerLabel.text = NSLocalizedString(@"房主", nil);
+    cell.roomerLabel.text = KTVLocalizedString(@"房主");
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
@@ -220,41 +219,9 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     VLRoomSeatModel *roomSeatModel = self.roomSeatsArray[indexPath.row];
-    
-    if (VLUserCenter.user.ifMaster) { //自己房主
-        if ([roomSeatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
-            return;
-        }
-        if (roomSeatModel.userNo.length > 0) { //改位置有人,让某人下麦
-            //该麦位有人,房主可以让游客下麦
-                if (self.delegate && [self.delegate respondsToSelector:@selector(roomMasterMakePersonDropOnLineWithIndex: withDropType:)]) {
-                    [self.delegate roomMasterMakePersonDropOnLineWithIndex:indexPath.row withDropType:VLRoomSeatDropTypeForceByRoomer];
-                }
-                return;
-        }
-    }else{                               //自己不是房主
-        if (roomSeatModel.userNo.length > 0) {  //改位置有人
-            if ([roomSeatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {//点击的是自己
-                if (self.delegate && [self.delegate respondsToSelector:@selector(roomMasterMakePersonDropOnLineWithIndex: withDropType:)]) {
-                    [self.delegate roomMasterMakePersonDropOnLineWithIndex:indexPath.row withDropType:VLRoomSeatDropTypeSelfly];
-                }
-                return;
-            }
-        }else{                               //位置没人 上麦
-            BOOL ifOnSeat = NO;
-            for (VLRoomSeatModel *model in self.roomSeatsArray) {
-                if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
-                    ifOnSeat = YES;
-                }
-            }
-            if (!ifOnSeat) {//自己没在麦上
-                if (self.delegate && [self.delegate respondsToSelector:@selector(seatItemClickAction:withIndex:)]) {
-                    [self.delegate seatItemClickAction:roomSeatModel withIndex:indexPath.row];
-                }
-            }
-        }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLRoomPersonView:seatItemTappedWithModel:atIndex:)]) {
+        [self.delegate onVLRoomPersonView:self seatItemTappedWithModel:roomSeatModel atIndex:indexPath.row];
     }
-    
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
