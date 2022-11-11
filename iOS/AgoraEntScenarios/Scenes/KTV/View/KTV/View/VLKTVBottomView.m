@@ -76,10 +76,10 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self
             //TODO
-            self.isSelfMuted = info.isSelfMuted;
+            self.isSelfMuted = info.isAudioMuted;
             self.isVideoMuted = info.isVideoMuted;
 
-            if (info.isSelfMuted == 0) {
+            if (info.isAudioMuted == 0) {
                 [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
             }
             else{
