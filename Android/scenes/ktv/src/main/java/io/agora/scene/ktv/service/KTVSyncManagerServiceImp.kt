@@ -2,11 +2,15 @@ package io.agora.scene.ktv.service
 
 import android.content.Context
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
-import io.agora.scene.base.BuildConfig
+import android.text.TextUtils
+import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
+import io.agora.syncmanager.rtm.Sync.EventListener
+import java.util.concurrent.CountDownLatch
 
 
 /**
@@ -19,17 +23,30 @@ class KTVSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
     private val kSceneId = "scene_ktv"
+    private val kCollectionIdChooseSong = "choose_song"
+    private val kCollectionIdSeatInfo = "seat_info"
+    private val kCollectionIdUser = "userCollection"
 
+    private data class VLLoginModel(
+        val userNo: String,
+    )
 
     @Volatile
     private var syncUtilsInited = false
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val workingHandlerThread by lazy {
+        val thread = HandlerThread("WorkingThread")
+        thread.start()
+        thread
+    }
+    private val workingHandler by lazy {
+        Handler(workingHandlerThread.looper)
+    }
 
-    private var mSceneReference : SceneReference? = null
+    private var mSceneReference: SceneReference? = null
 
-    private var selSongModel: VLRoomSelSongModel? = null
-
+    // subscribers
     private var roomStatusSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit)? =
         null
     private var roomUserCountSubscriber: ((Int) -> Unit)? =
@@ -39,30 +56,40 @@ class KTVSyncManagerServiceImp(
     private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit)? =
         null
 
-    private var roomNo: String = ""
-    private var roomMap: MutableMap<String, VLRoomListModel> = mutableMapOf<String, VLRoomListModel>()
-    private var userMap: MutableMap<String, VLLoginModel?> = mutableMapOf<String, VLLoginModel?>()
-    private var seatMap: MutableMap<String, VLRoomSeatModel?> = mutableMapOf<String, VLRoomSeatModel?>()
-    private var songList: ArrayList<VLRoomSelSongModel> = ArrayList<VLRoomSelSongModel>()
+    // cache objectId
+    private val objIdOfRoomNo = HashMap<String, String>() // objectId of room no
+    private val objIdOfSongNo = ArrayList<String>() // objectId of song no
+    private val objIdOfSeatIndex = HashMap<Int, String>() // objectId of seat index
+    private val objIdOfUserNo = HashMap<String, String>() // objectId of user no
+
+    // cache data
+    private val roomSubscribeListener = mutableListOf<EventListener>()
+    private val roomMap = mutableMapOf<String, VLRoomListModel>()
+    private val userMap = mutableMapOf<String, VLLoginModel?>()
+    private val seatMap = mutableMapOf<String, VLRoomSeatModel?>()
+    private val songChosenList = ArrayList<VLRoomSelSongModel>()
+
+    private var currRoomNo: String = ""
+
 
     // ========= 房间相关 =====================
 
     override fun getRoomList(
         completion: (error: Exception?, list: List<VLRoomListModel>?) -> Unit
     ) {
-        initScene {
+        initSync {
             Sync.Instance().getScenes(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
                     val ret = ArrayList<VLRoomListModel>()
                     result?.forEach {
                         val obj = it.toObject(VLRoomListModel::class.java)
-                        obj.objectId = it.id
+                        objIdOfRoomNo[obj.roomNo] = it.id
                         ret.add(obj)
 
                         roomMap[obj.roomNo] = obj
                     }
-                    //按照创建时间顺序排序 TODO
-                    //val roomList = ret.sortedWith(compareBy({ it.createdAt })) as ArrayList<VLRoomListModel>
+                    //按照创建时间顺序排序
+                    ret.sortBy { it.createdAt }
                     runOnMainThread { completion.invoke(null, ret) }
                 }
 
@@ -77,55 +104,34 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVCreateRoomInputModel,
         completion: (error: Exception?, out: KTVCreateRoomOutputModel?) -> Unit
     ) {
-        initScene {
-            val isPrivate = if (inputModel.isPrivate == 0) false else true
+        initSync {
             val vlRoomListModel = VLRoomListModel(
-                inputModel.name,
-                isPrivate,
-                inputModel.password,
-                UserManager.getInstance().user.userNo,
-                (100000.. 999999).random().toString(),
-                0,
-                (1..2).random().toString(),
-                "",
-                "",
-                "", //TODO TIME
-                "",
-                0,
-                "",
-                0,
-                "",
-                UserManager.getInstance().user.userNo,
-                null
+                roomNo = (100000..999999).random().toString(),
+                name = inputModel.name,
+                icon = inputModel.icon,
+                isPrivate = inputModel.isPrivate != 0,
+                password = inputModel.password,
+                creatorNo = UserManager.getInstance().user.userNo,
+                bgOption = (1..2).random().toString(),
             )
             val scene = Scene()
-            scene.id = inputModel.name
+            scene.id = vlRoomListModel.roomNo
             scene.userId = inputModel.userNo
 
-            val property: Map<String, String?> = mapOf(
-                "name" to vlRoomListModel.name,
-                "isPravite" to isPrivate.toString(),
-                "password" to vlRoomListModel.password,
-                "creator" to vlRoomListModel.creator,
-                "roomNo" to vlRoomListModel.roomNo,
-                "creatorNo" to vlRoomListModel.creator,
-                "isChorus" to vlRoomListModel.isChorus.toString(),
-                "bgOption" to vlRoomListModel.bgOption,
-                "soundEffect" to vlRoomListModel.soundEffect,
-                "belCanto" to vlRoomListModel.belCanto,
-                "createdAt" to vlRoomListModel.createdAt,
-                "updatedAt" to vlRoomListModel.updatedAt,
-                "status" to vlRoomListModel.status.toString(),
-                "deletedAt" to vlRoomListModel.deletedAt,
-                "roomPeopleNum" to vlRoomListModel.roomPeopleNum.toString(),
-                "icon" to vlRoomListModel.icon,
-            )
-            scene.property = property
+            scene.property = GsonUtils.covertToMap(vlRoomListModel)
 
-            Sync.Instance().createScene(scene, object: Sync.Callback{
+            Sync.Instance().createScene(scene, object : Sync.Callback {
                 override fun onSuccess() {
                     roomMap[vlRoomListModel.roomNo] = vlRoomListModel
-                    runOnMainThread { completion.invoke(null, KTVCreateRoomOutputModel(vlRoomListModel.roomNo, vlRoomListModel.password)) }
+                    runOnMainThread {
+                        completion.invoke(
+                            null,
+                            KTVCreateRoomOutputModel(
+                                vlRoomListModel.roomNo,
+                                vlRoomListModel.password
+                            )
+                        )
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -139,31 +145,47 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVJoinRoomInputModel,
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     ) {
-        initScene {
-            Sync.Instance().joinScene(inputModel.roomNo, object: Sync.JoinSceneCallback{
+        if (!TextUtils.isEmpty(currRoomNo)) {
+            completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null);
+        }
+        val cacheRoom = roomMap[inputModel.roomNo]
+        if (cacheRoom == null) {
+            completion.invoke(RuntimeException("The room is not available!"), null);
+            return
+        }
+        if (cacheRoom.isPrivate && cacheRoom.password != inputModel.password) {
+            completion.invoke(RuntimeException("The password is error!"), null);
+            return
+        }
+        initSync {
+            Sync.Instance().joinScene(inputModel.roomNo, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
-                    roomNo = inputModel.roomNo
-                    val room = roomMap[roomNo]
+                    currRoomNo = inputModel.roomNo
 
-                    runOnMainThread {
-                        // 空白麦位
-                        val seatsArray = _emptySeats()
+                    _subscribeRoomChanged()
+                    _subscribeChooseSong {}
+                    _addUserIfNeed { _, _ -> }
+                    _autoOnSeatIfNeed { error, seats ->
+                        if (error != null) {
+                            completion.invoke(error, null)
+                            return@_autoOnSeatIfNeed
+                        }
 
                         val kTVJoinRoomOutputModel = KTVJoinRoomOutputModel(
-                            room!!.name,
+                            cacheRoom.name,
                             inputModel.roomNo,
-                            room!!.creatorNo,
-                            "",
-                            seatsArray,
+                            cacheRoom.creatorNo,
+                            cacheRoom.bgOption,
+                            seats,
+                            cacheRoom.roomPeopleNum,
                             "", //TODO fetchToken
                             "", //TODO fetchToken
-                        "" //TODO fetchToken
+                            "", //TODO fetchToken,
                         )
-                        completion.invoke(null, kTVJoinRoomOutputModel)
-                        // 订阅用户数量事件
-//                        _addUserIfNeed()
-//                        _autoOnSeatIfNeed()
+                        runOnMainThread {
+                            completion.invoke(null, kTVJoinRoomOutputModel)
+                        }
                     }
                 }
 
@@ -175,15 +197,37 @@ class KTVSyncManagerServiceImp(
     }
 
     override fun leaveRoomWithCompletion(completion: (error: Exception?) -> Unit) {
-        val room = roomMap[roomNo]
-        if (room!!.creatorNo == UserManager.getInstance().user.userNo) {
-            // 移除房间
-            _removeUser { error -> run {} }
-            _updateUserCount(userMap.count() - 1) // TODO max(userMap.count() - 1, 0)
-            roomMap.remove(roomNo)
-            //Sync.Instance().destroy();
+        val cacheRoom = roomMap[currRoomNo] ?: return
+        currRoomNo = ""
 
-            mSceneReference?.delete(object: Sync.Callback{
+
+        // 取消所有订阅
+        roomSubscribeListener.forEach {
+            mSceneReference?.unsubscribe(it)
+        }
+        roomSubscribeListener.clear()
+
+        // 减少用户数，并清空用户信息
+        _removeUser {}
+        _updateUserCount(userMap.size - 1)
+        userMap.clear()
+
+        // 如果上麦了要下麦，并清空麦位信息
+        seatMap.forEach {
+            it.value?.let { seat ->
+                if (seat.userNo == UserManager.getInstance().user.userNo) {
+                    _removeSeat(seat) {}
+                    return@forEach
+                }
+            }
+        }
+        seatMap.clear()
+
+
+        if (cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
+            // 移除房间
+            roomMap.remove(cacheRoom.roomNo)
+            mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
                     runOnMainThread { completion.invoke(null) }
                 }
@@ -201,28 +245,44 @@ class KTVSyncManagerServiceImp(
                 completion.invoke(null)
             }
         }
+
+        mSceneReference = null
     }
 
     override fun changeMVCoverWithInput(
         inputModel: KTVChangeMVCoverInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-//        val roomInfo = roomMap[roomNo]
-//        roomInfo!!.bgOption = inputModel.mvIndex.toString()
-        // TODO key? value?
-        mSceneReference?.update("bgOption", inputModel.mvIndex.toString(), object: Sync.DataItemCallback {
-            override fun onSuccess(result: IObject?) {
-                runOnMainThread {
-                    completion.invoke(null)
+        val roomInfo = roomMap[currRoomNo] ?: return
+        mSceneReference?.update(
+            HashMap(
+                GsonUtils.covertToMap(
+                    VLRoomListModel(
+                        roomInfo.roomNo,
+                        roomInfo.name,
+                        roomInfo.icon,
+                        roomInfo.isPrivate,
+                        roomInfo.password,
+                        roomInfo.creatorNo,
+                        roomInfo.createdAt,
+                        inputModel.mvIndex.toString(),
+                        roomInfo.roomPeopleNum
+                    )
+                )
+            ),
+            object : Sync.DataItemCallback {
+                override fun onSuccess(result: IObject?) {
+                    runOnMainThread {
+                        completion.invoke(null)
+                    }
                 }
-            }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread {
-                    completion.invoke(exception)
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread {
+                        completion.invoke(exception)
+                    }
                 }
-            }
-        })
+            })
     }
 
     override fun subscribeRoomStatusWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit) {
@@ -231,8 +291,6 @@ class KTVSyncManagerServiceImp(
 
     override fun subscribeUserListCountWithChanged(changedBlock: (count: Int) -> Unit) {
         roomUserCountSubscriber = changedBlock
-        _addUserIfNeed()
-        _autoOnSeatIfNeed()
     }
 
     // =================== 麦位相关 ===============================
@@ -241,7 +299,14 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVOnSeatInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        val seatInfo = _getUserSeatInfo(inputModel.seatIndex)
+        seatMap.forEach {
+            it.value?.let { seat ->
+                if (seat.userNo == UserManager.getInstance().user.userNo) {
+                    return
+                }
+            }
+        }
+        val seatInfo = _genUserSeatInfo(inputModel.seatIndex)
         _addSeatInfo(seatInfo, completion)
     }
 
@@ -273,7 +338,6 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.isVideoMuted,
                         originSeatInfo.ifSelTheSingSong,
                         originSeatInfo.ifJoinedChorus,
-                        originSeatInfo.objectId
                     )
                     _updateSeat(seatInfo, completion)
                 }
@@ -300,8 +364,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.isSelfMuted,
                         isVideoMuted, // update this
                         originSeatInfo.ifSelTheSingSong,
-                        originSeatInfo.ifJoinedChorus,
-                        originSeatInfo.objectId
+                        originSeatInfo.ifJoinedChorus
                     )
                     _updateSeat(seatInfo, completion)
                 }
@@ -316,97 +379,137 @@ class KTVSyncManagerServiceImp(
 
     // ============= 歌曲相关 =============================
 
-    override fun getSongDetailWithInput(
-        inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeSongWithInput(
-        inputModel: KTVRemoveSongInputModel,
-        completion: (error: Exception?) -> Unit
-    ) {
-        _removeChooseSong(inputModel.objectId, completion)
-    }
-
     override fun getChoosedSongsListWithCompletion(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
         _getChooseSongInfo(completion)
-    }
-
-    override fun switchSongWithInput(
-        inputModel: KTVSwitchSongInputModel,
-        completion: (error: Exception?) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun markSongDidPlayWithInput(
-        inputModel: VLRoomSelSongModel,
-        completion: (error: Exception?) -> Unit
-    ) {
-        _updateChooseSong(inputModel, completion)
     }
 
     override fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        var songInfo = VLRoomSelSongModel(
+        val song = VLRoomSelSongModel(
             inputModel.songName,
             inputModel.songNo,
             inputModel.songUrl,
             inputModel.singer,
-            "",
-            0,
+            inputModel.lyric,
             inputModel.imageUrl,
+
+            userNo = UserManager.getInstance().user.userNo,
+            userId = UserManager.getInstance().user.id.toString(),
+            name = UserManager.getInstance().user.name,
+            sort = if (songChosenList.isEmpty()) 1 else songChosenList.last().sort + 1
         )
-        _addChooseSongInfo(songInfo, { error ->
-            run {
-                completion(error)
-            }
-        })
+        //net request and notify others
+        _addChooseSongInfo(song, completion)
+    }
+
+    override fun switchSongWithInput(
+        inputModel: KTVSwitchSongInputModel,
+        completion: (error: Exception?) -> Unit
+    ) {
+        // remove the first song and move the song to first position
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"))
+            return
+        }
+
+        songChosenList.removeAt(0)
+        val removeObjId = objIdOfSongNo.removeAt(0)
+        _removeChooseSong(removeObjId) {}
+
+        val filter = songChosenList.filter { it.songNo == inputModel.songNo }
+        val targetSong = filter.getOrNull(0)
+        if (targetSong == null) {
+            completion.invoke(RuntimeException("The song no not found!"))
+            return
+        }
+        val index = songChosenList.indexOf(targetSong)
+        songChosenList.add(0, songChosenList.removeAt(index))
+        objIdOfSongNo.add(0, objIdOfSongNo.removeAt(index))
+
+        //net request and notify others
+        _sortChooseSongList {
+            chooseSongSubscriber?.invoke(
+                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                targetSong
+            )
+            completion.invoke(null)
+        }
+
     }
 
     override fun makeSongTopWithInput(
         inputModel: KTVMakeSongTopInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        val topSong = songList[0]
-        val userSongList = songList.filter { it.objectId == inputModel?.objectId } as ArrayList<VLRoomSelSongModel>
-        if (userSongList.count() > 0) {
-            val song = userSongList[0]
+        // move the song to second position
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"))
+            return
+        }
+        if (songChosenList.size < 3) {
+            completion.invoke(RuntimeException("The chosen songs size is less then three, it is unnecessary to top up!"))
+            return
+        }
 
-            // mark input song to top
-            val targetSort = 0//(_minSort() ?? 0) -1
-            val songInfo = VLRoomSelSongModel(
-                topSong.songName,
-                topSong.songNo,
-                topSong.songUrl,
-                topSong.singer,
-                topSong.lyric,
-                topSong.status,
-                topSong.imageUrl,
+        val filter = songChosenList.filter { it.songNo == inputModel.songNo }
+        val targetSong = filter.getOrNull(0)
+        if (targetSong == null) {
+            completion.invoke(RuntimeException("The song no not found!"))
+            return
+        }
+        if (targetSong == songChosenList.first()) {
+            completion.invoke(RuntimeException("The song is playing now!"))
+            return
+        }
+        if (targetSong == songChosenList[1]) {
+            completion.invoke(RuntimeException("The song has been top up!"))
+            return
+        }
 
-                objectId = topSong.objectId
+        val indexOf = songChosenList.indexOf(targetSong)
+        songChosenList.add(1, songChosenList.removeAt(indexOf))
+        objIdOfSongNo.add(1, objIdOfSongNo.removeAt(indexOf))
+
+        //net request and notify others
+        _sortChooseSongList {
+            chooseSongSubscriber?.invoke(
+                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                targetSong
             )
+            completion.invoke(it)
+        }
+    }
 
-            if (topSong.objectId != song.objectId) {
-                val songInfo = VLRoomSelSongModel(
-                    topSong.songName,
-                    topSong.songNo,
-                    topSong.songUrl,
-                    topSong.singer,
-                    topSong.lyric,
-                    topSong.status,
-                    topSong.imageUrl,
+    override fun removeSongWithInput(
+        inputModel: KTVRemoveSongInputModel,
+        completion: (error: Exception?) -> Unit
+    ) {
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"))
+            return
+        }
+        val targetSong = songChosenList.getOrNull(inputModel.sort - 1)
+        if (targetSong == null) {
+            completion.invoke(RuntimeException("The song no not found!"))
+            return
+        }
 
-                    objectId = song.objectId
-                )
-                _updateChooseSong(songInfo, {})
-            }
 
-            _updateChooseSong(songInfo, {})
+        val indexOf = songChosenList.indexOf(targetSong)
+        songChosenList.removeAt(indexOf)
+        val removeAt = objIdOfSongNo.removeAt(indexOf)
+
+        //net request and notify others
+        _removeChooseSong(removeAt) {}
+
+        _sortChooseSongList {
+            chooseSongSubscriber?.invoke(
+                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                targetSong
+            )
+            completion.invoke(it)
         }
     }
 
@@ -414,12 +517,116 @@ class KTVSyncManagerServiceImp(
         inputModel: KTVJoinChorusInputModel,
         completion: (error: Exception?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        // set the chorus user to the first chosen song
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"))
+            return
+        }
+        val targetSong = songChosenList[0]
+        if (!TextUtils.isEmpty(targetSong.chorusNo)) {
+            completion.invoke(RuntimeException("The song has chorus user already!"))
+            return
+        }
+        songChosenList.remove(targetSong)
+        val newSong = VLRoomSelSongModel(
+            targetSong.songName,
+            targetSong.songNo,
+            targetSong.songUrl,
+            targetSong.singer,
+            targetSong.lyric,
+            targetSong.imageUrl,
+
+            userNo = targetSong.userNo,
+            userId = targetSong.userId,
+            name = targetSong.name,
+            chorusNo = UserManager.getInstance().user.userNo,
+            isChorus = true,
+            isOriginal = targetSong.isOriginal,
+            sort = targetSong.sort
+        )
+        songChosenList.add(0, newSong)
+
+        //net request and notify others
+        _updateChooseSong(
+            objIdOfSongNo[0],
+            newSong
+        ) {
+            chooseSongSubscriber?.invoke(
+                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                newSong
+            )
+            completion.invoke(it)
+        }
     }
 
     override fun becomeSolo() {
-        TODO("Not yet implemented")
+        // unset the chorus user to the first chosen song
+        if (songChosenList.size <= 0) {
+            return
+        }
+
+        val targetSong = songChosenList[0]
+        if (TextUtils.isEmpty(targetSong.chorusNo)) {
+            return
+        }
+        songChosenList.remove(targetSong)
+        val newSong = VLRoomSelSongModel(
+            targetSong.songName,
+            targetSong.songNo,
+            targetSong.songUrl,
+            targetSong.singer,
+            targetSong.lyric,
+            targetSong.imageUrl,
+
+            userNo = targetSong.userNo,
+            userId = targetSong.userId,
+            name = targetSong.name,
+            isOriginal = targetSong.isOriginal,
+            sort = targetSong.sort
+        )
+        songChosenList.add(
+            0, newSong
+        )
+
+        //net request and notify others
+        _updateChooseSong(
+            objIdOfSongNo[0],
+            newSong
+        ) {
+            chooseSongSubscriber?.invoke(
+                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                newSong
+            )
+        }
     }
+
+    override fun getSongDetailWithInput(
+        inputModel: KTVSongDetailInputModel,
+        completion: (error: Exception?, out: KTVSongDetailOutputModel?) -> Unit
+    ) {
+        // get the target song detail
+        if (songChosenList.size <= 0) {
+            completion.invoke(RuntimeException("The chosen song list is empty!"), null)
+            return
+        }
+
+        val filter = songChosenList.filter { it.songNo == inputModel.songNo }
+        val targetSong = filter.getOrNull(0)
+        if (targetSong == null) {
+            completion.invoke(RuntimeException("The song no not found!"), null)
+            return
+        }
+
+        completion.invoke(
+            null, KTVSongDetailOutputModel(
+                targetSong.songNo,
+                targetSong.lyric,
+                targetSong.songUrl
+            )
+        )
+
+    }
+
 
     override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
@@ -434,7 +641,15 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-    private fun initScene(complete: () -> Unit) {
+    private fun runOnWorkingThread(r: Runnable) {
+        if (Thread.currentThread() == workingHandlerThread.looper.thread) {
+            r.run()
+        } else {
+            workingHandler.post(r)
+        }
+    }
+
+    private fun initSync(complete: () -> Unit) {
         if (syncUtilsInited) {
             complete.invoke()
             return
@@ -442,8 +657,9 @@ class KTVSyncManagerServiceImp(
 
         Sync.Instance().init(context,
             mapOf(
-                Pair("appid", BuildConfig.AGORA_APP_ID),
+                Pair("appid", "aab8b8f5a8cd4469a63042fcfafe7063"),
                 Pair("defaultChannel", kSceneId),
+                // Pair("isUseRtm", "true"),
             ),
             object : Sync.Callback {
                 override fun onSuccess() {
@@ -452,16 +668,17 @@ class KTVSyncManagerServiceImp(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    runOnMainThread{ errorHandler?.invoke(exception) }
+                    runOnMainThread { errorHandler?.invoke(exception) }
                 }
             }
         )
     }
 
+
     // ------------------------ User operation ------------------------
     // 订阅在线用户
     private fun _subscribeOnlineUsers(completion: () -> Unit) {
-        mSceneReference?.subscribe("userCollection", object: Sync.EventListener {
+        val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
 
             }
@@ -484,16 +701,18 @@ class KTVSyncManagerServiceImp(
             override fun onSubscribeError(ex: SyncManagerException?) {
                 completion()
             }
-        })
+        }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.subscribe(kCollectionIdUser, listener)
     }
 
     private fun _getUserInfo(completion: (error: Exception?, list: List<VLLoginModel>?) -> Unit) {
-        mSceneReference?.collection("userCollection")?.get(object: Sync.DataListCallback{
+        mSceneReference?.collection(kCollectionIdUser)?.get(object : Sync.DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 val ret = ArrayList<VLLoginModel>()
                 result?.forEach {
                     val obj = it.toObject(VLLoginModel::class.java)
-                    obj.objectId = it.id
+                    objIdOfUserNo[obj.userNo] = it.id
                     ret.add(obj)
 
                     userMap[obj.userNo] = obj
@@ -510,21 +729,23 @@ class KTVSyncManagerServiceImp(
 
     private fun _addUserInfo(completion: () -> Unit) {
         val localUserInfo = VLLoginModel(UserManager.getInstance().user.userNo)
-        mSceneReference?.collection("userCollection")?.add(localUserInfo, object: Sync.DataItemCallback{
-            override fun onSuccess(result: IObject) {
-                runOnMainThread { completion.invoke() }
-            }
+        mSceneReference?.collection(kCollectionIdUser)
+            ?.add(localUserInfo, object : Sync.DataItemCallback {
+                override fun onSuccess(result: IObject) {
+                    runOnMainThread { completion.invoke() }
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke() }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke() }
+                }
+            })
     }
 
     private fun _removeUser(completion: (error: Exception?) -> Unit) {
-        val objectId = userMap[UserManager.getInstance().user.userNo]?.objectId
-        mSceneReference?.collection("userCollection")?.delete(objectId, object: Sync.Callback{
+        val objectId = objIdOfUserNo[UserManager.getInstance().user.userNo] ?: return
+        mSceneReference?.collection(kCollectionIdUser)?.delete(objectId, object : Sync.Callback {
             override fun onSuccess() {
+                objIdOfUserNo.remove(UserManager.getInstance().user.userNo)
                 runOnMainThread { completion.invoke(null) }
             }
 
@@ -534,69 +755,67 @@ class KTVSyncManagerServiceImp(
         })
     }
 
-    private fun _addUserIfNeed() {
+    private fun _addUserIfNeed(completion: (Exception?, Int?) -> Unit) {
         _subscribeOnlineUsers {}
-        _getUserInfo {error, list ->
-            run {
-                if (!userMap.containsKey(UserManager.getInstance().user.userNo)) {
-                    _addUserInfo {
-                        _getUserInfo { error, list ->
-                            run {}
+        _getUserInfo { error, list ->
+            if (error != null || list == null) {
+                completion.invoke(error, null)
+                return@_getUserInfo
+            }
+            if (!userMap.containsKey(UserManager.getInstance().user.userNo)) {
+                _addUserInfo {
+                    _getUserInfo { error2, list2 ->
+                        if (error2 != null || list2 == null) {
+                            completion.invoke(error2, null)
+                            return@_getUserInfo
                         }
+                        completion.invoke(null, list2.size)
                     }
                 }
+            } else {
+                completion.invoke(null, list.size)
             }
         }
     }
 
     private fun _updateUserCount(count: Int) {
-        var roomInfo = roomMap[roomNo]
-        if (count == roomInfo!!.roomPeopleNum) {
+        val roomInfo = roomMap[currRoomNo] ?: return
+        if (count == roomInfo.roomPeopleNum) {
             return
         }
-//        roomInfo?.updatedAt = ""
-//        roomInfo?.roomPeopleNum = count
-
-        // TODO key? value?
-        mSceneReference?.update("roomPeopleNum", count, object: Sync.DataItemCallback {
-            override fun onSuccess(result: IObject?) {
-            }
-
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread {
+        mSceneReference?.update(
+            HashMap(
+                GsonUtils.covertToMap(
+                    VLRoomListModel(
+                        roomInfo.roomNo,
+                        roomInfo.name,
+                        roomInfo.icon,
+                        roomInfo.isPrivate,
+                        roomInfo.password,
+                        roomInfo.creatorNo,
+                        roomInfo.createdAt,
+                        roomInfo.bgOption,
+                        count
+                    )
+                )
+            ),
+            object : Sync.DataItemCallback {
+                override fun onSuccess(result: IObject?) {
                 }
-            }
-        })
 
-        roomUserCountSubscriber?.invoke(count)
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread {
+                    }
+                }
+            })
+        runOnMainThread { roomUserCountSubscriber?.invoke(count) }
     }
 
     // --------------------- Seat operation --------------------------
-    //空白麦位
-    private fun _emptySeats() : List<VLRoomSeatModel> {
-        val seatsArray = ArrayList<VLRoomSeatModel>()
-        for (i in 0..7) {
-            val vLRoomSeatModel = VLRoomSeatModel(
-                false,
-                "",
-                "",
-                "",
-                "",
-                i,
-                false,
-                0,
-                0,
-                false,
-                false
-            )
-            seatsArray.add(vLRoomSeatModel)
-        }
-        return seatsArray
-    }
 
-    private fun _getUserSeatInfo(seatIndex: Int) : VLRoomSeatModel {
+    private fun _genUserSeatInfo(seatIndex: Int): VLRoomSeatModel {
         val vLRoomSeatModel = VLRoomSeatModel(
-            false,
+            roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.userNo,
             UserManager.getInstance().getUser().headUrl,
             UserManager.getInstance().getUser().userNo,
             UserManager.getInstance().getUser().id.toString(),
@@ -605,52 +824,62 @@ class KTVSyncManagerServiceImp(
             false,
             0,
             0,
-            false,
-            false
+            ifSelTheSingSong = false,
+            ifJoinedChorus = false
         )
         return vLRoomSeatModel
     }
 
-    private fun _autoOnSeatIfNeed() {
+    private fun _autoOnSeatIfNeed(completion: (error: Exception?, seat: List<VLRoomSeatModel>?) -> Unit) {
+        val cacheRoom = roomMap[currRoomNo] ?: return
         _subscribeSeats {}
-        _getSeatInfo { error, list ->
-            run {
-                seatMap.forEach {
-                    if (it.value?.objectId != null) {
-                        seatListChangeSubscriber?.invoke(
-                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                            it.value
-                        )
+        _getSeatInfo { err, list ->
+            if (err != null) {
+                completion.invoke(err, null)
+                return@_getSeatInfo
+            }
+            var hasMaster = false
+            val outList = ArrayList<VLRoomSeatModel>()
+            seatMap.forEach {
+                it.value?.let { seat ->
+                    outList.add(seat)
+                    seatListChangeSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                        seat
+                    )
+                    if (seat.isMaster) {
+                        hasMaster = true
                     }
-
-                    // update seat info (user avater/nick name did changed) if seat existed
-                    //val seatInfo = seatMap.filter { it.value?.userNo == UserManager.getInstance().user.userNo }.values
-                    seatMap.forEach {
-                        if (it.value?.userNo == UserManager.getInstance().user.userNo) {
-                            val seatInfo = it.value
-                            if (seatInfo != null) {
-                                val targetSeatInfo = _getUserSeatInfo(seatInfo.onSeat)
-                                targetSeatInfo.objectId = seatInfo.objectId
-                                _updateSeat(targetSeatInfo, {})
-                            }
-                        }
-                    }
-
-                    // add master to first seat
-                    val targetSeatInfo = _getUserSeatInfo(0)
-                    _addSeatInfo(targetSeatInfo, {})
                 }
+            }
+            if (!hasMaster && cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
+                val targetSeatInfo = _genUserSeatInfo(0)
+                _addSeatInfo(targetSeatInfo) { error ->
+                    if (error != null) {
+                        completion.invoke(error, null)
+                        return@_addSeatInfo
+                    }
+                    outList.add(targetSeatInfo)
+                    seatListChangeSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                        targetSeatInfo
+                    )
+                    completion.invoke(null, outList)
+                }
+            } else {
+                completion.invoke(null, outList)
             }
         }
     }
 
+
     private fun _getSeatInfo(completion: (error: Exception?, list: List<VLRoomSeatModel>?) -> Unit) {
-        mSceneReference?.collection("seat_info")?.get(object: Sync.DataListCallback{
+        mSceneReference?.collection(kCollectionIdSeatInfo)?.get(object : Sync.DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 val ret = ArrayList<VLRoomSeatModel>()
                 result?.forEach {
                     val obj = it.toObject(VLRoomSeatModel::class.java)
-                    obj.objectId = it.id
+                    objIdOfSeatIndex[obj.onSeat] = it.id
                     ret.add(obj)
 
                     // 储存在本地map中
@@ -666,76 +895,83 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun _updateSeat(seatInfo: VLRoomSeatModel, completion: (error: Exception?) -> Unit) {
-        val objectId = seatInfo.objectId
-        mSceneReference?.collection("seat_info")?.update(objectId, seatInfo, object: Sync.Callback{
-            override fun onSuccess() {
-                runOnMainThread { completion.invoke(null) }
-            }
+        val objectId = objIdOfSeatIndex[seatInfo.onSeat] ?: return
+        mSceneReference?.collection(kCollectionIdSeatInfo)
+            ?.update(objectId, seatInfo, object : Sync.Callback {
+                override fun onSuccess() {
+                    runOnMainThread { completion.invoke(null) }
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
     }
 
     private fun _removeSeat(seatInfo: VLRoomSeatModel, completion: (error: Exception?) -> Unit) {
-        val objectId = seatInfo.objectId
-        mSceneReference?.collection("seat_info")?.delete(objectId, object: Sync.Callback{
-            override fun onSuccess() {
-                runOnMainThread { completion.invoke(null) }
-            }
+        val objectId = objIdOfSeatIndex[seatInfo.onSeat] ?: return
+        mSceneReference?.collection(kCollectionIdSeatInfo)
+            ?.delete(objectId, object : Sync.Callback {
+                override fun onSuccess() {
+                    runOnMainThread { completion.invoke(null) }
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
     }
 
     private fun _addSeatInfo(seatInfo: VLRoomSeatModel, completion: (error: Exception?) -> Unit) {
-        mSceneReference?.collection("seat_info")?.add(seatInfo, object: Sync.DataItemCallback{
-            override fun onSuccess(result: IObject) {
-                runOnMainThread { completion.invoke(null) }
-            }
+        mSceneReference?.collection(kCollectionIdSeatInfo)
+            ?.add(seatInfo, object : Sync.DataItemCallback {
+                override fun onSuccess(result: IObject) {
+                    runOnMainThread { completion.invoke(null) }
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
     }
 
     private fun _subscribeSeats(completion: () -> Unit) {
-        mSceneReference?.subscribe("seat_info", object: Sync.EventListener {
+        val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
                 // TODO Nothing?
             }
 
             override fun onUpdated(item: IObject?) {
-                val obj = item?.toObject(VLRoomSeatModel::class.java)
-                obj?.objectId = item?.id
-                seatMap[obj?.onSeat.toString()] = obj
-                seatListChangeSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, obj)
+                val obj = item?.toObject(VLRoomSeatModel::class.java) ?: return
+                objIdOfSeatIndex[obj.onSeat] = obj.id
+
+                if (seatMap.containsKey(obj.onSeat.toString())) {
+                    seatMap[obj.onSeat.toString()] = obj
+                    seatListChangeSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                        obj
+                    )
+                } else {
+                    seatMap[obj.onSeat.toString()] = obj
+                    seatListChangeSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                        obj
+                    )
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-                seatMap.forEach {
-                    if (it.value?.objectId == item?.toObject(VLRoomSeatModel::class.java)?.objectId) {
-                        val originSeat = it.value
-                        if (originSeat != null) {
-                            val vLRoomSeatModel = VLRoomSeatModel(
-                                false,
-                                "",
-                                "",
-                                "",
-                                "",
-                                originSeat.onSeat,
-                                false,
-                                0,
-                                0,
-                                false,
-                                false
+                item ?: return
+
+                seatMap.forEach { entry ->
+                    entry.value?.let { seat ->
+                        if (objIdOfSeatIndex[seat.onSeat] == item.id) {
+                            seatMap.remove(entry.key)
+                            seatListChangeSubscriber?.invoke(
+                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                seat
                             )
-                            seatMap[originSeat?.onSeat.toString()] = vLRoomSeatModel
-                            seatListChangeSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted, originSeat)
+                            return
                         }
                     }
                 }
@@ -744,28 +980,94 @@ class KTVSyncManagerServiceImp(
             override fun onSubscribeError(ex: SyncManagerException?) {
                 completion()
             }
-        })
+        }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.subscribe(kCollectionIdSeatInfo, listener)
     }
 
     // ------------ Choose song operation ---------------------
-    private fun _minSort() : Int? {
-        return 0
+
+    private fun _sortChooseSongList(completion: (error: Exception?) -> Unit) {
+        val firstSong = songChosenList.getOrNull(0) ?: return
+        val firstObjId = objIdOfSongNo[0]
+        val firstNewSong = VLRoomSelSongModel(
+            firstSong.songName,
+            firstSong.songNo,
+            firstSong.songUrl,
+            firstSong.singer,
+            firstSong.lyric,
+            firstSong.imageUrl,
+
+            firstSong.userNo,
+            firstSong.userId,
+            firstSong.name,
+            firstSong.chorusNo,
+            firstSong.isChorus,
+            firstSong.isOriginal,
+            1
+        )
+        _updateChooseSong(
+            firstObjId, firstNewSong
+        ) { error ->
+            if (error != null) {
+                completion.invoke(error)
+                return@_updateChooseSong
+            }
+            songChosenList[0] = firstNewSong
+
+            val songsSise = songChosenList.size
+            val letchCount = CountDownLatch(songsSise - 1)
+            for (i in 1 until songsSise) {
+                songChosenList[i].let { song ->
+                    val newSong = VLRoomSelSongModel(
+                        song.songName,
+                        song.songNo,
+                        song.songUrl,
+                        song.singer,
+                        song.lyric,
+                        song.imageUrl,
+
+                        song.userNo,
+                        song.userId,
+                        song.name,
+                        song.chorusNo,
+                        song.isChorus,
+                        song.isOriginal,
+                        i + 1
+                    )
+                    songChosenList[i] = newSong
+                    _updateChooseSong(
+                        objIdOfSongNo[i],
+                        newSong
+                    ) {
+                        letchCount.countDown()
+                    }
+                }
+            }
+            runOnMainThread {
+                letchCount.await()
+                completion.invoke(null)
+            }
+
+        }
     }
 
-    private fun _sortChooseSongList() {
-
-    }
 
     private fun _getChooseSongInfo(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
-        mSceneReference?.collection("choose_song")?.get(object: Sync.DataListCallback{
+        mSceneReference?.collection(kCollectionIdChooseSong)?.get(object : Sync.DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 val ret = ArrayList<VLRoomSelSongModel>()
+                val retObjId = ArrayList<String>()
                 result?.forEach {
                     val obj = it.toObject(VLRoomSelSongModel::class.java)
-                    obj.objectId = it.id
                     ret.add(obj)
+                    retObjId.add(it.id)
                 }
-                songList = ret
+                ret.sortBy { it.sort }
+                songChosenList.clear()
+                songChosenList.addAll(ret)
+                objIdOfSongNo.clear()
+                objIdOfSongNo.addAll(retObjId)
                 runOnMainThread { completion.invoke(null, ret) }
             }
 
@@ -775,120 +1077,135 @@ class KTVSyncManagerServiceImp(
         })
     }
 
-    private fun _updateChooseSong(songInfo: VLRoomSelSongModel, completion: (error: Exception?) -> Unit) {
-        val objectId = songInfo.objectId
-        mSceneReference?.collection("choose_song")?.update(objectId, songInfo, object: Sync.Callback{
-            override fun onSuccess() {
-                runOnMainThread { completion.invoke(null) }
-            }
+    private fun _updateChooseSong(
+        objectId: String,
+        songInfo: VLRoomSelSongModel,
+        completion: (error: Exception?) -> Unit
+    ) {
+        mSceneReference?.collection(kCollectionIdChooseSong)
+            ?.update(objectId, songInfo, object : Sync.Callback {
+                override fun onSuccess() {
+                    completion.invoke(null)
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    completion.invoke(exception)
+                }
+            })
     }
 
-    private fun _addChooseSongInfo(songInfo: VLRoomSelSongModel, completion: (error: Exception?) -> Unit) {
-        //TODO SetSort
-        //SyncManager collectionKey:SYNC_MANAGER_CHOOSE_SONG_INFO
-        mSceneReference?.collection("choose_song")?.add(songInfo, object: Sync.DataItemCallback{
-            override fun onSuccess(result: IObject) {
-                runOnMainThread { completion.invoke(null) }
-            }
+    private fun _addChooseSongInfo(
+        songInfo: VLRoomSelSongModel,
+        completion: (error: Exception?) -> Unit
+    ) {
+        mSceneReference?.collection(kCollectionIdChooseSong)
+            ?.add(songInfo, object : Sync.DataItemCallback {
+                override fun onSuccess(result: IObject) {
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                    songChosenList.add(songInfo)
+                    objIdOfSongNo.add(result.id)
+
+                    chooseSongSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                        songInfo
+                    )
+
+                    runOnMainThread { completion.invoke(null) }
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
     }
 
     private fun _removeAllUsersChooseSong() {
-        val userSongList = songList.filter { it.userNo == UserManager.getInstance().user.userNo }.forEach {
-            _removeChooseSong(it.objectId, {})
-        }
+        songChosenList.filter { it.userNo == UserManager.getInstance().user.userNo }
+            .forEach {
+                val indexOf = songChosenList.indexOf(it)
+                songChosenList.removeAt(indexOf)
+                _removeChooseSong(objIdOfSongNo.removeAt(indexOf), {})
+            }
     }
 
-    private fun _removeChooseSong(songId: String?, completion: (error: Exception?) -> Unit) {
-        val objectId = songId
-        mSceneReference?.collection("choose_song")?.delete(objectId, object: Sync.Callback{
-            override fun onSuccess() {
-                runOnMainThread { completion.invoke(null) }
-            }
+    private fun _removeChooseSong(objectId: String, completion: (error: Exception?) -> Unit) {
+        mSceneReference?.collection(kCollectionIdChooseSong)
+            ?.delete(objectId, object : Sync.Callback {
+                override fun onSuccess() {
+                    runOnMainThread { completion.invoke(null) }
+                }
 
-            override fun onFail(exception: SyncManagerException?) {
-                runOnMainThread { completion.invoke(exception) }
-            }
-        })
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { completion.invoke(exception) }
+                }
+            })
     }
 
-    private fun _markCurrentSongIfNeed() {
-        if (songList.size > 0) {
-            val topSong = songList[0]
-            if (topSong.status == 0 && topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
-                val songInfo = VLRoomSelSongModel(
-                    topSong.songName,
-                    topSong.songNo,
-                    topSong.songUrl,
-                    topSong.singer,
-                    topSong.lyric,
-                    topSong.status,
-                    topSong.imageUrl,
-                    objectId = topSong.objectId
-                )
-                _updateChooseSong(songInfo, {})
-            }
-        }
-    }
+    private fun _subscribeRoomChanged() {
+        val listener = object : EventListener {
+            override fun onCreated(item: IObject?) {
 
-    private fun _markSoloSongIfNeed() {
-        if (songList.size > 0) {
-            val topSong = songList[0]
-            if (topSong.isChorus == false && topSong.userNo == UserManager.getInstance().user.userNo) {
-                val songInfo = VLRoomSelSongModel(
-                    topSong.songName,
-                    topSong.songNo,
-                    topSong.songUrl,
-                    topSong.singer,
-                    topSong.lyric,
-                    topSong.status,
-                    topSong.imageUrl,
-                    objectId = topSong.objectId
-                )
-                _updateChooseSong(songInfo, {})
             }
+
+            override fun onUpdated(item: IObject?) {
+                item ?: return
+                val roomInfo = item.toObject(VLRoomListModel::class.java)
+                roomMap[roomInfo.roomNo] = roomInfo
+                runOnMainThread {
+                    roomStatusSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                        roomInfo
+                    )
+                }
+            }
+
+            override fun onDeleted(item: IObject?) {
+                val roomInfo = roomMap[item?.id] ?: return
+                runOnMainThread {
+                    roomStatusSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                        roomInfo
+                    )
+                }
+                roomMap.remove(roomInfo.roomNo)
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException?) {
+
+            }
+
         }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.subscribe(listener)
     }
 
     private fun _subscribeChooseSong(completion: () -> Unit) {
-        mSceneReference?.subscribe("choose_song", object: Sync.EventListener {
+        val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
                 // TODO Nothing?
             }
 
             override fun onUpdated(item: IObject?) {
-                val songInfo = item?.toObject(VLRoomSelSongModel::class.java)
-                if (songInfo != null) {
-                    songList = songList.filter { it.objectId != songInfo.objectId } as ArrayList<VLRoomSelSongModel>
-                    songList.add(songInfo)
-                    _sortChooseSongList()
-                    chooseSongSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, songInfo)
-                    _markCurrentSongIfNeed()
-                }
+                val songInfo = item?.toObject(VLRoomSelSongModel::class.java) ?: return
+                chooseSongSubscriber?.invoke(
+                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                    songInfo
+                )
             }
 
             override fun onDeleted(item: IObject?) {
-                val userSongList = songList.filter { it.objectId == item?.id } as ArrayList<VLRoomSelSongModel>
-                if (userSongList.count() > 0) {
-                    val originSong = userSongList[0]
-                    songList = songList.filter { it.objectId != originSong.objectId } as ArrayList<VLRoomSelSongModel>
-                    chooseSongSubscriber?.invoke(KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted, originSong)
-                    _markCurrentSongIfNeed()
-                }
+                item ?: return
+                chooseSongSubscriber?.invoke(
+                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                    null
+                )
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
                 completion()
             }
-        })
+        }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.subscribe(kCollectionIdChooseSong, listener)
     }
 }

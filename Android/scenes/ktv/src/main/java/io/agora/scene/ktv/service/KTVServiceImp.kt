@@ -12,6 +12,8 @@ import io.agora.scene.base.api.base.BaseResponse
 import io.agora.scene.base.bean.MemberMusicModel
 import io.agora.scene.base.bean.RoomListModel
 import io.agora.scene.base.data.model.AgoraRoom
+import io.agora.scene.base.data.model.KTVBaseResponse
+import io.agora.scene.base.data.model.MusicModelBase
 import io.agora.scene.base.event.ReceivedMessageEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -82,22 +84,15 @@ class KTVServiceImp : KTVServiceProtocol {
                     data.data?.records?.forEach {
                         ret.add(
                             VLRoomListModel(
-                                it.name,
-                                it.isPrivate == 1,
-                                it.password,
-                                it.creatorNo,
-                                it.roomNo,
-                                it.isChorus,
-                                it.bgOption,
-                                it.soundEffect,
-                                it.belCanto,
-                                it.createdAt,
-                                it.updatedAt,
-                                it.status,
-                                it.deletedAt,
-                                it.roomPeopleNum,
-                                it.icon,
-                                it.creatorNo
+                                roomNo = it.roomNo,
+                                name = it.name,
+                                icon = it.icon,
+                                isPrivate = it.isPrivate > 0,
+                                password = it.password,
+                                creatorNo = it.creatorNo,
+                                createdAt = it.createdAt,
+                                bgOption = it.bgOption,
+                                roomPeopleNum = it.roomPeopleNum
                             )
                         )
                     }
@@ -197,6 +192,7 @@ class KTVServiceImp : KTVServiceProtocol {
                                 creatorNo,
                                 bgOption,
                                 seatsArray,
+                                roomPeopleNum,
 
                                 agoraRTMToken,
                                 agoraRTCToken,
@@ -329,22 +325,7 @@ class KTVServiceImp : KTVServiceProtocol {
 
                     roomStatusSubscriber?.invoke(
                         KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, VLRoomListModel(
-                            "",
-                            false,
-                            "",
-                            bean.userNo,
-                            bean.roomNo,
-                            0,
-                            bean.bgOption,
-                            "",
-                            "",
-                            "",
-                            "",
-                            0,
-                            "",
-                            0,
-                            "",
-                            ""
+                            bgOption = inputModel.mvIndex.toString(),
                         )
                     )
                 }
@@ -614,7 +595,6 @@ class KTVServiceImp : KTVServiceProtocol {
                                 it.songUrl,
                                 it.singer,
                                 it.lyric,
-                                it.status,
                                 it.imageUrl,
 
                                 it.userNo,
@@ -640,7 +620,7 @@ class KTVServiceImp : KTVServiceProtocol {
         inputModel: KTVSwitchSongInputModel, completion: (error: Exception?) -> Unit
     ) {
         ApiManager.getInstance().requestSwitchSong(
-            inputModel.userNo, inputModel.songNo, inputModel.roomNo
+            UserManager.getInstance().user.userNo, inputModel.songNo, roomNo
         ).compose(applyApiSchedulers()).subscribe(object : ApiSubscriber<BaseResponse<String?>?>() {
             override fun onSubscribe(d: Disposable) {
 
@@ -651,7 +631,7 @@ class KTVServiceImp : KTVServiceProtocol {
                 val bean = RTMMessageBean()
                 bean.headUrl = UserManager.getInstance().user.headUrl
                 bean.messageType = KtvConstant.MESSAGE_ROOM_TYPE_SWITCH_SONGS
-                bean.roomNo = inputModel.roomNo
+                bean.roomNo = roomNo
                 bean.userNo = UserManager.getInstance().user.userNo
                 RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
@@ -666,7 +646,7 @@ class KTVServiceImp : KTVServiceProtocol {
                     val bean = RTMMessageBean()
                     bean.headUrl = UserManager.getInstance().user.headUrl
                     bean.messageType = KtvConstant.MESSAGE_ROOM_TYPE_SWITCH_SONGS
-                    bean.roomNo = inputModel.roomNo
+                    bean.roomNo = roomNo
                     bean.userNo = UserManager.getInstance().user.userNo
                     RTMManager.getInstance().sendMessage(gson.toJson(bean))
 
@@ -713,17 +693,28 @@ class KTVServiceImp : KTVServiceProtocol {
 
     override fun getSongDetailWithInput(
         inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
+        completion: (error: Exception?, out: KTVSongDetailOutputModel?) -> Unit
     ) {
-        TODO("Not yet implemented")
-    }
+        ApiManager.getInstance().requestSongsDetail(inputModel.songNo)
+            .compose(applyApiSchedulers())
+            .subscribe(
+                object : ApiSubscriber<KTVBaseResponse<MusicModelBase>>(){
+                    override fun onSuccess(t: KTVBaseResponse<MusicModelBase>?) {
+                        val data = t?.data?.data ?: return
+                        completion.invoke(null, KTVSongDetailOutputModel(
+                            inputModel.songNo,
+                            data.lyric,
+                            data.playUrl
+                        ))
+                    }
 
-    override fun markSongDidPlayWithInput(
-        inputModel: VLRoomSelSongModel, completion: (error: Exception?) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
+                    override fun onFailure(t: ApiException?) {
+                        completion.invoke(t, null)
+                    }
 
+                }
+            )
+    }
 
     override fun chooseSongWithInput(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
@@ -877,22 +868,7 @@ class KTVServiceImp : KTVServiceProtocol {
             VLSendMessageType.VLSendMessageTypeChangeMVBg.value -> {
                 roomStatusSubscriber?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated, VLRoomListModel(
-                        "",
-                        false,
-                        "",
-                        bean.userNo,
-                        bean.roomNo,
-                        0,
-                        bean.bgOption,
-                        "",
-                        "",
-                        "",
-                        "",
-                        0,
-                        "",
-                        0,
-                        "",
-                        ""
+                        bgOption = bean.bgOption
                     )
                 )
             }

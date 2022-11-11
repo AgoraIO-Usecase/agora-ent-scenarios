@@ -83,7 +83,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         roomCreateViewModel.roomModelList.observe(this, vlRoomListModels -> {
             hideLoadingView();
             getBinding().smartRefreshLayout.finishRefresh();
-            if (vlRoomListModels == null) {
+            if (vlRoomListModels == null || vlRoomListModels.isEmpty()) {
                 getBinding().rvRooms.setVisibility(View.GONE);
                 getBinding().btnCreateRoom.setVisibility(View.GONE);
                 getBinding().tvTips1.setVisibility(View.VISIBLE);
