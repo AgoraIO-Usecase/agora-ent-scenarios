@@ -8,6 +8,7 @@ import com.tencent.bugly.crashreport.CrashReport
 import io.agora.scene.voice.general.interfaceOrImplement.UserActivityLifecycleCallbacks
 import io.agora.voice.imkit.manager.ChatroomConfigManager
 import io.agora.voice.network.http.VRRequestApi
+import io.agora.voice.network.http.toolbox.VoiceToolboxRequestApi
 
 /**
  * @author create by zhangwei03
@@ -22,6 +23,7 @@ object VoiceConfigManager {
         instance = app
         ChatroomConfigManager.getInstance().initRoomConfig(app, BuildConfig.im_app_key)
         VRRequestApi.get().setBaseUrl(BuildConfig.server_host)
+        VoiceToolboxRequestApi.get().setBaseUrl(BuildConfig.toolbox_server_host)
         app.registerActivityLifecycleCallbacks(mLifecycleCallbacks)
         SVGAParser.shareParser().init(app)
         SVGALogger.setLogEnabled(true)
