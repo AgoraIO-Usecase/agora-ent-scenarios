@@ -9,4 +9,7 @@ public class PagePathConstant {
     public static final String pageRoomCreate = "/ktv/roomCreate";
     public static final String pageRoomLiving = "/ktv/roomLiving";
     public static final String pageRoomList = "/ktv/pageRoomList";
+
+
+    public static final String pageVoiceChat = "/chatroom/ChatroomSplashActivity";
 }

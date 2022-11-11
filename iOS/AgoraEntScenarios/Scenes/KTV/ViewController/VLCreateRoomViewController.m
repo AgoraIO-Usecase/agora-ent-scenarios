@@ -17,7 +17,7 @@
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 
 @interface VLCreateRoomViewController ()<VLCreateRoomViewDelegate/*,AgoraRtmDelegate*/>
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
@@ -47,7 +47,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:NSLocalizedString(@"创建房间", nil)];
+    [self setNaviTitleName:KTVLocalizedString(@"创建房间")];
     [self setBackBtn];
 }
 
@@ -92,73 +92,6 @@
         ktvVC.seatsArray = outputModel.seatsArray;
         [self.navigationController pushViewController:ktvVC animated:YES];
     }];
-//    NSDictionary *param = @{
-//        @"belCanto": @"0",
-//        @"icon": [NSString stringWithFormat:@"%@",roomModel.icon],
-//        @"isPrivate":roomModel.isPrivate ? @(1) : @(0),
-//        @"name": [NSString stringWithFormat:@"%@",roomModel.name],
-//        @"password": roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"",
-//        @"soundEffect": @"0",
-//        @"userNo": VLUserCenter.user.userNo
-//    };
-//    [VLAPIRequest postRequestURL:kURLCreateRoom parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            NSDictionary *param = @{
-//                @"roomNo" : response.data,
-//                @"userNo":VLUserCenter.user.userNo,
-//                @"password":roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @""
-//            };
-//            VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-//
-//            [VLAPIRequest getRequestURL:kURLGetInRoom parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [AgoraRtm updateDelegate:self];
-//                    if ([response.data[@"creatorNo"] isEqualToString:VLUserCenter.user.userNo]) { //自己是房主
-//                        VLUserCenter.user.ifMaster = YES;
-//                    }else{
-//                        VLUserCenter.user.ifMaster = NO;
-//                    }
-//
-//                    VLUserCenter.user.agoraRTCToken = response.data[@"agoraRTCToken"];
-//                    VLUserCenter.user.agoraRTMToken = response.data[@"agoraRTMToken"];
-//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
-//
-//                    VLLog(@"Agora - RTCToken: %@, RTMToken: %@, RTCPlayerToken: %@, UID: %@, roomNo: %@", VLUserCenter.user.agoraRTCToken, VLUserCenter.user.agoraRTMToken, VLUserCenter.user.agoraPlayerRTCToken, VLUserCenter.user.id, param[@"roomNo"]);
-//                    [AgoraRtm.kit loginByToken:VLUserCenter.user.agoraRTMToken user:VLUserCenter.user.id completion:^(AgoraRtmLoginErrorCode errorCode) {
-//                        if (!(errorCode == AgoraRtmLoginErrorOk || errorCode == AgoraRtmLoginErrorAlreadyLogin)) {
-//                            VLLog(@"Agora - 加入RTM失败, errorCode: %ld", errorCode);
-//                            return;
-//                        }
-//                        [AgoraRtm setStatus:LoginStatusOnline];
-//                        //登录RTC
-//                        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken channelId:listModel.roomNo info:nil uid:[VLUserCenter.user.id integerValue] joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-//                            VLLog(@"Agora - 加入RTC成功");
-//                            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-//                        }];
-//                        //处理座位信息
-//                        listModel.roomNo = response.data[@"roomNo"];
-//                        listModel.name = response.data[@"name"];
-//                        listModel.bgOption = 0;
-//                        NSArray *seatsArray = response.data[@"roomUserInfoDTOList"];
-//                        VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-//                        ktvVC.roomModel = listModel;
-//                        ktvVC.seatsArray = [self configureSeatsWithArray:seatsArray songArray:nil];
-//                        [self.navigationController pushViewController:ktvVC animated:YES];
-//                    }];
-//                }else{
-//                    [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
-//                }
-//
-//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//                [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
-//            }];
-//
-//        }else{
-//            [VLToast toast:response.message];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [VLToast toast:NSLocalizedString(@"创建房间失败", nil)];
-//    }];
 }
 
 - (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

@@ -20,6 +20,7 @@
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
+#import "KTVMacro.h"
 @import LEEAlert;
 
 @interface VLOnLineListVC ()<VLHomeOnLineListViewDelegate/*,AgoraRtmDelegate*/,VLPopScoreViewDelegate>
@@ -49,7 +50,7 @@
 
 - (void)commonUI {
     [self setBackgroundImage:@"online_list_BgIcon"];
-    [self setNaviTitleName:NSLocalizedString(@"在线K歌房", nil)];
+    [self setNaviTitleName:KTVLocalizedString(@"在线K歌房")];
     if ([VLUserCenter center].isLogin) {
         [self setBackBtn];
     }
@@ -104,9 +105,9 @@
         __block UITextField *TF = nil;
         
         [LEEAlert alert].config
-        .LeeTitle(NSLocalizedString(@"输入密码", nil))
+        .LeeTitle(KTVLocalizedString(@"输入密码"))
         .LeeAddTextField(^(UITextField *textField) {
-            textField.placeholder = NSLocalizedString(@"请输入房间密码", nil);
+            textField.placeholder = KTVLocalizedString(@"请输入房间密码");
             textField.textColor = UIColorBlack;
             textField.clearButtonMode=UITextFieldViewModeWhileEditing;
             textField.font = UIFontMake(15);
@@ -131,7 +132,7 @@
         .LeeAddAction(^(LEEAction *action) {
             VL(weakSelf);
             action.type = LEEActionTypeCancel;
-            action.title = NSLocalizedString(@"确认", nil);
+            action.title = KTVLocalizedString(@"确认");
             action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
             action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
             action.cornerRadius = 20;
@@ -174,45 +175,7 @@
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
         [weakSelf.navigationController pushViewController:ktvVC animated:YES];
-        
     }];
-//    [VLAPIRequest getRequestURL:kURLGetInRoom parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//
-//            [AgoraRtm updateDelegate:self];
-//            if ([response.data[@"creatorNo"] isEqualToString:VLUserCenter.user.userNo]) { //自己是房主
-//                VLUserCenter.user.ifMaster = YES;
-//            }else{
-//                VLUserCenter.user.ifMaster = NO;
-//            }
-//            listModel.creator = response.data[@"creatorNo"];
-//            VLUserCenter.user.agoraRTCToken = response.data[@"agoraRTCToken"];
-//            VLUserCenter.user.agoraRTMToken = response.data[@"agoraRTMToken"];
-//            VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
-//
-////            [AgoraRtm setCurrent:VLUserCenter.user.name];
-//            //登录RTM
-//            [AgoraRtm.kit loginByToken:VLUserCenter.user.agoraRTMToken user:VLUserCenter.user.id completion:^(AgoraRtmLoginErrorCode errorCode) {
-//                if (!(errorCode == AgoraRtmLoginErrorOk || errorCode == AgoraRtmLoginErrorAlreadyLogin)) {
-//                    VLLog(@"加入RTM失败");
-//                    return;
-//                }
-//                [AgoraRtm setStatus:LoginStatusOnline];
-//                //处理座位信息
-//                NSArray *seatsArray = response.data[@"roomUserInfoDTOList"];
-//                NSArray *songArray = response.data[@"roomSongInfoDTOS"];
-//                VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
-//                ktvVC.roomModel = listModel;
-//                ktvVC.seatsArray = [self configureSeatsWithArray:seatsArray songArray:songArray];
-//                [self.navigationController pushViewController:ktvVC animated:YES];
-//            }];
-//        }else{
-//            [VLToast toast:response.message];
-//        }
-//
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [VLToast toast:NSLocalizedString(@"加入房间失败", nil)];
-//    }];
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {
