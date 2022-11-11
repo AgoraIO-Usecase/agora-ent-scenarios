@@ -702,41 +702,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self muteLocalVideo:!self.isNowCameraMuted];
 }
 
-- (void)leaveMicSeat:(void (^)(void))completion {
-    BOOL ifOnSeat = NO;
-    NSInteger seatIndex = -1;
-    VLRoomSeatModel *model = [self getCurrentUserSeatInfo];
-    if (model != nil) {
-        ifOnSeat = YES;
-        seatIndex = model.seatIndex;
-    }
-    if (ifOnSeat) { //在麦位
-        KTVOutSeatInputModel* inputModel = [KTVOutSeatInputModel new];
-        inputModel.userNo = VLUserCenter.user.userNo;
-        inputModel.userId = VLUserCenter.user.id;
-        inputModel.userName = VLUserCenter.user.name;
-        inputModel.userHeadUrl = VLUserCenter.user.headUrl ? VLUserCenter.user.headUrl:@"";
-        inputModel.seatIndex = seatIndex;
-        [[AppContext ktvServiceImp] outSeatWithInput:inputModel
-                                          completion:^(NSError * error) {
-            if (error.code == 20007) {
-                // 房间已关闭
-                [self popForceLeaveRoom];
-                return;
-            }
-            if (error != nil) {
-                return;
-            }
-
-            VLLog(@"发送下麦消息成功");
-            [VLUserCenter clearUserRoomInfo];
-            completion();
-        }];
-    }else{
-        completion();
-    }
-}
-
 - (void)leaveRoom {
     VL(weakSelf);
     [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
@@ -864,57 +829,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //    VL(weakSelf);
     [[AppContext ktvServiceImp] onSeatWithInput:inputModel
                                      completion:^(NSError * error) {
-//        if (error != nil) {
-//            return;
-//        }
-//
-//        VLLog(@"发送上麦消息成功");
-        //自己在该位置刷新UI
-//        for (VLRoomSeatModel *model in weakSelf.seatsArray) {
-//            if (model.seatIndex == index) {
-//                model.isMaster = NO;
-//                model.headUrl = VLUserCenter.user.headUrl;
-//                model.seatIndex = index;
-//                model.name = VLUserCenter.user.name;
-//                model.userNo = VLUserCenter.user.userNo;
-//                model.rtcUid = VLUserCenter.user.id;
-//
-//                if([weakSelf isMainSinger:VLUserCenter.user.userNo]) {
-//                    model.isSelTheSingSong = YES;
-//                    [weakSelf.MVView setPlayerViewsHidden:NO
-//                                         nextButtonHidden:NO];
-//                }
-//
-//                VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-//                if(selSongModel != nil) {
-//                    if (selSongModel.isChorus
-//                        && [selSongModel.chorusNo isEqualToString:VLUserCenter.user.userNo]) {
-//                        model.isJoinedChorus = YES;
-//                    }
-//                }
-//
-//                break;
-//            }
-//        }
-//        [weakSelf.roomPersonView setSeatsArray:weakSelf.seatsArray];
-//        [weakSelf.bottomView resetBtnStatus];
-//        [weakSelf.MVView updateUIWithUserOnSeat:YES
-//                                           song:weakSelf.selSongsArray.firstObject];
-//        [weakSelf.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-//        [weakSelf muteLocalAudio:NO];
     }];
 }
 
 #pragma mark private method
-- (void)_leaveSeat {
-    [self.seatsArray enumerateObjectsUsingBlock:^(VLRoomSeatModel*  obj, NSUInteger idx, BOOL*  stop) {
-        if ([obj.userNo isEqualToString:VLUserCenter.user.userNo]) {
-            [self _leaveSeatWithSeatModel: obj withCompletion:nil];
-            *stop = YES;
-        }
-    }];
-}
-
 - (void)_leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
                  withCompletion:(void(^ __nullable)(NSError*))completion {
     if(seatModel.rtcUid == VLUserCenter.user.id) {
@@ -934,39 +852,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (completion) {
             completion(error);
         }
-//        if (error != nil) {
-//            if (completion) {
-//                completion(error);
-//            }
-//            return;
-//        }
-        //房主自己手动更新视图
-//        if ([seatModel.userNo isEqualToString:VLUserCenter.user.userNo]) {//如果自己主动下麦
-//            [self.MVView updateUIWithUserOnSeat:NO
-//                                           song:self.selSongsArray.firstObject];
-//            [self.MVView setPlayerViewsHidden:YES
-//                             nextButtonHidden:YES];
-//            if([self isMainSinger:VLUserCenter.user.userNo]) {
-//                [self playNextSong:0];
-//            }
-//
-//            [self setSelfAudience];
-//        } else if([self isRoomOwner]
-//                && [self isMainSinger:inputModel.userNo]==YES) {
-//            [self playNextSong:1];
-//        }
-//
-//        [self resetChorusStatus:inputModel.userNo];
-//
-//        for (VLRoomSeatModel *model in self.seatsArray) {
-//            if (model.seatIndex == inputModel.seatIndex) {
-//                [model resetLeaveSeat];
-//            }
-//        }
-//        [self.roomPersonView setSeatsArray:self.seatsArray];
-//        if (completion) {
-//            completion(nil);
-//        }
     }];
 }
 
@@ -1105,19 +990,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         [LEEAlert popLeaveRoomDialogWithCancelBlock:nil
                                       withDoneBlock:^{
-            if(weakSelf.isOnMicSeat) {
-                // Drop mic first
-                [weakSelf _leaveSeat];
-            }
             [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
-            VLRoomSelSongModel *song = self.selSongsArray.firstObject;
-            if([song isSongOwner]) {
-                //mvview action type exit
-                [weakSelf playNextSong:0];
-            }
-            [weakSelf leaveMicSeat:^{
-                [weakSelf leaveRoom];
-            }];
+            [weakSelf leaveRoom];
         }];
     }
 }
