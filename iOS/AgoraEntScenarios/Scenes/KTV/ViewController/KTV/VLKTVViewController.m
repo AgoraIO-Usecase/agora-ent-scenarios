@@ -709,7 +709,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model withRole:(KTVSingRole)role
 {
-    if([model.songNo isEqualToString:self.currentPlayingSongNo]) {
+    if([model.songNo isEqualToString:self.currentPlayingSongNo] || [self.lyricCallbacks objectForKey:model.songNo]) {
+        VLLog(@"skip load, song %@ already playing or loading", model.songNo);
         return;
     }
     
@@ -750,8 +751,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-// TODO
-// Play song locally and update UI
 - (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
     NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
     [self.lyricCallbacks setObject:block forKey:requestId];
@@ -900,8 +899,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         VLLog(@"Agora - 加入RTC成功");
        
-//        [self setUpUI];
-//        [AgoraRtm updateDelegate:self];
     }];
     [self.RTCkit setEnableSpeakerphone:YES];
     
