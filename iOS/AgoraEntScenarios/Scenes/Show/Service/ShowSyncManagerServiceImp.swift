@@ -389,6 +389,7 @@ extension ShowSyncManagerServiceImp {
         }
         roomInfo.updatedAt = Date().timeIntervalSince1970
         roomInfo.roomUserCount = roomUserCount
+        roomInfo.objectId = roomNo
         let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?

@@ -144,6 +144,7 @@
 		A845AD40291BADCB00A41D8D /* ShowMusicTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */; };
 		A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */; };
 		A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */; };
+		A845AD46291C9A0800A41D8D /* ShowChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -591,6 +592,7 @@
 		A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicTableHeaderView.swift; sourceTree = "<group>"; };
 		A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
 		A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicItemCell.swift; sourceTree = "<group>"; };
+		A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatInputView.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1322,6 +1324,7 @@
 			isa = PBXGroup;
 			children = (
 				A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */,
+				A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */,
 				A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */,
 				A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */,
 				A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */,
@@ -3251,6 +3254,7 @@
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD8417C029090C520026B624 /* KTVSyncManagerServiceImp.swift in Sources */,
+				A845AD46291C9A0800A41D8D /* ShowChatInputView.swift in Sources */,
 				DD8417B829090C520026B624 /* VLKTVTopView.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				05FFE6FE290F706C0024D22F /* VoiceRoomChatView.swift in Sources */,

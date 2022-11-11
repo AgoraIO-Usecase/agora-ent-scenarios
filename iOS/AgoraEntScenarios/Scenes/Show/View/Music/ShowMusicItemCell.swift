@@ -19,7 +19,6 @@ import UIKit
     override var isSelected: Bool {
         didSet{
             indicatorImgView.isHidden = !isSelected
-            nameLabel.font = isSelected ? .show_M_12 : .show_R_11
             nameLabel.textColor = isSelected ? .show_main_text : .show_beauty_deselect
         }
     }
@@ -27,7 +26,7 @@ import UIKit
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
-        show_layoutSubviews()
+        show_layoutImageTitle()
     }
     
     required init?(coder: NSCoder) {
@@ -38,24 +37,38 @@ import UIKit
         // 选中标识
         indicatorImgView = UIImageView()
         indicatorImgView.isHidden = true
-        indicatorImgView.image = UIImage.show_sceneImage(name: "show_beauty_selected")
+        indicatorImgView.image = UIImage.show_sceneImage(name: "show_music_set_select_indicator")
         contentView.addSubview(indicatorImgView)
+        indicatorImgView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(58)
+        }
         
         // 图
         imageView = UIImageView()
         imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
         contentView.addSubview(imageView)
         
+        // 蒙版
+        let coverView = UIView()
+        coverView.layer.cornerRadius = 8
+        coverView.layer.masksToBounds = true
+        contentView.addSubview(coverView)
+        coverView.backgroundColor = .show_music_item_bg
+        coverView.snp.makeConstraints { make in
+            make.edges.equalTo(UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2))
+        }
+        
         // 名称
         nameLabel = UILabel()
         nameLabel.font = .show_R_11
-        nameLabel.textColor = .show_main_text
+        nameLabel.textColor = .show_beauty_deselect
         nameLabel.numberOfLines = 2
-        nameLabel.text = "美白".show_localized
         contentView.addSubview(nameLabel)
     }
     
-    func show_layoutSubviews() {
+    func show_layoutImageTitle() {
         indicatorImgView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.centerX.equalToSuperview()
@@ -73,7 +86,7 @@ import UIKit
     }
     
     func setImage(_ image: String, name: String) {
-        imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
+        imageView.image = UIImage.show_sceneImage(name: image)
         nameLabel.text = name
     }
 }
@@ -81,36 +94,26 @@ import UIKit
 
 class ShowMusicImageTopItemCell: ShowMusicItemCell {
     
-    override func show_layoutSubviews() {
-        indicatorImgView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.centerX.equalToSuperview()
-            make.width.height.equalTo(58)
-        }
+    override func show_layoutImageTitle() {
         
         imageView.snp.makeConstraints { make in
             make.centerX.equalTo(indicatorImgView)
-            make.top.equalTo(indicatorImgView)
+            make.top.equalTo(indicatorImgView).offset(5)
         }
         
         nameLabel.snp.makeConstraints { make in
             make.centerX.equalTo(indicatorImgView)
-            make.bottom.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-5)
         }
     }
 }
 
 class ShowMusicImageBackgroundItemCell: ShowMusicItemCell {
     
-    override func show_layoutSubviews() {
-        indicatorImgView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.centerX.equalToSuperview()
-            make.width.height.equalTo(58)
-        }
+    override func show_layoutImageTitle() {
         
         imageView.snp.makeConstraints { make in
-            make.edges.equalTo(UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1))
+            make.edges.equalTo(UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2))
         }
         
         nameLabel.snp.makeConstraints { make in
@@ -121,13 +124,8 @@ class ShowMusicImageBackgroundItemCell: ShowMusicItemCell {
 
 class ShowMusicImageOnlyItemCell: ShowMusicItemCell {
     
-    override func show_layoutSubviews() {
-        indicatorImgView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.centerX.equalToSuperview()
-            make.width.height.equalTo(58)
-        }
-        
+    override func show_layoutImageTitle() {
+      
         imageView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }

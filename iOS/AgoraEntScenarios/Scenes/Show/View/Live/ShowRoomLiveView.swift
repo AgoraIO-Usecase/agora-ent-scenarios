@@ -66,14 +66,10 @@ class ShowRoomLiveView: UIView {
         return tableView
     }()
     
-    private lazy var chatTextField: UITextField = {
-        let textField = UITextField()
-        textField.delegate = self
+    private lazy var chatInputView: ShowChatInputView = {
+        let textField = ShowChatInputView()
         textField.isHidden = true
-        textField.font = .show_R_14
-        textField.textColor = .black
-        textField.returnKeyType = .send
-        textField.backgroundColor = .show_main_text
+        textField.delegate = self
         return textField
     }()
     
@@ -130,15 +126,7 @@ class ShowRoomLiveView: UIView {
             make.right.equalTo(-70)
             make.height.equalTo(168)
         }
-        
-        addSubview(chatTextField)
-        chatTextField.snp.makeConstraints { make in
-            make.left.equalTo(15)
-            make.right.equalTo(-15)
-            make.height.equalTo(40)
-            make.top.equalTo(tableView.snp.bottom).offset(15)
-        }
-        
+    
         addSubview(chatButton)
         chatButton.snp.makeConstraints { make in
             make.left.equalTo(15)
@@ -150,16 +138,26 @@ class ShowRoomLiveView: UIView {
             make.centerY.equalTo(chatButton)
             make.right.equalTo(-15)
         }
+        
+        addSubview(chatInputView)
+        chatInputView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.height.equalTo(56)
+            make.top.equalTo(tableView.snp.bottom).offset(15)
+        }
     }
     
     @objc private func didClickChatButton() {
-        chatButton.isHidden = true
-        chatTextField.isHidden = false
-        chatTextField.becomeFirstResponder()
+        chatInputView.isHidden = false
+        chatInputView.textField.becomeFirstResponder()
     }
     
     @objc private func didClickCloseButton() {
         delegate?.onClickCloseButton()
+    }
+    
+    private func sendMessage(){
+        
     }
 
 }
@@ -191,19 +189,18 @@ extension ShowRoomLiveView: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension ShowRoomLiveView: UITextFieldDelegate {
+extension ShowRoomLiveView: ShowChatInputViewDelegate {
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textField.isHidden = true
-        chatButton.isHidden = false
+    func onEndEditing() {
+        chatInputView.isHidden = true
+    }
+
+    func onClickEmojiButton() {
+        
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if let text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines), text.count > 0 {
-            delegate?.onClickSendMsgButton(text: text)
-        }
-        textField.text = nil
-        textField.resignFirstResponder()
-        return true
+    func onClickSendButton(text: String) {
+        delegate?.onClickSendMsgButton(text: text)
     }
+    
 }

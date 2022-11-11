@@ -12,9 +12,83 @@ class ShowMusicEffectVC: UIViewController {
     struct MusicConfigData {
         let title: String
         let dataArray: [ShowMusicEffectCell.CellData]
+        let defaultSelectIndex: Int
     }
     
-    private var dataArray = [MusicConfigData]()
+    // 背景音乐
+    private lazy var musicBg = {
+        var musicBgDataArray = [ShowMusicEffectCell.CellData]()
+        let titles = [
+            "show_music_setting_bg_happy".show_localized,
+            "show_music_setting_bg_romantic".show_localized,
+            "show_music_setting_bg_happy_2".show_localized,
+        ]
+        let images = [
+            "show_music_set_bg",
+            "show_music_set_bg",
+            "show_music_set_bg",
+        ]
+        
+        for i in 0 ..< titles.count {
+            let data = ShowMusicEffectCell.CellData(image: images[i], title: titles[i], style: .imageTop)
+            musicBgDataArray.append(data)
+        }
+        return MusicConfigData(title: "show_music_setting_bg_title".show_localized, dataArray: musicBgDataArray, defaultSelectIndex: 0)
+    }()
+    
+    // 美声
+    private lazy var beautyVoice = {
+        var beautyVoiceDataArray = [ShowMusicEffectCell.CellData]()
+        
+        let titles = [
+            "show_music_setting_beaty_yuansheng".show_localized,
+            "show_music_setting_beaty_tianmei".show_localized,
+            "show_music_setting_beaty_zhongxing".show_localized,
+            "show_music_setting_beaty_wenzhong".show_localized,
+            "show_music_setting_beaty_mohuan".show_localized,
+        ]
+        let images = [
+            "show_music_beauty_yuanchang",
+            "show_music_beauty_tianmei",
+            "show_music_beauty_zhongxing",
+            "show_music_beauty_wenzhong",
+            "show_music_beauty_mohuan",
+        ]
+        for i in 0 ..< titles.count {
+            let data = ShowMusicEffectCell.CellData(image: images[i], title: titles[i], style: .imageBackground)
+            beautyVoiceDataArray.append(data)
+        }
+        return MusicConfigData(title:  "show_music_setting_beatuy_title".show_localized, dataArray: beautyVoiceDataArray, defaultSelectIndex: 1)
+    }()
+    
+    // 混响
+    private lazy var mixVoice = {
+        var mixVoiceDataArray = [ShowMusicEffectCell.CellData]()
+        let titles = [
+            "show_music_setting_mix_none".show_localized,
+            "show_music_setting_mix_ktv".show_localized,
+            "show_music_setting_mix_concert".show_localized,
+            "show_music_setting_mix_record".show_localized,
+            "show_music_setting_mix_hollowness".show_localized,
+        ]
+        let images = [
+            "show_music_mix_none",
+            "show_music_mix_KTV",
+            "show_music_mix_concert",
+            "show_music_mix_record",
+            "show_music_mix_hollowness",
+        ]
+        for i in 0 ..< titles.count {
+            let style: ShowMusicEffectCell.LayoutStyle = i == 0 ? .imageOnly : .imageBackground
+            let data = ShowMusicEffectCell.CellData(image: images[i], title: titles[i], style: style)
+            mixVoiceDataArray.append(data)
+        }
+        return MusicConfigData(title: "show_music_setting_mix_title".show_localized, dataArray: mixVoiceDataArray, defaultSelectIndex: 0)
+    }()
+    
+    private lazy var dataArray = {
+        return [musicBg, beautyVoice,mixVoice]
+    }()
     
     private let headerView = ShowMusicTableHeaderView()
     
@@ -36,7 +110,6 @@ class ShowMusicEffectVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        configData()
     }
     
     private func setupUI(){
@@ -46,32 +119,6 @@ class ShowMusicEffectVC: UIViewController {
             make.height.equalTo(487)
         }
     }
-    
-    private func configData(){
-        var musicBgDataArray = [ShowMusicEffectCell.CellData]()
-        for title in ["欢快","浪漫", "欢快2"] {
-            let data = ShowMusicEffectCell.CellData(image: "", title: title, style: .imageTop)
-            musicBgDataArray.append(data)
-        }
-        let musicBg = MusicConfigData(title: "背景音乐", dataArray: musicBgDataArray)
-        
-        var beautyVoiceDataArray = [ShowMusicEffectCell.CellData]()
-        for title in ["原声","甜美", "中性","稳重", "魔幻"] {
-            let data = ShowMusicEffectCell.CellData(image: "", title: title, style: .imageBackground)
-            beautyVoiceDataArray.append(data)
-        }
-        let beautyVoice = MusicConfigData(title: "美声", dataArray: beautyVoiceDataArray)
-        
-        var mixVoiceDataArray = [ShowMusicEffectCell.CellData]()
-        for title in ["","KTV", "演唱会","录音棚", "空旷"] {
-            let data = ShowMusicEffectCell.CellData(image: "", title: title, style: .imageBackground)
-            mixVoiceDataArray.append(data)
-        }
-        let mixVoice = MusicConfigData(title: "混响", dataArray: beautyVoiceDataArray)
-        
-        dataArray = [musicBg, beautyVoice,mixVoice]
-    }
-
 }
 
 extension ShowMusicEffectVC {
@@ -99,7 +146,7 @@ extension ShowMusicEffectVC: UITableViewDelegate, UITableViewDataSource {
             cell = ShowMusicEffectCell(style: .default, reuseIdentifier: cellID)
         }
         let data = dataArray[indexPath.row]
-        cell?.setTitle(data.title, dataArray: data.dataArray)
+        cell?.setTitle(data.title, dataArray: data.dataArray,defaultSelectIndex: data.defaultSelectIndex)
         return cell!
     }
     
