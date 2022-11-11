@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger isVideoMuted;
 
 ///新增, 判断当前歌曲是否是自己点的
-@property (nonatomic, assign) BOOL isSelTheSingSong;
+@property (nonatomic, assign) BOOL isOwner;
 
 @property (nonatomic, assign) BOOL isJoinedChorus;
 
