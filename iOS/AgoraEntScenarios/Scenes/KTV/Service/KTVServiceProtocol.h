@@ -40,8 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol KTVServiceProtocol <NSObject>
 
 
-/// room info
-
 /// 获取房间列表
 /// @param page <#page description#>
 /// @param completion <#completion description#>
@@ -60,14 +58,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)joinRoomWithInput:(KTVJoinRoomInputModel*)inputModel
                completion:(void (^)(NSError* _Nullable, KTVJoinRoomOutputModel*_Nullable))completion;
 
-/// 离开房间
+/// 切换MV封面
+/// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
-
-
-
-
-// mic seat
+- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
+                    completion:(void(^)(NSError* _Nullable))completion;
 
 /// 上麦
 /// @param inputModel <#inputModel description#>
@@ -81,34 +76,37 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)outSeatWithInput:(KTVOutSeatInputModel*)inputModel
               completion:(void(^)(NSError* _Nullable))completion;
 
-/// 设置麦位声音
-/// @param openStatus YES: 开启声音 NO: 关闭声音
+/// 离开房间
 /// @param completion <#completion description#>
-- (void)openAudioStatusWithStatus:(BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)leaveRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
 
-/// 打开麦位摄像头
-/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
+/// 删除房间
 /// @param completion <#completion description#>
-- (void)openVideoStatusWithStatus: (BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)removeRoomWithCompletion:(void(^)(NSError* _Nullable))completion;
 
 
-
-
-
-
-//choose songs
-
-/// 删除选中歌曲
+/// 删除歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
 - (void)removeSongWithInput:(KTVRemoveSongInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
+
 /// 获取选择歌曲列表
 /// @param completion <#completion description#>
 - (void)getChoosedSongsListWithCompletion:(void(^)(NSError* _Nullable, NSArray<VLRoomSelSongModel*>* _Nullable))completion;
+
+/// 加入合唱
+/// @param inputModel <#inputModel description#>
+/// @param completion <#completion description#>
+- (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
+                 completion:(void(^)(NSError* _Nullable))completion;
+
+/// 歌曲详情
+/// @param inputModel <#inputModel description#>
+/// @param completion <#completion description#>
+- (void)getSongDetailWithInput:(KTVSongDetailInputModel*)inputModel
+                    completion:(void(^)(NSError* _Nullable, KTVSongDetailOutputModel* _Nullable))completion;
 
 
 /// 主唱告诉后台当前播放的歌曲
@@ -123,54 +121,56 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)chooseSongWithInput:(KTVChooseSongInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
+
+
 /// 置顶歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
 - (void)makeSongTopWithInput:(KTVMakeSongTopInputModel*)inputModel
                   completion:(void(^)(NSError* _Nullable))completion;
 
-
-
-
-//lyrics
-
-/// 加入合唱
-/// @param inputModel <#inputModel description#>
-/// @param completion <#completion description#>
-- (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
-                 completion:(void(^)(NSError* _Nullable))completion;
-
-/// 当前歌曲合唱改为独唱
-- (void)becomeSolo;
-
-/// 切换MV封面
-/// @param inputModel <#inputModel description#>
-/// @param completion <#completion description#>
-- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
-                completion:(void(^)(NSError* _Nullable))completion;
-
-/// 更新得分
-/// @param totalVolume <#totalVolume description#>
-- (void)updateSingingScoreWithTotalVolume:(double)totalVolume;
-
-
 //subscribe
 
-/// 订阅用户变化
+
+/// user count did changed
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeUserListCountWithChanged:(void(^)(NSUInteger))changedBlock;
 
-/// 订阅麦位变化
+/// seat list did changed
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeSeatListWithChanged:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock;
 
-/// 订阅房间状态变化
+/// room status did changed
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeRoomStatusWithChanged:(void (^)(NSUInteger, VLRoomListModel*))changedBlock;
 
-/// 订阅选中歌曲变化
+
+/// song did changed
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
+
+
+// Deprecated method
+- (void)muteWithMuteStatus:(BOOL)mute
+                completion:(void(^)(NSError* _Nullable))completion;
+
+- (void)openVideoStatusWithStatus: (BOOL)openStatus
+                       completion:(void(^)(NSError* _Nullable))completion;
+
+- (void)publishChooseSongEvent;
+- (void)leaveChannel;
+- (void)publishMuteEventWithMuteStatus:(BOOL)muteStatus
+                            completion:(void(^)(NSError* _Nullable))completion;
+- (void)publishVideoOpenEventWithOpenStatus:(BOOL)openStatus
+                                 completion:(void(^)(NSError* _Nullable))completion;
+- (void)publishSongDidChangedEventWithOwnerStatus:(BOOL)isMaster;
+- (void)publishToSoloEvent;
+- (void)publishJoinToChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
+- (void)publishSongOwnerWithOwnerId:(NSString*)userNo;
+- (void)publishSingingScoreWithTotalVolume:(double)totalVolume;
+
+
+- (void)subscribeRtmMessageWithStatusChanged:(void(^)(AgoraRtmChannel*, AgoraRtmMessage*, AgoraRtmMember*))changedBlock;
 @end
 
 NS_ASSUME_NONNULL_END
