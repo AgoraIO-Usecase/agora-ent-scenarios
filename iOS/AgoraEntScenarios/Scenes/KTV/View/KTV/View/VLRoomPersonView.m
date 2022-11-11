@@ -66,15 +66,15 @@
 - (void)setSeatsArray:(NSArray *)roomSeatsArray {
     self.roomSeatsArray = [[NSMutableArray alloc]initWithArray:roomSeatsArray];
     for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-        if (seatModel.id != nil) {
-            if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.id]) {
-                [self.roomSeatsViewArray removeObjectForKey:seatModel.id];
+        if (seatModel.rtcUid != nil) {
+            if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
+                [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
             }
             UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
-            renderView.tag = viewTag+[seatModel.id integerValue];
+            renderView.tag = viewTag+[seatModel.rtcUid integerValue];
 
             AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
-            videoCanvas.uid = [seatModel.id integerValue];
+            videoCanvas.uid = [seatModel.rtcUid integerValue];
             videoCanvas.view = renderView;
             videoCanvas.renderMode = AgoraVideoRenderModeHidden;
             //TODO video display
@@ -90,7 +90,7 @@
 //            else{
 //                [self.RTCkit setupRemoteVideo:videoCanvas];
 //            }
-            [self.roomSeatsViewArray setObject:renderView forKey:seatModel.id];
+            [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
         }
     }
     [self.personCollectionView reloadData];
@@ -99,15 +99,15 @@
 - (void)updateSeatsByModel:(VLRoomSeatModel *)model{
     for (NSInteger i = 0; i < [self.roomSeatsArray count]; i++) {
         VLRoomSeatModel *seatModel = [self.roomSeatsArray objectAtIndex:i];
-        if (seatModel.id != nil) {
-            if ([seatModel.id isEqual:model.id]) {
-                if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.id]) {
-                    [self.roomSeatsViewArray removeObjectForKey:seatModel.id];
+        if (seatModel.rtcUid != nil) {
+            if ([seatModel.rtcUid isEqual:model.rtcUid]) {
+                if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
+                    [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
                 }
                 UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
-                renderView.tag = viewTag+[seatModel.id integerValue];
+                renderView.tag = viewTag + [seatModel.rtcUid integerValue];
                 AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
-                videoCanvas.uid = [seatModel.id integerValue];
+                videoCanvas.uid = [seatModel.rtcUid integerValue];
                 videoCanvas.view = renderView;
                 videoCanvas.renderMode = AgoraVideoRenderModeHidden;
 //                if ([model.id isEqual:VLUserCenter.user.id]) {
@@ -122,7 +122,7 @@
 //                else{
 //                    [self.RTCkit setupRemoteVideo:videoCanvas];
 //                }
-                [self.roomSeatsViewArray setObject:renderView forKey:seatModel.id];
+                [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
                 [self.roomSeatsArray removeObject:seatModel];
                 [self.roomSeatsArray insertObject:model atIndex:i];
                 [self.personCollectionView reloadData];
@@ -192,15 +192,15 @@
     else
         cell.joinChorusBtn.hidden = YES;
     
-    if (seatModel.id == nil) {
+    if (seatModel.rtcUid == nil) {
         cell.muteImgView.hidden = YES;
         cell.singingBtn.hidden = YES;
         cell.joinChorusBtn.hidden = YES;
     }
     if (seatModel.isVideoMuted ==  1) { //开启了视频
-        if ([self.roomSeatsViewArray valueForKey:seatModel.id] != nil) {
+        if ([self.roomSeatsViewArray valueForKey:seatModel.rtcUid] != nil) {
             [cell.videoView removeAllSubviews];
-            [cell.videoView insertSubview:[self.roomSeatsViewArray valueForKey:seatModel.id] atIndex:0];
+            [cell.videoView insertSubview:[self.roomSeatsViewArray valueForKey:seatModel.rtcUid] atIndex:0];
         }
     }
     

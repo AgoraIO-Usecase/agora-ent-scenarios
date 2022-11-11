@@ -659,7 +659,7 @@ extension KTVSyncManagerServiceImp {
         let user = VLUserCenter.user
         let seatInfo = VLRoomSeatModel()
         seatInfo.seatIndex = seatIndex
-        seatInfo.id = user.id
+        seatInfo.rtcUid = user.id
         seatInfo.userNo = user.userNo
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
@@ -848,7 +848,7 @@ extension KTVSyncManagerServiceImp {
                            let seat = VLRoomSeatModel()
                            seat.seatIndex = origSeat.seatIndex
                            self.seatMap["\(origSeat.seatIndex)"] = seat
-                           self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, origSeat)
+                           self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, seat)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
