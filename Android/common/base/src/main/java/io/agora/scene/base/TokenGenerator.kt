@@ -75,7 +75,7 @@ object TokenGenerator {
         postBody.put("expire", 900)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
-        postBody.put("type", 1)
+        postBody.put("type", tokenType.value)
         postBody.put("uid", uid + "")
 
         val request = Request.Builder().url(
