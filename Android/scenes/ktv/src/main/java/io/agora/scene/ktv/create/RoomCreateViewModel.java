@@ -45,7 +45,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
     public void createRoom(int isPrivate,
                            String name, String password,
                            String userNo, String icon) {
-        ktvServiceProtocol.createRoomWithInput(new KTVCreateRoomInputModel(
+        ktvServiceProtocol.createRoom(new KTVCreateRoomInputModel(
                 icon, isPrivate, name, password, userNo
         ), (e, ktvCreateRoomOutputModel) -> {
             if (e == null && ktvCreateRoomOutputModel != null) {
@@ -63,7 +63,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
     }
 
     public void joinRoom(String roomNo, String password) {
-        ktvServiceProtocol.joinRoomWithInput(new KTVJoinRoomInputModel(roomNo, password),
+        ktvServiceProtocol.joinRoom(new KTVJoinRoomInputModel(roomNo, password),
                 (e, ktvJoinRoomOutputModel) -> {
                     if (e == null && ktvJoinRoomOutputModel != null) {
                         // success
