@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
@@ -163,36 +164,51 @@ class KTVSyncManagerServiceImp(
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
 
-                    _subscribeRoomChanged()
-                    _subscribeChooseSong {}
-                    _addUserIfNeed { addUsererror, userSize ->
-                        if(addUsererror != null){
-                            completion.invoke(addUsererror, null)
-                            return@_addUserIfNeed
-                        }
-                        _autoOnSeatIfNeed { error, seats ->
-                            if (error != null) {
-                                completion.invoke(error, null)
-                                return@_autoOnSeatIfNeed
-                            }
+                    TokenGenerator.generateTokens(
+                        currRoomNo,
+                        UserManager.getInstance().user.id.toString(),
+                        TokenGenerator.TokenGeneratorType.token006,
+                        arrayOf(TokenGenerator.AgoraTokenType.rtc, TokenGenerator.AgoraTokenType.rtm),
+                        { ret ->
+                            val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc]!!
+                            val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm]!!
+                            _subscribeRoomChanged()
+                            _subscribeChooseSong {}
+                            _addUserIfNeed { addUsererror, userSize ->
+                                if(addUsererror != null){
+                                    completion.invoke(addUsererror, null)
+                                    return@_addUserIfNeed
+                                }
+                                _autoOnSeatIfNeed { error, seats ->
+                                    if (error != null) {
+                                        completion.invoke(error, null)
+                                        return@_autoOnSeatIfNeed
+                                    }
 
-                            val kTVJoinRoomOutputModel = KTVJoinRoomOutputModel(
-                                cacheRoom.name,
-                                inputModel.roomNo,
-                                cacheRoom.creatorNo,
-                                cacheRoom.bgOption,
-                                seats,
-                                userSize,
-                                "", //TODO fetchToken
-                                "", //TODO fetchToken
-                                "", //TODO fetchToken,
-                            )
-                            runOnMainThread {
-                                completion.invoke(null, kTVJoinRoomOutputModel)
-                            }
-                        }
+                                    val kTVJoinRoomOutputModel = KTVJoinRoomOutputModel(
+                                        cacheRoom.name,
+                                        inputModel.roomNo,
+                                        cacheRoom.creatorNo,
+                                        cacheRoom.bgOption,
+                                        seats,
+                                        userSize,
+                                        rtmToken,
+                                        rtcToken,
+                                        "", //TODO fetchToken,
+                                    )
+                                    runOnMainThread {
+                                        completion.invoke(null, kTVJoinRoomOutputModel)
+                                    }
+                                }
 
-                    }
+                            }
+                        },
+                        {
+                            completion.invoke(it, null)
+                        }
+                    )
+
+
 
                 }
 
