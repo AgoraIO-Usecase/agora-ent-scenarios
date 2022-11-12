@@ -30,6 +30,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -62,15 +63,8 @@ public class ApiManager {
                         }
                     }
                     return chain.proceed(builder.build());
-                }).addInterceptor(new LoggerInterceptor(null, true))
-//                .addInterceptor(LoggerInterceptor(null, true))
-                /*
-            这里可以添加一个HttpLoggingInterceptor，因为Retrofit封装好了从Http请求到解析，
-            出了bug很难找出来问题，添加HttpLoggingInterceptor拦截器方便调试接口
-             */
-//                .addInterceptor(HttpLoggingInterceptor()
-//                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-
+                })
+                .addInterceptor(new HttpLoggingInterceptor())
                 .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
