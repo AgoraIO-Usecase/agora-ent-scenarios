@@ -38,16 +38,18 @@ data class VLRoomListModel(
 }
 
 data class VLRoomSeatModel(
-    val isMaster: Boolean,
-    val headUrl: String,
-    val userNo: String,
-    val id: String,
-    val name: String,
-    val onSeat: Int,
-    val joinSing: Boolean,
-    val isSelfMuted: Int,
-    val isVideoMuted: Int,
-    val ifSelTheSingSong: Boolean,
+    val isMaster: Boolean,// 是否是房主
+    val headUrl: String,// 头像
+    val userNo: String,// 座位上用户no
+    val rtcUid: String,// 座位上用户id，与rtc的userId一致
+    val name: String,// 座位上用户昵称
+    val seatIndex: Int,// 座位编号
+    val joinSing: Boolean,// 是否合唱
+    val isSelfMuted: Int,// 是否静音
+    val isVideoMuted: Int,// 是否开启视频
+
+    // TODO 下面两个字段似乎是多余的？
+    val ifSelTheSingSong: Boolean,// 判断当前歌曲是否是自己点的
     val ifJoinedChorus: Boolean,
 ) : java.io.Serializable
 
@@ -113,9 +115,9 @@ data class VLRoomSelSongModel(
     // 获取歌词列表返回的歌词信息
     val songName: String,// 歌曲名
     val songNo: String, // 歌词唯一标识
-    val songUrl: String, // mp3路径
+    val songUrl: String?, // mp3路径
     val singer: String, // 演唱者
-    val lyric: String, // 歌词
+    val lyric: String?, // 歌词
     val imageUrl: String,// 歌曲封面
 
     // 获取已点歌记返回的歌词信息，同时也包含上面信息

@@ -12,8 +12,6 @@ import io.agora.scene.base.api.base.BaseResponse
 import io.agora.scene.base.bean.MemberMusicModel
 import io.agora.scene.base.bean.RoomListModel
 import io.agora.scene.base.data.model.AgoraRoom
-import io.agora.scene.base.data.model.KTVBaseResponse
-import io.agora.scene.base.data.model.MusicModelBase
 import io.agora.scene.base.event.ReceivedMessageEvent
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -105,7 +103,7 @@ class KTVServiceImp : KTVServiceProtocol {
             })
     }
 
-    override fun createRoomWithInput(
+    override fun createRoom(
         inputModel: KTVCreateRoomInputModel,
         completion: (error: Exception?, out: KTVCreateRoomOutputModel?) -> Unit
     ) {
@@ -134,7 +132,7 @@ class KTVServiceImp : KTVServiceProtocol {
         })
     }
 
-    override fun joinRoomWithInput(
+    override fun joinRoom(
         inputModel: KTVJoinRoomInputModel,
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     ) {
@@ -212,7 +210,7 @@ class KTVServiceImp : KTVServiceProtocol {
             })
     }
 
-    override fun leaveRoomWithCompletion(completion: (error: Exception?) -> Unit) {
+    override fun leaveRoom(completion: (error: Exception?) -> Unit) {
         if (roomNo == null) {
             completion.invoke(RuntimeException("No room joined!"))
             return
@@ -298,7 +296,7 @@ class KTVServiceImp : KTVServiceProtocol {
         }
     }
 
-    override fun changeMVCoverWithInput(
+    override fun changeMVCover(
         inputModel: KTVChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
     ) {
         if (roomNo == null) {
@@ -336,18 +334,18 @@ class KTVServiceImp : KTVServiceProtocol {
             })
     }
 
-    override fun subscribeRoomStatusWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit) {
+    override fun subscribeRoomStatus(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomListModel?) -> Unit) {
         roomStatusSubscriber = changedBlock
     }
 
-    override fun subscribeUserListCountWithChanged(changedBlock: (count: Int) -> Unit) {
+    override fun subscribeUserListCount(changedBlock: (count: Int) -> Unit) {
         roomUserCountSubscriber = changedBlock
     }
 
 
     // =============== 麦位相关 ===========================
 
-    override fun onSeatWithInput(
+    override fun onSeat(
         inputModel: KTVOnSeatInputModel, completion: (error: Exception?) -> Unit
     ) {
         if (localSeatModel != null) {
@@ -405,7 +403,7 @@ class KTVServiceImp : KTVServiceProtocol {
                 })
     }
 
-    override fun outSeatWithInput(
+    override fun outSeat(
         inputModel: KTVOutSeatInputModel, completion: (error: Exception?) -> Unit
     ) {
         if (localSeatModel == null) {
@@ -459,7 +457,7 @@ class KTVServiceImp : KTVServiceProtocol {
                 })
     }
 
-    override fun muteWithMuteStatus(isSelfMuted: Int, completion: (error: Exception?) -> Unit) {
+    override fun openAudioStatus(isSelfMuted: Int, completion: (error: Exception?) -> Unit) {
         if (localSeatModel == null) {
             completion.invoke(RuntimeException("The user has been out seat!"))
             return
@@ -479,9 +477,9 @@ class KTVServiceImp : KTVServiceProtocol {
                             localSeatModel.isMaster,
                             localSeatModel.headUrl,
                             localSeatModel.userNo,
-                            localSeatModel.id,
+                            localSeatModel.rtcUid,
                             localSeatModel.name,
-                            localSeatModel.onSeat,
+                            localSeatModel.seatIndex,
                             localSeatModel.joinSing,
                             isSelfMuted,
                             localSeatModel.isVideoMuted,
@@ -513,7 +511,7 @@ class KTVServiceImp : KTVServiceProtocol {
             )
     }
 
-    override fun openVideoStatusWithStatus(
+    override fun openVideoStatus(
         isVideoMuted: Int, completion: (error: Exception?) -> Unit
     ) {
         if (localSeatModel == null) {
@@ -534,9 +532,9 @@ class KTVServiceImp : KTVServiceProtocol {
                             localSeatModel.isMaster,
                             localSeatModel.headUrl,
                             localSeatModel.userNo,
-                            localSeatModel.id,
+                            localSeatModel.rtcUid,
                             localSeatModel.name,
-                            localSeatModel.onSeat,
+                            localSeatModel.seatIndex,
                             localSeatModel.joinSing,
                             localSeatModel.isSelfMuted,
                             isVideoMuted,
@@ -569,7 +567,7 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
 
-    override fun subscribeSeatListWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSeatModel?) -> Unit) {
+    override fun subscribeSeatList(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSeatModel?) -> Unit) {
         seatListChangeSubscriber = changedBlock
     }
 
@@ -577,7 +575,7 @@ class KTVServiceImp : KTVServiceProtocol {
     // =============== 歌词相关 ================================
 
 
-    override fun getChoosedSongsListWithCompletion(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
+    override fun getChoosedSongsList(completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit) {
         ApiManager.getInstance().requestGetSongsOrderedList(roomNo)
             .compose(applyApiSchedulers())
             .subscribe(object : ApiSubscriber<BaseResponse<List<MemberMusicModel>?>>() {
@@ -616,7 +614,7 @@ class KTVServiceImp : KTVServiceProtocol {
             })
     }
 
-    override fun switchSongWithInput(
+    override fun switchSong(
         inputModel: KTVSwitchSongInputModel, completion: (error: Exception?) -> Unit
     ) {
         ApiManager.getInstance().requestSwitchSong(
@@ -659,7 +657,7 @@ class KTVServiceImp : KTVServiceProtocol {
         })
     }
 
-    override fun removeSongWithInput(
+    override fun removeSong(
         inputModel: KTVRemoveSongInputModel, completion: (error: Exception?) -> Unit
     ) {
         ApiManager.getInstance().requestDeleteSong(
@@ -691,32 +689,7 @@ class KTVServiceImp : KTVServiceProtocol {
             );
     }
 
-    override fun getSongDetailWithInput(
-        inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel?) -> Unit
-    ) {
-        ApiManager.getInstance().requestSongsDetail(inputModel.songNo)
-            .compose(applyApiSchedulers())
-            .subscribe(
-                object : ApiSubscriber<KTVBaseResponse<MusicModelBase>>(){
-                    override fun onSuccess(t: KTVBaseResponse<MusicModelBase>?) {
-                        val data = t?.data?.data ?: return
-                        completion.invoke(null, KTVSongDetailOutputModel(
-                            inputModel.songNo,
-                            data.lyric,
-                            data.playUrl
-                        ))
-                    }
-
-                    override fun onFailure(t: ApiException?) {
-                        completion.invoke(t, null)
-                    }
-
-                }
-            )
-    }
-
-    override fun chooseSongWithInput(
+    override fun chooseSong(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
     ) {
         val isChorus : Int = inputModel.isChorus
@@ -749,7 +722,7 @@ class KTVServiceImp : KTVServiceProtocol {
             );
     }
 
-    override fun makeSongTopWithInput(
+    override fun makeSongTop(
         inputModel: KTVMakeSongTopInputModel, completion: (error: Exception?) -> Unit
     ) {
         ApiManager.getInstance().requestTopSong(inputModel.sort, inputModel.songNo, UserManager.getInstance().user.userNo, roomNo)
@@ -781,7 +754,7 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
 
-    override fun joinChorusWithInput(
+    override fun joinChorus(
         inputModel: KTVJoinChorusInputModel, completion: (error: Exception?) -> Unit
     ) {
         ApiManager.getInstance()
@@ -843,7 +816,7 @@ class KTVServiceImp : KTVServiceProtocol {
     }
 
 
-    override fun subscribeChooseSongWithChanged(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit) {
+    override fun subscribeChooseSong(changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
     }
 
