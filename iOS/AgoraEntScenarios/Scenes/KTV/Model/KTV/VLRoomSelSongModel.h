@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///排序
 @property (nonatomic, copy) NSString *sort;
 ///0 未开始 1.已唱 2.正在唱
-@property (nonatomic, assign) NSInteger  status;
+@property (nonatomic, assign) NSInteger status;
 ///是谁点的歌
 @property (nonatomic, copy) NSString *userNo;
 //@property (nonatomic, copy) NSString *userId;
@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 是否是自己点的歌曲
 - (BOOL)isSongOwner;
+
+- (BOOL)readyToPlay;
 
 - (BOOL)waittingForChorus;
 @end

@@ -99,6 +99,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
+@property (nonatomic, assign) double currentVoicePitch;
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 
@@ -299,8 +300,7 @@ VLPopScoreViewDelegate
                 
                 //观众看到打分
                 if (songInfo.status == 2) {
-                    double voicePitch = songInfo.score;
-                    [weakSelf.MVView setVoicePitch:@[@(voicePitch)]];
+                    weakSelf.currentVoicePitch = songInfo.score;
                     return;
                 }
             }
@@ -440,9 +440,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         return;
     }
     
-    double voicePitch = speaker.voicePitch;
-    [self.MVView setVoicePitch:@[@(voicePitch)]];
-    [[AppContext ktvServiceImp] updateSingingScoreWithScore:voicePitch];
+//    self.currentVoicePitch = speaker.voicePitch;
+    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
 }
 
 - (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
@@ -665,7 +664,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (model == nil || [model waittingForChorus]) {
         return;
     }
-    if (model.status != 2 && !model.isChorus) {
+    if (model.status != 2 && [model readyToPlay]) {
         [self markSongDidPlayWithModel:model];
         return;
     }
@@ -1518,6 +1517,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                onSeat:self.isOnMicSeat];
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
+}
+
+- (void)setCurrentVoicePitch:(double)currentVoicePitch {
+    [self.MVView setVoicePitch:@[@(currentVoicePitch)]];
 }
 
 #pragma mark - lazy getter
