@@ -98,11 +98,8 @@
     inputModel.songNo = model.songNo;
     inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] makeSongTopWithInput:inputModel
-                                          completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
+    [[AppContext ktvServiceImp] PinSongWithInput:inputModel
+                                      completion:^(NSError * error) {
     }];
 }
 

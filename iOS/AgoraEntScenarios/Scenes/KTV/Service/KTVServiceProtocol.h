@@ -72,26 +72,26 @@ NS_ASSUME_NONNULL_BEGIN
 /// 上麦
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)onSeatWithInput:(KTVOnSeatInputModel*)inputModel
-             completion:(void(^)(NSError* _Nullable))completion;
+- (void)enterSeatWithInput:(KTVOnSeatInputModel*)inputModel
+                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 下麦
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)outSeatWithInput:(KTVOutSeatInputModel*)inputModel
-              completion:(void(^)(NSError* _Nullable))completion;
+- (void)leaveSeatWithInput:(KTVOutSeatInputModel*)inputModel
+                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 设置麦位声音
-/// @param openStatus YES: 开启声音 NO: 关闭声音
+/// @param muted YES: 关闭声音 NO: 开启声音
 /// @param completion <#completion description#>
-- (void)openAudioStatusWithStatus:(BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)updateSeatAudioMuteStatusWithMuted:(BOOL)muted
+                                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 打开麦位摄像头
-/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
+/// @param muted YES: 关闭摄像头 NO: 开启摄像头
 /// @param completion <#completion description#>
-- (void)openVideoStatusWithStatus: (BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)updateSeatVideoMuteStatusWithMuted:(BOOL)muted
+                                completion:(void(^)(NSError* _Nullable))completion;
 
 
 
@@ -126,8 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 置顶歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)makeSongTopWithInput:(KTVMakeSongTopInputModel*)inputModel
-                  completion:(void(^)(NSError* _Nullable))completion;
+- (void)PinSongWithInput:(KTVMakeSongTopInputModel*)inputModel
+              completion:(void(^)(NSError* _Nullable))completion;
 
 
 //lyrics
@@ -139,12 +139,12 @@ NS_ASSUME_NONNULL_BEGIN
                  completion:(void(^)(NSError* _Nullable))completion;
 
 /// 当前歌曲合唱改为独唱
-- (void)becomeSolo;
+- (void)enterSoloMode;
 
 /// 切换MV封面
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
+- (void)changeMVCoverWithParams:(KTVChangeMVCoverInputModel*)inputModel
                 completion:(void(^)(NSError* _Nullable))completion;
 
 /// 更新得分
