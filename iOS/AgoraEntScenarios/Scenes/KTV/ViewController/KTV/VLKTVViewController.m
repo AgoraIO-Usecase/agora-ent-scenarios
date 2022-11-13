@@ -168,10 +168,8 @@ VLPopScoreViewDelegate
     //请求已点歌曲
     VL(weakSelf);
     [self refreshChoosedSongList:^{
-        //拿到当前歌的歌词去播放和同步歌词
-        VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
         //请求歌词和歌曲
-        [self loadAndPlaySong];
+        [weakSelf loadAndPlaySong];
     }];
 }
 
@@ -652,8 +650,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
     
-    [[AppContext ktvServiceImp] openAudioStatusWithStatus:!mute
-                                               completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
+                                                        completion:^(NSError * error) {
+        
     }];
 }
 
@@ -666,8 +665,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         self.isNowCameraMuted = YES;
     }
     [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
-    [[AppContext ktvServiceImp] openVideoStatusWithStatus:!mute
-                                               completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:mute
+                                                        completion:^(NSError * error) {
     }];
 }
 
@@ -808,8 +807,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
     inputModel.seatIndex = index;
 //    VL(weakSelf);
-    [[AppContext ktvServiceImp] onSeatWithInput:inputModel
-                                     completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] enterSeatWithInput:inputModel
+                                        completion:^(NSError * error) {
     }];
 }
 
@@ -828,12 +827,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.userName = seatModel.name;
     inputModel.userHeadUrl = seatModel.headUrl;
     inputModel.seatIndex = seatModel.seatIndex;
-    [[AppContext ktvServiceImp] outSeatWithInput:inputModel
-                                      completion:^(NSError * error) {
-        if (completion) {
-            completion(error);
-        }
-    }];
+    [[AppContext ktvServiceImp] leaveSeatWithInput:inputModel
+                                        completion:completion];
 }
 
 #pragma mark - rtc utils
@@ -1051,8 +1046,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.mvIndex = index;
 //    inputModel.userNo = VLUserCenter.user.userNo;
     VL(weakSelf);
-    [[AppContext ktvServiceImp] changeMVCoverWithInput:inputModel
-                                            completion:^(NSError * error) {
+    [[AppContext ktvServiceImp] changeMVCoverWithParams:inputModel
+                                             completion:^(NSError * error) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -1416,7 +1411,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //发送独唱的消息
 - (void)becomeSolo {
-    [[AppContext ktvServiceImp] becomeSolo];
+    [[AppContext ktvServiceImp] enterSoloMode];
 }
 
 - (void)joinChorus {
