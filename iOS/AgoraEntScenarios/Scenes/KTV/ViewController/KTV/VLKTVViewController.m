@@ -466,7 +466,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         if([self isMainSinger:VLUserCenter.user.userNo]) {
             double voicePitch = (double)totalVolume;
             [self.MVView setVoicePitch:@[@(voicePitch)]];
-            [[AppContext ktvServiceImp] updateSingingScoreWithTotalVolume:totalVolume];
+            [[AppContext ktvServiceImp] updateSingingScoreWithScore:voicePitch];
         }
     }
 }
@@ -697,9 +697,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if (model == nil
-        || [model waittingForChorus]
-        || model.status != 2) {
+    if (model == nil || [model waittingForChorus]) {
+        return;
+    }
+    if (model.status != 2 && !model.isChorus) {
+        [self markSongDidPlayWithModel:model];
         return;
     }
     

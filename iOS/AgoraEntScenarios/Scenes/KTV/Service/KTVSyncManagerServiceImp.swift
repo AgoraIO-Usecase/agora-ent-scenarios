@@ -390,15 +390,15 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         _markSoloSongIfNeed()
     }
     
-    func updateSingingScore(withTotalVolume totalVolume: Double) {
+    func updateSingingScore(withScore score: Double) {
 //        assertionFailure()
         guard let topSong = self.songList.first else {
 //            assertionFailure()
             return
         }
         
-        topSong.status = 2
-        topSong.score = totalVolume
+//        topSong.status = 2
+        topSong.score = score
         _updateChooseSong(songInfo: topSong) { error in
         }
     }

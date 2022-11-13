@@ -148,8 +148,8 @@ NS_ASSUME_NONNULL_BEGIN
                 completion:(void(^)(NSError* _Nullable))completion;
 
 /// 更新得分
-/// @param totalVolume <#totalVolume description#>
-- (void)updateSingingScoreWithTotalVolume:(double)totalVolume;
+/// @param score <#totalVolume description#>
+- (void)updateSingingScoreWithScore:(double)score;
 
 
 //subscribe
