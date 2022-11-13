@@ -33,7 +33,6 @@
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLHomeOnLineListViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
-//        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(exitRoomEvent) name:kExitRoomNotification object:nil];
         self.delegate = delegate;
         [self setupView];
     }
