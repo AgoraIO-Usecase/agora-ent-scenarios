@@ -153,7 +153,6 @@ VLPopScoreViewDelegate
     //start join
     [self joinRTCChannel];
     
-    
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
     //处理背景
@@ -591,7 +590,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-#pragma mark - content center
+#pragma mark AgoraMusicContentCenterEventDelegate
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
     LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
@@ -600,9 +599,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self.lyricCallbacks removeObjectForKey:requestId];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        callback(lyricUrl);
-    });
+    VLLog(@"lll onLyricResult ");
+    callback(lyricUrl);
 }
 
 - (void)onMusicChartsResult:(nonnull NSString *)requestId
@@ -629,15 +627,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         [self.musicCallbacks removeObjectForKey:sSongCode];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block();
-        });
+        block();
     } else if(status == AgoraMusicContentCenterPreloadStatusPreloading) {
         // Do nothing.
     } else {
-        dispatch_main_async_safe(^{
-            [VLToast toast:KTVLocalizedString(@"加载歌曲失败")];
-        });
+        [VLToast toast:KTVLocalizedString(@"加载歌曲失败")];
     }
 }
 
@@ -705,16 +699,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     
-    [self loadAndPlaySongWithModel:model withRole:[model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience];
+    KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience;
+    [self loadAndPlaySongWithModel:model withRole:role];
 }
 
-- (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model withRole:(KTVSingRole)role
-{
-    if([model.songNo isEqualToString:self.currentPlayingSongNo] || [self.lyricCallbacks objectForKey:model.songNo]) {
+- (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model
+                        withRole:(KTVSingRole)role {
+    if([model.songNo isEqualToString:self.currentPlayingSongNo]
+       || [self.lyricCallbacks count] > 0
+       || [self.musicCallbacks count] > 0) {
         VLLog(@"skip load, song %@ already playing or loading", model.songNo);
         return;
     }
     
+    VLLog(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
+
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
@@ -730,9 +729,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //TODO why always NO?
                 [self.MVView updateUIWithUserOnSeat:NO
                                                song:model];
-                
-                //owner to update
-                [self markSongDidPlayWithModel:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
@@ -837,7 +833,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //发送流消息
 - (void)sendStremMessageWithDict:(NSDictionary *)dict
                          success:(sendStreamSuccess)success {
-    NSLog(@"sendStremMessageWithDict:::%@",dict);
+    VLLog(@"sendStremMessageWithDict:::%@",dict);
     NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
     if (streamId == -1) {
         AgoraDataStreamConfig *config = [AgoraDataStreamConfig new];
@@ -913,7 +909,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
     VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
-    self.lyricCallbacks = [NSMutableDictionary new];
 }
 
 - (void)setSelfAudience {
@@ -1549,6 +1544,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [_AgoraMcc registerEventDelegate:[AppContext shared]];
     }
     [[AppContext shared] setAgoraMcc:AgoraMcc];
+    [self.AgoraMcc enableMainQueueDispatch:YES];
+    self.lyricCallbacks = [NSMutableDictionary dictionary];
+    self.musicCallbacks = [NSMutableDictionary dictionary];
 }
 
 - (void)setSeatsArray:(NSArray<VLRoomSeatModel *> *)seatsArray
