@@ -102,7 +102,7 @@
         imageNamed = @"ktv_score_C";
     }
     VLLog(@"Using as score view %@", imageNamed);
-    _scoreImgView.image = [UIImage imageNamed:imageNamed];
+    _scoreImgView.image = [UIImage sceneImageWithName:imageNamed];
 }
 
 - (void)dismiss {
@@ -143,7 +143,7 @@
 - (UIImageView *)starImageView {
     if (!_starImageView) {
         _starImageView = [[UIImageView alloc] init];
-        _starImageView.image = [UIImage imageNamed:@"ktv_score_star"];
+        _starImageView.image = [UIImage sceneImageWithName:@"ktv_score_star"];
     }
     return _starImageView;
 }
@@ -151,7 +151,7 @@
 - (UIImageView *)scoreImgView {
     if (!_scoreImgView) {
         _scoreImgView = [[UIImageView alloc] init];
-        _scoreImgView.image = [UIImage imageNamed:@"ktv_score_S"];
+        _scoreImgView.image = [UIImage sceneImageWithName:@"ktv_score_S"];
     }
     return _scoreImgView;
 }
@@ -159,7 +159,7 @@
 - (UIImageView *)circleLightImageView {
     if (!_circleLightImageView) {
         _circleLightImageView = [[UIImageView alloc] init];
-        _circleLightImageView.image = [UIImage imageNamed:@"ktv_score_topPart"];
+        _circleLightImageView.image = [UIImage sceneImageWithName:@"ktv_score_topPart"];
     }
     return _circleLightImageView;
 }
@@ -167,7 +167,7 @@
 - (UIImageView *)circleImageView {
     if (!_circleImageView) {
         _circleImageView = [[UIImageView alloc] init];
-        _circleImageView.image = [UIImage imageNamed:@"ktv_score_bottomPart"];
+        _circleImageView.image = [UIImage sceneImageWithName:@"ktv_score_bottomPart"];
     }
     return _circleImageView;
 }

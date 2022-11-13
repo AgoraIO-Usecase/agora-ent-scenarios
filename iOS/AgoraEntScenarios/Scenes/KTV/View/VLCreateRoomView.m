@@ -49,7 +49,8 @@
     iconImgView.layer.cornerRadius = 20;
     iconImgView.layer.masksToBounds = YES;
     self.iconImgView = iconImgView;
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%@",self.addRoomModel.icon]];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@", self.addRoomModel.icon];
+    self.iconImgView.image = [UIImage sceneImageWithName:iconName];
     [self addSubview:iconImgView];
     
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
@@ -197,7 +198,8 @@
 - (void)randomBtnClickEvent {
     [self createRandomNumber];
     self.inputTF.text = self.addRoomModel.name;
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%@",self.addRoomModel.icon]];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@",self.addRoomModel.icon];
+    self.iconImgView.image = [UIImage sceneImageWithName: iconName];
 }
 
 - (void)createBtnClickEvent {

@@ -66,7 +66,7 @@
     [self.contentView addSubview:self.nickNameLabel];
     
     self.muteImgView = [[UIImageView alloc]initWithFrame:CGRectMake(VLREALVALUE_WIDTH(54)/2-12, VLREALVALUE_WIDTH(54)/2-12, 24, 24)];
-    self.muteImgView.image = [UIImage imageNamed:@"ktv_self_seatMute"];
+    self.muteImgView.image = [UIImage sceneImageWithName:@"ktv_self_seatMute"];
     self.muteImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.muteImgView];
     
