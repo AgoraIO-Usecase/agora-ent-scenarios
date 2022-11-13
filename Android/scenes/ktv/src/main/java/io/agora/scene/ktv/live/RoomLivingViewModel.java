@@ -503,11 +503,11 @@ public class RoomLivingViewModel extends ViewModel {
                 ChannelMediaOptions options = new ChannelMediaOptions();
                 options.publishMicrophoneTrack = isUnMute;
                 mRtcEngine.updateChannelMediaOptions(options);
-                if (mMusicPlayer != null) {
+                if (mPlayer != null) {
                     if (isUnMute) {
-                        mMusicPlayer.setOldMicVolume();
+                        setOldMicVolume();
                     } else {
-                        mMusicPlayer.resetVolume();
+                        resetVolume();
                     }
                 }
             } else {
@@ -1034,7 +1034,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onNetworkQuality(int uid, int txQuality, int rxQuality) {
                 super.onNetworkQuality(uid, txQuality, rxQuality);
-                if(uid == UserManager.getInstance().getUser().id) {
+                if(uid == 0) { //本地user uid = 0
                     networkStatusLiveData.postValue(new NetWorkEvent(txQuality, rxQuality));
                 }
             }
@@ -1221,12 +1221,12 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onMicVolChanged(int vol) {
-                mMusicPlayer.setMicVolume(vol);
+                setMicVolume(vol);
             }
 
             @Override
             public void onMusicVolChanged(int vol) {
-                mMusicPlayer.setMusicVolume(vol);
+                setMusicVolume(vol);
             }
 
             @Override
@@ -1261,7 +1261,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onToneChanged(int newToneValue) {
-                mMusicPlayer.setAudioMixingPitch(newToneValue);
+                mPlayer.setAudioPitch(newToneValue);
             }
         });
     }
@@ -1288,6 +1288,37 @@ public class RoomLivingViewModel extends ViewModel {
                 return Constants.STYLE_TRANSFORMATION_RNB;
         }
         return Constants.AUDIO_EFFECT_OFF;
+    }
+
+    // -------------- 音量调整 -----------------
+    private int musicVolume = 40;
+    private int micVolume = 40;
+    private int micOldVolume = 40;
+
+    public void resetVolume() {
+        if (micVolume != musicVolume) {
+            micOldVolume = micVolume;
+            setMicVolume(musicVolume);
+        }
+    }
+
+    public void setMusicVolume(int v) {
+        musicVolume = v;
+        mPlayer.adjustPlayoutVolume(v);
+        mPlayer.adjustPublishSignalVolume(v);
+    }
+
+    public void setOldMicVolume() {
+        setMicVolume(micOldVolume);
+    }
+
+    public void setMicVolume(int v) {
+        if (seatLocalLiveData.getValue().isSelfMuted() == 1) {
+            micOldVolume = v;
+            return;
+        }
+        micVolume = v;
+        mRtcEngine.adjustRecordingSignalVolume(v);
     }
 
     public void musicStartPlay(Context context, VLRoomSelSongModel music) {
