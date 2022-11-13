@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLPopChooseSongView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus;
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus;
 
 @property (nonatomic, strong) NSArray *selSongsArray;
 
