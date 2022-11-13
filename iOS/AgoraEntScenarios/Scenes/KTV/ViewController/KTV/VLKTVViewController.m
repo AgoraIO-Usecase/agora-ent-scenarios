@@ -370,6 +370,7 @@ VLPopScoreViewDelegate
                                      withDelegate:self];
     
     self.chooseSongView = (VLPopChooseSongView*)popChooseSongView.currCustomView;
+    self.chooseSongView.selSongsArray = self.selSongsArray; //刷新已点歌曲UI
 }
 
 //弹出音效
