@@ -664,8 +664,6 @@ extension KTVSyncManagerServiceImp {
         seatInfo.userNo = user.userNo
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
-        /// 是否合唱
-        seatInfo.joinSing = false
         /// 是否自己静音
         seatInfo.isAudioMuted = 0
         /// 是否开启视频
