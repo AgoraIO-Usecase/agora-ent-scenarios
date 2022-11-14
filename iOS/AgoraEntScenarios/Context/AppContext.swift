@@ -6,12 +6,27 @@
 //
 
 import Foundation
+import Bugly
 
 @objc class AppContext: NSObject {
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
     @objc var extDic: NSMutableDictionary = NSMutableDictionary()
+    
+    override init() {
+        super.init()
+        setupBugly()
+    }
+    
+    private func setupBugly() {
+        let config = BuglyConfig()
+        config.reportLogLevel = BuglyLogLevel.warn
+        #if DEBUG
+        config.debugMode = true
+        #endif
+        Bugly.start(withAppId: "e188384728", config: config)
+    }
 
     @objc func getLang() -> String {
         guard let lang = NSLocale.preferredLanguages.first else {
