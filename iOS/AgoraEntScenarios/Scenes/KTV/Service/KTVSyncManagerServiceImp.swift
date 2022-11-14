@@ -85,6 +85,11 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     // MARK: room info
     func getRoomList(withPage page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
         initScene { [weak self] in
+            guard page < 1 else {
+                completion(nil, [])
+                return
+            }
+            
             SyncUtil.fetchAll { results in
                 print("result == \(results.compactMap { $0.toJson() })")
                 guard let self = self else {
@@ -116,14 +121,6 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
         roomInfo.createdAt = "\(Date().timeIntervalSince1970)"
-//        roomInfo.soundEffect;
-//        roomInfo.belCanto;
-//        roomInfo.createdAt;
-//        roomInfo.updatedAt;
-//        roomInfo.status;
-//        roomInfo.deletedAt;
-//        roomInfo.roomPeopleNum;
-//        roomInfo.icon;
 
         let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
 
@@ -150,14 +147,14 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     self.roomList?.append(roomInfo)
-//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
-                    let output = KTVCreateRoomOutputModel()
-                    output.name = inputModel.name
-                    output.roomNo = roomInfo.roomNo
-                    output.seatsArray = self._emptySeats()
-                    completion(nil, output)
+                    self._autoOnSeatIfNeed { seatArray in
+                        let output = KTVCreateRoomOutputModel()
+                        output.name = inputModel.name
+                        output.roomNo = roomInfo.roomNo
+                        output.seatsArray = seatArray
+                        completion(nil, output)
+                    }
                     self._addUserIfNeed()
-                    self._autoOnSeatIfNeed()
                     self._subscribeChooseSong {}
                 }
             } fail: { error in
@@ -198,13 +195,13 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
-//                    VLUserCenter.user.agoraPlayerRTCToken = response.data[@"agoraPlayerRTCToken"];
-                    let output = KTVJoinRoomOutputModel()
-                    output.creator = userId
-                    output.seatsArray = self._emptySeats()
-                    completion(nil, output)
+                    self._autoOnSeatIfNeed { seatArray in
+                        let output = KTVJoinRoomOutputModel()
+                        output.creator = userId
+                        output.seatsArray = seatArray
+                        completion(nil, output)
+                    }
                     self._addUserIfNeed()
-                    self._autoOnSeatIfNeed()
                     self._subscribeChooseSong {}
                 }
             } fail: { error in
@@ -642,12 +639,15 @@ extension KTVSyncManagerServiceImp {
 // MARK: Seat operation
 
 extension KTVSyncManagerServiceImp {
-    private func _emptySeats() -> [VLRoomSeatModel] {
+    private func _getInitSeats() -> [VLRoomSeatModel] {
         var seatArray = [VLRoomSeatModel]()
         for i in 0...7 {
+            if let seat = seatMap["\(i)"] {
+                seatArray.append(seat)
+                continue
+            }
             let seat = VLRoomSeatModel()
             seat.seatIndex = i
-//            seat.objectId = "\(i)"
             seatArray.append(seat)
 
             seatMap["\(i)"] = seat
@@ -665,9 +665,9 @@ extension KTVSyncManagerServiceImp {
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
         /// 是否自己静音
-        seatInfo.isAudioMuted = 0
+        seatInfo.isAudioMuted = 1
         /// 是否开启视频
-        seatInfo.isVideoMuted = 0
+        seatInfo.isVideoMuted = 1
 
         /// 新增, 判断当前歌曲是否是自己点的
         seatInfo.isOwner = false
@@ -677,21 +677,15 @@ extension KTVSyncManagerServiceImp {
         return seatInfo
     }
 
-    private func _autoOnSeatIfNeed() {
+    private func _autoOnSeatIfNeed(completion: @escaping ([VLRoomSeatModel])->()) {
         _subscribeSeats {}
 
+        userList.removeAll()
+        songList.removeAll()
+        seatMap.removeAll()
         _getSeatInfo { [weak self] error, list in
             guard let self = self else {
                 return
-            }
-
-            // mock callback
-            self.seatMap.forEach { (key: String, value: VLRoomSeatModel) in
-                if value.objectId == nil {
-                    return
-                }
-
-                self.seatListDidChanged?(KTVSubscribeCreated.rawValue, value)
             }
 
             // update seat info (user avater/nick name did changed) if seat existed
@@ -699,16 +693,20 @@ extension KTVSyncManagerServiceImp {
                 let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
+                    completion(self._getInitSeats())
                 }
                 return
             }
             guard VLUserCenter.user.ifMaster else {
+                completion(self._getInitSeats())
                 return
             }
 
             // add master to first seat
             let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
+            targetSeatInfo.isAudioMuted = 0
             self._addSeatInfo(seatInfo: targetSeatInfo) { error in
+                completion(self._getInitSeats())
             }
         }
     }
