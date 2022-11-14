@@ -961,6 +961,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onVLKTVMoreSelView:(VLPopMoreSelView *)view
                  btnTapped:(id)sender
                  withValue:(VLKTVMoreBtnClickType)typeValue {
+    [[LSTPopView getPopViewWithCustomView:view] dismiss];
     switch (typeValue) {
         case VLKTVMoreBtnClickTypeBelcanto:
             [self popBelcantoView];
