@@ -79,13 +79,13 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
             self.isSelfMuted = info.isAudioMuted;
             self.isVideoMuted = info.isVideoMuted;
 
-            if (info.isAudioMuted == 0) {
+            if (!info.isAudioMuted) {
                 [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
             }
             else{
                 [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
             }
-            if (info.isVideoMuted == 1) {
+            if (!info.isVideoMuted) {
                 [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
             }
             else{
