@@ -219,26 +219,40 @@ public class RoomLivingViewModel extends ViewModel {
     // =============== 房间相关 ==========================
 
     public void initRoom() {
-        ktvServiceProtocol.subscribeRoomStatusWithChanged((ktvSubscribe, vlRoomListModel) -> {
+        KTVJoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
+        if (_roomInfo == null) {
+            throw new RuntimeException("The roomInfo muse be not null before initSeats method calling!");
+        }
+
+        roomUserCountLiveData.postValue(_roomInfo.getRoomPeopleNum());
+
+        if (isRoomOwner()) {
+            RTCManager.getInstance().getRtcEngine().setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
+        }
+
+        ktvServiceProtocol.subscribeRoomStatus((ktvSubscribe, vlRoomListModel) -> {
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted) {
                 roomDeleteLiveData.postValue(true);
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
-                KTVJoinRoomOutputModel _roomInfo = roomInfoLiveData.getValue();
-                roomInfoLiveData.postValue(new KTVJoinRoomOutputModel(
-                        _roomInfo.getRoomName(),
-                        _roomInfo.getRoomNo(),
-                        _roomInfo.getCreatorNo(),
-                        vlRoomListModel.getBgOption(),
-                        _roomInfo.getSeatsArray(),
-                        _roomInfo.getAgoraRTMToken(),
-                        _roomInfo.getAgoraRTCToken(),
-                        _roomInfo.getAgoraPlayerRTCToken()
-                ));
+                KTVJoinRoomOutputModel _rroomInfo = roomInfoLiveData.getValue();
+                if (!vlRoomListModel.getBgOption().equals(_rroomInfo.getBgOption())) {
+                    roomInfoLiveData.postValue(new KTVJoinRoomOutputModel(
+                            _rroomInfo.getRoomName(),
+                            _rroomInfo.getRoomNo(),
+                            _rroomInfo.getCreatorNo(),
+                            vlRoomListModel.getBgOption(),
+                            _rroomInfo.getSeatsArray(),
+                            _rroomInfo.getRoomPeopleNum(),
+                            _rroomInfo.getAgoraRTMToken(),
+                            _rroomInfo.getAgoraRTCToken(),
+                            _rroomInfo.getAgoraPlayerRTCToken()
+                    ));
+                }
             }
             return null;
         });
 
-        ktvServiceProtocol.subscribeUserListCountWithChanged(count -> {
+        ktvServiceProtocol.subscribeUserListCount(count -> {
             roomUserCountLiveData.postValue(count);
             return null;
         });
@@ -249,7 +263,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 退出房间
      */
     public void exitRoom() {
-        ktvServiceProtocol.leaveRoomWithCompletion(e -> {
+        ktvServiceProtocol.leaveRoom(e -> {
             if (e == null) {
                 roomDeleteLiveData.postValue(false);
             } else {
@@ -263,7 +277,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 设置背景
      */
     public void setMV_BG(int bgPosition) {
-        ktvServiceProtocol.changeMVCoverWithInput(new KTVChangeMVCoverInputModel(bgPosition), new Function1<Exception, Unit>() {
+        ktvServiceProtocol.changeMVCover(new KTVChangeMVCoverInputModel(bgPosition), new Function1<Exception, Unit>() {
             @Override
             public Unit invoke(Exception e) {
                 if (e == null) {
@@ -301,7 +315,7 @@ public class RoomLivingViewModel extends ViewModel {
             seatLocalLiveData.setValue(null);
         }
 
-        ktvServiceProtocol.subscribeSeatListWithChanged((ktvSubscribe, vlRoomSeatModel) -> {
+        ktvServiceProtocol.subscribeSeatList((ktvSubscribe, vlRoomSeatModel) -> {
             if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated) {
 
                 List<VLRoomSeatModel> oValue = seatListLiveData.getValue();
@@ -324,9 +338,9 @@ public class RoomLivingViewModel extends ViewModel {
                 }
                 List<VLRoomSeatModel> value = new ArrayList<>(oValue);
                 int index = -1;
-                for (VLRoomSeatModel seat : value) {
-                    index++;
-                    if (seat.getOnSeat() == vlRoomSeatModel.getOnSeat()) {
+                for (int i = 0; i < value.size(); i++) {
+                    if (value.get(i).getSeatIndex() == vlRoomSeatModel.getSeatIndex()) {
+                        index = i;
                         break;
                     }
                 }
@@ -401,7 +415,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 上麦
      */
     public void haveSeat(int onSeatIndex) {
-        ktvServiceProtocol.onSeatWithInput(new KTVOnSeatInputModel(onSeatIndex), new Function1<Exception, Unit>() {
+        ktvServiceProtocol.onSeat(new KTVOnSeatInputModel(onSeatIndex), new Function1<Exception, Unit>() {
             @Override
             public Unit invoke(Exception e) {
                 if (e == null) {
@@ -422,13 +436,13 @@ public class RoomLivingViewModel extends ViewModel {
      * 离开麦位
      */
     public void leaveSeat(VLRoomSeatModel seatModel) {
-        ktvServiceProtocol.outSeatWithInput(
+        ktvServiceProtocol.outSeat(
                 new KTVOutSeatInputModel(
                         seatModel.getUserNo(),
-                        seatModel.getId(),
+                        seatModel.getRtcUid(),
                         seatModel.getName(),
                         seatModel.getHeadUrl(),
-                        seatModel.getOnSeat()
+                        seatModel.getSeatIndex()
                 ),
                 e -> {
                     if (e == null) {
@@ -449,7 +463,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void toggleSelfVideo(int isVideoMuted) {
-        ktvServiceProtocol.openVideoStatusWithStatus(isVideoMuted, e -> {
+        ktvServiceProtocol.openVideoStatus(isVideoMuted, e -> {
             if (e == null) {
                 // success
                 mRtcEngine.enableLocalVideo(isVideoMuted == 1);
@@ -468,7 +482,7 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void toggleMic(int isSelfMuted) {
         boolean isUnMute = isSelfMuted == 0;
-        ktvServiceProtocol.muteWithMuteStatus(isSelfMuted, e -> {
+        ktvServiceProtocol.openAudioStatus(isSelfMuted, e -> {
             if (e == null) {
                 // success
                 if (!isUnMute) {
@@ -503,7 +517,7 @@ public class RoomLivingViewModel extends ViewModel {
     // ======== 歌曲相关 ============
 
     public void initSongs() {
-        ktvServiceProtocol.subscribeChooseSongWithChanged((ktvSubscribe, songModel) -> {
+        ktvServiceProtocol.subscribeChooseSong((ktvSubscribe, songModel) -> {
             getSongChosenList();
             return null;
         });
@@ -534,7 +548,7 @@ public class RoomLivingViewModel extends ViewModel {
                                 List<VLRoomSelSongModel> songs = new ArrayList<>();
 
                                 // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-                                ktvServiceProtocol.getChoosedSongsListWithCompletion((e, songsChosen) -> {
+                                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
                                     if(e == null && songsChosen != null){
                                         // success
                                         for (MusicModelNew record : musicModel.records) {
@@ -553,10 +567,9 @@ public class RoomLivingViewModel extends ViewModel {
                                                         record.songUrl,
                                                         record.singer,
                                                         record.lyric,
-                                                        record.status,
                                                         record.imageUrl,
 
-                                                        "", "", "", "", false, 0, 0, 0.0, false, ""
+                                                        "", "", "", "", false, 0, 0
                                                 );
                                             }
 
@@ -611,7 +624,7 @@ public class RoomLivingViewModel extends ViewModel {
                                 List<VLRoomSelSongModel> songs = new ArrayList<>();
 
                                 // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-                                ktvServiceProtocol.getChoosedSongsListWithCompletion((e, songsChosen) -> {
+                                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
                                     if(e == null && songsChosen != null){
                                         // success
                                         for (MusicModelNew record : musicModel.records) {
@@ -630,10 +643,9 @@ public class RoomLivingViewModel extends ViewModel {
                                                         record.songUrl,
                                                         record.singer,
                                                         record.lyric,
-                                                        record.status,
                                                         record.imageUrl,
 
-                                                        "", "", "", "", false, 0, 0, 0.0, false, ""
+                                                        "", "", "", "", false, 0, 0
                                                 );
                                             }
 
@@ -669,13 +681,14 @@ public class RoomLivingViewModel extends ViewModel {
         if(songModel == null){
             return liveData;
         }
-        ktvServiceProtocol.chooseSongWithInput(
+        ktvServiceProtocol.chooseSong(
                 new KTVChooseSongInputModel(isChorus ? 1 : 0,
                         songModel.getSongName(),
                         songModel.getSongNo(),
                         songModel.getSongUrl(),
                         songModel.getSinger(),
-                        songModel.getImageUrl()),
+                        songModel.getImageUrl(),
+                        songModel.getLyric()),
                 e -> {
                     if (e == null) {
                         // success
@@ -698,8 +711,8 @@ public class RoomLivingViewModel extends ViewModel {
         if(songModel == null){
             return;
         }
-        ktvServiceProtocol.removeSongWithInput(
-                new KTVRemoveSongInputModel(songModel.getSongNo(), songModel.getSort(), ""),
+        ktvServiceProtocol.removeSong(
+                new KTVRemoveSongInputModel(songModel.getSongNo(), songModel.getSort()),
                 e -> {
                     if (e == null) {
                         // success: do nothing for subscriber dealing with the event already
@@ -720,10 +733,9 @@ public class RoomLivingViewModel extends ViewModel {
         if(songModel == null){
             return;
         }
-        ktvServiceProtocol.makeSongTopWithInput(new KTVMakeSongTopInputModel(
+        ktvServiceProtocol.makeSongTop(new KTVMakeSongTopInputModel(
                 songModel.getSongNo(),
-                songModel.getSort(),
-                ""
+                songModel.getSort()
         ), e -> {
             if(e == null){
                 // success: do nothing for subscriber dealing with the event already
@@ -739,7 +751,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 获取已点列表
      */
     public void getSongChosenList() {
-        ktvServiceProtocol.getChoosedSongsListWithCompletion((e, data) -> {
+        ktvServiceProtocol.getChoosedSongsList((e, data) -> {
             if (e == null && data != null) {
                 // success
                 songsOrderedLiveData.postValue(data);
@@ -774,7 +786,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
 
-        ktvServiceProtocol.joinChorusWithInput(new KTVJoinChorusInputModel(musicModel.getSongNo()), e -> {
+        ktvServiceProtocol.joinChorus(new KTVJoinChorusInputModel(musicModel.getSongNo()), e -> {
             if (e == null) {
                 songPlayingLiveData.postValue(new VLRoomSelSongModel(
                         musicModel.getSongName(),
@@ -782,7 +794,6 @@ public class RoomLivingViewModel extends ViewModel {
                         musicModel.getSongUrl(),
                         musicModel.getSinger(),
                         musicModel.getLyric(),
-                        musicModel.getStatus(),
 
                         musicModel.getImageUrl(),
                         musicModel.getUserNo(),
@@ -791,12 +802,7 @@ public class RoomLivingViewModel extends ViewModel {
                         UserManager.getInstance().getUser().userNo,
                         true,
                         musicModel.isOriginal(),
-                        musicModel.getSort(),
-
-                        musicModel.getScore(),
-                        musicModel.isOwnSong(),
-
-                        musicModel.getObjectId()
+                        musicModel.getSort()
                 ));
                 // success
                 //mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
@@ -825,7 +831,6 @@ public class RoomLivingViewModel extends ViewModel {
                 musicModel.getSongUrl(),
                 musicModel.getSinger(),
                 musicModel.getLyric(),
-                musicModel.getStatus(),
 
                 musicModel.getImageUrl(),
                 musicModel.getUserNo(),
@@ -834,12 +839,7 @@ public class RoomLivingViewModel extends ViewModel {
                 "",
                 false,
                 musicModel.isOriginal(),
-                musicModel.getSort(),
-
-                musicModel.getScore(),
-                musicModel.isOwnSong(),
-
-                musicModel.getObjectId()
+                musicModel.getSort()
         ));
     }
 
@@ -858,10 +858,8 @@ public class RoomLivingViewModel extends ViewModel {
         }
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
 
-        ktvServiceProtocol.switchSongWithInput(new KTVSwitchSongInputModel(
-                UserManager.getInstance().getUser().userNo,
-                musicModel.getSongNo(),
-                roomInfoLiveData.getValue().getRoomNo()
+        ktvServiceProtocol.switchSong(new KTVSwitchSongInputModel(
+                musicModel.getSongNo()
         ), e -> {
             if (e == null) {
                 // success
