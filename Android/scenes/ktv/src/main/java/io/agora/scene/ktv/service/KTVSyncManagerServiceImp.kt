@@ -11,6 +11,7 @@ import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.syncmanager.rtm.Sync.EventListener
 import java.util.concurrent.CountDownLatch
+import kotlin.random.Random
 
 
 /**
@@ -61,6 +62,7 @@ class KTVSyncManagerServiceImp(
     private val seatMap = mutableMapOf<String, VLRoomSeatModel?>() // key: seatIndex
     private val songChosenList = ArrayList<VLRoomSelSongModel>()
 
+    @Volatile
     private var currRoomNo: String = ""
 
 
@@ -98,7 +100,7 @@ class KTVSyncManagerServiceImp(
     ) {
         initSync {
             val vlRoomListModel = VLRoomListModel(
-                roomNo = (100000..999999).random().toString(),
+                roomNo = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString(),
                 name = inputModel.name,
                 icon = inputModel.icon,
                 isPrivate = inputModel.isPrivate != 0,
@@ -139,6 +141,7 @@ class KTVSyncManagerServiceImp(
     ) {
         if (!TextUtils.isEmpty(currRoomNo)) {
             completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
+            return
         }
         val cacheRoom = roomMap[inputModel.roomNo]
         if (cacheRoom == null) {
@@ -214,54 +217,74 @@ class KTVSyncManagerServiceImp(
 
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
         val cacheRoom = roomMap[currRoomNo] ?: return
-
-
-
         // 取消所有订阅
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
 
-        // 减少用户数，并清空用户信息
-        innerRemoveUser {}
-        innerUpdateUserCount(userMap.size - 1)
-        userMap.clear()
-
-        // 如果上麦了要下麦，并清空麦位信息
-        seatMap.forEach {
-            it.value?.let { seat ->
-                if (seat.userNo == UserManager.getInstance().user.userNo) {
-                    innerRemoveSeat(seat) {}
-                    return@forEach
-                }
-            }
-        }
-        seatMap.clear()
-
-
         if (cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
             // 移除房间
-            roomMap.remove(cacheRoom.roomNo)
             mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
-                    runOnMainThread { completion.invoke(null) }
+                    runOnMainThread {
+                        resetCacheInfo(true)
+                        completion.invoke(null)
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
                     runOnMainThread { completion.invoke(exception) }
                 }
             })
-            runOnMainThread {
-                completion.invoke(null)
-            }
         } else {
+            resetCacheInfo(false)
             // leave room
             runOnMainThread {
                 completion.invoke(null)
             }
         }
+    }
 
+    private fun resetCacheInfo(isRoomDestroyed: Boolean = false) {
+
+        // 减少用户数，并清空用户信息
+        if(!isRoomDestroyed){
+            innerRemoveUser {}
+            innerUpdateUserCount(userMap.size - 1)
+        }
+
+        userMap.clear()
+        objIdOfUserNo.clear()
+
+        // 如果上麦了要下麦，并清空麦位信息
+        if(!isRoomDestroyed){
+            seatMap.forEach {
+                it.value?.let { seat ->
+                    if (seat.userNo == UserManager.getInstance().user.userNo) {
+                        innerRemoveSeat(seat) {}
+                        return@forEach
+                    }
+                }
+            }
+        }
+        seatMap.clear()
+        objIdOfSeatIndex.clear()
+
+        // 删除点歌信息
+        if(!isRoomDestroyed){
+            songChosenList.forEachIndexed { index: Int, songModel: VLRoomSelSongModel ->
+                if (songModel.userNo.equals(UserManager.getInstance().user.userNo)) {
+                    innerRemoveChooseSong(objIdOfSongNo[index]) {}
+                }
+            }
+        }
+        objIdOfSongNo.clear()
+        songChosenList.clear()
+
+        if(isRoomDestroyed){
+            roomMap.remove(currRoomNo)
+        }
         mSceneReference = null
         currRoomNo = ""
     }
@@ -1127,11 +1150,11 @@ class KTVSyncManagerServiceImp(
             override fun onDeleted(item: IObject?) {
                 item ?: return
                 val roomInfo = roomMap[item.id] ?: return
-                roomMap.remove(roomInfo.roomNo)
 
                 if (item.id != currRoomNo) {
                     return
                 }
+                resetCacheInfo(true)
                 runOnMainThread {
                     roomStatusSubscriber?.invoke(
                         KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
