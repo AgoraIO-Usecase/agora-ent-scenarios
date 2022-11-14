@@ -1,5 +1,8 @@
 package io.agora.scene.ktv.service
 
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.ToastUtils
+
 
 interface KTVServiceProtocol {
 
@@ -10,7 +13,13 @@ interface KTVServiceProtocol {
     }
 
     companion object {
-        private val instance by lazy { KTVServiceImp() }
+        private val instance by lazy {
+            // KTVServiceImp()
+            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
+                error?.message?.let { ToastUtils.showToast(it) }
+            }
+        }
+
         fun getImplInstance(): KTVServiceProtocol = instance
     }
 
@@ -26,7 +35,7 @@ interface KTVServiceProtocol {
     /**
      * 创建房间
      */
-    fun createRoomWithInput(
+    fun createRoom(
         inputModel: KTVCreateRoomInputModel,
         completion: (error: Exception?, out: KTVCreateRoomOutputModel?) -> Unit
     )
@@ -34,7 +43,7 @@ interface KTVServiceProtocol {
     /**
      * 加入房间
      */
-    fun joinRoomWithInput(
+    fun joinRoom(
         inputModel: KTVJoinRoomInputModel,
         completion: (error: Exception?, out: KTVJoinRoomOutputModel?) -> Unit
     )
@@ -42,28 +51,28 @@ interface KTVServiceProtocol {
     /**
      * 离开房间
      */
-    fun leaveRoomWithCompletion(
+    fun leaveRoom(
         completion: (error: Exception?) -> Unit
     )
 
     /**
      * 切换MV封面
      */
-    fun changeMVCoverWithInput(
+    fun changeMVCover(
         inputModel: KTVChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
      * room status did changed
      */
-    fun subscribeRoomStatusWithChanged(
+    fun subscribeRoomStatus(
         changedBlock: (KTVSubscribe, VLRoomListModel?) -> Unit
     )
 
     /**
      * user count did changed
      */
-    fun subscribeUserListCountWithChanged(
+    fun subscribeUserListCount(
         changedBlock: (count: Int) -> Unit
     )
 
@@ -73,7 +82,7 @@ interface KTVServiceProtocol {
     /**
      * 上麦
      */
-    fun onSeatWithInput(
+    fun onSeat(
         inputModel: KTVOnSeatInputModel,
         completion: (error: Exception?) -> Unit
     )
@@ -81,28 +90,28 @@ interface KTVServiceProtocol {
     /**
      * 下麦
      */
-    fun outSeatWithInput(
+    fun outSeat(
         inputModel: KTVOutSeatInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 设置麦位静音
      */
-    fun muteWithMuteStatus(
+    fun openAudioStatus(
         isSelfMuted: Int, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 打开麦位摄像头
      */
-    fun openVideoStatusWithStatus(
+    fun openVideoStatus(
         isVideoMuted: Int, completion: (error: Exception?) -> Unit
     )
 
     /**
      * seat list did changed
      */
-    fun subscribeSeatListWithChanged(
+    fun subscribeSeatList(
         changedBlock: (KTVServiceProtocol.KTVSubscribe, VLRoomSeatModel?) -> Unit
     )
 
@@ -111,58 +120,42 @@ interface KTVServiceProtocol {
     /**
      * 获取选择歌曲列表
      */
-    fun getChoosedSongsListWithCompletion(
+    fun getChoosedSongsList(
         completion: (error: Exception?, list: List<VLRoomSelSongModel>?) -> Unit
     )
 
     /**
      * 删除歌曲
      */
-    fun removeSongWithInput(
+    fun removeSong(
         inputModel: KTVRemoveSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * 歌曲详情
-     */
-    fun getSongDetailWithInput(
-        inputModel: KTVSongDetailInputModel,
-        completion: (error: Exception?, out: KTVSongDetailOutputModel) -> Unit
-    )
-
-
-    /**
      * 切歌
      */
-    fun switchSongWithInput(
+    fun switchSong(
         inputModel: KTVSwitchSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 点歌
      */
-    fun chooseSongWithInput(
+    fun chooseSong(
         inputModel: KTVChooseSongInputModel, completion: (error: Exception?) -> Unit
-    )
-
-    /**
-     * 主唱告诉后台当前播放的歌曲
-     */
-    fun markSongDidPlayWithInput(
-        inputModel: VLRoomSelSongModel, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 置顶歌曲
      */
-    fun makeSongTopWithInput(
+    fun makeSongTop(
         inputModel: KTVMakeSongTopInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 加入合唱
      */
-    fun joinChorusWithInput(
+    fun joinChorus(
         inputModel: KTVJoinChorusInputModel, completion: (error: Exception?) -> Unit
     )
 
@@ -174,7 +167,7 @@ interface KTVServiceProtocol {
     /**
      * song did changed
      */
-    fun subscribeChooseSongWithChanged(
+    fun subscribeChooseSong(
         changedBlock: (KTVSubscribe, VLRoomSelSongModel?) -> Unit
     )
 
