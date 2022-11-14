@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.live;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -31,7 +32,6 @@ import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.holder.RoomPeopleHolder;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
-import io.agora.scene.ktv.manager.RTCManager;
 import io.agora.scene.ktv.service.KTVJoinRoomOutputModel;
 import io.agora.scene.ktv.service.VLRoomSeatModel;
 import io.agora.scene.ktv.service.VLRoomSelSongModel;
@@ -61,6 +61,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
     private SongDialog mChooseSongDialog;
     private SongDialog mChorusSongDialog;
+
+    private ProgressDialog mLoadingDialog;
 
 
     public static void launch(Context context, KTVJoinRoomOutputModel roomInfo) {
@@ -179,6 +181,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setPitchViewOnActionListener(lrcActionListenerImpl);
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
 
+        roomLivingViewModel.loadingDialogVisible.observe(this, this::showLoadingDialog);
 
         // 房间相关
         roomLivingViewModel.roomInfoLiveData.observe(this, ktvJoinRoomOutputModel -> {
@@ -309,95 +312,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue()));
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
-
-
-//        roomLivingViewModel.setISingleCallback((type, o) -> {
-//            ThreadManager.getMainHandler().post(() -> {
-//                if (isFinishing() || getBinding() == null) {
-//                    return;
-//                }
-//                hideLoadingView();
-//
-//                // 麦位相关
-//                // ---- local ----
-//                if (type == KtvConstant.CALLBACK_TYPE_ROOM_ON_SEAT) {
-//                    RTMMessageBean msg = (RTMMessageBean) o;
-//                    AgoraMember member = new AgoraMember();
-//                    member.onSeat = msg.onSeat;
-//                    member.userNo = msg.userNo;
-//                    member.headUrl = msg.headUrl;
-//                    member.name = msg.name;
-//                    member.id = msg.id;
-//                    member.isSelfMuted = 0;
-//                    member.isVideoMuted = 0;
-//                    onMemberJoin(member);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LEAVE_SEAT) {
-//                    RTMMessageBean msg = (RTMMessageBean) o;
-//                    AgoraMember member = new AgoraMember();
-//                    member.onSeat = msg.onSeat;
-//                    member.userNo = msg.userNo;
-//                    member.headUrl = msg.headUrl;
-//                    member.name = msg.name;
-//                    member.isSelfMuted = 0;
-//                    member.isVideoMuted = 0;
-//                    onMemberLeave(member);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_MIC_STATUS) {
-//                    getBinding().cbMic.setChecked((boolean) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_VIDEO_STATUS_CHANGED) {
-//                    onVideoStatusChange((AgoraMember) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_TOGGLE_MIC) {
-//                    getBinding().cbMic.setEnabled((Boolean) o);
-//                }
-//                // ---- remote ----
-//                if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_MEMBER_LEAVE) {
-//                    onMemberLeave((AgoraMember) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_MEMBER_JOIN) {
-//                    onMemberJoin((AgoraMember) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_SEAT_CHANGE) {
-//                    mRoomSpeakerAdapter.notifyDataSetChanged();
-//                } else if (type == KtvConstant.TYPE_CONTROL_VIEW_STATUS_ON_VIDEO) {
-//                    RTMMessageBean bean = (RTMMessageBean) o;
-//                    //头像打开摄像头
-//                    for (int i = 0; i < mRoomSpeakerAdapter.dataList.size(); i++) {
-//                        if (mRoomSpeakerAdapter.dataList.get(i) != null && mRoomSpeakerAdapter.dataList.get(i).userNo.equals(bean.userNo)) {
-//                            mRoomSpeakerAdapter.dataList.get(i).isVideoMuted = bean.isVideoMuted;
-////                            mRoomSpeakerAdapter.dataList.get(i).setStreamId(bean.streamId.intValue());
-//                            mRoomSpeakerAdapter.notifyItemChanged(i);
-//                        }
-//                    }
-//                } else if (type == KtvConstant.TYPE_CONTROL_VIEW_STATUS_ON_MIC_MUTE) {
-//                    RTMMessageBean bean = (RTMMessageBean) o;
-//                    for (int i = 0; i < mRoomSpeakerAdapter.dataList.size(); i++) {
-//                        if (mRoomSpeakerAdapter.dataList.get(i) != null &&
-//                                mRoomSpeakerAdapter.dataList.get(i).userNo.equals(bean.userNo)) {
-//                            mRoomSpeakerAdapter.dataList.get(i).isSelfMuted = bean.isSelfMuted;
-////                            mRoomSpeakerAdapter.dataList.get(i).setStreamId(bean.streamId.intValue());
-//                            mRoomSpeakerAdapter.notifyItemChanged(i);
-//                        }
-//                    }
-//                }
-//
-//
-//                // 歌曲相关
-//                else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_LOCAL_PITCH) {
-//                    getBinding().lrcControlView.getPitchView().updateLocalPitch((float) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_PLAY_COMPLETED) {
-//
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_MUSIC_DEL) {
-////                onMusicDelete((MemberMusicModel) o);
-//                } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_LIVING_ON_JOINED_CHORUS) {
-//                    getBinding().lrcControlView.onMemberJoinedChorus();
-//                    mRoomSpeakerAdapter.notifyDataSetChanged();
-//                }
-//
-//                // 其他
-//                else if (type == KtvConstant.CALLBACK_TYPE_ROOM_NETWORK_STATUS) {
-//                    NetWorkEvent event = (NetWorkEvent) (o);
-//                    setNetWorkStatus(event.txQuality, event.rxQuality);
-//                }
-//            });
-//        });
-
     }
 
 
@@ -654,6 +568,18 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             });
         }
         creatorExitDialog.show();
+    }
+
+    private void showLoadingDialog(boolean show) {
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new ProgressDialog(this);
+            mLoadingDialog.setMessage(getString(R.string.loading));
+        }
+        if (show) {
+            mLoadingDialog.show();
+        } else {
+            mLoadingDialog.dismiss();
+        }
     }
 
     @Override
