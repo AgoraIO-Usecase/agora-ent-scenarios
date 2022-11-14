@@ -286,17 +286,16 @@ VLPopScoreViewDelegate
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
             //TODO 逻辑要理一下
             if (KTVSubscribeUpdated == status) {
+                [weakSelf loadAndPlaySong];
+                
                 //有人加入合唱
                 if(songInfo.isChorus
                    && weakSelf.currentPlayingSongNo == nil
                    && songInfo.chorusNo != nil) {
                     [weakSelf.MVView setJoinInViewHidden];
                     [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                    [weakSelf markSongDidPlayWithModel:songInfo];
                     return;
                 }
-                
-                [weakSelf loadAndPlaySong];
                 
                 //观众看到打分
                 if (songInfo.status == 2) {
@@ -663,10 +662,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     if (model == nil || [model waittingForChorus]) {
+        VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
         return;
     }
     if (model.status != 2 && [model readyToPlay]) {
         [self markSongDidPlayWithModel:model];
+        VLLog(@"skip load, song %@ need to mark to playing", model.songNo);
         return;
     }
     
