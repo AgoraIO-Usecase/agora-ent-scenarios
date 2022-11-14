@@ -130,8 +130,6 @@ NS_ASSUME_NONNULL_BEGIN
                   completion:(void(^)(NSError* _Nullable))completion;
 
 
-
-
 //lyrics
 
 /// 加入合唱
@@ -158,19 +156,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 订阅用户变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeUserListCountWithChanged:(void(^)(NSUInteger))changedBlock;
+- (void)subscribeUserListCountChangedWithBlock:(void(^)(NSUInteger))changedBlock;
 
 /// 订阅麦位变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeSeatListWithChanged:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock;
+- (void)subscribeSeatListChangedWithBlock:(void (^)(NSUInteger, VLRoomSeatModel*))changedBlock;
 
 /// 订阅房间状态变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeRoomStatusWithChanged:(void (^)(NSUInteger, VLRoomListModel*))changedBlock;
+- (void)subscribeRoomStatusChangedWithBlock:(void (^)(NSUInteger, VLRoomListModel*))changedBlock;
 
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeChooseSongWithChanged:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
+- (void)subscribeChooseSongChangedWithBlock:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
 @end
 
 NS_ASSUME_NONNULL_END
