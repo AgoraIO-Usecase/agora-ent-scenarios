@@ -283,31 +283,42 @@ VLPopScoreViewDelegate
     
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
-        //refresh first
-        [weakSelf refreshChoosedSongList:nil];
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
-            //TODO 逻辑要理一下
-            if (KTVSubscribeUpdated == status) {
-                [weakSelf loadAndPlaySong];
-                
-                //有人加入合唱
-                if(songInfo.isChorus
-                   && weakSelf.currentPlayingSongNo == nil
-                   && songInfo.chorusNo != nil) {
-                    [weakSelf.MVView setJoinInViewHidden];
-                    [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                    return;
-                }
-                
-                //观众看到打分
-                if (songInfo.status == 2) {
-                    weakSelf.currentVoicePitch = songInfo.score;
-                    return;
-                }
+            VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
+            //add new song
+            if (song == nil) {
+                NSMutableArray* selSongsArray = [NSMutableArray arrayWithArray:weakSelf.selSongsArray];
+                [selSongsArray appendObject:songInfo];
+                weakSelf.selSongsArray = selSongsArray;
+                return;
+            }
+            
+            [weakSelf replaceSelSongWithInfo:songInfo];
+            [weakSelf loadAndPlaySong];
+            
+            //有人加入合唱
+            if(songInfo.isChorus
+               && weakSelf.currentPlayingSongNo == nil
+               && songInfo.chorusNo != nil) {
+                [weakSelf.MVView setJoinInViewHidden];
+                [weakSelf setUserJoinChorus:songInfo.chorusNo];
+                return;
+            }
+            
+            //观众看到打分
+            if (songInfo.status == 2) {
+                weakSelf.currentVoicePitch = songInfo.score;
+                return;
+            }
+            
+            //pin
+            if (song.sort != songInfo.sort) {
+                [weakSelf refreshChoosedSongList:nil];
             }
         } else if (KTVSubscribeDeleted == status) {
             VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
             if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
+                [weakSelf removeSelSongWithSongNo:songInfo.songNo];
                 return;
             }
             
@@ -321,6 +332,7 @@ VLPopScoreViewDelegate
             if (removedSongIsPlaying || isWaitingForPlay) {
                 [weakSelf stopCurrentSong];
             }
+            [weakSelf removeSelSongWithSongNo:songInfo.songNo];
         }
     }];
 }
@@ -619,7 +631,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
                                                         completion:^(NSError * error) {
-        
     }];
 }
 
@@ -1180,7 +1191,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onKTVMVView:(VLKTVMVView *)view startSingType:(VLKTVMVViewSingActionType)singType {
     if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱
         //发送独唱的消息
-        [self becomeSolo];
+        [self enterSoloMode];
     } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
         if(!self.isOnMicSeat) {
             [VLToast toast:KTVLocalizedString(@"请先上坐")];
@@ -1354,7 +1365,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 //发送独唱的消息
-- (void)becomeSolo {
+- (void)enterSoloMode {
     [[AppContext ktvServiceImp] enterSoloMode];
 }
 
@@ -1438,6 +1449,43 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     }
     self.roomPersonView.roomSeatsArray = self.seatsArray;
+}
+
+- (void)removeSelSongWithSongNo:(NSString*)songNo {
+    NSMutableArray* selSongsArray = [NSMutableArray array];
+    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.songNo isEqualToString:songNo]) {
+            return;
+        }
+        [selSongsArray addObject:obj];
+    }];
+    
+    self.selSongsArray = selSongsArray;
+}
+
+- (VLRoomSelSongModel*)selSongWithSongNo:(NSString*)songNo {
+    __block VLRoomSelSongModel* song = nil;
+    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.songNo isEqualToString:songNo]) {
+            song = obj;
+            *stop = YES;
+        }
+    }];
+    
+    return song;
+}
+
+- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
+    NSMutableArray* selSongsArray = [NSMutableArray array];
+    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.songNo isEqualToString:songInfo.songNo]) {
+            [selSongsArray addObject:songInfo];
+            return;
+        }
+        [selSongsArray addObject:obj];
+    }];
+    
+    self.selSongsArray = selSongsArray;
 }
 
 #pragma mark - getter/handy utils
