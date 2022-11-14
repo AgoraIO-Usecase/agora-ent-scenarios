@@ -637,10 +637,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)muteLocalVideo:(BOOL)mute {
     if (!mute) {
-        [self.RTCkit enableLocalVideo:YES];
         self.isNowCameraMuted = NO;
     } else {
-        [self.RTCkit enableLocalVideo:NO];
         self.isNowCameraMuted = YES;
     }
     [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
@@ -861,11 +859,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     [self.RTCkit enableVideo];
-    [self.RTCkit enableLocalVideo:NO];
     [self.RTCkit enableAudio];
     
-    self.isNowMicMuted = ![self isBroadcaster];
-    self.isNowCameraMuted = YES;
+    VLRoomSeatModel* myseat = [self.seatsArray objectAtIndex:0];
+    
+    self.isNowMicMuted = myseat.isAudioMuted;
+    self.isNowCameraMuted = myseat.isVideoMuted;
     
     AgoraVideoEncoderConfiguration *encoderConfiguration =
     [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
@@ -1560,13 +1559,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
+    BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    [self.bottomView updateAudioBtn:isNowMicMuted];
+    
+    if(oldValue != isNowMicMuted) {
+        [self.RTCkit enableLocalAudio:!isNowMicMuted];
+        [self.bottomView updateAudioBtn:isNowMicMuted];
+    }
 }
 
 - (void)setIsNowCameraMuted:(BOOL)isNowCameraMuted {
+    BOOL oldValue = _isNowCameraMuted;
     _isNowCameraMuted = isNowCameraMuted;
-    [self.bottomView updateVideoBtn:isNowCameraMuted];
+    
+    if(oldValue != isNowCameraMuted) {
+        [self.RTCkit enableLocalVideo:!isNowCameraMuted];
+        [self.bottomView updateVideoBtn:isNowCameraMuted];
+    }
 }
 
 - (void)setIsEarOn:(BOOL)isEarOn {
