@@ -333,6 +333,7 @@ VLPopScoreViewDelegate
                 [weakSelf stopCurrentSong];
             }
             [weakSelf removeSelSongWithSongNo:songInfo.songNo];
+            [weakSelf loadAndPlaySong];
         }
     }];
 }
