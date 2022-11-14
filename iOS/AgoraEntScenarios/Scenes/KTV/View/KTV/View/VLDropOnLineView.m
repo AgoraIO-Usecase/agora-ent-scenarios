@@ -64,9 +64,13 @@
     [self addSubview:dropLineBtn];
 }
 
-- (void)setPartRoundWithView:(UIView *)view corners:(UIRectCorner)corners cornerRadius:(float)cornerRadius {
+- (void)setPartRoundWithView:(UIView *)view
+                     corners:(UIRectCorner)corners
+                cornerRadius:(float)cornerRadius {
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:view.bounds byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)].CGPath;
+    shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:view.bounds
+                                            byRoundingCorners:corners
+                                                  cornerRadii:CGSizeMake(cornerRadius, cornerRadius)].CGPath;
     view.layer.mask = shapeLayer;
 }
 

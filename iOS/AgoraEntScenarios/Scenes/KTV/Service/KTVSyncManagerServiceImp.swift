@@ -264,10 +264,13 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     }
 
     func outSeat(withInput inputModel: KTVOutSeatInputModel, completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.userOnSeat)"]!
+        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
         _removeSeat(seatInfo: seatInfo) { error in
             // TODO(wushengtao): whitout callback
         }
+        
+        //remove current user's choose song
+        _removeAllUserChooseSong()
         completion(nil)
     }
     
@@ -327,6 +330,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
+        inputModel.status = 2
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
@@ -343,7 +347,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         songInfo.status = 0
         /// 是谁点的歌
         songInfo.userNo = VLUserCenter.user.userNo
-        songInfo.userId = UserInfo.userId
+//        songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
         _addChooseSongInfo(songInfo: songInfo) { error in
@@ -395,20 +399,19 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         topSong.status = 2
         topSong.score = totalVolume
         _updateChooseSong(songInfo: topSong) { error in
-            
         }
     }
 
     //MARK: subscribe
-    func subscribeUserListCount(changed changedBlock: @escaping (UInt) -> Void) {
+    func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
         userListCountDidChanged = changedBlock
     }
 
-    func subscribeSeatList(changed changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
+    func subscribeSeatListChanged(_ changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
         seatListDidChanged = changedBlock
     }
-
-    func subscribeRoomStatus(changed changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
+    
+    func subscribeRoomStatusChanged(_ changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
         roomStatusDidChanged = changedBlock
 
         guard let channelName = roomNo else {
@@ -438,51 +441,9 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
                        })
     }
 
-    func subscribeChooseSong(changed changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
+    func subscribeChooseSongChanged(_ changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
         chooseSongDidChanged = changedBlock
     }
-
-
-    
-
-    // MARK: Deprecated protocol method
-//    func publishChooseSongEvent() {
-////        assertionFailure()
-//        // replace with subscribeChooseSong()
-//    }
-//
-//    func leaveChannel() {
-////        assert(false)
-//        // ignore
-//    }
-//
-//    func publishMuteEvent(withMuteStatus muteStatus: Bool, completion: @escaping (Error?) -> Void) {
-//        // replace with muteWithMuteStatus
-//    }
-//
-//    func publishVideoOpenEvent(withOpenStatus openStatus: Bool, completion: @escaping (Error?) -> Void) {
-//        // replace with openVideoStatus()
-//    }
-//
-//    func publishSongDidChangedEvent(withOwnerStatus isMaster: Bool) {
-//        // replace with subscribeChooseSong()
-//    }
-//
-//
-//    func publishJoinToChorus(completion: @escaping (Error?) -> Void) {
-//        //replace with joinChorusWithInput
-////        assertionFailure()
-//    }
-//
-//    func publishSongOwner(withOwnerId userNo: String) {
-////        assertionFailure()
-//        //ignore
-//    }
-//
-//
-//    func subscribeRtmMessage(statusChanged changedBlock: @escaping (AgoraRtmChannel, AgoraRtmMessage, AgoraRtmMember) -> Void) {
-////        assert(false)
-//    }
 }
 
 
@@ -506,7 +467,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         //remove current user's choose song
-        _removeAllUsersChooseSong()
+        _removeAllUserChooseSong()
 
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
@@ -684,7 +645,7 @@ extension KTVSyncManagerServiceImp {
         var seatArray = [VLRoomSeatModel]()
         for i in 0...7 {
             let seat = VLRoomSeatModel()
-            seat.onSeat = i
+            seat.seatIndex = i
 //            seat.objectId = "\(i)"
             seatArray.append(seat)
 
@@ -697,8 +658,8 @@ extension KTVSyncManagerServiceImp {
     private func _getUserSeatInfo(seatIndex: Int) -> VLRoomSeatModel {
         let user = VLUserCenter.user
         let seatInfo = VLRoomSeatModel()
-        seatInfo.onSeat = seatIndex
-        seatInfo.id = user.id
+        seatInfo.seatIndex = seatIndex
+        seatInfo.rtcUid = user.id
         seatInfo.userNo = user.userNo
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
@@ -710,9 +671,9 @@ extension KTVSyncManagerServiceImp {
         seatInfo.isVideoMuted = 0
 
         /// 新增, 判断当前歌曲是否是自己点的
-        seatInfo.ifSelTheSingSong = false
+        seatInfo.isSelTheSingSong = false
 
-        seatInfo.ifJoinedChorus = false
+        seatInfo.isJoinedChorus = false
 
         return seatInfo
     }
@@ -736,7 +697,7 @@ extension KTVSyncManagerServiceImp {
 
             // update seat info (user avater/nick name did changed) if seat existed
             if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.onSeat)
+                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
                 }
@@ -767,7 +728,7 @@ extension KTVSyncManagerServiceImp {
                 }
                 let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
                 seats.forEach { seat in
-                    self.seatMap["\(seat.onSeat)"] = seat
+                    self.seatMap["\(seat.seatIndex)"] = seat
                 }
 
                 finished(nil, seats)
@@ -841,11 +802,12 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .add(data: params,
-                 success: { obj in
-                     finished(nil)
-                 }, fail: { error in
-                     finished(error)
-                 })
+                 success: {[weak self] obj in
+                self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
+                finished(nil)
+            }, fail: { error in
+                finished(error)
+            })
     }
 
     private func _subscribeSeats(finished: @escaping () -> Void) {
@@ -863,7 +825,7 @@ extension KTVSyncManagerServiceImp {
                            else {
                                return
                            }
-                           self.seatMap["\(model.onSeat)"] = model
+                           self.seatMap["\(model.seatIndex)"] = model
                            self.seatListDidChanged?(KTVSubscribeCreated.rawValue, model)
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
@@ -872,7 +834,7 @@ extension KTVSyncManagerServiceImp {
                            else {
                                return
                            }
-                           self.seatMap["\(model.onSeat)"] = model
+                           self.seatMap["\(model.seatIndex)"] = model
                            self.seatListDidChanged?(KTVSubscribeUpdated.rawValue, model)
                        }, onDeleted: { [weak self] object in
                            guard let self = self else {
@@ -884,9 +846,9 @@ extension KTVSyncManagerServiceImp {
                                return
                            }
                            let seat = VLRoomSeatModel()
-                           seat.onSeat = origSeat.onSeat
-                           self.seatMap["\(origSeat.onSeat)"] = seat
-                           self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, origSeat)
+                           seat.seatIndex = origSeat.seatIndex
+                           self.seatMap["\(origSeat.seatIndex)"] = seat
+                           self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, seat)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
@@ -978,7 +940,7 @@ extension KTVSyncManagerServiceImp {
                  })
     }
     
-    private func _removeAllUsersChooseSong() {
+    private func _removeAllUserChooseSong() {
         let userSongLists = self.songList.filter({ $0.userNo == VLUserCenter.user.userNo})
         userSongLists.forEach { model in
             self._removeChooseSong(songId: model.objectId) { error in
@@ -1058,7 +1020,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self._sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onUpdated: { [weak self] object in
                            guard let self = self,
                                  let jsonStr = object.toJson(),
@@ -1070,7 +1032,7 @@ extension KTVSyncManagerServiceImp {
                            self.songList.append(model)
                            self._sortChooseSongList()
                            self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onDeleted: { [weak self] object in
                            guard let self = self,
                                  let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
@@ -1079,7 +1041,7 @@ extension KTVSyncManagerServiceImp {
                            }
                            self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                            self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
-                           self._markCurrentSongIfNeed()
+//                           self._markCurrentSongIfNeed()
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
