@@ -38,16 +38,17 @@ let page_size = 15
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
-        VoiceRoomIMManager.shared?.configIM(appkey: "52117440#955012")
+        VoiceRoomIMManager.shared?.configIM(appkey: "81691796#990293")
 
         // MARK: - you can replace request host call this.
 
-        VoiceRoomBusinessRequest.shared.changeHost(host: "http://a1-test-voiceroom.easemob.com")
-        if user.hasVoiceRoomUserInfo {
+      //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
+        //if user.hasVoiceRoomUserInfo {
             mapUser(user: user)
-        } else {
-            login()
-        }
+        self.showContent()
+//        } else {
+//            login()
+//        }
     }
 
     override public func viewDidLoad() {
