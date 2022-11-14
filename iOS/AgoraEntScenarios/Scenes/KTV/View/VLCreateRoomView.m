@@ -49,7 +49,7 @@
     iconImgView.layer.cornerRadius = 20;
     iconImgView.layer.masksToBounds = YES;
     self.iconImgView = iconImgView;
-    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@", self.addRoomModel.icon];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@.jpg", self.addRoomModel.icon];
     self.iconImgView.image = [UIImage sceneImageWithName:iconName];
     [self addSubview:iconImgView];
     

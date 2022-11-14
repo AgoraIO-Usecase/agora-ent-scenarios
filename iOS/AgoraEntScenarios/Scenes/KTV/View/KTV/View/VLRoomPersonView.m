@@ -151,24 +151,37 @@
 }
 
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray {
+    BOOL hasChanged = NO;
     if (choosedSongArray.count > 0) {
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            if ([seatModel.userNo isEqualToString:songModel.userNo]) {
-                seatModel.isOwner = YES;
-            }else{
-                seatModel.isOwner = NO;
+            BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
+            if (isOwner != seatModel.isOwner) {
+                seatModel.isOwner = isOwner;
+                hasChanged = YES;
             }
-            seatModel.isJoinedChorus = NO;
+            if (seatModel.isJoinedChorus) {
+                seatModel.isJoinedChorus = NO;
+                hasChanged = YES;
+            }
         }
-        [self.personCollectionView reloadData];
     }else{
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-            seatModel.isOwner = NO;
-            seatModel.isJoinedChorus = NO;
+            if (seatModel.isOwner) {
+                seatModel.isOwner = NO;
+                hasChanged = YES;
+            }
+            if (seatModel.isJoinedChorus) {
+                seatModel.isJoinedChorus = NO;
+                hasChanged = YES;
+            }
         }
-        [self.personCollectionView reloadData];
     }
+    
+    if (!hasChanged) {
+        return;
+    }
+    [self.personCollectionView reloadData];
 }
 
 

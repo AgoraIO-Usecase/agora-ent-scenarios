@@ -68,8 +68,11 @@
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
 //    intputModel.userNo = VLUserCenter.user.userNo;
+    VL(weakSelf);
+    self.view.userInteractionEnabled = NO;
     [[AppContext ktvServiceImp] createRoomWithInput:intputModel
                                          completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+        weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -91,7 +94,7 @@
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
-        [self.navigationController pushViewController:ktvVC animated:YES];
+        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
 }
 
