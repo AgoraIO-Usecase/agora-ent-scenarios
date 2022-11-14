@@ -37,6 +37,7 @@
 		0510B867290B7A6E0063E57A /* VRSoundEffectsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0510B860290B7A6E0063E57A /* VRSoundEffectsViewController.swift */; };
 		0510B868290B7A6E0063E57A /* VRSpatialSoundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0510B861290B7A6E0063E57A /* VRSpatialSoundViewController.swift */; };
 		0510B86A290B7AE80063E57A /* VoiceRoomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0510B869290B7AE80063E57A /* VoiceRoomAlertViewController.swift */; };
+		0536D86A29222D0200BF1D3F /* Xcode14.m in Sources */ = {isa = PBXBuildFile; fileRef = 0536D86929222D0200BF1D3F /* Xcode14.m */; };
 		053998BE290A7222005143C7 /* VoiceChatRoomResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 053998BD290A7222005143C7 /* VoiceChatRoomResource.bundle */; };
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B5290B9495001329E6 /* VoiceRoomBusinessApi.swift */; };
@@ -453,6 +454,8 @@
 		0510B860290B7A6E0063E57A /* VRSoundEffectsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSoundEffectsViewController.swift; sourceTree = "<group>"; };
 		0510B861290B7A6E0063E57A /* VRSpatialSoundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRSpatialSoundViewController.swift; sourceTree = "<group>"; };
 		0510B869290B7AE80063E57A /* VoiceRoomAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomAlertViewController.swift; sourceTree = "<group>"; };
+		0536D86829222D0200BF1D3F /* Xcode14.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Xcode14.h; sourceTree = "<group>"; };
+		0536D86929222D0200BF1D3F /* Xcode14.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Xcode14.m; sourceTree = "<group>"; };
 		053998BD290A7222005143C7 /* VoiceChatRoomResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = VoiceChatRoomResource.bundle; sourceTree = "<group>"; };
 		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
 		057DD9B5290B9495001329E6 /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
@@ -1127,6 +1130,8 @@
 				057DD9E1290B9495001329E6 /* VRVerifyCodeTextView.swift */,
 				057DD9E2290B9495001329E6 /* VoiceRoomPageContainer.swift */,
 				057DD9E3290B9495001329E6 /* Notification+Presentation.swift */,
+				0536D86829222D0200BF1D3F /* Xcode14.h */,
+				0536D86929222D0200BF1D3F /* Xcode14.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2949,6 +2954,7 @@
 				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
 				DD8417B529090C520026B624 /* VLPopChooseSongView.m in Sources */,
 				DD84179329090C520026B624 /* VLAddRoomModel.m in Sources */,
+				0536D86A29222D0200BF1D3F /* Xcode14.m in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
@@ -3216,7 +3222,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 292LAU3ZVD;
+				DEVELOPMENT_TEAM = 499WYUV8Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
@@ -3233,7 +3239,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.enterprise.easeim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
@@ -3252,7 +3258,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 292LAU3ZVD;
+				DEVELOPMENT_TEAM = 499WYUV8Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
@@ -3269,7 +3275,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.enterprise.easeim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
