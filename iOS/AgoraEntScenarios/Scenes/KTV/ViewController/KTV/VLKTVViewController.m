@@ -711,27 +711,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf loadMusic:model.songNo withCallback:^{
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
                 weakSelf.isPlayerPublish = YES;
-                [weakSelf.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
+                [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
                 
                 [weakSelf.MVView start];
                 [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
                 //TODO why always NO?
-                [self.MVView updateUIWithUserOnSeat:NO
-                                               song:model];
+                [weakSelf.MVView updateUIWithUserOnSeat:NO
+                                                   song:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
             model.lyric = lyricUrl;
             [weakSelf.MVView loadLrcURL:lyricUrl];
+            weakSelf.currentPlayingSongNo = model.songNo;
             
             weakSelf.isPlayerPublish = NO;
-            [weakSelf.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
+            [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
             
             [weakSelf.MVView start];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             //TODO why always NO?
-            [self.MVView updateUIWithUserOnSeat:NO
+            [weakSelf.MVView updateUIWithUserOnSeat:NO
                                            song:model];
         }];
     }
