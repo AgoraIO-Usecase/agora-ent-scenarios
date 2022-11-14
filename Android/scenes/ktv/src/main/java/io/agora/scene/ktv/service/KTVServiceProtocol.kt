@@ -132,13 +132,6 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * 切歌
-     */
-    fun switchSong(
-        inputModel: KTVSwitchSongInputModel, completion: (error: Exception?) -> Unit
-    )
-
-    /**
      * 点歌
      */
     fun chooseSong(

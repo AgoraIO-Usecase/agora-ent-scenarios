@@ -67,7 +67,6 @@ import io.agora.scene.ktv.service.KTVOnSeatInputModel;
 import io.agora.scene.ktv.service.KTVOutSeatInputModel;
 import io.agora.scene.ktv.service.KTVRemoveSongInputModel;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
-import io.agora.scene.ktv.service.KTVSwitchSongInputModel;
 import io.agora.scene.ktv.service.VLRoomSeatModel;
 import io.agora.scene.ktv.service.VLRoomSelSongModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
@@ -708,7 +707,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         ktvServiceProtocol.removeSong(
-                new KTVRemoveSongInputModel(songModel.getSongNo(), songModel.getSort()),
+                new KTVRemoveSongInputModel(songModel.getSongNo()),
                 e -> {
                     if (e == null) {
                         // success: do nothing for subscriber dealing with the event already
@@ -754,9 +753,12 @@ public class RoomLivingViewModel extends ViewModel {
 
                 if(data.size() > 0){
                     VLRoomSelSongModel value = songPlayingLiveData.getValue();
-                    if(value == null){
-                        songPlayingLiveData.postValue(data.get(0));
+                    VLRoomSelSongModel songPlaying = data.get(0);
+                    if(value == null || !value.getSongNo().equals(songPlaying.getSongNo())){
+                        songPlayingLiveData.postValue(songPlaying);
                     }
+                }else{
+                    songPlayingLiveData.postValue(null);
                 }
 
             } else {
@@ -854,28 +856,12 @@ public class RoomLivingViewModel extends ViewModel {
         }
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
 
-        ktvServiceProtocol.switchSong(new KTVSwitchSongInputModel(
+        ktvServiceProtocol.removeSong(new KTVRemoveSongInputModel(
                 musicModel.getSongNo()
         ), e -> {
             if (e == null) {
-                // success
-                List<VLRoomSelSongModel> orderedSongs = songsOrderedLiveData.getValue();
+                // success do nothing for dealing in song subscriber
 
-                if (orderedSongs == null) {
-                    return null;
-                }
-
-                Iterator<VLRoomSelSongModel> iterator = orderedSongs.iterator();
-                while (iterator.hasNext()) {
-                    VLRoomSelSongModel next = iterator.next();
-                    if (next.getSongNo().equals(musicModel.getSongNo())) {
-                        iterator.remove();
-                        break;
-                    }
-                }
-
-                songsOrderedLiveData.postValue(new ArrayList<>(orderedSongs));
-                songPlayingLiveData.postValue(orderedSongs.size() > 0 ? orderedSongs.get(0) : null);
             } else {
                 // failed
                 ToastUtils.showToast(e.getMessage());

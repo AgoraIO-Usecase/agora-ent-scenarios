@@ -424,41 +424,6 @@ class KTVSyncManagerServiceImp(
         innerAddChooseSongInfo(song, completion)
     }
 
-    override fun switchSong(
-        inputModel: KTVSwitchSongInputModel,
-        completion: (error: Exception?) -> Unit
-    ) {
-        // remove the first song and move the song to first position
-        if (songChosenList.size <= 0) {
-            completion.invoke(RuntimeException("The chosen song list is empty!"))
-            return
-        }
-
-        songChosenList.removeAt(0)
-        val removeObjId = objIdOfSongNo.removeAt(0)
-        innerRemoveChooseSong(removeObjId) {}
-
-        val filter = songChosenList.filter { it.songNo == inputModel.songNo }
-        val targetSong = filter.getOrNull(0)
-        if (targetSong == null) {
-            completion.invoke(RuntimeException("The song no not found!"))
-            return
-        }
-        val index = songChosenList.indexOf(targetSong)
-        songChosenList.add(0, songChosenList.removeAt(index))
-        objIdOfSongNo.add(0, objIdOfSongNo.removeAt(index))
-
-        //net request and notify others
-        innerSortChooseSongList {
-            chooseSongSubscriber?.invoke(
-                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                targetSong
-            )
-            completion.invoke(null)
-        }
-
-    }
-
     override fun makeSongTop(
         inputModel: KTVMakeSongTopInputModel,
         completion: (error: Exception?) -> Unit
@@ -494,10 +459,6 @@ class KTVSyncManagerServiceImp(
 
         //net request and notify others
         innerSortChooseSongList {
-            chooseSongSubscriber?.invoke(
-                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                targetSong
-            )
             completion.invoke(it)
         }
     }
@@ -510,26 +471,25 @@ class KTVSyncManagerServiceImp(
             completion.invoke(RuntimeException("The chosen song list is empty!"))
             return
         }
-        val targetSong = songChosenList.getOrNull(inputModel.sort - 1)
+        val targetSong = songChosenList.filter { it.songNo == inputModel.songNo }.getOrNull(0)
         if (targetSong == null) {
             completion.invoke(RuntimeException("The song no not found!"))
             return
         }
-
 
         val indexOf = songChosenList.indexOf(targetSong)
         songChosenList.removeAt(indexOf)
         val removeAt = objIdOfSongNo.removeAt(indexOf)
 
         //net request and notify others
-        innerRemoveChooseSong(removeAt) {}
-
-        innerSortChooseSongList {
-            chooseSongSubscriber?.invoke(
-                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
-                targetSong
-            )
-            completion.invoke(it)
+        innerRemoveChooseSong(removeAt) {
+            if(it != null){
+                completion.invoke(it)
+            }else{
+                innerSortChooseSongList { error->
+                    completion.invoke(error)
+                }
+            }
         }
     }
 
@@ -994,7 +954,11 @@ class KTVSyncManagerServiceImp(
     // ------------ Choose song operation ---------------------
 
     private fun innerSortChooseSongList(completion: (error: Exception?) -> Unit) {
-        val firstSong = songChosenList.getOrNull(0) ?: return
+        val firstSong = songChosenList.getOrNull(0)
+        if(firstSong == null){
+            completion.invoke(null)
+            return
+        }
         val firstObjId = objIdOfSongNo[0]
         val firstNewSong = VLRoomSelSongModel(
             firstSong.songName,
@@ -1111,11 +1075,6 @@ class KTVSyncManagerServiceImp(
                     songChosenList.add(songInfo)
                     objIdOfSongNo.add(result.id)
 
-                    chooseSongSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        songInfo
-                    )
-
                     runOnMainThread { completion.invoke(null) }
                 }
 
@@ -1170,7 +1129,7 @@ class KTVSyncManagerServiceImp(
                 val roomInfo = roomMap[item.id] ?: return
                 roomMap.remove(roomInfo.roomNo)
 
-                if (item.id == currRoomNo) {
+                if (item.id != currRoomNo) {
                     return
                 }
                 runOnMainThread {
