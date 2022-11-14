@@ -6,7 +6,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.util.ObjectsCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -42,11 +41,9 @@ import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.scene.base.BuildConfig;
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.ApiSubscriber;
-import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.apiutils.SchedulersUtil;
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.bean.MemberMusicModel;
@@ -60,7 +57,6 @@ import io.agora.scene.base.event.PreLoadEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
-import io.agora.scene.ktv.manager.BaseMusicPlayer;
 import io.agora.scene.ktv.manager.ResourceManager;
 import io.agora.scene.ktv.service.KTVChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.KTVChooseSongInputModel;
@@ -226,8 +222,8 @@ public class RoomLivingViewModel extends ViewModel {
 
         roomUserCountLiveData.postValue(_roomInfo.getRoomPeopleNum());
 
-        if (isRoomOwner()) {
-            RTCManager.getInstance().getRtcEngine().setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
+        if (isRoomOwner() && mRtcEngine != null) {
+            mRtcEngine.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
         }
 
         ktvServiceProtocol.subscribeRoomStatus((ktvSubscribe, vlRoomListModel) -> {
@@ -1299,7 +1295,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(Context context, VLRoomSelSongModel music) {
         //musicStop();
         boolean isOwnSong = music.getUserNo().equals(UserManager.getInstance().getUser().userNo);
-        boolean isChorus = music.isChorus() || music.getStatus() == 2;
+        boolean isChorus = music.isChorus();
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
         if (isChorus) {
             //合唱
