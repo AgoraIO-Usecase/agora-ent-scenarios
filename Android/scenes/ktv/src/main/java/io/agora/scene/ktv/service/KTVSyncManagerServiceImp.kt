@@ -438,6 +438,7 @@ class KTVSyncManagerServiceImp(
             inputModel.lyric,
             inputModel.imageUrl,
 
+            isChorus = inputModel.isChorus > 0,
             userNo = UserManager.getInstance().user.userNo,
             userId = UserManager.getInstance().user.id.toString(),
             name = UserManager.getInstance().user.name,
