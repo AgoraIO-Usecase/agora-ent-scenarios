@@ -7,6 +7,7 @@
 
 import Foundation
 import YYCategories
+import MBProgressHUD
 
 private let kSceneId = "scene_ktv"
 
@@ -31,6 +32,20 @@ private func agoraPrint(_ message: String) {
     print(message)
     #else
     #endif
+}
+
+private func _showLoadingIfNeed() {
+    guard let window = UIApplication.shared.delegate?.window as? UIWindow else {
+        return
+    }
+    MBProgressHUD.showAdded(to: window, animated: true)
+}
+
+private func _hideLoadingIfNeed() {
+    guard let window = UIApplication.shared.delegate?.window as? UIWindow else {
+        return
+    }
+    MBProgressHUD.hide(for: window, animated: true)
 }
 
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
@@ -85,7 +100,7 @@ private func agoraPrint(_ message: String) {
             completion()
         }
     }
-
+    
     // MARK: protocol method
     
     // MARK: room info
@@ -130,6 +145,7 @@ private func agoraPrint(_ message: String) {
 
         let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
 
+        _showLoadingIfNeed()
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
@@ -147,6 +163,7 @@ private func agoraPrint(_ message: String) {
                           let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
                         agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        _hideLoadingIfNeed()
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
@@ -154,6 +171,7 @@ private func agoraPrint(_ message: String) {
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
+                        _hideLoadingIfNeed()
                         let output = KTVCreateRoomOutputModel()
                         output.name = inputModel.name
                         output.roomNo = roomInfo.roomNo
@@ -164,6 +182,7 @@ private func agoraPrint(_ message: String) {
                     self._subscribeChooseSong {}
                 }
             } fail: { error in
+                _hideLoadingIfNeed()
                 completion(error, nil)
             }
         }
@@ -179,6 +198,7 @@ private func agoraPrint(_ message: String) {
 
         let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
 
+        _showLoadingIfNeed()
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
@@ -195,6 +215,7 @@ private func agoraPrint(_ message: String) {
                           let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
+                        _hideLoadingIfNeed()
                         agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
@@ -202,6 +223,7 @@ private func agoraPrint(_ message: String) {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     self._autoOnSeatIfNeed { seatArray in
+                        _hideLoadingIfNeed()
                         let output = KTVJoinRoomOutputModel()
                         output.creator = userId
                         output.seatsArray = seatArray
@@ -211,6 +233,7 @@ private func agoraPrint(_ message: String) {
                     self._subscribeChooseSong {}
                 }
             } fail: { error in
+                _hideLoadingIfNeed()
                 completion(error, nil)
             }
         }
