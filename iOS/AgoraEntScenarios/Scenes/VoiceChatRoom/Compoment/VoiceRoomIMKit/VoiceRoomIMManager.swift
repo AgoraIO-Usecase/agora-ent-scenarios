@@ -70,8 +70,8 @@ fileprivate let once = VoiceRoomIMManager()
         options.isAutoLogin = false
 //        options.setValue(false, forKeyPath: "enableDnsConfig")
 //        options.setValue(6717, forKeyPath: "chatPort")
-//        options.setValue("52.80.99.104", forKeyPath: "chatServer")
-//        options.setValue("http://a1-test.easemob.com", forKeyPath: "restServer")
+//        options.setValue("https://a1.chat.agora.io", forKeyPath: "chatServer")
+        options.setValue("https://a1.chat.agora.io", forKeyPath: "restServer")
         AgoraChatClient.shared().initializeSDK(with: options)
     }
 
