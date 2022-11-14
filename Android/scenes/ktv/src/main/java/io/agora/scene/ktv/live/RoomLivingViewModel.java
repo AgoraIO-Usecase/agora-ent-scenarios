@@ -97,6 +97,10 @@ public class RoomLivingViewModel extends ViewModel {
     }
     private Role role = Role.Listener;
 
+    // loading dilaog
+    private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
+    final LiveData<Boolean> loadingDialogVisible = _loadingDialogVisible;
+
     /**
      * 房间信息
      */
@@ -760,6 +764,7 @@ public class RoomLivingViewModel extends ViewModel {
                 }else{
                     songPlayingLiveData.postValue(null);
                 }
+                _loadingDialogVisible.postValue(false);
 
             } else {
                 // failed
@@ -856,6 +861,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
 
+        _loadingDialogVisible.postValue(true);
         ktvServiceProtocol.removeSong(new KTVRemoveSongInputModel(
                 musicModel.getSongNo()
         ), e -> {
@@ -864,6 +870,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             } else {
                 // failed
+                _loadingDialogVisible.postValue(false);
                 ToastUtils.showToast(e.getMessage());
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             }

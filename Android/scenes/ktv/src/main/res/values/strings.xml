@@ -2,6 +2,7 @@
 <resources>
     <string name="join">加入</string>
     <string name="score">评分</string>
+    <string name="loading">加载中…</string>
 
     <string name="create_room">创建房间</string>
     <string name="room_title">房间标题</string>
