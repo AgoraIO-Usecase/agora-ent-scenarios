@@ -15,22 +15,25 @@ enum ShowToolMenuType: CaseIterable {
     case real_time_data
     case HD
     case setting
+    case mute_mic
+    case end_pk
     
     var imageName: String {
         switch self {
         case .switch_camera: return "show_switch_camera"
         case .camera: return "show_camera"
-        case .mic: return "show_mic"
+        case .mic, .mute_mic: return "show_mic"
         case .real_time_data: return "show_realtime"
         case .HD: return "show_hd"
         case .setting: return "show_setting"
+        case .end_pk: return "show_end_pk"
         }
     }
     
     var selectedImageName: String? {
         switch self {
         case .camera: return "show_camera_off"
-        case .mic: return "show_mic_off"
+        case .mic, .mute_mic: return "show_mic_off"
         default: return nil
         }
     }
@@ -43,12 +46,15 @@ enum ShowToolMenuType: CaseIterable {
         case .real_time_data: return "实时数据"
         case .HD: return "画质"
         case .setting: return "高级设置"
+        case .mute_mic: return "静音"
+        case .end_pk: return "结束连麦"
         }
     }
     var selectedTitle: String? {
         switch self {
         case .camera: return "摄像头关"
         case .mic: return "麦克风关"
+        case .mute_mic: return "取消静音"
         default: return title
         }
     }
@@ -60,6 +66,13 @@ class ShowToolMenuModel {
     var title: String = ""
     var type: ShowToolMenuType = .switch_camera
     var isSelected: Bool = false
+}
+
+enum ShowMenuType {
+    /// 未pk
+    case none
+    /// PK中
+    case pking
 }
 
 class ShowToolMenuView: UIView {
@@ -76,14 +89,28 @@ class ShowToolMenuView: UIView {
         view.delegate = self
         view.register(LiveToolViewCell.self,
                       forCellWithReuseIdentifier: LiveToolViewCell.description())
+        view.register(LiveToolHeaderView.self,
+                      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                      withReuseIdentifier: LiveToolHeaderView.description())
         return view
     }()
     
+    var type: ShowMenuType = .none {
+        didSet {
+            if type == .none {
+                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 != .mute_mic && $0 != .end_pk }))
+            } else {
+                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .mute_mic || $0 == .end_pk }))
+            }
+        }
+    }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(type: ShowMenuType) {
+        super.init(frame: .zero)
         setupUI()
-        updateToolType(type: ShowToolMenuType.allCases.map({ $0 }))
+        defer {
+            self.type = type
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -125,12 +152,11 @@ class ShowToolMenuView: UIView {
         addSubview(collectionView)
         
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
-        heightAnchor.constraint(equalToConstant: 190 + Screen.safeAreaBottomHeight()).isActive = true
         
         collectionView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 28).isActive = true
-        collectionView.heightAnchor.constraint(equalToConstant: 127).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Screen.safeAreaBottomHeight()).isActive = true
     }
 }
 extension ShowToolMenuView: AGECollectionViewDelegate {
@@ -146,8 +172,57 @@ extension ShowToolMenuView: AGECollectionViewDelegate {
         let isSelected = cell.updateButtonState()
         onTapItemClosure?(model.type, isSelected)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
+                                                                         withReuseIdentifier: LiveToolHeaderView.description(),
+                                                                         for: indexPath)
+        
+        return headerView
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        CGSize(width: Screen.width, height: type == .none ? 0 : 50)
+    }
 }
 
+
+class LiveToolHeaderView: UICollectionReusableView {
+    private lazy var tipsLabel: AGELabel = {
+        let label = AGELabel(colorStyle: .white, fontStyle: .middle)
+        label.text = "对观众SLKGJAKLGJ"
+        return label
+    }()
+    private lazy var lineView: AGEView = {
+        let view = AGEView()
+        view.backgroundColor = .gray
+        return view
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupUI() {
+        addSubview(tipsLabel)
+        addSubview(lineView)
+        tipsLabel.translatesAutoresizingMaskIntoConstraints = false
+        lineView.translatesAutoresizingMaskIntoConstraints = false
+        
+        tipsLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
+        tipsLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        
+        lineView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
+        lineView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        lineView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+}
 
 class LiveToolViewCell: UICollectionViewCell {
     private lazy var iconButton: UIButton = {
