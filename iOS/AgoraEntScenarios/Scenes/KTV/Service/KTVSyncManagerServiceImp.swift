@@ -299,7 +299,7 @@ private func _hideLoadingIfNeed() {
         }
         
         //remove current user's choose song
-        _removeAllUserChooseSong()
+        _removeAllUserChooseSong(userNo: seatInfo.userNo)
         completion(nil)
     }
     
@@ -1015,8 +1015,8 @@ extension KTVSyncManagerServiceImp {
             })
     }
     
-    private func _removeAllUserChooseSong() {
-        let userSongLists = self.songList.filter({ $0.userNo == VLUserCenter.user.userNo})
+    private func _removeAllUserChooseSong(userNo: String = VLUserCenter.user.userNo) {
+        let userSongLists = self.songList.filter({ $0.userNo == userNo})
         userSongLists.forEach { model in
             self._removeChooseSong(songId: model.objectId) { error in
                 
