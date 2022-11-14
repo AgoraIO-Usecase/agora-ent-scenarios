@@ -24,7 +24,6 @@ import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.KtvConstant;
-import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.ISingleCallback;
 import io.agora.scene.base.event.NetWorkEvent;
@@ -290,7 +289,7 @@ public final class RTCManager {
                         bean.messageType = KtvConstant.MESSAGE_ROOM_TYPE_SYNCHRO_PITCH;
                         bean.roomNo = RoomManager.mRoom.roomNo;
                         bean.pitch = info.voicePitch;
-                        RTMManager.getInstance().sendMessage(GsonUtils.Companion.getGson().toJson(bean));
+                        // RTMManager.getInstance().sendMessage(GsonUtils.Companion.getGson().toJson(bean));
                     }
                 }
             }

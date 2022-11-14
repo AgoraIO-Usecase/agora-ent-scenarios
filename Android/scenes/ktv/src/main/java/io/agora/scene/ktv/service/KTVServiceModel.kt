@@ -108,7 +108,6 @@ data class KTVOutSeatInputModel(
 
 data class KTVRemoveSongInputModel(
     val songNo: String,
-    val sort: Int,
 )
 
 data class VLRoomSelSongModel(
@@ -162,10 +161,6 @@ data class KTVSongDetailOutputModel(
     val songNo: String,
     val lyric: String,
     val songUrl: String
-)
-
-data class KTVSwitchSongInputModel(
-    val songNo: String
 )
 
 data class KTVChooseSongInputModel(
