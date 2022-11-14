@@ -17,7 +17,6 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.SPUtil;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
@@ -59,7 +58,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         mAdapter = new BaseRecyclerViewAdapter<>(null, new OnItemClickListener<VLRoomListModel>() {
             @Override
             public void onItemClick(@NonNull VLRoomListModel data, View view, int position, long viewType) {
-                if (data.isPrivate() && !UserManager.getInstance().getUser().userNo.equals(data.getCreatorNo())) {
+                if (data.isPrivate()) {
                     showInputPwdDialog(data);
                 } else {
                     // RoomManager.getInstance().setAgoraRoom(data);
