@@ -99,6 +99,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
+@property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) double currentVoicePitch;
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
@@ -232,15 +233,13 @@ VLPopScoreViewDelegate
             NSAssert(false, @"model == nil");
             return;
         }
+        
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息 / 是否打开视频 / 是否静音
             
             [model resetWithInfo:seatModel];
-            weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
             model.isJoinedChorus = [weakSelf isJoinedChorusWithUserNo:seatModel.userNo];
             
-            //TODO
-//            [weakSelf.roomPersonView updateSeatsByModel:model];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
@@ -260,6 +259,9 @@ VLPopScoreViewDelegate
             [model resetWithInfo:nil];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         }
+        
+        //update my seat status
+        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -283,6 +285,9 @@ VLPopScoreViewDelegate
     
     //callback if choose song list didchanged
     [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
+        // update in-ear monitoring
+        [weakSelf _checkInEarMonitoring];
+        
         if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -1213,13 +1218,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 4: 在耳返中添加降噪 audio filter。
         // AgoraEarMonitoringFilterNoiseSuppression
         // [self.RTCkit enableInEarMonitoring:setting.soundOn includeAudioFilters:AgoraEarMonitoringFilterBuiltInAudioFilters | AgoraEarMonitoringFilterNoiseSuppression];
-        [self setIsEarOn: setting.soundOn];
-        
-        if(self.isNowMicMuted) {
-            [self.RTCkit enableInEarMonitoring:NO];
-        } else {
-            [self.RTCkit enableInEarMonitoring:setting.soundOn];
-        }
+        self.isEarOn = setting.soundOn;
     } else if (type == VLKTVValueDidChangedTypeMV) { // MV
         
     } else if (type == VLKTVValueDidChangedRiseFall) { // 升降调
@@ -1554,6 +1553,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
     _isOnMicSeat = isOnMicSeat;
     
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    self.isNowMicMuted = info.isAudioMuted;
+    self.isNowCameraMuted = info.isVideoMuted;
+    
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
 }
@@ -1579,7 +1582,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsEarOn:(BOOL)isEarOn {
+    _isEarOn = isEarOn;
+    [self _checkInEarMonitoring];
     [self.settingView setIsEarOn:isEarOn];
+}
+
+- (void)_checkInEarMonitoring {
+    if([self isMainSinger:VLUserCenter.user.userNo]) {
+        [self.RTCkit enableInEarMonitoring:_isEarOn];
+    } else {
+        [self.RTCkit enableInEarMonitoring:NO];
+    }
 }
 
 - (void)setSelSongsArray:(NSArray<VLRoomSelSongModel *> *)selSongsArray {
