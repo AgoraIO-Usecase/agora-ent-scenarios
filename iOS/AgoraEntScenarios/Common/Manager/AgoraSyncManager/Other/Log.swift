@@ -162,7 +162,7 @@ class LogUtil {
     func log(message: String) {
         let item = LogItem(message: message, dateTime: Date())
         logs.append(item)
-        print(item.description)
+//        print(item.description)
         writeAppLogsToDisk()
     }
 

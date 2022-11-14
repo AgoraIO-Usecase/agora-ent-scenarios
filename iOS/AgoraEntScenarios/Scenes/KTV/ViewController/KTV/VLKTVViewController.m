@@ -85,6 +85,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, assign) float currentTime;
+@property (nonatomic, assign) float currentDuration;
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
@@ -531,6 +532,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             RtcMusicLrcMessage *musicLrcMessage = [RtcMusicLrcMessage vj_modelWithDictionary:dict];
             float postion = musicLrcMessage.time;
             self.currentTime = postion;
+            self.currentDuration = [dict[@"duration"] longValue];
             
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
@@ -1119,8 +1121,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark - AgoraLrcViewDelegate
 -(NSTimeInterval)getTotalTime {
-    NSTimeInterval time = [_rtcMediaPlayer getDuration];
-    return time;
+    VLRoomSelSongModel *model = self.selSongsArray.firstObject;
+    if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
+        NSTimeInterval time = [_rtcMediaPlayer getDuration];
+        return time;
+    }
+    return self.currentDuration;
 }
 
 - (NSTimeInterval)getPlayerCurrentTime {
