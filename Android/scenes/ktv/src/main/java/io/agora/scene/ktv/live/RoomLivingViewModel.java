@@ -1092,9 +1092,7 @@ public class RoomLivingViewModel extends ViewModel {
                         stopDisplayLrc();
                         mRecvedPlayPosition = 0;
                         mLastRecvPlayPosTime = null;
-//                        mMusicModel = null;
                         mAudioTrackIndex = 1;
-//                        mStatus = BaseMusicPlayer.Status.IDLE;
                         break;
                     case PLAYER_STATE_FAILED:
                         //onMusicOpenError(io.agora.mediaplayer.Constants.MediaPlayerError.getValue(error));
@@ -1135,14 +1133,13 @@ public class RoomLivingViewModel extends ViewModel {
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
                 playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
                 Log.d("cwtsw", "onMusicCompleted");
-                changeMusic();
-
                 mPlayer.stop();
-                stopDisplayLrc();
-                stopSyncLrc();
-                mRecvedPlayPosition = 0;
-                mLastRecvPlayPosTime = null;
-                mAudioTrackIndex = 1;
+                changeMusic();
+////                stopDisplayLrc();
+////                stopSyncLrc();
+//                mRecvedPlayPosition = 0;
+//                mLastRecvPlayPosTime = null;
+//                mAudioTrackIndex = 1;
             }
 
             @Override
@@ -1456,6 +1453,7 @@ public class RoomLivingViewModel extends ViewModel {
                         }
                     });
         } else {
+            stopDisplayLrc();
             // 听众视角
             ResourceManager.Instance(mContext)
                     .download(music, true)
@@ -1489,8 +1487,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     // 开始播放歌词
     private void startDisplayLrc() {
-        if (mDisplayThread != null) return;
-        Log.d("cwtsw", "startDisplayLrc");
+        Log.d("KTVLiveRoomLog:", "startDisplayLrc");
         mStopDisplayLrc = false;
         mDisplayThread = new Thread(new Runnable() {
             @Override
