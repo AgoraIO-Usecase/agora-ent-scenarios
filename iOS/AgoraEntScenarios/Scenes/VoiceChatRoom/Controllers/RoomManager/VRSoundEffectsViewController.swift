@@ -90,7 +90,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     private func loginIM(with entity: VRRoomEntity) {
        // AgoraChatClient.shared().logout(false
         print("login------\(entity.owner?.name ?? "")-----\(entity.owner?.im_token ?? "")")
-        VoiceRoomIMManager.shared?.loginIM(userName: "271", token: entity.owner?.im_token ?? "", completion: { userName, error in
+        VoiceRoomIMManager.shared?.loginIM(userName: "263", token: entity.owner?.im_token ?? "", completion: { userName, error in
             SVProgressHUD.dismiss()
             if error == nil {
                 let info: VRRoomInfo = VRRoomInfo()
