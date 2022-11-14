@@ -137,7 +137,7 @@ VLPopScoreViewDelegate
     //房间麦位视图
     VLRoomPersonView *personView = [[VLRoomPersonView alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
-    [self.roomPersonView setSeatsArray:self.seatsArray];
+    self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
     
     //底部按钮视图
@@ -239,7 +239,9 @@ VLPopScoreViewDelegate
             weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
             model.isJoinedChorus = [weakSelf isJoinedChorusWithUserNo:seatModel.userNo];
             
-            [weakSelf.roomPersonView updateSeatsByModel:model];
+            //TODO
+//            [weakSelf.roomPersonView updateSeatsByModel:model];
+            [weakSelf setSeatsArray:weakSelf.seatsArray];
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
             
@@ -1014,6 +1016,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
+- (void)onVLRoomPersonView:(VLRoomPersonView *)view onRenderVideo:(VLRoomSeatModel *)model inView:(UIView *)videoView atIndex:(NSInteger)seatIndex
+{
+    AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
+    videoCanvas.uid = [model.rtcUid unsignedIntegerValue];
+    videoCanvas.view = videoView;
+    videoCanvas.renderMode = AgoraVideoRenderModeHidden;
+    if([model.userNo isEqual:VLUserCenter.user.userNo]) {
+        //is self
+        [self.RTCkit setupLocalVideo:videoCanvas];
+    } else {
+        [self.RTCkit setupRemoteVideo:videoCanvas];
+    }
+}
+
 #pragma mark - VLPopSelBgViewDelegate
 -(void)onVLPopSelBgView:(VLPopSelBgView *)view
        tappedWithAction:(VLKTVSelBgModel *)selBgModel
@@ -1421,7 +1437,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             break;
         }
     }
-    [self.roomPersonView setSeatsArray:self.seatsArray];
+    self.roomPersonView.roomSeatsArray = self.seatsArray;
 }
 
 #pragma mark - getter/handy utils
@@ -1484,7 +1500,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
-    [self.roomPersonView setSeatsArray:self.seatsArray];
+    self.roomPersonView.roomSeatsArray = self.seatsArray;
 }
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {

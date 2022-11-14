@@ -18,8 +18,6 @@
 @property(nonatomic, weak) id <VLRoomPersonViewDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
-
-@property (nonatomic, strong) NSMutableDictionary *roomSeatsViewArray;
 @end
 
 @implementation VLRoomPersonView
@@ -27,8 +25,7 @@
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRoomPersonViewDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit{
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
-        self.roomSeatsArray = [[NSMutableArray alloc]init];
-        self.roomSeatsViewArray = [[NSMutableDictionary alloc]init];
+        self.roomSeatsArray = [[NSArray alloc]init];
         [self setupView];
     }
     return self;
@@ -63,20 +60,20 @@
     
 }
 
-- (void)setSeatsArray:(NSArray *)roomSeatsArray {
-    self.roomSeatsArray = [[NSMutableArray alloc]initWithArray:roomSeatsArray];
-    for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
-        if (seatModel.rtcUid != nil) {
-            if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
-                [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
-            }
-            UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
-            renderView.tag = viewTag+[seatModel.rtcUid integerValue];
-
-            AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
-            videoCanvas.uid = [seatModel.rtcUid integerValue];
-            videoCanvas.view = renderView;
-            videoCanvas.renderMode = AgoraVideoRenderModeHidden;
+- (void)setRoomSeatsArray:(NSArray *)roomSeatsArray {
+    _roomSeatsArray = [[NSArray alloc]initWithArray:roomSeatsArray];
+//    for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
+//        if (seatModel.rtcUid != nil) {
+//            if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
+//                [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
+//            }
+//            UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
+//            renderView.tag = viewTag+[seatModel.rtcUid integerValue];
+//
+//            AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
+//            videoCanvas.uid = [seatModel.rtcUid integerValue];
+//            videoCanvas.view = renderView;
+//            videoCanvas.renderMode = AgoraVideoRenderModeHidden;
             //TODO video display
 //            if ([seatModel.id isEqual:VLUserCenter.user.id]) {
 //                [self.RTCkit setupLocalVideo:videoCanvas];
@@ -90,26 +87,26 @@
 //            else{
 //                [self.RTCkit setupRemoteVideo:videoCanvas];
 //            }
-            [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
-        }
-    }
+//            [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
+//        }
+//    }
     [self.personCollectionView reloadData];
 }
 
-- (void)updateSeatsByModel:(VLRoomSeatModel *)model{
-    for (NSInteger i = 0; i < [self.roomSeatsArray count]; i++) {
-        VLRoomSeatModel *seatModel = [self.roomSeatsArray objectAtIndex:i];
-        if (seatModel.rtcUid != nil) {
-            if ([seatModel.rtcUid isEqual:model.rtcUid]) {
-                if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
-                    [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
-                }
-                UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
-                renderView.tag = viewTag + [seatModel.rtcUid integerValue];
-                AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
-                videoCanvas.uid = [seatModel.rtcUid integerValue];
-                videoCanvas.view = renderView;
-                videoCanvas.renderMode = AgoraVideoRenderModeHidden;
+//- (void)updateSeatsByModel:(VLRoomSeatModel *)model{
+//    for (NSInteger i = 0; i < [self.roomSeatsArray count]; i++) {
+//        VLRoomSeatModel *seatModel = [self.roomSeatsArray objectAtIndex:i];
+//        if (seatModel.rtcUid != nil) {
+//            if ([seatModel.rtcUid isEqual:model.rtcUid]) {
+//                if ([[self.roomSeatsViewArray allKeys]containsObject:seatModel.rtcUid]) {
+//                    [self.roomSeatsViewArray removeObjectForKey:seatModel.rtcUid];
+//                }
+//                UIView *renderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, VLREALVALUE_WIDTH(54), VLREALVALUE_WIDTH(54))];
+//                renderView.tag = viewTag + [seatModel.rtcUid integerValue];
+//                AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
+//                videoCanvas.uid = [seatModel.rtcUid integerValue];
+//                videoCanvas.view = renderView;
+//                videoCanvas.renderMode = AgoraVideoRenderModeHidden;
 //                if ([model.id isEqual:VLUserCenter.user.id]) {
 ////                    [self.RTCkit enableVideo];
 //                    [self.RTCkit setupLocalVideo:videoCanvas];
@@ -122,14 +119,19 @@
 //                else{
 //                    [self.RTCkit setupRemoteVideo:videoCanvas];
 //                }
-                [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
-                [self.roomSeatsArray removeObject:seatModel];
-                [self.roomSeatsArray insertObject:model atIndex:i];
-                [self.personCollectionView reloadData];
-                return;
-            }
-        }
-    }
+//                [self.roomSeatsViewArray setObject:renderView forKey:seatModel.rtcUid];
+//                [self.roomSeatsArray removeObject:seatModel];
+//                [self.roomSeatsArray insertObject:model atIndex:i];
+//                [self.personCollectionView reloadData];
+//                return;
+//            }
+//        }
+//    }
+//}
+
+- (void)updateIfNeeded
+{
+    [self.personCollectionView reloadData];
 }
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
@@ -171,21 +173,7 @@
     }
     cell.singingBtn.hidden = !seatModel.isOwner;
     
-    if (seatModel.isVideoMuted == 1) {
-        cell.avatarImgView.hidden = YES;
-        cell.avatarCoverBgView.hidden = YES;
-        
-    }else{
-        cell.avatarImgView.hidden = NO;
-        cell.avatarCoverBgView.hidden = NO;
-    }
-    if (seatModel.isAudioMuted == 0) {
-//        NSLog(@"显示：：%@", seatModel.name);
-        cell.muteImgView.hidden = YES;
-    }else{
-//        NSLog(@"不显示：：%@", seatModel.name);
-        cell.muteImgView.hidden = NO;
-    }
+    cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
     if(seatModel.isJoinedChorus)
         cell.joinChorusBtn.hidden = NO;
@@ -197,11 +185,11 @@
         cell.singingBtn.hidden = YES;
         cell.joinChorusBtn.hidden = YES;
     }
-    if (seatModel.isVideoMuted ==  1) { //开启了视频
-        if ([self.roomSeatsViewArray valueForKey:seatModel.rtcUid] != nil) {
-            [cell.videoView removeAllSubviews];
-            [cell.videoView insertSubview:[self.roomSeatsViewArray valueForKey:seatModel.rtcUid] atIndex:0];
-        }
+    
+    //only display when rtcUid exists (on mic seat), and video is not muted
+    cell.videoView.hidden = !(seatModel.rtcUid != nil && !seatModel.isVideoMuted);
+    if (!seatModel.isVideoMuted) { //开启了视频
+        [self.delegate onVLRoomPersonView:self onRenderVideo:seatModel inView:cell.videoView atIndex:indexPath.row];
     }
     
     return cell;

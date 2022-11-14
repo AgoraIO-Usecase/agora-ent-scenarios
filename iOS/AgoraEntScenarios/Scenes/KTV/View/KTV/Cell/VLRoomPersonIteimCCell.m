@@ -99,6 +99,8 @@
     self.joinChorusBtn.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.5);
     self.joinChorusBtn.alpha = 0.6;
     [self.contentView addSubview:self.joinChorusBtn];
+    
+    
 }
 
 @end
