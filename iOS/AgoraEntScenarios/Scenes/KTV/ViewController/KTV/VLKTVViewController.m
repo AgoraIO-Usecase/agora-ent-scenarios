@@ -233,15 +233,13 @@ VLPopScoreViewDelegate
             NSAssert(false, @"model == nil");
             return;
         }
+        
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息 / 是否打开视频 / 是否静音
             
             [model resetWithInfo:seatModel];
-            weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
             model.isJoinedChorus = [weakSelf isJoinedChorusWithUserNo:seatModel.userNo];
             
-            //TODO
-//            [weakSelf.roomPersonView updateSeatsByModel:model];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
@@ -261,6 +259,9 @@ VLPopScoreViewDelegate
             [model resetWithInfo:nil];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         }
+        
+        //update my seat status
+        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -1551,6 +1552,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
     _isOnMicSeat = isOnMicSeat;
+    
+    VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    self.isNowMicMuted = info.isAudioMuted;
+    self.isNowCameraMuted = info.isVideoMuted;
     
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
