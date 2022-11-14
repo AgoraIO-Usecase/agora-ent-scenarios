@@ -96,7 +96,7 @@ class NetworkManager {
                       "ts": "".timeStamp,
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
+//        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
         "https://toolbox.bj2.agoralab.co/v1/token006/generate"
         : "https://toolbox.bj2.agoralab.co/v1/token/generate"
@@ -107,11 +107,11 @@ class NetworkManager {
             let token = data?["token"]
             print(response)
             success(token)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
     
@@ -147,7 +147,7 @@ class NetworkManager {
                       "src": "iOS",
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
+//        ToastView.showWait(text: "loading...", view: nil)
         NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
@@ -156,11 +156,11 @@ class NetworkManager {
             let userName = data?["userName"]
             print(response)
             success(roomId, userName)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil, nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
 
