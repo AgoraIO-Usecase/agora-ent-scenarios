@@ -757,6 +757,7 @@ extension KTVSyncManagerServiceImp {
             // add master to first seat
             let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
             targetSeatInfo.isAudioMuted = 0
+            targetSeatInfo.isMaster = true
             self._addSeatInfo(seatInfo: targetSeatInfo) { error in
                 completion(self._getInitSeats())
             }
