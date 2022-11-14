@@ -21,7 +21,8 @@ import Bugly
     
     private func setupBugly() {
         let config = BuglyConfig()
-        config.reportLogLevel = BuglyLogLevel.warn
+//        config.reportLogLevel = BuglyLogLevel.warn
+        config.unexpectedTerminatingDetectionEnable = true
         #if DEBUG
         config.debugMode = true
         #endif
