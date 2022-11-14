@@ -8,6 +8,7 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
+import AgoraChat
 
 public class VRSoundEffectsViewController: VRBaseViewController {
     var code = ""
@@ -66,24 +67,40 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc private func entryRoom() {
+        
+        AgoraChatClient.shared().logout(false)
+        
         SVProgressHUD.show(withStatus: "Loading".localized())
         let entity: VRRoomEntity = VRRoomEntity()
         entity.sound_effect = effects.type
         entity.is_private = !code.isEmpty
         entity.name = name
         entity.roomPassword = code
-        serviceImp.createRoom(room: entity) { error, entity in
+        serviceImp.createRoom(room: entity) { error, room in
             SVProgressHUD.dismiss()
-            if error == nil, entity != nil {
+            if let room = room {
                 self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                self.loginIM(with: room)
+            } else {
+                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+            }
+        }
+    }
+    
+    private func loginIM(with entity: VRRoomEntity) {
+       // AgoraChatClient.shared().logout(false
+        print("login------\(entity.owner?.name ?? "")-----\(entity.owner?.im_token ?? "")")
+        VoiceRoomIMManager.shared?.loginIM(userName: "271", token: entity.owner?.im_token ?? "", completion: { userName, error in
+            SVProgressHUD.dismiss()
+            if error == nil {
                 let info: VRRoomInfo = VRRoomInfo()
                 info.room = entity
                 info.mic_info = nil
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
             } else {
-                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                self.view.makeToast("AgoraChat Login failed!", point: self.view.center, title: nil, image: nil, completion: nil)
             }
-       }
+        })
     }
 }

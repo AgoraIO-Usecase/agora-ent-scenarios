@@ -126,9 +126,9 @@ class NetworkManager {
                           nickName: String,
                           password: String,
                           uid: String,
-                          success: @escaping (String?, String?) -> Void) {
+                          success: @escaping (String?, String?, String?, String?) -> Void) {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil, nil)
+            success(nil, nil, nil, nil)
             return
         }
         let chatParams = [
@@ -143,6 +143,7 @@ class NetworkManager {
         ]
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
+                      "AppCertificate": KeyCenter.Certificate as Any,
                       "src": "iOS",
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
@@ -151,14 +152,16 @@ class NetworkManager {
                                           params: params,
                                           success: { response in
             let data = response["data"] as? [String: String]
-            let roomId = data?["chatId"]
-            let userName = data?["userName"]
+            let uid = data?["uid"]
+            let chatId = data?["chatId"]
+            let token = data?["token"]
+            let name = data?["userName"]
             print(response)
-            success(roomId, userName)
+            success(uid, chatId, token, name)
             ToastView.hidden()
         }, failure: { error in
             print(error)
-            success(nil, nil)
+            success(nil, nil, nil, nil)
             ToastView.hidden()
         })
     }
