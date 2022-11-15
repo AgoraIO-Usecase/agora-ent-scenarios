@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:pitchDoneTextColor="@color/white"
-        app:pitchInitialScore="0"/>
+        app:pitchInitialScore="0" />
 
     <io.agora.lyrics_view.LrcView
         android:id="@+id/lrcView"
