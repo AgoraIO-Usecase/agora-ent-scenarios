@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import io.agora.scene.voice.databinding.VoiceDialogBottomSheetAlertBinding
 import io.agora.voice.baseui.dialog.BaseSheetDialog
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 
 /**
  * 确定/取消

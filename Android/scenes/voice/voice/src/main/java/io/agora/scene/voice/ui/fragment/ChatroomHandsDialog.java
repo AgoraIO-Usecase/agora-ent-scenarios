@@ -26,7 +26,7 @@ import io.agora.scene.voice.R;
 import io.agora.voice.baseui.BaseInitFragment;
 import io.agora.voice.baseui.dialog.BaseSheetDialog;
 import io.agora.voice.buddy.tool.LogTools;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.databinding.VoiceRoomHandLayoutBinding;
 
 public class ChatroomHandsDialog extends BaseSheetDialog<VoiceRoomHandLayoutBinding> {
@@ -85,7 +85,7 @@ public class ChatroomHandsDialog extends BaseSheetDialog<VoiceRoomHandLayoutBind
                     title = tab.getCustomView().findViewById(R.id.mtTabText);
                     ShapeableImageView tag_line = tab.getCustomView().findViewById(R.id.tab_bg);
                     ViewGroup.LayoutParams layoutParams = title.getLayoutParams();
-                    layoutParams.height = (int) MathTools.dp2px(getActivity(), 26);
+                    layoutParams.height = (int) DeviceTools.dp2px(getActivity(), 26);
                     title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                     title.setGravity(Gravity.CENTER);
                     title.setTypeface(null, Typeface.BOLD);

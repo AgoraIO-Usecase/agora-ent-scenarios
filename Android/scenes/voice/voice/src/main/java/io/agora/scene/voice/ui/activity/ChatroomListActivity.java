@@ -34,7 +34,6 @@ import io.agora.scene.voice.ui.fragment.ChatroomListFragment;
 import io.agora.voice.buddy.config.RouterPath;
 import io.agora.voice.buddy.tool.ResourcesTools;
 
-@Route(path = RouterPath.ChatroomListPath)
 public class ChatroomListActivity extends BaseActivity implements RoomTitleBar.OnBackPressListener, View.OnClickListener {
 
     private RoomTitleBar mVRTitleBar;

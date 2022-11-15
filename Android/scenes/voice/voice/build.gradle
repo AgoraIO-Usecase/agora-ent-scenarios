@@ -6,15 +6,15 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 Properties properties = new Properties()
 properties.load(project.file('voice_gradle.properties').newDataInputStream())
 def final isBuildTypesTest = properties.getProperty('isBuildTypesTest')
+
 def final TEST_RTC_APP_ID = properties.getProperty('AGORA_APP_ID_TEST')
-def final TEST_RTC_APP_TOKEN = properties.getProperty('AGORA_APP_TOKEN_TSET')
+def final TEST_RTC_APP_CERT = properties.getProperty('AGORA_APP_CERTIFICATE_TEST')
 def final TEST_IM_APP_KEY = properties.getProperty('IM_APP_KEY_TEST')
-def final TEST_APP_SERVER_HOST = properties.getProperty('IM_APP_HOST_TEST')
 def final TEST_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_TEST')
+
 def final RELEASE_RTC_APP_ID = properties.getProperty('AGORA_APP_ID_RELEASE')
-def final RELEASE_RTC_APP_TOKEN = properties.getProperty('AGORA_APP_TOKEN_RELEASE')
+def final RELEASE_RTC_APP_CERT = properties.getProperty('AGORA_APP_CERTIFICATE_RELEASE')
 def final RELEASE_IM_APP_KEY = properties.getProperty('IM_APP_KEY_RELEASE')
-def final RELEASE__APP_SERVER_HOST = properties.getProperty('IM_APP_HOST_RELEASE')
 def final RELEASE_TOOLBOX_SERVER_HOST = properties.getProperty('TOOLBOX_SERVER_HOST_RELEASE')
 
 android {
@@ -29,16 +29,14 @@ android {
         if (isBuildTypesTest.toBoolean()){
             buildConfigField "Boolean", "voice_env_is_test", "${true}"
             buildConfigField "String", "agora_app_id", "${TEST_RTC_APP_ID}"
-            buildConfigField "String", "agora_app_token", "${TEST_RTC_APP_TOKEN}"
+            buildConfigField "String", "agora_app_cert", "${TEST_RTC_APP_CERT}"
             buildConfigField "String", "im_app_key", "${TEST_IM_APP_KEY}"
-            buildConfigField "String", "server_host", "${TEST_APP_SERVER_HOST}"
             buildConfigField "String", "toolbox_server_host", "${TEST_TOOLBOX_SERVER_HOST}"
         }else {
             buildConfigField "Boolean", "voice_env_is_test", "${false}"
             buildConfigField "String", "agora_app_id", "${RELEASE_RTC_APP_ID}"
-            buildConfigField "String", "agora_app_token", "${RELEASE_RTC_APP_TOKEN}"
+            buildConfigField "String", "agora_app_cert", "${RELEASE_RTC_APP_CERT}"
             buildConfigField "String", "im_app_key", "${RELEASE_IM_APP_KEY}"
-            buildConfigField "String", "server_host", "${RELEASE__APP_SERVER_HOST}"
             buildConfigField "String", "toolbox_server_host", "${RELEASE_TOOLBOX_SERVER_HOST}"
         }
 

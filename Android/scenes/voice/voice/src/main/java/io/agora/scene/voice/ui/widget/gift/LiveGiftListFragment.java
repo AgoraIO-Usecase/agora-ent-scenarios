@@ -12,7 +12,7 @@ import io.agora.scene.voice.ui.widget.recyclerview.HorizontalPageLayoutManager;
 import io.agora.scene.voice.ui.widget.recyclerview.PagingScrollHelper;
 import io.agora.voice.baseui.BaseInitFragment;
 import io.agora.voice.baseui.interfaces.OnItemClickListener;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
 
 public class LiveGiftListFragment extends BaseInitFragment implements OnItemClickListener {
@@ -47,7 +47,7 @@ public class LiveGiftListFragment extends BaseInitFragment implements OnItemClic
         //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(MathTools.dp2px(getContext(), 3), 0);
+        drawable.setSize(DeviceTools.dp2px(getContext(), 3), 0);
         itemDecoration.setDrawable(drawable);
         rvList.addItemDecoration(itemDecoration);
 

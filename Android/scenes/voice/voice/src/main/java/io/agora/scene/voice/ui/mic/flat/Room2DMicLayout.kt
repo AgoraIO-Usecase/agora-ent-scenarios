@@ -15,7 +15,7 @@ import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.ui.mic.IRoomMicView
 import io.agora.voice.baseui.adapter.OnItemChildClickListener
 import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.ui.mic.RoomMicConstructor

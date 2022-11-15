@@ -81,7 +81,7 @@ class VRToolboxServerHttpManager {
                     "voice generateToken success: $result".logE(TAG)
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type)
-                    callBack.onSuccess(bean)
+                    callBack.onSuccess(bean?.data)
                 }
 
                 override fun onError(code: Int, msg: String) {
@@ -151,16 +151,16 @@ class VRToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success: $result".logE(TAG)
+                    "voice createImRoom success: $result".logE(TAG)
                     val bean = GsonTools.toBean<VRCreateRoomResponse>(
                         result,
                         object : TypeToken<VRCreateRoomResponse>() {}.type
                     )
-                    callBack.onSuccess(bean)
+                    callBack.onSuccess(bean?.data)
                 }
 
                 override fun onError(code: Int, msg: String) {
-                    "voice generateToken onError: $code msg: $msg".logE(TAG)
+                    "voice createImRoom onError: $code msg: $msg".logE(TAG)
                     callBack.onError(code, msg)
                 }
             })

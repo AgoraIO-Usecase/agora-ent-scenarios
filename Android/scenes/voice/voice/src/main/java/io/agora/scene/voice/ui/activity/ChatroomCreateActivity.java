@@ -37,7 +37,7 @@ import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputView;
 import io.agora.scene.voice.ui.widget.titlebar.RoomTitleBar;
 import io.agora.voice.baseui.BaseActivity;
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.voice.buddy.config.RouterParams;
 import io.agora.voice.buddy.config.RouterPath;
@@ -50,7 +50,6 @@ import io.agora.voice.imkit.manager.ChatroomHelper;
 import io.agora.voice.network.tools.bean.VRUserBean;
 import io.agora.voice.network.tools.bean.VRoomInfoBean;
 
-@Route(path = RouterPath.ChatroomCreatePath)
 public class ChatroomCreateActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener, RoomTitleBar.OnBackPressListener, View.OnClickListener, RoomEncryptionInputView.OnTextChangeListener {
 
    private RadioGroup mRadioGroup;
@@ -218,11 +217,11 @@ public class ChatroomCreateActivity extends BaseActivity implements RadioGroup.O
       mViewPager.setOffscreenPageLimit(1);
       View recyclerView = mViewPager.getChildAt(0);
       if(recyclerView instanceof RecyclerView){
-         recyclerView.setPadding(MathTools.dp2px(this,30), 0, MathTools.dp2px(this,30), 0);
+         recyclerView.setPadding(DeviceTools.dp2px(this,30), 0, DeviceTools.dp2px(this,30), 0);
          ((RecyclerView) recyclerView).setClipToPadding(false);
       }
       CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-      compositePageTransformer.addTransformer(new MarginPageTransformer(MathTools.dp2px(this,16)));
+      compositePageTransformer.addTransformer(new MarginPageTransformer(DeviceTools.dp2px(this,16)));
       mViewPager.setPageTransformer(compositePageTransformer);
       // set adapter
       mViewPager.setAdapter(new RecyclerView.Adapter<ViewHolder>() {

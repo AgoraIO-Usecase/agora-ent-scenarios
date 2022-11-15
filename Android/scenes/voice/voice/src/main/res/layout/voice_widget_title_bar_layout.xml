@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:scaleType="centerInside"
-            tools:src="@drawable/voice_icon_tab_back_empty"/>
+            tools:src="@drawable/voice_icon_tab_back_empty" />
 
     </RelativeLayout>
 
