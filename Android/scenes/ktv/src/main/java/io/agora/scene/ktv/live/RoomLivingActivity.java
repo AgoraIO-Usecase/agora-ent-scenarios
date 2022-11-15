@@ -262,6 +262,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onPrepareStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_WAIT_CHORUS) {
                 getBinding().lrcControlView.onWaitChorusStatus();
+            } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHORUS_JOINED) {
+                getBinding().lrcControlView.onMemberJoinedChorus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
