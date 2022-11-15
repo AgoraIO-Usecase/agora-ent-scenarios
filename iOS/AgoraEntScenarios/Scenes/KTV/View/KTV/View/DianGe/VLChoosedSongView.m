@@ -96,7 +96,6 @@
     
     KTVMakeSongTopInputModel* inputModel = [KTVMakeSongTopInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] PinSongWithInput:inputModel
                                       completion:^(NSError * error) {
@@ -119,7 +118,6 @@
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {

@@ -294,7 +294,26 @@ VLPopScoreViewDelegate
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
         
-        if (KTVSubscribeCreated == status || KTVSubscribeUpdated == status) {
+        if (KTVSubscribeDeleted == status) {
+            VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
+            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
+                [weakSelf removeSelSongWithSongNo:songInfo.songNo];
+                return;
+            }
+            
+            //切换歌曲
+            /*
+             1. removed song is top song, play next
+             2. waitting for play, play next
+             */
+            BOOL removedSongIsPlaying = [selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo];
+            BOOL isWaitingForPlay = [weakSelf.currentPlayingSongNo length] == 0;
+            if (removedSongIsPlaying || isWaitingForPlay) {
+                [weakSelf stopCurrentSong];
+            }
+            [weakSelf removeSelSongWithSongNo:songInfo.songNo];
+            [weakSelf loadAndPlaySong];
+        } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
             if (song == nil) {
@@ -317,28 +336,7 @@ VLPopScoreViewDelegate
             }
             
             //pin
-            if (song.sort != songInfo.sort) {
-                [weakSelf refreshChoosedSongList:nil];
-            }
-        } else if (KTVSubscribeDeleted == status) {
-            VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
-                [weakSelf removeSelSongWithSongNo:songInfo.songNo];
-                return;
-            }
-            
-            //切换歌曲
-            /*
-             1. removed song is top song, play next
-             2. waitting for play, play next
-             */
-            BOOL removedSongIsPlaying = [selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo];
-            BOOL isWaitingForPlay = [weakSelf.currentPlayingSongNo length] == 0;
-            if (removedSongIsPlaying || isWaitingForPlay) {
-                [weakSelf stopCurrentSong];
-            }
-            [weakSelf removeSelSongWithSongNo:songInfo.songNo];
-            [weakSelf loadAndPlaySong];
+            [weakSelf refreshChoosedSongList:nil];
         }
     }];
 }
@@ -1356,14 +1354,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(model == nil
        || self.roomModel == nil
        || self.roomModel.roomNo == nil
-       || model.songNo == nil
-       || model.sort == nil) {
+       || model.songNo == nil) {
         return;
     }
     
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {

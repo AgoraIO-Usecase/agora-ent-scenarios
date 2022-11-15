@@ -21,13 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *songUrl;
 ///歌词
 @property (nonatomic, copy) NSString *lyric;;
-///排序
-@property (nonatomic, copy) NSString *sort;
+///创建时间
+@property (nonatomic, assign) NSTimeInterval createAt;
+//置顶时间
+@property (nonatomic, assign) NSTimeInterval pinAt;
+
 ///0 未开始 1.已唱 2.正在唱
 @property (nonatomic, assign) NSInteger status;
 ///是谁点的歌
 @property (nonatomic, copy) NSString *userNo;
-//@property (nonatomic, copy) NSString *userId;
+
 ///点歌人昵称
 @property (nonatomic, copy) NSString *name;
 
