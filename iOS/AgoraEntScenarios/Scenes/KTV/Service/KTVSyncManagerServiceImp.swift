@@ -300,7 +300,6 @@ private func _hideLoadingIfNeed() {
                    completion: @escaping (Error?) -> Void) {
         let seatInfo = seatMap["\(inputModel.seatIndex)"]!
         _removeSeat(seatInfo: seatInfo) { error in
-            // TODO(wushengtao): whitout callback
         }
         
         //remove current user's choose song
@@ -518,11 +517,6 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
-//        removeUser { error in
-//            //TODO(wushengtao): whitout callback
-        ////            completion(error)
-//        }
-//        SyncUtil.leaveScene(id: channelName)
         SyncUtil.scene(id: channelName)?.deleteScenes()
         roomNo = nil
         completion(nil)
@@ -822,22 +816,23 @@ extension KTVSyncManagerServiceImp {
         
         agoraPrint("imp seat update... [\(objectId)]")
         let params = seatInfo.yy_modelToJSONObject() as! [String: Any]
+        //TODO: convert to swift map to fix SyncManager parse NSDictionary bugs
+        var seatParams = [String: Any]()
+        params.forEach { (key: String, value: Any) in
+            seatParams[key] = value
+        }
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .update(id: objectId,
-                    data: params,
+                    data: seatParams,
                     success: {
                 agoraPrint("imp seat update success...")
-//                finished(nil)
+                finished(nil)
             }, fail: { error in
                 agoraPrint("imp seat update fail...")
-//                finished(NSError(domain: error.message, code: error.code))
+                finished(NSError(domain: error.message, code: error.code))
             })
-        //TODO(wushengtao): callbacll never received, mock it
-        DispatchQueue.main.async {
-            finished(nil)
-        }
     }
 
     private func _removeSeat(seatInfo: VLRoomSeatModel,
