@@ -403,11 +403,11 @@ private func _hideLoadingIfNeed() {
         }
 
         // mark input song to top
-        let targetSort = (_minSort() ?? 0) - 1
-        song.sort = "\(targetSort)"
+        song.pinAt = Date().timeIntervalSince1970
 
-        if topSong.objectId != song.objectId {
-            topSong.sort = "\(targetSort - 1)"
+        //if top song is playing status, keep it always on top(_sortChooseSongList)
+        if topSong.objectId != song.objectId, topSong.status != 2 {
+            topSong.pinAt = Date().timeIntervalSince1970
             _updateChooseSong(songInfo: topSong) { error in
             }
         }
@@ -948,18 +948,20 @@ extension KTVSyncManagerServiceImp {
 // MARK: Choose song operation
 
 extension KTVSyncManagerServiceImp {
-    private func _minSort() -> Int? {
-        var sort: Int?
-        songList.forEach { model in
-            let _sort = Int(model.sort) ?? 0
-            sort = sort == nil ? _sort : min(sort!, _sort)
-        }
-
-        return sort
-    }
-
     private func _sortChooseSongList() {
-        songList = songList.sorted(by: { Int($0.sort)! < Int($1.sort)! })
+        songList = songList.sorted(by: { model1, model2 in
+            if model1.status == 2 {
+                return true
+            }
+            if model2.status == 2 {
+                return false
+            }
+            if model1.pinAt < 1,  model2.pinAt < 1 {
+                return model1.createAt - model2.createAt < 0 ? true : false
+            }
+            
+            return model1.pinAt - model2.pinAt > 0 ? true : false
+        })
     }
 
     private func _getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
@@ -1018,8 +1020,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         agoraPrint("imp song add...")
-        let targetSort = (Int(songList.last?.sort ?? "-1") ?? -1) + 1
-        songInfo.sort = "\(targetSort)"
+        songInfo.createAt = Date().timeIntervalSince1970
         let params = songInfo.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
