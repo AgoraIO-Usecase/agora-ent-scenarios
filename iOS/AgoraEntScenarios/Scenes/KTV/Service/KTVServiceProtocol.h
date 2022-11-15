@@ -169,6 +169,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongChangedWithBlock:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
+
+/// 订阅歌曲评分变化
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
 @end
 
 NS_ASSUME_NONNULL_END

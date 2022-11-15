@@ -31,10 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 ///点歌人昵称
 @property (nonatomic, copy) NSString *name;
 
-/// 得分
-@property (nonatomic, assign) double score;
-
-
 @property (nonatomic, copy, nullable) NSString* objectId;
 
 
