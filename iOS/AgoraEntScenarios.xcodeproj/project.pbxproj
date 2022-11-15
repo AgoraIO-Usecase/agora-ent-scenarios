@@ -443,6 +443,13 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */; };
+		E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */; };
+		E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3120291A46DD00412D42 /* ShowSegmentView.swift */; };
+		E74A3123291A580100412D42 /* ShowApplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3122291A580100412D42 /* ShowApplyView.swift */; };
+		E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */; };
+		E74A3132291B929E00412D42 /* ShowRealTimeDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */; };
+		E74A3135291B97DD00412D42 /* ShowToolMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1033,6 +1040,13 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPKInviteView.swift; sourceTree = "<group>"; };
+		E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyAndInviteView.swift; sourceTree = "<group>"; };
+		E74A3120291A46DD00412D42 /* ShowSegmentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSegmentView.swift; sourceTree = "<group>"; };
+		E74A3122291A580100412D42 /* ShowApplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyView.swift; sourceTree = "<group>"; };
+		E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowStatisticsInfo.swift; sourceTree = "<group>"; };
+		E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowRealTimeDataView.swift; sourceTree = "<group>"; };
+		E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToolMenuView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1466,6 +1480,10 @@
 				A81ED0182922433500B40454 /* Setting */,
 				A845AD3E291BAD9900A41D8D /* Music */,
 				A845AD29291A01F700A41D8D /* Live */,
+				E74A3133291B97C000412D42 /* ToolMenu */,
+				E74A3124291B4DE700412D42 /* RealTime */,
+				E74A311B2919FBA700412D42 /* PKInvite */,
+				A88D142F2914C13500F5DF6A /* Beauty */,
 				A88D14282913BEB900F5DF6A /* CreateLive */,
 				A8B561A429136BD7004F34D1 /* RoomList */,
 			);
@@ -2725,6 +2743,34 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
+		E74A311B2919FBA700412D42 /* PKInvite */ = {
+			isa = PBXGroup;
+			children = (
+				E74A3120291A46DD00412D42 /* ShowSegmentView.swift */,
+				E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */,
+				E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */,
+				E74A3122291A580100412D42 /* ShowApplyView.swift */,
+			);
+			path = PKInvite;
+			sourceTree = "<group>";
+		};
+		E74A3124291B4DE700412D42 /* RealTime */ = {
+			isa = PBXGroup;
+			children = (
+				E74A3130291B929E00412D42 /* ShowRealTimeDataView.swift */,
+				E74A312F291B929E00412D42 /* ShowStatisticsInfo.swift */,
+			);
+			path = RealTime;
+			sourceTree = "<group>";
+		};
+		E74A3133291B97C000412D42 /* ToolMenu */ = {
+			isa = PBXGroup;
+			children = (
+				E74A3134291B97DD00412D42 /* ShowToolMenuView.swift */,
+			);
+			path = ToolMenu;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2970,6 +3016,7 @@
 				057DD9FD290B9495001329E6 /* PresentationAnimation.swift in Sources */,
 				DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */,
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
+				E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				A81ED01F2922457400B40454 /* ShowSettingSegmentCell.swift in Sources */,
@@ -2991,11 +3038,13 @@
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
 				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
+				E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */,
 				05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */,
 				DD8417BC29090C520026B624 /* VLNoBodyOnLineView.m in Sources */,
 				05FFE710290F706C0024D22F /* PopTip+Draw.swift in Sources */,
 				DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */,
 				DDA19A5B28FFE57A009D3E61 /* EKAlertMessage.swift in Sources */,
+				E74A3123291A580100412D42 /* ShowApplyView.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
 				A8B5619F29127724004F34D1 /* ShowCreateLiveView.swift in Sources */,
@@ -3045,6 +3094,7 @@
 				05FFE71F290F73670024D22F /* VoiceRoomApplyUsersViewController.swift in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD8417BB29090C520026B624 /* VLRobMicrophoneView.m in Sources */,
+				E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */,
 				05FFE6F2290F706C0024D22F /* VMManagerView.swift in Sources */,
 				05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */,
 				DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */,
@@ -3068,6 +3118,7 @@
 				DDA19A5228FFE57A009D3E61 /* EKAttributes+Presets.swift in Sources */,
 				DD84178629090C520026B624 /* VLMineView.m in Sources */,
 				DD84179F29090C520026B624 /* VLsoundEffectView.m in Sources */,
+				E74A3132291B929E00412D42 /* ShowRealTimeDataView.swift in Sources */,
 				DDA199E728FFE579009D3E61 /* VLFontUtils.m in Sources */,
 				0510B829290B730E0063E57A /* VoiceRoomAudiencesEntity.swift in Sources */,
 				05FFE70B290F706C0024D22F /* VMSliderTableViewCell.swift in Sources */,
@@ -3161,6 +3212,7 @@
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
 				DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */,
+				E74A3135291B97DD00412D42 /* ShowToolMenuView.swift in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
 				05FFE6F9290F706C0024D22F /* VMMuteView.swift in Sources */,
 				05FFE733290F74560024D22F /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
@@ -3256,6 +3308,7 @@
 				DDA19A4228FFE57A009D3E61 /* UIView+Shadow.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				A8B5619B29125EEA004F34D1 /* ShowEmptyView.swift in Sources */,
+				E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */,
 				DD8417C229090C520026B624 /* KTVServiceModel.m in Sources */,
 				DD8417AE29090C520026B624 /* VLTouristOnLineView.m in Sources */,
 				05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */,
