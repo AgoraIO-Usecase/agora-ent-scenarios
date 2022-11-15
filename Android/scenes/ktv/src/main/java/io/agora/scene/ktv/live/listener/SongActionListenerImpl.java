@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.agora.scene.base.utils.LiveDataUtils;
-import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.service.VLRoomSelSongModel;
 import io.agora.scene.ktv.widget.song.OnSongActionListener;
@@ -21,25 +20,19 @@ import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.ktv.widget.song.SongItem;
 
 public class SongActionListenerImpl implements OnSongActionListener {
-    private static final Map<Integer, RoomLivingViewModel.SongType> sSongTypeMap = new LinkedHashMap<>();
-
-    static {
-        sSongTypeMap.put(R.string.song_rank_2, RoomLivingViewModel.SongType.HI_SONG);
-        sSongTypeMap.put(R.string.song_rank_3, RoomLivingViewModel.SongType.TICKTOK);
-        sSongTypeMap.put(R.string.song_rank_4, RoomLivingViewModel.SongType.CLASSICAL);
-        sSongTypeMap.put(R.string.song_rank_5, RoomLivingViewModel.SongType.KTV);
-    }
-
     private final LifecycleOwner mLifecycleOwner;
     private final RoomLivingViewModel mViewModel;
     private final boolean isChorus;
+    private final LinkedHashMap<Integer, String> songTypeMap;
     private int mCurrPage = 1;
 
 
     public SongActionListenerImpl(
             LifecycleOwner activity,
             RoomLivingViewModel viewModel,
+            LinkedHashMap<Integer, String> songTypeMap,
             boolean isChorus) {
+        this.songTypeMap = songTypeMap;
         mLifecycleOwner = activity;
         mViewModel = viewModel;
         this.isChorus = isChorus;
@@ -107,17 +100,17 @@ public class SongActionListenerImpl implements OnSongActionListener {
 
     public List<String> getSongTypeTitles(Context context) {
         List<String> titles = new ArrayList<>();
-        for (Map.Entry<Integer, RoomLivingViewModel.SongType> entry : sSongTypeMap.entrySet()) {
-            titles.add(context.getString(entry.getKey()));
+        for (Map.Entry<Integer, String> entry : songTypeMap.entrySet()) {
+            titles.add(entry.getValue());
         }
         return titles;
     }
 
-    private RoomLivingViewModel.SongType getSongType(int index) {
+    private int getSongType(int index) {
         int i = 0;
-        for (Map.Entry<Integer, RoomLivingViewModel.SongType> entry : sSongTypeMap.entrySet()) {
+        for (Map.Entry<Integer, String> entry : songTypeMap.entrySet()) {
             if (index == i) {
-                return entry.getValue();
+                return entry.getKey();
             }
             i++;
         }

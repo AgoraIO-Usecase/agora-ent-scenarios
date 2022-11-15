@@ -433,9 +433,7 @@ class KTVSyncManagerServiceImp(
         val song = VLRoomSelSongModel(
             inputModel.songName,
             inputModel.songNo,
-            inputModel.songUrl,
             inputModel.singer,
-            inputModel.lyric,
             inputModel.imageUrl,
 
             isChorus = inputModel.isChorus > 0,
@@ -535,18 +533,17 @@ class KTVSyncManagerServiceImp(
         val newSong = VLRoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
-            targetSong.songUrl,
             targetSong.singer,
-            targetSong.lyric,
             targetSong.imageUrl,
 
+            isChorus = targetSong.isChorus,
             userNo = targetSong.userNo,
             userId = targetSong.userId,
             name = targetSong.name,
-            chorusNo = UserManager.getInstance().user.userNo,
-            isChorus = true,
             isOriginal = targetSong.isOriginal,
-            sort = targetSong.sort
+            sort = targetSong.sort,
+
+            chorusNo = UserManager.getInstance().user.userNo
         )
         songChosenList.add(0, newSong)
 
@@ -577,11 +574,10 @@ class KTVSyncManagerServiceImp(
         val newSong = VLRoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
-            targetSong.songUrl,
             targetSong.singer,
-            targetSong.lyric,
             targetSong.imageUrl,
 
+            isChorus = targetSong.isChorus,
             userNo = targetSong.userNo,
             userId = targetSong.userId,
             name = targetSong.name,
@@ -987,9 +983,7 @@ class KTVSyncManagerServiceImp(
         val firstNewSong = VLRoomSelSongModel(
             firstSong.songName,
             firstSong.songNo,
-            firstSong.songUrl,
             firstSong.singer,
-            firstSong.lyric,
             firstSong.imageUrl,
 
             firstSong.userNo,
@@ -1016,9 +1010,7 @@ class KTVSyncManagerServiceImp(
                     val newSong = VLRoomSelSongModel(
                         song.songName,
                         song.songNo,
-                        song.songUrl,
                         song.singer,
-                        song.lyric,
                         song.imageUrl,
 
                         song.userNo,
