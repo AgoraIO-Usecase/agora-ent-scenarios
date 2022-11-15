@@ -34,7 +34,6 @@ class ShowVideoSettingVC: UIViewController {
     }
     
     private func setUpUI(){
-        return
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
