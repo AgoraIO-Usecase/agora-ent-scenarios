@@ -379,8 +379,8 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.joinSing,
                         isSelfMuted, // update this
                         originSeatInfo.isVideoMuted,
-                        originSeatInfo.ifSelTheSingSong,
-                        originSeatInfo.ifJoinedChorus,
+                        originSeatInfo.isOwner,
+                        originSeatInfo.isJoinedChorus,
                     )
                     innerUpdateSeat(seatInfo, completion)
                 }
@@ -404,10 +404,10 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.name,
                         originSeatInfo.seatIndex,
                         originSeatInfo.joinSing,
-                        originSeatInfo.isSelfMuted,
+                        originSeatInfo.isAudioMuted,
                         isVideoMuted, // update this
-                        originSeatInfo.ifSelTheSingSong,
-                        originSeatInfo.ifJoinedChorus
+                        originSeatInfo.isOwner,
+                        originSeatInfo.isJoinedChorus
                     )
                     innerUpdateSeat(seatInfo, completion)
                 }
@@ -800,8 +800,8 @@ class KTVSyncManagerServiceImp(
             false,
             0,
             0,
-            ifSelTheSingSong = false,
-            ifJoinedChorus = false
+            isOwner = false,
+            isJoinedChorus = false
         )
     }
 
