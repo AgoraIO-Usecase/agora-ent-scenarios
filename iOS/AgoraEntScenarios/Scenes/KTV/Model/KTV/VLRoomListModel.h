@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 ///新加字段 当前房间的创建者
 @property (nonatomic, copy) NSString *creatorNo;
 
+@property (nonatomic, copy) NSString* objectId;
+
 @end
 
 NS_ASSUME_NONNULL_END
