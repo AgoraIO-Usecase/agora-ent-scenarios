@@ -825,10 +825,9 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .document(id: objectId)
-            .update(key: "",
+            .update(id: objectId,
                     data: params,
-                    success: {_ in
+                    success: {
                 agoraPrint("imp seat update success...")
 //                finished(nil)
             }, fail: { error in
@@ -883,6 +882,7 @@ extension KTVSyncManagerServiceImp {
             .add(data: params,
                  success: {[weak self] obj in
                 agoraPrint("imp seat add success...")
+                seatInfo.objectId = obj.getId()
                 self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
                 finished(nil)
             }, fail: { error in
