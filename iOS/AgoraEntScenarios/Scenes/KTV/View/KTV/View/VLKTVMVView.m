@@ -21,10 +21,8 @@
 @import Masonry;
 
 @class QMUIButton;
-@interface VLKTVMVView () < AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
-{
-    BOOL _lrcReadyToStart;
-}
+@interface VLKTVMVView () <VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
 @property (nonatomic, strong) UILabel *musicTitleLabel;
@@ -391,37 +389,6 @@
     }
 }
 
-
-#pragma mark - AgoraLrcDownloadDelegate
-
-- (void)beginDownloadLrcWithUrl:(NSString *)url {
-    VLLog(@"\n歌词开始下载\n%@",url);
-}
-
-- (void)downloadLrcFinishedWithUrl:(NSString *)url {
-    VLLog(@"\n歌词下载完成\n%@",url);
-    if (_lrcReadyToStart) {
-        _lrcReadyToStart = NO;
-        [self _startLrc];
-    }
-}
-
-- (void)downloadLrcProgressWithUrl:(NSString *)url progress:(double)progress {
-    VLLog(@"\n歌词下载进度\n%@,%f",url,progress);
-}
-
-- (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
-    VLLog(@"\n歌词下载失败\n%@\n%@",url,error);
-}
-
-- (void)beginParseLrc {
-    VLLog(@"歌词开始解析");
-}
-
-- (void)parseLrcFinished {
-    VLLog(@"歌词解析完成");
-}
-
 #pragma mark - AgoraKaraokeScoreDelegate
 
 /// 评分回调
@@ -469,17 +436,14 @@
 }
 
 - (void)start {
-    //waitting for lrc download success
-    _lrcReadyToStart = YES;
+    [_lrcView start];
 }
 
 - (void)stop {
-    _lrcReadyToStart = NO;
     [_lrcView stop];
 }
 
 - (void)reset {
-    _lrcReadyToStart = NO;
     [_lrcView reset];
 }
 
@@ -531,8 +495,8 @@
 
 - (AgoraLrcScoreView *)lrcView {
     if (!_lrcView) {
-        _lrcView = [[AgoraLrcScoreView alloc] initWithDelegate:self];
-        _lrcView.downloadDelegate = self;
+        _lrcView = [[AgoraLrcScoreView alloc] initWithDelegate:_delegate];
+        _lrcView.downloadDelegate = _delegate;
         _lrcView.backgroundColor = [UIColor clearColor];
         _lrcView.scoreDelegate = self;
         _lrcView.clipsToBounds = YES;
