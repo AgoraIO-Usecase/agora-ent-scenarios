@@ -253,7 +253,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.songPlayingLiveData.observe(this, model -> {
-            if (model == null) return;
+            if (model == null) {
+                roomLivingViewModel.musicStop();
+                return;
+            };
             onMusicChanged(model);
             getBinding().lrcControlView.setScoreControlView();
         });
