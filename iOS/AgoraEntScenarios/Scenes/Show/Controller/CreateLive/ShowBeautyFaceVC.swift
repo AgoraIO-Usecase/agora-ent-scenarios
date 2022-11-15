@@ -12,37 +12,45 @@ class ShowBeautyFaceVC: UIViewController {
     
     var defalutSelectIndex = 0
    
-    var collectionView: UICollectionView!
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUpUI()
-    }
-    
-    private func setUpUI(){
-        // 列表
+    private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 15
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         layout.itemSize = CGSize(width: 48, height: 70)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.register(ShowBeautyFaceCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowBeautyFaceCell.self))
         collectionView.delegate = self
         collectionView.dataSource = self
+        return collectionView
+    }()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpUI()
+        configDefaultSelect()
+    }
+    
+    private func setUpUI(){
+        // 列表
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        // 默认选中
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+    }
+    
+    // 默认选中
+    private func configDefaultSelect(){
+        CATransaction.begin()
+        CATransaction.setCompletionBlock {
             let indexPath = IndexPath(item: self.defalutSelectIndex, section: 0)
             if self.collectionView.numberOfItems(inSection: 0)  > self.defalutSelectIndex {
-                self.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+                self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .left)
             }
         }
+        collectionView.reloadData()
+        CATransaction.commit()
     }
 }
 

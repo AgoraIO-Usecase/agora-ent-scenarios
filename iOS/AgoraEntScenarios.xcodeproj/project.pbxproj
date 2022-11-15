@@ -129,6 +129,33 @@
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		A81ECFF12921E01200B40454 /* ShowAdvancedSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */; };
+		A81ECFF32921E07A00B40454 /* ShowVideoSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */; };
+		A81ECFF52921E09500B40454 /* ShowAudioSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */; };
+		A81ECFF72921E3B400B40454 /* ShowCaptureSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */; };
+		A81ECFFC2921EA4300B40454 /* ShowNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFFB2921EA4300B40454 /* ShowNavigationBar.swift */; };
+		A81ED01B292244F800B40454 /* ShowSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED01A292244F800B40454 /* ShowSettingSwitchCell.swift */; };
+		A81ED01D2922451D00B40454 /* ShowSettingBaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED01C2922451D00B40454 /* ShowSettingBaseCell.swift */; };
+		A81ED01F2922457400B40454 /* ShowSettingSegmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED01E2922457400B40454 /* ShowSettingSegmentCell.swift */; };
+		A81ED023292245D300B40454 /* ShowSettingLabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED022292245D300B40454 /* ShowSettingLabelCell.swift */; };
+		A81ED025292245E200B40454 /* ShowSettingSliderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED024292245E200B40454 /* ShowSettingSliderCell.swift */; };
+		A81ED0272922511700B40454 /* ShowSettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED0262922511700B40454 /* ShowSettingModel.swift */; };
+		A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD1F2918C87C00A41D8D /* UIView+Show.swift */; };
+		A845AD222918D24600A41D8D /* ShowSelectQualityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */; };
+		A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */; };
+		A845AD262918FAB300A41D8D /* AppContext+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD252918FAB300A41D8D /* AppContext+Show.swift */; };
+		A845AD282919263200A41D8D /* ShowLiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD272919263200A41D8D /* ShowLiveViewController.swift */; };
+		A845AD2B291A024100A41D8D /* ShowRoomInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */; };
+		A845AD2D291A163200A41D8D /* ShowRoomMembersCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */; };
+		A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */; };
+		A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */; };
+		A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */; };
+		A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD39291B82AE00A41D8D /* ShowChatModel.swift */; };
+		A845AD3C291BA74300A41D8D /* ShowMusicEffectVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */; };
+		A845AD40291BADCB00A41D8D /* ShowMusicTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */; };
+		A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */; };
+		A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */; };
+		A845AD46291C9A0800A41D8D /* ShowChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -568,6 +595,33 @@
 		05FFE73F290F752C0024D22F /* VMSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMSoundView.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAdvancedSettingVC.swift; sourceTree = "<group>"; };
+		A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowVideoSettingVC.swift; sourceTree = "<group>"; };
+		A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAudioSettingVC.swift; sourceTree = "<group>"; };
+		A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCaptureSettingVC.swift; sourceTree = "<group>"; };
+		A81ECFFB2921EA4300B40454 /* ShowNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNavigationBar.swift; sourceTree = "<group>"; };
+		A81ED01A292244F800B40454 /* ShowSettingSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingSwitchCell.swift; sourceTree = "<group>"; };
+		A81ED01C2922451D00B40454 /* ShowSettingBaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingBaseCell.swift; sourceTree = "<group>"; };
+		A81ED01E2922457400B40454 /* ShowSettingSegmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingSegmentCell.swift; sourceTree = "<group>"; };
+		A81ED022292245D300B40454 /* ShowSettingLabelCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingLabelCell.swift; sourceTree = "<group>"; };
+		A81ED024292245E200B40454 /* ShowSettingSliderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingSliderCell.swift; sourceTree = "<group>"; };
+		A81ED0262922511700B40454 /* ShowSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingModel.swift; sourceTree = "<group>"; };
+		A845AD1F2918C87C00A41D8D /* UIView+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Show.swift"; sourceTree = "<group>"; };
+		A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityVC.swift; sourceTree = "<group>"; };
+		A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityCell.swift; sourceTree = "<group>"; };
+		A845AD252918FAB300A41D8D /* AppContext+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+Show.swift"; sourceTree = "<group>"; };
+		A845AD272919263200A41D8D /* ShowLiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowLiveViewController.swift; sourceTree = "<group>"; };
+		A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomInfoView.swift; sourceTree = "<group>"; };
+		A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomMembersCountView.swift; sourceTree = "<group>"; };
+		A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomBottomBar.swift; sourceTree = "<group>"; };
+		A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomLiveView.swift; sourceTree = "<group>"; };
+		A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomChatCell.swift; sourceTree = "<group>"; };
+		A845AD39291B82AE00A41D8D /* ShowChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
+		A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectVC.swift; sourceTree = "<group>"; };
+		A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicTableHeaderView.swift; sourceTree = "<group>"; };
+		A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
+		A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicItemCell.swift; sourceTree = "<group>"; };
+		A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatInputView.swift; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1302,29 +1356,95 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A81ECFFA2921EA2100B40454 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				A81ECFFB2921EA4300B40454 /* ShowNavigationBar.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		A81ED0182922433500B40454 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				A81ED01C2922451D00B40454 /* ShowSettingBaseCell.swift */,
+				A81ED01A292244F800B40454 /* ShowSettingSwitchCell.swift */,
+				A81ED01E2922457400B40454 /* ShowSettingSegmentCell.swift */,
+				A81ED022292245D300B40454 /* ShowSettingLabelCell.swift */,
+				A81ED024292245E200B40454 /* ShowSettingSliderCell.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		A81ED019292244AE00B40454 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				A81ED0262922511700B40454 /* ShowSettingModel.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		A845AD29291A01F700A41D8D /* Live */ = {
+			isa = PBXGroup;
+			children = (
+				A845AD2A291A024100A41D8D /* ShowRoomInfoView.swift */,
+				A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */,
+				A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */,
+				A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */,
+				A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */,
+				A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */,
+			);
+			path = Live;
+			sourceTree = "<group>";
+		};
+		A845AD38291B824400A41D8D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A81ED019292244AE00B40454 /* Setting */,
+				A845AD39291B82AE00A41D8D /* ShowChatModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A845AD3D291BA7F200A41D8D /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */,
+				A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */,
+				A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */,
+				A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		A845AD3E291BAD9900A41D8D /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				A845AD3F291BADCB00A41D8D /* ShowMusicTableHeaderView.swift */,
+				A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */,
+				A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
 		A88D14282913BEB900F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
 				A8B5619E29127724004F34D1 /* ShowCreateLiveView.swift */,
+				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
+				A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */,
 			);
 			path = CreateLive;
 			sourceTree = "<group>";
 		};
-		A88D142F2914C13500F5DF6A /* Beauty */ = {
-			isa = PBXGroup;
-			children = (
-				A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */,
-			);
-			path = Beauty;
-			sourceTree = "<group>";
-		};
-		A88D14302914C13E00F5DF6A /* Beauty */ = {
+		A88D14302914C13E00F5DF6A /* CreateLive */ = {
 			isa = PBXGroup;
 			children = (
 				A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */,
 				A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */,
+				A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */,
 			);
-			path = Beauty;
+			path = CreateLive;
 			sourceTree = "<group>";
 		};
 		A8B5617F2910FB19004F34D1 /* Show */ = {
@@ -1334,6 +1454,7 @@
 				A8B5618729111022004F34D1 /* Common */,
 				A8B561902912080C004F34D1 /* Utils */,
 				A8B561812910FB35004F34D1 /* View */,
+				A845AD38291B824400A41D8D /* Models */,
 				A8B561802910FB2A004F34D1 /* Controller */,
 				A8B5618B29111258004F34D1 /* showResource.bundle */,
 			);
@@ -1343,9 +1464,12 @@
 		A8B561802910FB2A004F34D1 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				A88D14302914C13E00F5DF6A /* Beauty */,
+				A845AD3D291BA7F200A41D8D /* Setting */,
+				A88D14302914C13E00F5DF6A /* CreateLive */,
 				A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */,
 				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
+				A845AD272919263200A41D8D /* ShowLiveViewController.swift */,
+				A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1353,6 +1477,9 @@
 		A8B561812910FB35004F34D1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				A81ED0182922433500B40454 /* Setting */,
+				A845AD3E291BAD9900A41D8D /* Music */,
+				A845AD29291A01F700A41D8D /* Live */,
 				E74A3133291B97C000412D42 /* ToolMenu */,
 				E74A3124291B4DE700412D42 /* RealTime */,
 				E74A311B2919FBA700412D42 /* PKInvite */,
@@ -1366,7 +1493,7 @@
 		A8B5618729111022004F34D1 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				A8B5618F29112E33004F34D1 /* VIew */,
+				A81ECFFA2921EA2100B40454 /* View */,
 				A8B561882911102C004F34D1 /* ViewController */,
 			);
 			path = Common;
@@ -1380,13 +1507,6 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
-		A8B5618F29112E33004F34D1 /* VIew */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = VIew;
-			sourceTree = "<group>";
-		};
 		A8B561902912080C004F34D1 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -1394,6 +1514,7 @@
 				A8B561942912486C004F34D1 /* UIColor+Show.swift */,
 				A8B5619829125125004F34D1 /* UIFont+Show.swift */,
 				A88D14292914B0A300F5DF6A /* NSString+Show.swift */,
+				A845AD1F2918C87C00A41D8D /* UIView+Show.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2607,6 +2728,7 @@
 				DDBF78892918D5920001855B /* ShowServiceModel.swift */,
 				DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */,
 				DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */,
+				A845AD252918FAB300A41D8D /* AppContext+Show.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -2897,16 +3019,21 @@
 				E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
+				A81ED01F2922457400B40454 /* ShowSettingSegmentCell.swift in Sources */,
 				05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */,
 				DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */,
 				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
+				A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */,
+				A845AD40291BADCB00A41D8D /* ShowMusicTableHeaderView.swift in Sources */,
 				DD8417BD29090C520026B624 /* VLCreateRoomView.m in Sources */,
 				DD8417AB29090C520026B624 /* VLKTVItemBaseView.m in Sources */,
+				A81ED023292245D300B40454 /* ShowSettingLabelCell.swift in Sources */,
 				0510B824290B72FC0063E57A /* VRRoomMenuBarEntity.swift in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				05FFE732290F74560024D22F /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				0510B825290B72FC0063E57A /* VRUser.swift in Sources */,
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
+				A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */,
 				DD8417A729090C520026B624 /* VLKTVSwitcherView.m in Sources */,
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
 				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,
@@ -2925,12 +3052,15 @@
 				DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84179929090C520026B624 /* VLBelcantoModel.m in Sources */,
+				A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */,
 				05FFE734290F74560024D22F /* AgoraChatRoom3DRtcView.swift in Sources */,
+				A81ECFF32921E07A00B40454 /* ShowVideoSettingVC.swift in Sources */,
 				DD84179C29090C520026B624 /* VLRoomPersonIteimCCell.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
 				05FFE705290F706C0024D22F /* VoiceRoomPopView.swift in Sources */,
 				DDBF788D2918D5920001855B /* ShowSyncManagerServiceImp.swift in Sources */,
 				DDA19A5F28FFE57A009D3E61 /* EKNotificationMessageView.swift in Sources */,
+				A845AD37291A415200A41D8D /* ShowRoomChatCell.swift in Sources */,
 				DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */,
 				05FFE70E290F706C0024D22F /* VoiceRoomAlertContainer.swift in Sources */,
 				DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */,
@@ -2941,6 +3071,7 @@
 				DD84179E29090C520026B624 /* VLChoosedSongTCell.m in Sources */,
 				DD8417AC29090C520026B624 /* VLPopMoreSelView.m in Sources */,
 				DD84177E29090C520026B624 /* VLHomeView.m in Sources */,
+				A845AD222918D24600A41D8D /* ShowSelectQualityVC.swift in Sources */,
 				DDA199E428FFE579009D3E61 /* VLDeviceUtils.m in Sources */,
 				0510B838290B77330063E57A /* VRRoomListCell.swift in Sources */,
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
@@ -2956,6 +3087,7 @@
 				DDA19A3728FFE57A009D3E61 /* HapticFeedbackGenerator.swift in Sources */,
 				DDA19A5028FFE57A009D3E61 /* EKAttributes+PositionConstraints.swift in Sources */,
 				DD8417B729090C520026B624 /* VLPopSelBgView.m in Sources */,
+				A81ED01D2922451D00B40454 /* ShowSettingBaseCell.swift in Sources */,
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
 				DDA19A3D28FFE57A009D3E61 /* UIViewArray+QuickLayout.swift in Sources */,
 				057DD9FB290B9495001329E6 /* UIViewController+Presentation.swift in Sources */,
@@ -3008,19 +3140,24 @@
 				0510B852290B799E0063E57A /* VRCreateRoomView.swift in Sources */,
 				DD8417A029090C520026B624 /* VLKTVBottomView.m in Sources */,
 				DD8417BE29090C520026B624 /* VLHomeOnLineListCCell.m in Sources */,
+				A845AD31291A3CDC00A41D8D /* ShowRoomLiveView.swift in Sources */,
 				A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */,
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				0510B865290B7A6E0063E57A /* VRAllRoomsViewController.swift in Sources */,
 				057DDA06290B9495001329E6 /* PresentationSegue.swift in Sources */,
 				A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */,
 				A8B561952912486C004F34D1 /* UIColor+Show.swift in Sources */,
+				A845AD282919263200A41D8D /* ShowLiveViewController.swift in Sources */,
+				A81ED0272922511700B40454 /* ShowSettingModel.swift in Sources */,
 				057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */,
 				057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */,
+				A81ECFFC2921EA4300B40454 /* ShowNavigationBar.swift in Sources */,
 				05FFE6FF290F706C0024D22F /* VMSwitchTableViewCell.swift in Sources */,
 				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
 				0510B855290B799E0063E57A /* BaseNavigationView.swift in Sources */,
 				0510B854290B799E0063E57A /* VREmptyView.swift in Sources */,
 				DDBF788C2918D5920001855B /* ShowServiceModel.swift in Sources */,
+				A81ECFF12921E01200B40454 /* ShowAdvancedSettingVC.swift in Sources */,
 				A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */,
 				DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
@@ -3042,6 +3179,7 @@
 				DDA19A1428FFE579009D3E61 /* SyncManager+Info.swift in Sources */,
 				DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */,
 				DDA19A3228FFE57A009D3E61 /* EKWrapperView.swift in Sources */,
+				A81ECFF52921E09500B40454 /* ShowAudioSettingVC.swift in Sources */,
 				05FFE702290F706C0024D22F /* VoiceRoomChatCell.swift in Sources */,
 				057DDA02290B9495001329E6 /* VoiceRoomPasswordAlert.swift in Sources */,
 				057DD9FA290B9495001329E6 /* VRVerifyCodeView.swift in Sources */,
@@ -3049,10 +3187,13 @@
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */,
 				DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */,
+				A845AD2B291A024100A41D8D /* ShowRoomInfoView.swift in Sources */,
 				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
 				DDA19A1128FFE579009D3E61 /* Log.swift in Sources */,
 				0510B84F290B799E0063E57A /* VRSoundTypeCard.swift in Sources */,
+				A845AD262918FAB300A41D8D /* AppContext+Show.swift in Sources */,
 				DD8417B329090C520026B624 /* VLSearchSongResultView.m in Sources */,
+				A81ED01B292244F800B40454 /* ShowSettingSwitchCell.swift in Sources */,
 				DD8417A529090C520026B624 /* VLKTVSettingView.m in Sources */,
 				DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */,
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
@@ -3065,6 +3206,7 @@
 				0510B82B290B730E0063E57A /* VoiceRoomChatModel.swift in Sources */,
 				DD8417BF29090C520026B624 /* VLHomeOnLineListView.m in Sources */,
 				057DDA0A290B9496001329E6 /* Notification+Presentation.swift in Sources */,
+				A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */,
 				05FFE70C290F706C0024D22F /* VMSoundSelTableViewCell.swift in Sources */,
 				0510B867290B7A6E0063E57A /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
@@ -3099,6 +3241,7 @@
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
 				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
+				A845AD3C291BA74300A41D8D /* ShowMusicEffectVC.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */,
 				DD8417A929090C520026B624 /* VLKTVSliderView.m in Sources */,
@@ -3121,6 +3264,7 @@
 				0510B853290B799E0063E57A /* VRCreateRoomInputView.swift in Sources */,
 				DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */,
 				0510B823290B72FC0063E57A /* VRRoomEntity.swift in Sources */,
+				A845AD2D291A163200A41D8D /* ShowRoomMembersCountView.swift in Sources */,
 				DD8417AD29090C520026B624 /* VLKTVMVView.m in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */,
@@ -3139,6 +3283,7 @@
 				0510B835290B77330063E57A /* VRCreateRoomCardCell.swift in Sources */,
 				057DDA04290B9495001329E6 /* PresentationEnums.swift in Sources */,
 				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
+				A81ED025292245E200B40454 /* ShowSettingSliderCell.swift in Sources */,
 				DD8417B529090C520026B624 /* VLPopChooseSongView.m in Sources */,
 				DD84179329090C520026B624 /* VLAddRoomModel.m in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
@@ -3153,6 +3298,7 @@
 				DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */,
 				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
 				DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */,
+				A81ECFF72921E3B400B40454 /* ShowCaptureSettingVC.swift in Sources */,
 				057DD9FC290B9495001329E6 /* VoiceRoomEmojiManager.swift in Sources */,
 				DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */,
 				DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */,
@@ -3213,6 +3359,7 @@
 				DDA19A6528FFE57A009D3E61 /* EKAccessoryNoteMessageView.swift in Sources */,
 				05FFE704290F706C0024D22F /* VoiceRoomInviteCell.swift in Sources */,
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
+				A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
 				A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */,
@@ -3220,6 +3367,7 @@
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD8417C029090C520026B624 /* KTVSyncManagerServiceImp.swift in Sources */,
+				A845AD46291C9A0800A41D8D /* ShowChatInputView.swift in Sources */,
 				DD8417B829090C520026B624 /* VLKTVTopView.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				05FFE6FE290F706C0024D22F /* VoiceRoomChatView.swift in Sources */,
@@ -3232,6 +3380,7 @@
 				057DDA0C290B9778001329E6 /* AgoraSceneConfig.swift in Sources */,
 				DD84178B29090C520026B624 /* VLLoginViewController.m in Sources */,
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
+				A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */,
 				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 			);
@@ -3413,7 +3562,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3452,7 +3601,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = JDPG69R49Z;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;

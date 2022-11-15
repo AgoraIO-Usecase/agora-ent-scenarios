@@ -28,6 +28,18 @@ class ShowRoomListCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setBgImge(_ img: String, name: String?, id: String?, count: Int) {
+        imageView.image = UIImage.show_sceneImage(name: "show_room_bg_\(img)")
+        nameLabel.text = name
+        idLablel.text = "ID: \(id ?? "0")"
+        let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_room_person")!)
+        attachment.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
+        let attriTipsImg = NSAttributedString(attachment: attachment)
+        let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
+        attriTips.append(NSAttributedString(string: "  \(count)人"))
+        numberLabel.attributedText = attriTips
+    }
+    
     private func createSubviews(){
         // 背景图
         imageView = UIImageView()
@@ -35,7 +47,6 @@ class ShowRoomListCell: UICollectionViewCell {
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         contentView.addSubview(imageView)
-        imageView.sd_setImage(with: URL(string: "https://img0.baidu.com/it/u=1824168527,1620830099&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1667494800&t=20221f64ed073069b5caf60756a53221"))
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -66,7 +77,7 @@ class ShowRoomListCell: UICollectionViewCell {
         contentView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.left.equalTo(10)
-            make.top.equalTo(coverImgView).offset(8)
+            make.bottom.equalTo(coverImgView).offset(-30)
             make.right.equalTo(-10)
         }
         
@@ -74,7 +85,6 @@ class ShowRoomListCell: UICollectionViewCell {
         idLablel = UILabel()
         idLablel.font = .show_R_10
         idLablel.textColor = .show_main_text
-        idLablel.text = "ID: 1234123"
         contentView.addSubview(idLablel)
         idLablel.snp.makeConstraints { make in
             make.left.equalTo(nameLabel)
@@ -85,7 +95,6 @@ class ShowRoomListCell: UICollectionViewCell {
         numberLabel = UILabel()
         numberLabel.font = .show_R_10
         numberLabel.textColor = .show_main_text
-        numberLabel.text = "5人"
         contentView.addSubview(numberLabel)
         numberLabel.snp.makeConstraints { make in
             make.centerY.equalTo(idLablel)

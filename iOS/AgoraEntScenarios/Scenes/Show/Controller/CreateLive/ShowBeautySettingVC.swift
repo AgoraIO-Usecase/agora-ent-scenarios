@@ -14,7 +14,51 @@ class ShowBeautySettingVC: UIViewController {
     var dismissed: (()->())?
     
     private var slider: UISlider!
-    private let titles = ["美颜".show_localized, "滤镜".show_localized, "特效".show_localized,"美妆".show_localized, "背景".show_localized]
+    private let titles = ["create_beauty_setting_beauty_face".show_localized,
+                          "create_beauty_setting_filter".show_localized,
+                          "create_beauty_setting_special_effects".show_localized,
+                          "create_beauty_setting_make_up".show_localized,
+                          "create_beauty_setting_bg".show_localized]
+    
+    // 背景
+    private lazy var bgView: UIView = {
+        let bgView = UIView()
+        bgView.backgroundColor = .show_dark_cover_bg
+        return bgView
+    }()
+    
+    // 对比按钮
+    private lazy var compareButton = {
+        let compareButton = UIButton(type: .custom)
+        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
+        compareButton.addTarget(self, action: #selector(didClickCompareButton), for: .touchUpInside)
+        return compareButton
+    }()
+    
+    // 指示条
+    private lazy var indicator = {
+        let indicator = JXCategoryIndicatorLineView()
+        indicator.indicatorWidth = 30
+        indicator.indicatorHeight = 2
+        indicator.indicatorColor = .show_main_text
+        return indicator
+    }()
+    
+    // 分类
+    private lazy var segmentedView = {
+        let segmentedView = JXCategoryTitleView()
+        segmentedView.isTitleColorGradientEnabled = true
+        segmentedView.titles = titles
+        segmentedView.titleFont = .show_R_14
+        segmentedView.titleSelectedFont = .show_M_15
+        segmentedView.titleColor = .show_beauty_deselect
+        segmentedView.titleSelectedColor = .show_main_text
+        segmentedView.backgroundColor = .clear
+        segmentedView.defaultSelectedIndex = 0
+        segmentedView.delegate = self
+        segmentedView.indicators = [self.indicator]
+        return segmentedView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,47 +81,25 @@ class ShowBeautySettingVC: UIViewController {
         }
         
         // 对比按钮
-        let compareButton = UIButton(type: .custom)
-        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
-        compareButton.addTarget(self, action: #selector(didClickCompareButton), for: .touchUpInside)
+        
         view.addSubview(compareButton)
         compareButton.snp.makeConstraints { make in
             make.centerY.equalTo(slider)
             make.right.equalTo(-20)
         }
         
-        // 背景
-        let bgView = UIView()
-        bgView.backgroundColor = .show_beauty_setting_bg
         view.addSubview(bgView)
         bgView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
             make.height.equalTo(203)
         }
 
-        //配置数据源
-        let segmentedView = JXCategoryTitleView()
-        segmentedView.isTitleColorGradientEnabled = true
-        segmentedView.titles = titles
-        segmentedView.titleFont = .show_R_14
-        segmentedView.titleSelectedFont = .show_M_15
-        segmentedView.titleColor = .show_beauty_deselect
-        segmentedView.titleSelectedColor = .show_main_text
-        segmentedView.backgroundColor = .clear
-        segmentedView.delegate = self
         bgView.addSubview(segmentedView)
         segmentedView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(10)
             make.height.equalTo(30)
         }
-        
-        // 指示条
-        let indicator = JXCategoryIndicatorLineView()
-        indicator.indicatorWidth = 30
-        indicator.indicatorHeight = 2
-        indicator.indicatorColor = .show_main_text
-        segmentedView.indicators = [indicator]
         
         if let listContainerView = JXCategoryListContainerView(type: .scrollView, delegate: self) {
             segmentedView.listContainer = listContainerView
@@ -88,6 +110,11 @@ class ShowBeautySettingVC: UIViewController {
                 make.height.equalTo(70)
             }
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        bgView.setRoundingCorners([.topLeft, .topRight], radius: 20)
     }
 
 }
