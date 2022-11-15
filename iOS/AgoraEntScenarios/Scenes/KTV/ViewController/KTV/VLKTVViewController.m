@@ -133,7 +133,6 @@ VLPopScoreViewDelegate
     
     //MV视图(显示歌词...)
     self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)*0.67) withDelegate:self];
-    self.MVView.lrcView.delegate = self;
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
@@ -583,14 +582,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark AgoraMusicContentCenterEventDelegate
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
+    
+    VLLog(@"onLyricResult %@", lyricUrl);
+    [self.MVView loadLrcURL:lyricUrl];
+    
     LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
     if(!callback) {
         return;
     }
     [self.lyricCallbacks removeObjectForKey:requestId];
     
-    VLLog(@"lll onLyricResult ");
-    callback(lyricUrl);
+    [self.lyricCallbacks setObject:callback forKey:lyricUrl];
+//    callback(lyricUrl);
 }
 
 - (void)onMusicChartsResult:(nonnull NSString *)requestId
@@ -705,9 +708,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-            model.lyric = lyricUrl;
+            VLLog(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@", model.songNo, model.songName);
+//            model.lyric = lyricUrl;
             [weakSelf.MVView loadLrcURL:lyricUrl];
             [weakSelf loadMusic:model.songNo withCallback:^{
+                VLLog(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@", model.songNo, model.songName);
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
                 weakSelf.isPlayerPublish = YES;
                 [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
@@ -721,7 +726,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
     } else if(role == KTVSingRoleAudience) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-            model.lyric = lyricUrl;
+            VLLog(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
+//            model.lyric = lyricUrl;
             [weakSelf.MVView loadLrcURL:lyricUrl];
             weakSelf.currentPlayingSongNo = model.songNo;
             
@@ -1209,6 +1215,49 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self joinChorus]; //发送加入合唱的消息
         }
     }
+}
+
+
+#pragma mark - AgoraLrcDownloadDelegate
+
+- (void)beginDownloadLrcWithUrl:(NSString *)url {
+    VLLog(@"\n歌词开始下载\n%@",url);
+}
+
+- (void)downloadLrcFinishedWithUrl:(NSString *)url {
+    VLLog(@"\n歌词下载完成\n%@",url);
+    
+    LyricCallback callback = [self.lyricCallbacks objectForKey:url];
+    if(!callback) {
+        return;
+    }
+    [self.lyricCallbacks removeObjectForKey:url];
+    
+    callback(url);
+}
+
+- (void)downloadLrcProgressWithUrl:(NSString *)url progress:(double)progress {
+    VLLog(@"\n歌词下载进度\n%@,%f",url,progress);
+}
+
+- (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
+    VLLog(@"\n歌词下载失败\n%@\n%@",url,error);
+    
+    LyricCallback callback = [self.lyricCallbacks objectForKey:url];
+    if(!callback) {
+        return;
+    }
+    [self.lyricCallbacks removeObjectForKey:url];
+    
+    callback(nil);
+}
+
+- (void)beginParseLrc {
+    VLLog(@"歌词开始解析");
+}
+
+- (void)parseLrcFinished {
+    VLLog(@"歌词解析完成");
 }
 
 #pragma mark - VLKTVSettingViewDelegate
