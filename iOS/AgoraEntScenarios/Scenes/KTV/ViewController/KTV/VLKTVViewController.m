@@ -584,7 +584,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              lyricUrl:(nonnull NSString *)lyricUrl {
     
     VLLog(@"onLyricResult %@", lyricUrl);
-    [self.MVView loadLrcURL:lyricUrl];
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
     if(!callback) {
@@ -592,6 +591,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self.lyricCallbacks removeObjectForKey:requestId];
     
+    [self.MVView loadLrcURL:lyricUrl];
     [self.lyricCallbacks setObject:callback forKey:lyricUrl];
 //    callback(lyricUrl);
 }
