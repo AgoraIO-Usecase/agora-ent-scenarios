@@ -78,4 +78,20 @@ extension UIColor {
     @objc static var show_chat_input_text: UIColor {
         return UIColor.HexColor(hex: 0x3C4267, alpha: 1)
     }
+    
+    
+    
+    @objc static var show_Ellipse5: UIColor {
+        return UIColor.HexColor(hex: 0x6D7291, alpha: 1)
+    }
+    
+    @objc static var show_Ellipse6: UIColor {
+        return UIColor.HexColor(hex: 0x303553, alpha: 1)
+    }
+    
+    @objc static var show_Ellipse7: UIColor {
+        return UIColor.HexColor(hex: 0x040A25, alpha: 1)
+    }
+    
+    
 }

@@ -70,8 +70,9 @@ class ShowRoomListVC: ShowBaseViewController {
             if error == nil {
                 let vc = ShowLiveViewController()
                 vc.room = room
-                vc.modalPresentationStyle = .overCurrentContext
-                self?.present(vc, animated: true)
+                let nc = UINavigationController(rootViewController: vc)
+                nc.modalPresentationStyle = .overCurrentContext
+                self?.present(nc, animated: true)
             }
         }
     }

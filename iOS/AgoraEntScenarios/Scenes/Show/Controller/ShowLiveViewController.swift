@@ -46,7 +46,13 @@ class ShowLiveViewController: UIViewController {
         subscribeChatMsg()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+    
     private func setupUI(){
+        navigationController?.isNavigationBarHidden = true
         liveView.room = room
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
@@ -197,7 +203,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-        
+        let settingVC = ShowAdvancedSettingVC()
+        navigationController?.pushViewController(settingVC, animated: true)
     }
     
 }
