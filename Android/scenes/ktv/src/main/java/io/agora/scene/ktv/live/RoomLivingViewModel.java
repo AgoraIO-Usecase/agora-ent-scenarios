@@ -756,7 +756,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if(data.size() > 0){
                     VLRoomSelSongModel value = songPlayingLiveData.getValue();
                     VLRoomSelSongModel songPlaying = data.get(0);
-                    if(value == null || !value.getSongNo().equals(songPlaying.getSongNo())){
+                    if(value == null || !value.getSongNo().equals(songPlaying.getSongNo()) || songPlaying.getChorusNo() != null){
                         songPlayingLiveData.postValue(songPlaying);
                     }
                 }else{
@@ -854,6 +854,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         if (mPlayer != null) {
+            mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), Integer.parseInt(musicModel.getUserId()) * 10 + 1));
             mPlayer.setAudioDualMonoMode(2);
             mPlayer.stop();
         }
@@ -924,9 +925,9 @@ public class RoomLivingViewModel extends ViewModel {
                     if (jsonMsg.getString("cmd").equals("setLrcTime")) {
                         long position = jsonMsg.getLong("time");
                         if (position == 0) {
-                            mPlayer.play();
+                            musicToggleStart();
                         } else if (position == -1) {
-                            mPlayer.pause();
+                            musicToggleStart();
                         } else {
                             mRecvedPlayPosition = position;
                             mLastRecvPlayPosTime = System.currentTimeMillis();
@@ -1267,6 +1268,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void musicStartPlay(Context context, VLRoomSelSongModel music) {
         //musicStop();
+        mPlayer.stop();
         stopSyncLrc();
         stopDisplayLrc();
         mRecvedPlayPosition = 0;
@@ -1298,15 +1300,16 @@ public class RoomLivingViewModel extends ViewModel {
 
                 mRtcEngine.joinChannelEx(
                         roomInfoLiveData.getValue().getAgoraRTCToken(),
-                        new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), 12345),
+                        new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), Integer.parseInt(music.getUserId()) * 10 + 1),
                         options,
                         new IRtcEngineEventHandler() {
                         }
                 );
-                mRtcEngine.muteRemoteAudioStream(12345, true);
+                mRtcEngine.muteRemoteAudioStream(Integer.parseInt(music.getUserId()) * 10 + 1, true);
             } else if (music.getChorusNo().equals(UserManager.getInstance().getUser().userNo)) {
                 // 合唱者加入后，合唱者mute 点歌者mpk流
-                mRtcEngine.muteRemoteAudioStream(12345, true);
+                mRtcEngine.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
+                mRtcEngine.muteRemoteAudioStream(Integer.parseInt(music.getUserId()) * 10 + 1, true);
                 // 合唱者开始网络测试
                 // startNetTestTask();
             }
@@ -1394,15 +1397,26 @@ public class RoomLivingViewModel extends ViewModel {
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
             if (needSendStatus) {
                 // 合唱时 发送状态
-                sendPlay();
+                sendPause();
             }
             mPlayer.pause();
         } else if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PAUSE) {
             if (needSendStatus) {
                 // 合唱时 发送状态
-                sendPause();
+                sendPlay();
             }
             mPlayer.resume();
+        }
+    }
+
+    public void musicStop() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            stopSyncLrc();
+            stopDisplayLrc();
+            mRecvedPlayPosition = 0;
+            mLastRecvPlayPosTime = null;
+            mAudioTrackIndex = 1;
         }
     }
 
