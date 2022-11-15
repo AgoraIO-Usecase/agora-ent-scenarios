@@ -13,7 +13,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AgoraEntFullDemo"
 include ':app'
-include ':common:lrcview'
 include ':common:base'
 include ':common:ui-widget'
 include ':scenes:ktv'

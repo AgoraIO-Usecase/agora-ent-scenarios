@@ -2,11 +2,11 @@ package io.agora.scene.ktv.live.listener;
 
 import android.content.Context;
 
-import io.agora.lrcview.PitchView;
+import io.agora.lyrics_view.PitchView;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.LrcControlView;
 
-public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener, PitchView.OnActionListener {
+public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener, PitchView.OnSingScoreListener {
 
     private final Context mContext;
     private final RoomLivingViewModel mViewModel;
@@ -18,22 +18,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
         mLrcControlView = lrcControlView;
     }
 
-    // The Impl of LrcControlView.OnLrcActionListener
 
-    @Override
-    public void onProgressChanged(long time) {
-        mViewModel.musicSeek(time);
-    }
-
-    @Override
-    public void onStartTrackingTouch() {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch() {
-
-    }
 
     @Override
     public void onSwitchOriginalClick() {
@@ -68,11 +53,27 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
     @Override
     public void onCountTime(int time) {
         mViewModel.musicCountDown(time);
+    }
+
+    // The Impl of LrcControlView.OnLrcActionListener
+
+    @Override
+    public void onProgressChanged(long time) {
+        mViewModel.musicSeek(time);
+    }
+
+    @Override
+    public void onStartTrackingTouch() {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch() {
 
     }
 
 
-    // The Impl of PitchView.OnActionListener
+    // The Impl of PitchView.OnSingScoreListener
 
     @Override
     public void onOriginalPitch(float pitch, int totalCount) {

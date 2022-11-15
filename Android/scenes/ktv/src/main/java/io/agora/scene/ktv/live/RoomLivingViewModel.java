@@ -5,24 +5,24 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.agora.lrcview.LrcLoadUtils;
-import io.agora.lrcview.bean.LrcData;
+import io.agora.lyrics_view.DownloadManager;
+import io.agora.lyrics_view.LrcLoadUtils;
+import io.agora.lyrics_view.bean.LrcData;
 import io.agora.mediaplayer.IMediaPlayerObserver;
 import io.agora.mediaplayer.data.PlayerUpdatedInfo;
 import io.agora.mediaplayer.data.SrcInfo;
@@ -41,23 +41,11 @@ import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
 import io.agora.scene.base.BuildConfig;
-import io.agora.scene.base.api.ApiException;
-import io.agora.scene.base.api.ApiManager;
-import io.agora.scene.base.api.ApiSubscriber;
-import io.agora.scene.base.api.apiutils.SchedulersUtil;
-import io.agora.scene.base.api.base.BaseResponse;
-import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.bean.Page;
-import io.agora.scene.base.bean.PageModel;
 import io.agora.scene.base.component.AgoraApplication;
-import io.agora.scene.base.data.model.BaseMusicModel;
-import io.agora.scene.base.data.model.MusicModelNew;
 import io.agora.scene.base.event.NetWorkEvent;
-import io.agora.scene.base.event.PreLoadEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
-import io.agora.scene.ktv.manager.ResourceManager;
 import io.agora.scene.ktv.service.KTVChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.KTVChooseSongInputModel;
 import io.agora.scene.ktv.service.KTVJoinChorusInputModel;
@@ -71,10 +59,6 @@ import io.agora.scene.ktv.service.VLRoomSeatModel;
 import io.agora.scene.ktv.service.VLRoomSelSongModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
-import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -117,19 +101,6 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 歌词信息
      */
-    public enum SongType {
-        HI_SONG(1),
-        TICKTOK(2),
-        CLASSICAL(3),
-        KTV(4);
-
-        final int value;
-
-        SongType(int value) {
-            this.value = value;
-        }
-    }
-
     final MutableLiveData<List<VLRoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<VLRoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
 
@@ -180,6 +151,12 @@ public class RoomLivingViewModel extends ViewModel {
      */
     private boolean isBackPlay = false;
     private boolean isOpnEar = false;
+
+    /**
+     * RTC歌词内容回调
+     */
+    private final Map<String, IMusicContentCenterEventHandler> rtcMusicHandlerMap = new HashMap<>();
+    private final Map<String, List<Integer>> rtcMusicTypesMap = new HashMap<>();
 
     public RoomLivingViewModel(KTVJoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -523,73 +500,113 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     /**
+     * 获取歌曲类型
+     * @return map key: 类型名称，value: 类型值
+     */
+    public LiveData<LinkedHashMap<Integer, String>> getSongTypes() {
+        MutableLiveData<LinkedHashMap<Integer, String>> liveData = new MutableLiveData<>();
+
+        String requestId = iAgoraMusicContentCenter.getMusicCharts();
+        rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
+            @Override
+            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
+                // do nothing
+            }
+
+            @Override
+            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
+                // do nothing
+            }
+
+            @Override
+            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
+                LinkedHashMap<Integer, String> types = new LinkedHashMap<>();
+                for (MusicChartInfo musicChartInfo : list) {
+                    types.put(musicChartInfo.type, musicChartInfo.name);
+                }
+                liveData.postValue(types);
+            }
+
+            @Override
+            public void onLyricResult(String requestId, String lyricUrl) {
+                // do nothing
+            }
+        });
+
+        return liveData;
+    }
+
+    /**
      * 获取歌曲列表
      */
-    public LiveData<List<VLRoomSelSongModel>> getSongList(SongType type, int page) {
-        // TODO 改成从RTC中获取歌曲列表
+    public LiveData<List<VLRoomSelSongModel>> getSongList(int type, int page) {
+        // 从RTC中获取歌曲列表
         MutableLiveData<List<VLRoomSelSongModel>> liveData = new MutableLiveData<>();
-        ApiManager.getInstance().requestGetSongsList(page, type.value)
-                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<BaseMusicModel>>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
+        String requestId = iAgoraMusicContentCenter.getMusicCollectionByMusicChartId(type, page, 30);
+        rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
+            @Override
+            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
+                // do nothing
+            }
 
-                            }
+            @Override
+            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize,
+                                                int total, Music[] list) {
+                List<Music> musicList = new ArrayList<>(Arrays.asList(list));
+                List<VLRoomSelSongModel> songs = new ArrayList<>();
 
-                            @Override
-                            public void onSuccess(BaseResponse<BaseMusicModel> data) {
-                                BaseMusicModel musicModel = data.getData();
-                                if (musicModel == null) {
-                                    return;
-                                }
-                                List<VLRoomSelSongModel> songs = new ArrayList<>();
-
-                                // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-                                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
-                                    if(e == null && songsChosen != null){
-                                        // success
-                                        for (MusicModelNew record : musicModel.records) {
-                                            VLRoomSelSongModel songItem = null;
-                                            for (VLRoomSelSongModel vlRoomSelSongModel : songsChosen) {
-                                                if(vlRoomSelSongModel.getSongNo().equals(record.songNo)){
-                                                    songItem = vlRoomSelSongModel;
-                                                    break;
-                                                }
-                                            }
-
-                                            if(songItem == null){
-                                                songItem = new VLRoomSelSongModel(
-                                                        record.songName,
-                                                        record.songNo,
-                                                        record.songUrl,
-                                                        record.singer,
-                                                        record.lyric,
-                                                        record.imageUrl,
-
-                                                        "", "", "", "", false, 0, 0
-                                                );
-                                            }
-
-                                            songs.add(songItem);
-                                        }
-                                        liveData.postValue(songs);
-                                    }else{
-                                        if(e != null){
-                                            ToastUtils.showToast(e.getMessage());
-                                        }
-                                    }
-                                    return null;
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(@Nullable ApiException t) {
-                                if(t != null){
-                                    ToastUtils.showToast(t.getMessage());
+                // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
+                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
+                    if(e == null && songsChosen != null){
+                        // success
+                        for (Music music : musicList) {
+                            VLRoomSelSongModel songItem = null;
+                            for (VLRoomSelSongModel vlRoomSelSongModel : songsChosen) {
+                                if(vlRoomSelSongModel.getSongNo().equals(String.valueOf(music.songCode))){
+                                    songItem = vlRoomSelSongModel;
+                                    break;
                                 }
                             }
+
+                            List<Integer> lyricTypes = new ArrayList<>();
+                            for (int lyricType : music.lyricTypes) {
+                                lyricTypes.add(lyricType);
+                            }
+                            rtcMusicTypesMap.put(String.valueOf(music.songCode), lyricTypes);
+
+                            if(songItem == null){
+                                songItem = new VLRoomSelSongModel(
+                                        music.name,
+                                        String.valueOf(music.songCode),
+                                        music.singer,
+                                        music.poster,
+
+                                        "", "", "", "", false, 0, 0
+                                );
+                            }
+
+                            songs.add(songItem);
                         }
-                );
+                        liveData.postValue(songs);
+                    }else{
+                        if(e != null){
+                            ToastUtils.showToast(e.getMessage());
+                        }
+                    }
+                    return null;
+                });
+            }
+
+            @Override
+            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
+                // do nothing
+            }
+
+            @Override
+            public void onLyricResult(String requestId, String lyricUrl) {
+                // do nothing
+            }
+        });
         return liveData;
     }
 
@@ -597,76 +614,73 @@ public class RoomLivingViewModel extends ViewModel {
      * 搜索歌曲
      */
     public LiveData<List<VLRoomSelSongModel>> searchSong(String condition) {
-        // TODO 改成从RTC中搜索歌曲
+        // 从RTC中搜索歌曲
         MutableLiveData<List<VLRoomSelSongModel>> liveData = new MutableLiveData<>();
-        PageModel pageModel = new PageModel();
-        pageModel.page = new Page();
-        pageModel.page.current = 1;
-        pageModel.page.size = 100;
-        pageModel.name = condition;
-        ApiManager.getInstance().requestSearchSong(pageModel)
-                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<BaseMusicModel>>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
 
-                            }
+        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 1, 100);
+        rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
+            @Override
+            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
+                // do nothing
+            }
 
-                            @Override
-                            public void onSuccess(BaseResponse<BaseMusicModel> data) {
-                                BaseMusicModel musicModel = data.getData();
-                                if (musicModel == null) {
-                                    return;
-                                }
-                                List<VLRoomSelSongModel> songs = new ArrayList<>();
+            @Override
+            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
+                List<Music> musicList = new ArrayList<>(Arrays.asList(list));
+                List<VLRoomSelSongModel> songs = new ArrayList<>();
 
-                                // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-                                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
-                                    if(e == null && songsChosen != null){
-                                        // success
-                                        for (MusicModelNew record : musicModel.records) {
-                                            VLRoomSelSongModel songItem = null;
-                                            for (VLRoomSelSongModel vlRoomSelSongModel : songsChosen) {
-                                                if(vlRoomSelSongModel.getSongNo().equals(record.songNo)){
-                                                    songItem = vlRoomSelSongModel;
-                                                    break;
-                                                }
-                                            }
-
-                                            if(songItem == null){
-                                                songItem = new VLRoomSelSongModel(
-                                                        record.songName,
-                                                        record.songNo,
-                                                        record.songUrl,
-                                                        record.singer,
-                                                        record.lyric,
-                                                        record.imageUrl,
-
-                                                        "", "", "", "", false, 0, 0
-                                                );
-                                            }
-
-                                            songs.add(songItem);
-                                        }
-                                        liveData.postValue(songs);
-                                    }else{
-                                        if(e != null){
-                                            ToastUtils.showToast(e.getMessage());
-                                        }
-                                    }
-                                    return null;
-                                });
-
-                            }
-
-                            @Override
-                            public void onFailure(@Nullable ApiException t) {
-                                if(t != null){
-                                    ToastUtils.showToast(t.getMessage());
+                // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
+                ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
+                    if(e == null && songsChosen != null){
+                        // success
+                        for (Music music : musicList) {
+                            VLRoomSelSongModel songItem = null;
+                            for (VLRoomSelSongModel vlRoomSelSongModel : songsChosen) {
+                                if(vlRoomSelSongModel.getSongNo().equals(String.valueOf(music.songCode))){
+                                    songItem = vlRoomSelSongModel;
+                                    break;
                                 }
                             }
+
+                            List<Integer> lyricTypes = new ArrayList<>();
+                            for (int lyricType : music.lyricTypes) {
+                                lyricTypes.add(lyricType);
+                            }
+                            rtcMusicTypesMap.put(String.valueOf(music.songCode), lyricTypes);
+
+                            if(songItem == null){
+                                songItem = new VLRoomSelSongModel(
+                                        music.name,
+                                        String.valueOf(music.songCode),
+                                        music.singer,
+                                        music.poster,
+
+                                        "", "", "", "", false, 0, 0
+                                );
+                            }
+
+                            songs.add(songItem);
                         }
-                );
+                        liveData.postValue(songs);
+                    }else{
+                        if(e != null){
+                            ToastUtils.showToast(e.getMessage());
+                        }
+                    }
+                    return null;
+                });
+            }
+
+            @Override
+            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
+                // do nothing
+            }
+
+            @Override
+            public void onLyricResult(String requestId, String lyricUrl) {
+                // do nothing
+            }
+        });
         return liveData;
     }
 
@@ -682,10 +696,8 @@ public class RoomLivingViewModel extends ViewModel {
                 new KTVChooseSongInputModel(isChorus ? 1 : 0,
                         songModel.getSongName(),
                         songModel.getSongNo(),
-                        songModel.getSongUrl(),
                         songModel.getSinger(),
-                        songModel.getImageUrl(),
-                        songModel.getLyric()),
+                        songModel.getImageUrl()),
                 e -> {
                     if (e == null) {
                         // success
@@ -792,9 +804,7 @@ public class RoomLivingViewModel extends ViewModel {
                 songPlayingLiveData.postValue(new VLRoomSelSongModel(
                         musicModel.getSongName(),
                         musicModel.getSongNo(),
-                        musicModel.getSongUrl(),
                         musicModel.getSinger(),
-                        musicModel.getLyric(),
 
                         musicModel.getImageUrl(),
                         musicModel.getUserNo(),
@@ -829,9 +839,7 @@ public class RoomLivingViewModel extends ViewModel {
         songPlayingLiveData.postValue(new VLRoomSelSongModel(
                 musicModel.getSongName(),
                 musicModel.getSongNo(),
-                musicModel.getSongUrl(),
                 musicModel.getSinger(),
-                musicModel.getLyric(),
 
                 musicModel.getImageUrl(),
                 musicModel.getUserNo(),
@@ -1048,17 +1056,29 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
-
+                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                if(handler != null){
+                   handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
+                    rtcMusicHandlerMap.remove(requestId);
+                }
             }
 
             @Override
             public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
-
+                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                if(handler != null){
+                    handler.onMusicChartsResult(requestId, status, list);
+                    rtcMusicHandlerMap.remove(requestId);
+                }
             }
 
             @Override
             public void onLyricResult(String requestId, String lyricUrl) {
-
+                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+                if(handler != null){
+                    handler.onLyricResult(requestId, lyricUrl);
+                    rtcMusicHandlerMap.remove(requestId);
+                }
             }
         });
 
@@ -1335,7 +1355,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
 
         // 准备歌词
-        prepareLrc(context, music.toMemberMusicModel(), isChorus, isOwnSong);
+        prepareLrc(context, music, isChorus, isOwnSong);
     }
 
     // 倒计时
@@ -1445,74 +1465,59 @@ public class RoomLivingViewModel extends ViewModel {
     private static volatile Long mLastRecvPlayPosTime = null;
 
     // 歌词播放准备
-    private void prepareLrc(Context mContext,  @NonNull MemberMusicModel music, boolean isChorus, boolean isOwnSong) {
+    private void prepareLrc(Context mContext,  @NonNull VLRoomSelSongModel music, boolean isChorus, boolean isOwnSong) {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-        // TODO 判断条件
-        if (isOwnSong || isChorus) {
-            // 点歌者视角、合唱者视角
-            ResourceManager.Instance(mContext)
-                    .download(music, true)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleObserver<MemberMusicModel>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onSuccess(@NonNull MemberMusicModel musicModel) {
-                            // 加载歌词
-                            File lrcFile = music.fileLrc;
-                            LrcData data = LrcLoadUtils.parse(lrcFile);
-                            playerMusicLrcDataLiveData.postValue(data);
-
-                            // 加载歌曲
-                            if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(musicModel.songNo)) != 0) {
-                                mccNeedPreload = true;
-                                iAgoraMusicContentCenter.preload(Long.parseLong(musicModel.songNo), null);
-                            } else {
-                                mccNeedPreload = false;
-                                int ret = mPlayer.open(Long.parseLong(musicModel.songNo), 0);
-                                mpkNeedStopped = ( ret == 0 ) ? false : true;
-                            }
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            ToastUtils.showToast(io.agora.scene.base.R.string.ktv_lrc_load_fail);
-                        }
-                    });
-        } else {
-            // 听众视角
-            ResourceManager.Instance(mContext)
-                    .download(music, true)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleObserver<MemberMusicModel>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onSuccess(@NonNull MemberMusicModel musicModel) {
-//                            onResourceReady(musicModel);
-//                            onMusicPlaingByListener();
-//                            playByListener(musicModel);
-                            File lrcFile = music.fileLrc;
-                            LrcData data = LrcLoadUtils.parse(lrcFile);
-                            playerMusicLrcDataLiveData.postValue(data);
-                            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                            startDisplayLrc(); // TODD 听众stop播放LRC的时机？？
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            ToastUtils.showToast(io.agora.scene.base.R.string.ktv_lrc_load_fail);
-                        }
-                    });
+        List<Integer> lyricTypes = rtcMusicTypesMap.get(music.getSongNo());
+        if(lyricTypes == null || lyricTypes.isEmpty()){
+            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
+            return;
         }
+        String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), lyricTypes.size() > 1? lyricTypes.get(1): lyricTypes.get(0));
+        rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
+            @Override
+            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
+                // do nothing
+            }
+
+            @Override
+            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
+                // do nothing
+            }
+
+            @Override
+            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
+                // do nothing
+            }
+
+            @Override
+            public void onLyricResult(String requestId, String lyricUrl) {
+                DownloadManager.getInstance().download(mContext, lyricUrl, file -> {
+                    LrcData data = LrcLoadUtils.parse(file);
+                    playerMusicLrcDataLiveData.postValue(data);
+
+                    if(isOwnSong || isChorus){
+                        // 点歌者视角、合唱者视角
+
+                        // 加载歌曲
+                        if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(music.getSongNo())) != 0) {
+                            mccNeedPreload = true;
+                            iAgoraMusicContentCenter.preload(Long.parseLong(music.getSongNo()), null);
+                        } else {
+                            mccNeedPreload = false;
+                            int ret = mPlayer.open(Long.parseLong(music.getSongNo()), 0);
+                            mpkNeedStopped = ret != 0;
+                        }
+                    }else{
+                        // 听众视角
+                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                        startDisplayLrc();
+                    }
+
+                }, exception -> {
+                    ToastUtils.showToast(exception.getMessage());
+                });
+            }
+        });
     }
 
     // 开始播放歌词
