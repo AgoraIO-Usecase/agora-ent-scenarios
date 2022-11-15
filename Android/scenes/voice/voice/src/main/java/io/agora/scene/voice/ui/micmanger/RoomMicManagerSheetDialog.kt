@@ -13,7 +13,7 @@ import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.bean.MicManagerBean
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.dialog.BaseSheetDialog
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.ui.mic.RoomMicConstructor

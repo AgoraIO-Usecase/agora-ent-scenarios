@@ -14,7 +14,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 
 import java.util.Arrays;
 
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
 
 public class ExpressionView extends LinearLayoutCompat {
@@ -37,7 +37,7 @@ public class ExpressionView extends LinearLayoutCompat {
       GridView gv = (GridView) view.findViewById(R.id.gridview);
       ImageView iv_emoji_delete = view.findViewById(R.id.iv_emoji_delete);
 
-      gv.setVerticalSpacing((int) MathTools.dp2px(getContext(), 20));
+      gv.setVerticalSpacing((int) DeviceTools.dp2px(getContext(), 20));
       gv.setNumColumns(mColumns);
       gv.setVerticalSpacing(40);
 

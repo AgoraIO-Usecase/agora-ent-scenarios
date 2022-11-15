@@ -32,4 +32,8 @@ public interface ResultCallBack<T>
      * @param errorMsg  A description of the issue that caused this call to fail.
      */
     void onError(final int error, final String errorMsg);
+
+    default void onError(final int error){
+        onError(error,"");
+    }
 }

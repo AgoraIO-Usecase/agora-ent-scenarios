@@ -6,8 +6,8 @@ import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.baseui.adapter.OnItemChildClickListener
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.MathTools
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.secnceui.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceItemRoom2dBotMicBinding
 
@@ -23,7 +23,7 @@ class Room2DBotMicAdapter constructor(
 
     override fun onBindViewHolder(holder: Room2DBotMicViewHolder, position: Int) {
         val layoutParams = holder.mBinding.root.layoutParams
-        val size = ((MathTools.getDisplaySize().width - 28.dp) / 2).toInt()
+        val size = ((DeviceTools.getDisplaySize().width - 28.dp) / 2).toInt()
         layoutParams.width = size
         holder.mBinding.root.layoutParams = layoutParams
         super.onBindViewHolder(holder, position)

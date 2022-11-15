@@ -3,6 +3,7 @@ package io.agora.scene.voice.controller
 import android.content.Context
 import io.agora.scene.voice.bean.SoundAudioBean
 import io.agora.scene.voice.BuildConfig
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.rtckit.open.IRtcKitListener
@@ -31,7 +32,7 @@ class RtcRoomController : IRtcKitListener {
     }
 
     private val rtcChannelConfig by lazy {
-        RtcChannelConfig(BuildConfig.agora_app_token)
+        RtcChannelConfig(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken())
     }
 
     private var rtcManger: RtcKitManager? = null

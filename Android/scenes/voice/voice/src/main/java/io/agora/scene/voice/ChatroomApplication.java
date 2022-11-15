@@ -10,6 +10,6 @@ public class ChatroomApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ARouter.init(this);
-        VoiceConfigManager.initMain(this);
+        VoiceConfigManager.initMain();
     }
 }

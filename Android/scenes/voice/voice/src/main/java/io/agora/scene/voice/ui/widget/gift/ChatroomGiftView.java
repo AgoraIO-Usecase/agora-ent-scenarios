@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import io.agora.scene.voice.bean.GiftBean;
 import io.agora.voice.imkit.bean.ChatMessageData;
 import io.agora.voice.imkit.custormgift.CustomMsgHelper;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
 import io.agora.voice.imkit.manager.ChatroomHelper;
 
@@ -104,7 +104,7 @@ public class ChatroomGiftView extends LinearLayout {
         //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(0, (int) MathTools.dp2px(getContext(), 6));
+        drawable.setSize(0, (int) DeviceTools.dp2px(getContext(), 6));
         itemDecoration.setDrawable(drawable);
         recyclerView.addItemDecoration(itemDecoration);
 

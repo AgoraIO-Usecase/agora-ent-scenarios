@@ -9,8 +9,8 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.bean.RoomRankUserBean
 import io.agora.voice.buddy.tool.*
 import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.MathTools.dp
-import io.agora.voice.buddy.tool.MathTools.number2K
+import io.agora.voice.buddy.tool.DeviceTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.number2K
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
 
@@ -50,7 +50,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 
     fun setTitleMaxWidth() {
         val layoutParams: ViewGroup.LayoutParams = binding.llTitle.layoutParams
-        layoutParams.width = MathTools.getDisplaySize().width - 220.dp.toInt()
+        layoutParams.width = DeviceTools.getDisplaySize().width - 220.dp.toInt()
         binding.llTitle.layoutParams = layoutParams
     }
 

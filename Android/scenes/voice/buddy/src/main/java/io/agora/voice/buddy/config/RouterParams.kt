@@ -7,6 +7,7 @@ object RouterParams {
     const val KEY_CHATROOM_INFO = "chatroom_info"
     const val KEY_CHATROOM_DETAILS_INFO = "chatroom_details_info"
     const val KEY_CHATROOM_JOIN_PASSWORD = "chatroom_join_password"
+    const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
 
     const val KEY_CHATROOM_CREATE_NAME = "chatroom_create_name"
     const val KEY_CHATROOM_CREATE_IS_PUBLIC = "chatroom_create_is_public"
