@@ -710,7 +710,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
             VLLog(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@", model.songNo, model.songName);
 //            model.lyric = lyricUrl;
-            [weakSelf.MVView loadLrcURL:lyricUrl];
+//            [weakSelf.MVView loadLrcURL:lyricUrl];
             [weakSelf loadMusic:model.songNo withCallback:^{
                 VLLog(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@", model.songNo, model.songName);
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
@@ -728,7 +728,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
             VLLog(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
 //            model.lyric = lyricUrl;
-            [weakSelf.MVView loadLrcURL:lyricUrl];
+//            [weakSelf.MVView loadLrcURL:lyricUrl];
             weakSelf.currentPlayingSongNo = model.songNo;
             
             weakSelf.isPlayerPublish = NO;
