@@ -45,6 +45,7 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.service.KTVChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.KTVChooseSongInputModel;
@@ -64,7 +65,9 @@ import kotlin.jvm.functions.Function1;
 
 public class RoomLivingViewModel extends ViewModel {
 
+    private final String TAG = "KTV Scene LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
+
 
     /**
      * 用户状态
@@ -584,7 +587,6 @@ public class RoomLivingViewModel extends ViewModel {
                                         "", "", "", "", false, 0, 0
                                 );
                             }
-
                             songs.add(songItem);
                         }
                         liveData.postValue(songs);
@@ -973,7 +975,7 @@ public class RoomLivingViewModel extends ViewModel {
 //                        message.sendToTarget();
                     }
                 } catch (JSONException exp) {
-                    Log.e("KTV Scene LOG", "onStreamMessage:" + exp.toString());
+                    Log.e(TAG, "onStreamMessage:" + exp.toString());
                 }
             }
 
@@ -1010,7 +1012,7 @@ public class RoomLivingViewModel extends ViewModel {
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("KTV Scene LOG", "RtcEngine.create() called error: " + e.toString());
+            Log.e(TAG, "RtcEngine.create() called error: " + e.toString());
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
         mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
@@ -1031,7 +1033,7 @@ public class RoomLivingViewModel extends ViewModel {
                 UserManager.getInstance().getUser().id.intValue()
         );
         if (ret != Constants.ERR_OK) {
-            Log.e("KTV Scene LOG", "joinRTC() called error: " + ret);
+            Log.e(TAG, "joinRTC() called error: " + ret);
         }
 
         // --------- 初始化内容中心 ---------
@@ -1039,14 +1041,14 @@ public class RoomLivingViewModel extends ViewModel {
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
         contentCenterConfiguration.mccUid = UserManager.getInstance().getUser().id;
-        contentCenterConfiguration.rtmToken = roomInfoLiveData.getValue().getAgoraRTMToken();
+        contentCenterConfiguration.token = roomInfoLiveData.getValue().getAgoraRTMToken();
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
         iAgoraMusicContentCenter.registerEventHandler(new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
                 if (percent == 100) {
-                    Log.d("KTV Scene LOG", "多人 percent = " + percent + " status = " + status);
+                    Log.d(TAG, "多人 percent = " + percent + " status = " + status);
                     if (mccNeedPreload && mPlayer != null) {
                         mccNeedPreload = false;
                         mPlayer.open(songCode, 0);
@@ -1111,7 +1113,14 @@ public class RoomLivingViewModel extends ViewModel {
                         }
                         break;
                     case PLAYER_STATE_FAILED:
-                        Log.e("KTV Scene LOG", "onPlayerStateChanged: failed to play:" + error.toString());
+                        Log.e(TAG, "onPlayerStateChanged: failed to play:" + error.toString());
+                        break;
+                    case PLAYER_STATE_PLAYBACK_COMPLETED:
+                    case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                        Log.d(TAG, "onMusicCompleted");
+                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                        playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
+                        changeMusic();
                         break;
                     default:
                 }
@@ -1143,14 +1152,6 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onPreloadEvent(String src, io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent event) {
 
-            }
-
-            @Override
-            public void onCompleted() {
-                Log.d("KTV Scene LOG", "onMusicCompleted");
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
-                changeMusic();
             }
 
             @Override
@@ -1472,7 +1473,9 @@ public class RoomLivingViewModel extends ViewModel {
             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             return;
         }
-        String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), lyricTypes.size() > 1? lyricTypes.get(1): lyricTypes.get(0));
+
+        // lyricType -- 0: xml; 1: lrc
+        String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), 0);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
@@ -1492,32 +1495,66 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onLyricResult(String requestId, String lyricUrl) {
                 DownloadManager.getInstance().download(mContext, lyricUrl, file -> {
-                    LrcData data = LrcLoadUtils.parse(file);
-                    playerMusicLrcDataLiveData.postValue(data);
 
-                    if(isOwnSong || isChorus){
-                        // 点歌者视角、合唱者视角
+                    if (file.getName().endsWith(".zip")) {
+                        ZipUtils.unZipAsync(file.getAbsolutePath(),
+                                file.getAbsolutePath().replace(".zip", ""),
+                                new ZipUtils.UnZipCallback() {
+                                    @Override
+                                    public void onFileUnZipped(List<String> unZipFilePaths) {
+                                        String xmlPath = "";
+                                        for (String path : unZipFilePaths) {
+                                            if(path.endsWith(".xml")){
+                                                xmlPath = path;
+                                                break;
+                                            }
+                                        }
+                                        if(TextUtils.isEmpty(xmlPath)){
+                                            ToastUtils.showToast("The xml file not exist!");
+                                            return;
+                                        }
+                                        File xmlFile = new File(xmlPath);
 
-                        // 加载歌曲
-                        if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(music.getSongNo())) != 0) {
-                            mccNeedPreload = true;
-                            iAgoraMusicContentCenter.preload(Long.parseLong(music.getSongNo()), null);
-                        } else {
-                            mccNeedPreload = false;
-                            int ret = mPlayer.open(Long.parseLong(music.getSongNo()), 0);
-                            mpkNeedStopped = ret != 0;
-                        }
-                    }else{
-                        // 听众视角
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        startDisplayLrc();
+                                        LrcData data = LrcLoadUtils.parse(xmlFile);
+                                        playerMusicLrcDataLiveData.postValue(data);
+                                        preloadMusic(isOwnSong, isChorus, music);
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        ToastUtils.showToast(e.getMessage());
+                                    }
+                                });
+                    } else {
+                        LrcData data = LrcLoadUtils.parse(file);
+                        playerMusicLrcDataLiveData.postValue(data);
+                        preloadMusic(isOwnSong, isChorus, music);
                     }
-
                 }, exception -> {
                     ToastUtils.showToast(exception.getMessage());
                 });
             }
         });
+    }
+
+    private void preloadMusic(boolean isOwnSong, boolean isChorus, @NonNull VLRoomSelSongModel music) {
+        if(isOwnSong || isChorus){
+            // 点歌者视角、合唱者视角
+
+            // 加载歌曲
+            if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(music.getSongNo())) != 0) {
+                mccNeedPreload = true;
+                iAgoraMusicContentCenter.preload(Long.parseLong(music.getSongNo()), null);
+            } else {
+                mccNeedPreload = false;
+                int ret = mPlayer.open(Long.parseLong(music.getSongNo()), 0);
+                mpkNeedStopped = ret != 0;
+            }
+        }else{
+            // 听众视角
+            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+            startDisplayLrc();
+        }
     }
 
     // 开始播放歌词
@@ -1560,7 +1597,7 @@ public class RoomLivingViewModel extends ViewModel {
             try {
                 mDisplayThread.join();
             } catch (InterruptedException exp) {
-                Log.d("KTV Scene LOG", "stopDisplayLrc: " + exp.toString());
+                Log.d(TAG, "stopDisplayLrc: " + exp.toString());
             }
         }
     }
@@ -1606,7 +1643,7 @@ public class RoomLivingViewModel extends ViewModel {
 
                 int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
                 if (ret < 0) {
-                    Log.e("KTV Scene LOG", "sendSyncLrc() sendStreamMessage called returned: " + ret);
+                    Log.e(TAG, "sendSyncLrc() sendStreamMessage called returned: " + ret);
                 }
             }
         });
@@ -1621,7 +1658,7 @@ public class RoomLivingViewModel extends ViewModel {
             try {
                 mSyncLrcThread.join();
             } catch (InterruptedException exp) {
-                Log.e("KTV Scene LOG", "stopSyncLrc: " + exp.toString());
+                Log.e(TAG, "stopSyncLrc: " + exp.toString());
             }
         }
     }
@@ -1667,7 +1704,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendReplyTestDelay() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendReplyTestDelay() sendStreamMessage called returned: " + ret);
         }
     }
 
@@ -1684,7 +1721,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendTestDelay() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendTestDelay() sendStreamMessage called returned: " + ret);
         }
     }
 
@@ -1702,7 +1739,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendStartPlay() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendStartPlay() sendStreamMessage called returned: " + ret);
         }
     }
 
@@ -1717,10 +1754,10 @@ public class RoomLivingViewModel extends ViewModel {
             cfg.ordered = true;
             streamId = mRtcEngine.createDataStream(cfg);
         }
-        Log.d("KTV Scene LOG", "发送多人暂停消息");
+        Log.d(TAG, "发送多人暂停消息");
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendPause() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendPause() sendStreamMessage called returned: " + ret);
         }
     }
 
@@ -1735,10 +1772,10 @@ public class RoomLivingViewModel extends ViewModel {
             cfg.ordered = true;
             streamId = mRtcEngine.createDataStream(cfg);
         }
-        Log.d("KTV Scene LOG", "发送多人恢复");
+        Log.d(TAG, "发送多人恢复");
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendPlay() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendPlay() sendStreamMessage called returned: " + ret);
         }
     }
 
@@ -1755,7 +1792,7 @@ public class RoomLivingViewModel extends ViewModel {
         }
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
-            Log.e("KTV Scene LOG", "sendTrackMode() sendStreamMessage called returned: " + ret);
+            Log.e(TAG, "sendTrackMode() sendStreamMessage called returned: " + ret);
         }
     }
 }
