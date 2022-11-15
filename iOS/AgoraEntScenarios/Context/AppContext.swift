@@ -20,13 +20,14 @@ import Bugly
     }
     
     private func setupBugly() {
+#if DEBUG
+#else
         let config = BuglyConfig()
-//        config.reportLogLevel = BuglyLogLevel.warn
+        config.reportLogLevel = BuglyLogLevel.warn
         config.unexpectedTerminatingDetectionEnable = true
-        #if DEBUG
         config.debugMode = true
-        #endif
         Bugly.start(withAppId: "e188384728", config: config)
+#endif
     }
 
     @objc func getLang() -> String {
