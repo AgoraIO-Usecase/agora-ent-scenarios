@@ -15,6 +15,8 @@ private let kSceneId = "scene_ktv"
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
+//score
+private let SYNC_MANAGER_SINGING_SCORE_INFO = "singing_score"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -58,6 +60,7 @@ private func _hideLoadingIfNeed() {
     private var seatListDidChanged: ((UInt, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
+    private var singingScoreDidChanged: ((Double) -> Void)?
 
     private var roomNo: String? {
         didSet {
@@ -179,7 +182,7 @@ private func _hideLoadingIfNeed() {
                         completion(nil, output)
                     }
                     self._addUserIfNeed()
-                    self._subscribeChooseSong {}
+//                    self._subscribeChooseSong {}
                 }
             } fail: { error in
                 _hideLoadingIfNeed()
@@ -230,7 +233,7 @@ private func _hideLoadingIfNeed() {
                         completion(nil, output)
                     }
                     self._addUserIfNeed()
-                    self._subscribeChooseSong {}
+//                    self._subscribeChooseSong {}
                 }
             } fail: { error in
                 _hideLoadingIfNeed()
@@ -262,9 +265,11 @@ private func _hideLoadingIfNeed() {
             return
         }
         roomInfo.bgOption = Int(inputModel.mvIndex)
+//        let objectId = roomInfo.objectId
+        let objectId = channelName
         var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
-        params["objectId"] = channelName
-        agoraPrint("imp room update mv...")
+        params["objectId"] = objectId
+        agoraPrint("imp room update mv... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
             .update(key: "",
@@ -421,24 +426,21 @@ private func _hideLoadingIfNeed() {
     
     func updateSingingScore(withScore score: Double) {
 //        assertionFailure()
-        guard let topSong = self.songList.first else {
-//            assertionFailure()
-            return
-        }
-        
-//        topSong.status = 2
-        topSong.score = score
-        _updateChooseSong(songInfo: topSong) { error in
+        _addSingingScore(score: score) {
         }
     }
 
     //MARK: subscribe
     func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
         userListCountDidChanged = changedBlock
+        _subscribeOnlineUsers {
+        }
     }
 
     func subscribeSeatListChanged(_ changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
         seatListDidChanged = changedBlock
+        _subscribeSeats {
+        }
     }
     
     func subscribeRoomStatusChanged(_ changedBlock: @escaping (UInt, VLRoomListModel) -> Void) {
@@ -476,6 +478,13 @@ private func _hideLoadingIfNeed() {
 
     func subscribeChooseSongChanged(_ changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
         chooseSongDidChanged = changedBlock
+        _subscribeChooseSong {
+        }
+    }
+    
+    func subscribeSingingScoreChanged(_ changedBlock: @escaping (Double) -> Void) {
+        singingScoreDidChanged = changedBlock
+        _subscribeSingScore()
     }
 }
 
@@ -523,7 +532,7 @@ extension KTVSyncManagerServiceImp {
 // MARK: User operation
 extension KTVSyncManagerServiceImp {
     private func _addUserIfNeed() {
-        _subscribeOnlineUsers {}
+//        _subscribeOnlineUsers {}
         _getUserInfo { error, userList in
             // current user already add
             if self.userList.contains(where: { $0.userNo == VLUserCenter.user.userNo }) {
@@ -679,12 +688,12 @@ extension KTVSyncManagerServiceImp {
 //                completion(error)
 //            })
         
-        agoraPrint("imp room update user count ...")
-        params["objectId"] = channelName
+//        let objectId = roomInfo.objectId
+        let objectId = channelName
+        agoraPrint("imp room update user count... [\(objectId)]")
+        params["objectId"] = objectId
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: "")
-            .document(id: channelName)
             .update(key: "",
                     data: params,
                     success: { obj in
@@ -739,7 +748,7 @@ extension KTVSyncManagerServiceImp {
     }
 
     private func _autoOnSeatIfNeed(completion: @escaping ([VLRoomSeatModel])->()) {
-        _subscribeSeats {}
+//        _subscribeSeats {}
 
         userList.removeAll()
         songList.removeAll()
@@ -811,7 +820,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        agoraPrint("imp seat update...")
+        agoraPrint("imp seat update... [\(objectId)]")
         let params = seatInfo.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
@@ -987,7 +996,7 @@ extension KTVSyncManagerServiceImp {
         }
 
         let params = songInfo.yy_modelToJSONObject() as! [String: Any]
-        agoraPrint("imp song update...")
+        agoraPrint("imp song update... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
@@ -1135,6 +1144,71 @@ extension KTVSyncManagerServiceImp {
                 agoraPrint("imp song subscribe fail \(error.message)...")
                 ToastView.show(text: error.message)
                 finished()
+            })
+    }
+}
+
+
+//MARK: song score operation
+extension KTVSyncManagerServiceImp {
+    private func _addSingingScore(score: Double, finished: @escaping () -> Void) {
+        guard let channelName = roomNo else {
+//            assert(false, "channelName = nil")
+            agoraPrint("_addSingingScore channelName = nil")
+            return
+        }
+        agoraPrint("imp singing score add ... [\(score)]")
+
+        let params = [
+            "score": score,
+            "objectId": channelName
+        ] as [String : Any]
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_MANAGER_SINGING_SCORE_INFO)
+            .add(data: params,
+                 success: {_ in 
+                agoraPrint("imp singing score add success...")
+                finished()
+            }, fail: { error in
+                agoraPrint("imp singing score add fail :\(error.message)...")
+                agoraPrint(error.message)
+                finished()
+            })
+    }
+    
+    private func _subscribeSingScore() {
+        guard let channelName = roomNo else {
+            agoraAssert("channelName = nil")
+            return
+        }
+        agoraPrint("imp singing score subscribe...")
+        SyncUtil
+            .scene(id: channelName)?
+            .subscribe(key: SYNC_MANAGER_SINGING_SCORE_INFO,
+                       onCreated: { [weak self] object in
+                guard let self = self,
+                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
+                else {
+                    return
+                }
+                agoraPrint("imp singing score subscribe onCreated... [\(score)]")
+                self.singingScoreDidChanged?(score)
+            }, onUpdated: { [weak self] object in
+                guard let self = self,
+                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
+                else {
+                    return
+                }
+                agoraPrint("imp singing score subscribe onUpdated... [\(score)]")
+                self.singingScoreDidChanged?(score)
+            }, onDeleted: { object in
+                agoraPrint("imp singing score subscribe onDeleted...")
+            }, onSubscribed: {
+//                LogUtils.log(message: "subscribe message", level: .info)
+            }, fail: { error in
+                agoraPrint("imp singing score subscribe fail \(error.message)...")
+                ToastView.show(text: error.message)
             })
     }
 }

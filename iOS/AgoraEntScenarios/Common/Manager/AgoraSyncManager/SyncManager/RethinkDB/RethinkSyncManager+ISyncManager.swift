@@ -88,7 +88,7 @@ extension RethinkSyncManager: ISyncManager {
     func add(reference: CollectionReference, data: [String: Any?], success: SuccessBlockObj?, fail: FailBlock?) {
         onSuccessBlockObj[reference.className] = success
         onFailBlock[reference.className] = fail
-        let objectId = UUID().uuid16string()
+        let objectId = data["objectId"] as? String ?? UUID().uuid16string()
         var parasm = data
         parasm["objectId"] = objectId
         write(channelName: reference.className, data: parasm, objectId: objectId, isAdd: true)

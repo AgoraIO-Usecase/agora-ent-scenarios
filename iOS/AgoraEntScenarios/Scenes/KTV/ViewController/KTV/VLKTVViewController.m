@@ -227,6 +227,11 @@ VLPopScoreViewDelegate
         [weakSelf setRoomUsersCount:count];
     }];
     
+    [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
+        //观众看到打分
+        weakSelf.currentVoicePitch = score;
+    }];
+    
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         
         VLRoomSeatModel* model = [self getUserSeatInfoWithIndex:seatModel.seatIndex];
@@ -308,12 +313,6 @@ VLPopScoreViewDelegate
                && songInfo.chorusNo != nil) {
                 [weakSelf.MVView setJoinInViewHidden];
                 [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                return;
-            }
-            
-            //观众看到打分
-            if (songInfo.status == 2) {
-                weakSelf.currentVoicePitch = songInfo.score;
                 return;
             }
             
@@ -899,8 +898,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     contentCenterConfiguration.rtcEngine = self.RTCkit;
     contentCenterConfiguration.appId = [[AppContext shared] appId];
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
-    contentCenterConfiguration.rtmToken = VLUserCenter.user.agoraRTMToken;
-    VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.rtmToken);
+    contentCenterConfiguration.token = VLUserCenter.user.agoraRTMToken;
+    VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.token);
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
 }
 
