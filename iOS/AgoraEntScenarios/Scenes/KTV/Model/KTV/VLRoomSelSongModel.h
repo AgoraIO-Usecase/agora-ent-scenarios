@@ -18,9 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *singer;
 @property (nonatomic, copy) NSString *songName;
 @property (nonatomic, copy) NSString *songNo;
-@property (nonatomic, copy) NSString *songUrl;
+//@property (nonatomic, copy) NSString *songUrl;
 ///歌词
-@property (nonatomic, copy) NSString *lyric;;
+//@property (nonatomic, copy) NSString *lyric;
 ///创建时间
 @property (nonatomic, assign) NSTimeInterval createAt;
 //置顶时间
