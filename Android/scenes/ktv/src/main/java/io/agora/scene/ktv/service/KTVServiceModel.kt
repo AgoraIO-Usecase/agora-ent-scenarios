@@ -44,12 +44,12 @@ data class VLRoomSeatModel(
     val name: String,// 座位上用户昵称
     val seatIndex: Int,// 座位编号
     val joinSing: Boolean,// 是否合唱
-    val isSelfMuted: Int,// 是否静音
+    val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
 
     // TODO 下面两个字段似乎是多余的？
-    val ifSelTheSingSong: Boolean,// 判断当前歌曲是否是自己点的
-    val ifJoinedChorus: Boolean,
+    val isOwner: Boolean,// 判断当前歌曲是否是自己点的
+    val isJoinedChorus: Boolean,
 ) : java.io.Serializable
 
 
@@ -128,16 +128,6 @@ data class VLRoomSelSongModel(
 
 data class KTVJoinChorusInputModel(
     val songNo: String
-)
-
-data class KTVSongDetailInputModel(
-    val songNo: String
-)
-
-data class KTVSongDetailOutputModel(
-    val songNo: String,
-    val lyric: String,
-    val songUrl: String
 )
 
 data class KTVChooseSongInputModel(
