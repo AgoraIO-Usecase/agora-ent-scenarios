@@ -1,7 +1,6 @@
 package io.agora.scene.ktv.service
 
 import io.agora.scene.base.R
-import io.agora.scene.base.bean.MemberMusicModel
 
 data class VLRoomListModel(
     val roomNo: String = "",
@@ -114,9 +113,7 @@ data class VLRoomSelSongModel(
     // 获取歌词列表返回的歌词信息
     val songName: String,// 歌曲名
     val songNo: String, // 歌词唯一标识
-    val songUrl: String?, // mp3路径
     val singer: String, // 演唱者
-    val lyric: String?, // 歌词
     val imageUrl: String,// 歌曲封面
 
     // 获取已点歌记返回的歌词信息，同时也包含上面信息
@@ -127,27 +124,7 @@ data class VLRoomSelSongModel(
     val isChorus: Boolean = false, // 是否合唱
     val isOriginal: Int = 0, //是否原唱
     val sort: Int = 0,// 已点歌曲的播放顺序排序
-) {
-
-    // TODO remove it
-    fun toMemberMusicModel(): MemberMusicModel {
-        return MemberMusicModel().apply {
-            chorusNo = this@VLRoomSelSongModel.chorusNo
-            imageUrl = this@VLRoomSelSongModel.imageUrl
-            isChorus = this@VLRoomSelSongModel.isChorus
-            isOriginal = this@VLRoomSelSongModel.isOriginal
-            singer = this@VLRoomSelSongModel.singer
-            songName = this@VLRoomSelSongModel.songName
-            songNo = this@VLRoomSelSongModel.songNo
-            songUrl = this@VLRoomSelSongModel.songUrl
-            lyric = this@VLRoomSelSongModel.lyric
-            sort = this@VLRoomSelSongModel.sort
-            userNo = this@VLRoomSelSongModel.userNo
-            userId = this@VLRoomSelSongModel.userId
-            name = this@VLRoomSelSongModel.name
-        }
-    }
-}
+)
 
 data class KTVJoinChorusInputModel(
     val songNo: String
@@ -167,10 +144,8 @@ data class KTVChooseSongInputModel(
     val isChorus: Int,
     val songName: String,
     val songNo: String,
-    val songUrl: String,
     val singer: String,
     val imageUrl: String,
-    val lyric: String,
 )
 
 data class KTVMakeSongTopInputModel(
