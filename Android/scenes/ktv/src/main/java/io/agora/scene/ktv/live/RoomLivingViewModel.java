@@ -160,7 +160,6 @@ public class RoomLivingViewModel extends ViewModel {
      * RTC歌词内容回调
      */
     private final Map<String, IMusicContentCenterEventHandler> rtcMusicHandlerMap = new HashMap<>();
-    private final Map<String, List<Integer>> rtcMusicTypesMap = new HashMap<>();
 
     public RoomLivingViewModel(KTVJoinRoomOutputModel roomInfo) {
         this.roomInfoLiveData = new MutableLiveData<>(roomInfo);
@@ -572,12 +571,6 @@ public class RoomLivingViewModel extends ViewModel {
                                 }
                             }
 
-                            List<Integer> lyricTypes = new ArrayList<>();
-                            for (int lyricType : music.lyricTypes) {
-                                lyricTypes.add(lyricType);
-                            }
-                            rtcMusicTypesMap.put(String.valueOf(music.songCode), lyricTypes);
-
                             if(songItem == null){
                                 songItem = new VLRoomSelSongModel(
                                         music.name,
@@ -644,12 +637,6 @@ public class RoomLivingViewModel extends ViewModel {
                                     break;
                                 }
                             }
-
-                            List<Integer> lyricTypes = new ArrayList<>();
-                            for (int lyricType : music.lyricTypes) {
-                                lyricTypes.add(lyricType);
-                            }
-                            rtcMusicTypesMap.put(String.valueOf(music.songCode), lyricTypes);
 
                             if(songItem == null){
                                 songItem = new VLRoomSelSongModel(
@@ -1469,11 +1456,6 @@ public class RoomLivingViewModel extends ViewModel {
     // 歌词播放准备
     private void prepareLrc(Context mContext,  @NonNull VLRoomSelSongModel music, boolean isChorus, boolean isOwnSong) {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-        List<Integer> lyricTypes = rtcMusicTypesMap.get(music.getSongNo());
-        if(lyricTypes == null || lyricTypes.isEmpty()){
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
-            return;
-        }
 
         // lyricType -- 0: xml; 1: lrc
         String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), 0);
