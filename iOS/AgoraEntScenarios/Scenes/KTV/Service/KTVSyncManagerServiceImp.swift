@@ -488,12 +488,9 @@ extension KTVSyncManagerServiceImp {
             return
         }
         _removeUser { error in
-            // TODO(wushengtao): whitout callback
-            self._updateUserCount(with: max(self.userList.count - 1, 0))
         }
-        // TODO(wushengtao): bacause of removeUser can not recv callback, invoke immediately
-//        _updateUserCount(with: max(userList.count - 1, 0))
 
+        //leave if enter seat
         if let seat = seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
             _removeSeat(seatInfo: seat) { error in
             }
@@ -533,8 +530,8 @@ extension KTVSyncManagerServiceImp {
                 return
             }
             self._addUserInfo {
-                self._getUserInfo { error, userList in
-                }
+//                self._getUserInfo { error, userList in
+//                }
             }
         }
     }
@@ -597,19 +594,26 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
                        onCreated: { _ in
-                       }, onUpdated: { object in
+                       }, onUpdated: {[weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
-                           guard let jsonStr = object.toJson(), let model = VLLoginModel.yy_model(withJSON: jsonStr) else { return }
-                           if self.userList.contains(where: { $0.userNo == model.userNo }) { return }
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = VLLoginModel.yy_model(withJSON: jsonStr),
+                                 !self.userList.contains(where: { $0.userNo == model.userNo })
+                           else {
+                               return
+                           }
                            self.userList.append(model)
+                           agoraPrint("imp user subscribe onUpdated2... \(self.userList.count)")
                            self._updateUserCount { error in
                            }
-                       }, onDeleted: { object in
+                       }, onDeleted: {[weak self] object in
                            agoraPrint("imp user subscribe onDeleted...")
-                           if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
-                               self.userList.remove(at: index)
-                               self._updateUserCount { error in
-                               }
+                           guard let self = self, let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else {
+                               return
+                           }
+                           self.userList.remove(at: index)
+                           self._updateUserCount { error in
                            }
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
@@ -623,11 +627,14 @@ extension KTVSyncManagerServiceImp {
 
     private func _removeUser(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
+            agoraAssert("_removeUser channelName = nil")
             return
         }
-        agoraPrint("imp user delete ...")
-        let objectId = userList.filter({ $0.userNo == UserInfo.userId && $0.objectId != nil }).first?.objectId ?? ""
+        guard let objectId = userList.filter({ $0.userNo == VLUserCenter.user.userNo }).first?.objectId else {
+            agoraAssert("_removeUser objectId = nil")
+            return
+        }
+        agoraPrint("imp user delete... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
@@ -647,10 +654,12 @@ extension KTVSyncManagerServiceImp {
 
     private func _updateUserCount(with count: Int) {
         guard let channelName = roomNo,
-              let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
+              let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
+              roomInfo.creator == VLUserCenter.user.userNo
         else {
 //            assert(false, "channelName = nil")
             agoraPrint("updateUserCount channelName = nil")
+            userListCountDidChanged?(UInt(count))
             return
         }
         let roomPeopleNum = "\(count)"
@@ -834,7 +843,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         
-        agoraPrint("imp seat delete...")
+        agoraPrint("imp seat delete... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
@@ -1033,7 +1042,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
-        agoraPrint("imp song delete...")
+        agoraPrint("imp song delete... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
