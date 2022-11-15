@@ -104,7 +104,7 @@ public final class RTCManager {
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
         contentCenterConfiguration.mccUid = uid;
-        contentCenterConfiguration.rtmToken = rtmToken;
+        contentCenterConfiguration.token = rtmToken;
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
         iAgoraMusicContentCenter.registerEventHandler(new IMusicContentCenterEventHandler() {
