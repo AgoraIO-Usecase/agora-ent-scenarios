@@ -18,7 +18,7 @@
             android:theme="@style/voice_Theme.AgoraScenesChatroom" />
 
         <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomListActivity"
+            android:name="io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -26,7 +26,7 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomCreateActivity"
+            android:name="io.agora.scene.voice.ui.activity.VoiceRoomCreateActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/voice_Theme.AgoraScenesChatroom"
@@ -39,7 +39,7 @@
             android:theme="@style/voice_Theme.AgoraScenesChatroom" />
 
         <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomSoundSelectionActivity"
+            android:name="io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/voice_Theme.AgoraScenesChatroom" />

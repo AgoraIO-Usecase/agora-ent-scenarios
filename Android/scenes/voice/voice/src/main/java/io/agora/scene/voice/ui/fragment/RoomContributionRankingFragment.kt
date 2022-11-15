@@ -18,7 +18,7 @@ import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.R

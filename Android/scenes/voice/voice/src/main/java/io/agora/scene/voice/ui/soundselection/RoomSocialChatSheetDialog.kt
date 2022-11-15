@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import io.agora.scene.voice.bean.CustomerUsageBean
 import io.agora.voice.baseui.dialog.BaseSheetDialog
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.scene.voice.databinding.VoiceDialogRoomSocialChatBinding
 
 class RoomSocialChatSheetDialog constructor() : BaseSheetDialog<VoiceDialogRoomSocialChatBinding>() {

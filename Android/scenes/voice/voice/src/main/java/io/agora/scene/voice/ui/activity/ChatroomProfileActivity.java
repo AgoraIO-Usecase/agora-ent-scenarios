@@ -28,7 +28,7 @@ import io.agora.scene.voice.databinding.VoiceProfileAvatarBinding;
 import io.agora.scene.voice.ui.widget.titlebar.RoomTitleBar;
 import io.agora.voice.baseui.BaseActivity;
 import io.agora.voice.baseui.popupwindow.CommonPopupWindow;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.chat.ChatClient;
@@ -41,7 +41,6 @@ import io.agora.voice.buddy.config.RouterPath;
 import io.agora.voice.network.tools.VRValueCallBack;
 import io.agora.voice.network.tools.bean.VRUserBean;
 
-@Route(path = RouterPath.ChatroomProfilePath)
 public class ChatroomProfileActivity extends BaseActivity implements View.OnClickListener, RoomTitleBar.OnBackPressListener, TextView.OnEditorActionListener {
    private RoomTitleBar titleBar;
    private ShapeableImageView avatar;
@@ -176,7 +175,7 @@ public class ChatroomProfileActivity extends BaseActivity implements View.OnClic
    private void showDialog(View itemView){
       new CommonPopupWindow.ViewDataBindingBuilder<VoiceProfileAvatarBinding>()
               .width(ConstraintLayout.LayoutParams.MATCH_PARENT)
-              .height(MathTools.dp2px(this,535))
+              .height(DeviceTools.dp2px(this,535))
               .outsideTouchable(true)
               .focusable(true)
               .animationStyle(R.style.voice_BottomDialogFragment_Animation)

@@ -19,7 +19,7 @@ import androidx.annotation.RestrictTo;
 import java.lang.ref.SoftReference;
 
 import io.agora.voice.buddy.R;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 
 /**
  * <pre>
@@ -90,7 +90,7 @@ public final class InternalToast {
         new Builder(mApp)
                 .setDuration(duration)
                 .setGravity(Gravity.BOTTOM)
-                .setOffset((int) MathTools.getDp(200))
+                .setOffset((int) DeviceTools.getDp(200))
                 .setToastTYpe(toastType)
                 .setTitle(notice)
                 .build()

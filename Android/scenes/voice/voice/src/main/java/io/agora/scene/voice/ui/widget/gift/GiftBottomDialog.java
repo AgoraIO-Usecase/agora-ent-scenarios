@@ -22,7 +22,7 @@ import io.agora.scene.voice.databinding.VoiceDialogGiftLayoutBinding;
 import io.agora.scene.voice.databinding.VoicePopGiftLayoutBinding;
 import io.agora.voice.baseui.dialog.BaseSheetDialog;
 import io.agora.voice.baseui.popupwindow.CommonPopupWindow;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 
 public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBinding> implements View.OnClickListener {
     private int currentIndex = 0;//当前页面,默认首页
@@ -144,9 +144,9 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         Log.e("addViewPagerDots", "count: " + count);
         if (llGuideGroup == null || count < 1 || getContext() == null) return;
         LinearLayoutCompat.LayoutParams lp = new LinearLayoutCompat.LayoutParams(
-                MathTools.dp2px(getContext(), 5), MathTools.dp2px(getContext(), 5));
-        lp.leftMargin = MathTools.dp2px(getContext(), 5);
-        lp.rightMargin = MathTools.dp2px(getContext(), 5);
+                DeviceTools.dp2px(getContext(), 5), DeviceTools.dp2px(getContext(), 5));
+        lp.leftMargin = DeviceTools.dp2px(getContext(), 5);
+        lp.rightMargin = DeviceTools.dp2px(getContext(), 5);
         for (int i = 0; i < count; i++) {
             ImageView imageView = new ImageView(llGuideGroup.getContext());
             imageView.setLayoutParams(lp);
@@ -170,8 +170,8 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         itemView.getLocationInWindow(location);
         if (getContext() != null) {
             new CommonPopupWindow.ViewDataBindingBuilder<VoicePopGiftLayoutBinding>()
-                    .width(MathTools.dp2px(getContext(), 120))
-                    .height(MathTools.dp2px(getContext(), 186))
+                    .width(DeviceTools.dp2px(getContext(), 120))
+                    .height(DeviceTools.dp2px(getContext(), 186))
                     .outsideTouchable(true)
                     .focusable(true)
                     .clippingEnabled(false)
@@ -210,8 +210,8 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
                     })
                     .build(getContext())
                     .showAtLocation(itemView, Gravity.NO_GRAVITY,
-                            location[0] - MathTools.dp2px(getContext(), 60) / 3,
-                            location[1] - MathTools.dp2px(getContext(), 186));
+                            location[0] - DeviceTools.dp2px(getContext(), 60) / 3,
+                            location[1] - DeviceTools.dp2px(getContext(), 186));
         }
     }
 

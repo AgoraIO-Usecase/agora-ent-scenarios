@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.agora.scene.voice.databinding.VoiceDialogCenterFragmentAlertBinding
 import io.agora.voice.baseui.dialog.BaseFragmentDialog
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 
 /**
  * 中间弹框，确认/取消按钮
