@@ -7,7 +7,7 @@ import android.util.TypedValue
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
-object MathTools {
+object DeviceTools {
 
     @JvmStatic
     val Number.dp

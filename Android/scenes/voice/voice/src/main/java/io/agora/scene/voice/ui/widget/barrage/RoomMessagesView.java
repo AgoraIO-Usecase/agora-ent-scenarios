@@ -40,7 +40,7 @@ import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.voice.imkit.bean.ChatMessageData;
 import io.agora.voice.imkit.custormgift.CustomMsgHelper;
 import io.agora.voice.imkit.custormgift.CustomMsgType;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.voice.imkit.manager.ChatroomHelper;
@@ -89,7 +89,7 @@ public class RoomMessagesView extends RelativeLayout{
         //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(0, (int) MathTools.dp2px(getContext(), 6));
+        drawable.setSize(0, (int) DeviceTools.dp2px(getContext(), 6));
         itemDecoration.setDrawable(drawable);
         listview.addItemDecoration(itemDecoration);
         //设置item动画

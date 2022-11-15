@@ -20,7 +20,7 @@ import java.util.Objects;
 import io.agora.scene.voice.bean.CustomerUsageBean;
 import io.agora.scene.voice.bean.SoundSelectionBean;
 import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.buddy.tool.MathTools;
+import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ResourcesTools;
 import io.agora.scene.voice.R;
 
@@ -90,8 +90,8 @@ public class ChatroomSoundSelectionAdapter extends RoomBaseRecyclerViewAdapter<S
             sound_desc.setText(bean.getSoundIntroduce());
             for (CustomerUsageBean customerUsageBean : Objects.requireNonNull(bean.getCustomer())) {
                 ImageView imageView = new ImageView(context);
-                LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(MathTools.dp2px(context, 20), MathTools.dp2px(context, 20));
-                marginLayoutParams.rightMargin = MathTools.dp2px(context, 10);
+                LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(DeviceTools.dp2px(context, 20), DeviceTools.dp2px(context, 20));
+                marginLayoutParams.rightMargin = DeviceTools.dp2px(context, 10);
                 imageView.setImageResource(customerUsageBean.getAvatar());
                 imageView.setLayoutParams(marginLayoutParams);
                 if (layout.getChildCount() < bean.getCustomer().size()) {

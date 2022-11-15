@@ -40,13 +40,13 @@
             android:keepScreenOn="true"
             android:screenOrientation="portrait" />
 
-        <activity android:name="io.agora.scene.voice.ui.activity.ChatroomListActivity"
+        <activity android:name="io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"/>
 
-        <activity android:name="io.agora.scene.voice.ui.activity.ChatroomCreateActivity"
+        <activity android:name="io.agora.scene.voice.ui.activity.VoiceRoomCreateActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
             android:exported="false"/>
@@ -55,7 +55,7 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
-        <activity android:name="io.agora.scene.voice.ui.activity.ChatroomSoundSelectionActivity"
+        <activity android:name="io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity"
             android:screenOrientation="portrait"
             android:exported="false"/>
 

@@ -9,7 +9,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import io.agora.scene.voice.bean.SoundSelectionBean
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.buddy.tool.MathTools.dp
+import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemRoomSoundSelectionBinding

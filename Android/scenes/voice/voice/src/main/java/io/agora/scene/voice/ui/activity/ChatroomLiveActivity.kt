@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -390,18 +389,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     })
             }
         })
-    }
-
-    private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        if (window.attributes.softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            if (currentFocus != null) {
-                imm.hideSoftInputFromWindow(
-                    currentFocus?.windowToken,
-                    InputMethodManager.HIDE_NOT_ALWAYS
-                )
-            }
-        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

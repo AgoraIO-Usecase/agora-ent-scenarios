@@ -11,5 +11,5 @@ public class PagePathConstant {
     public static final String pageRoomList = "/ktv/pageRoomList";
 
 
-    public static final String pageVoiceChat = "/chatroom/ChatroomSplashActivity";
+    public static final String pageVoiceChat = "/voice/VoiceRoomListActivity";
 }
