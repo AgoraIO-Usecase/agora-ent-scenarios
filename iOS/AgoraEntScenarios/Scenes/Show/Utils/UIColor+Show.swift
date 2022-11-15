@@ -39,8 +39,18 @@ extension UIColor {
         return UIColor.HexColor(hex: 0x0C0923, alpha: 0.3)
     }
     
+    // 直播场景背景色
+    @objc static var show_room_info_cover: UIColor {
+        return UIColor.HexColor(hex: 0x000000, alpha: 0.25)
+    }
+    
+    // 音乐设置背景色
+    @objc static var show_music_item_bg: UIColor {
+        return UIColor.HexColor(hex: 0x000000, alpha: 0.35)
+    }
+    
     // 背景色
-    @objc static var show_beauty_setting_bg: UIColor {
+    @objc static var show_dark_cover_bg: UIColor {
         return UIColor.HexColor(hex: 0x151325, alpha: 0.85)
     }
     
@@ -48,4 +58,40 @@ extension UIColor {
     @objc static var show_btn_bg: UIColor {
         return UIColor.HexColor(hex: 0x345DFF, alpha: 1)
     }
+    
+    // 红点颜色
+    @objc static var show_red_dot: UIColor {
+        return UIColor.HexColor(hex: 0xFF317B, alpha: 1)
+    }
+    
+    // 红点颜色
+    @objc static var show_chat_user_name: UIColor {
+        return UIColor.HexColor(hex: 0xA6C4FF, alpha: 1)
+    }
+    
+    // 输入框背景
+    @objc static var show_chat_input_bg: UIColor {
+        return UIColor.HexColor(hex: 0xF1F3F8, alpha: 1)
+    }
+    
+    // 输入框文字
+    @objc static var show_chat_input_text: UIColor {
+        return UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+    }
+    
+    
+    
+    @objc static var show_Ellipse5: UIColor {
+        return UIColor.HexColor(hex: 0x6D7291, alpha: 1)
+    }
+    
+    @objc static var show_Ellipse6: UIColor {
+        return UIColor.HexColor(hex: 0x303553, alpha: 1)
+    }
+    
+    @objc static var show_Ellipse7: UIColor {
+        return UIColor.HexColor(hex: 0x040A25, alpha: 1)
+    }
+    
+    
 }

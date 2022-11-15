@@ -14,6 +14,19 @@ extension String {
         else {
             return self
         }
-        return NSLocalizedString(self,tableName: "Localizable", bundle:bundle ,comment: "")
+        
+        guard var lang = NSLocale.preferredLanguages.first else {
+            return self
+        }
+        if lang.contains("zh") {
+            lang = "zh-Hans"
+        } else {
+            lang = "en"
+        }
+        
+        guard let langPath = bundle.path(forResource: lang, ofType: "lproj") , let detailBundle = Bundle(path: langPath) else {
+            return self
+        }
+        return NSLocalizedString(self,tableName: "Localizable", bundle:detailBundle ,comment: "")
     }
 }
