@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -588,7 +587,6 @@ public class RoomLivingViewModel extends ViewModel {
                                         "", "", "", "", false, 0, 0
                                 );
                             }
-
                             songs.add(songItem);
                         }
                         liveData.postValue(songs);
@@ -1475,6 +1473,7 @@ public class RoomLivingViewModel extends ViewModel {
             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_END);
             return;
         }
+
         // lyricType -- 0: xml; 1: lrc
         String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), 0);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
@@ -1496,6 +1495,7 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onLyricResult(String requestId, String lyricUrl) {
                 DownloadManager.getInstance().download(mContext, lyricUrl, file -> {
+
                     if (file.getName().endsWith(".zip")) {
                         ZipUtils.unZipAsync(file.getAbsolutePath(),
                                 file.getAbsolutePath().replace(".zip", ""),
