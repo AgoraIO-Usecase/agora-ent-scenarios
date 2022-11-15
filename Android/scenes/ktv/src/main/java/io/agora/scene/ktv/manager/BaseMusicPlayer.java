@@ -632,6 +632,10 @@ public abstract class BaseMusicPlayer extends IRtcEngineEventHandler implements 
             case PLAYER_STATE_STOPPED:
                 onMusicStop();
                 break;
+            case PLAYER_STATE_PLAYBACK_COMPLETED:
+            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                onMusicCompleted();
+                break;
             case PLAYER_STATE_FAILED:
                 onMusicOpenError(io.agora.mediaplayer.Constants.MediaPlayerError.getValue(error));
                 mLogger.e("onPlayerStateChanged: failed to play, error " + error);
@@ -684,11 +688,6 @@ public abstract class BaseMusicPlayer extends IRtcEngineEventHandler implements 
     public void onPlayBufferUpdated(long l) {
 
     }
-
-//    @Override
-//    public void onCompleted() {
-//        onMusicCompleted();
-//    }
 
     private void onMusicOpening() {
         mLogger.i("onMusicOpening() called");
