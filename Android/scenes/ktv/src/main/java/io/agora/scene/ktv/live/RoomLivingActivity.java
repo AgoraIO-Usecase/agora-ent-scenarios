@@ -1,7 +1,6 @@
 package io.agora.scene.ktv.live;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -62,8 +61,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
     private SongDialog mChooseSongDialog;
     private SongDialog mChorusSongDialog;
-
-    private ProgressDialog mLoadingDialog;
 
 
     public static void launch(Context context, KTVJoinRoomOutputModel roomInfo) {
@@ -182,7 +179,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().lrcControlView.setPitchViewOnActionListener(lrcActionListenerImpl);
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
 
-        roomLivingViewModel.loadingDialogVisible.observe(this, this::showLoadingDialog);
+        roomLivingViewModel.loadingDialogVisible.observe(this, visible -> {
+            if(visible){
+                showLoadingView();
+            }else{
+                hideLoadingView();
+            }
+        });
 
         // 房间相关
         roomLivingViewModel.roomInfoLiveData.observe(this, ktvJoinRoomOutputModel -> {
@@ -214,7 +217,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             for (VLRoomSeatModel seatModel : seatModels) {
                 VLRoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getSeatIndex());
                 if (oSeatModel == null
-                        || oSeatModel.isSelfMuted() != seatModel.isSelfMuted()
+                        || oSeatModel.isAudioMuted() != seatModel.isAudioMuted()
                         || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()) {
                     mRoomSpeakerAdapter.dataList.set(seatModel.getSeatIndex(), seatModel);
                     mRoomSpeakerAdapter.notifyItemChanged(seatModel.getSeatIndex());
@@ -427,7 +430,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (mChorusSongDialog == null) {
             mChorusSongDialog = new SongDialog();
             mChorusSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
-            showLoadingDialog(true);
+            showLoadingView();
             LiveDataUtils.observerThenRemove(this,
                     roomLivingViewModel.getSongTypes(), typeMap -> {
 
@@ -438,7 +441,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 chooseSongListener.getSongTypeTitles(this),
                                 0);
                         mChorusSongDialog.setChooseSongListener(chooseSongListener);
-                        showLoadingDialog(false);
+                        hideLoadingView();
                         showChorusSongDialog();
                     });
             return;
@@ -451,7 +454,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (mChooseSongDialog == null) {
             mChooseSongDialog = new SongDialog();
             mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
-            showLoadingDialog(true);
+            showLoadingView();
             LiveDataUtils.observerThenRemove(this,
                     roomLivingViewModel.getSongTypes(), typeMap -> {
 
@@ -462,7 +465,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 chooseSongListener.getSongTypeTitles(this),
                                 0);
                         mChooseSongDialog.setChooseSongListener(chooseSongListener);
-                        showLoadingDialog(false);
+                        hideLoadingView();
                         showChooseSongDialog();
                     });
             return;
@@ -590,18 +593,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             });
         }
         creatorExitDialog.show();
-    }
-
-    private void showLoadingDialog(boolean show) {
-        if (mLoadingDialog == null) {
-            mLoadingDialog = new ProgressDialog(this);
-            mLoadingDialog.setMessage(getString(R.string.loading));
-        }
-        if (show) {
-            mLoadingDialog.show();
-        } else {
-            mLoadingDialog.dismiss();
-        }
     }
 
     @Override

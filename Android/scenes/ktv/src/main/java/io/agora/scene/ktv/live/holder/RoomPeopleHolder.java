@@ -50,7 +50,7 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
             mBinding.tvRoomOwner.setVisibility(View.VISIBLE);
         }
         mBinding.tvUserName.setText(member.getName());
-        if (member.isSelfMuted() == 1) {
+        if (member.isAudioMuted() == 1) {
             mBinding.ivMute.setVisibility(View.VISIBLE);
         } else {
             mBinding.ivMute.setVisibility(View.GONE);

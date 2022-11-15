@@ -423,7 +423,7 @@ public class RoomLivingViewModel extends ViewModel {
                         // success
                         role = Role.Listener;
                         mRtcEngine.setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
-                        if (seatModel.isSelfMuted() == 1) {
+                        if (seatModel.isAudioMuted() == 1) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
                                 toggleMic(0);
                             }
@@ -617,7 +617,7 @@ public class RoomLivingViewModel extends ViewModel {
         // 从RTC中搜索歌曲
         MutableLiveData<List<VLRoomSelSongModel>> liveData = new MutableLiveData<>();
 
-        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 1, 100);
+        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 100);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
@@ -1177,7 +1177,7 @@ public class RoomLivingViewModel extends ViewModel {
         mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
-                if (seatLocalLiveData.getValue().isSelfMuted() == 1) {
+                if (seatLocalLiveData.getValue().isAudioMuted() == 1) {
                     isOpnEar = isEar;
                     return;
                 }
@@ -1278,7 +1278,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void setMicVolume(int v) {
-        if (seatLocalLiveData.getValue().isSelfMuted() == 1) {
+        if (seatLocalLiveData.getValue().isAudioMuted() == 1) {
             micOldVolume = v;
             return;
         }
