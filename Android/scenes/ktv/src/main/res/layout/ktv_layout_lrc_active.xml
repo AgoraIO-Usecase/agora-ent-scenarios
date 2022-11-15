@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:theme="@style/Theme.MaterialComponents.Light"
+    tools:layout_height="230dp"
     tools:background="@mipmap/bg_player_default">
 
-    <io.agora.lrcview.PitchView
+    <io.agora.lyrics_view.PitchView
         android:id="@+id/pitchView"
         android:layout_width="0dp"
         android:layout_height="70dp"
@@ -16,10 +18,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:pitchDoneTextColor="@color/white"
-        app:pitchInitialScore="0"
-        app:pitchNormalTextColor="@color/grey_d8" />
+        app:pitchInitialScore="0"/>
 
-    <io.agora.lrcview.LrcView
+    <io.agora.lyrics_view.LrcView
         android:id="@+id/lrcView"
         android:layout_width="match_parent"
         android:layout_height="0dp"

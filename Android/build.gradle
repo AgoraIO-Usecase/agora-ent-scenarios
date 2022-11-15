@@ -1,6 +1,6 @@
 apply from: 'config.gradle'
 buildscript {
-    ext.kotlin_version = "1.5.31"
+    ext.kotlin_version = "1.6.0"
     repositories {
 
         maven { url 'https://maven.aliyun.com/repository/central' }

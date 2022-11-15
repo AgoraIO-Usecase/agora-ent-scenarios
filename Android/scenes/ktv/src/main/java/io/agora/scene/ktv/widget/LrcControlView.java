@@ -15,8 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 
-import io.agora.lrcview.LrcView;
-import io.agora.lrcview.PitchView;
+import io.agora.lyrics_view.LrcView;
+import io.agora.lyrics_view.PitchView;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -99,11 +99,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setOnLrcClickListener(OnLrcActionListener mOnLrcActionListener) {
         this.mOnLrcActionListener = mOnLrcActionListener;
-        mBinding.ilActive.lrcView.setActionListener(this.mOnLrcActionListener);
+        mBinding.ilActive.lrcView.setSeekListener(mOnLrcActionListener);
     }
 
-    public void setPitchViewOnActionListener(PitchView.OnActionListener onActionListener) {
-        mBinding.ilActive.pitchView.onActionListener = onActionListener;
+    public void setPitchViewOnActionListener(PitchView.OnSingScoreListener onActionListener) {
+        mBinding.ilActive.pitchView.setSingScoreListener(onActionListener);
     }
 
     private CountDownTimer mCountDownLatch;
@@ -332,7 +332,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.switchOriginal.setChecked(checked);
     }
 
-    public interface OnLrcActionListener extends LrcView.OnActionListener {
+    public interface OnLrcActionListener extends LrcView.OnLyricsSeekListener {
         default void onSwitchOriginalClick() {
         }
 
