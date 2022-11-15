@@ -44,7 +44,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        return
         configCustomNaviBar()
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
