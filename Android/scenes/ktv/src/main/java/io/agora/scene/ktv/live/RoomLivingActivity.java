@@ -25,6 +25,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.manager.UserManager;
+import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
@@ -290,7 +291,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             Log.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
             if (UserManager.getInstance().getUser().userNo.equals(userNo)) {
                 Log.d("cwtsw", "计算得分");
-                int score = (int) getBinding().lrcControlView.getPitchView().getAverageScore();
+                int score = (int) getBinding().lrcControlView.getPitchView().totalScore;
                 getBinding().tvResultScore.setText(String.valueOf(score));
                 if (score >= 90) {
                     getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
@@ -425,14 +426,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void showChorusSongDialog() {
         if (mChorusSongDialog == null) {
             mChorusSongDialog = new SongDialog();
-            mChorusSongDialog.setChosenControllable(true);
-            SongActionListenerImpl chooseSongListener =
-                    new SongActionListenerImpl(this,
-                            roomLivingViewModel, true);
-            mChorusSongDialog.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    0);
-            mChorusSongDialog.setChooseSongListener(chooseSongListener);
+            mChorusSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
+            showLoadingDialog(true);
+            LiveDataUtils.observerThenRemove(this,
+                    roomLivingViewModel.getSongTypes(), typeMap -> {
+
+                        SongActionListenerImpl chooseSongListener =
+                                new SongActionListenerImpl(this,
+                                        roomLivingViewModel, typeMap, true);
+                        mChorusSongDialog.setChooseSongTabsTitle(
+                                chooseSongListener.getSongTypeTitles(this),
+                                0);
+                        mChorusSongDialog.setChooseSongListener(chooseSongListener);
+                        showLoadingDialog(false);
+                        showChorusSongDialog();
+                    });
+            return;
         }
         roomLivingViewModel.getSongChosenList();
         mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
@@ -441,14 +450,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private void showChooseSongDialog() {
         if (mChooseSongDialog == null) {
             mChooseSongDialog = new SongDialog();
-            mChooseSongDialog.setChosenControllable(true);
-            SongActionListenerImpl chooseSongListener =
-                    new SongActionListenerImpl(this,
-                            roomLivingViewModel, false);
-            mChooseSongDialog.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    0);
-            mChooseSongDialog.setChooseSongListener(chooseSongListener);
+            mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
+            showLoadingDialog(true);
+            LiveDataUtils.observerThenRemove(this,
+                    roomLivingViewModel.getSongTypes(), typeMap -> {
+
+                        SongActionListenerImpl chooseSongListener =
+                                new SongActionListenerImpl(this,
+                                        roomLivingViewModel, typeMap,false);
+                        mChooseSongDialog.setChooseSongTabsTitle(
+                                chooseSongListener.getSongTypeTitles(this),
+                                0);
+                        mChooseSongDialog.setChooseSongListener(chooseSongListener);
+                        showLoadingDialog(false);
+                        showChooseSongDialog();
+                    });
+            return;
         }
         roomLivingViewModel.getSongChosenList();
         mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
