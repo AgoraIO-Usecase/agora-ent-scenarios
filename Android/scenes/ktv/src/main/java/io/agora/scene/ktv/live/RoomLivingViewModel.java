@@ -141,6 +141,10 @@ public class RoomLivingViewModel extends ViewModel {
      */
     private RtcEngineEx mRtcEngine;
     /**
+     * 主版本的音频设置
+     */
+    private final ChannelMediaOptions mainChannelMediaOption = new ChannelMediaOptions();
+    /**
      * 歌曲内容中心
      */
     public IAgoraMusicContentCenter iAgoraMusicContentCenter;
@@ -399,15 +403,14 @@ public class RoomLivingViewModel extends ViewModel {
                     // success
                     role = Role.Speaker;
                     if (mRtcEngine != null) {
-                        ChannelMediaOptions options = new ChannelMediaOptions();
-                        options.publishCameraTrack = false;
-                        options.publishMicrophoneTrack = true;
-                        options.publishCustomAudioTrack = false;
-                        options.enableAudioRecordingOrPlayout = true;
-                        options.autoSubscribeVideo = false;
-                        options.autoSubscribeAudio = true;
-                        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                        mRtcEngine.updateChannelMediaOptions(options);
+                        mainChannelMediaOption.publishCameraTrack = false;
+                        mainChannelMediaOption.publishMicrophoneTrack = true;
+                        mainChannelMediaOption.publishCustomAudioTrack = false;
+                        mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                        mainChannelMediaOption.autoSubscribeVideo = true;
+                        mainChannelMediaOption.autoSubscribeAudio = true;
+                        mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                     }
                 } else {
                     // failure
@@ -435,17 +438,16 @@ public class RoomLivingViewModel extends ViewModel {
                         // success
                         role = Role.Listener;
                         if (mRtcEngine != null) {
-                            ChannelMediaOptions options = new ChannelMediaOptions();
-                            options.publishCameraTrack = false;
-                            options.publishMicrophoneTrack = true;
-                            options.publishCustomAudioTrack = false;
-                            options.enableAudioRecordingOrPlayout = true;
-                            options.autoSubscribeVideo = false;
-                            options.autoSubscribeAudio = true;
-                            options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-                            mRtcEngine.updateChannelMediaOptions(options);
+                            mainChannelMediaOption.publishCameraTrack = false;
+                            mainChannelMediaOption.publishMicrophoneTrack = true;
+                            mainChannelMediaOption.publishCustomAudioTrack = false;
+                            mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                            mainChannelMediaOption.autoSubscribeVideo = true;
+                            mainChannelMediaOption.autoSubscribeAudio = true;
+                            mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+                            mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                         }
-                        if (seatModel.isAudioMuted() == 1) {
+                        if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
                                 musicUpdateMic(false);
                             }
@@ -463,6 +465,7 @@ public class RoomLivingViewModel extends ViewModel {
             if (e == null) {
                 // success
                 mRtcEngine.enableLocalVideo(isOpen);
+                musicUpdateCamera(isOpen);
             } else {
                 // failure
                 ToastUtils.showToast(e.getMessage());
@@ -488,8 +491,13 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
-    private void musicUpdateMic(boolean isUnMute) {
-        if (!isUnMute) {
+    private void musicUpdateCamera(boolean isOpen){
+        mainChannelMediaOption.publishCameraTrack = isOpen;
+        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+    }
+
+    private void musicUpdateMic(boolean isOpen) {
+        if (!isOpen) {
             if (mSetting.isEar()) {
                 isOpnEar = true;
                 mSetting.setEar(false);
@@ -499,11 +507,10 @@ public class RoomLivingViewModel extends ViewModel {
         } else {
             mSetting.setEar(isOpnEar);
         }
-        ChannelMediaOptions options = new ChannelMediaOptions();
-        options.publishMicrophoneTrack = isUnMute;
-        mRtcEngine.updateChannelMediaOptions(options);
+        mainChannelMediaOption.publishMicrophoneTrack = isOpen;
+        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         if (mPlayer != null) {
-            if (isUnMute) {
+            if (isOpen) {
                 setOldMicVolume();
             } else {
                 resetVolume();
@@ -1038,6 +1045,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         // --------- 加入频道 -----------
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        mRtcEngine.enableVideo();
         mRtcEngine.enableAudio();
         mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO);
         mRtcEngine.enableAudioVolumeIndication(30, 10, true);
@@ -1340,7 +1348,7 @@ public class RoomLivingViewModel extends ViewModel {
                 options.publishCustomAudioTrack = false;
                 options.enableAudioRecordingOrPlayout = false;
                 options.publishMicrophoneTrack = false;
-                options.autoSubscribeVideo = false;
+                options.autoSubscribeVideo = true;
                 options.autoSubscribeAudio = false;
                 options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                 options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
@@ -1365,17 +1373,16 @@ public class RoomLivingViewModel extends ViewModel {
             // 独唱状态
             if (isOwnSong) {
                 // 点歌者(演唱者)同时推人声、播放器混流, 停止订阅远端音频流
-                ChannelMediaOptions options = new ChannelMediaOptions();
-                options.publishCameraTrack = false;
-                options.publishMicrophoneTrack = true;
-                options.publishCustomAudioTrack = false;
-                options.enableAudioRecordingOrPlayout = true;
-                options.autoSubscribeAudio = false;
-                options.autoSubscribeVideo = false;
-                options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
-                options.publishMediaPlayerAudioTrack = true;
-                mRtcEngine.updateChannelMediaOptions(options);
+                mainChannelMediaOption.publishCameraTrack = false;
+                mainChannelMediaOption.publishMicrophoneTrack = true;
+                mainChannelMediaOption.publishCustomAudioTrack = false;
+                mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                mainChannelMediaOption.autoSubscribeAudio = false;
+                mainChannelMediaOption.autoSubscribeVideo = true;
+                mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
+                mainChannelMediaOption.publishMediaPlayerAudioTrack = true;
+                mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
             }
         }
 
@@ -1476,25 +1483,23 @@ public class RoomLivingViewModel extends ViewModel {
             mAudioTrackIndex = 1;
         }
         if (role == Role.Owner || role == Role.Speaker) {
-            ChannelMediaOptions options = new ChannelMediaOptions();
-            options.publishMicrophoneTrack = true;
-            options.publishCameraTrack = false;
-            options.publishCustomAudioTrack = false;
-            options.enableAudioRecordingOrPlayout = true;
-            options.autoSubscribeVideo = false;
-            options.autoSubscribeAudio = true;
-            options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-            mRtcEngine.updateChannelMediaOptions(options);
+            mainChannelMediaOption.publishMicrophoneTrack = true;
+            mainChannelMediaOption.publishCameraTrack = false;
+            mainChannelMediaOption.publishCustomAudioTrack = false;
+            mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+            mainChannelMediaOption.autoSubscribeVideo = true;
+            mainChannelMediaOption.autoSubscribeAudio = true;
+            mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+            mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         } else {
-            ChannelMediaOptions options = new ChannelMediaOptions();
-            options.publishCameraTrack = false;
-            options.publishMicrophoneTrack = false;
-            options.publishCustomAudioTrack = false;
-            options.enableAudioRecordingOrPlayout = true;
-            options.autoSubscribeVideo = false;
-            options.autoSubscribeAudio = true;
-            options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-            mRtcEngine.updateChannelMediaOptions(options);
+            mainChannelMediaOption.publishCameraTrack = false;
+            mainChannelMediaOption.publishMicrophoneTrack = false;
+            mainChannelMediaOption.publishCustomAudioTrack = false;
+            mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+            mainChannelMediaOption.autoSubscribeVideo = true;
+            mainChannelMediaOption.autoSubscribeAudio = true;
+            mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+            mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         }
     }
 

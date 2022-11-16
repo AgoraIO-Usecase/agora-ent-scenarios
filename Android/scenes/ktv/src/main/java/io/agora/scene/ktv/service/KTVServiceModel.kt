@@ -46,7 +46,13 @@ data class RoomSeatModel(
     val joinSing: Boolean,// 是否合唱
     val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
-) : java.io.Serializable
+) : java.io.Serializable {
+
+    companion object{
+        val MUTED_VALUE_TRUE = 1
+        val MUTED_VALUE_FALSE = 0
+    }
+}
 
 
 data class CreateRoomInputModel(
