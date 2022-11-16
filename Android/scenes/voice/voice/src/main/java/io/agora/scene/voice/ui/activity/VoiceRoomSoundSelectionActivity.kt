@@ -18,10 +18,8 @@ import io.agora.voice.baseui.utils.StatusBarCompat
 import io.agora.voice.buddy.config.RouterParams
 import io.agora.scene.voice.bean.SoundSelectionBean
 import io.agora.scene.voice.service.VoiceRoomModel
-import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
-import io.agora.voice.buddy.config.RouterPath
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
 import io.agora.scene.voice.model.VoiceRoomViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
@@ -43,6 +41,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     private var encryption: String = ""
     private var roomType = 0
     private var soundEffect = ConfigConstants.SoundSelection.Social_Chat
+    private var curVoiceRoomModel: VoiceRoomModel? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivitySoundSelectionLayoutBinding {
         return VoiceActivitySoundSelectionLayoutBinding.inflate(inflater)
@@ -100,19 +99,28 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.createRoomObservable()
-            .observe(this) { response: Resource<VoiceRoomModel> ->
-                parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
-                    override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
-                        val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUsername()
-                        val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                        "Voice create room chat_username:$chatUsername".logD()
-                        "Voice create room im_token:$chatToken".logD()
+        voiceRoomViewModel.createRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
+                    curVoiceRoomModel = voiceRoomModel
+                    voiceRoomModel?.let {
+                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                    }
+                }
+            })
+        }
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean?>() {
+                override fun onSuccess(result: Boolean?) {
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
+                    "Voice create room chat_username:$chatUsername".logD()
+                    "Voice create room im_token:$chatToken".logD()
+                    if (!ChatroomHelper.getInstance().isLoggedIn) {
                         ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
                             override fun onSuccess() {
-                                // todo 设置kv
                                 ThreadManager.getInstance().runOnMainThread {
-                                    joinRoom(voiceRoomModel)
+                                    goVoiceRoom()
                                 }
                             }
 
@@ -121,12 +129,16 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                                     binding.bottomGoLive.isEnabled = true
                                     dismissLoading()
                                 }
-
                             }
                         })
+                    } else {
+                        ThreadManager.getInstance().runOnMainThread {
+                            goVoiceRoom()
+                        }
                     }
-                })
-            }
+                }
+            })
+        }
     }
 
     private fun createNormalRoom(sound_effect: Int) {
@@ -155,20 +167,17 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         }
     }
 
-    fun joinRoom(voiceRoomModel: VoiceRoomModel?) {
-        dismissLoading()
-        // TODO:  zhangwei
-        ToastTools.show(this,"TODO 房间详情")
-//        ARouter.getInstance()
-//            .build(RouterPath.ChatroomPath)
-//            .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, voiceRoomModel)
-//            .navigation()
-//        val intent = Intent(this, ChatroomLiveActivity::class.java).apply {
-//            putExtra(RouterParams.KEY_VOICE_ROOM_MODEL, voiceRoomModel)
-//        }
-//        startActivity(intent)
-//        finishCreateActivity()
-//        finish()
+    private fun goVoiceRoom() {
+        curVoiceRoomModel?.let {
+            dismissLoading()
+            val intent = Intent(this, ChatroomLiveActivity::class.java).apply {
+                putExtra(RouterParams.KEY_VOICE_ROOM_MODEL, it)
+            }
+            startActivity(intent)
+            // todo 优化
+            finishCreateActivity()
+            finish()
+        }
     }
 
     /**
@@ -182,7 +191,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             return
         }
         for (activity in activities) {
-            if (activity !== lifecycleCallbacks.current() && activity is ChatroomCreateActivity) {
+            if (activity !== lifecycleCallbacks.current() && activity is VoiceRoomCreateActivity) {
                 activity.finish()
             }
         }

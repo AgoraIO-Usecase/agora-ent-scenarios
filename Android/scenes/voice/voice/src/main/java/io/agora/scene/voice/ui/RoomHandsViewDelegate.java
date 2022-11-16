@@ -8,12 +8,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import java.util.Map;
 
+import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.scene.voice.ui.common.CommonSheetAlertDialog;
 import io.agora.scene.voice.ui.fragment.ChatroomHandsDialog;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.general.net.ChatroomHttpManager;
-import io.agora.scene.voice.general.repositories.ProfileManager;
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView;
 import io.agora.voice.network.tools.VRValueCallBack;
 
@@ -38,11 +38,11 @@ public class RoomHandsViewDelegate {
         this.roomId = roomId;
         this.owner = owner;
         Log.e("onRoomDetails", "owner: " + owner);
-        Log.e("onRoomDetails", "getUid: " + ProfileManager.getInstance().getProfile().getUid());
+        Log.e("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
     }
 
     public boolean isOwner() {
-        return ProfileManager.getInstance().getProfile().getUid().equals(owner);
+        return VoiceBuddyFactory.get().getVoiceBuddy().equals(owner);
     }
 
     public void showOwnerHandsDialog() {

@@ -7,31 +7,46 @@ import android.app.Application
  */
 interface IVoiceBuddy {
 
+    /** app */
     fun application(): Application
 
+    /** api url */
     fun toolboxServiceUrl(): String
 
+    /** user avatar */
     fun headUrl(): String
 
-    fun userName(): String
+    /** user nickname */
+    fun nickName(): String
 
+    /** user id */
     fun userId(): String
 
+    /** user token */
     fun userToken(): String
 
+    /** rtc user id */
     fun rtcUid(): Int
 
+    /** rtc app id*/
     fun rtcAppId(): String
 
+    /** rtc app certificate*/
     fun rtcAppCert(): String
 
+    /** rtc channel token */
     fun rtcToken(): String
 
+    /** im app key */
     fun chatAppKey(): String
 
+    /** im user login token */
     fun chatToken(): String
 
-    fun chatUsername(): String
+    /** im user id */
+    fun chatUid(): String
 
-    fun setupChatConfig(chatUsername: String, chatToken: String, rtcToken: String)
+    fun setupRtcToken(rtcToken: String)
+
+    fun setupChatConfig(chatUid: String, chatToken: String)
 }

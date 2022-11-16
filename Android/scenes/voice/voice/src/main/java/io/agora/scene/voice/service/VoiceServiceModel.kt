@@ -9,7 +9,7 @@ open class VoiceChatBaseModel(
     var objectId: String? = null //  // SyncManager独有，用来更新和删除数据
 )
 
-data class VoiceCreateRoomModel(
+data class VoiceCreateRoomModel constructor(
     val roomName: String,
     val isPrivate: Boolean,
     val password: String,
@@ -17,16 +17,16 @@ data class VoiceCreateRoomModel(
     val roomType: Int = 0,
 ) : BaseRoomBean
 
-data class VoiceMemberModel(
+data class VoiceMemberModel constructor(
     var uid: String? = null,
     var chatUid: String? = null,
-    var name: String? = null,
+    var nickName: String? = null,
     var portrait: String? = null,
     var rtcUid: Int = 0,
     var micIndex: Int = 0,
 ) : BaseRoomBean
 
-data class VoiceRankUserModel(
+data class VoiceRankUserModel constructor(
     val name: String? = null,
     val portrait: String = "",
     val amount: Int = 0
@@ -36,7 +36,7 @@ data class VoiceRoomModel constructor(
     var owner: VoiceMemberModel? = null,
     var roomId: String = "",
     var isPrivate: Boolean = false,
-    var clickCount: Int = 0,
+    var memberCount: Int = 0,
     var roomType: Int = 0,
     var roomName: String = "",
     var soundEffect: Int = 0,

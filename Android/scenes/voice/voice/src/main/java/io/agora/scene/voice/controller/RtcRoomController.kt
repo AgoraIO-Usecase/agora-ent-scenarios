@@ -74,7 +74,7 @@ class RtcRoomController : IRtcKitListener {
         broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
     ) {
-        rtcManger = RtcKitManager.initRTC(context, RtcInitConfig(BuildConfig.agora_app_id), this)
+        rtcManger = RtcKitManager.initRTC(context, RtcInitConfig(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()), this)
         rtcChannelConfig.roomId = roomId
         rtcChannelConfig.userId = userId
         rtcChannelConfig.broadcaster = broadcaster

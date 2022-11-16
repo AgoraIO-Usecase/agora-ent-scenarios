@@ -12,12 +12,12 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 import org.jetbrains.annotations.NotNull;
 
 import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.voice.imkit.bean.ChatMessageData;
 import io.agora.voice.imkit.custormgift.CustomMsgHelper;
 import io.agora.voice.imkit.custormgift.OnMsgCallBack;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.general.net.ChatroomHttpManager;
-import io.agora.scene.voice.general.repositories.ProfileManager;
 import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
 import io.agora.scene.voice.ui.widget.gift.OnSendClickListener;
@@ -48,7 +48,7 @@ public class RoomGiftViewDelegate {
       this.roomId = roomId;
       this.owner = owner;
       Log.e("onRoomDetails","owner: " + owner);
-      Log.e("onRoomDetails","getUid: " + ProfileManager.getInstance().getProfile().getUid());
+      Log.e("onRoomDetails","getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
    }
 
 
@@ -70,8 +70,8 @@ public class RoomGiftViewDelegate {
                           public void onSuccess(Boolean var1) {
                              Log.e("sendGift","Successfully reported");
                              CustomMsgHelper.getInstance().sendGiftMsg(
-                                     ProfileManager.getInstance().getProfile().getName(),
-                                     ProfileManager.getInstance().getProfile().getPortrait(),
+                                     VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+                                     VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
                                      giftBean.getId(), giftBean.getNum(),giftBean.getPrice(),giftBean.getName(),
                                      new OnMsgCallBack() {
                                         @Override

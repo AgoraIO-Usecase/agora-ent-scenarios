@@ -6,6 +6,8 @@ import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.scene.voice.bean.RoomRankUserBean
 import io.agora.scene.voice.bean.RoomUserInfoBean
+import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.network.tools.bean.*
@@ -14,6 +16,17 @@ import io.agora.voice.network.tools.bean.*
  * @author create by zhangwei03
  */
 object RoomInfoConstructor {
+
+    /** VoiceRoomModel convert RoomKitBean*/
+    fun RoomKitBean.convertByVoiceRoomModel(voiceRoomModel: VoiceRoomModel) {
+        roomId = voiceRoomModel.roomId
+        chatroomId = voiceRoomModel.chatroomId
+        channelId = voiceRoomModel.channelId
+        ownerId = voiceRoomModel.owner?.uid ?: ""
+        roomType = voiceRoomModel.roomType
+        isOwner = curUserIsHost(voiceRoomModel.owner?.uid)
+        soundEffect = voiceRoomModel.soundEffect
+    }
 
     fun RoomKitBean.convertByRoomInfo(roomInfo: VRoomBean.RoomsBean) {
         roomId = roomInfo.room_id ?: ""
@@ -35,8 +48,9 @@ object RoomInfoConstructor {
         soundEffect = roomDetails.soundSelection
     }
 
+    /** Check if you are a host */
     private fun curUserIsHost(ownerId: String?): Boolean {
-        return TextUtils.equals(ownerId, io.agora.scene.voice.general.repositories.ProfileManager.getInstance().profile.uid)
+        return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
     }
 
     /**
@@ -49,7 +63,7 @@ object RoomInfoConstructor {
             owner = serverUser2UiUser(roomDetail.owner)
             memberCount = roomDetail.member_count
             // 普通观众 memberCount +1
-            if (owner?.rtcUid != io.agora.scene.voice.general.repositories.ProfileManager.getInstance().rtcUid()) {
+            if (owner?.rtcUid != VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                 memberCount += 1
             }
             giftCount = roomDetail.gift_amount
