@@ -21,7 +21,7 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.manager.RoomManager;
-import io.agora.scene.ktv.service.VLRoomSelSongModel;
+import io.agora.scene.ktv.service.RoomSelSongModel;
 
 /**
  * 歌词控制View
@@ -274,7 +274,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         }
     }
 
-    public void setMusic(@NonNull VLRoomSelSongModel mMusic) {
+    public void setMusic(@NonNull RoomSelSongModel mMusic) {
         mBinding.ilActive.lrcView.reset();
         mBinding.ilActive.pitchView.setLrcData(null);
 
