@@ -53,7 +53,7 @@ class AgoraChatRoomHeaderView: UIView {
             self.giftBtn.snp.updateConstraints { make in
                 make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
             }
-            self.soundSetLabel.text = entity.sound_effect?.localized()
+            self.soundSetLabel.text = getSoundType(with: entity.sound_effect)
             updateGiftList()
         }
     }
@@ -124,7 +124,7 @@ class AgoraChatRoomHeaderView: UIView {
         let soundSetView = UIView()
         addSubview(soundSetView)
 
-        soundSetLabel.text = entity.sound_effect ?? LanguageManager.localValue(key: "Social Chat")
+        soundSetLabel.text = getSoundType(with: entity.sound_effect)
         soundSetLabel.textColor = .white
         soundSetLabel.font = UIFont.systemFont(ofSize: 10)
         addSubview(soundSetLabel)
@@ -379,5 +379,22 @@ class AgoraChatRoomHeaderView: UIView {
             rankSBtn.isHidden = true
             rankTBtn.isHidden = true
         }
+    }
+    
+    private func getSoundType(with index: Int) -> String {
+        var soundType: String = "Social Chat".localized()
+        switch index {
+        case 0:
+            soundType = "Social Chat".localized()
+        case 1:
+            soundType = "Karaoke".localized()
+        case 2:
+            soundType = "Gaming Buddy".localized()
+        case 3:
+            soundType = "Professional podcaster".localized()
+        default:
+            soundType = "Social Chat".localized()
+        }
+        return soundType
     }
 }
