@@ -446,7 +446,7 @@ public final class RoomManager {
         singers.clear();
     }
 
-    //同步用户状态
+    // 同步用户状态
     public void memberEventUpData(AgoraMember memberRemote) {
         AgoraMember memberLocal = memberHashMap.get(memberRemote.userNo);
         if (memberLocal != null && memberLocal.role != memberRemote.role) {
