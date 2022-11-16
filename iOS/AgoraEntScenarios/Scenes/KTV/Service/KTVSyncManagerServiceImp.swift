@@ -402,11 +402,11 @@ private func _hideLoadingIfNeed() {
         }
 
         // mark input song to top
-        song.pinAt = Date().timeIntervalSince1970
+        song.pinAt = Date().timeIntervalSince1970 * 1000
 
         //if top song is playing status, keep it always on top(_sortChooseSongList)
         if topSong.objectId != song.objectId, topSong.status != 2 {
-            topSong.pinAt = Date().timeIntervalSince1970
+            topSong.pinAt = Date().timeIntervalSince1970 * 1000
             _updateChooseSong(songInfo: topSong) { error in
             }
         }
@@ -669,7 +669,7 @@ extension KTVSyncManagerServiceImp {
         if roomPeopleNum == roomInfo.roomPeopleNum {
             return
         }
-        roomInfo.updatedAt = "\(Date().timeIntervalSince1970)"
+        roomInfo.updatedAt = "\(Date().timeIntervalSince1970 * 1000)"
         roomInfo.roomPeopleNum = roomPeopleNum
         var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
 //        SyncUtil
@@ -1015,7 +1015,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         agoraPrint("imp song add...")
-        songInfo.createAt = Date().timeIntervalSince1970
+        songInfo.createAt = Date().timeIntervalSince1970 * 1000
         let params = songInfo.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
