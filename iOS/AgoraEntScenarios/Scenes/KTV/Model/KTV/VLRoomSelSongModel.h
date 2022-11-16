@@ -22,9 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 ///歌词
 //@property (nonatomic, copy) NSString *lyric;
 ///创建时间
-@property (nonatomic, assign) NSTimeInterval createAt;
+@property (nonatomic, assign) int64_t createAt;
 //置顶时间
-@property (nonatomic, assign) NSTimeInterval pinAt;
+@property (nonatomic, assign) int64_t pinAt;
 
 ///0 未开始 1.已唱 2.正在唱
 @property (nonatomic, assign) NSInteger status;
