@@ -567,9 +567,6 @@ class KTVSyncManagerServiceImp(
         }
 
         val targetSong = songChosenList[0]
-        if (TextUtils.isEmpty(targetSong.chorusNo)) {
-            return
-        }
         songChosenList.remove(targetSong)
         val newSong = VLRoomSelSongModel(
             targetSong.songName,
@@ -577,7 +574,7 @@ class KTVSyncManagerServiceImp(
             targetSong.singer,
             targetSong.imageUrl,
 
-            isChorus = targetSong.isChorus,
+            isChorus = false,
             userNo = targetSong.userNo,
             userId = targetSong.userId,
             name = targetSong.name,

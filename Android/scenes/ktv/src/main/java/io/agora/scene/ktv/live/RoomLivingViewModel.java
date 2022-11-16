@@ -358,9 +358,6 @@ public class RoomLivingViewModel extends ViewModel {
                     // 合唱相关逻辑
                     if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getChorusNo())) {
                         //我是合唱
-//                        RoomManager.getInstance().mMusicModel.isChorus = false;
-//                        RoomManager.getInstance().mMusicModel.userId = "";
-//                        RoomManager.getInstance().mMusicModel.setType(MemberMusicModel.SingType.Single);
                         getSongChosenList();
                     } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getUserNo())) {
                         //推送切歌逻辑
@@ -398,8 +395,17 @@ public class RoomLivingViewModel extends ViewModel {
                 if (e == null) {
                     // success
                     role = Role.Speaker;
-                    mRtcEngine.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
-
+                    if (mRtcEngine != null) {
+                        ChannelMediaOptions options = new ChannelMediaOptions();
+                        options.publishCameraTrack = false;
+                        options.publishMicrophoneTrack = true;
+                        options.publishCustomAudioTrack = false;
+                        options.enableAudioRecordingOrPlayout = true;
+                        options.autoSubscribeVideo = false;
+                        options.autoSubscribeAudio = true;
+                        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                        mRtcEngine.updateChannelMediaOptions(options);
+                    }
                 } else {
                     // failure
                     ToastUtils.showToast(e.getMessage());
@@ -425,7 +431,17 @@ public class RoomLivingViewModel extends ViewModel {
                     if (e == null) {
                         // success
                         role = Role.Listener;
-                        mRtcEngine.setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
+                        if (mRtcEngine != null) {
+                            ChannelMediaOptions options = new ChannelMediaOptions();
+                            options.publishCameraTrack = false;
+                            options.publishMicrophoneTrack = true;
+                            options.publishCustomAudioTrack = false;
+                            options.enableAudioRecordingOrPlayout = true;
+                            options.autoSubscribeVideo = false;
+                            options.autoSubscribeAudio = true;
+                            options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+                            mRtcEngine.updateChannelMediaOptions(options);
+                        }
                         if (seatModel.isAudioMuted() == 1) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
                                 toggleMic(0);
@@ -758,8 +774,22 @@ public class RoomLivingViewModel extends ViewModel {
                 if(data.size() > 0){
                     VLRoomSelSongModel value = songPlayingLiveData.getValue();
                     VLRoomSelSongModel songPlaying = data.get(0);
-                    if(value == null || !value.getSongNo().equals(songPlaying.getSongNo()) || songPlaying.getChorusNo() != null){
+                    if (value == null) {
+                        // 列表为空
                         songPlayingLiveData.postValue(songPlaying);
+                    } else if (value.getChorusNo() != null) {
+                        // 合唱
+                        if (!value.getSongNo().equals(songPlaying.getSongNo()) || !value.getChorusNo().equals(songPlaying.getChorusNo())) {
+                            songPlayingLiveData.postValue(songPlaying);
+                        }
+                    } else if (value.isChorus() && !songPlaying.isChorus()) {
+                        // 取消合唱
+                            songPlayingLiveData.postValue(songPlaying);
+                    } else {
+                        // 独唱、首次点合唱
+                        if(!value.getSongNo().equals(songPlaying.getSongNo()) || songPlaying.getChorusNo() != null) {
+                            songPlayingLiveData.postValue(songPlaying);
+                        }
                     }
                 }else{
                     songPlayingLiveData.postValue(null);
@@ -791,20 +821,6 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvServiceProtocol.joinChorus(new KTVJoinChorusInputModel(musicModel.getSongNo()), e -> {
             if (e == null) {
-                songPlayingLiveData.postValue(new VLRoomSelSongModel(
-                        musicModel.getSongName(),
-                        musicModel.getSongNo(),
-                        musicModel.getSinger(),
-
-                        musicModel.getImageUrl(),
-                        musicModel.getUserNo(),
-                        musicModel.getUserId(),
-                        musicModel.getName(),
-                        UserManager.getInstance().getUser().userNo,
-                        true,
-                        musicModel.isOriginal(),
-                        musicModel.getSort()
-                ));
                 // success
                 //mMusicPlayer.switchRole(Constants.CLIENT_ROLE_BROADCASTER);
             } else {
@@ -825,21 +841,6 @@ public class RoomLivingViewModel extends ViewModel {
         }
         //musicStartPlay(context, musicModel);
         ktvServiceProtocol.becomeSolo();
-
-        songPlayingLiveData.postValue(new VLRoomSelSongModel(
-                musicModel.getSongName(),
-                musicModel.getSongNo(),
-                musicModel.getSinger(),
-
-                musicModel.getImageUrl(),
-                musicModel.getUserNo(),
-                musicModel.getUserId(),
-                musicModel.getName(),
-                "",
-                false,
-                musicModel.isOriginal(),
-                musicModel.getSort()
-        ));
     }
 
     /**
@@ -852,7 +853,10 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         if (mPlayer != null) {
-            mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), Integer.parseInt(musicModel.getUserId()) * 10 + 1));
+            if (musicModel.isChorus()) {
+                mRtcEngine.muteAllRemoteAudioStreams(false);
+                mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), Integer.parseInt(musicModel.getUserId()) * 10 + 1));
+            }
             mPlayer.setAudioDualMonoMode(2);
             mPlayer.stop();
         }
@@ -1218,8 +1222,14 @@ public class RoomLivingViewModel extends ViewModel {
                 mPlayer.setAudioPitch(newToneValue);
             }
         });
+
+        // 初始化音量
+        mPlayer.adjustPlayoutVolume(40);
+        mPlayer.adjustPublishSignalVolume(40);
+        mRtcEngine.adjustRecordingSignalVolume(40);
     }
 
+    // ==================== settings =====================
     private int getEffectIndex(int index) {
         switch (index) {
             case 0:
@@ -1267,7 +1277,8 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void setMicVolume(int v) {
-        if (seatLocalLiveData.getValue().isAudioMuted() == 1) {
+        int isMuted = seatLocalLiveData.getValue().isAudioMuted();
+        if (isMuted == 1) {
             micOldVolume = v;
             return;
         }
@@ -1289,13 +1300,14 @@ public class RoomLivingViewModel extends ViewModel {
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
         if (isChorus) {
             //合唱
+            mRtcEngine.muteAllRemoteAudioStreams(false);
             if (music.getChorusNo() == null) {
                 // 没有合唱者加入时， 播放等待动画
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_WAIT_CHORUS);
                 return;
             } else if (isOwnSong) {
-                // 合唱者加入后，点歌者推mpk流
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHORUS_JOINED);
+                // 合唱者加入后，点歌者推mpk流
                 ChannelMediaOptions options = new ChannelMediaOptions();
                 options.publishCameraTrack = false;
                 options.publishCustomAudioTrack = false;
@@ -1324,21 +1336,18 @@ public class RoomLivingViewModel extends ViewModel {
             }
         } else {
             // 独唱状态
-            if (role == Role.Owner || role == Role.Speaker) {
-                // 点歌者同时推人声、播放器混流
+            if (isOwnSong) {
+                // 点歌者(演唱者)同时推人声、播放器混流, 停止订阅远端音频流
                 ChannelMediaOptions options = new ChannelMediaOptions();
                 options.publishCameraTrack = false;
+                options.publishMicrophoneTrack = true;
                 options.publishCustomAudioTrack = false;
-                options.enableAudioRecordingOrPlayout = false;
+                options.enableAudioRecordingOrPlayout = true;
+                options.autoSubscribeAudio = false;
                 options.autoSubscribeVideo = false;
-                if (isOwnSong) {
-                    options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                    options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
-                    options.publishMediaPlayerAudioTrack = true;
-                    options.autoSubscribeAudio = false;
-                } else {
-                    options.autoSubscribeAudio = true;
-                }
+                options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
+                options.publishMediaPlayerAudioTrack = true;
                 mRtcEngine.updateChannelMediaOptions(options);
             }
         }
@@ -1402,7 +1411,7 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         boolean needSendStatus = songPlayingLiveData.getValue().isChorus()
-                && songPlayingLiveData.getValue().getUserNo() == UserManager.getInstance().getUser().userNo;
+                && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo);
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
             if (needSendStatus) {
                 // 合唱时 发送状态
@@ -1419,6 +1428,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void musicStop() {
+        // 列表中无歌曲， 还原状态
         if (mPlayer != null) {
             mPlayer.stop();
             stopSyncLrc();
@@ -1426,6 +1436,27 @@ public class RoomLivingViewModel extends ViewModel {
             mRecvedPlayPosition = 0;
             mLastRecvPlayPosTime = null;
             mAudioTrackIndex = 1;
+        }
+        if (role == Role.Owner || role == Role.Speaker) {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishMicrophoneTrack = true;
+            options.publishCameraTrack = false;
+            options.publishCustomAudioTrack = false;
+            options.enableAudioRecordingOrPlayout = true;
+            options.autoSubscribeVideo = false;
+            options.autoSubscribeAudio = true;
+            options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+            mRtcEngine.updateChannelMediaOptions(options);
+        } else {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishCameraTrack = false;
+            options.publishMicrophoneTrack = false;
+            options.publishCustomAudioTrack = false;
+            options.enableAudioRecordingOrPlayout = true;
+            options.autoSubscribeVideo = false;
+            options.autoSubscribeAudio = true;
+            options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+            mRtcEngine.updateChannelMediaOptions(options);
         }
     }
 
@@ -1521,7 +1552,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void preloadMusic(boolean isOwnSong, boolean isChorus, @NonNull VLRoomSelSongModel music) {
-        if(isOwnSong || isChorus){
+        if (isOwnSong || isChorus){
             // 点歌者视角、合唱者视角
 
             // 加载歌曲
@@ -1533,7 +1564,7 @@ public class RoomLivingViewModel extends ViewModel {
                 int ret = mPlayer.open(Long.parseLong(music.getSongNo()), 0);
                 mpkNeedStopped = ret != 0;
             }
-        }else{
+        } else {
             // 听众视角
             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             startDisplayLrc();
