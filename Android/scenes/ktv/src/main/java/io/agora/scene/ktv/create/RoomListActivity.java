@@ -23,7 +23,7 @@ import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
 import io.agora.scene.ktv.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
-import io.agora.scene.ktv.service.VLRoomListModel;
+import io.agora.scene.ktv.service.RoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 
 /**
@@ -31,7 +31,7 @@ import io.agora.scene.widget.dialog.InputPasswordDialog;
  */
 @Route(path = PagePathConstant.pageRoomList)
 public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBinding> {
-    private BaseRecyclerViewAdapter<ItemRoomListBinding, VLRoomListModel, RoomHolder> mAdapter;
+    private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
     private InputPasswordDialog inputPasswordDialog;
 
@@ -55,9 +55,9 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
         roomCreateViewModel = new ViewModelProvider(this).get(RoomCreateViewModel.class);
-        mAdapter = new BaseRecyclerViewAdapter<>(null, new OnItemClickListener<VLRoomListModel>() {
+        mAdapter = new BaseRecyclerViewAdapter<>(null, new OnItemClickListener<RoomListModel>() {
             @Override
-            public void onItemClick(@NonNull VLRoomListModel data, View view, int position, long viewType) {
+            public void onItemClick(@NonNull RoomListModel data, View view, int position, long viewType) {
                 if (data.isPrivate()) {
                     showInputPwdDialog(data);
                 } else {
@@ -110,7 +110,7 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         });
     }
 
-    private void showInputPwdDialog(VLRoomListModel data) {
+    private void showInputPwdDialog(RoomListModel data) {
         if (inputPasswordDialog == null) {
             inputPasswordDialog = new InputPasswordDialog(this);
         }

@@ -14,7 +14,7 @@ import java.util.Map;
 
 import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
-import io.agora.scene.ktv.service.VLRoomSelSongModel;
+import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.widget.song.OnSongActionListener;
 import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.ktv.widget.song.SongItem;
@@ -74,7 +74,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
         // 点歌
-        VLRoomSelSongModel songModel = songItem.getTag(VLRoomSelSongModel.class);
+        RoomSelSongModel songModel = songItem.getTag(RoomSelSongModel.class);
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.chooseSong(songModel, isChorus),
                 success -> {
@@ -87,14 +87,14 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChosenSongDeleteClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
         // 删歌
-        VLRoomSelSongModel songModel = song.getTag(VLRoomSelSongModel.class);
+        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
         mViewModel.deleteSong(songModel);
     }
 
     @Override
     public void onChosenSongTopClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
         // 置顶
-        VLRoomSelSongModel songModel = song.getTag(VLRoomSelSongModel.class);
+        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
         mViewModel.topUpSong(songModel);
     }
 
@@ -117,10 +117,10 @@ public class SongActionListenerImpl implements OnSongActionListener {
         throw new RuntimeException("songsDialogGetSongType out of index: " + index);
     }
 
-    public static List<SongItem> transSongModel(@Nullable List<VLRoomSelSongModel> data) {
+    public static List<SongItem> transSongModel(@Nullable List<RoomSelSongModel> data) {
         ArrayList<SongItem> list = new ArrayList<>();
         if (data != null) {
-            for (VLRoomSelSongModel song : data) {
+            for (RoomSelSongModel song : data) {
                 SongItem item = new SongItem(
                         song.getSongNo(),
                         song.getSongName(),

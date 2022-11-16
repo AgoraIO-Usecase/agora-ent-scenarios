@@ -2,7 +2,7 @@ package io.agora.scene.ktv.service
 
 import io.agora.scene.base.R
 
-data class VLRoomListModel(
+data class RoomListModel(
     val roomNo: String = "",
     val name: String = "",
     val icon: String = "",
@@ -36,7 +36,7 @@ data class VLRoomListModel(
     }
 }
 
-data class VLRoomSeatModel(
+data class RoomSeatModel(
     val isMaster: Boolean,// 是否是房主
     val headUrl: String,// 头像
     val userNo: String,// 座位上用户no
@@ -46,14 +46,10 @@ data class VLRoomSeatModel(
     val joinSing: Boolean,// 是否合唱
     val isAudioMuted: Int,// 是否静音
     val isVideoMuted: Int,// 是否开启视频
-
-    // TODO 下面两个字段似乎是多余的？
-    val isOwner: Boolean,// 判断当前歌曲是否是自己点的
-    val isJoinedChorus: Boolean,
 ) : java.io.Serializable
 
 
-data class KTVCreateRoomInputModel(
+data class CreateRoomInputModel(
     val icon: String,
     val isPrivate: Int,
     val name: String,
@@ -61,23 +57,23 @@ data class KTVCreateRoomInputModel(
     val userNo: String,
 )
 
-data class KTVCreateRoomOutputModel(
+data class CreateRoomOutputModel(
     val roomNo: String?,
     val password: String?,
 )
 
 
-data class KTVJoinRoomInputModel(
+data class JoinRoomInputModel(
     val roomNo: String,
     val password: String?,
 )
 
-data class KTVJoinRoomOutputModel(
+data class JoinRoomOutputModel(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
     val bgOption: String,
-    val seatsArray: List<VLRoomSeatModel>?,
+    val seatsArray: List<RoomSeatModel>?,
     /**
      * 房间内人数
      */
@@ -89,15 +85,15 @@ data class KTVJoinRoomOutputModel(
 ) : java.io.Serializable
 
 
-data class KTVChangeMVCoverInputModel(
+data class ChangeMVCoverInputModel(
     val mvIndex: Int
 )
 
-data class KTVOnSeatInputModel(
+data class OnSeatInputModel(
     val seatIndex: Int
 )
 
-data class KTVOutSeatInputModel(
+data class OutSeatInputModel(
     val userNo: String,
     val userId: String,
     val userName: String,
@@ -105,11 +101,11 @@ data class KTVOutSeatInputModel(
     val userOnSeat: Int,
 )
 
-data class KTVRemoveSongInputModel(
+data class RemoveSongInputModel(
     val songNo: String,
 )
 
-data class VLRoomSelSongModel(
+data class RoomSelSongModel(
     // 获取歌词列表返回的歌词信息
     val songName: String,// 歌曲名
     val songNo: String, // 歌词唯一标识
@@ -118,19 +114,28 @@ data class VLRoomSelSongModel(
 
     // 获取已点歌记返回的歌词信息，同时也包含上面信息
     val userNo: String? = null,// 点歌人No
-    val userId: String? = null,// 点歌人id
     val name: String? = null,// 点歌人昵称
     val chorusNo: String? = null, // 合唱者userNo
     val isChorus: Boolean = false, // 是否合唱
     val isOriginal: Int = 0, //是否原唱
-    val sort: Int = 0,// 已点歌曲的播放顺序排序
-)
 
-data class KTVJoinChorusInputModel(
+    // 排序字段
+    val status : Int, // 0 未开始 1.已唱 2.正在唱
+    val createAt: Double,
+    val pinAt: Double
+){
+    companion object {
+        val STATUS_IDLE = 0
+        val STATUS_PLAYED = 1
+        val STATUS_PLAYING = 2
+    }
+}
+
+data class JoinChorusInputModel(
     val songNo: String
 )
 
-data class KTVChooseSongInputModel(
+data class ChooseSongInputModel(
     val isChorus: Int,
     val songName: String,
     val songNo: String,
@@ -138,7 +143,10 @@ data class KTVChooseSongInputModel(
     val imageUrl: String,
 )
 
-data class KTVMakeSongTopInputModel(
-    val songNo: String,
-    val sort: Int,
+data class MakeSongTopInputModel(
+    val songNo: String
+)
+
+data class UpdateSingingScoreInputModel(
+    val score: Double
 )
