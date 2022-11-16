@@ -97,15 +97,15 @@ interface KTVServiceProtocol {
     /**
      * 设置麦位静音
      */
-    fun openAudioStatus(
-        isSelfMuted: Int, completion: (error: Exception?) -> Unit
+    fun updateSeatAudioMuteStatus(
+        mute: Boolean, completion: (error: Exception?) -> Unit
     )
 
     /**
      * 打开麦位摄像头
      */
-    fun openVideoStatus(
-        isVideoMuted: Int, completion: (error: Exception?) -> Unit
+    fun updateSeatVideoMuteStatus(
+        mute: Boolean, completion: (error: Exception?) -> Unit
     )
 
     /**

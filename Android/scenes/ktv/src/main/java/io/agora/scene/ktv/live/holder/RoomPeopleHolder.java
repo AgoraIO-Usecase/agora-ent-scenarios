@@ -78,7 +78,7 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
         User mUser = UserManager.getInstance().getUser();
         RtcEngine engine = RTCManager.getInstance().getRtcEngine();
         if (mUser != null) {
-            if (member.isVideoMuted() == 0) { // 未开启摄像头 《==》 移除存在的SurfaceView，显示头像
+            if (member.isVideoMuted() == 1) { // 未开启摄像头 《==》 移除存在的SurfaceView，显示头像
                 mBinding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                 if (mBinding.superLayout.getChildAt(0) instanceof CardView) {
                     mBinding.superLayout.removeViewAt(0);
