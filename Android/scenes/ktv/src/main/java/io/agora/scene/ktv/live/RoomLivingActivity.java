@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
@@ -425,6 +427,26 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         moreDialog.dismiss();
     }
 
+    private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap){
+        // 0 -> "项目热歌榜单"
+        // 1 -> "声网热歌榜"
+        // 2 -> "新歌榜"
+        // 3 -> "嗨唱推荐"
+        // 4 -> "抖音热歌"
+        // 5 -> "古风热歌"
+        // 6 -> "KTV必唱"
+        LinkedHashMap<Integer, String> ret = new LinkedHashMap<>();
+        for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
+            int key = entry.getKey();
+            String value = entry.getValue();
+            if (key == 2) {
+                value = getString(R.string.song_rank_7);
+            }
+            ret.put(key, value);
+        }
+        return ret;
+    }
+
     private void showChorusSongDialog() {
         if (mChorusSongDialog == null) {
             mChorusSongDialog = new SongDialog();
@@ -435,7 +457,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                         SongActionListenerImpl chooseSongListener =
                                 new SongActionListenerImpl(this,
-                                        roomLivingViewModel, typeMap, true);
+                                        roomLivingViewModel, filterSongTypeMap(typeMap), true);
                         mChorusSongDialog.setChooseSongTabsTitle(
                                 chooseSongListener.getSongTypeTitles(this),
                                 0);
@@ -459,7 +481,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                         SongActionListenerImpl chooseSongListener =
                                 new SongActionListenerImpl(this,
-                                        roomLivingViewModel, typeMap,false);
+                                        roomLivingViewModel, filterSongTypeMap(typeMap),false);
                         mChooseSongDialog.setChooseSongTabsTitle(
                                 chooseSongListener.getSongTypeTitles(this),
                                 0);
