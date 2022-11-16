@@ -87,6 +87,14 @@ private func _hideLoadingIfNeed() {
 
         return roomNo
     }
+    
+    private func _unsubscribe() {
+        guard let channelName = roomNo, let scene = SyncUtil.scene(id: channelName) else {
+            return
+        }
+        
+        scene.unsubscribeScene()
+    }
 
     private func initScene(completion: @escaping () -> Void) {
         if syncUtilsInited {
@@ -507,6 +515,7 @@ extension KTVSyncManagerServiceImp {
         //remove current user's choose song
         _removeAllUserChooseSong()
 
+        _unsubscribe()
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
         completion(nil)
@@ -517,6 +526,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
+        _unsubscribe()
         SyncUtil.scene(id: channelName)?.deleteScenes()
         roomNo = nil
         completion(nil)
