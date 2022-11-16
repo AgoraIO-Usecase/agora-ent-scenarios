@@ -89,11 +89,13 @@ private func _hideLoadingIfNeed() {
     }
     
     private func _unsubscribe() {
-        guard let channelName = roomNo, let scene = SyncUtil.scene(id: channelName) else {
+        guard let channelName = roomNo else {
             return
         }
         
-        scene.unsubscribeScene()
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribeScene()
     }
 
     private func initScene(completion: @escaping () -> Void) {
