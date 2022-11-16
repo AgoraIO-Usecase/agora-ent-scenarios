@@ -311,7 +311,7 @@ public let kMPK_RTC_UID: UInt = 1
     }
 
     // init rtc
-    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: AgoraConfig.rtcId, delegate: nil)
+    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
 
     /**
      * 设置RTC角色
@@ -417,7 +417,7 @@ public let kMPK_RTC_UID: UInt = 1
      * @param rtmUid 可选，如果不使用RTM，使用自己的IM，这个值不用传
      * @param type 有四种 social，ktv，game， anchor
      */
-    public func joinVoicRoomWith(with channelName: String, rtcUid: Int?, type: VMMUSIC_TYPE) -> Int32 {
+    public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         if type == .ktv || type == .social {
@@ -436,7 +436,7 @@ public let kMPK_RTC_UID: UInt = 1
         }
         setAINS(with: .mid)
         loadKit(with: channelName, rtcUid: rtcUid)
-        let code: Int32 = rtcKit.joinChannel(byToken: nil, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
+        let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
     }
 

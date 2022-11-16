@@ -46,7 +46,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc func goLive() {
-        if name.isEmpty || effects.type.isEmpty {
+        if name.isEmpty {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         Throttler.throttle {
@@ -80,27 +80,14 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             SVProgressHUD.dismiss()
             if let room = room {
                 self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-                self.loginIM(with: room)
-            } else {
-                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-            }
-        }
-    }
-    
-    private func loginIM(with entity: VRRoomEntity) {
-       // AgoraChatClient.shared().logout(false
-        print("login------\(entity.owner?.name ?? "")-----\(entity.owner?.im_token ?? "")")
-        VoiceRoomIMManager.shared?.loginIM(userName: "263", token: entity.owner?.im_token ?? "", completion: { userName, error in
-            SVProgressHUD.dismiss()
-            if error == nil {
                 let info: VRRoomInfo = VRRoomInfo()
-                info.room = entity
+                info.room = room
                 info.mic_info = nil
                 let vc = VoiceRoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)
             } else {
-                self.view.makeToast("AgoraChat Login failed!", point: self.view.center, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
             }
-        })
+        }
     }
 }

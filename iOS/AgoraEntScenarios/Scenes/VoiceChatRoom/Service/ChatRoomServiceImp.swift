@@ -249,7 +249,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         
         room_entity.room_id = String(millisecond)
         room_entity.channel_id = String(millisecond)
-        room_entity.sound_effect = room.sound_effect ?? "Social_Chat".localized()
+        room_entity.sound_effect = room.sound_effect
         room_entity.is_private = room.is_private
         room_entity.name = room.name
         room_entity.created_at = UInt(millisecond)
@@ -263,39 +263,38 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
-        initIM(with: room_entity.name ?? "", pwd: "12345678") {[weak self] im_token, uid, room_id, name in
-            
-            owner.im_token = im_token
+        initIM(with: room_entity.name ?? "", pwd: "12345678") {[weak self] im_token, uid, room_id in
             owner.chat_uid = uid
             room_entity.chatroom_id = room_id
             room_entity.owner = owner
+            VLUserCenter.user.im_token = im_token
+            VLUserCenter.user.chat_uid = uid
             
-            //更新环信KV
-            VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: room_id, attributes: (self?.createMics())!, completion: { error in
-                if error == nil {
+            VoiceRoomIMManager.shared?.loginIM(userName: owner.rtc_uid ?? "" , token: im_token , completion: { userName, error in
+                if error != nil {
+                    if let strongSelf = self {
+                        strongSelf.roomList?.append(room_entity)
+                        let params = room_entity.kj.JSONObject()
+                        strongSelf.initScene {
+                            SyncUtil.joinScene(id: room_entity.room_id ?? "",
+                                               userId: VLUserCenter.user.userNo,
+                                               property: params) { result in
+                                let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                                completion(nil,model)
+                            } fail: { error in
+                                completion(error, nil)
+                            }
+                        }
+                    }
+                } else {
                     
                 }
             })
-
-            if let strongSelf = self {
-                strongSelf.roomList?.append(room_entity)
-                let params = room_entity.kj.JSONObject()
-                strongSelf.initScene {
-                    SyncUtil.joinScene(id: room_entity.room_id ?? "",
-                                       userId: VLUserCenter.user.userNo,
-                                       property: params) { result in
-                        let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                        completion(nil,model)
-                    } fail: { error in
-                        completion(error, nil)
-                    }
-                }
-            }
         }
 
     }
     
-    func joinRoom(_ roomId: String, user: VRUser, completion: @escaping (Error?) -> Void) {
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, VRRoomEntity?) -> Void) {
         
         /**
          先拿到对应的房间信息
@@ -309,7 +308,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             for room in roomList {
                 if room.room_id == roomId {
                     let updateRoom: VRRoomEntity = room
-                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
+                    updateRoom.member_count = updateRoom.member_count ?? 0 + 1
                     let params = updateRoom.kj.JSONObject()
                     SyncUtil
                         .scene(id: roomId)?
@@ -318,22 +317,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 success: {[weak self] obj in
                             print("updateUserCount success")
                             //获取IM信息
-                            self?.initIM(with: room.name ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id, name in
-                                user.im_token = im_token
-                                user.chat_uid = chat_uid
-                                //加入语聊房
-                                VoiceRoomIMManager.shared?.joinedChatRoom(roomId: chatroom_id, completion: { room, error in
-                                    completion(self?.convertError(error: error))
-                                    //更新KV
-                                    VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
-                                        completion(self?.convertError(error: error))
-                                    })
-                                })
+                            self?.initIM(with: room.name ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
+                                VLUserCenter.user.im_token = im_token
+                                VLUserCenter.user.chat_uid = chat_uid
+                                completion(nil, updateRoom)
                             }
                         },
                                 fail: { error in
                             print("updateUserCount fail")
-                            completion(error)
+                            completion(error, nil)
                         })
                 }
             }
@@ -357,7 +349,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         self.roomList?.remove(at: index)
                     } else {
                         let updateRoom: VRRoomEntity = room
-                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
+                        updateRoom.member_count = updateRoom.member_count ?? 0 - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
@@ -408,56 +400,26 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         for (idx,item) in mics.enumerated() {
             micsMap["mic_\(idx)"] = item.kj.JSONString()
         }
-        
         micsMap["use_robot"] = "0"
         micsMap["robot_volume"] = "50"
-        micsMap["gift_amount"] = "0"
         return micsMap
     }
     
-    func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String, String) -> Void) {
+    func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
-//        let VMGroup = DispatchGroup()
-//        let VMQueue = DispatchQueue(label: "com.agora.vm.www")
         var im_token = ""
         var im_uid = ""
         var chatroom_id = ""
         
-        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token, name in
-            im_uid = uid ?? ""
-            chatroom_id = room_id ?? ""
-            im_token = token ?? ""
-            completion(im_token, im_uid, chatroom_id, name ?? "")
-            print("login-create------\(im_uid)-----\(im_token)")
-//            NetworkManager.shared.generateToken(channelName: roomName, uid: uid ?? "", tokenType: .token007, type: .chat) { token in
-//                im_token = token ?? ""
-//                completion(im_token, im_uid, chatroom_id)
-//            }
+        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+                im_uid = uid ?? ""
+                chatroom_id = room_id ?? ""
+                im_token = token ?? ""
+                VLUserCenter.user.agoraRTCToken = token ?? ""
+                completion(im_token, im_uid, chatroom_id )
+            }
         }
-        
-        
-        
-//        VMGroup.enter()
-//        VMQueue.async {
-//            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .chat) { token in
-//                im_token = token ?? ""
-//                VMGroup.leave()
-//            }
-//        }
-//
-//        VMGroup.enter()
-//        VMQueue.async {
-//            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id in
-//                im_uid = uid ?? ""
-//                chatroom_id = room_id ?? ""
-//                VMGroup.leave()
-//            }
-//        }
-//
-//        VMGroup.notify(queue: VMQueue) {[weak self] in
-//
-//            completion(im_token, im_uid, chatroom_id)
-//        }
     }
 }
 

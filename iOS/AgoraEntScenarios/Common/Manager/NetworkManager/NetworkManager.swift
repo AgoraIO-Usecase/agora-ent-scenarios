@@ -126,9 +126,9 @@ class NetworkManager {
                           nickName: String,
                           password: String,
                           uid: String,
-                          success: @escaping (String?, String?, String?, String?) -> Void) {
+                          success: @escaping (String?, String?, String?) -> Void) {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil, nil, nil, nil)
+            success(nil, nil, nil)
             return
         }
         let chatParams = [
@@ -155,13 +155,12 @@ class NetworkManager {
             let uid = data?["uid"]
             let chatId = data?["chatId"]
             let token = data?["token"]
-            let name = data?["userName"]
             print(response)
-            success(uid, chatId, token, name)
+            success(uid, chatId, token)
             ToastView.hidden()
         }, failure: { error in
             print(error)
-            success(nil, nil, nil, nil)
+            success(nil, nil, nil)
             ToastView.hidden()
         })
     }

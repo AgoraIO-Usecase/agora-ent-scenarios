@@ -21,7 +21,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 加入房间
     /// - Parameters:
     ///
-    func joinRoom(_ roomId: String, user: VRUser, completion: @escaping (Error?) -> Void)
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, VRRoomEntity?) -> Void)
     
     /// 离开房间
     /// - Parameters:
