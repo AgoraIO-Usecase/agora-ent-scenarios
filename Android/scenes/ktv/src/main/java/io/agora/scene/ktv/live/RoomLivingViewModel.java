@@ -872,7 +872,7 @@ public class RoomLivingViewModel extends ViewModel {
             mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
             if (musicModel.isChorus()) {
                 mRtcEngine.muteAllRemoteAudioStreams(false);
-                mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), Integer.parseInt(musicModel.getUserId()) * 10 + 1));
+                mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
             }
             mPlayer.setAudioDualMonoMode(2);
             mPlayer.stop();
