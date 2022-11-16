@@ -24,16 +24,16 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
 import io.agora.scene.ktv.manager.RTCManager;
 import io.agora.scene.ktv.manager.RoomManager;
-import io.agora.scene.ktv.service.VLRoomSeatModel;
+import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
-public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemRoomSpeakerBinding, VLRoomSeatModel> {
+public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemRoomSpeakerBinding, RoomSeatModel> {
     public RoomPeopleHolder(@NonNull KtvItemRoomSpeakerBinding mBinding) {
         super(mBinding);
     }
 
     @Override
-    public void binding(VLRoomSeatModel member, int selectedIndex) {
+    public void binding(RoomSeatModel member, int selectedIndex) {
         mBinding.tvUserName.setText(String.valueOf(getAdapterPosition() + 1));
         mBinding.avatarItemRoomSpeaker.setImageResource(R.mipmap.ktv_ic_seat);
         mBinding.tvZC.setVisibility(View.GONE);
@@ -73,7 +73,7 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
         showAvatarOrCameraView(member);
     }
 
-    private void showAvatarOrCameraView(VLRoomSeatModel member) {
+    private void showAvatarOrCameraView(RoomSeatModel member) {
         Context mContext = itemView.getContext();
         User mUser = UserManager.getInstance().getUser();
         RtcEngine engine = RTCManager.getInstance().getRtcEngine();

@@ -32,9 +32,9 @@ import io.agora.scene.ktv.live.fragment.dialog.MVFragment;
 import io.agora.scene.ktv.live.holder.RoomPeopleHolder;
 import io.agora.scene.ktv.live.listener.LrcActionListenerImpl;
 import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
-import io.agora.scene.ktv.service.KTVJoinRoomOutputModel;
-import io.agora.scene.ktv.service.VLRoomSeatModel;
-import io.agora.scene.ktv.service.VLRoomSelSongModel;
+import io.agora.scene.ktv.service.JoinRoomOutputModel;
+import io.agora.scene.ktv.service.RoomSeatModel;
+import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.ktv.widget.MoreDialog;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
@@ -54,7 +54,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private RoomLivingViewModel roomLivingViewModel;
     private MoreDialog moreDialog;
     private MusicSettingDialog musicSettingDialog;
-    private BaseRecyclerViewAdapter<KtvItemRoomSpeakerBinding, VLRoomSeatModel, RoomPeopleHolder> mRoomSpeakerAdapter;
+    private BaseRecyclerViewAdapter<KtvItemRoomSpeakerBinding, RoomSeatModel, RoomPeopleHolder> mRoomSpeakerAdapter;
     private CloseRoomDialog creatorExitDialog;
 
     private CommonDialog exitDialog;
@@ -63,7 +63,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private SongDialog mChorusSongDialog;
 
 
-    public static void launch(Context context, KTVJoinRoomOutputModel roomInfo) {
+    public static void launch(Context context, JoinRoomOutputModel roomInfo) {
         Intent intent = new Intent(context, RoomLivingActivity.class);
         intent.putExtra(EXTRA_ROOM_INFO, roomInfo);
         context.startActivity(intent);
@@ -80,14 +80,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             @NonNull
             @Override
             public <T extends ViewModel> T create(@NonNull Class<T> aClass) {
-                return (T) new RoomLivingViewModel((KTVJoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
+                return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
 
-        mRoomSpeakerAdapter = new BaseRecyclerViewAdapter<>(Arrays.asList(new VLRoomSeatModel[8]),
-                new OnItemClickListener<VLRoomSeatModel>() {
+        mRoomSpeakerAdapter = new BaseRecyclerViewAdapter<>(Arrays.asList(new RoomSeatModel[8]),
+                new OnItemClickListener<RoomSeatModel>() {
                     @Override
-                    public void onItemClick(@NonNull VLRoomSeatModel data, View view, int position, long viewType) {
+                    public void onItemClick(@NonNull RoomSeatModel data, View view, int position, long viewType) {
                         OnItemClickListener.super.onItemClick(data, view, position, viewType);
                         if (!TextUtils.isEmpty(data.getUserNo())) {
                             if (roomLivingViewModel.isRoomOwner()) {
@@ -109,9 +109,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         OnItemClickListener.super.onItemClick(view, position, viewType);
                         if (position == -1) return;
                         //点击坐位 上麦位
-                        VLRoomSeatModel agoraMember = mRoomSpeakerAdapter.dataList.get(position);
+                        RoomSeatModel agoraMember = mRoomSpeakerAdapter.dataList.get(position);
                         if (agoraMember == null) {
-                            VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
+                            RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                             if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                                 roomLivingViewModel.haveSeat(position);
                                 requestRecordPermission();
@@ -150,7 +150,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             setDarkStatusIcon(isBlackDarkStatus());
         });
         getBinding().cbMic.setOnCheckedChangeListener((compoundButton, b) -> {
-            VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
+            RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
             if (seatLocal == null || mRoomSpeakerAdapter.getItemData(seatLocal.getSeatIndex()) == null) {
                 return;
             }
@@ -188,10 +188,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
 
         // 房间相关
-        roomLivingViewModel.roomInfoLiveData.observe(this, ktvJoinRoomOutputModel -> {
+        roomLivingViewModel.roomInfoLiveData.observe(this, joinRoomOutputModel -> {
             //修改背景
-            if (!TextUtils.isEmpty(ktvJoinRoomOutputModel.getBgOption())) {
-                setPlayerBgFromMsg(Integer.parseInt(ktvJoinRoomOutputModel.getBgOption()));
+            if (!TextUtils.isEmpty(joinRoomOutputModel.getBgOption())) {
+                setPlayerBgFromMsg(Integer.parseInt(joinRoomOutputModel.getBgOption()));
             }
         });
         roomLivingViewModel.roomDeleteLiveData.observe(this, deletedByCreator -> {
@@ -214,8 +214,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if(seatModels == null){
                 return;
             }
-            for (VLRoomSeatModel seatModel : seatModels) {
-                VLRoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getSeatIndex());
+            for (RoomSeatModel seatModel : seatModels) {
+                RoomSeatModel oSeatModel = mRoomSpeakerAdapter.dataList.get(seatModel.getSeatIndex());
                 if (oSeatModel == null
                         || oSeatModel.isAudioMuted() != seatModel.isAudioMuted()
                         || oSeatModel.isVideoMuted() != seatModel.isVideoMuted()) {
@@ -223,12 +223,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     mRoomSpeakerAdapter.notifyItemChanged(seatModel.getSeatIndex());
                 }
             }
-            for (VLRoomSeatModel seatModel : mRoomSpeakerAdapter.dataList) {
+            for (RoomSeatModel seatModel : mRoomSpeakerAdapter.dataList) {
                 if (seatModel == null) {
                     continue;
                 }
                 boolean exist = false;
-                for (VLRoomSeatModel model : seatModels) {
+                for (RoomSeatModel model : seatModels) {
                     if (seatModel.getSeatIndex() == model.getSeatIndex()) {
                         exist = true;
                         break;
@@ -294,7 +294,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             Log.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
             if (UserManager.getInstance().getUser().userNo.equals(userNo)) {
                 Log.d("cwtsw", "计算得分");
-                int score = (int) getBinding().lrcControlView.getPitchView().totalScore;
+                int score = (int) getBinding().lrcControlView.getPitchView().cumulatedScore;
                 getBinding().tvResultScore.setText(String.valueOf(score));
                 if (score >= 90) {
                     getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
@@ -356,7 +356,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     /**
      * 下麦提示
      */
-    private void showUserLeaveSeatMenuDialog(VLRoomSeatModel seatModel) {
+    private void showUserLeaveSeatMenuDialog(RoomSeatModel seatModel) {
         if (mUserLeaveSeatMenuDialog == null) {
             mUserLeaveSeatMenuDialog = new UserLeaveSeatMenuDialog(this);
         }
@@ -406,7 +406,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void onMusicChanged(@NonNull VLRoomSelSongModel music) {
+    private void onMusicChanged(@NonNull RoomSelSongModel music) {
         getBinding().lrcControlView.setMusic(music);
         if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
@@ -560,12 +560,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 //        }
     }
 
-    private void onMemberLeave(@NonNull VLRoomSeatModel member) {
+    private void onMemberLeave(@NonNull RoomSeatModel member) {
         if (member.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
             getBinding().groupBottomView.setVisibility(View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(View.VISIBLE);
         }
-        VLRoomSeatModel temp = mRoomSpeakerAdapter.getItemData(member.getSeatIndex());
+        RoomSeatModel temp = mRoomSpeakerAdapter.getItemData(member.getSeatIndex());
         if (temp != null) {
             mRoomSpeakerAdapter.dataList.set(member.getSeatIndex(), null);
             mRoomSpeakerAdapter.notifyItemChanged(member.getSeatIndex());
