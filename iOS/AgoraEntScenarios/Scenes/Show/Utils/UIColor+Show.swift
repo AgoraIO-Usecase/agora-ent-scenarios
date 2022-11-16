@@ -29,6 +29,10 @@ extension UIColor {
         return UIColor.HexColor(hex: 0xFFFFFF, alpha: 0.7)
     }
     
+    @objc static var show_zi02: UIColor {
+        return UIColor.HexColor(hex: 0x684BF2, alpha: 1)
+    }
+    
     // slider
     @objc static var show_zi03: UIColor {
         return UIColor.HexColor(hex: 0x7A59FB, alpha: 1)
@@ -58,6 +62,11 @@ extension UIColor {
     @objc static var show_btn_bg: UIColor {
         return UIColor.HexColor(hex: 0x345DFF, alpha: 1)
     }
+
+    // 不推荐按钮背景
+    @objc static var show_btn_bg_not_recommended: UIColor {
+        return UIColor.HexColor(hex: 0xEFF4FF, alpha: 1)
+    }
     
     // 红点颜色
     @objc static var show_red_dot: UIColor {
@@ -79,7 +88,28 @@ extension UIColor {
         return UIColor.HexColor(hex: 0x3C4267, alpha: 1)
     }
     
+    // segment未选中的背景
+    @objc static var show_segment_bg: UIColor {
+        return UIColor.HexColor(hex: 0xF2F2F5, alpha: 1)
+    }
     
+    // segment未选中的边框
+    @objc static var show_segment_border: UIColor {
+        return UIColor.HexColor(hex: 0xECECF0, alpha: 1)
+    }
+    
+    // segment未选中的标题
+    @objc static var show_segment_title_nor: UIColor {
+        return UIColor.HexColor(hex: 0x979CBB, alpha: 1)
+    }
+    
+    @objc static var show_footer_separator: UIColor {
+        return UIColor.HexColor(hex: 0xF5F4F6, alpha: 1)
+    }
+    
+    @objc static var show_Ellipse2: UIColor {
+        return UIColor.HexColor(hex: 0xE6E5F1, alpha: 1)
+    }
     
     @objc static var show_Ellipse5: UIColor {
         return UIColor.HexColor(hex: 0x6D7291, alpha: 1)
@@ -93,5 +123,9 @@ extension UIColor {
         return UIColor.HexColor(hex: 0x040A25, alpha: 1)
     }
     
+   
+    @objc static var show_blue03: UIColor {
+        return UIColor.HexColor(hex: 0x1BA1FC, alpha: 1)
+    }
     
 }

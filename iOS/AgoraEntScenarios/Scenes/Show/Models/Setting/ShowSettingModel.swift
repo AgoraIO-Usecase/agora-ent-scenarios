@@ -9,37 +9,63 @@ import UIKit
 
 
 
-protocol ShowSettingModel {
+class ShowSettingModel {
+    var title: String = ""
+    init(title: String) {
+        self.title = title
+    }
+}
+
+class ShowSettingSwitchModel: ShowSettingModel {
     
+    var isOn: Bool = false
+    var valueChangedAction: ((_ isOn: Bool)->())?
+    var clickDetailButonAction: (()->())?
+    init(title: String, isOn: Bool, valueChangedAction: ( (_: Bool) -> Void)? = nil, clickDetailButonAction: (() -> Void)? = nil) {
+        super.init(title: title)
+        self.isOn = isOn
+        self.valueChangedAction = valueChangedAction
+        self.clickDetailButonAction = clickDetailButonAction
+    }
 }
 
-struct ShowSettingSwitchModel: ShowSettingModel {
-    let title: String
-    let isOn: Bool
-    let valueChangedAction: ((_ isOn: Bool)->())
-    let clickDetailButonAction: (()->())
+class ShowSettingSegmentModel: ShowSettingModel {
+    var selectedIndex: Int = 0
+    var items: [String] = [String]()
+    var selectedIndexChangedAction: ((_ index: Int)->())?
+    
+    init(title: String,selectedIndex: Int, items: [String], selectedIndexChangedAction: ((_: Int) -> Void)? = nil) {
+        super.init(title: title)
+        self.selectedIndex = selectedIndex
+        self.items = items
+        self.selectedIndexChangedAction = selectedIndexChangedAction
+    }
 }
 
-struct ShowSettingSegmentModel: ShowSettingModel {
-    let title: String
-    let selectedIndex: Int
-    let items: [String]
-    let selectedIndexChangedAction: ((_ index: Int)->())
+class ShowSettingSliderModel: ShowSettingModel {
+    var value: Float = 0
+    var minValue: Float = 0
+    var maxValue: Float = 1
+    var sliderValueChangedAction: ((_ value: Float)->())?    // 变化结束
+    
+    init(title: String,value: Float, minValue: Float, maxValue: Float, sliderValueChangedAction: ((_: Float) -> Void)? = nil) {
+        super.init(title: title)
+        self.value = value
+        self.minValue = minValue
+        self.maxValue = maxValue
+        self.sliderValueChangedAction = sliderValueChangedAction
+    }
 }
 
-struct ShowSettingSliderModel: ShowSettingModel {
-    let title: String
-    let value: Float
-    let minValue: Float
-    let maxValue: Float
-    let sliderValueChangingAction: ((_ value: Float)->())   // 正在变化
-    let sliderValueChangedAction: ((_ value: Float)->())    // 变化结束
-}
-
-struct ShowSettingLabelModel: ShowSettingModel {
-    let title: String
-    let value: String
-    let cellDidSelectedAction: (()->())
+class ShowSettingLabelModel: ShowSettingModel {
+    var value: String = ""
+    var cellDidSelectedAction: ((_ index: Int)->())?
+    
+    init(title: String,value: String, cellDidSelectedAction: ((_ index: Int) -> Void)? = nil) {
+        super.init(title: title)
+        self.value = value
+        self.cellDidSelectedAction = cellDidSelectedAction
+    }
 }
 
 

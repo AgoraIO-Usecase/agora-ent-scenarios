@@ -32,9 +32,15 @@ class ShowSettingSwitchCell: ShowSettingBaseCell {
             make.right.equalTo(-20)
             make.centerY.equalTo(titleLabel)
         }
+        
+        contentView.addSubview(detailButton)
+        detailButton.snp.makeConstraints { make in
+            make.centerY.equalTo(titleLabel)
+            make.left.equalTo(titleLabel.snp.right).offset(6)
+        }
     }
     
-    func setTitle(_ title: String, isOn: Bool, valueChangedAction: @escaping ((_ isOn: Bool)->()), detailButtonAction:@escaping (()->())) {
+    func setTitle(_ title: String, isOn: Bool, valueChangedAction: ((_ isOn: Bool)->())?, detailButtonAction: (()->())?) {
         titleLabel.text = title
         aSwitch.isOn = isOn
         self.valueChangedAction = valueChangedAction
@@ -46,7 +52,7 @@ class ShowSettingSwitchCell: ShowSettingBaseCell {
     }
     
     @objc private func didClickDetailButton(){
-        
+        self.clickDetailButonAction?()
     }
     
 }
