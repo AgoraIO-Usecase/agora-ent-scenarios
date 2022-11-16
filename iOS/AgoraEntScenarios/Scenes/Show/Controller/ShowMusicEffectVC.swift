@@ -16,7 +16,7 @@ class ShowMusicEffectVC: UIViewController {
     }
     
     // 背景音乐
-    private lazy var musicBg = {
+    private lazy var musicBg: MusicConfigData = {
         var musicBgDataArray = [ShowMusicEffectCell.CellData]()
         let titles = [
             "show_music_setting_bg_happy".show_localized,
@@ -37,7 +37,7 @@ class ShowMusicEffectVC: UIViewController {
     }()
     
     // 美声
-    private lazy var beautyVoice = {
+    private lazy var beautyVoice: MusicConfigData = {
         var beautyVoiceDataArray = [ShowMusicEffectCell.CellData]()
         
         let titles = [
@@ -62,7 +62,7 @@ class ShowMusicEffectVC: UIViewController {
     }()
     
     // 混响
-    private lazy var mixVoice = {
+    private lazy var mixVoice: MusicConfigData = {
         var mixVoiceDataArray = [ShowMusicEffectCell.CellData]()
         let titles = [
             "show_music_setting_mix_none".show_localized,
