@@ -174,7 +174,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.iconView.image = UIImage(settingImage[2 + indexPath.row])
             cell.titleLabel.text = settingName[2 + indexPath.row]
             if indexPath.row == 0 {
-                cell.contentLabel.text = roomInfo?.room?.sound_effect?.localized() ?? ""
+                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 0)
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
@@ -210,5 +210,22 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
         let lead = NSStringDrawingOptions.usesFontLeading
         let rect = text.boundingRect(with: CGSize(width: 0, height: height), options: [origin, lead], attributes: [NSAttributedString.Key.font: font], context: nil)
         return rect.width
+    }
+    
+    private func getSoundType(with index: Int) -> String {
+        var soundType: String = "Social Chat".localized()
+        switch index {
+        case 0:
+            soundType = "Social Chat".localized()
+        case 1:
+            soundType = "Karaoke".localized()
+        case 2:
+            soundType = "Gaming Buddy".localized()
+        case 3:
+            soundType = "Professional podcaster".localized()
+        default:
+            soundType = "Social Chat".localized()
+        }
+        return soundType
     }
 }

@@ -30,6 +30,7 @@ class VoiceRoomViewController: VRBaseViewController {
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
     var sRtcView: AgoraChatRoom3DRtcView!
+    var serviceImp: ChatRoomServiceImp = ChatRoomServiceImp()
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
@@ -92,8 +93,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
         VoiceRoomIMManager.shared?.delegate = self
         VoiceRoomIMManager.shared?.addChatRoomListener()
-        // 获取房间详情
-        requestRoomDetail()
 
         // 加载RTC+IM
         loadKit()
@@ -135,7 +134,7 @@ extension VoiceRoomViewController {
 
         VMGroup.enter()
         VMQueue.async { [weak self] in
-            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)", rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
+            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
             VMGroup.leave()
         }
 
@@ -159,19 +158,41 @@ extension VoiceRoomViewController {
         VMGroup.notify(queue: VMQueue) { [weak self] in
             DispatchQueue.main.async {
                 let joinSuccess = rtcJoinSuccess && IMJoinSuccess
-                // 上传登陆信息到服务器
-                self?.uploadStatus(status: joinSuccess)
+                // 获取房间详情
+                //加入房间成功后，需要先更新
+                if self?.isOwner == true {
+                    //房主更新环信KV
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: (self?.serviceImp.createMics())!, completion: { error in
+                        if error == nil {
+                            
+                        } else {
+                            
+                        }
+                    })
+                } else {
+                    //观众更新KV
+                    guard let user = VoiceRoomUserInfo.shared.user else {return}
+                   VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+                       if error == nil {
+                           self?.requestRoomDetail()
+                       } else {
+                           
+                       }
+                   })
+                }
+                
+                
             }
         }
     }
 
-    func getSceneType(_ type: String) -> VMMUSIC_TYPE {
+    func getSceneType(_ type: Int) -> VMMUSIC_TYPE {
         switch type {
-        case "Karaoke":
+        case 1:
             return .ktv
-        case "Gaming Buddy":
+        case 2:
             return .game
-        case "Professional podcaster":
+        case 3:
             return .anchor
         default:
             return .social
@@ -182,9 +203,9 @@ extension VoiceRoomViewController {
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
         guard let room_id = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomInfo(roomId: room_id), params: [:], classType: VRRoomInfo.self) { [weak self] room, error in
+        serviceImp.fetchRoomDetail(room_id) {[weak self] error, room_info in
             if error == nil {
-                guard let info = room else { return }
+                guard let info = room_info else { return }
                 self?.roomInfo = info
             } else {
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
@@ -194,7 +215,7 @@ extension VoiceRoomViewController {
 
     func requestRankList() {
         guard let room_id = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchGiftContribute(roomId: room_id), params: [:], classType: VRUsers.self) { [weak self] list, error in
+        serviceImp.fetchGiftContribute(room_id) {[weak self] error, list in
             if error == nil {
                 guard let list = list?.ranking_list else { return }
                 let info = self?.roomInfo
@@ -286,14 +307,14 @@ extension VoiceRoomViewController {
     }
 
     func uploadStatus(status: Bool) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .joinRoom(roomId: roomId), params: [:]) { dic, error in
-            if let result = dic?["result"] as? Bool, error == nil, result {
-                self.view.makeToast("Joined successful!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-            } else {
-                self.didHeaderAction(with: .back, destroyed: false)
-            }
-        }
+//        guard let roomId = roomInfo?.room?.room_id else { return }
+//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .joinRoom(roomId: roomId), params: [:]) { dic, error in
+//            if let result = dic?["result"] as? Bool, error == nil, result {
+//                self.view.makeToast("Joined successful!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+//            } else {
+//                self.didHeaderAction(with: .back, destroyed: false)
+//            }
+//        }
     }
 
     @objc func resignKeyboard() {
@@ -361,12 +382,16 @@ extension VoiceRoomViewController {
 
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .leaveRoom(roomId: roomId), params: [:]) { dic, error in
-            if let result = dic?["result"] as? Bool, error == nil, result {
-                debugPrint("result:\(result)")
-            }
+        serviceImp.leaveRoom(roomId, isOwner: self.isOwner) { error, flag in
+            
         }
-        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        
+//        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .leaveRoom(roomId: roomId), params: [:]) { dic, error in
+//            if let result = dic?["result"] as? Bool, error == nil, result {
+//                debugPrint("result:\(result)")
+//            }
+//        }
+//        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -402,8 +427,7 @@ extension VoiceRoomViewController {
     }
 
     func showSoundView() {
-        guard let soundEffect = roomInfo?.room?.sound_effect else { return }
-        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 240~), soundEffect: soundEffect)
+        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 240~), soundEffect: roomInfo?.room?.sound_effect ?? 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 240~)), custom: soundView)
         presentViewController(vc)
     }
