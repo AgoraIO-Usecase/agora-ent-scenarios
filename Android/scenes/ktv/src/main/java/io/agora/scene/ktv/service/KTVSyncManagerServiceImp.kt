@@ -7,8 +7,11 @@ import android.text.TextUtils
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
-import io.agora.syncmanager.rtm.*
+import io.agora.syncmanager.rtm.IObject
+import io.agora.syncmanager.rtm.Scene
+import io.agora.syncmanager.rtm.SceneReference
 import io.agora.syncmanager.rtm.Sync.*
+import io.agora.syncmanager.rtm.SyncManagerException
 import kotlin.random.Random
 
 
@@ -74,7 +77,7 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
     ) {
         initSync {
-            Sync.Instance().getScenes(object : DataListCallback {
+            Instance().getScenes(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
                     val ret = ArrayList<RoomListModel>()
                     result?.forEach {
@@ -116,7 +119,7 @@ class KTVSyncManagerServiceImp(
 
             scene.property = GsonUtils.covertToMap(roomListModel)
 
-            Sync.Instance().createScene(scene, object : Sync.Callback {
+            Instance().createScene(scene, object : Callback {
                 override fun onSuccess() {
                     roomMap[roomListModel.roomNo] = roomListModel
                     runOnMainThread {
@@ -155,7 +158,7 @@ class KTVSyncManagerServiceImp(
             return
         }
         initSync {
-            Sync.Instance().joinScene(inputModel.roomNo, object : Sync.JoinSceneCallback {
+            Instance().joinScene(inputModel.roomNo, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
@@ -228,7 +231,7 @@ class KTVSyncManagerServiceImp(
 
         if (cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
             // 移除房间
-            mSceneReference?.delete(object : Sync.Callback {
+            mSceneReference?.delete(object : Callback {
                 override fun onSuccess() {
                     runOnMainThread {
                         resetCacheInfo(true)
@@ -316,7 +319,7 @@ class KTVSyncManagerServiceImp(
                     )
                 )
             ),
-            object : Sync.DataItemCallback {
+            object : DataItemCallback {
                 override fun onSuccess(result: IObject?) {
                     runOnMainThread {
                         completion.invoke(null)
@@ -684,13 +687,13 @@ class KTVSyncManagerServiceImp(
             return
         }
 
-        Sync.Instance().init(context,
+        Instance().init(context,
             mapOf(
                 Pair("appid", io.agora.scene.base.BuildConfig.AGORA_APP_ID),
                 Pair("defaultChannel", kSceneId),
                 // Pair("isUseRtm", "true"),
             ),
-            object : Sync.Callback {
+            object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true
                     runOnMainThread { complete.invoke() }
@@ -770,7 +773,7 @@ class KTVSyncManagerServiceImp(
     private fun innerAddUserInfo(completion: () -> Unit) {
         val localUserInfo = VLLoginModel(UserManager.getInstance().user.userNo)
         mSceneReference?.collection(kCollectionIdUser)
-            ?.add(localUserInfo, object : Sync.DataItemCallback {
+            ?.add(localUserInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {
                     runOnMainThread { completion.invoke() }
                 }
@@ -783,7 +786,7 @@ class KTVSyncManagerServiceImp(
 
     private fun innerRemoveUser(completion: (error: Exception?) -> Unit) {
         val objectId = objIdOfUserNo[UserManager.getInstance().user.userNo] ?: return
-        mSceneReference?.collection(kCollectionIdUser)?.delete(objectId, object : Sync.Callback {
+        mSceneReference?.collection(kCollectionIdUser)?.delete(objectId, object : Callback {
             override fun onSuccess() {
                 objIdOfUserNo.remove(UserManager.getInstance().user.userNo)
                 runOnMainThread { completion.invoke(null) }
@@ -839,7 +842,7 @@ class KTVSyncManagerServiceImp(
                     )
                 )
             ),
-            object : Sync.DataItemCallback {
+            object : DataItemCallback {
                 override fun onSuccess(result: IObject?) {
                 }
 
@@ -862,8 +865,8 @@ class KTVSyncManagerServiceImp(
             UserManager.getInstance().user.name,
             seatIndex,
             false,
-            0,
-            1
+            RoomSeatModel.MUTED_VALUE_FALSE,
+            RoomSeatModel.MUTED_VALUE_TRUE
         )
     }
 
@@ -937,7 +940,7 @@ class KTVSyncManagerServiceImp(
     ) {
         val objectId = objIdOfSeatIndex[seatInfo.seatIndex] ?: return
         mSceneReference?.collection(kCollectionIdSeatInfo)
-            ?.update(objectId, seatInfo, object : Sync.Callback {
+            ?.update(objectId, seatInfo, object : Callback {
                 override fun onSuccess() {
                     runOnMainThread { completion.invoke(null) }
                 }
@@ -954,7 +957,7 @@ class KTVSyncManagerServiceImp(
     ) {
         val objectId = objIdOfSeatIndex[seatInfo.seatIndex] ?: return
         mSceneReference?.collection(kCollectionIdSeatInfo)
-            ?.delete(objectId, object : Sync.Callback {
+            ?.delete(objectId, object : Callback {
                 override fun onSuccess() {
                     objIdOfSeatIndex.remove(seatInfo.seatIndex)
                     seatMap.remove(seatInfo.seatIndex.toString())
@@ -972,7 +975,7 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         mSceneReference?.collection(kCollectionIdSeatInfo)
-            ?.add(seatInfo, object : Sync.DataItemCallback {
+            ?.add(seatInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {
                     runOnMainThread { completion.invoke(null) }
                 }
@@ -1112,7 +1115,7 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         mSceneReference?.collection(kCollectionIdChooseSong)
-            ?.update(objectId, songInfo, object : Sync.Callback {
+            ?.update(objectId, songInfo, object : Callback {
                 override fun onSuccess() {
                     completion.invoke(null)
                 }
@@ -1128,7 +1131,7 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         mSceneReference?.collection(kCollectionIdChooseSong)
-            ?.add(songInfo, object : Sync.DataItemCallback {
+            ?.add(songInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {
 
                     songChosenList.add(songInfo)
@@ -1154,7 +1157,7 @@ class KTVSyncManagerServiceImp(
 
     private fun innerRemoveChooseSong(objectId: String, completion: (error: Exception?) -> Unit) {
         mSceneReference?.collection(kCollectionIdChooseSong)
-            ?.delete(objectId, object : Sync.Callback {
+            ?.delete(objectId, object : Callback {
                 override fun onSuccess() {
                     runOnMainThread { completion.invoke(null) }
                 }
@@ -1275,7 +1278,7 @@ class KTVSyncManagerServiceImp(
         val sceneReference = mSceneReference ?: return
         if (TextUtils.isEmpty(objIdOfSingingScore)) {
             sceneReference.collection(kCollectionIdSingingScore)
-                .add(data, object : Sync.DataItemCallback {
+                .add(data, object : DataItemCallback {
                     override fun onSuccess(result: IObject?) {
                         objIdOfSingingScore = result?.id ?: ""
                     }
@@ -1286,7 +1289,7 @@ class KTVSyncManagerServiceImp(
                 })
         } else {
             sceneReference.collection(kCollectionIdSingingScore)
-                .update(objIdOfSingingScore, data, object : Sync.Callback {
+                .update(objIdOfSingingScore, data, object : Callback {
                     override fun onSuccess() {
 
                     }
