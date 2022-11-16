@@ -46,7 +46,7 @@ typedef enum : NSUInteger {
 } KTVSingRole;
 static NSInteger streamId = -1;
 typedef void (^LyricCallback)(NSString* lyricUrl);
-typedef void (^LoadMusicCallback)(void);
+typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
@@ -615,20 +615,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 status:(AgoraMusicContentCenterPreloadStatus)status
                    msg:(nonnull NSString *)msg
               lyricUrl:(nonnull NSString *)lyricUrl {
-    if (status == AgoraMusicContentCenterPreloadStatusOK) {
-        VLLog(@"Agora - onPreLoadEvent, playMusic");
-        NSString* sSongCode = [NSString stringWithFormat:@"%ld", songCode];
-        LoadMusicCallback block = [self.musicCallbacks objectForKey:sSongCode];
-        if(!block) {
-            return;
-        }
-        [self.musicCallbacks removeObjectForKey:sSongCode];
-        block();
-    } else if(status == AgoraMusicContentCenterPreloadStatusPreloading) {
-        // Do nothing.
-    } else {
-        [VLToast toast:KTVLocalizedString(@"加载歌曲失败")];
+    VLLog(@"Agora - onPreLoadEvent: %ld", status);
+    if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
+        return;
     }
+    NSString* sSongCode = [NSString stringWithFormat:@"%ld", songCode];
+    LoadMusicCallback block = [self.musicCallbacks objectForKey:sSongCode];
+    if(!block) {
+        return;
+    }
+    [self.musicCallbacks removeObjectForKey:sSongCode];
+    block(status);
 }
 
 #pragma mark - action utils / business
@@ -712,9 +709,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
             VLLog(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@", model.songNo, model.songName);
+            if (lyricUrl == nil) {
+                return;
+            }
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
-            [weakSelf loadMusic:model.songNo withCallback:^{
+            [weakSelf loadMusic:model.songNo withCallback:^(AgoraMusicContentCenterPreloadStatus status){
+                if (status != AgoraMusicContentCenterPreloadStatusOK) {
+                    return;
+                }
                 VLLog(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@", model.songNo, model.songName);
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
                 weakSelf.isPlayerPublish = YES;
@@ -729,6 +732,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
     } else if(role == KTVSingRoleAudience) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
+            if (lyricUrl == nil) {
+                return;
+            }
             VLLog(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
@@ -756,19 +762,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.lyricCallbacks setObject:block forKey:requestId];
 }
 
-- (void)loadMusic:(NSString *)songCode withCallback:(void (^ _Nullable)(void))block {
+- (void)loadMusic:(NSString *)songCode withCallback:(LoadMusicCallback)block {
     NSInteger songCodeIntValue = [songCode integerValue];
     NSInteger error = [self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue];
     if(error == 0) {
         if(block) {
             [self.musicCallbacks removeObjectForKey:songCode];
-            block();
+            block(AgoraMusicContentCenterPreloadStatusOK);
         }
+        
+        return;
     }
-    else {
-        error = [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
-        [self.musicCallbacks setObject:block forKey:songCode];
+    
+    error = [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
+    if (error != 0) {
+        if(block) {
+            [self.musicCallbacks removeObjectForKey:songCode];
+            block(AgoraMusicContentCenterPreloadStatusError);
+        }
+        return;
     }
+    [self.musicCallbacks setObject:block forKey:songCode];
+
     VLLog(@"_rtcMediaPlayer--------是否静音:%d",[_rtcMediaPlayer getMute]);
 }
 

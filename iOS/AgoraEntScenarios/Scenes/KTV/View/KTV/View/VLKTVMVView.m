@@ -134,10 +134,7 @@
 }
 
 - (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.lrcView setVoicePitch:pitch];
-    });
-    
+    [self.lrcView setVoicePitch:pitch];    
 }
 
 #pragma mark - Action
