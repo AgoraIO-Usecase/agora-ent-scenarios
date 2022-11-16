@@ -408,12 +408,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull VLRoomSelSongModel music) {
         getBinding().lrcControlView.setMusic(music);
-        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())
-                || UserManager.getInstance().getUser().userNo.equals(music.getChorusNo())) {
-//            RoomManager.mMine.role = AgoraMember.Role.Speaker;
+        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
+        } else if (UserManager.getInstance().getUser().userNo.equals(music.getChorusNo())) {
+            getBinding().lrcControlView.setRole(LrcControlView.Role.Partner);
         } else {
-//            RoomManager.mMine.role = AgoraMember.Role.Listener;
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         }
         roomLivingViewModel.musicStartPlay(this, music);

@@ -45,7 +45,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
 
     public enum Role {
-        Singer, Listener
+        Singer, Listener, Partner
     }
 
     private Role mRole = Role.Listener;
@@ -263,6 +263,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(true);
+        } else if (this.mRole == Role.Partner) {
+            mBinding.ilActive.lrcView.setEnableDrag(true);
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
+            mBinding.ilActive.ivChangeSong.setVisibility(View.GONE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
