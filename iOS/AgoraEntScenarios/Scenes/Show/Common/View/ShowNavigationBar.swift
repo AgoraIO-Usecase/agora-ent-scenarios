@@ -38,7 +38,7 @@ class ShowNavigationBar: UIView {
     private var leftButtons = [UIButton]()
     private var rightButtons = [UIButton]()
     
-    lazy var titleLabel = {
+    lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         addSubview(titleLabel)
         titleLabel.text = "navi_title_show_live".show_localized

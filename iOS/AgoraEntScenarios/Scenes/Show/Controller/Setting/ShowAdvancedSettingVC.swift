@@ -18,7 +18,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
                           "show_advance_setting_capture_title".show_localized]
     
     // 指示条
-    private lazy var indicator = {
+    private lazy var indicator: JXCategoryIndicatorLineView = {
         let indicator = JXCategoryIndicatorLineView()
         indicator.indicatorWidth = 66
         indicator.indicatorHeight = 2
@@ -27,7 +27,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     }()
     
     // 分类
-    private lazy var segmentedView = {
+    private lazy var segmentedView: JXCategoryTitleView = {
         let segmentedView = JXCategoryTitleView()
         segmentedView.isTitleColorGradientEnabled = true
         segmentedView.titles = titles
