@@ -25,7 +25,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.bean.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
 import io.agora.scene.voice.model.VoiceRoomViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory.Companion.get
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
@@ -59,6 +59,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     private var encryption: String = ""
     private var roomName: String = ""
     private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private var curVoiceRoomModel: VoiceRoomModel? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityCreateRoomLayoutBinding {
         return VoiceActivityCreateRoomLayoutBinding.inflate(inflater)
@@ -78,7 +79,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         binding.edPwd.setOnTextChangeListener {
             if (it.length >= 4) hideKeyboard()
         }
-        binding.radioGroupGender.setOnCheckedChangeListener{ group,checkedId->
+        binding.radioGroupGender.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.radioButton_private) {
                 isPublic = false
             } else if (checkedId == R.id.radioButton_public) {
@@ -86,10 +87,10 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             }
             chickPrivate()
         }
-        binding.titleBar.setOnBackPressListener{
+        binding.titleBar.setOnBackPressListener {
             onBackPressed()
         }
-        binding.bottomNext.setOnClickListener{
+        binding.bottomNext.setOnClickListener {
             if (roomType == 1) {
                 binding.bottomNext.isEnabled = false
                 showLoading(false)
@@ -98,7 +99,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             roomName = binding.edRoomName.text.toString().trim { it <= ' ' }
             checkPrivate()
         }
-        binding.randomLayout.setOnClickListener{
+        binding.randomLayout.setOnClickListener {
             binding.edRoomName.setText(randomName())
         }
         binding.agoraTabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
@@ -139,19 +140,28 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.createRoomObservable()
-            .observe(this) { response: Resource<VoiceRoomModel> ->
-                parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
-                    override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
-                        val chatUsername = get().getVoiceBuddy().chatUsername()
-                        val chatToken = get().getVoiceBuddy().chatToken()
-                        "Voice create room chat_uid:$chatUsername".logD()
-                        "Voice create room im_token:$chatToken".logD()
+        voiceRoomViewModel.createRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
+                    curVoiceRoomModel = voiceRoomModel
+                    voiceRoomModel?.let {
+                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                    }
+                }
+            })
+        }
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(result: Boolean?) {
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
+                    "Voice create room chat_username:$chatUsername".logD()
+                    "Voice create room im_token:$chatToken".logD()
+                    if (!ChatroomHelper.getInstance().isLoggedIn) {
                         ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
                             override fun onSuccess() {
-                                // todo 设置kv
                                 ThreadManager.getInstance().runOnMainThread {
-                                    joinRoom(voiceRoomModel)
+                                    goVoiceRoom()
                                 }
                             }
 
@@ -162,9 +172,14 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                                 }
                             }
                         })
+                    } else {
+                        ThreadManager.getInstance().runOnMainThread {
+                            goVoiceRoom()
+                        }
                     }
-                })
-            }
+                }
+            })
+        }
     }
 
     override fun onDestroy() {
@@ -216,15 +231,17 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         mediator.attach()
     }
 
-    fun joinRoom(data: VoiceRoomModel?) {
-        binding.bottomNext.isEnabled = true
-        dismissLoading()
-        "voice room create joinChatRoom onSuccess".logD()
-        ARouter.getInstance()
-            .build(RouterPath.ChatroomPath)
-            .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, data)
-            .navigation()
-        finish()
+    fun goVoiceRoom() {
+        curVoiceRoomModel?.let {
+            binding.bottomNext.isEnabled = true
+            dismissLoading()
+            "voice room create joinChatRoom onSuccess".logD()
+            ARouter.getInstance()
+                .build(RouterPath.ChatroomPath)
+                .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
+                .navigation()
+            finish()
+        }
     }
 
     private fun chickPrivate() {

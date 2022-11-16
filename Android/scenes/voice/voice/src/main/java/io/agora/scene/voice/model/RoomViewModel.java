@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.agora.ValueCallBack;
 import io.agora.scene.voice.bean.RoomKitBean;
 import io.agora.scene.voice.controller.RtcRoomController;
+import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.voice.baseui.general.callback.ResultCallBack;
 import io.agora.voice.baseui.general.net.Resource;
 import io.agora.voice.buddy.tool.LogTools;
@@ -22,7 +23,6 @@ import io.agora.chat.ChatRoom;
 import io.agora.scene.voice.general.livedatas.SingleSourceLiveData;
 import io.agora.scene.voice.general.repositories.ChatroomRepository;
 import io.agora.scene.voice.general.repositories.NetworkOnlyResource;
-import io.agora.scene.voice.general.repositories.ProfileManager;
 import kotlin.Pair;
 import io.agora.voice.network.tools.VRDefaultValueCallBack;
 import io.agora.voice.network.tools.bean.VRoomBean;
@@ -129,7 +129,7 @@ public class RoomViewModel extends AndroidViewModel {
         joinRtcChannel.set(false);
         joinImRoom.set(false);
         RtcRoomController.get().joinChannel(getApplication(), roomKitBean.getChannelId(),
-                ProfileManager.getInstance().getProfile().getRtc_uid(),
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
                 roomKitBean.isOwner(),
                 new VRDefaultValueCallBack<Boolean>() {
                     @Override

@@ -3,6 +3,7 @@ package io.agora.scene.voice.general.net
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.network.http.VRHttpCallback
@@ -21,13 +22,15 @@ import org.json.JSONObject
 class VRToolboxServerHttpManager {
 
     private val TAG = "VoiceToolboxServerHttpManager"
-    private lateinit var context: Context
+
+    private fun context(): Context {
+        return VoiceBuddyFactory.get().getVoiceBuddy().application().applicationContext
+    }
 
     companion object {
         @JvmStatic
-        fun get(context: Context): VRToolboxServerHttpManager {
+        fun get(): VRToolboxServerHttpManager {
             val sSingle = InstanceHelper.sSingle
-            sSingle.context = context
             return sSingle
         }
     }
@@ -71,7 +74,7 @@ class VRToolboxServerHttpManager {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        VRHttpClientManager.Builder(context)
+        VRHttpClientManager.Builder(context())
             .setUrl(VoiceToolboxRequestApi.get().generateToken())
             .setHeaders(headers)
             .setParams(requestBody.toString())
@@ -79,9 +82,15 @@ class VRToolboxServerHttpManager {
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
                     "voice generateToken success: $result".logE(TAG)
-                    val bean = GsonTools.toBean<VRGenerateTokenResponse>(result,
-                        object : TypeToken<VRGenerateTokenResponse>() {}.type)
-                    callBack.onSuccess(bean?.data)
+                    val bean = GsonTools.toBean<VRGenerateTokenResponse>(
+                        result,
+                        object : TypeToken<VRGenerateTokenResponse>() {}.type
+                    )
+                    if (bean?.isSuccess() == true) {
+                        callBack.onSuccess(bean.data)
+                    } else {
+                        callBack.onError(bean?.code ?: -1, bean?.msg)
+                    }
                 }
 
                 override fun onError(code: Int, msg: String) {
@@ -113,12 +122,12 @@ class VRToolboxServerHttpManager {
      */
     fun createImRoom(
         chatroomName: String,
-        chatroomNameDesc: String,
+        chatroomNameDesc: String = "Welcome!",
         chatroomOwner: String,
-        src: String,
+        src: String = "Android",
         traceId: String,
         username: String,
-        password: String,
+        password: String = "12345678",
         nickname: String,
         callBack: VRValueCallBack<VRCreateRoomResponse>
     ) {
@@ -144,7 +153,7 @@ class VRToolboxServerHttpManager {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        VRHttpClientManager.Builder(context)
+        VRHttpClientManager.Builder(context())
             .setUrl(VoiceToolboxRequestApi.get().createImRoom())
             .setHeaders(headers)
             .setParams(requestBody.toString())
@@ -156,7 +165,11 @@ class VRToolboxServerHttpManager {
                         result,
                         object : TypeToken<VRCreateRoomResponse>() {}.type
                     )
-                    callBack.onSuccess(bean?.data)
+                    if (bean?.isSuccess() == true) {
+                        callBack.onSuccess(bean.data)
+                    } else {
+                        callBack.onError(bean?.code ?: -1, bean?.msg)
+                    }
                 }
 
                 override fun onError(code: Int, msg: String) {
