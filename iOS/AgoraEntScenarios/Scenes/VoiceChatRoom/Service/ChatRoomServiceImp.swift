@@ -271,7 +271,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             VLUserCenter.user.chat_uid = uid
             
             VoiceRoomIMManager.shared?.loginIM(userName: owner.rtc_uid ?? "" , token: im_token , completion: { userName, error in
-                if error != nil {
+                if error == nil {
                     if let strongSelf = self {
                         strongSelf.roomList?.append(room_entity)
                         let params = room_entity.kj.JSONObject()
