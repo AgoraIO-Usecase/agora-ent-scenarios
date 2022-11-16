@@ -154,7 +154,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (seatLocal == null || mRoomSpeakerAdapter.getItemData(seatLocal.getSeatIndex()) == null) {
                 return;
             }
-            roomLivingViewModel.toggleMic(b ? 0 : 1);
+            roomLivingViewModel.toggleMic(b);
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
@@ -542,7 +542,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
-        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen ? 1 : 0);
+        toggleVideoRun = () -> roomLivingViewModel.toggleSelfVideo(isOpen);
         requestCameraPermission();
     }
 
