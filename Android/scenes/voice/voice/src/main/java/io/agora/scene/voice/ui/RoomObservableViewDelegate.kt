@@ -1,6 +1,7 @@
 package io.agora.scene.voice.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
@@ -31,6 +32,7 @@ import io.agora.voice.baseui.interfaces.IParserSource
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
 import io.agora.scene.voice.R
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.secnceui.annotation.MicClickAction
@@ -331,13 +333,13 @@ class RoomObservableViewDelegate constructor(
             if (rtcUid > 0) {
                 micMap[index] = rtcUid
                 // 当前用户在麦位上
-                if (rtcUid == io.agora.scene.voice.general.repositories.ProfileManager.getInstance().rtcUid()) {
+                if (rtcUid ==  VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     kvLocalUser = micInfo
                 }
             } else {
                 val removeRtcUid = micMap.remove(index)
                 // 当前用户从麦位移除
-                if (removeRtcUid == io.agora.scene.voice.general.repositories.ProfileManager.getInstance().rtcUid()) {
+                if (removeRtcUid ==   VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     myselfMicInfo = null
                 }
             }
@@ -390,7 +392,7 @@ class RoomObservableViewDelegate constructor(
                     val micIndex = micInfo.index
                     if (rtcUid > 0) {
                         // 自己
-                        if (rtcUid == io.agora.scene.voice.general.repositories.ProfileManager.getInstance().rtcUid()) {
+                        if (rtcUid ==  VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                             myselfMicInfo = micInfo
                             RtcRoomController.get().isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
                         }
@@ -613,18 +615,13 @@ class RoomObservableViewDelegate constructor(
      * 点击麦位
      */
     fun onUserMicClick(micInfo: MicInfoBean) {
-        if (roomKitBean.isOwner || io.agora.scene.voice.general.repositories.ProfileManager.getInstance()
-                .isMyself(micInfo.userInfo?.userId)
-        ) { // 房主或者自己
+        val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(),micInfo.userInfo?.userId)
+        if (roomKitBean.isOwner ||  isMyself) { // 房主或者自己
             val roomMicMangerDialog = RoomMicManagerSheetDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable(RoomMicManagerSheetDialog.KEY_MIC_INFO, micInfo)
                     putSerializable(RoomMicManagerSheetDialog.KEY_IS_OWNER, roomKitBean.isOwner)
-                    putSerializable(
-                        RoomMicManagerSheetDialog.KEY_IS_MYSELF,
-                        io.agora.scene.voice.general.repositories.ProfileManager.getInstance()
-                            .isMyself(micInfo.userInfo?.userId)
-                    )
+                    putSerializable(RoomMicManagerSheetDialog.KEY_IS_MYSELF, isMyself)
                 }
             }
             roomMicMangerDialog.onItemClickListener = object : OnItemClickListener<MicManagerBean> {
@@ -684,9 +681,7 @@ class RoomObservableViewDelegate constructor(
             // 座位被锁麦
             ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.userInfo == null) {
-            val mineMicIndex = iRoomMicView.findMicByUid(
-                io.agora.scene.voice.general.repositories.ProfileManager.getInstance().myUid()
-            )
+            val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
             if (mineMicIndex > 0)
                 showAlertDialog(activity.getString(R.string.voice_chatroom_exchange_mic),
                     object : CommonSheetAlertDialog.OnClickBottomListener {

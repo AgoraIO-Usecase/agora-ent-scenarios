@@ -2,11 +2,17 @@ package io.agora.scene.voice.general.repositories
 
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
-import io.agora.scene.voice.service.VoiceCreateRoomModel
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.BuildConfig
+import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
+import io.agora.scene.voice.service.*
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
+import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
+import io.agora.voice.network.tools.VRDefaultValueCallBack
+import java.util.*
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author create by zhangwei03
@@ -26,7 +32,7 @@ class VoiceRoomRepository : BaseRepository() {
     fun fetchRoomList(page: Int, roomType: Int): LiveData<Resource<List<VoiceRoomModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceRoomModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRoomModel>>>) {
-                voiceServiceProtocol.fetchRoomList(0, 0, completion = { error, result ->
+                voiceServiceProtocol.fetchRoomList(page, roomType, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -79,6 +85,32 @@ class VoiceRoomRepository : BaseRepository() {
                     roomType = roomType
                 )
                 voiceServiceProtocol.createRoom(voiceCreateRoomModel, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error, "")
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    /**
+     * 加入房间
+     * @param roomId 房间id
+     * @param password 密码
+     * @param needConvertConfig false
+     */
+    fun joinRoom(
+        roomId: String,
+        password: String? = null,
+        needConvertConfig: Boolean = false,
+    ): LiveData<Resource<Boolean>> {
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+
+                voiceServiceProtocol.joinRoom(roomId, password ?: "", needConvertConfig, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {

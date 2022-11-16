@@ -10,9 +10,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.launcher.ARouter
+import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
 import io.agora.scene.voice.model.VoiceRoomViewModel
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
@@ -23,7 +25,9 @@ import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.config.RouterParams
 import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
+import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools.show
+import io.agora.voice.imkit.manager.ChatroomHelper
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() {
     private lateinit var voiceRoomViewModel: VoiceRoomViewModel
@@ -62,6 +66,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     }
 
     private fun voiceRoomObservable() {
+        voiceRoomViewModel.getRoomList(0, 0)
         voiceRoomViewModel.roomListObservable().observe(requireActivity()) { response: Resource<List<VoiceRoomModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceRoomModel>>() {
                 override fun onSuccess(dataList: List<VoiceRoomModel>?) {
@@ -84,7 +89,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 override fun onSuccess(value: Boolean?) {
                     if (value == true) {
                         curVoiceRoomModel?.let {
-                            goChatroomPage(it)
+                            // 房间列表进入需要置换 token 与获取 im 配置
+                            voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword, true)
                         }
                     } else {
                         dismissLoading()
@@ -98,23 +104,55 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 }
             })
         }
-        voiceRoomViewModel.getRoomList(0,0)
-    }
+        voiceRoomViewModel.joinRoomObservable().observe(requireActivity()) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean?>() {
+                override fun onSuccess(reslut: Boolean?) {
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
+                    "Voice room list chat_username:$chatUsername".logD()
+                    "Voice room list im_token:$chatToken".logD()
+                    if (!ChatroomHelper.getInstance().isLoggedIn) {
+                        ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
+                            override fun onSuccess() {
+                                ThreadManager.getInstance().runOnMainThread {
+                                    goChatroomPage()
+                                }
+                            }
 
-    private fun onItemClick(voiceRoomModel: VoiceRoomModel) {
-        if (voiceRoomModel.isPrivate) {
-            showInputDialog(voiceRoomModel)
-        } else {
-            goChatroomPage(voiceRoomModel)
+                            override fun onError(code: Int, desc: String) {
+                                ThreadManager.getInstance().runOnMainThread {
+                                    dismissLoading()
+                                }
+                            }
+                        })
+                    } else {
+                        ThreadManager.getInstance().runOnMainThread {
+                            goChatroomPage()
+                        }
+                    }
+                }
+            })
         }
     }
 
-    private fun goChatroomPage(voiceRoomModel: VoiceRoomModel) {
-        ARouter.getInstance()
-            .build(RouterPath.ChatroomPath)
-            .withSerializable(RouterParams.KEY_CHATROOM_INFO, voiceRoomModel)
-            .navigation()
-        dismissLoading()
+    private fun onItemClick(voiceRoomModel: VoiceRoomModel) {
+        curVoiceRoomModel = voiceRoomModel
+        if (voiceRoomModel.isPrivate) {
+            showInputDialog(voiceRoomModel)
+        } else {
+            // 房间列表进入需要置换 token 与获取 im 配置
+            voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, voiceRoomModel.roomPassword, true)
+        }
+    }
+
+    private fun goChatroomPage() {
+        curVoiceRoomModel?.let {
+            ARouter.getInstance()
+                .build(RouterPath.ChatroomPath)
+                .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
+                .navigation()
+            dismissLoading()
+        }
     }
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
@@ -124,7 +162,6 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
-                    curVoiceRoomModel = voiceRoomModel
                     voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomId, password)
                     showLoading(false)
                 }

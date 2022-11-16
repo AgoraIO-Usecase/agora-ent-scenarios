@@ -24,19 +24,24 @@ class VoiceRoomViewModel constructor(application: Application) : AndroidViewMode
     private val _createRoomObservable: SingleSourceLiveData<Resource<VoiceRoomModel>> =
         SingleSourceLiveData()
 
+    private val _joinRoomObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+
     fun roomListObservable(): LiveData<Resource<List<VoiceRoomModel>>> = _roomListObservable
 
     fun checkPasswordObservable(): LiveData<Resource<Boolean>> = _checkPasswordObservable
 
     fun createRoomObservable(): LiveData<Resource<VoiceRoomModel>> = _createRoomObservable
 
+    fun joinRoomObservable(): LiveData<Resource<Boolean>> = _joinRoomObservable
+
     /**
      * 获取房间列表
      * @param page 第几页，暂未用到
      * @param roomType 房间类型，暂未用到
      */
-    fun getRoomList(page: Int, type: Int) {
-        _roomListObservable.setSource(voiceRoomRepository.fetchRoomList(page, type))
+    fun getRoomList(page: Int, roomType: Int) {
+        _roomListObservable.setSource(voiceRoomRepository.fetchRoomList(page, roomType))
     }
 
     /**
@@ -59,7 +64,23 @@ class VoiceRoomViewModel constructor(application: Application) : AndroidViewMode
         _createRoomObservable.setSource(voiceRoomRepository.createRoom(roomName, soundEffect, 0, password))
     }
 
+    /**
+     * 创建3d音频房间
+     * @param roomName 房间名
+     * @param soundEffect 房间音效类型
+     * @param password  私有房间，有秘密
+     */
     fun createSpatialRoom(roomName: String, soundEffect: Int = 0, password: String? = null) {
         _createRoomObservable.setSource(voiceRoomRepository.createRoom(roomName, soundEffect, 0, password))
+    }
+
+    /**
+     * 加入房间
+     * @param roomId 房间id
+     * @param password 房间密码
+     * @param needRequestConfig 是否需要置换rtcToken 与 获取 im 配置
+     */
+    fun joinRoom(roomId: String, password: String? = null, needRequestConfig: Boolean = false) {
+        _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId, password,needRequestConfig))
     }
 }
