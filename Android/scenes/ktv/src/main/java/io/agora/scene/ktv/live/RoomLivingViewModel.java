@@ -1205,7 +1205,8 @@ public class RoomLivingViewModel extends ViewModel {
         mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
-                if (seatLocalLiveData.getValue().isAudioMuted() == 1) {
+                int isMuted = seatLocalLiveData.getValue().isAudioMuted();
+                if (isMuted == 1) {
                     isOpnEar = isEar;
                     return;
                 }
@@ -1377,7 +1378,7 @@ public class RoomLivingViewModel extends ViewModel {
                 mainChannelMediaOption.publishMicrophoneTrack = true;
                 mainChannelMediaOption.publishCustomAudioTrack = false;
                 mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-                mainChannelMediaOption.autoSubscribeAudio = false;
+                mainChannelMediaOption.autoSubscribeAudio = true;
                 mainChannelMediaOption.autoSubscribeVideo = true;
                 mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                 mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
