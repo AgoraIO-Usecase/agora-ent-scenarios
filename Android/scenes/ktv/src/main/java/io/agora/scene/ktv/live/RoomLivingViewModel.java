@@ -447,7 +447,7 @@ public class RoomLivingViewModel extends ViewModel {
                         }
                         if (seatModel.isAudioMuted() == 1) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                                toggleMic(0);
+                                musicUpdateMic(false);
                             }
                         }
                     } else {
@@ -458,11 +458,11 @@ public class RoomLivingViewModel extends ViewModel {
                 });
     }
 
-    public void toggleSelfVideo(int isVideoMuted) {
-        ktvServiceProtocol.openVideoStatus(isVideoMuted, e -> {
+    public void toggleSelfVideo(boolean isOpen) {
+        ktvServiceProtocol.updateSeatVideoMuteStatus(!isOpen, e -> {
             if (e == null) {
                 // success
-                mRtcEngine.enableLocalVideo(isVideoMuted == 1);
+                mRtcEngine.enableLocalVideo(isOpen);
             } else {
                 // failure
                 ToastUtils.showToast(e.getMessage());
@@ -474,39 +474,41 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 静音
      *
-     * @param isSelfMuted 1 为静音
      */
-    public void toggleMic(int isSelfMuted) {
-        boolean isUnMute = isSelfMuted == 0;
-        ktvServiceProtocol.openAudioStatus(isSelfMuted, e -> {
+    public void toggleMic(boolean isUnMute) {
+        ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
-                if (!isUnMute) {
-                    if (mSetting.isEar()) {
-                        isOpnEar = true;
-                        mSetting.setEar(false);
-                    } else {
-                        isOpnEar = false;
-                    }
-                } else {
-                    mSetting.setEar(isOpnEar);
-                }
-                ChannelMediaOptions options = new ChannelMediaOptions();
-                options.publishMicrophoneTrack = isUnMute;
-                mRtcEngine.updateChannelMediaOptions(options);
-                if (mPlayer != null) {
-                    if (isUnMute) {
-                        setOldMicVolume();
-                    } else {
-                        resetVolume();
-                    }
-                }
+                musicUpdateMic(isUnMute);
             } else {
                 // failure
                 ToastUtils.showToast(e.getMessage());
             }
             return null;
         });
+    }
+
+    private void musicUpdateMic(boolean isUnMute) {
+        if (!isUnMute) {
+            if (mSetting.isEar()) {
+                isOpnEar = true;
+                mSetting.setEar(false);
+            } else {
+                isOpnEar = false;
+            }
+        } else {
+            mSetting.setEar(isOpnEar);
+        }
+        ChannelMediaOptions options = new ChannelMediaOptions();
+        options.publishMicrophoneTrack = isUnMute;
+        mRtcEngine.updateChannelMediaOptions(options);
+        if (mPlayer != null) {
+            if (isUnMute) {
+                setOldMicVolume();
+            } else {
+                resetVolume();
+            }
+        }
     }
 
 

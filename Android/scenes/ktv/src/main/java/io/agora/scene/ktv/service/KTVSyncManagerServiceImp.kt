@@ -370,7 +370,7 @@ class KTVSyncManagerServiceImp(
         completion(null)
     }
 
-    override fun openAudioStatus(isSelfMuted: Int, completion: (error: Exception?) -> Unit) {
+    override fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit) {
         seatMap.forEach {
             if (it.value?.userNo == UserManager.getInstance().user.userNo) {
                 val originSeatInfo = it.value
@@ -383,7 +383,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.name,
                         originSeatInfo.seatIndex,
                         originSeatInfo.joinSing,
-                        isSelfMuted, // update this
+                        if (mute) 1 else 0, // update this
                         originSeatInfo.isVideoMuted
                     )
                     innerUpdateSeat(seatInfo, completion)
@@ -392,8 +392,8 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-    override fun openVideoStatus(
-        isVideoMuted: Int,
+    override fun updateSeatVideoMuteStatus(
+        mute: Boolean,
         completion: (error: Exception?) -> Unit
     ) {
         seatMap.forEach {
@@ -409,7 +409,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.seatIndex,
                         originSeatInfo.joinSing,
                         originSeatInfo.isAudioMuted,
-                        isVideoMuted// update this
+                        if (mute) 1 else 0// update this
                     )
                     innerUpdateSeat(seatInfo, completion)
                 }
@@ -863,7 +863,7 @@ class KTVSyncManagerServiceImp(
             seatIndex,
             false,
             0,
-            0
+            1
         )
     }
 
