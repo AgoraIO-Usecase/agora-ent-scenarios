@@ -1174,6 +1174,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView start];
         //发送继续播放的消息
         [self sendPauseOrResumeMessage:0];
+        
+        //failed to load lyric/music, try again
+        [self loadAndPlaySong];
     } else if (type == VLKTVMVViewActionTypeMVPause) { //暂停
         [self.rtcMediaPlayer pause];
         [self.MVView stop];
