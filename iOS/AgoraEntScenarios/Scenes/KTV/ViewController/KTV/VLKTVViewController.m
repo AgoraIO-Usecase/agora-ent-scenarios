@@ -228,7 +228,10 @@ VLPopScoreViewDelegate
     
     [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
         //观众看到打分
-        weakSelf.currentVoicePitch = score;
+        if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+            //audience use sync to update pitch value, main singer don't
+            weakSelf.currentVoicePitch = score;
+        }
     }];
     
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
@@ -453,11 +456,11 @@ VLPopScoreViewDelegate
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
     AgoraRtcAudioVolumeInfo* speaker = [speakers firstObject];
-    if (speaker == nil || ![self isMainSinger:VLUserCenter.user.userNo]) {
+    if (speaker == nil || ![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
         return;
     }
     
-//    self.currentVoicePitch = speaker.voicePitch;
+    self.currentVoicePitch = speaker.voicePitch;
     [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
 }
 
@@ -474,7 +477,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLLog(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isMainSinger:VLUserCenter.user.userNo]) {
+                if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
                     [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
                 }
                 [self playNextSong:0];
@@ -862,7 +865,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:3000 smooth:3 reportVad:YES];
+    int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
     if (code == 0) {
         VLLog(@"评分回调开启成功\n");
     } else {
@@ -1167,7 +1170,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                        withDoneBlock:^{
             if (weakSelf.selSongsArray.count >= 1) {
                 if([weakSelf isRoomOwner]
-                   && [weakSelf isMainSinger:VLUserCenter.user.userNo] == NO) {
+                   && [weakSelf isCurrentSongMainSinger:VLUserCenter.user.userNo] == NO) {
                     [weakSelf playNextSong:1];
                 } else {
                     [weakSelf playNextSong:0];
@@ -1432,7 +1435,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - Util functions to check user character for current song.
-- (BOOL)isMainSinger:(NSString *)userNo {
+- (BOOL)isCurrentSongMainSinger:(NSString *)userNo {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     return [selSongModel.userNo isEqualToString:userNo];
 }
@@ -1450,15 +1453,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     return NO;
-}
-
-- (NSString *)getMainSingerUserNo {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    if(selSongModel != nil) {
-        return selSongModel.userNo;
-    }
-    
-    return nil;
 }
 
 - (NSString *)getChrousSingerUserNo {
@@ -1640,7 +1634,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)_checkInEarMonitoring {
-    if([self isMainSinger:VLUserCenter.user.userNo]) {
+    if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
         [self.RTCkit enableInEarMonitoring:_isEarOn];
     } else {
         [self.RTCkit enableInEarMonitoring:NO];
