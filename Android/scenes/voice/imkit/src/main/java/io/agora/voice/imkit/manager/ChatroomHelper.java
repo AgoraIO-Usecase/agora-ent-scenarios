@@ -408,6 +408,10 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         ChatClient.getInstance().renewToken(newToken);
     }
 
+    public boolean isLoggedIn(){
+        return ChatClient.getInstance().isLoggedIn();
+    }
+
     public void login(String uid,String token,CallBack callBack){
         ChatClient.getInstance().loginWithAgoraToken(uid, token, new CallBack() {
             @Override

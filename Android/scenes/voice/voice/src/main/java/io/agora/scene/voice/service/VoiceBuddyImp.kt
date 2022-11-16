@@ -11,23 +11,23 @@ import io.agora.voice.buddy.IVoiceBuddy
  */
 class VoiceBuddyImp : IVoiceBuddy {
 
+    private var chatUid: String = ""
     private var chatToken: String = ""
     private var rtcToken: String = ""
-    private var chatUsername: String = ""
 
     override fun application(): Application {
         return AgoraApplication.the()
     }
 
     override fun toolboxServiceUrl(): String {
-        return ""
+        return BuildConfig.toolbox_server_host
     }
 
     override fun headUrl(): String {
         return UserManager.getInstance().user?.headUrl ?: ""
     }
 
-    override fun userName(): String {
+    override fun nickName(): String {
         return UserManager.getInstance().user?.name ?: ""
     }
 
@@ -56,8 +56,8 @@ class VoiceBuddyImp : IVoiceBuddy {
         return rtcToken
     }
 
-    override fun chatUsername(): String {
-        return chatUsername
+    override fun chatUid(): String {
+        return chatUid
     }
 
     override fun chatAppKey(): String {
@@ -68,9 +68,12 @@ class VoiceBuddyImp : IVoiceBuddy {
         return chatToken
     }
 
-    override fun setupChatConfig(chatUsername: String, chatToken: String, rtcToken: String) {
-        this.chatUsername = chatUsername
-        this.chatToken = chatToken
+    override fun setupRtcToken(rtcToken: String) {
         this.rtcToken = rtcToken
+    }
+
+    override fun setupChatConfig(chatUid: String, chatToken: String) {
+        this.chatUid = chatUid
+        this.chatToken = chatToken
     }
 }
