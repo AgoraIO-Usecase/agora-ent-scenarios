@@ -594,6 +594,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self.lyricCallbacks removeObjectForKey:requestId];
     
+    if ([lyricUrl length] == 0) {
+        callback(nil);
+        return;
+    }
+    
     [self.MVView loadLrcURL:lyricUrl];
     [self.lyricCallbacks setObject:callback forKey:lyricUrl];
 //    callback(lyricUrl);
