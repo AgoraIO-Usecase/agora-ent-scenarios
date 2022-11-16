@@ -123,7 +123,7 @@ private func _hideLoadingIfNeed() {
                 let dataArray = results.map({ info in
                     return VLRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
-                self.roomList = dataArray.sorted(by: { TimeInterval($0.updatedAt ?? $0.createdAt ?? "0") ?? 0 > TimeInterval($1.updatedAt ?? $0.createdAt ?? "0") ?? 0 })
+                self.roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
                 completion(nil, self.roomList)
             } fail: { error in
                 completion(error, nil)
@@ -144,7 +144,7 @@ private func _hideLoadingIfNeed() {
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
-        roomInfo.createdAt = "\(Date().timeIntervalSince1970)"
+        roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
 
         let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
 
@@ -402,11 +402,11 @@ private func _hideLoadingIfNeed() {
         }
 
         // mark input song to top
-        song.pinAt = Date().timeIntervalSince1970 * 1000
+        song.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
 
         //if top song is playing status, keep it always on top(_sortChooseSongList)
         if topSong.objectId != song.objectId, topSong.status != 2 {
-            topSong.pinAt = Date().timeIntervalSince1970 * 1000
+            topSong.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
             _updateChooseSong(songInfo: topSong) { error in
             }
         }
@@ -669,7 +669,7 @@ extension KTVSyncManagerServiceImp {
         if roomPeopleNum == roomInfo.roomPeopleNum {
             return
         }
-        roomInfo.updatedAt = "\(Date().timeIntervalSince1970 * 1000)"
+        roomInfo.updatedAt = Int64(Date().timeIntervalSince1970 * 1000)
         roomInfo.roomPeopleNum = roomPeopleNum
         var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
 //        SyncUtil
@@ -1015,7 +1015,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         agoraPrint("imp song add...")
-        songInfo.createAt = Date().timeIntervalSince1970 * 1000
+        songInfo.createAt = Int64(Date().timeIntervalSince1970 * 1000)
         let params = songInfo.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
