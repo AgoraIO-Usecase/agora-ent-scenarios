@@ -65,7 +65,7 @@ class ShowRoomListVC: ShowBaseViewController {
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        preNC.modalPresentationStyle = .overCurrentContext
+        preNC.modalPresentationStyle = .fullScreen
         present(preNC, animated: true)
     }
     
@@ -76,7 +76,7 @@ class ShowRoomListVC: ShowBaseViewController {
                 let vc = ShowLiveViewController()
                 vc.room = room
                 let nc = UINavigationController(rootViewController: vc)
-                nc.modalPresentationStyle = .overCurrentContext
+                nc.modalPresentationStyle = .fullScreen
                 self?.present(nc, animated: true)
             }
         }

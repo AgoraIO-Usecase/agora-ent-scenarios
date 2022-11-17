@@ -34,7 +34,6 @@ class ShowVideoSettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        setUpData()
     }
     
     private func setUpUI(){
