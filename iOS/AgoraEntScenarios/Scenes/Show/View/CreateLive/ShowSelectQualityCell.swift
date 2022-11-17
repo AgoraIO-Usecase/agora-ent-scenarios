@@ -20,7 +20,7 @@ class ShowSelectQualityCell: UICollectionViewCell {
     }()
     
     // 值
-    private lazy var valueLabel = {
+    private lazy var valueLabel: UILabel = {
         let label = UILabel()
         label.font = .show_R_12
         label.textColor = .show_main_text
