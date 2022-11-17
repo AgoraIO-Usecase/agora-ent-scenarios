@@ -255,6 +255,8 @@ extension ShowSyncManagerServiceImp {
     private func _leaveRoom(completion: @escaping (Error?) -> Void) {
         defer {
             _unsubscribe()
+            roomNo = nil
+            completion(nil)
         }
         
         guard let channelName = roomNo else {
@@ -265,8 +267,6 @@ extension ShowSyncManagerServiceImp {
         }
 
         SyncUtil.leaveScene(id: channelName)
-        roomNo = nil
-        completion(nil)
     }
 
     private func _removeRoom(completion: @escaping (Error?) -> Void) {
@@ -323,15 +323,29 @@ extension ShowSyncManagerServiceImp {
             print("addUserInfo channelName = nil")
             return
         }
-        let model = VLUserCenter.user
+        let model = ShowUser()
+        model.userId = VLUserCenter.user.userNo
+        model.avatar = VLUserCenter.user.headUrl
+        model.userName = VLUserCenter.user.name
 
         let params = model.yy_modelToJSONObject() as! [String: Any]
         agoraPrint("imp user add ...")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: { object in
+            .add(data: params, success: { [weak self] object in
                 agoraPrint("imp user add success...")
+                guard let self = self,
+                      let jsonStr = object.toJson(),
+                      let model = ShowUser.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                
+                if self.userList.contains(where: { $0.userId == model.userId }) {
+                    return
+                }
+                
+                self.userList.append(model)
                 finished()
             }, fail: { error in
                 agoraPrint("imp user add fail :\(error.message)...")
@@ -377,6 +391,7 @@ extension ShowSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
+        
         guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.userNo }).first?.objectId else {
             agoraAssert("_removeUser objectId = nil")
             return
