@@ -5,7 +5,6 @@ import com.google.gson.JsonElement
 import com.google.gson.ToNumberPolicy
 import com.google.gson.reflect.TypeToken
 import org.json.JSONObject
-import java.lang.Exception
 import java.lang.reflect.Type
 
 object GsonTools {
@@ -54,9 +53,9 @@ object GsonTools {
     }
 
     @JvmStatic
-    fun beanToMap(obj: Any): Map<String, String> {
+    fun beanToMap(obj: Any): Map<String, Any> {
         return try {
-            gson.fromJson(gson.toJson(obj), object : TypeToken<Map<String, String>>() {}.type)
+            gson.fromJson(gson.toJson(obj), object : TypeToken<Map<String, Any>>() {}.type)
         } catch (e: Exception) {
             emptyMap()
         }
