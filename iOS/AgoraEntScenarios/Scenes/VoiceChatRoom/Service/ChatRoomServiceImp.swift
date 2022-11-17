@@ -302,26 +302,20 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             VLUserCenter.user.im_token = im_token
             VLUserCenter.user.chat_uid = uid
             
-            VoiceRoomIMManager.shared?.loginIM(userName: owner.rtc_uid ?? "" , token: im_token , completion: { userName, error in
-                if error == nil {
-                    if let strongSelf = self {
-                        strongSelf.roomList?.append(room_entity)
-                        let params = room_entity.kj.JSONObject()
-                        strongSelf.initScene {
-                            SyncUtil.joinScene(id: room_entity.room_id ?? "",
-                                               userId: VLUserCenter.user.userNo,
-                                               property: params) { result in
-                                let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                                completion(nil,model)
-                            } fail: { error in
-                                completion(error, nil)
-                            }
-                        }
+            if let strongSelf = self {
+                strongSelf.roomList?.append(room_entity)
+                let params = room_entity.kj.JSONObject()
+                strongSelf.initScene {
+                    SyncUtil.joinScene(id: room_entity.room_id ?? "",
+                                       userId: VLUserCenter.user.userNo,
+                                       property: params) { result in
+                        let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                        completion(nil,model)
+                    } fail: { error in
+                        completion(error, nil)
                     }
-                } else {
-                    
                 }
-            })
+            }
         }
 
     }
@@ -439,19 +433,19 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
-            var im_token = ""
-            var im_uid = ""
-            var chatroom_id = ""
-            
-            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
-                im_uid = uid ?? ""
-                chatroom_id = room_id ?? ""
-                im_token = token ?? ""
-                NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
-                    VLUserCenter.user.agoraRTCToken = token ?? ""
-                    completion(im_token, im_uid, chatroom_id )
-                }
+        var im_token = ""
+        var im_uid = ""
+        var chatroom_id = ""
+        
+        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+            im_uid = uid ?? ""
+            chatroom_id = room_id ?? ""
+            im_token = token ?? ""
+            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+                VLUserCenter.user.agoraRTCToken = token ?? ""
+                completion(im_token, im_uid, chatroom_id )
             }
         }
+    }
 }
 
