@@ -586,7 +586,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
     
-    VLLog(@"onLyricResult %@", lyricUrl);
+    KTVLogInfo(@"onLyricResult %@", lyricUrl);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
     if(!callback) {
@@ -620,7 +620,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 status:(AgoraMusicContentCenterPreloadStatus)status
                    msg:(nonnull NSString *)msg
               lyricUrl:(nonnull NSString *)lyricUrl {
-    VLLog(@"Agora - onPreLoadEvent: %ld", status);
+    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
         return;
     }
@@ -709,7 +709,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     [self stopCurrentSong];
-    VLLog(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
+    KTVLogInfo(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
 
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
@@ -764,6 +764,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
+    KTVLogInfo(@"loadLyric: %ld", songNo);
+//    [KTVLog infoWithText:[NSString stringWithFormat:@"loadLyric: %ld", songNo] tag:nil];
     NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
     if ([requestId length] == 0) {
         if (block) {
@@ -775,6 +777,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadMusic:(NSString *)songCode withCallback:(LoadMusicCallback)block {
+    KTVLogInfo(@"loadMusic: %@", songCode);
     NSInteger songCodeIntValue = [songCode integerValue];
     NSInteger error = [self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue];
     if(error == 0) {
@@ -800,7 +803,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)openMusicWithSongCode:(NSInteger )songCode {
-    VLLog(@"Agora - MediaPlayer playing %ld", songCode);
+    KTVLogInfo(@"Agora - MediaPlayer playing %ld", songCode);
     if(self.rtcMediaPlayer != nil) {
         self.currentPlayingSongNo = [NSString stringWithFormat:@"%ld", songCode];
         [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
@@ -1284,7 +1287,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)downloadLrcFinishedWithUrl:(NSString *)url {
-    VLLog(@"\n歌词下载完成\n%@",url);
+    KTVLogInfo(@"download lrc finished %@",url);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:url];
     if(!callback) {
@@ -1300,7 +1303,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
-    VLLog(@"\n歌词下载失败\n%@\n%@",url,error);
+    KTVLogInfo(@"download lrc fail %@: %@",url,error);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:url];
     if(!callback) {
