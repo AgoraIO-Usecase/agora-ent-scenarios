@@ -476,14 +476,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         } else if (state == AgoraMediaPlayerStatePlayBackCompleted) {
             VLLog(@"Playback Completed");
         } else if (state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLLog(@"Playback all loop completed");
-                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
-                    [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
-                }
-                [self playNextSong:0];
-            });
+            VLLog(@"Playback all loop completed");
+            VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
+            if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+                [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
+            }
+            [self playNextSong:0];
         } else if (state == AgoraMediaPlayerStateStopped) {
         }
     });
