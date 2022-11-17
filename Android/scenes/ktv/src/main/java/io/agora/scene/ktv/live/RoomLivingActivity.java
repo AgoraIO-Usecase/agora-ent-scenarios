@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -442,15 +441,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         cardView.setCardElevation(0);
         cardView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> cardView.setRadius((right - left) / 2f));
 
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, 0);
-        lp.dimensionRatio = "1:1";
-        cardView.setLayoutParams(lp);
-
         SurfaceView surfaceView = new SurfaceView(context);
         surfaceView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         cardView.addView(surfaceView);
-        container.addView(cardView, 0);
+        container.addView(cardView);
         return surfaceView;
     }
 
