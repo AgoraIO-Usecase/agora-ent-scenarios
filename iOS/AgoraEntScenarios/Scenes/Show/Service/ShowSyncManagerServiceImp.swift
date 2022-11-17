@@ -9,7 +9,7 @@ import Foundation
 
 private let kSceneId = "scene_show"
 
-private let SYNC_MANAGER_MESSAGE_INFO = "show_message_info"
+private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -255,6 +255,8 @@ extension ShowSyncManagerServiceImp {
     private func _leaveRoom(completion: @escaping (Error?) -> Void) {
         defer {
             _unsubscribe()
+            roomNo = nil
+            completion(nil)
         }
         
         guard let channelName = roomNo else {
@@ -265,8 +267,6 @@ extension ShowSyncManagerServiceImp {
         }
 
         SyncUtil.leaveScene(id: channelName)
-        roomNo = nil
-        completion(nil)
     }
 
     private func _removeRoom(completion: @escaping (Error?) -> Void) {
@@ -323,15 +323,29 @@ extension ShowSyncManagerServiceImp {
             print("addUserInfo channelName = nil")
             return
         }
-        let model = VLUserCenter.user
+        let model = ShowUser()
+        model.userId = VLUserCenter.user.userNo
+        model.avatar = VLUserCenter.user.headUrl
+        model.userName = VLUserCenter.user.name
 
         let params = model.yy_modelToJSONObject() as! [String: Any]
         agoraPrint("imp user add ...")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: { object in
+            .add(data: params, success: { [weak self] object in
                 agoraPrint("imp user add success...")
+                guard let self = self,
+                      let jsonStr = object.toJson(),
+                      let model = ShowUser.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                
+                if self.userList.contains(where: { $0.userId == model.userId }) {
+                    return
+                }
+                
+                self.userList.append(model)
                 finished()
             }, fail: { error in
                 agoraPrint("imp user add fail :\(error.message)...")
@@ -377,6 +391,7 @@ extension ShowSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
+        
         guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.userNo }).first?.objectId else {
             agoraAssert("_removeUser objectId = nil")
             return
@@ -443,7 +458,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp message get...")
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_MESSAGE_INFO)
+            .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
                 let messageList = list.compactMap({ ShowMessage.yy_model(withJSON: $0.toJson()!)! })
@@ -468,7 +483,7 @@ extension ShowSyncManagerServiceImp {
         let params = message.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_MESSAGE_INFO)
+            .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .add(data: params, success: { object in
                 agoraPrint("imp message add success...")
                 finished?(nil)
@@ -487,7 +502,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp message subscribe ...")
         SyncUtil
             .scene(id: channelName)?
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
+            .subscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
                            agoraPrint("imp message subscribe onUpdated...")
