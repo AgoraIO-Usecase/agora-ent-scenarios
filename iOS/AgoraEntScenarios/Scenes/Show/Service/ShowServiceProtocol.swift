@@ -47,7 +47,7 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// 监听用户变化
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeUser(subscribeClosure: @escaping (ShowSubscribeStatus, ShowUser) -> Void)
+    func subscribeUserChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowUser) -> Void)
     
     /// 获取当前房间所有用户
     /// - Parameter completion: 完成回调   (错误信息， 用户列表)
@@ -62,12 +62,12 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     ///   - message: <#message description#>
     ///   - completion: <#completion description#>
     func sendChatMessage(message: ShowMessage,
-                         completion: ((Error) -> Void)?)
+                         completion: ((Error?) -> Void)?)
     
     /// 订阅聊天消息变化
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeMicSeatInvitation(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMessage) -> Void)
+    func subscribeMessageChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMessage) -> Void)
     
     
     
@@ -80,7 +80,7 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// 主播订阅连麦申请变化
     /// - Parameters:
     ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeMicSeatApply(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatApply) -> Void)
+    func subscribeMicSeatApplyChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatApply) -> Void)
     
     /// 观众申请连麦
     /// - Parameters:
@@ -116,7 +116,7 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     
     /// 观众订阅连麦邀请
     /// - Parameter subscribeClosure: <#subscribeClosure description#>
-    func subscribeMicSeatInvitation(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatInvitation) -> Void)
+    func subscribeMicSeatInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatInvitation) -> Void)
     
     /// 主播创建连麦邀请
     /// - Parameters:
