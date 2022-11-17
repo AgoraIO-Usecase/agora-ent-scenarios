@@ -97,14 +97,13 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func subscribeChatMsg(){
-        /*
-        AppContext.showServiceImp.subscribeMicSeatInvitation { [weak self] status, msg in
+        
+        AppContext.showServiceImp.subscribeMessageChanged(subscribeClosure: { [weak self] status, msg in
             if let text = msg.message {
                 let model = ShowChatModel(userName: msg.userName ?? "", text: text)
                 self?.liveView.addChatModel(model)
             }
-        }
-         */
+        })
     }
     
     private func sendMessageWithText(_ text: String) {
