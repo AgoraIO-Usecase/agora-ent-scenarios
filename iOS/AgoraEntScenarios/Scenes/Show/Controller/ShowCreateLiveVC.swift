@@ -153,7 +153,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         room.thumbnailId = createView.roomBg
         room.ownerId = VLUserCenter.user.userNo
         room.ownerAvater = VLUserCenter.user.headUrl
-        room.createdAt = Date().timeIntervalSince1970
+        room.createdAt = Date().millionsecondSince1970()
         AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
             let liveVC = ShowLiveViewController()
             liveVC.room = detailModel
