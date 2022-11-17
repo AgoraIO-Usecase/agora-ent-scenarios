@@ -120,7 +120,6 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickBeautyBtnAction() {
         createView.hideBottomViews = true
         let beautyVC = ShowBeautySettingVC()
-        beautyVC.modalPresentationStyle = .overCurrentContext
         present(beautyVC, animated: true)
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
@@ -131,7 +130,6 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         createView.hideBottomViews = true
         let vc = ShowSelectQualityVC()
         vc.defalutSelectIndex = selectedResolution
-        vc.modalPresentationStyle = .overCurrentContext
         present(vc, animated: true)
         vc.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false

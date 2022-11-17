@@ -186,18 +186,22 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
-        
+        /*
+        let vc = ShowReceiveLiveFinishAlertVC()
+        vc.dismissAlert { [weak self] in
+            self?.dismiss(animated: true)
+        }
+        present(vc, animated: true)
+         */
     }
     
     func onClickBeautyButton() {
         let beautyVC = ShowBeautySettingVC()
-        beautyVC.modalPresentationStyle = .overCurrentContext
         present(beautyVC, animated: true)
     }
     
     func onClickMusicButton() {
         let vc = ShowMusicEffectVC()
-        vc.modalPresentationStyle = .overCurrentContext
         present(vc, animated: true)
     }
     

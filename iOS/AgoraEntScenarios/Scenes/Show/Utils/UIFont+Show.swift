@@ -63,6 +63,10 @@ extension UIFont {
         show_regularFontSize(14)
     }
     
+    @objc static var show_R_16: UIFont? {
+        show_regularFontSize(16)
+    }
+    
     // 导航栏标题
     @objc static var show_navi_title: UIFont? {
         show_SemiboldFontSize(16)
