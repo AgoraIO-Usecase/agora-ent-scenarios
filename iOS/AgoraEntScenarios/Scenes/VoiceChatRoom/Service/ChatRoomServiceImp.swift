@@ -228,7 +228,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 let dataArray = results.map({ info in
                     return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 })
-                self?.roomList = dataArray.sorted(by: {$0.created_at! > $1.created_at!})
+                self?.roomList = dataArray.sorted(by: {$0.created_at ?? 0 > $1.created_at ?? 0})
                 completion(nil, self?.roomList)
             } fail: { error in
                 completion(error, nil)
@@ -270,26 +270,20 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             VLUserCenter.user.im_token = im_token
             VLUserCenter.user.chat_uid = uid
             
-            VoiceRoomIMManager.shared?.loginIM(userName: owner.rtc_uid ?? "" , token: im_token , completion: { userName, error in
-                if error == nil {
-                    if let strongSelf = self {
-                        strongSelf.roomList?.append(room_entity)
-                        let params = room_entity.kj.JSONObject()
-                        strongSelf.initScene {
-                            SyncUtil.joinScene(id: room_entity.room_id ?? "",
-                                               userId: VLUserCenter.user.userNo,
-                                               property: params) { result in
-                                let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                                completion(nil,model)
-                            } fail: { error in
-                                completion(error, nil)
-                            }
-                        }
+            if let strongSelf = self {
+                strongSelf.roomList?.append(room_entity)
+                let params = room_entity.kj.JSONObject()
+                strongSelf.initScene {
+                    SyncUtil.joinScene(id: room_entity.room_id ?? "",
+                                       userId: VLUserCenter.user.userNo,
+                                       property: params) { result in
+                        let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                        completion(nil,model)
+                    } fail: { error in
+                        completion(error, nil)
                     }
-                } else {
-                    
                 }
-            })
+            }
         }
 
     }
@@ -412,10 +406,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         var chatroom_id = ""
         
         NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+            im_uid = uid ?? ""
+            chatroom_id = room_id ?? ""
+            im_token = token ?? ""
             NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
-                im_uid = uid ?? ""
-                chatroom_id = room_id ?? ""
-                im_token = token ?? ""
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 completion(im_token, im_uid, chatroom_id )
             }
