@@ -17,10 +17,10 @@ import androidx.palette.graphics.Palette;
 
 import io.agora.lyrics_view.LrcView;
 import io.agora.lyrics_view.PitchView;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.ktv.service.RoomSelSongModel;
 
 /**
@@ -169,17 +169,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         stopTimer();
     }
 
-    public void onPrepareStatus() {
+    public void onPrepareStatus(boolean isMineOwner) {
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
-//        if (RoomManager.getInstance().mMusicModel != null
-//                && RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-//            this.mRole = Role.Singer;
-//        }
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
@@ -191,7 +187,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
         }
-        if (RoomManager.mMine.isMaster) {
+        if (isMineOwner) {
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
@@ -202,17 +198,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 mBinding.ilActive.ivMusicMenu.setVisibility(View.GONE);
             }
         }
-//        else if (RoomManager.getInstance().mMusicModel == null || !RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
-//        }
         stopTimer();
     }
 
-    public void onPlayStatus() {
+    public void onPlayStatus(RoomSelSongModel songPlaying) {
         stopTimer();
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        setScoreControlView();
+        setScoreControlView(songPlaying);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
@@ -220,15 +213,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivMusicStart.setImageResource(R.mipmap.ktv_ic_pause);
     }
 
-    public void setScoreControlView() {
-        if (RoomManager.getInstance().mMusicModel != null && RoomManager.getInstance().mMusicModel.isChorus) {
-            if (RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)
-                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userId)) {
+    public void setScoreControlView(RoomSelSongModel songPlaying) {
+        if (songPlaying != null && songPlaying.isChorus()) {
+            if (UserManager.getInstance().getUser().userNo.equals(songPlaying.getUserNo())) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
             } else {
                 mBinding.scoreControlView.setVisibility(GONE);
             }
-        } else if (RoomManager.getInstance().mMusicModel != null && !RoomManager.getInstance().mMusicModel.isJoin) {
+        } else if (songPlaying != null && !songPlaying.isChorus()) {
             mBinding.scoreControlView.setVisibility(VISIBLE);
         } else {
             mBinding.scoreControlView.setVisibility(GONE);

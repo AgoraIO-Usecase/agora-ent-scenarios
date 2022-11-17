@@ -50,6 +50,7 @@ data class RoomSeatModel(
 
     companion object{
         val MUTED_VALUE_TRUE = 1
+
         val MUTED_VALUE_FALSE = 0
     }
 }
