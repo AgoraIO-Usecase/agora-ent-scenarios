@@ -27,10 +27,6 @@ open class MediaPlayerObserver : IMediaPlayerObserver {
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {
     }
 
-    override fun onCompleted() {
-
-    }
-
     override fun onAgoraCDNTokenWillExpire() {
     }
 

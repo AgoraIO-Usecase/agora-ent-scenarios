@@ -1,6 +1,7 @@
 package io.agora.scene.base.api.apiutils
 
 import com.google.gson.*
+import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 open class GsonUtils {
@@ -32,6 +33,10 @@ open class GsonUtils {
 
         fun covertToString(obj: Any, typeOfSrc: Type): JsonElement {
             return gson.toJsonTree(obj, typeOfSrc)
+        }
+
+        fun covertToMap(obj: Any): Map<String, String>{
+            return gson.fromJson(gson.toJson(obj), object: TypeToken<HashMap<String, String>>(){}.type)
         }
     }
 }

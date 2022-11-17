@@ -75,18 +75,19 @@
             return;
         }
         
-        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
-                              channelId:outputModel.roomNo
-                                   info:nil uid:[VLUserCenter.user.id integerValue]
-                            joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-            VLLog(@"Agora - 加入RTC成功");
-            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-        }];
+//        [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
+//                              channelId:outputModel.roomNo
+//                                   info:nil uid:[VLUserCenter.user.id integerValue]
+//                            joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
+//            VLLog(@"Agora - 加入RTC成功");
+//            [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
+//        }];
         //处理座位信息
         VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
         listModel.roomNo = outputModel.roomNo;
         listModel.name = outputModel.name;
         listModel.bgOption = 0;
+        listModel.creatorNo = VLUserCenter.user.userNo;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
@@ -94,34 +95,34 @@
     }];
 }
 
-- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {
-    NSMutableArray *seatMuArray = [NSMutableArray array];
-    NSArray *modelArray = [VLRoomSeatModel vj_modelArrayWithJson:seatsArray];
-    for (int i=0; i<8; i++) {
-        BOOL ifFind = NO;
-        for (VLRoomSeatModel *model in modelArray) {
-            if (model.onSeat == i) { //这个位置已经有人了
-                ifFind = YES;
-                if(songArray != nil && [songArray count] >= 1) {
-                    if([model.userNo isEqualToString:songArray[0][@"userNo"]]) {
-                        model.ifSelTheSingSong = YES;
-                    }
-                    else if([model.userNo isEqualToString:songArray[0][@"chorusNo"]]) {
-                        model.ifJoinedChorus = YES;
-                    }
-                }
-                
-                [seatMuArray addObject:model];
-            }
-        }
-        if (!ifFind) {
-            VLRoomSeatModel *model = [[VLRoomSeatModel alloc]init];
-            model.onSeat = i;
-            [seatMuArray addObject:model];
-        }
-    }
-    return seatMuArray.mutableCopy;
-}
+//- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {
+//    NSMutableArray *seatMuArray = [NSMutableArray array];
+//    NSArray *modelArray = [VLRoomSeatModel vj_modelArrayWithJson:seatsArray];
+//    for (int i=0; i<8; i++) {
+//        BOOL ifFind = NO;
+//        for (VLRoomSeatModel *model in modelArray) {
+//            if (model.seatIndex == i) { //这个位置已经有人了
+//                ifFind = YES;
+//                if(songArray != nil && [songArray count] >= 1) {
+//                    if([model.userNo isEqualToString:songArray[0][@"userNo"]]) {
+//                        model.isSelTheSingSong = YES;
+//                    }
+//                    else if([model.userNo isEqualToString:songArray[0][@"chorusNo"]]) {
+//                        model.isJoinedChorus = YES;
+//                    }
+//                }
+//                
+//                [seatMuArray addObject:model];
+//            }
+//        }
+//        if (!ifFind) {
+//            VLRoomSeatModel *model = [[VLRoomSeatModel alloc]init];
+//            model.seatIndex = i;
+//            [seatMuArray addObject:model];
+//        }
+//    }
+//    return seatMuArray.mutableCopy;
+//}
 
 - (void)setUpUI {
     VLCreateRoomView *createRoomView = [[VLCreateRoomView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];

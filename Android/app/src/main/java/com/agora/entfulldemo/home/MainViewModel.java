@@ -10,7 +10,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.ApiSubscriber;
@@ -34,14 +34,14 @@ public class MainViewModel extends BaseRequestViewModel {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(@Nullable UserInfoChangeEvent event) {
         if (getISingleCallback() != null) {
-            getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(@Nullable UserLogoutEvent event) {
         if (getISingleCallback() != null) {
-            getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_USER_LOGOUT, null);
+            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_LOGOUT, null);
         }
     }
 
@@ -62,7 +62,7 @@ public class MainViewModel extends BaseRequestViewModel {
                         UserManager.getInstance().getUser().name = data.getData().name;
                         UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
                         UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                        getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
                     }
 
                     @Override
@@ -90,7 +90,7 @@ public class MainViewModel extends BaseRequestViewModel {
                     @Override
                     public void onSuccess(BaseResponse<User> data) {
                         ToastUtils.showToast("修改成功");
-                        getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                         if (!TextUtils.isEmpty(name)) {
                             UserManager.getInstance().getUser().name = name;
                         }
@@ -145,7 +145,7 @@ public class MainViewModel extends BaseRequestViewModel {
 
                     @Override
                     public void onSuccess(BaseResponse<String> data) {
-                        getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS, null);
                     }
 
                     @Override

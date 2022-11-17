@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.R;
 import io.agora.scene.widget.databinding.DialogSelectPhotoFromBinding;
 
@@ -47,7 +47,7 @@ public class SelectPhotoFromDialog extends BaseDialog<DialogSelectPhotoFromBindi
     protected void setGravity() {
         getWindow().setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                KTVUtil.dp2px(222)
+                UiUtil.dp2px(222)
         );
         getWindow().getAttributes().gravity = Gravity.BOTTOM;
     }
