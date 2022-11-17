@@ -112,12 +112,11 @@ class ShowLiveViewController: UIViewController {
         showMsg.userId = VLUserCenter.user.id
         showMsg.userName = VLUserCenter.user.name
         showMsg.message = text
-        showMsg.createAt = Date().timeIntervalSince1970
-        /*
+        showMsg.createAt = Date().millionsecondSince1970()
+        
         AppContext.showServiceImp.sendChatMessage(message: showMsg) { error in
-            print("发送消息状态 \(error.localizedDescription) text = \(text)")
+            print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
-         */
         let model = ShowChatModel(userName: VLUserCenter.user.name, text: text)
         liveView.addChatModel(model)
     }
