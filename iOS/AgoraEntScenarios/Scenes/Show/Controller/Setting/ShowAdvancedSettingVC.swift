@@ -80,9 +80,9 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         // 标题
         naviBar.title = "show_advanced_setting_title".show_localized
         // 右边按钮
-        let saveBarButtonItem = ShowBarButtonItem(title: "show_advanced_setting_save".show_localized, target: self, action: #selector(didClickSaveBarButton))
+//        let saveBarButtonItem = ShowBarButtonItem(title: "show_advanced_setting_save".show_localized, target: self, action: #selector(didClickSaveBarButton))
         let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
-        naviBar.rightItems = [saveBarButtonItem, preSetButtonItem]
+        naviBar.rightItems = [preSetButtonItem]
         view.addSubview(naviBar)
     }
   
@@ -92,7 +92,8 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
 extension ShowAdvancedSettingVC {
     // 点击预设按钮
     @objc private func didClickPreSetBarButton() {
-        
+        let vc = ShowPresettingVC()
+        present(vc, animated: true)
     }
     
     // 点击保存按钮
