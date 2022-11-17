@@ -40,8 +40,8 @@ class ShowRoomListModel: ShowBaseInfo {
     var ownerAvater: String?                      //房主头像
     var ownerName: String?                        //房主名
     var roomStatus: ShowRoomStatus = .activity    //直播状态
-    var createdAt: Double = 0                     //创建时间，与19700101时间比较的毫秒数
-    var updatedAt: Double = 0                     //更新时间
+    var createdAt: Int64 = 0                      //创建时间，与19700101时间比较的毫秒数
+    var updatedAt: Int64 = 0                      //更新时间
 }
 
 
@@ -64,7 +64,7 @@ class ShowMessage: ShowBaseInfo {
     var userId: String?        //用户id
     var userName: String?      //用户名
     var message: String?       //用户名
-    var createAt: Double = 0   //创建时间，与19700101时间比较的毫秒数
+    var createAt: Int64 = 0    //创建时间，与19700101时间比较的毫秒数
 }
 
 /// 连麦申请
@@ -73,7 +73,7 @@ class ShowMicSeatApply: ShowBaseInfo {
     var userAvatar: String?                          //用户头像
     var userName: String?                            //用户名
     var status: ShowRoomRequestStatus = .waitting    //申请状态
-    var createdAt: Double = 0                        //创建时间，与19700101时间比较的毫秒数
+    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
 
@@ -84,7 +84,7 @@ class ShowMicSeatInvitation: ShowBaseInfo {
     var userName: String?                            //用户名
     var fromUserId: String?                          //发起邀请用户id
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
-    var createdAt: Double = 0                        //创建时间，与19700101时间比较的毫秒数
+    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
 /// PK邀请
@@ -95,5 +95,5 @@ class ShowPKInvitation: ShowBaseInfo {
     var fromName: String?                            //发起Pk用户名
     var fromRoomId: String?                          //发起Pk房间id
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
-    var createdAt: Double = 0                        //创建时间，与19700101时间比较的毫秒数
+    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
