@@ -1599,7 +1599,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
     [_AgoraMcc registerEventDelegate:nil];
     [[AppContext shared] unregisterEventDelegate:self];
-//    [AgoraMusicContentCenter destroy];
+    [AgoraMusicContentCenter destroy];
     _AgoraMcc = AgoraMcc;
     if (_AgoraMcc != nil) {
         [[AppContext shared] registerEventDelegate:self];
