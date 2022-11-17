@@ -14,12 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-
 import java.util.Random;
 
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
@@ -31,7 +28,6 @@ import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 /**
  * 创建房间
  */
-@Route(path = PagePathConstant.pageRoomCreate)
 public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCreateBinding> {
     /**
      * 当前选中的是第几个输入框

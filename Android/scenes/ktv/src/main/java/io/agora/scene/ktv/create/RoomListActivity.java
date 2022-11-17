@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.create;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +12,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.utils.SPUtil;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
@@ -29,7 +27,7 @@ import io.agora.scene.widget.dialog.InputPasswordDialog;
 /**
  * 房间列表
  */
-@Route(path = PagePathConstant.pageRoomList)
+@Route(path = PagePathConstant.pageKTVRoomList)
 public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBinding> {
     private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
@@ -48,7 +46,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     }
 
     private void loadRoomList() {
-        SPUtil.putBoolean(KtvConstant.IS_AGREE, true);
         roomCreateViewModel.loadRooms();
     }
 
@@ -74,10 +71,10 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     @Override
     public void initListener() {
         getBinding().btnCreateRoom.setOnClickListener(view -> {
-            PagePilotManager.pageCreateRoomStep1();
+            startActivity(new Intent(this, RoomCreateActivity.class));
         });
         getBinding().btnCreateRoom2.setOnClickListener(view -> {
-            PagePilotManager.pageCreateRoomStep1();
+            startActivity(new Intent(this, RoomCreateActivity.class));
         });
         roomCreateViewModel.roomModelList.observe(this, vlRoomListModels -> {
             hideLoadingView();
