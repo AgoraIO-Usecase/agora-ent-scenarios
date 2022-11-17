@@ -18,10 +18,10 @@
     self.headUrl = @"";
     self.name = @"";
     self.userNo = @"";
-    self.id = nil;
+    self.rtcUid = nil;
     self.isSelfMuted = 0;
     self.isVideoMuted = 0;
-    self.ifJoinedChorus = NO;
+    self.isJoinedChorus = NO;
 }
 
 @end

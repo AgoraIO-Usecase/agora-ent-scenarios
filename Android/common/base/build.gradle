@@ -10,8 +10,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.android.minSdkVersion
         targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode 1
-        versionName "1.0.0"
         flavorDimensions ""
 
         javaCompileOptions {
@@ -57,6 +55,7 @@ dependencies {
     api rootProject.ext.deps.rxjava2
     api rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.okhttp
+    implementation rootProject.ext.deps.okhttp_logger
     implementation rootProject.ext.deps.retrofit2
     implementation rootProject.ext.deps.retrofit2_adapter
     api rootProject.ext.deps.gson
@@ -66,6 +65,8 @@ dependencies {
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
+
+    implementation rootProject.ext.deps.coroutines_android
 
     api rootProject.ext.deps.rtc
     api rootProject.ext.deps.rtm

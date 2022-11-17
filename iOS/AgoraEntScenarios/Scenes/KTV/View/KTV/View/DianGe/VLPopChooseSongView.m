@@ -30,7 +30,10 @@
 
 @implementation VLPopChooseSongView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus{
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -72,7 +75,6 @@
 }
 
 #pragma mark --setter,getter
-
 - (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
     if (selSongsArray.count > 0) {
@@ -82,11 +84,6 @@
     }
     [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
-}
-
-- (NSArray *)validateSelSongArray {
-    [self setSelSongsArray:[self.choosedSongView getSelSongArray]];
-    return self.selSongsArray;
 }
 
 - (VLHotSpotBtn *)dianGeBtn {

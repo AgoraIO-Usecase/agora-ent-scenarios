@@ -68,7 +68,6 @@ public class MVFragment extends BaseViewBindingFragment<FragmentDialogMvBinding>
     @Override
     public void onItemClick(@NonNull Integer data, View view, int position, long viewType) {
         mAdapter.selectedIndex = position;
-        RoomManager.mRoom.bgOption = String.valueOf(position);
         index = position;
         mAdapter.notifyDataSetChanged();
         ((RoomLivingActivity) requireActivity()).setPlayerBg(position);
