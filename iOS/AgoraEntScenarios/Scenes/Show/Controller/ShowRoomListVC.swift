@@ -28,12 +28,17 @@ class ShowRoomListVC: ShowBaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        getRoomList()
+//        getRoomList()
         addRefresh()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        getRoomList()
+    }
+    
     private func setUpUI(){
-      
         // 背景图
         let bgView = UIImageView()
         bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
