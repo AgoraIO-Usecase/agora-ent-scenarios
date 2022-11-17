@@ -80,11 +80,17 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             SVProgressHUD.dismiss()
             if let room = room {
                 self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-                let info: VRRoomInfo = VRRoomInfo()
-                info.room = room
-                info.mic_info = nil
-                let vc = VoiceRoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
+                VoiceRoomIMManager.shared?.loginIM(userName: room.owner?.rtc_uid ?? "" , token: VLUserCenter.user.im_token , completion: { userName, error in
+                    if error == nil {
+                        let info: VRRoomInfo = VRRoomInfo()
+                        info.room = room
+                        info.mic_info = nil
+                        let vc = VoiceRoomViewController(info: info)
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    } else {
+                        
+                    }
+                })
             } else {
                 self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
             }
