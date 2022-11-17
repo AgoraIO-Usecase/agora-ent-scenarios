@@ -28,9 +28,41 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return vmError
     }
     
-    func fetchRoomDetail(_ roomId: String, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
-        VoiceRoomIMManager.shared?.fetchChatroomAttributes(chatroom_id: roomId, keys: ["owner","ranking_list","member_list"], completion: { error, map in
-//            completion(self.convertError(error: error),(model(from: map ?? [:], type: VRUser.self) as! VRUser))
+    func fetchRoomDetail(roomInfo: VRRoomInfo, isOwner: Bool, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
+        var keys = ["ranking_list","member_list","gift_amount","robot_volume","use_robot"]
+        if isOwner == false {
+            keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
+        }
+        VoiceRoomIMManager.shared?.fetchChatroomAttributes(chatroom_id: roomInfo.room?.room_id ?? "", keys: keys, completion: { error, map in
+            if let ranking_list = map?["ranking_list"]?.toArray() {
+                print("ranking_list: \(ranking_list)")
+                roomInfo.room?.ranking_list = ranking_list.kj.modelArray(VRUser.self)
+            }
+            if let member_list = map?["ranking_list"]?.toArray() {
+                print("member_list: \(member_list)")
+                roomInfo.room?.member_list = member_list.kj.modelArray(VRUser.self)
+            }
+            if let gift_amount = map?["gift_amount"] as? String {
+                roomInfo.room?.gift_amount = Int(gift_amount)
+            }
+            if let use_robot = map?["use_robot"] as? String {
+                roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
+            }
+            if let robot_volume = map?["robot_volume"] as? String {
+                roomInfo.room?.robot_volume = UInt(robot_volume) ?? 50
+            }
+            let mics = map?.filter({
+                $0.key.hasSuffix("mic_")
+            })
+            var micsJson = [Dictionary<String,Any>]()
+            if mics?.keys.count ?? 0 > 0 {
+                for key in mics!.keys {
+                    micsJson.append(mics?[key]?.z.jsonToDictionary() ?? [:])
+                }
+                roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self)
+            }
+            
+            completion(self.convertError(error: error),roomInfo)
         })
     }
     
@@ -75,7 +107,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func forbidMic(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard var mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
+        guard let mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
             return
         }
         if mic.status == 3 {
@@ -89,7 +121,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func unForbidMic(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard var mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
+        guard let mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
             return
         }
         mic.status = 0
@@ -99,7 +131,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func lockMic(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard var mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
+        guard let mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
             return
         }
         if mic.status == 2 {
@@ -113,7 +145,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func unLockMic(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard var mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
+        guard let mic = VoiceRoomIMManager.shared?.mics?[mic_index] else {
             return
         }
         mic.status = 0
@@ -228,7 +260,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 let dataArray = results.map({ info in
                     return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 })
-                self?.roomList = dataArray.sorted(by: {$0.created_at! > $1.created_at!})
+                self?.roomList = dataArray.sorted(by: {$0.created_at ?? 0 > $1.created_at ?? 0})
                 completion(nil, self?.roomList)
             } fail: { error in
                 completion(error, nil)
@@ -407,19 +439,19 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
-        var im_token = ""
-        var im_uid = ""
-        var chatroom_id = ""
-        
-        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
-            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+            var im_token = ""
+            var im_uid = ""
+            var chatroom_id = ""
+            
+            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
                 im_uid = uid ?? ""
                 chatroom_id = room_id ?? ""
                 im_token = token ?? ""
-                VLUserCenter.user.agoraRTCToken = token ?? ""
-                completion(im_token, im_uid, chatroom_id )
+                NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+                    VLUserCenter.user.agoraRTCToken = token ?? ""
+                    completion(im_token, im_uid, chatroom_id )
+                }
             }
         }
-    }
 }
 
