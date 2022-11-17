@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi;
 import com.agora.entfulldemo.databinding.ActivityWelcomeBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -109,7 +109,7 @@ public class WelcomeActivity extends BaseViewBindingActivity<ActivityWelcomeBind
             PagePilotManager.pageMainHome();
             finish();
         } else {
-            if (!SPUtil.getBoolean(KtvConstant.IS_AGREE, false)) {
+            if (!SPUtil.getBoolean(Constant.IS_AGREE, false)) {
                 showUserAgreementDialog();
             } else {
                 PagePilotManager.pagePhoneLoginRegister();

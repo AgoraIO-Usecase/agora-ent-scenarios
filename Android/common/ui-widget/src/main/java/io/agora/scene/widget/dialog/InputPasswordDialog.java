@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.component.ISingleCallback;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogInputPasswordBinding;
 
 public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> {
@@ -85,8 +85,8 @@ public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> 
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(300),
-                KTVUtil.dp2px(230)
+                UiUtil.dp2px(300),
+                UiUtil.dp2px(230)
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }

@@ -24,8 +24,8 @@ import com.agora.entfulldemo.databinding.FragmentHomeMineBinding;
 
 import java.io.File;
 
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -68,14 +68,14 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
     @Override
     public void initListener() {
         mainViewModel.setISingleCallback((type, o) -> {
-            if (type == KtvConstant.CALLBACK_TYPE_USER_INFO_CHANGE) {
+            if (type == Constant.CALLBACK_TYPE_USER_INFO_CHANGE) {
                 User user = UserManager.getInstance().getUser();
                 GlideApp.with(this).load(user.headUrl).error(R.mipmap.userimage)
                         .transform(new CenterCropRoundCornerTransform(100))
                         .into(getBinding().ivUserAvatar);
                 getBinding().tvUserID.setText(getString(R.string.id_is_, user.userNo));
                 getBinding().tvUserMobile.setText(user.name);
-            } else if (type == KtvConstant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
+            } else if (type == Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
                 UserManager.getInstance().logout();
                 requireActivity().finish();
                 PagePilotManager.pageWelcome();
@@ -206,13 +206,13 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
             logoffAccountDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
-                    SPUtil.putBoolean(KtvConstant.IS_AGREE, false);
+                    SPUtil.putBoolean(Constant.IS_AGREE, false);
                     mainViewModel.requestCancellation(UserManager.getInstance().getUser().userNo);
                 }
 
                 @Override
                 public void onRightButtonClick() {
-
+                    SPUtil.putBoolean(Constant.IS_AGREE, true);
                 }
             });
         }
@@ -228,7 +228,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
             logoutDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
-                    SPUtil.putBoolean(KtvConstant.IS_AGREE, false);
+                    SPUtil.putBoolean(Constant.IS_AGREE, false);
                     UserManager.getInstance().logout();
                     requireActivity().finish();
                     PagePilotManager.pageWelcome();

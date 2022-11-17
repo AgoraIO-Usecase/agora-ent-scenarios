@@ -24,7 +24,7 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 
 public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndexBinding> {
 
@@ -48,7 +48,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndex
                     }
                 }
             }, HomeIndexHolder.class);
-            int padding = KTVUtil.dp2px(8);
+            int padding = UiUtil.dp2px(8);
             RecyclerView.ItemDecoration itemDecoration = new RecyclerView.ItemDecoration() {
                 @Override
                 public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
@@ -67,7 +67,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndex
     private void goScene(@NonNull ScenesModel scenesModel) {
         switch (scenesModel.getType()) {
             case Ktv_Online:
-                PagePilotManager.pageRoomList();
+                PagePilotManager.pageKTVRoomList();
                 break;
             case Voice_Chat:
                 ARouter.getInstance()
