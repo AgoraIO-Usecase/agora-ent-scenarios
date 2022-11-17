@@ -19,7 +19,6 @@ import io.agora.scene.ktv.databinding.FragmentDialogMvBinding;
 import io.agora.scene.ktv.databinding.KtvItemMvBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.ktv.live.holder.MVHolder;
-import io.agora.scene.ktv.manager.RoomManager;
 import io.agora.scene.widget.DividerDecoration;
 
 public class MVFragment extends BaseViewBindingFragment<FragmentDialogMvBinding> implements OnItemClickListener<Integer> {
