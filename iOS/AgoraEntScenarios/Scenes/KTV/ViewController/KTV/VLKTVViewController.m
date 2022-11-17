@@ -68,9 +68,6 @@ AgoraRtcEngineDelegate,
 AgoraMusicContentCenterEventDelegate,
 VLPopScoreViewDelegate
 >
-{
-    id<AgoraMusicPlayerProtocol> _rtcMediaPlayer;
-}
 
 @property (nonatomic, strong) VLKTVMVView *MVView;
 @property (nonatomic, strong) VLKTVSelBgModel *choosedBgModel;
@@ -84,7 +81,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLsoundEffectView *soundEffectView; // 音效视图
 
-@property (nonatomic, strong, readonly) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
+@property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, assign) float currentTime;
@@ -168,6 +165,8 @@ VLPopScoreViewDelegate
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [UIViewController popGestureClose:self];
+    
+    [self createMediaPlayer];
     
     //请求已点歌曲
     VL(weakSelf);
@@ -413,8 +412,8 @@ VLPopScoreViewDelegate
     [LEEAlert popForceLeaveRoomDialogWithCompletion:^{
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                [weakSelf destroyMediaPlayer];
-                [weakSelf leaveRTCChannel];
+//                [weakSelf destroyMediaPlayer];
+//                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
             }
         }
@@ -677,7 +676,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        [weakSelf destroyMediaPlayer];
+//        [weakSelf destroyMediaPlayer];
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
@@ -881,14 +880,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 销毁播放器
 - (void)destroyMediaPlayer {
-    if (_rtcMediaPlayer == nil) {
+    if (self.rtcMediaPlayer == nil) {
         return;
     }
-    [_rtcMediaPlayer stop];
+    [self.rtcMediaPlayer stop];
     VLLog(@"Agora - RTCMediaPlayer stop");
-    [self.RTCkit destroyMediaPlayer:_rtcMediaPlayer];
+    [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
     VLLog(@"Agora - Destroy media player");
-    _rtcMediaPlayer = nil;
+    self.rtcMediaPlayer = nil;
+}
+
+
+/// create media player
+- (void)createMediaPlayer {
+    [self destroyMediaPlayer];
+    
+    _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
+    // 调节本地播放音量。0-100
+    [_rtcMediaPlayer adjustPlayoutVolume:200];
+//    调节远端用户听到的音量。0-400
+    [_rtcMediaPlayer adjustPublishSignalVolume:200];
 }
 
 - (void)joinRTCChannel {
@@ -1695,17 +1706,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - lazy getter
-- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
-    if (!_rtcMediaPlayer) {
-        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
-        // 调节本地播放音量。0-100
-         [_rtcMediaPlayer adjustPlayoutVolume:200];
-//         调节远端用户听到的音量。0-400
-         [_rtcMediaPlayer adjustPublishSignalVolume:200];
-    }
-    return _rtcMediaPlayer;
-}
-
 - (VLKTVSettingView *)settingView {
     if (!_settingView) {
         _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
