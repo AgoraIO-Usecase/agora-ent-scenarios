@@ -13,7 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 
 
 public class BaseBottomSheetDialogFragment<B extends ViewBinding> extends BottomSheetDialogFragment {
@@ -41,8 +41,8 @@ public class BaseBottomSheetDialogFragment<B extends ViewBinding> extends Bottom
 
     private B getViewBindingByReflect(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         try {
-            Class<B> c = KTVUtil.getGenericClass(getClass(), 0);
-            return KTVUtil.getViewBinding(c, inflater, container);
+            Class<B> c = UiUtil.getGenericClass(getClass(), 0);
+            return UiUtil.getViewBinding(c, inflater, container);
         } catch (Exception e) {
             e.printStackTrace();
         }

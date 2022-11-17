@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat;
 
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.R;
 import io.agora.scene.widget.databinding.DialogUserAgreementBinding;
 
@@ -87,8 +87,8 @@ public class UserAgreementDialog extends BaseDialog<DialogUserAgreementBinding> 
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(280),
-                KTVUtil.dp2px(365)
+                UiUtil.dp2px(280),
+                UiUtil.dp2px(365)
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }

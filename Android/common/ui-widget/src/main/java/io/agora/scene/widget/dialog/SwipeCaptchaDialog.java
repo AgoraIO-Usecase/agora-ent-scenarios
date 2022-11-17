@@ -19,8 +19,8 @@ import java.util.Random;
 
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.KTVUtil;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.R;
 import io.agora.scene.widget.SwipeCaptchaView;
 import io.agora.scene.widget.databinding.DialogSwipeCaptchaBinding;
@@ -109,8 +109,8 @@ public class SwipeCaptchaDialog extends BaseDialog<DialogSwipeCaptchaBinding> {
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(295),
-                KTVUtil.dp2px(365)
+                UiUtil.dp2px(295),
+                UiUtil.dp2px(365)
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
