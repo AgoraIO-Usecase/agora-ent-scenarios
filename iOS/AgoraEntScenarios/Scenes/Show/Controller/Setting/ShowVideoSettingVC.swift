@@ -15,7 +15,8 @@ private let LabelCellID = "LabelCellID"
 
 class ShowVideoSettingVC: UIViewController {
     
-    var dataArray = [ShowSettingModel]()
+    var dataArray = [ShowSettingKey]()
+    var settingManager: ShowSettingManager!
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -42,64 +43,6 @@ class ShowVideoSettingVC: UIViewController {
             make.edges.equalToSuperview()
         }
     }
-    
-    private func setUpData(){
-        /*
-        let model = ShowSettingSwitchModel(title: "哈哈", isOn: true) { isOn in
-            ToastView.show(text: "点击了开关的\(isOn)")
-            
-        } clickDetailButonAction: {
-            ToastView.show(text: "点击了哈哈哈详情")
-        }
-        
-        let model2 = ShowSettingSwitchModel(title: "哈哈", isOn: true) { isOn in
-            ToastView.show(text: "点击了开关的\(isOn)")
-            
-        } clickDetailButonAction: {
-            ToastView.show(text: "点击了哈哈哈详情")
-        }
-        
-        let model3 = ShowSettingSwitchModel(title: "哈哈", isOn: true) { isOn in
-            ToastView.show(text: "点击了开关的\(isOn)")
-            
-        } clickDetailButonAction: {
-            ToastView.show(text: "点击了哈哈哈详情")
-        }
-        
-        let model4 = ShowSettingSwitchModel(title: "哈哈", isOn: true) { isOn in
-            ToastView.show(text: "点击了开关的\(isOn)")
-            
-        } clickDetailButonAction: {
-            ToastView.show(text: "点击了哈哈哈详情")
-        }
-        
-        let segmentModel = ShowSettingSegmentModel(title: "人像增强", selectedIndex: 0, items: ["无","低","中","高"]) { index in
-            
-        }
-        
-        let segmentModel2 = ShowSettingSegmentModel(title: "延迟", selectedIndex: 2, items: ["低","中","高"]) { index in
-            
-        }
-        
-        let sliderModel = ShowSettingSliderModel(title: "码率", value: 400, minValue: 200, maxValue: 1000) { value in
-            
-        }
-        
-        let sliderModel2 = ShowSettingSliderModel(title: "码率2", value: 400, minValue: 200, maxValue: 1000) { value in
-            
-        }
-        
-        let labelModel = ShowSettingLabelModel(title: "分辨率", value: "360 * 640") { index in
-           
-        }
-        
-        let labelModel2 = ShowSettingLabelModel(title: "帧率", value: "30 fps") { index in
-            
-        }
-        
-        dataArray = [model,model2,model4,model3,segmentModel, segmentModel2,sliderModel,sliderModel2, labelModel, labelModel2]
-         */
-    }
 }
 
 extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
@@ -112,52 +55,47 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         
         let data = dataArray[indexPath.row]
         var cell: UITableViewCell!
-        if data is ShowSettingSwitchModel {
-            let model = data as! ShowSettingSwitchModel
+        if data.type() == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            cell.setTitle(model.title, isOn: model.isOn) { isOn in
-                model.isOn = isOn
-                model.valueChangedAction?(isOn)
+            cell.setTitle(data.title(), isOn: data.boolValue()) { isOn in
+                data.writeValue(isOn)
+                self.settingManager.updateSettingForkey(data)
             } detailButtonAction: {
-                model.clickDetailButonAction?()
+                
             }
             return cell
-        }else if data is ShowSettingSegmentModel {
-            let model = data as! ShowSettingSegmentModel
+        }else if data.type() == .segment {
             let cell = tableView.dequeueReusableCell(withIdentifier: SegmentCellID, for: indexPath) as! ShowSettingSegmentCell
-            cell.setTitle(model.title, items: model.items, defaultSelectIndex: model.selectedIndex) { index in
-                model.selectedIndex = index
-                model.selectedIndexChangedAction?(index)
+            
+            cell.setTitle(data.title(), items: data.items(), defaultSelectIndex: data.intValue()) { index in
+                data.writeValue(index)
+                self.settingManager.updateSettingForkey(data)
             }
             return cell
-        }else if data is ShowSettingSliderModel {
-            let model = data as! ShowSettingSliderModel
+        }else if data.type() == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(model.title, value: model.value, minValue: model.minValue, maxValue: model.maxValue) { value in
-                model.value = value
+            cell.setTitle(data.title(), value: data.floatValue(), minValue: 100, maxValue: 1000) { value in
+                
             } sliderValueChangedAction: { value in
-                model.value = value
-                model.sliderValueChangedAction?(value)
+                data.writeValue(value)
+                self.settingManager.updateSettingForkey(data)
             }
 
             return cell
-        }else if data is ShowSettingLabelModel {
-            let model = data as! ShowSettingLabelModel
+        }else if data.type() == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
-            cell.setTitle(model.title, value: model.value) {
-                /*
+            let index = data.intValue()
+            let value = data.items()[index]
+            cell.setTitle(data.title(), value: value) {
                 let vc = ShowSettingActionSheetVC()
-                let dataArray = ["320x240","320x2401","320x2402","320x2403","320x2405","320x2406","320x2407"]
-                vc.title = "分辨率"
-                vc.dataArray = dataArray
+                vc.title = data.title()
+                vc.dataArray = data.items()
                 vc.didSelectedIndex = { index in
-                    let value = dataArray[index]
-                    model.value = value
-                    model.cellDidSelectedAction?(index)
+                    data.writeValue(index)
+                    self.settingManager.updateSettingForkey(data)
                     tableView.reloadData()
                 }
                 self.present(vc, animated: true)
-                 */
             }
             return cell
         }else {

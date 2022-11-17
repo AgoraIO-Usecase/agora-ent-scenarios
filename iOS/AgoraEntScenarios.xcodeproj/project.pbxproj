@@ -186,6 +186,7 @@
 		A8F3725A2924BCB900CEA88D /* ShowReceivePKView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F372592924BCB900CEA88D /* ShowReceivePKView.swift */; };
 		A8F3725C2924D25100CEA88D /* ShowReceiveLiveFinishAlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3725B2924D25100CEA88D /* ShowReceiveLiveFinishAlertVC.swift */; };
 		A8F3725E2924D26B00CEA88D /* ShowReceiveFinishView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3725D2924D26A00CEA88D /* ShowReceiveFinishView.swift */; };
+		A8F372602924E7A300CEA88D /* ShowSettingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3725F2924E7A300CEA88D /* ShowSettingManager.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -671,6 +672,7 @@
 		A8F372592924BCB900CEA88D /* ShowReceivePKView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceivePKView.swift; sourceTree = "<group>"; };
 		A8F3725B2924D25100CEA88D /* ShowReceiveLiveFinishAlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceiveLiveFinishAlertVC.swift; sourceTree = "<group>"; };
 		A8F3725D2924D26A00CEA88D /* ShowReceiveFinishView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceiveFinishView.swift; sourceTree = "<group>"; };
+		A8F3725F2924E7A300CEA88D /* ShowSettingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingManager.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -1462,6 +1464,7 @@
 				A8F372432924818500CEA88D /* ShowPresettingVC.swift */,
 				A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */,
 				A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */,
+				A8F3725F2924E7A300CEA88D /* ShowSettingManager.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -3350,6 +3353,7 @@
 				05FFE707290F706C0024D22F /* VoiceRoomChatBar.swift in Sources */,
 				DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */,
 				DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */,
+				A8F372602924E7A300CEA88D /* ShowSettingManager.swift in Sources */,
 				DDA19A5E28FFE57A009D3E61 /* EKRatingMessageView.swift in Sources */,
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
 				DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */,
