@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.event.UserInfoChangeEvent;
@@ -42,14 +42,14 @@ public final class UserManager {
     private void writeUserInfoToPrefs(boolean isLogOut) {
         if (isLogOut) {
             mUser = null;
-            SPUtil.putString(KtvConstant.CURRENT_USER, "");
+            SPUtil.putString(Constant.CURRENT_USER, "");
         } else {
-            SPUtil.putString(KtvConstant.CURRENT_USER, getUserInfoJson());
+            SPUtil.putString(Constant.CURRENT_USER, getUserInfoJson());
         }
     }
 
     private void readingUserInfoFromPrefs() {
-        String userInfo = SPUtil.getString(KtvConstant.CURRENT_USER, "");
+        String userInfo = SPUtil.getString(Constant.CURRENT_USER, "");
         if (!TextUtils.isEmpty(userInfo)) {
             mUser = GsonUtil.getInstance().fromJson(userInfo, User.class);
             if (TextUtils.isEmpty(ApiManager.token)) {

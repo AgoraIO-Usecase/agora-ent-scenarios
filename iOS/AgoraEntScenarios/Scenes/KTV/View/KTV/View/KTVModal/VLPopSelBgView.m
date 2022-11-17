@@ -32,7 +32,6 @@
 }
 
 - (void)setupView {
-    
     self.picsModelArray = [VLKTVSelBgModel vj_modelArrayWithJson:self.picsArray];
 
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
@@ -80,10 +79,10 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     for (VLKTVSelBgModel *model in self.picsModelArray) {
-        model.ifSelect = NO;
+        model.isSelect = NO;
     }
     VLKTVSelBgModel *selBgModel = self.picsModelArray[indexPath.row];
-    selBgModel.ifSelect = YES;
+    selBgModel.isSelect = YES;
     [self.collectionView reloadData];
     if (self.delegate && [self.delegate respondsToSelector:@selector(onVLPopSelBgView:tappedWithAction:atIndex:)]) {
         [self.delegate onVLPopSelBgView:self tappedWithAction:selBgModel atIndex:indexPath.item];
@@ -94,26 +93,34 @@
     _selBgModel = selBgModel;
     for (VLKTVSelBgModel *model in self.picsModelArray) {
         if ([_selBgModel.imageName isEqualToString:model.imageName]) {
-            model.ifSelect = YES;
+            model.isSelect = YES;
         }
     }
     if (!selBgModel) {
         VLKTVSelBgModel *picModel = self.picsModelArray.firstObject;
-        picModel.ifSelect = YES;
+        picModel.isSelect = YES;
     }
     [self.collectionView reloadData];
 }
 
 - (NSArray *)picsArray {
     if (!_picsArray) {
-        _picsArray = @[@{@"imageName":@"ktv_mvbg0",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg1",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg2",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg3",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg4",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg5",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg6",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg7",@"ifSelect":@(false)},@{@"imageName":@"ktv_mvbg8",@"ifSelect":@(false)}];
+        _picsArray = @[
+        @{@"imageName":@"ktv_mvbg0",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg1",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg2",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg3",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg4",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg5",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg6",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg7",@"ifSelect":@(false)},
+        @{@"imageName":@"ktv_mvbg8",@"ifSelect":@(false)}
+        ];
     }
     return _picsArray;
 }
 
-
 @end
-
 
 @implementation VLKTVSelBgCell
 
@@ -124,6 +131,7 @@
     }
     return self;
 }
+
 #pragma mark - Intial Methods
 - (void)setupView {
     
@@ -139,7 +147,7 @@
 - (void)setSelBgModel:(VLKTVSelBgModel *)selBgModel {
     _selBgModel = selBgModel;
     self.picImgView.image = [UIImage sceneImageWithName:selBgModel.imageName];
-    self.selIcon.hidden = !selBgModel.ifSelect;
+    self.selIcon.hidden = !selBgModel.isSelect;
 }
 
 @end

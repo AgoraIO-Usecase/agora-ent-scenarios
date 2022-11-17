@@ -19,7 +19,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.util.List;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.manager.PagePilotManager;
@@ -48,7 +48,7 @@ public class MainActivity extends BaseViewBindingActivity<ActivityMainBinding> {
         navController = ActivityKt.findNavController(this, R.id.nav_host_fragment_activity_main);
         BottomNavigationViewKt.setupWithNavController(getBinding().navView, navController);
         mainViewModel.setISingleCallback((type, data) -> {
-            if (type == KtvConstant.CALLBACK_TYPE_USER_LOGOUT) {
+            if (type == Constant.CALLBACK_TYPE_USER_LOGOUT) {
                 UserManager.getInstance().logout();
                 finish();
                 PagePilotManager.pageWelcome();
