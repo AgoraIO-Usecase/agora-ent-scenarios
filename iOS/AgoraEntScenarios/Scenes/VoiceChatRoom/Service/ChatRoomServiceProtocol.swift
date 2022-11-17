@@ -31,8 +31,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 获取房间详情
     /// - Parameters:
     ///
-    func fetchRoomDetail(_ roomId: String,
-                         completion: @escaping (Error?, VRRoomInfo?) -> Void)
+    func fetchRoomDetail(roomInfo: VRRoomInfo, isOwner: Bool, completion: @escaping (Error?, VRRoomInfo?) -> Void)
 
     /// 邀请上卖
     /// - Parameters:
