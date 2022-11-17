@@ -3,6 +3,7 @@ package io.agora.scene.ktv.live;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -42,6 +43,7 @@ import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
+import io.agora.rtc2.video.VideoCanvas;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
@@ -1382,6 +1384,19 @@ public class RoomLivingViewModel extends ViewModel {
             }
             mPlayer.resume();
         }
+    }
+
+    // ------------------ 本地视频渲染 ------------------
+    public void renderLocalCameraVideo(SurfaceView surfaceView) {
+        if (mRtcEngine == null) return;
+        mRtcEngine.startPreview();
+        mRtcEngine.setupLocalVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, 0));
+    }
+
+    // ------------------ 远端视频渲染 ------------------
+    public void renderRemoteCameraVideo(SurfaceView surfaceView, int uid) {
+        if (mRtcEngine == null) return;
+        mRtcEngine.setupRemoteVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, uid));
     }
 
     // ------------------ 倒计时 ------------------

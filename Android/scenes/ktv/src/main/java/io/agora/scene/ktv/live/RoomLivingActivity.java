@@ -155,13 +155,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         binding.flVideoContainer.removeAllViews();
                         SurfaceView surfaceView = fillWithRenderView(binding.flVideoContainer);
                         if (item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) { // 是本人
-                            // TODO start camera and render local video
-                            // engine.startPreview();
-                            // engine.setupLocalVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, 0));
+                            roomLivingViewModel.renderLocalCameraVideo(surfaceView);
                         } else {
-                            int id = Integer.parseInt(item.getRtcUid());
-                            // TODO render remote video
-                            // engine.setupRemoteVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, id));
+                            int uid = Integer.parseInt(item.getRtcUid());
+                            roomLivingViewModel.renderRemoteCameraVideo(surfaceView, uid);
                         }
                     }
 
