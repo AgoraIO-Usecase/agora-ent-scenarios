@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 import io.agora.scene.base.BuildConfig;
 
 @Keep
-public class KTVUtil {
+public class UiUtil {
     public static void logD(String msg) {
         if (BuildConfig.DEBUG)
             Log.d("AGORA-KTV", msg);

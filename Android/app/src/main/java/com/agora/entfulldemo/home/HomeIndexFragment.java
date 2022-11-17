@@ -25,6 +25,6 @@ public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndex
 
     @Override
     public void initListener() {
-        getBinding().bgGoKTV.setOnClickListener(view -> PagePilotManager.pageRoomList());
+        getBinding().bgGoKTV.setOnClickListener(view -> PagePilotManager.pageKTVRoomList());
     }
 }
