@@ -7,11 +7,19 @@
 
 import UIKit
 import JXCategoryView
+import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
 
+    var agoraKit: AgoraRtcEngineKit! {
+        didSet {
+            settingManager = ShowSettingManager(agoraKit: agoraKit)
+        }
+    }
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
+    
+    private var settingManager: ShowSettingManager!
     
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized,
@@ -85,6 +93,18 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         naviBar.rightItems = [preSetButtonItem]
         view.addSubview(naviBar)
     }
+    
+    private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
+        let videoSettings: [ShowSettingKey] = [.lowlightEnhance, .colorEnhance,.videoDenoiser,.beauty,.BFrame,.videoCaptureSize,.FPS]
+        let audioSettings: [ShowSettingKey]  = []
+        let captureSettings: [ShowSettingKey]  = []
+        let settings = [videoSettings, audioSettings, captureSettings]
+        
+        let vc = ShowVideoSettingVC()
+        vc.settingManager = settingManager
+        vc.dataArray = settings[index]
+        return vc
+    }
   
 }
 
@@ -110,7 +130,7 @@ extension ShowAdvancedSettingVC: JXCategoryListContainerViewDelegate {
     }
     
     func listContainerView(_ listContainerView: JXCategoryListContainerView!, initListFor index: Int) -> JXCategoryListContentViewDelegate! {
-        return ShowVideoSettingVC()
+        return createSettingVCForIndex(index)
     }
     
 }

@@ -208,6 +208,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickSettingButton() {
         let settingVC = ShowAdvancedSettingVC()
+        settingVC.agoraKit = agoraKit
         navigationController?.pushViewController(settingVC, animated: true)
     }
     
