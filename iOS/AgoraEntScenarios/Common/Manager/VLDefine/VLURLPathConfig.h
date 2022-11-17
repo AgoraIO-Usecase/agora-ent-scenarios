@@ -8,10 +8,7 @@
 
 //通知的字符串
 static NSString * const kExitRoomNotification = @"exitRoomNotification";
-static NSString * const kDianGeSuccessNotification = @"DianGeSuccessNotification";
-static NSString * const kMakeTopNotification = @"MakeTopNotification";
-static NSString * const kDeleteSuccessNotification = @"DeleteSuccessNotification";
-static NSString * const kUpdateSelSongArrayNotification = @"kUpdateSelSongArrayNotification";
+static NSString * const kChoosedSongListChangedNotification = @"choosedSongListChangedNotification";
 
 #pragma mark - API
 static NSString * const kURLPathUploadImage = @"/api-login/upload"; //上传图片

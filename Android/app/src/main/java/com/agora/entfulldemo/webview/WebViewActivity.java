@@ -12,7 +12,7 @@ import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import kotlin.jvm.JvmField;
@@ -23,7 +23,7 @@ public class WebViewActivity extends BaseViewBindingActivity<ActivityWebviewBind
      * h5地址
      */
     @JvmField
-    @Autowired(name = KtvConstant.URL)
+    @Autowired(name = Constant.URL)
     String url = "https://www.agora.io/cn/about-us/";
 
 

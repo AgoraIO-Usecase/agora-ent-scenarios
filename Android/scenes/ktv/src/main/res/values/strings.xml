@@ -2,6 +2,7 @@
 <resources>
     <string name="join">加入</string>
     <string name="score">评分</string>
+    <string name="loading">加载中…</string>
 
     <string name="create_room">创建房间</string>
     <string name="room_title">房间标题</string>
@@ -19,6 +20,7 @@
     <string name="song_and_singer" translatable="false">%s - %s</string>
     <string name="please_use_headset">请插入耳机使用耳返功能</string>
     <string name="mv">MV</string>
+    <string name="song_background">歌词背景</string>
     <string name="more_actions">更多操作</string>
 
     <string name="create">创建</string>
@@ -74,6 +76,7 @@
     <string name="song_rank_4">古风热歌</string>
     <string name="song_rank_5">KTV必唱</string>
     <string name="song_rank_6">新歌榜</string>
+    <string name="song_rank_7">热门新歌</string>
     <string name="song_search_place_holder">搜索歌曲、歌手</string>
 
     <string name="song_effect_1">空间塑造</string>
