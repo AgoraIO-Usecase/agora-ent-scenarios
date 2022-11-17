@@ -9,7 +9,7 @@ import Foundation
 
 private let kSceneId = "scene_show"
 
-private let SYNC_MANAGER_MESSAGE_INFO = "show_message_info"
+private let SYNC_MANAGER_MESSAGE_COLLECTION = "show_message_collection"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -458,7 +458,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp message get...")
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_MESSAGE_INFO)
+            .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
                 let messageList = list.compactMap({ ShowMessage.yy_model(withJSON: $0.toJson()!)! })
@@ -483,7 +483,7 @@ extension ShowSyncManagerServiceImp {
         let params = message.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_MESSAGE_INFO)
+            .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .add(data: params, success: { object in
                 agoraPrint("imp message add success...")
                 finished?(nil)
@@ -502,7 +502,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp message subscribe ...")
         SyncUtil
             .scene(id: channelName)?
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
+            .subscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
                            agoraPrint("imp message subscribe onUpdated...")
