@@ -62,7 +62,7 @@ class ShowRoomLiveView: UIView {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 46
         tableView.showsVerticalScrollIndicator = false
-        tableView.transform = CGAffineTransformMakeRotation(Double.pi)
+        tableView.transform = CGAffineTransform(rotationAngle: Double.pi)
         return tableView
     }()
     

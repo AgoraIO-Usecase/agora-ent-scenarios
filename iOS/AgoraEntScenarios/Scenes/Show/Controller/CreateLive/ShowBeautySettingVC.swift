@@ -28,7 +28,7 @@ class ShowBeautySettingVC: UIViewController {
     }()
     
     // 对比按钮
-    private lazy var compareButton = {
+    private lazy var compareButton: UIButton = {
         let compareButton = UIButton(type: .custom)
         compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
         compareButton.addTarget(self, action: #selector(didClickCompareButton), for: .touchUpInside)
@@ -36,7 +36,7 @@ class ShowBeautySettingVC: UIViewController {
     }()
     
     // 指示条
-    private lazy var indicator = {
+    private lazy var indicator: JXCategoryIndicatorLineView = {
         let indicator = JXCategoryIndicatorLineView()
         indicator.indicatorWidth = 30
         indicator.indicatorHeight = 2
@@ -45,7 +45,7 @@ class ShowBeautySettingVC: UIViewController {
     }()
     
     // 分类
-    private lazy var segmentedView = {
+    private lazy var segmentedView: JXCategoryTitleView = {
         let segmentedView = JXCategoryTitleView()
         segmentedView.isTitleColorGradientEnabled = true
         segmentedView.titles = titles
