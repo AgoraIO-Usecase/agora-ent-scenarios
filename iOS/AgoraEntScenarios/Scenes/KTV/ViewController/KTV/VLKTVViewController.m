@@ -708,6 +708,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     
+    [self stopCurrentSong];
     VLLog(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
 
     VL(weakSelf);
@@ -1118,6 +1119,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
         weakSelf.choosedBgModel = selBgModel;
     }];
+}
+
+#pragma mark VLPopChooseSongViewDelegate
+- (void)chooseSongView:(VLPopChooseSongView*)view tabbarDidClick:(NSUInteger)tabIndex {
+    if (tabIndex != 1) {
+        return;
+    }
+    
+    [self refreshChoosedSongList:nil];
 }
 
 #pragma mark - VLChooseBelcantoViewDelegate
