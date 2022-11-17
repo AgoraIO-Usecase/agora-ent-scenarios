@@ -20,6 +20,8 @@ public enum ROLE_TYPE {
 
 let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "Sweet Heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "Flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "Crystal Box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "Super Agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "Star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "Lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "Diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "Crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "Rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
+fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
+
 class VoiceRoomViewController: VRBaseViewController {
     lazy var toastPoint: CGPoint = .init(x: self.view.center.x, y: self.view.center.y + 70)
 
@@ -145,6 +147,28 @@ extension VoiceRoomViewController {
                 guard let self = self else { return }
                 if error == nil {
                     IMJoinSuccess = true
+                    // 获取房间详情
+                    //加入房间成功后，需要先更新
+                    if self.isOwner == true {
+                        //房主更新环信KV
+                        VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: self.serviceImp.createMics(), completion: { error in
+                            if error == nil {
+                                self.roomInfo?.mic_info? = VoiceRoomIMManager.shared?.mics ?? []
+                            } else {
+                                
+                            }
+                        })
+                    } else {
+                        //观众更新拉取详情后更新kv
+                       self.requestRoomDetail()
+                       guard let user = VoiceRoomUserInfo.shared.user else {return}
+                       VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+                           if error == nil {
+                           } else {
+                               
+                           }
+                       })
+                    }
                     VMGroup.leave()
                 } else {
                     self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -158,28 +182,7 @@ extension VoiceRoomViewController {
         VMGroup.notify(queue: VMQueue) { [weak self] in
             DispatchQueue.main.async {
                 let joinSuccess = rtcJoinSuccess && IMJoinSuccess
-                // 获取房间详情
-                //加入房间成功后，需要先更新
-                if self?.isOwner == true {
-                    //房主更新环信KV
-                    VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: (self?.serviceImp.createMics())!, completion: { error in
-                        if error == nil {
-                            
-                        } else {
-                            
-                        }
-                    })
-                } else {
-                    //观众更新KV
-                    guard let user = VoiceRoomUserInfo.shared.user else {return}
-                   VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
-                       if error == nil {
-                           self?.requestRoomDetail()
-                       } else {
-                           
-                       }
-                   })
-                }
+                
                 
                 
             }
@@ -202,11 +205,22 @@ extension VoiceRoomViewController {
     // 加入房间获取房间详情
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
-        guard let room_id = roomInfo?.room?.room_id else { return }
-        serviceImp.fetchRoomDetail(room_id) {[weak self] error, room_info in
+        serviceImp.fetchRoomDetail(roomInfo: self.roomInfo!, isOwner: self.isOwner) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
+                if self?.isOwner ?? false {
+                    if self?.roomInfo?.room?.member_list == nil {
+                        self?.roomInfo?.room?.member_list = [VRUser]()
+                    }
+                    self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: self?.roomInfo?.room?.chatroom_id ?? "", attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+                        if error != nil {
+                            self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+                        }
+                    })
+                }
                 self?.roomInfo = info
+                VoiceRoomIMManager.shared?.mics = self?.roomInfo?.mic_info
             } else {
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
