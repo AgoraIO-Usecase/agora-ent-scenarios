@@ -68,6 +68,9 @@ AgoraRtcEngineDelegate,
 AgoraMusicContentCenterEventDelegate,
 VLPopScoreViewDelegate
 >
+{
+    id<AgoraMusicPlayerProtocol> _rtcMediaPlayer;
+}
 
 @property (nonatomic, strong) VLKTVMVView *MVView;
 @property (nonatomic, strong) VLKTVSelBgModel *choosedBgModel;
@@ -81,7 +84,7 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLsoundEffectView *soundEffectView; // 音效视图
 
-@property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
+@property (nonatomic, strong, readonly) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
 @property (nonatomic, assign) float currentTime;
@@ -184,7 +187,7 @@ VLPopScoreViewDelegate
 - (void)viewDidDisappear:(BOOL)animated
 {
     streamId = -1;
-    self.rtcMediaPlayer = nil;
+    [self destroyMediaPlayer];
 
     if(self.mediaPlayerConnection) {
 //        [self disableMediaChannel];
@@ -764,6 +767,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
     NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
+    if ([requestId length] == 0) {
+        if (block) {
+            block(nil);
+        }
+        return;
+    }
     [self.lyricCallbacks setObject:block forKey:requestId];
 }
 
@@ -872,10 +881,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 销毁播放器
 - (void)destroyMediaPlayer {
-    [self.rtcMediaPlayer stop];
+    if (_rtcMediaPlayer == nil) {
+        return;
+    }
+    [_rtcMediaPlayer stop];
     VLLog(@"Agora - RTCMediaPlayer stop");
-    [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
+    [self.RTCkit destroyMediaPlayer:_rtcMediaPlayer];
     VLLog(@"Agora - Destroy media player");
+    _rtcMediaPlayer = nil;
 }
 
 - (void)joinRTCChannel {
@@ -927,6 +940,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
     contentCenterConfiguration.token = VLUserCenter.user.agoraRTMToken;
     VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.token);
+    [AgoraMusicContentCenter destroy];
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
 }
 
@@ -1599,7 +1613,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
     [_AgoraMcc registerEventDelegate:nil];
     [[AppContext shared] unregisterEventDelegate:self];
-    [AgoraMusicContentCenter destroy];
     _AgoraMcc = AgoraMcc;
     if (_AgoraMcc != nil) {
         [[AppContext shared] registerEventDelegate:self];
