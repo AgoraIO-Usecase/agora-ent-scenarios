@@ -35,7 +35,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 邀请上卖
     /// - Parameters:
     ///
-    func inviteUserToMic(userId: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
+    func inviteUserToMic(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 获取礼物列表
     /// - Parameters:
@@ -124,7 +124,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - user: VRUser instance
     ///   - completion: 回调
-    func agreeApply(userId: String, completion: @escaping (Error?) -> Void)
+    func agreeApply(chatUid: String, completion: @escaping (Error?) -> Void)
 
     /// 获取房间列表
     /// - Parameters:
