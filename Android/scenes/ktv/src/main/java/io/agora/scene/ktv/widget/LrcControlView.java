@@ -193,9 +193,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             if (this.mRole != Role.Singer) {
-                mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
-                mBinding.ilActive.switchOriginal.setVisibility(View.GONE);
-                mBinding.ilActive.ivMusicMenu.setVisibility(View.GONE);
+                mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
             }
         }
         stopTimer();
@@ -258,11 +258,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         } else if (this.mRole == Role.Partner) {
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-            mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
-            mBinding.ilActive.ivChangeSong.setVisibility(View.GONE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
-            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);
         }
     }
 
