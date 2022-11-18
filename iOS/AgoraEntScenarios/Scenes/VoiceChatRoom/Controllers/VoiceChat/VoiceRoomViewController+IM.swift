@@ -93,7 +93,8 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         let info = roomInfo
         info?.room?.member_count! += 1
         roomInfo = info
-        self.roomInfo?.room?.member_list?.append(model(from: ext ?? [:], VRUser.self))
+        guard let map = ext else { return }
+        self.roomInfo?.room?.member_list?.append(model(from: map, VRUser.self))
         self.convertShowText(userName: username, content: LanguageManager.localValue(key: "Joined"), joined: true)
     }
 
