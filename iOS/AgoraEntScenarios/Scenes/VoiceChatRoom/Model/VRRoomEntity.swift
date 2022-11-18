@@ -34,8 +34,8 @@ import KakaJSON
     public var roomPassword = ""
     public var click_count: Int? = 0 // 观看人数
     public var announcement: String? // Notice
-    public var ranking_list: [VRUser]? // 土豪榜
-    public var member_list: [VRUser]? // 用户榜
+    public var ranking_list: [VRUser]? = [VRUser]() // 土豪榜
+    public var member_list: [VRUser]? = [VRUser]() // 用户榜
     public var rtc_uid: Int? = 0
     public var use_robot: Bool? = false
     public var robot_volume: UInt?

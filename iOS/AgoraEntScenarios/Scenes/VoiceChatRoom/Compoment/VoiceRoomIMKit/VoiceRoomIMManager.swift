@@ -32,6 +32,8 @@ public let VoiceRoomJoinedMember = "chatroom_join"
     func receiveGift(roomId: String, meta: [String: String]?)
 
     func receiveApplySite(roomId: String, meta: [String: String]?)
+    
+    func receiveCancelApplySite(roomId: String, chat_uid: String)
 
     func receiveInviteSite(roomId: String, meta: [String: String]?)
 
@@ -58,8 +60,12 @@ fileprivate let once = VoiceRoomIMManager()
     
     public var currentRoomId = ""
     
-    public var mics: [VRRoomMic]?
-
+    public var mics: [VRRoomMic] = [VRRoomMic]()
+    
+    public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
+    
+    public var members: [VRUser] = [VRUser]()
+    
     @objc public static var shared: VoiceRoomIMManager? = once
 
     @objc public weak var delegate: VoiceRoomIMDelegate?
@@ -135,6 +141,10 @@ public extension VoiceRoomIMManager {
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveInviteSite(roomId:meta:))) {
                             self.delegate?.receiveInviteSite(roomId: self.currentRoomId, meta: body.customExt)
                         }
+                    case VoiceRoomCancelApplySite:
+                        if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveCancelApplySite(roomId:chat_uid:))) {
+                            self.delegate?.receiveCancelApplySite(roomId: self.currentRoomId,chat_uid: message.to)
+                        }
                     case VoiceRoomApplySite:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveApplySite(roomId:meta:))) {
                             self.delegate?.receiveApplySite(roomId: self.currentRoomId, meta: body.customExt)
@@ -162,7 +172,6 @@ public extension VoiceRoomIMManager {
     }
 
     // MARK: - AgoraChatroomManagerDelegate
-
     func chatroomAnnouncementDidUpdate(_ aChatroom: AgoraChatroom, announcement aAnnouncement: String?) {
         if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.announcementChanged(roomId:content:))) {
             if let roomId = aChatroom.chatroomId, let announcement = aAnnouncement, roomId == self.currentRoomId {
@@ -208,7 +217,6 @@ public extension VoiceRoomIMManager {
     }
 
     // MARK: - Send
-
     @objc func sendMessage(roomId: String, text: String, ext: [AnyHashable: Any]?, completion: @escaping (AgoraChatMessage?, AgoraChatError?) -> Void) {
         let message = AgoraChatMessage(conversationID: roomId, body: AgoraChatTextMessageBody(text: text), ext: ext)
         message.chatType = .chatRoom
@@ -261,13 +269,13 @@ public extension VoiceRoomIMManager {
         })
     }
     
-    func setChatroomAttributes(chatRoomId: String,attributes: Dictionary<String,String>, completion: @escaping (AgoraChatError?) -> ()) {
-        AgoraChatClient.shared().roomManager?.setChatroomAttributesForced(chatRoomId, attributes: attributes, autoDelete: true, completionBlock: { error, errorAttributes in
+    func setChatroomAttributes(attributes: Dictionary<String,String>, completion: @escaping (AgoraChatError?) -> ()) {
+        AgoraChatClient.shared().roomManager?.setChatroomAttributesForced(self.currentRoomId, attributes: attributes, autoDelete: true, completionBlock: { error, errorAttributes in
             completion(error)
         })
     }
     
-    func fetchChatroomAttributes(chatroom_id: String,keys:[String],completion: ((AgoraChatError?,[String:String]?) -> ())?) {
-        AgoraChatClient.shared().roomManager?.fetchChatroomAttributes(chatroom_id, keys: keys,completion: completion)
+    func fetchChatroomAttributes(keys:[String],completion: ((AgoraChatError?,[String:String]?) -> ())?) {
+        AgoraChatClient.shared().roomManager?.fetchChatroomAttributes(self.currentRoomId, keys: keys,completion: completion)
     }
 }

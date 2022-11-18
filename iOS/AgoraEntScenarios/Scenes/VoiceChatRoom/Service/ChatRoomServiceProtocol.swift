@@ -15,9 +15,8 @@ public enum updateRoomState {
     case robotVoleme
 }
 
-// 房间内部需要用到环信KV
+/// 房间内部需要用到环信KV
 protocol ChatRoomServiceProtocol: NSObjectProtocol {
-    
     /// 加入房间
     /// - Parameters:
     ///
@@ -31,117 +30,101 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 获取房间详情
     /// - Parameters:
     ///
-    func fetchRoomDetail(roomInfo: VRRoomInfo, isOwner: Bool, completion: @escaping (Error?, VRRoomInfo?) -> Void)
+    func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void)
 
     /// 邀请上卖
     /// - Parameters:
     ///
-    func inviteUserToMic(_ user: VRUser,
-                         completion: @escaping (Error?, Bool) -> Void)
-    
-    /// 拒绝上卖
-    /// - Parameters:
-    ///
-    func refuseInviteToMic(_ user: VRUser,
-                           completion: @escaping (Error?, Bool) -> Void)
-    
-    /// 发送礼物
-    /// - Parameters:
-    ///
-    func sendGift(_ giftInfo: VoiceRoomGiftEntity,
-                  completion: @escaping (Error?, Bool) -> Void)
+    func inviteUserToMic(userId: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 获取礼物列表
     /// - Parameters:
     ///
     func fetchGiftContribute(_ roomId: String,
-                             completion: @escaping (Error?, VRUsers?) -> Void)
-    
+                             completion: @escaping (Error?, [VRUser]?) -> Void)
     /// 获取人员列表
     /// - Parameters:
     ///
-    func fetchRoomMembers(chatroom_id: String, completion: @escaping (Error?, VRUsers?) -> Void)
+    func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void)
 
     /// 激活机器人,修改公告，修改机器人音量
     /// - Parameters:
     ///
-    func modifyRoomInfo(chatroom_id: String,key: String,value: String,
+    func modifyRoomInfo(key: String,value: String,
                         completion: @escaping (Error?, Bool) -> Void)
 
     /// 禁言指定麦位
     /// - Parameters:
     ///
-    func forbidMic(chatroom_id: String,mic_index: Int,
+    func forbidMic(mic_index: Int,
                    completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消禁言指定麦位
     /// - Parameters:
     /// 
-    func unForbidMic(chatroom_id: String,mic_index: Int,
+    func unForbidMic(mic_index: Int,
                      completion: @escaping (Error?, Bool) -> Void)
 
     /// 锁麦
     /// - Parameters:
     ///
-    func lockMic(chatroom_id: String,mic_index: Int,
+    func lockMic(mic_index: Int,
                  completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消锁麦
     /// - Parameters:
     ///
-    func unLockMic(chatroom_id: String,mic_index: Int,
+    func unLockMic(mic_index: Int,
                    completion: @escaping (Error?, Bool) -> Void)
 
     /// 踢用户下麦
     /// - Parameters:
     ///
-    func kickOff(chatroom_id: String,mic_index: Int,
+    func kickOff(mic_index: Int,
                  completion: @escaping (Error?, Bool) -> Void)
 
     /// 下麦
     /// - Parameters:
     ///
-    func leaveMic(chatroom_id: String,mic_index: Int,
+    func leaveMic(mic_index: Int,
                   completion: @escaping (Error?, Bool) -> Void)
 
     /// mute
     /// - Parameters:
     ///
-    func muteLocal(chatroom_id: String,mic_index: Int,completion: @escaping (Error?, Bool) -> Void)
+    func muteLocal(mic_index: Int,completion: @escaping (Error?, Bool) -> Void)
 
     /// unmute
     /// - Parameters:
     ///
-    func unmuteLocal(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void)
+    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void)
 
     /// 换麦
     /// - Parameters:
     ///
-    func changeMic(user: VRUser,old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
-
-    /// 取消邀请
-    /// - Parameters:
-    ///
-    func refuseInvite(_ roomId: String,
-                      completion: @escaping (Error?, Bool) -> Void)
+    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
 
     /// 接受邀请
     /// - Parameters:
     ///
-    func agreeInvite(_ roomId: String,_ user: VRUser,
-                     completion: @escaping (Error?, Bool) -> Void)
+    func agreeInvite(completion: @escaping (Error?, Bool) -> Void)
 
     /// 申请上麦
     /// - Parameters:
     ///
-    func submitApply(chat_user: VRUser,
-                     completion: @escaping (Error?, Bool) -> Void)
+    func submitApply(index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消上麦
     /// - Parameters:
     ///
     func cancelApply(chat_uid: String,
                      completion: @escaping (Error?, Bool) -> Void)
+    
+    /// Description 同意申请
+    /// - Parameters:
+    ///   - user: VRUser instance
+    ///   - completion: 回调
+    func agreeApply(userId: String, completion: @escaping (Error?) -> Void)
 
     /// 获取房间列表
     /// - Parameters:
