@@ -481,7 +481,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
                 [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
             }
-            [self playNextSong:0];
+            [self playNextSong];
         } else if (state == AgoraMediaPlayerStateStopped) {
         }
     });
@@ -821,7 +821,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self cancelLoadAndPlay];
 }
 
-- (void)playNextSong:(int)isMasterInterrupt {
+- (void)playNextSong {
     [self stopCurrentSong];
     [self deleteSongEvent:self.selSongsArray.firstObject];
     VLLog(@"RTC media player stop");
@@ -1229,9 +1229,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (weakSelf.selSongsArray.count >= 1) {
                 if([weakSelf isRoomOwner]
                    && [weakSelf isCurrentSongMainSinger:VLUserCenter.user.userNo] == NO) {
-                    [weakSelf playNextSong:1];
+                    [weakSelf playNextSong];
                 } else {
-                    [weakSelf playNextSong:0];
+                    [weakSelf playNextSong];
                 }
                 
                 VLLog(@"---Change song---");
@@ -1244,7 +1244,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.rtcMediaPlayer selectAudioTrack:1];
         [self sendTrackModeMessage:1];
     } else if (type == VLKTVMVViewActionTypeExit) {
-        [self playNextSong:0];
+        [self playNextSong];
     }
 }
 
