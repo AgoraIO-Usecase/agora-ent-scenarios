@@ -184,9 +184,31 @@ extension VoiceRoomViewController {
         VMGroup.notify(queue: VMQueue) { [weak self] in
             DispatchQueue.main.async {
                 let joinSuccess = rtcJoinSuccess && IMJoinSuccess
-                
-                
-                
+                // 获取房间详情
+                //加入房间成功后，需要先更新
+                if self?.isOwner == true {
+                    //房主更新环信KV
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: (self?.serviceImp.createMics())!, completion: { error in
+                        if error == nil {
+                            if let info = self?.roomInfo {
+                                info.mic_info = VoiceRoomIMManager.shared?.mics ?? []
+                                self?.roomInfo = info
+                            }
+                        } else {
+                            
+                        }
+                    })
+                } else {
+                    //观众更新KV
+                    guard let user = VoiceRoomUserInfo.shared.user else {return}
+                   VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+                       if error == nil {
+                           self?.requestRoomDetail()
+                       } else {
+                           
+                       }
+                   })
+                }
             }
         }
     }
