@@ -61,7 +61,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 }
                 roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self)
             }
-            
+            if isOwner == false {
+                roomInfo.room?.owner = roomInfo.mic_info?.first?.member
+            }
             completion(self.convertError(error: error),roomInfo)
         })
     }
@@ -404,6 +406,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.status = 0
         mic.member = VRUser()
         mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
         mic.member?.name = VLUserCenter.user.name
