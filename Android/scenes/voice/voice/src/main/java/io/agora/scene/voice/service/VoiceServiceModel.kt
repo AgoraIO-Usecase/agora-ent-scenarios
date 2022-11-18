@@ -1,5 +1,6 @@
 package io.agora.scene.voice.service
 
+import com.google.gson.annotations.SerializedName
 import io.agora.scene.voice.bean.BaseRoomBean
 
 /**
@@ -18,12 +19,12 @@ data class VoiceCreateRoomModel constructor(
 ) : BaseRoomBean
 
 data class VoiceMemberModel constructor(
-    var uid: String? = null,
-    var chatUid: String? = null,
-    var nickName: String? = null,
-    var portrait: String? = null,
-    var rtcUid: Int = 0,
-    var micIndex: Int = 0,
+    @SerializedName("uid") var uid: String? = null,
+    @SerializedName("chat_uid") var chatUid: String? = null,
+    @SerializedName("name") var nickName: String? = null,
+    @SerializedName("portrait") var portrait: String? = null,
+    @SerializedName("rtc_uid") var rtcUid: Int = 0,
+    @SerializedName("mic_index") var micIndex: Int = 0,
 ) : BaseRoomBean
 
 data class VoiceRankUserModel constructor(
@@ -34,16 +35,16 @@ data class VoiceRankUserModel constructor(
 
 data class VoiceRoomModel constructor(
     var owner: VoiceMemberModel? = null,
-    var roomId: String = "",
-    var isPrivate: Boolean = false,
-    var memberCount: Int = 0,
-    var roomType: Int = 0,
-    var roomName: String = "",
-    var soundEffect: Int = 0,
-    var channelId: String = "",
-    var chatroomId: String = "",
-    var createdAt: Long = 0,
-    var roomPassword: String = "",
+    @SerializedName("room_id") var roomId: String = "",
+    @SerializedName("is_private") var isPrivate: Boolean = false,
+    @SerializedName("member_count") var memberCount: Int = 0,
+    @SerializedName("type") var roomType: Int = 0,
+    @SerializedName("name") var roomName: String = "",
+    @SerializedName("sound_effect") var soundEffect: Int = 0,
+    @SerializedName("channel_id") var channelId: String = "",
+    @SerializedName("chatroom_id") var chatroomId: String = "",
+    @SerializedName("created_at") var createdAt: Long = 0,
+    @SerializedName("roomPassword") var roomPassword: String = "",
 ) : BaseRoomBean
 
 data class VoiceMicInfoModel constructor(

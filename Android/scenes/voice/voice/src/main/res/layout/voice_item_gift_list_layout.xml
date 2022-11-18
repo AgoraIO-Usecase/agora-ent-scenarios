@@ -33,7 +33,7 @@
             app:layout_constraintTop_toBottomOf="@id/iv_gift"
             android:text="Sweet Heart"
             android:layout_marginTop="5dp"
-            android:textSize="@dimen/voice_text_size_12sp"
+            android:textSize="@dimen/voice_sp_12"
             android:textColor="#040925"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -56,7 +56,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/voice_text_size_12sp"
+                android:textSize="@dimen/voice_sp_12"
                 android:textColor="#6c7192"
                 android:hint="1"
                 />
