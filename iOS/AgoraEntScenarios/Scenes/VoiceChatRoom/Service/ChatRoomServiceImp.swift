@@ -61,7 +61,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 }
                 roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self)
             }
-            
+            if isOwner == false {
+                roomInfo.room?.owner = roomInfo.mic_info?.first?.member
+            }
             completion(self.convertError(error: error),roomInfo)
         })
     }
