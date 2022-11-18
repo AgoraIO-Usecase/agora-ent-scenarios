@@ -97,7 +97,7 @@ extension VoiceRoomApplyUsersViewController {
     private func agreeUserApply(user: VoiceRoomApply?) {
         SVProgressHUD.show()
         guard let user = user?.member else { return }
-        self.serviceImp.agreeApply(userId: user.uid ?? "") { error in
+        self.serviceImp.agreeApply(chatUid: user.chat_uid ?? "") { error in
             SVProgressHUD.dismiss()
             if error == nil {
                 self.view.makeToast("Agree success!".localized())

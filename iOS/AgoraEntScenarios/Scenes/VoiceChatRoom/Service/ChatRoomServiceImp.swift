@@ -78,8 +78,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func inviteUserToMic(userId: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-        let user = VoiceRoomIMManager.shared?.members.first(where: { $0.uid == userId })
+    func inviteUserToMic(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
+        let user = VoiceRoomIMManager.shared?.members.first(where: { $0.chat_uid == chatUid })
         user?.mic_index = index
         VoiceRoomIMManager.shared?.sendCustomMessage(roomId: VoiceRoomIMManager.shared?.currentRoomId ?? "", event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
@@ -263,10 +263,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func agreeApply(userId: String, completion: @escaping (Error?) -> Void) {
+    func agreeApply(chatUid: String, completion: @escaping (Error?) -> Void) {
         var mic_index = 1
         let user = VoiceRoomIMManager.shared?.applicants.first(where: {
-            $0.member?.uid ?? "" == userId
+            $0.member?.chat_uid ?? "" == chatUid
         })
         if user?.member?.mic_index ?? 0 < 1 {
             mic_index = self.findMicIndex()
