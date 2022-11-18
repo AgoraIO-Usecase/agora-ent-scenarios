@@ -19,6 +19,10 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         let count: Int = info?.room?.member_count ?? 0
         info?.room?.member_count = count - 1
         roomInfo = info
+        self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
+            $0.chat_uid != userName
+        })
+        VoiceRoomIMManager.shared?.members = self.roomInfo?.room?.member_list ?? []
     }
 
     func voiceRoomUpdateRobotVolume(roomId: String, volume: String) {
@@ -59,15 +63,23 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
             self.roomInfo?.room?.gift_amount = gift_amount
         }
         //刷新礼物贡献总数，头部
-        
-//        self.requestRankList()
+        self.requestRankList()
     }
 
     func receiveApplySite(roomId: String, meta: [String: String]?) {
         if VoiceRoomUserInfo.shared.user?.uid ?? "" != roomInfo?.room?.owner?.uid ?? "" {
             return
         }
+        guard let map = meta?["user"]?.z.jsonToDictionary() else { return }
+        let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
+        VoiceRoomIMManager.shared?.applicants.append(apply)
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
+    }
+    
+    func receiveCancelApplySite(roomId: String, chat_uid: String) {
+        VoiceRoomIMManager.shared?.applicants = VoiceRoomIMManager.shared?.applicants.filter({
+            $0.member?.chat_uid != chat_uid
+        }) ?? []
     }
 
     func receiveInviteSite(roomId: String, meta: [String: String]?) {
@@ -76,6 +88,7 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         if VoiceRoomUserInfo.shared.user?.uid ?? "" != user?.uid ?? "" {
             return
         }
+        
         self.showInviteMicAlert()
     }
 
@@ -95,6 +108,7 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
         roomInfo = info
         guard let map = ext else { return }
         self.roomInfo?.room?.member_list?.append(model(from: map, VRUser.self))
+        VoiceRoomIMManager.shared?.members = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: username, content: LanguageManager.localValue(key: "Joined"), joined: true)
     }
 
@@ -141,7 +155,7 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
 
             let status = mic.status
             let mic_index = mic.mic_index
-            VoiceRoomIMManager.shared?.mics?[mic.mic_index] = mic
+            VoiceRoomIMManager.shared?.mics[mic.mic_index] = mic
             if !isOwner {
                 refreshHandsUp(status: status)
                 if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
