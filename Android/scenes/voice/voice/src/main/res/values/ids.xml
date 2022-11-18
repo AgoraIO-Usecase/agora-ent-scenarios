@@ -2,13 +2,13 @@
 <resources>
     <!-- extend menu ids -->
     <!-- gift -->
-    <item name="extend_item_gift" type="id"/>
+    <item name="voice_extend_item_gift" type="id"/>
     <!-- EQ -->
-    <item name="extend_item_eq" type="id"/>
+    <item name="voice_extend_item_eq" type="id"/>
     <!-- hand_up -->
-    <item name="extend_item_hand_up" type="id"/>
+    <item name="voice_extend_item_hand_up" type="id"/>
     <!-- mic -->
-    <item name="extend_item_mic" type="id"/>
+    <item name="voice_extend_item_mic" type="id"/>
     <!-- hand_up_status -->
-    <item name="extend_item_hand_up_status" type="id"/>
+    <item name="voice_extend_item_hand_up_status" type="id"/>
 </resources>

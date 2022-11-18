@@ -184,7 +184,7 @@
             android:layout_marginBottom="16dp"
             android:textColor="@color/voice_white"
             android:textStyle="bold"
-            android:textSize="@dimen/voice_text_size_12sp"
+            android:textSize="@dimen/voice_sp_12"
             android:gravity="center"
             android:text="@string/voice_room_list_item_enter"
             android:textColorHint="@color/voice_white"

@@ -84,7 +84,7 @@ public abstract class AbstractPathAnimator {
             config.xRand = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_xRand, res.getDimensionPixelOffset(R.dimen.voice_like_anim_bezier_x_rand));
             config.animLength = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_animLength, res.getDimensionPixelOffset(R.dimen.voice_like_anim_length));//动画长度
             config.animLengthRand = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_animLengthRand, res.getDimensionPixelOffset(R.dimen.voice_like_anim_length_rand));
-            config.bezierFactor = typedArray.getInteger(R.styleable.voice_LikeLayout_voice_bezierFactor, res.getInteger(R.integer.like_anim_bezier_factor));
+            config.bezierFactor = typedArray.getInteger(R.styleable.voice_LikeLayout_voice_bezierFactor, res.getInteger(R.integer.voice_like_anim_bezier_factor));
             config.xPointFactor = pointx;
 //            config.heartWidth = (int) typedArray.getDimension(R.styleable.HeartLayout_heart_width,
 //                    res.getDimensionPixelOffset(R.dimen.heart_size_width));//动画图片宽度
@@ -93,7 +93,7 @@ public abstract class AbstractPathAnimator {
             config.heartWidth = heartWidth;
             config.heartHeight = heartHeight;
             config.animDuration = typedArray.getInteger(R.styleable.voice_LikeLayout_voice_anim_duration,
-                    res.getInteger(R.integer.anim_duration));//持续期
+                    res.getInteger(R.integer.voice_anim_duration));//持续期
             return config;
         }
 

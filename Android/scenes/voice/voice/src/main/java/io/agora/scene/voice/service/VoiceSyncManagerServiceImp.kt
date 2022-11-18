@@ -32,7 +32,6 @@ class VoiceSyncManagerServiceImp(
 
     private var mSceneReference: SceneReference? = null
 
-    private val objIdOfRoomNo = mutableMapOf<String, String>() // objectId of room no
     private val roomMap = mutableMapOf<String, VoiceRoomModel>() // key: roomNo
 
     private val roomSubscribeListener = mutableListOf<Sync.EventListener>()
@@ -45,14 +44,17 @@ class VoiceSyncManagerServiceImp(
                 override fun onSuccess(result: MutableList<IObject>?) {
                     val ret = mutableListOf<VoiceRoomModel>()
                     result?.forEach { iObj ->
-                        iObj.toObject(VoiceRoomModel::class.java)?.let { voiceRoomModel ->
-                            objIdOfRoomNo[voiceRoomModel.roomId] = iObj.id
-                            ret.add(voiceRoomModel)
-                            roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                            //按照创建时间顺序排序
-                            ret.sortBy { it.createdAt }
+                        try {
+                            val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
+                            ret.add(voiceRoom)
+                            roomMap[voiceRoom.roomId] = voiceRoom
+                        } catch (e: Exception) {
+                            "voice room list get scene error: ${e.message}".logE()
                         }
+
                     }
+                    //按照创建时间顺序排序
+                    ret.sortBy { it.createdAt }
                     ThreadManager.getInstance().runOnMainThread {
                         completion.invoke(VoiceServiceProtocol.ERR_OK, ret)
                     }
@@ -134,15 +136,18 @@ class VoiceSyncManagerServiceImp(
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     val curRoomInfo = roomMap[roomId] ?: return
-                    mSceneReference?.update("memberCount", curRoomInfo.memberCount + 1, object : Sync.DataItemCallback {
-                        override fun onSuccess(result: IObject?) {
-                            "syncManager update on onSuccess ${result?.id}".logE()
-                        }
+                    mSceneReference?.update(
+                        "member_count",
+                        curRoomInfo.memberCount + 1,
+                        object : Sync.DataItemCallback {
+                            override fun onSuccess(result: IObject?) {
+                                "syncManager update on onSuccess ${result?.id}".logE()
+                            }
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            "syncManager update onFail ${exception?.message}".logE()
-                        }
-                    })
+                            override fun onFail(exception: SyncManagerException?) {
+                                "syncManager update onFail ${exception?.message}".logE()
+                            }
+                        })
                     innerSubscribeRoomChanged()
                     if (needConvertConfig) {
                         requestToolboxService(
@@ -187,10 +192,23 @@ class VoiceSyncManagerServiceImp(
                 }
             })
         } else {
-            ThreadManager.getInstance().runOnIOThread {
-                resetCacheInfo(roomId, false)
-                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-            }
+            val curRoomInfo = roomMap[roomId] ?: return
+            mSceneReference?.update("member_count", curRoomInfo.memberCount - 1, object : Sync.DataItemCallback {
+
+                override fun onSuccess(result: IObject?) {
+                    ThreadManager.getInstance().runOnIOThread {
+                        resetCacheInfo(roomId, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                    }
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    ThreadManager.getInstance().runOnIOThread {
+                        resetCacheInfo(roomId, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    }
+                }
+            })
         }
     }
 
@@ -271,7 +289,6 @@ class VoiceSyncManagerServiceImp(
         completion: (error: Int, result: Boolean) -> Unit
     ) {
     }
-
 
     private fun initScene(complete: () -> Unit) {
         if (syncUtilsInit) {

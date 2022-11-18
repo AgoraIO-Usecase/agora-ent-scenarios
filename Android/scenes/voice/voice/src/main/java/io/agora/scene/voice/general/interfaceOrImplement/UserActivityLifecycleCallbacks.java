@@ -44,23 +44,23 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityPaused(Activity activity) {
-        Log.e("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
+        Log.d("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        Log.e("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
+        Log.d("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
         resumeActivity.remove(activity);
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        Log.e("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
+        Log.d("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        Log.e("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
+        Log.d("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
         activityList.remove(activity);
     }
 

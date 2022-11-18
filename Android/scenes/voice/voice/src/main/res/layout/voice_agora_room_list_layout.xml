@@ -114,7 +114,7 @@
                 android:gravity="center"
                 android:text="@string/voice_agora_chat_room_create"
                 android:textColor="@color/voice_white"
-                android:textSize="@dimen/text_size_16sp"
+                android:textSize="@dimen/voice_sp_16"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@+id/icon_house_add"
                 app:layout_constraintTop_toTopOf="parent" />

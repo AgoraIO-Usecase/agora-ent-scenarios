@@ -69,7 +69,6 @@ dependencies {
     implementation project(':scenes:voice:imkit')
     implementation project(':scenes:voice:network')
     implementation project(':scenes:voice:rtckit')
-    implementation project(':scenes:voice:SVGAPlayer')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -90,4 +89,5 @@ dependencies {
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.easypermissions
     implementation rootProject.ext.deps.syncManager
+    implementation rootProject.ext.deps.svga_player
 }
