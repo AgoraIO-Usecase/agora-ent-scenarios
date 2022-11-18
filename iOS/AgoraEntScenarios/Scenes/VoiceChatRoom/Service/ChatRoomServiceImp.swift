@@ -467,8 +467,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.status = 0
         mic.member = VRUser()
         mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
+        mic.member?.name = VLUserCenter.user.name
         mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
         mic.member?.rtc_uid = AppContext.shared.appId()
         mic.member?.channel_id = ""
@@ -478,9 +480,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             let item = VRRoomMic()
             item.mic_index = i
             if i < 6 {
-                item.mic_index = -1
+                item.status = -1
             } else {
-                item.mic_index = -2
+                item.status = -2
             }
             mics.append(item)
         }
