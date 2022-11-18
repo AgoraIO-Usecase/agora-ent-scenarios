@@ -151,12 +151,11 @@ extension VoiceRoomViewController {
                     //加入房间成功后，需要先更新
                     if self.isOwner == true {
                         //房主更新环信KV
-                        VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: self.serviceImp.createMics(), completion: { error in
+                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: self.serviceImp.createMics(), completion: { error in
                             if error == nil {
-                                if let info = self.roomInfo {
-                                    info.mic_info = VoiceRoomIMManager.shared?.mics ?? []
-                                    self.roomInfo = info
-                                }
+                                self.roomInfo?.mic_info? = VoiceRoomIMManager.shared?.mics ?? []
+                                self.roomInfo?.room?.member_list = [VRUser]()
+                                self.roomInfo?.room?.ranking_list = [VRUser]()
                             } else {
                                 
                             }
@@ -230,7 +229,7 @@ extension VoiceRoomViewController {
     // 加入房间获取房间详情
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
-        serviceImp.fetchRoomDetail(roomInfo: self.roomInfo!, isOwner: self.isOwner) { [weak self] error, room_info in
+        serviceImp.fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
                 if self?.isOwner ?? false {
@@ -238,14 +237,15 @@ extension VoiceRoomViewController {
                         self?.roomInfo?.room?.member_list = [VRUser]()
                     }
                     self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
-                    VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: self?.roomInfo?.room?.chatroom_id ?? "", attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
                         if error != nil {
                             self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
                         }
                     })
                 }
                 self?.roomInfo = info
-                VoiceRoomIMManager.shared?.mics = self?.roomInfo?.mic_info
+                guard let mics = self?.roomInfo?.mic_info else { return }
+                VoiceRoomIMManager.shared?.mics = mics
             } else {
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
@@ -256,7 +256,7 @@ extension VoiceRoomViewController {
         guard let room_id = roomInfo?.room?.room_id else { return }
         serviceImp.fetchGiftContribute(room_id) {[weak self] error, list in
             if error == nil {
-                guard let list = list?.ranking_list else { return }
+                guard let list = list else { return }
                 let info = self?.roomInfo
                 info?.room?.ranking_list = list
                 self?.roomInfo = info
@@ -430,7 +430,7 @@ extension VoiceRoomViewController {
 //                debugPrint("result:\(result)")
 //            }
 //        }
-//        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
