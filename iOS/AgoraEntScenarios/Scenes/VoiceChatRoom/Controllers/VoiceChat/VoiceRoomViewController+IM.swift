@@ -48,12 +48,19 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
             giftList = self.giftList()
             view.addSubview(giftList!)
         }
-        giftList?.gifts.append(model(from: dic, VoiceRoomGiftEntity.self))
+        let gift = model(from: dic, VoiceRoomGiftEntity.self)
+        giftList?.gifts.append(gift)
         giftList?.cellAnimation()
         if let id = meta?["gift_id"], id == "VoiceRoomGift9" {
             rocketAnimation()
         }
-        self.requestRankList()
+        if var gift_amount = self.roomInfo?.room?.gift_amount {
+            gift_amount += Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
+            self.roomInfo?.room?.gift_amount = gift_amount
+        }
+        //刷新礼物贡献总数，头部
+        
+//        self.requestRankList()
     }
 
     func receiveApplySite(roomId: String, meta: [String: String]?) {
@@ -83,19 +90,11 @@ extension VoiceRoomViewController: VoiceRoomIMDelegate {
 
     func userJoinedRoom(roomId: String, username: String, ext: [String: Any]?) {
         // 更新用户人数
-        if ext?.keys.contains("member_count") == true {
-            if let count: String = ext?["member_count"] as? String {
-                let info = roomInfo
-                info?.room?.member_count = Int(count)
-                roomInfo = info
-            }
-        } else if ext?.keys.contains("click_count") == true {
-            if let count: String = ext?["click_count"] as? String {
-                let info = roomInfo
-                info?.room?.click_count = Int(count)
-                roomInfo = info
-            }
-        }
+        let info = roomInfo
+        info?.room?.member_count! += 1
+        roomInfo = info
+        guard let map = ext else { return }
+        self.roomInfo?.room?.member_list?.append(model(from: map, VRUser.self))
         self.convertShowText(userName: username, content: LanguageManager.localValue(key: "Joined"), joined: true)
     }
 
