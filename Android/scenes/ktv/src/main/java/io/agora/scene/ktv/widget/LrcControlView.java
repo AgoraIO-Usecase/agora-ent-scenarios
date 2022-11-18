@@ -256,10 +256,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(true);
         } else if (this.mRole == Role.Partner) {
-            mBinding.ilActive.lrcView.setEnableDrag(true);
+            mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);

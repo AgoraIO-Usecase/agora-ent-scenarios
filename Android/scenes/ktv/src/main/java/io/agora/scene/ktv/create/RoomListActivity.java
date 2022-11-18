@@ -96,7 +96,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         });
         roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
             if (ktvJoinRoomOutputModel == null) {
-                ToastUtils.showToast("密码不正确");
                 setDarkStatusIcon(isBlackDarkStatus());
             } else {
                 RoomLivingActivity.launch(RoomListActivity.this, ktvJoinRoomOutputModel);

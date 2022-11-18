@@ -482,12 +482,14 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 开关摄像头
      */
+    boolean isCameraOpened = false;
     public void toggleSelfVideo(boolean isOpen) {
         Log.d(TAG, "RoomLivingViewModel.toggleSelfVideo() called：" + isOpen);
         ktvServiceProtocol.updateSeatVideoMuteStatus(!isOpen, e -> {
             if (e == null) {
                 // success
                 Log.d(TAG, "RoomLivingViewModel.toggleSelfVideo() success");
+                isCameraOpened = isOpen;
                 mRtcEngine.enableLocalVideo(isOpen);
                 mainChannelMediaOption.publishCameraTrack = isOpen;
                 mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
@@ -503,12 +505,14 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * 静音
      */
+    boolean isMicrophoneMuted = false;
     public void toggleMic(boolean isUnMute) {
         Log.d(TAG, "RoomLivingViewModel.toggleMic() called：" + isUnMute);
         ktvServiceProtocol.updateSeatAudioMuteStatus(!isUnMute, e -> {
             if (e == null) {
                 // success
                 Log.d(TAG, "RoomLivingViewModel.toggleMic() success");
+                isMicrophoneMuted = !isUnMute;
                 musicUpdateMic(isUnMute);
             } else {
                 // failure
@@ -821,7 +825,7 @@ public class RoomLivingViewModel extends ViewModel {
                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() success");
                 songsOrderedLiveData.postValue(data);
 
-                if(data.size() > 0){
+                if (data.size() > 0){
                     RoomSelSongModel value = songPlayingLiveData.getValue();
                     RoomSelSongModel songPlaying = data.get(0);
                     if (value == null) {
@@ -845,7 +849,8 @@ public class RoomLivingViewModel extends ViewModel {
                             songPlayingLiveData.postValue(songPlaying);
                         }
                     }
-                }else{
+                } else {
+                    Log.d(TAG, "RoomLivingViewModel.getSongChosenList() return is emptyList");
                     songPlayingLiveData.postValue(null);
                 }
                 _loadingDialogVisible.postValue(false);
@@ -996,10 +1001,10 @@ public class RoomLivingViewModel extends ViewModel {
                         long position = jsonMsg.getLong("time");
                         if (position == 0) {
                             // 伴唱收到歌曲播放指令
-                            musicToggleStart();
+                            mPlayer.play();
                         } else if (position == -1) {
                             // 伴唱收到歌曲暂停指令
-                            musicToggleStart();
+                            mPlayer.pause();
                         } else {
                             // 观众收到歌词播放状态同步信息
                             mRecvedPlayPosition = position;
@@ -1011,7 +1016,15 @@ public class RoomLivingViewModel extends ViewModel {
                         int time = jsonMsg.getInt("time");
                         playerMusicCountDownLiveData.postValue(time);
                     } else if (jsonMsg.getString("cmd").equals("TrackMode")) {
-                        // TODO 伴唱收到原唱伴唱调整指令
+                        // 伴唱收到原唱伴唱调整指令
+                        if (mPlayer == null) return;
+                        int TrackMode = jsonMsg.getInt("mode");
+                        mPlayer.setAudioDualMonoMode(TrackMode);
+                    } else if (jsonMsg.getString("cmd").equals("Seek")) {
+                        // 伴唱收到原唱seek指令
+                        if (mPlayer == null) return;
+                        long position = jsonMsg.getLong("position");
+                        mPlayer.seek(position);
                     }
                 } catch (JSONException exp) {
                     Log.e(TAG, "onStreamMessage:" + exp.toString());
@@ -1352,9 +1365,17 @@ public class RoomLivingViewModel extends ViewModel {
         if (true) { // 因为咪咕音乐没有音轨，只有左右声道，所以暂定如此
             if (mAudioTrackIndex == 0) {
                 mAudioTrackIndex = 1;
+                if (needSendStatus) {
+                    // 合唱时 发送状态
+                    sendTrackMode(2);
+                }
                 mPlayer.setAudioDualMonoMode(2);
             } else {
                 mAudioTrackIndex = 0;
+                if (needSendStatus) {
+                    // 合唱时 发送状态
+                    sendTrackMode(1);
+                }
                 mPlayer.setAudioDualMonoMode(1);
             }
             return false;
@@ -1471,8 +1492,8 @@ public class RoomLivingViewModel extends ViewModel {
             // 独唱状态
             if (isOwnSong) {
                 // 点歌者(演唱者)同时推人声、播放器混流, 停止订阅远端音频流
-                mainChannelMediaOption.publishCameraTrack = false;
-                mainChannelMediaOption.publishMicrophoneTrack = true;
+                mainChannelMediaOption.publishCameraTrack = isCameraOpened;
+                mainChannelMediaOption.publishMicrophoneTrack = !isMicrophoneMuted;
                 mainChannelMediaOption.publishCustomAudioTrack = false;
                 mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
                 mainChannelMediaOption.autoSubscribeAudio = true;
@@ -1502,6 +1523,10 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
         if (mPlayer != null) {
+            if ( songPlayingLiveData.getValue().isChorus()
+                    && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                    sendMusicPlayerPosition(time);
+            }
             mPlayer.seek(time);
         }
     }
@@ -1519,8 +1544,8 @@ public class RoomLivingViewModel extends ViewModel {
             mAudioTrackIndex = 1;
         }
         if (role == Role.Owner || role == Role.Speaker) {
-            mainChannelMediaOption.publishMicrophoneTrack = true;
-            mainChannelMediaOption.publishCameraTrack = false;
+            mainChannelMediaOption.publishMicrophoneTrack = !isMicrophoneMuted;
+            mainChannelMediaOption.publishCameraTrack = isCameraOpened;
             mainChannelMediaOption.publishCustomAudioTrack = false;
             mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
             mainChannelMediaOption.autoSubscribeVideo = true;
@@ -1870,6 +1895,23 @@ public class RoomLivingViewModel extends ViewModel {
         int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
         if (ret < 0) {
             Log.e(TAG, "sendTrackMode() sendStreamMessage called returned: " + ret);
+        }
+    }
+
+    private void sendMusicPlayerPosition(long position) {
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "Seek");
+        msg.put("position", position);
+        JSONObject jsonMsg = new JSONObject(msg);
+        if (streamId == 0) {
+            DataStreamConfig cfg = new DataStreamConfig();
+            cfg.syncWithAudio = true;
+            cfg.ordered = true;
+            streamId = mRtcEngine.createDataStream(cfg);
+        }
+        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+        if (ret < 0) {
+            Log.e(TAG, "sendMusicPlayerPosition() sendStreamMessage called returned: " + ret);
         }
     }
 }
