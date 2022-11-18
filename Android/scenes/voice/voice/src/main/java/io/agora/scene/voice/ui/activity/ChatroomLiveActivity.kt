@@ -53,8 +53,6 @@ import io.agora.voice.imkit.manager.ChatroomListener
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
-import io.agora.voice.network.tools.VRValueCallBack
-import io.agora.voice.network.tools.bean.VRUserBean
 import io.agora.voice.network.tools.bean.VRoomInfoBean
 
 @Route(path = RouterPath.ChatroomPath)
@@ -296,12 +294,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             io.agora.scene.voice.ui.widget.primary.MenuItemClickListener {
             override fun onChatExtendMenuItemClick(itemId: Int, view: View?) {
                 when (itemId) {
-                    R.id.extend_item_eq -> {
+                    R.id.voice_extend_item_eq -> {
                         roomObservableDelegate.onAudioSettingsDialog(finishBack = {
                             finish()
                         })
                     }
-                    R.id.extend_item_mic -> {
+                    R.id.voice_extend_item_mic -> {
                         if (roomObservableDelegate.mySelfMicStatus() == MicStatus.ForceMute) {
                             // 被禁言
                             ToastTools.show(
@@ -318,7 +316,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             roomObservableDelegate.muteLocalAudio(true)
                         }
                     }
-                    R.id.extend_item_hand_up -> {
+                    R.id.voice_extend_item_hand_up -> {
                         "extend_item_hand_up isOwner:${handsDelegate.isOwner}".logE("onChatExtendMenuItemClick")
                         if (handsDelegate.isOwner) {
                             if (this@ChatroomLiveActivity::handsDelegate.isInitialized) {
@@ -331,7 +329,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             }
                         }
                     }
-                    R.id.extend_item_gift -> {
+                    R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {

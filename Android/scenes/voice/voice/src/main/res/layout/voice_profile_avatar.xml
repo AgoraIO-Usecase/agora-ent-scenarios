@@ -36,7 +36,7 @@
             app:layout_constraintRight_toRightOf="parent"
             android:id="@+id/title"
             android:textStyle="bold"
-            android:textSize="@dimen/text_size_16sp"
+            android:textSize="@dimen/voice_sp_16"
             android:textColor="#040925"
             android:text="@string/voice_chatroom_profile_change_picture"
             android:layout_width="wrap_content"

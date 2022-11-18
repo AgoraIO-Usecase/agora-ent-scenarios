@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="voice_text_size_12sp">12sp</dimen>
-    <dimen name="voice_text_size_13sp">13sp</dimen>
-    <dimen name="voice_text_size_14sp">14sp</dimen>
-    <dimen name="text_size_15sp">15sp</dimen>
-    <dimen name="text_size_16sp">16sp</dimen>
-    <dimen name="text_size_17sp">17sp</dimen>
-    <dimen name="text_size_18sp">18sp</dimen>
-
-    <dimen name="space_8dp">8dp</dimen>
-    <dimen name="space_84dp">84dp</dimen>
+    <dimen name="voice_space_8dp">8dp</dimen>
+    <dimen name="voice_space_84dp">84dp</dimen>
 
     <!-- like -->
     <dimen name="voice_like_anim_bezier_x_rand">50.0dp</dimen>

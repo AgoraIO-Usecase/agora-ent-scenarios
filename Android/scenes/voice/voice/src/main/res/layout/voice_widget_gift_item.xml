@@ -26,7 +26,7 @@
         android:textColor="@color/voice_white"
         android:layout_marginRight="6dp"
         android:minWidth="72dp"
-        android:textSize="@dimen/voice_text_size_12sp"
+        android:textSize="@dimen/voice_sp_12"
         app:layout_constraintLeft_toRightOf="@+id/avatar"
         app:layout_constraintRight_toLeftOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent"
@@ -51,7 +51,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:textColor="@color/voice_white"
         android:gravity="center"
-        android:textSize="@dimen/voice_text_size_12sp"
+        android:textSize="@dimen/voice_sp_12"
         android:id="@+id/gift_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
