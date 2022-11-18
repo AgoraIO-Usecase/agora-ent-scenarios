@@ -505,6 +505,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 //                    VLLog(@"发送失败");
                 }
             }];
+            //check invalid
+            if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
+                KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
+                [self stopCurrentSong];
+                [self loadAndPlaySong];
+            }
         }
 }
 
