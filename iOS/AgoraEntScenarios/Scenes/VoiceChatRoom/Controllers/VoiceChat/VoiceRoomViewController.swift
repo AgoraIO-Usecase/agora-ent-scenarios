@@ -229,7 +229,7 @@ extension VoiceRoomViewController {
     // 加入房间获取房间详情
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
-        serviceImp.fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity(), isOwner: self.isOwner) { [weak self] error, room_info in
+        serviceImp.fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
                 if self?.isOwner ?? false {
