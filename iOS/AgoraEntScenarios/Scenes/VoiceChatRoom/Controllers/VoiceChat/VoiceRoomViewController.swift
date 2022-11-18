@@ -153,7 +153,10 @@ extension VoiceRoomViewController {
                         //房主更新环信KV
                         VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: roomId, attributes: self.serviceImp.createMics(), completion: { error in
                             if error == nil {
-                                self.roomInfo?.mic_info? = VoiceRoomIMManager.shared?.mics ?? []
+                                if let info = self.roomInfo {
+                                    info.mic_info = VoiceRoomIMManager.shared?.mics ?? []
+                                    self.roomInfo = info
+                                }
                             } else {
                                 
                             }
