@@ -139,8 +139,12 @@ extension VoiceRoomViewController {
                         if self.roomInfo?.room?.ranking_list == nil {
                             self.roomInfo?.room?.ranking_list = [VRUser]()
                         }
+                        if let c = Int(count), let v = Int(value), var amount = VoiceRoomUserInfo.shared.user?.amount {
+                            amount += c * v
+                            VoiceRoomUserInfo.shared.user?.amount = amount
+                        }
                         self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
-                        VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: self.roomInfo?.room?.chatroom_id ?? "", attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
+                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
                             if error != nil {
                                 self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
                             }
@@ -152,10 +156,7 @@ extension VoiceRoomViewController {
                         }
                         giftList?.gifts.append(gift)
                         giftList?.cellAnimation()
-                        if let c = Int(count), let v = Int(value), var amount = VoiceRoomUserInfo.shared.user?.amount {
-                            amount += c * v
-                            VoiceRoomUserInfo.shared.user?.amount = amount
-                        }
+                        
                     } else {
                         self.view.makeToast("Send failed \(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
                     }
