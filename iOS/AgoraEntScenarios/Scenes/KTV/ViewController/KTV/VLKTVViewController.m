@@ -823,8 +823,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)playNextSong:(int)isMasterInterrupt {
     [self stopCurrentSong];
-    [self deleteSongEvent:self.selSongsArray.firstObject
-        isMasterInterrupt:isMasterInterrupt];
+    [self deleteSongEvent:self.selSongsArray.firstObject];
     VLLog(@"RTC media player stop");
 }
 
@@ -1461,11 +1460,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)deleteSongEvent:(VLRoomSelSongModel *)model isMasterInterrupt:(int)isMasterInterrupt {
-    if(model == nil
-       || self.roomModel == nil
-       || self.roomModel.roomNo == nil
-       || model.songNo == nil) {
+- (void)deleteSongEvent:(VLRoomSelSongModel *)model {
+    if([model.songNo length] == 0 || [self.roomModel.roomNo length] == 0) {
         return;
     }
     
@@ -1474,6 +1470,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {
+        if (error) {
+            KTVLogInfo(@"deleteSongEvent fail: %@ %ld", model.songName, error.code);
+        }
     }];
 }
 
