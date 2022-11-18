@@ -79,6 +79,7 @@ class KTVSyncManagerServiceImp(
         initSync {
             Instance().getScenes(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
+                    roomMap.clear()
                     val ret = ArrayList<RoomListModel>()
                     result?.forEach {
                         val obj = it.toObject(RoomListModel::class.java)
