@@ -77,7 +77,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                 }
             }, VoiceRoomSoundSelectionAdapter.SoundSelectViewHolder::class.java)
         binding.list.layoutManager = LinearLayoutManager(this)
-        val offsetPx = resources.getDimension(R.dimen.space_84dp)
+        val offsetPx = resources.getDimension(R.dimen.voice_space_84dp)
         val bottomOffsetDecoration = BottomOffsetDecoration(offsetPx.toInt())
         binding.list.addItemDecoration(bottomOffsetDecoration)
         binding.list.adapter = soundSelectAdapter

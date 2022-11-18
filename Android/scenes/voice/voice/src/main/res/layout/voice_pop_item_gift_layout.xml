@@ -16,7 +16,7 @@
         android:clickable="true"
         android:textColor="@drawable/voice_gift_color_pressed"
         android:background="@drawable/voice_bg_pop_gift_item"
-        android:textSize="@dimen/voice_text_size_14sp"
+        android:textSize="@dimen/voice_sp_14"
         android:layout_width="100dp"
         android:layout_height="28dp"/>
 

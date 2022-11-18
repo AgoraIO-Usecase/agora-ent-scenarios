@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
@@ -29,7 +30,7 @@ import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools.show
 import io.agora.voice.imkit.manager.ChatroomHelper
 
-class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() {
+class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
     private lateinit var voiceRoomViewModel: VoiceRoomViewModel
     private var listAdapter: VoiceRoomListAdapter? = null
 
@@ -47,14 +48,15 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
-        binding?.apply {
-            initAdapter(recycler)
+        binding?.let {
+            initAdapter(it.recycler)
+            it.swipeLayout.setOnRefreshListener(this)
         }
         voiceRoomObservable()
     }
 
     private fun initAdapter(recyclerView: RecyclerView) {
-        val offsetPx = resources.getDimension(R.dimen.space_84dp)
+        val offsetPx = resources.getDimension(R.dimen.voice_space_84dp)
         recyclerView.addItemDecoration(BottomOffsetDecoration(offsetPx.toInt()))
         listAdapter = VoiceRoomListAdapter(null, object : OnItemClickListener<VoiceRoomModel> {
             override fun onItemClick(voiceRoomModel: VoiceRoomModel, view: View, position: Int, viewType: Long) {
@@ -63,6 +65,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         }, VoiceRoomListAdapter.VoiceRoomListViewHolder::class.java)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = listAdapter
+
     }
 
     private fun voiceRoomObservable() {
@@ -166,7 +169,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     showLoading(false)
                 }
             })
-            .show(requireFragmentManager(), "encryptionInputDialog")
+            .show(childFragmentManager, "encryptionInputDialog")
     }
 
     internal class BottomOffsetDecoration(private val mBottomOffset: Int) : RecyclerView.ItemDecoration() {
@@ -180,5 +183,9 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 outRect[0, 0, 0] = 0
             }
         }
+    }
+
+    override fun onRefresh() {
+        voiceRoomViewModel.getRoomList(0, 0)
     }
 }

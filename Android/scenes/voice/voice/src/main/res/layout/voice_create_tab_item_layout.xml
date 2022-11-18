@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="17dp"
             android:gravity="center"
-            android:textSize="@dimen/voice_text_size_12sp"
+            android:textSize="@dimen/voice_sp_12"
             android:maxLines="1"
             android:maxLength="30"
             android:singleLine="true"

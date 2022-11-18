@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.tool.GsonTools
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.network.http.VRHttpCallback
 import io.agora.voice.network.http.VRHttpClientManager
@@ -81,7 +82,7 @@ class VRToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice generateToken success: $result".logE(TAG)
+                    "voice generateToken success: $result".logD(TAG)
                     val bean = GsonTools.toBean<VRGenerateTokenResponse>(
                         result,
                         object : TypeToken<VRGenerateTokenResponse>() {}.type
@@ -160,7 +161,7 @@ class VRToolboxServerHttpManager {
             .setRequestMethod(VRHttpClientManager.Method_POST)
             .asyncExecute(object : VRHttpCallback {
                 override fun onSuccess(result: String) {
-                    "voice createImRoom success: $result".logE(TAG)
+                    "voice createImRoom success: $result".logD(TAG)
                     val bean = GsonTools.toBean<VRCreateRoomResponse>(
                         result,
                         object : TypeToken<VRCreateRoomResponse>() {}.type

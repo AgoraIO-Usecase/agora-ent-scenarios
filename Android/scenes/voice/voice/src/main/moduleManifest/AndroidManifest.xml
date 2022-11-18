@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
-        android:networkSecurityConfig="@xml/app_net_config"
+        android:networkSecurityConfig="@xml/voice_net_config"
         android:theme="@style/voice_Theme.AgoraScenesChatroom">
         <activity android:name="io.agora.scene.voice.ui.activity.ChatroomSplashActivity"
             android:exported="true"

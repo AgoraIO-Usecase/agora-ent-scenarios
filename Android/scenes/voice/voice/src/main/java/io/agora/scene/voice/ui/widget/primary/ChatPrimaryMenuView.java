@@ -240,18 +240,18 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         Log.e("initMenu","roomType: " + roomType);
         if (roomType == 0){
             normalLayout.setVisibility(VISIBLE);
-            registerMenuItem(R.drawable.voice_icon_close_mic,R.id.extend_item_mic);
-            registerMenuItem(R.drawable.voice_icon_handuphard,R.id.extend_item_hand_up);
-            registerMenuItem(R.drawable.voice_icon_eq,R.id.extend_item_eq);
-            registerMenuItem(R.drawable.voice_icon_gift,R.id.extend_item_gift);
+            registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
+            registerMenuItem(R.drawable.voice_icon_handuphard,R.id.voice_extend_item_hand_up);
+            registerMenuItem(R.drawable.voice_icon_eq,R.id.voice_extend_item_eq);
+            registerMenuItem(R.drawable.voice_icon_gift,R.id.voice_extend_item_gift);
             addView();
         }else if (roomType == 1){
             normalLayout.setVisibility(VISIBLE);
             inputLayout.setVisibility(INVISIBLE);
             menuLayout.setVisibility(VISIBLE);
-            registerMenuItem(R.drawable.voice_icon_close_mic,R.id.extend_item_mic);
-            registerMenuItem(R.drawable.voice_icon_handuphard,R.id.extend_item_hand_up);
-            registerMenuItem(R.drawable.voice_icon_eq,R.id.extend_item_eq);
+            registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
+            registerMenuItem(R.drawable.voice_icon_handuphard,R.id.voice_extend_item_hand_up);
+            registerMenuItem(R.drawable.voice_icon_eq,R.id.voice_extend_item_eq);
             addView();
         }
     }
@@ -268,7 +268,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             imageView.setBackgroundResource(R.drawable.voice_bg_primary_menu_item_icon);
             imageView.setId(itemModel.id);
 
-            if (itemModel.id == R.id.extend_item_gift){
+            if (itemModel.id == R.id.voice_extend_item_gift){
                 marginLayoutParams.setMarginEnd(dp2px(activity,0));
             }
             imageView.setLayoutParams(marginLayoutParams);
@@ -279,12 +279,12 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                         clickListener.onChatExtendMenuItemClick(v.getId(),v);
                 }
             });
-            if (itemModel.id == R.id.extend_item_hand_up){
+            if (itemModel.id == R.id.voice_extend_item_hand_up){
                 RelativeLayout relativeLayout = new RelativeLayout(activity);
                 relativeLayout.setLayoutParams(new LayoutParams(dp2px(activity,42), dp2px(activity,38)));
 
                 ImageView status = new ImageView(activity);
-                status.setId(R.id.extend_item_hand_up_status);
+                status.setId(R.id.voice_extend_item_hand_up_status);
                 status.setImageResource(R.drawable.voice_bg_primary_hand_status);
                 status.setVisibility(GONE);
 
@@ -305,14 +305,14 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     public void setShowHandStatus(boolean isOwner,boolean isShowHandStatus){
         post(()-> {
             if (isOwner){
-                ImageView handStatus = menuLayout.findViewById(R.id.extend_item_hand_up_status);
+                ImageView handStatus = menuLayout.findViewById(R.id.voice_extend_item_hand_up_status);
                 if (isShowHandStatus){
                     handStatus.setVisibility(VISIBLE);
                 }else {
                     handStatus.setVisibility(GONE);
                 }
             }else {
-                ImageView hand = menuLayout.findViewById(R.id.extend_item_hand_up);
+                ImageView hand = menuLayout.findViewById(R.id.voice_extend_item_hand_up);
                 if (isShowHandStatus){
                     hand.setImageResource(R.drawable.voice_icon_handup_dot);
                 }else {
@@ -324,7 +324,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public void setEnableHand(boolean isEnable){
         post(()-> {
-            ImageView hand = menuLayout.findViewById(R.id.extend_item_hand_up);
+            ImageView hand = menuLayout.findViewById(R.id.voice_extend_item_hand_up);
             if (isEnable){
                 hand.setImageResource(R.drawable.voice_icon_vector);
                 hand.setEnabled(false);
@@ -337,7 +337,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public void setEnableMic(boolean isEnable){
         post(()-> {
-            ImageView mic = menuLayout.findViewById(R.id.extend_item_mic);
+            ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
             if (isEnable){
                 mic.setImageResource(R.drawable.voice_icon_mic);
             }else {
@@ -348,7 +348,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public void showMicVisible(boolean muteLocal,boolean isVisible){
         post(()-> {
-            ImageView mic = menuLayout.findViewById(R.id.extend_item_mic);
+            ImageView mic = menuLayout.findViewById(R.id.voice_extend_item_mic);
             if (muteLocal) {
                 mic.setImageResource(R.drawable.voice_icon_close_mic);
             } else {
