@@ -31,16 +31,6 @@ class ShowCreateLiveVC: UIViewController {
         return config
     }()
     
-    private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
-       let option = AgoraRtcChannelMediaOptions()
-        option.publishMicrophoneTrack = true
-        option.publishCameraTrack = true
-        option.clientRoleType = .broadcaster
-        option.autoSubscribeVideo = true
-        option.autoSubscribeAudio = true
-        return option
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
@@ -97,7 +87,7 @@ class ShowCreateLiveVC: UIViewController {
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
         let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = 0
+        canvas.uid = UInt(VLUserCenter.user.id) ?? 0
         canvas.renderMode = .hidden
         canvas.view = localView
         agoraKit?.setupLocalVideo(canvas)
@@ -151,7 +141,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         room.roomName = createView.roomName
         room.roomNo = createView.roomNo
         room.thumbnailId = createView.roomBg
-        room.ownerId = VLUserCenter.user.userNo
+        room.ownerId = VLUserCenter.user.id
         room.ownerAvater = VLUserCenter.user.headUrl
         room.createdAt = Date().millionsecondSince1970()
         AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
