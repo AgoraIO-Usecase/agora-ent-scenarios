@@ -912,7 +912,6 @@ public class RoomLivingViewModel extends ViewModel {
             return;
         }
         if (mPlayer != null) {
-            mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
             if (musicModel.isChorus()) {
                 mRtcEngine.muteAllRemoteAudioStreams(false);
                 mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
@@ -1036,6 +1035,30 @@ public class RoomLivingViewModel extends ViewModel {
                 // 网络状态回调
                 if (uid == 0) { //本地user uid = 0
                     networkStatusLiveData.postValue(new NetWorkEvent(txQuality, rxQuality));
+                }
+            }
+
+            public void onUserJoined(int uid, int elapsed) {
+                Log.d(TAG, "RoomLivingViewModel.onUserJoined() called: " + uid);
+                if (songPlayingLiveData.getValue() == null) return;
+                if (songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo) && uid == (int) (UserManager.getInstance().getUser().id * 10 + 1)) {
+                    // 合唱状态下mute推的mpk流
+                    mRtcEngine.muteRemoteAudioStream((int) (UserManager.getInstance().getUser().id * 10 + 1), true);
+                } else if (songPlayingLiveData.getValue().getChorusNo().equals(UserManager.getInstance().getUser().userNo)) {
+                    List<RoomSeatModel> seatList = seatListLiveData.getValue();
+                    RoomSeatModel mainSinger = null;
+                    if (seatList != null) {
+                        for (RoomSeatModel model : seatList) {
+                            if (model.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
+                                mainSinger = model;
+                            }
+                        }
+                    }
+
+                    if (mainSinger != null) {
+                        int ret = mRtcEngine.muteRemoteAudioStream(Integer.parseInt(mainSinger.getRtcUid()) * 10 + 1, true);
+                        Log.d(TAG, "RoomLivingViewModel.muteRemoteAudioStream() called: " + Integer.parseInt(mainSinger.getRtcUid()) * 10 + 1);
+                    }
                 }
             }
         };
@@ -1342,7 +1365,7 @@ public class RoomLivingViewModel extends ViewModel {
             return false;
         }
         boolean needSendStatus = songPlayingLiveData.getValue().isChorus()
-                && songPlayingLiveData.getValue().getUserNo() == UserManager.getInstance().getUser().userNo;
+                && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo);
 
         if (true) { // 因为咪咕音乐没有音轨，只有左右声道，所以暂定如此
             if (mAudioTrackIndex == 0) {
@@ -1449,7 +1472,7 @@ public class RoomLivingViewModel extends ViewModel {
                 options.publishCustomAudioTrack = false;
                 options.enableAudioRecordingOrPlayout = false;
                 options.publishMicrophoneTrack = false;
-                options.autoSubscribeVideo = true;
+                options.autoSubscribeVideo = false;
                 options.autoSubscribeAudio = false;
                 options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                 options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
@@ -1462,11 +1485,9 @@ public class RoomLivingViewModel extends ViewModel {
                         new IRtcEngineEventHandler() {
                         }
                 );
-                mRtcEngine.muteRemoteAudioStream((int) (UserManager.getInstance().getUser().id * 10 + 1), true);
             } else if (music.getChorusNo().equals(UserManager.getInstance().getUser().userNo)) {
                 // 合唱者加入后，合唱者mute 点歌者mpk流
                 mRtcEngine.setClientRole(Constants.CLIENT_ROLE_BROADCASTER);
-                mRtcEngine.muteRemoteAudioStream((int) (UserManager.getInstance().getUser().id * 10 + 1), true);
                 // 合唱者开始网络测试
                 // startNetTestTask();
             }
