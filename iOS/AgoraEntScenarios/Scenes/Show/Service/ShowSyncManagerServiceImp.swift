@@ -120,7 +120,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
+                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -155,7 +155,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
                         return
                     }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
+                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -176,7 +176,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         //current user is room owner, remove room
-        if roomInfo.ownerId == VLUserCenter.user.userNo {
+        if roomInfo.ownerId == VLUserCenter.user.id {
             _removeRoom(completion: completion)
             return
         }
@@ -285,7 +285,7 @@ extension ShowSyncManagerServiceImp {
     private func _addUserIfNeed() {
         _getUserList { error, userList in
             // current user already add
-            if self.userList.contains(where: { $0.userId == VLUserCenter.user.userNo }) {
+            if self.userList.contains(where: { $0.userId == VLUserCenter.user.id }) {
                 return
             }
             self._addUserInfo {
@@ -324,7 +324,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         let model = ShowUser()
-        model.userId = VLUserCenter.user.userNo
+        model.userId = VLUserCenter.user.id
         model.avatar = VLUserCenter.user.headUrl
         model.userName = VLUserCenter.user.name
 
@@ -392,7 +392,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         
-        guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.userNo }).first?.objectId else {
+        guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.id }).first?.objectId else {
             agoraAssert("_removeUser objectId = nil")
             return
         }
@@ -416,7 +416,7 @@ extension ShowSyncManagerServiceImp {
     private func _updateUserCount(with count: Int) {
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
-              roomInfo.ownerId == VLUserCenter.user.userNo
+              roomInfo.ownerId == VLUserCenter.user.id
         else {
 //            agoraPrint("updateUserCount channelName = nil")
 //            userListCountDidChanged?(UInt(count))
