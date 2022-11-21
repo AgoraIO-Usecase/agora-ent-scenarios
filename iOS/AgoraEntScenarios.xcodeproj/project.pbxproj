@@ -134,6 +134,7 @@
 		7F6BE3E02919ED4900F6714D /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */; };
 		7F6BE3E12919ED4900F6714D /* VLPopOnLineTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */; };
 		7F6BE3E4291A2B6600F6714D /* VLTouristOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */; };
+		DD0260262926736700D88B68 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0260252926736700D88B68 /* KTVLog.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -554,6 +555,7 @@
 		7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopOnLineTypeView.m; sourceTree = "<group>"; };
 		7F6BE3E2291A2B6600F6714D /* VLTouristOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLTouristOnLineView.h; sourceTree = "<group>"; };
 		7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLTouristOnLineView.m; sourceTree = "<group>"; };
+		DD0260252926736700D88B68 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -2462,6 +2464,7 @@
 		DDBF788F291A44FD0001855B /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				DD0260252926736700D88B68 /* KTVLog.swift */,
 				DDBF7890291A45120001855B /* KTVMacro.h */,
 			);
 			path = Utils;
@@ -2821,6 +2824,7 @@
 				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
 				0510B862290B7A6E0063E57A /* VRCreateRoomViewController.swift in Sources */,
 				0510B852290B799E0063E57A /* VRCreateRoomView.swift in Sources */,
+				DD0260262926736700D88B68 /* KTVLog.swift in Sources */,
 				DD8417A029090C520026B624 /* VLKTVBottomView.m in Sources */,
 				DD8417BE29090C520026B624 /* VLHomeOnLineListCCell.m in Sources */,
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
@@ -3216,7 +3220,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3236,7 +3240,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entscenarios;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3256,7 +3260,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3276,7 +3280,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entscenarios;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
