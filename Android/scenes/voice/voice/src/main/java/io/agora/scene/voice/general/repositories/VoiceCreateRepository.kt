@@ -2,22 +2,14 @@ package io.agora.scene.voice.general.repositories
 
 import android.text.TextUtils
 import androidx.lifecycle.LiveData
-import io.agora.scene.voice.BuildConfig
-import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
 import io.agora.scene.voice.service.*
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
-import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
-import io.agora.voice.network.tools.VRDefaultValueCallBack
-import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author create by zhangwei03
  */
-class VoiceRoomRepository : BaseRepository() {
+class VoiceCreateRepository : BaseRepository() {
 
     /**
      * voice chat protocol

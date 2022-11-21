@@ -14,7 +14,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
+import io.agora.scene.voice.model.VoiceCreateViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
@@ -31,7 +31,7 @@ import io.agora.voice.buddy.tool.ToastTools.show
 import io.agora.voice.imkit.manager.ChatroomHelper
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var listAdapter: VoiceRoomListAdapter? = null
 
     private var curVoiceRoomModel: VoiceRoomModel? = null
@@ -47,7 +47,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         binding?.let {
             initAdapter(it.recycler)
             it.swipeLayout.setOnRefreshListener(this)
