@@ -25,9 +25,8 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, readonly) NSArray *selSongsArray;
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLChoosedSongViewDelegate>)delegate;
-
-- (void)loadChoosedSongWithRoomNo:(NSString *)roomNo;
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLChoosedSongViewDelegate>)delegate;
 
 - (void)setSelSongsUIWithArray:(NSArray *)selSongsArray;
 

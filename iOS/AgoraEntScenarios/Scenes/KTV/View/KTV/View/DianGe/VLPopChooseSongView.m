@@ -70,7 +70,10 @@
         [self.dianGeBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         self.selsectSongView.hidden = YES;
         self.choosedSongView.hidden = NO;
-        [self.choosedSongView loadChoosedSongWithRoomNo:self.roomNo];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(chooseSongView:tabbarDidClick:)]) {
+        [self.delegate chooseSongView:self tabbarDidClick:sender.tag];
     }
 }
 
