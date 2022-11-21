@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
+import io.agora.voice.buddy.tool.ImageTools
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.voice.network.tools.bean.VRankingMemberBean
 
@@ -15,9 +16,7 @@ class RoomContributionRankingViewHolder(val binding: VoiceItemContributionRankin
     override fun binding(data: VRankingMemberBean?, selectedIndex: Int) {
         data?.let {
             setRankNumber()
-            binding.ivAudienceAvatar.setImageResource(
-                ResourcesTools.getDrawableId(binding.ivAudienceAvatar.context, it.portrait)
-            )
+            ImageTools.loadImage(binding.ivAudienceAvatar, it.portrait)
             binding.mtContributionUsername.text = it.name
             binding.mtContributionValue.text = it.amount.toString()
             val mgr: AssetManager = context.assets //得到AssetManager

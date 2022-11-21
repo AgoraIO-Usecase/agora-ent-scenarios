@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.agora.scene.voice.model.VoiceUserListViewModel;
 import io.agora.voice.baseui.BaseListFragment;
 import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback;
@@ -31,7 +32,6 @@ import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.general.net.ChatroomHttpManager;
-import io.agora.scene.voice.model.RoomInviteViewModel;
 import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter;
 import io.agora.voice.network.tools.VRValueCallBack;
 import io.agora.voice.network.tools.bean.VMemberBean;
@@ -40,7 +40,7 @@ import io.agora.voice.network.tools.bean.VRoomUserBean;
 public class ChatroomInviteHandsFragment extends BaseListFragment<VMemberBean> implements ChatroomInviteAdapter.onActionListener, SwipeRefreshLayout.OnRefreshListener {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
-    private RoomInviteViewModel handsViewModel;
+    private VoiceUserListViewModel handsViewModel;
     private List<VMemberBean> dataList = new ArrayList<>();
     private ChatroomInviteAdapter adapter;
     private int pageSize = 10;
@@ -98,7 +98,7 @@ public class ChatroomInviteHandsFragment extends BaseListFragment<VMemberBean> i
     @Override
     protected void initViewModel() {
         super.initViewModel();
-        handsViewModel = new ViewModelProvider(this).get(RoomInviteViewModel.class);
+        handsViewModel = new ViewModelProvider(this).get(VoiceUserListViewModel.class);
         handsViewModel.getInviteObservable().observe(this, response -> {
             parseResource(response, new OnResourceParseCallback<VRoomUserBean>() {
                 @Override

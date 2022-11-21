@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.agora.scene.voice.model.VoiceUserListViewModel;
 import io.agora.voice.baseui.BaseListFragment;
 import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback;
@@ -30,7 +31,6 @@ import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.general.net.ChatroomHttpManager;
-import io.agora.scene.voice.model.RoomRaisedViewModel;
 import io.agora.scene.voice.ui.adapter.ChatroomRaisedAdapter;
 import io.agora.voice.network.tools.VRValueCallBack;
 import io.agora.voice.network.tools.bean.VRMicListBean;
@@ -38,7 +38,7 @@ import io.agora.voice.network.tools.bean.VRMicListBean;
 public class ChatroomRaisedHandsFragment extends BaseListFragment<VRMicListBean.ApplyListBean> implements ChatroomRaisedAdapter.onActionListener, SwipeRefreshLayout.OnRefreshListener {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
-    private RoomRaisedViewModel handsViewModel;
+    private VoiceUserListViewModel handsViewModel;
     private ChatroomRaisedAdapter adapter;
     private List<VRMicListBean.ApplyListBean> dataList = new ArrayList<>();
     private int pageSize = 10;
@@ -96,7 +96,7 @@ public class ChatroomRaisedHandsFragment extends BaseListFragment<VRMicListBean.
     @Override
     protected void initViewModel() {
         super.initViewModel();
-        handsViewModel = new ViewModelProvider(this).get(RoomRaisedViewModel.class);
+        handsViewModel = new ViewModelProvider(this).get(VoiceUserListViewModel.class);
         handsViewModel.getRaisedObservable().observe(this,response -> {
             parseResource(response, new OnResourceParseCallback<VRMicListBean>() {
                 @Override

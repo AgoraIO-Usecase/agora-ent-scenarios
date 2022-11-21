@@ -6,13 +6,9 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.voice.bean.*
-import io.agora.scene.voice.controller.RtcMicVolumeListener
-import io.agora.scene.voice.controller.RtcRoomController
+import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor
-import io.agora.scene.voice.model.RoomMicViewModel
-import io.agora.scene.voice.model.RoomViewModel
 import io.agora.scene.voice.ui.ainoise.RoomAINSSheetDialog
 import io.agora.scene.voice.ui.audiosettings.RoomAudioSettingsSheetDialog
 import io.agora.scene.voice.ui.common.CommonFragmentAlertDialog
@@ -32,7 +28,10 @@ import io.agora.voice.baseui.interfaces.IParserSource
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
 import io.agora.scene.voice.R
+import io.agora.scene.voice.model.VoiceRoomLivingViewModel
+import io.agora.scene.voice.rtckit.RtcRoomController
 import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.secnceui.annotation.MicClickAction
@@ -50,26 +49,13 @@ import kotlin.random.Random
  */
 class RoomObservableViewDelegate constructor(
     private val activity: FragmentActivity,
+    private val roomLivingViewModel:VoiceRoomLivingViewModel,
     private val roomKitBean: RoomKitBean,
     private val iRoomTopView: IRoomLiveTopView, // 头部
     private val iRoomMicView: IRoomMicView, // 麦位
 ) : IParserSource {
     companion object {
         private const val TAG = "RoomObservableDelegate"
-    }
-
-    /**
-     * room viewModel
-     */
-    private val roomViewModel: RoomViewModel by lazy {
-        ViewModelProvider(activity)[RoomViewModel::class.java]
-    }
-
-    /**
-     * mic viewModel
-     */
-    private val micViewModel: RoomMicViewModel by lazy {
-        ViewModelProvider(activity)[RoomMicViewModel::class.java]
     }
 
     /**麦位信息，index,rtcUid*/
@@ -91,7 +77,7 @@ class RoomObservableViewDelegate constructor(
 
     init {
         // 更新公告
-        roomViewModel.roomNoticeObservable.observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.roomNoticeObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     if (data != true) return
@@ -104,18 +90,16 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 打开机器人
-        roomViewModel.openBotObservable.observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.openBotObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     if (data != true) return
-                    RtcRoomController.get().isUseBot = true
-                    roomAudioSettingDialog?.let {
-                        it.updateBoxCheckBoxView(true)
-                    }
+                    RtcRoomController.get().rtcChannelTemp.isUseBot = true
+                    roomAudioSettingDialog?.updateBoxCheckBoxView(true)
                     // 创建房间，第⼀次启动机器⼈后播放音效：
-                    if (RtcRoomController.get().firstActiveBot) {
-                        RtcRoomController.get().firstActiveBot = false
-                        RtcRoomController.get().updateEffectVolume(RtcRoomController.get().botVolume)
+                    if (RtcRoomController.get().rtcChannelTemp.firstActiveBot) {
+                        RtcRoomController.get().rtcChannelTemp.firstActiveBot = false
+                        RtcRoomController.get().updateEffectVolume(RtcRoomController.get().rtcChannelTemp.botVolume)
                         RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
                             RtcRoomController.get().playMusic(it)
                         }
@@ -124,24 +108,24 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 关闭机器人
-        roomViewModel.closeBotObservable.observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.closeBotObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     if (data != true) return
                     // 关闭机器人，暂停所有音效播放
-                    RtcRoomController.get().isUseBot = false
+                    RtcRoomController.get().rtcChannelTemp.isUseBot = false
                     RtcRoomController.get().resetMediaPlayer()
                 }
             })
         }
         // 机器人音量
-        roomViewModel.robotVolumeObservable.observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.robotVolumeObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "robotVolume update：$data".logE()
                     data?.let {
                         if (it.second) {
-                            RtcRoomController.get().botVolume = it.first
+                            RtcRoomController.get().rtcChannelTemp.botVolume = it.first
                             RtcRoomController.get().updateEffectVolume(it.first)
                         }
                     }
@@ -164,7 +148,7 @@ class RoomObservableViewDelegate constructor(
                 if (rtcUid == 0) {
                     // 自己,没有关麦
                     val myselfIndex = mySelfIndex()
-                    if (myselfIndex >= 0 && !RtcRoomController.get().isLocalAudioMute) {
+                    if (myselfIndex >= 0 && !RtcRoomController.get().rtcChannelTemp.isLocalAudioMute) {
                         iRoomMicView.updateVolume(myselfIndex, volume)
                     }
                 } else {
@@ -176,7 +160,7 @@ class RoomObservableViewDelegate constructor(
             }
         })
         // 关麦
-        micViewModel.closeMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.closeMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "close mic：$data".logE()
@@ -189,7 +173,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 取消关麦
-        micViewModel.cancelCloseMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.cancelCloseMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "cancel close mic：$data".logE()
@@ -202,7 +186,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 下麦
-        micViewModel.leaveMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.leaveMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "leave mic：$data".logE()
@@ -216,7 +200,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 禁言指定麦位
-        micViewModel.muteMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.muteMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "force mute mic：$data".logE()
@@ -229,7 +213,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 取消禁言指定麦位
-        micViewModel.cancelMuteMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.cancelMuteMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "cancel force mute mic：$data".logE()
@@ -242,7 +226,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 踢用户下麦
-        micViewModel.kickMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.kickMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "kick mic：$data".logE()
@@ -255,7 +239,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 用户拒绝申请上麦
-        micViewModel.rejectMicInvitationObservable().observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.rejectMicInvitationObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "reject mic invitation：$data".logE()
@@ -265,7 +249,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 锁麦
-        micViewModel.lockMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.lockMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "lock mic：$data".logE()
@@ -278,7 +262,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 取消锁麦
-        micViewModel.cancelLockMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+        roomLivingViewModel.cancelLockMicObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
                     "cancel lock mic：$data".logE()
@@ -291,7 +275,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 邀请上麦
-        micViewModel.invitationMicObservable().observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.invitationMicObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "invitation mic：$data".logE()
@@ -301,7 +285,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 同意上麦申请
-        micViewModel.applySubmitMicObservable().observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.applySubmitMicObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "apply submit mic：$data".logE()
@@ -311,7 +295,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 拒绝上麦申请
-        micViewModel.rejectSubmitMicObservable().observe(activity) { response: Resource<Boolean> ->
+        roomLivingViewModel.rejectSubmitMicObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     "reject submit mic：$data".logE()
@@ -333,13 +317,13 @@ class RoomObservableViewDelegate constructor(
             if (rtcUid > 0) {
                 micMap[index] = rtcUid
                 // 当前用户在麦位上
-                if (rtcUid ==  VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     kvLocalUser = micInfo
                 }
             } else {
                 val removeRtcUid = micMap.remove(index)
                 // 当前用户从麦位移除
-                if (removeRtcUid ==   VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                if (removeRtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     myselfMicInfo = null
                 }
             }
@@ -358,7 +342,7 @@ class RoomObservableViewDelegate constructor(
         }
         // 机器人麦位
         updateMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
-            RtcRoomController.get().isUseBot = it.micStatus == MicStatus.BotActivated
+            RtcRoomController.get().rtcChannelTemp.isUseBot = it.micStatus == MicStatus.BotActivated
         }
     }
 
@@ -371,13 +355,19 @@ class RoomObservableViewDelegate constructor(
         return -1
     }
 
+    fun onRoomModel(voiceRoomModel: VoiceRoomModel) {
+        val ownerUid = voiceRoomModel.owner?.uid ?: ""
+        iRoomTopView.onChatroomInfo(RoomInfoConstructor.voiceRoomModel2UiRoomInfo(voiceRoomModel))
+    }
+
     /**
      * 详情
      */
     fun onRoomDetails(vRoomInfoBean: VRoomInfoBean) {
         val isUseBot = vRoomInfoBean.room?.isUse_robot ?: false
-        RtcRoomController.get().isUseBot = isUseBot
-        RtcRoomController.get().botVolume = vRoomInfoBean.room?.robot_volume ?: ConfigConstants.RotDefaultVolume
+        RtcRoomController.get().rtcChannelTemp.isUseBot = isUseBot
+        RtcRoomController.get().rtcChannelTemp.botVolume =
+            vRoomInfoBean.room?.robot_volume ?: ConfigConstants.RotDefaultVolume
 
         val ownerUid = vRoomInfoBean.room?.owner?.uid ?: ""
         vRoomInfoBean.room?.let { vRoomInfo ->
@@ -392,9 +382,10 @@ class RoomObservableViewDelegate constructor(
                     val micIndex = micInfo.index
                     if (rtcUid > 0) {
                         // 自己
-                        if (rtcUid ==  VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                        if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                             myselfMicInfo = micInfo
-                            RtcRoomController.get().isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
+                            RtcRoomController.get().rtcChannelTemp.isLocalAudioMute =
+                                micInfo.micStatus != MicStatus.Normal
                         }
                         micMap[micIndex] = rtcUid
                     }
@@ -431,7 +422,7 @@ class RoomObservableViewDelegate constructor(
                 }
             }
         roomNoticeDialog.confirmCallback = { newNotice ->
-            roomViewModel.updateRoomNotice(activity, roomKitBean.roomId, newNotice)
+            roomLivingViewModel.updateRoomNotice(activity, roomKitBean.roomId, newNotice)
         }
         roomNoticeDialog.show(activity.supportFragmentManager, "roomNoticeSheetDialog")
     }
@@ -462,13 +453,13 @@ class RoomObservableViewDelegate constructor(
     fun onAudioSettingsDialog(finishBack: () -> Unit) {
         roomAudioSettingDialog = RoomAudioSettingsSheetDialog().apply {
             arguments = Bundle().apply {
-                val audioSettingsInfo = io.agora.scene.voice.bean.RoomAudioSettingsBean(
+                val audioSettingsInfo = RoomAudioSettingsBean(
                     enable = roomKitBean.isOwner,
                     roomType = roomKitBean.roomType,
-                    botOpen = RtcRoomController.get().isUseBot,
-                    botVolume = RtcRoomController.get().botVolume,
+                    botOpen = RtcRoomController.get().rtcChannelTemp.isUseBot,
+                    botVolume = RtcRoomController.get().rtcChannelTemp.botVolume,
                     soundSelection = roomKitBean.soundEffect,
-                    anisMode = RtcRoomController.get().anisMode,
+                    anisMode = RtcRoomController.get().rtcChannelTemp.anisMode,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -479,11 +470,11 @@ class RoomObservableViewDelegate constructor(
             RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
 
             override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-                roomViewModel.activeBot(activity, roomKitBean.roomId, isChecked)
+                roomLivingViewModel.activeBot(activity, roomKitBean.roomId, isChecked)
             }
 
             override fun onBotVolumeChange(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                roomViewModel.updateBotVolume(activity, roomKitBean.roomId, progress)
+                roomLivingViewModel.updateBotVolume(activity, roomKitBean.roomId, progress)
             }
 
             override fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean) {
@@ -512,7 +503,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSoundEffect(soundSelection: SoundSelectionBean, isCurrentUsing: Boolean) {
                     if (isCurrentUsing) {
                         // 试听音效需要开启机器人
-                        if (RtcRoomController.get().isUseBot) {
+                        if (RtcRoomController.get().rtcChannelTemp.isUseBot) {
                             RoomSoundAudioConstructor.soundSelectionAudioMap[soundSelection.soundSelectionType]?.let {
                                 // 播放最佳音效说明
                                 RtcRoomController.get().playMusic(it)
@@ -548,10 +539,10 @@ class RoomObservableViewDelegate constructor(
             }
         }
         ainsDialog.anisModeCallback = {
-            RtcRoomController.get().anisMode = it.anisMode
-            RtcRoomController.get().deNoise(it)
-            if (roomKitBean.isOwner && RtcRoomController.get().isUseBot && RtcRoomController.get().firstSwitchAnis) {
-                RtcRoomController.get().firstSwitchAnis = false
+            RtcRoomController.get().rtcChannelTemp.anisMode = it.anisMode
+            RtcRoomController.get().deNoise(it.anisMode)
+            if (roomKitBean.isOwner && RtcRoomController.get().rtcChannelTemp.isUseBot && RtcRoomController.get().rtcChannelTemp.firstSwitchAnis) {
+                RtcRoomController.get().rtcChannelTemp.firstSwitchAnis = false
 
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
                     // 播放AI 降噪介绍
@@ -561,7 +552,7 @@ class RoomObservableViewDelegate constructor(
         }
         ainsDialog.anisSoundCallback = { position, ainsSoundBean ->
             "onAINSDialog anisSoundCallback：$ainsSoundBean".logE(TAG)
-            if (RtcRoomController.get().isUseBot) {
+            if (RtcRoomController.get().rtcChannelTemp.isUseBot) {
                 ainsDialog.updateAnisSoundsAdapter(position, true)
                 RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
                     val audioUrl =
@@ -588,7 +579,7 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_SPATIAL_OPEN, false)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_IS_ENABLED, roomKitBean.isOwner)
             }
-        };
+        }
 
         spatialAudioSheetDialog.show(activity.supportFragmentManager, "mtSpatialAudio")
     }
@@ -615,8 +606,8 @@ class RoomObservableViewDelegate constructor(
      * 点击麦位
      */
     fun onUserMicClick(micInfo: MicInfoBean) {
-        val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(),micInfo.userInfo?.userId)
-        if (roomKitBean.isOwner ||  isMyself) { // 房主或者自己
+        val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(), micInfo.userInfo?.userId)
+        if (roomKitBean.isOwner || isMyself) { // 房主或者自己
             val roomMicMangerDialog = RoomMicManagerSheetDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable(RoomMicManagerSheetDialog.KEY_MIC_INFO, micInfo)
@@ -637,12 +628,12 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.ForceMute -> {
                             // 房主禁言其他座位
-                            micViewModel.muteMic(activity, roomKitBean.roomId, micInfo.index)
+                            roomLivingViewModel.muteMic(activity, roomKitBean.roomId, micInfo.index)
                         }
                         MicClickAction.ForceUnMute -> {
                             // 房主取消禁言其他座位
                             if (data.enable) {
-                                micViewModel.cancelMuteMic(activity, roomKitBean.roomId, micInfo.index)
+                                roomLivingViewModel.cancelMuteMic(activity, roomKitBean.roomId, micInfo.index)
                             } else {
                                 ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
                             }
@@ -657,21 +648,21 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.Lock -> {
                             //房主锁麦
-                            micViewModel.lockMic(activity, roomKitBean.roomId, micInfo.index)
+                            roomLivingViewModel.lockMic(activity, roomKitBean.roomId, micInfo.index)
                         }
                         MicClickAction.UnLock -> {
                             //房主取消锁麦
-                            micViewModel.cancelLockMic(activity, roomKitBean.roomId, micInfo.index)
+                            roomLivingViewModel.cancelLockMic(activity, roomKitBean.roomId, micInfo.index)
                         }
                         MicClickAction.KickOff -> {
                             //房主踢用户下台
-                            micViewModel.kickMic(
+                            roomLivingViewModel.kickMic(
                                 activity, roomKitBean.roomId, micInfo.userInfo?.userId ?: "", micInfo.index
                             )
                         }
                         MicClickAction.OffStage -> {
                             //用户主动下台
-                            micViewModel.leaveMicMic(activity, roomKitBean.roomId, micInfo.index)
+                            roomLivingViewModel.leaveMicMic(activity, roomKitBean.roomId, micInfo.index)
                         }
                     }
                 }
@@ -730,14 +721,14 @@ class RoomObservableViewDelegate constructor(
                 .rightText(activity.getString(R.string.voice_room_confirm))
                 .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                     override fun onConfirmClick() {
-                        roomViewModel.activeBot(activity, roomKitBean.roomId, true)
+                        roomLivingViewModel.activeBot(activity, roomKitBean.roomId, true)
                     }
                 })
                 .show(activity.supportFragmentManager, "botActivatedDialog")
         }
     }
 
-    fun showAlertDialog(content: String, onClickListener: CommonSheetAlertDialog.OnClickBottomListener) {
+    private fun showAlertDialog(content: String, onClickListener: CommonSheetAlertDialog.OnClickBottomListener) {
         CommonSheetAlertDialog()
             .contentText(content)
             .rightText(activity.getString(R.string.voice_room_confirm))
@@ -753,9 +744,9 @@ class RoomObservableViewDelegate constructor(
         RtcRoomController.get().enableLocalAudio(mute)
         val micIndex = if (index < 0) mySelfIndex() else index
         if (mute) {
-            micViewModel.closeMic(activity, roomKitBean.roomId, micIndex)
+            roomLivingViewModel.closeMic(activity, roomKitBean.roomId, micIndex)
         } else {
-            micViewModel.cancelCloseMic(activity, roomKitBean.roomId, micIndex)
+            roomLivingViewModel.cancelCloseMic(activity, roomKitBean.roomId, micIndex)
         }
     }
 

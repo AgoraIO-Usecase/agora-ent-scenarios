@@ -5,6 +5,7 @@ import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.secnceui.annotation.MicClickAction
+import io.agora.voice.buddy.tool.ImageTools
 import io.agora.voice.network.tools.bean.VMemberBean
 
 class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomAudienceListBinding) :
@@ -13,9 +14,7 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomA
     override fun binding(data: VMemberBean?, selectedIndex: Int) {
         data?.let { audienceInfo ->
             binding.mtAudienceUsername.text = audienceInfo.name
-            binding.ivAudienceAvatar.setImageResource(
-                ResourcesTools.getDrawableId(binding.ivAudienceAvatar.context, audienceInfo.portrait)
-            )
+            ImageTools.loadImage(binding.ivAudienceAvatar, audienceInfo.portrait)
             if (audienceInfo.mic_index == -1) {
                 // 不在麦位上
                 binding.mtAudienceAction.apply {

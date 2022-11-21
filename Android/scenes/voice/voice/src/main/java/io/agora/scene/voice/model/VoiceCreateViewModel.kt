@@ -4,16 +4,18 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.general.livedatas.SingleSourceLiveData
-import io.agora.scene.voice.general.repositories.VoiceRoomRepository
+import io.agora.scene.voice.general.repositories.VoiceCreateRepository
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.baseui.general.net.Resource
 
 /**
+ * 创建房间 && 房间列表等
+ *
  * @author create by zhangwei03
  */
-class VoiceRoomViewModel constructor(application: Application) : AndroidViewModel(application) {
+class VoiceCreateViewModel constructor(application: Application) : AndroidViewModel(application) {
 
-    private val voiceRoomRepository by lazy { VoiceRoomRepository() }
+    private val voiceRoomRepository by lazy { VoiceCreateRepository() }
 
     private val _roomListObservable: SingleSourceLiveData<Resource<List<VoiceRoomModel>>> =
         SingleSourceLiveData()

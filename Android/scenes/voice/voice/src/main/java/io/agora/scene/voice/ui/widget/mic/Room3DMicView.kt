@@ -12,6 +12,7 @@ import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.secnceui.annotation.MicStatus
+import io.agora.voice.buddy.tool.ImageTools
 
 /**
  * @author create by zhangwei03
@@ -81,9 +82,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 }
             } else { // 有人
                 ivMicInnerIcon.isVisible = false
-                ivMicInfo.setImageResource(
-                    ResourcesTools.getDrawableId(ivMicInfo.context, micInfo.userInfo?.userAvatar ?: "")
-                )
+                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
                 mtMicUsername.text = micInfo.userInfo?.username ?: ""
                 if (micInfo.ownerTag) {
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
