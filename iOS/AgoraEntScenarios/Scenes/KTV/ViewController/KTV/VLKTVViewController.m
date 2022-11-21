@@ -717,6 +717,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self stopCurrentSong];
     KTVLogInfo(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
 
+    //刷新MV里的视图
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
@@ -1710,9 +1713,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (self.chooseSongView) {
         self.chooseSongView.selSongsArray = selSongsArray; //刷新已点歌曲UI
     }
-    //刷新MV里的视图
-    [self.MVView updateUIWithSong:self.selSongsArray.firstObject
-                               onSeat:self.isOnMicSeat];
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
 }
