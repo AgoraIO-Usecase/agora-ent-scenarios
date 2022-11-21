@@ -88,6 +88,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             cell.setTitle(data.title(), value: value) {
                 let vc = ShowSettingActionSheetVC()
                 vc.title = data.title()
+                vc.defaultSelectedIndex = data.intValue()
                 vc.dataArray = data.items()
                 vc.didSelectedIndex = { index in
                     data.writeValue(index)
