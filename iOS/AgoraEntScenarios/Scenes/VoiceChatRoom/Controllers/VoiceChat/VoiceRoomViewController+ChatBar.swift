@@ -289,35 +289,61 @@ extension VoiceRoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .submitApply(roomId: roomId), params: index != nil ? ["mic_index": index ?? 2] : [:]) { dic, error in
-            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-                if result {
+        serviceImp.submitApply(index: index) { error, flag in
+            if error == nil {
+                if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
                     self.view.makeToast("Apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 } else {
                     self.view.makeToast("Apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
             } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+                
             }
         }
+//        guard let roomId = roomInfo?.room?.room_id else { return }
+//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .submitApply(roomId: roomId), params: index != nil ? ["mic_index": index ?? 2] : [:]) { dic, error in
+//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
+//                if result {
+//                    self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
+//                    self.view.makeToast("Apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+//                } else {
+//                    self.view.makeToast("Apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+//                }
+//            } else {
+////                self.view.makeToast("\(error?.localizedDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+//            }
+//        }
     }
 
     func cancelRequestSpeak(index: Int?) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .cancelApply(roomId: roomId), params: [:]) { dic, error in
-            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-                if result {
+        guard let local_index = self.local_index else {return}
+        guard let user: VRUser = self.roomInfo?.room?.member_list?[local_index] else {return}
+        serviceImp.cancelApply(chat_uid: user.chat_uid ?? "") { error, flag in
+            if error == nil {
+                if flag {
                     self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                     self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
                 } else {
                     self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
             } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
+                
             }
         }
+        //guard let roomId = roomInfo?.room?.room_id else { return }
+//        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .cancelApply(roomId: roomId), params: [:]) { dic, error in
+//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
+//                if result {
+//                    self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+//                    self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
+//                } else {
+//                    self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+//                }
+//            } else {
+////                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
+//            }
+//        }
     }
 
     func userCancelApplyAlert() {
