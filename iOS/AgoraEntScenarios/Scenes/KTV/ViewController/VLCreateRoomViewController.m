@@ -28,18 +28,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    AgoraRtcEngineConfig *config = [[AgoraRtcEngineConfig alloc]init];
-    config.appId = [AppContext.shared appId];
-    config.audioScenario = AgoraAudioScenarioChorus;
-    config.channelProfile = AgoraChannelProfileLiveBroadcasting;
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:config delegate:nil];
-    /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
-    if (code == 0) {
-        VLLog(@"评分回调开启成功\n");
-    } else {
-        VLLog(@"评分回调开启失败：%d\n",code);
-    }
+//    AgoraRtcEngineConfig *config = [[AgoraRtcEngineConfig alloc]init];
+//    config.appId = [AppContext.shared appId];
+//    config.audioScenario = AgoraAudioScenarioChorus;
+//    config.channelProfile = AgoraChannelProfileLiveBroadcasting;
+//    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:config delegate:nil];
+//    /// 开启唱歌评分功能
+//    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
+//    if (code == 0) {
+//        VLLog(@"评分回调开启成功\n");
+//    } else {
+//        VLLog(@"评分回调开启失败：%d\n",code);
+//    }
     [self commonUI];
     [self setUpUI];
     
