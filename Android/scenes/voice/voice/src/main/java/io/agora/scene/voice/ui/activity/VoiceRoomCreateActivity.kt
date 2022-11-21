@@ -33,7 +33,7 @@ import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.baseui.utils.StatusBarCompat
 import io.agora.voice.buddy.config.RouterParams
 import io.agora.voice.buddy.config.RouterPath
-import io.agora.voice.buddy.tool.DeviceTools.dp2px
+import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools.show
@@ -107,7 +107,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                 tab.customView?.let {
                     val title = it.findViewById<TextView>(R.id.tab_item_title)
                     val layoutParams = title.layoutParams
-                    layoutParams.height = dp2px(this@VoiceRoomCreateActivity, 26f)
+                    layoutParams.height = DeviceTools.dp2px(this@VoiceRoomCreateActivity, 26f)
                     title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                     title.gravity = Gravity.CENTER
                 }
@@ -191,11 +191,11 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         binding.vpFragment.offscreenPageLimit = 1
         val recyclerView = binding.vpFragment.getChildAt(0)
         if (recyclerView is RecyclerView) {
-            recyclerView.setPadding(dp2px(this, 30f), 0, dp2px(this, 30f), 0)
+            recyclerView.setPadding(DeviceTools.dp2px(this, 30f), 0, DeviceTools.dp2px(this, 30f), 0)
             recyclerView.clipToPadding = false
         }
         val compositePageTransformer = CompositePageTransformer()
-        compositePageTransformer.addTransformer(MarginPageTransformer(dp2px(this, 16f)))
+        compositePageTransformer.addTransformer(MarginPageTransformer(DeviceTools.dp2px(this, 16f)))
         binding.vpFragment.setPageTransformer(compositePageTransformer)
         // set adapter
         binding.vpFragment.adapter = object : RecyclerView.Adapter<ViewHolder>() {

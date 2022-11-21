@@ -21,9 +21,9 @@ public class GiftRepository {
         GiftBean bean;
         for(int i = 1; i <= SIZE; i++){
             bean = new GiftBean();
-            String name = "icon_gift_"+i;
+            String name = "voice_icon_gift_"+i;
             int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
-            int nameId = context.getResources().getIdentifier("gift_default_name_" + i, "string", context.getPackageName());
+            int nameId = context.getResources().getIdentifier("voice_gift_default_name_" + i, "string", context.getPackageName());
             bean.setResource(resId);
             bean.setName(context.getString(nameId));
             bean.setId("VoiceRoomGift"+i);
