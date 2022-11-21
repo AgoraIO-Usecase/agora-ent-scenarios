@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +26,7 @@ import io.agora.voice.buddy.config.RouterParams
 import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools.show
+import io.agora.voice.buddy.tool.ToastTools
 import io.agora.voice.imkit.manager.ChatroomHelper
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
@@ -97,7 +96,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                         }
                     } else {
                         dismissLoading()
-                        show(requireActivity(), getString(R.string.voice_room_check_password), Toast.LENGTH_SHORT)
+                        ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
                     }
                 }
 
@@ -144,6 +143,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             showInputDialog(voiceRoomModel)
         } else {
             // 房间列表进入需要置换 token 与获取 im 配置
+            showLoading(false)
             voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, voiceRoomModel.roomPassword, true)
         }
     }

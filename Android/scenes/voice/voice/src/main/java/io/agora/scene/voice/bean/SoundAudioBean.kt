@@ -11,4 +11,4 @@ data class SoundAudioBean constructor(
     var audioUrl: String, // 语聊url
     var audioUrlHigh: String = "", // 语聊url高降噪
     var audioUrlMedium: String = "", // 语聊url中降噪
-) : io.agora.scene.voice.bean.BaseRoomBean
+) : BaseRoomBean
