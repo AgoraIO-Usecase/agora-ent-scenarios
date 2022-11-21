@@ -35,6 +35,8 @@ let page_size = 15
 
     private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
 
+    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
+    
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
@@ -148,17 +150,36 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
-            SVProgressHUD.dismiss()
-            if error == nil {
-                let info = VRRoomInfo()
-                info.room = room
-                let vc = VoiceRoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
+        serviceImp.joinRoom(room.room_id ?? "") { error, room_entity in
+            if error == nil, room_entity != nil {
+                VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
+                    SVProgressHUD.dismiss()
+                    if error == nil {
+                        let info: VRRoomInfo = VRRoomInfo()
+                        info.room = room
+                        info.mic_info = nil
+                        let vc = VoiceRoomViewController(info: info)
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    } else {
+                        
+                    }
+                })
             } else {
                 self.view.makeToast("Loading failed,please retry or install again!")
             }
-        })
+        }
+        
+//        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
+//            SVProgressHUD.dismiss()
+//            if error == nil {
+//                let info = VRRoomInfo()
+//                info.room = room
+//                let vc = VoiceRoomViewController(info: info)
+//                self.navigationController?.pushViewController(vc, animated: true)
+//            } else {
+//                self.view.makeToast("Loading failed,please retry or install again!")
+//            }
+//        })
     }
 
     private func childViewControllersEvent() {
