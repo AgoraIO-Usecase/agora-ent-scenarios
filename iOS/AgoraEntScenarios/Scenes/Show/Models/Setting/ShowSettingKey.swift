@@ -87,7 +87,7 @@ enum ShowSettingKey: String {
         case .videoCaptureSize:
             return ["320x240","480x360","360x640","960x540","960x720","1280x720"]
         case .FPS:
-            return ["1","7","10","15","24","30","60"]
+            return ["1 fps","7 fps","10 fps","15 fps","24 fps","30 fps","60 fps"]
         default:
             return []
         }

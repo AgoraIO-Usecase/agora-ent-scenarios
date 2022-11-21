@@ -22,8 +22,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private var settingManager: ShowSettingManager!
     
     private let titles = ["show_advance_setting_video_title".show_localized,
-                          "show_advance_setting_audio_title".show_localized,
-                          "show_advance_setting_capture_title".show_localized]
+                          "show_advance_setting_audio_title".show_localized]
     
     // 指示条
     private lazy var indicator: JXCategoryIndicatorLineView = {
@@ -97,8 +96,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
         let videoSettings: [ShowSettingKey] = [.lowlightEnhance, .colorEnhance,.videoDenoiser,.beauty,.BFrame,.videoCaptureSize,.FPS]
         let audioSettings: [ShowSettingKey]  = []
-        let captureSettings: [ShowSettingKey]  = []
-        let settings = [videoSettings, audioSettings, captureSettings]
+        let settings = [videoSettings, audioSettings]
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
