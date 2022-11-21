@@ -46,7 +46,8 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
                 ivMicInnerIcon.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
+                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.userInfo?.userAvatar ?: "")
+                ImageTools.loadImage(ivMicInfo, botDrawable)
                 mtMicUsername.text = micInfo.userInfo?.username ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
