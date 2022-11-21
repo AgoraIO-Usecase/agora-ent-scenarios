@@ -579,12 +579,12 @@ class KTVSyncManagerServiceImp(
             completion.invoke(RuntimeException("The chosen song list is empty!"))
             return
         }
-        val targetSong = songChosenList[0]
+        val targetSong = innerSortChooseSongList()[0]
+        val indexOf = songChosenList.indexOf(targetSong)
         if (!TextUtils.isEmpty(targetSong.chorusNo)) {
             completion.invoke(RuntimeException("The song has chorus user already!"))
             return
         }
-        songChosenList.remove(targetSong)
         val newSong = RoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
@@ -601,11 +601,11 @@ class KTVSyncManagerServiceImp(
             createAt = targetSong.createAt,
             pinAt = targetSong.pinAt
         )
-        songChosenList.add(0, newSong)
+        songChosenList[indexOf] = newSong
 
         //net request and notify others
         innerUpdateChooseSong(
-            objIdOfSongNo[0],
+            objIdOfSongNo[indexOf],
             newSong
         ) {
             chooseSongSubscriber?.invoke(
@@ -622,8 +622,8 @@ class KTVSyncManagerServiceImp(
             return
         }
 
-        val targetSong = songChosenList[0]
-        songChosenList.remove(targetSong)
+        val targetSong = innerSortChooseSongList()[0]
+        val indexOf = songChosenList.indexOf(targetSong)
         val newSong = RoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
@@ -639,13 +639,11 @@ class KTVSyncManagerServiceImp(
             createAt = targetSong.createAt,
             pinAt = targetSong.pinAt
         )
-        songChosenList.add(
-            0, newSong
-        )
+        songChosenList[indexOf] = newSong
 
         //net request and notify others
         innerUpdateChooseSong(
-            objIdOfSongNo[0],
+            objIdOfSongNo[indexOf],
             newSong
         ) {
             chooseSongSubscriber?.invoke(

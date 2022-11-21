@@ -828,25 +828,26 @@ public class RoomLivingViewModel extends ViewModel {
                 if (data.size() > 0){
                     RoomSelSongModel value = songPlayingLiveData.getValue();
                     RoomSelSongModel songPlaying = data.get(0);
+
                     if (value == null) {
-                        // 列表为空
+                        // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
                         Log.d(TAG, "RoomLivingViewModel.getSongChosenList() chosen song list is empty");
                         songPlayingLiveData.postValue(songPlaying);
-                    } else if (value.getChorusNo() != null) {
-                        // 合唱
-                        if (!value.getSongNo().equals(songPlaying.getSongNo()) || !value.getChorusNo().equals(songPlaying.getChorusNo())) {
-                            Log.d(TAG, "RoomLivingViewModel.getSongChosenList() chorus");
-                            songPlayingLiveData.postValue(songPlaying);
-                        }
-                    } else if (value.isChorus() && !songPlaying.isChorus()) {
-                        // 取消合唱
-                        Log.d(TAG, "RoomLivingViewModel.getSongChosenList() become solo");
-                        songPlayingLiveData.postValue(songPlaying);
                     } else {
-                        // 独唱、首次点合唱
-                        if(!value.getSongNo().equals(songPlaying.getSongNo()) || songPlaying.getChorusNo() != null) {
-                            Log.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chours");
+                        // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
+                        if (!value.getSongNo().equals(songPlaying.getSongNo())) {
+                            Log.d(TAG, "RoomLivingViewModel.getSongChosenList() single or first chorus");
                             songPlayingLiveData.postValue(songPlaying);
+                        } else {
+                            if ((value.isChorus() && !songPlaying.isChorus())) {
+                                // 取消合唱
+                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() become solo");
+                                songPlayingLiveData.postValue(songPlaying);
+                            } else if (value.isChorus() && value.getChorusNo() == null && songPlaying.getChorusNo() != null) {
+                                // 加入合唱
+                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
+                                songPlayingLiveData.postValue(songPlaying);
+                            }
                         }
                     }
                 } else {
@@ -884,20 +885,6 @@ public class RoomLivingViewModel extends ViewModel {
             if (e == null) {
                 // success
                 Log.d(TAG, "RoomLivingViewModel.joinChorus() success");
-                songPlayingLiveData.postValue(new RoomSelSongModel(
-                        musicModel.getSongName(),
-                        musicModel.getSongNo(),
-                        musicModel.getSinger(),
-
-                        musicModel.getImageUrl(),
-                        musicModel.getUserNo(),
-                        musicModel.getName(),
-                        UserManager.getInstance().getUser().userNo,
-                        true,
-                        musicModel.isOriginal(),
-
-                        0, 0, 0
-                ));
             } else {
                 // failure
                 Log.e(TAG, "RoomLivingViewModel.joinChorus() failed: " + e.getMessage());
@@ -912,11 +899,6 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void leaveChorus(Context context) {
         Log.d(TAG, "RoomLivingViewModel.leaveChorus() called");
-        RoomSelSongModel musicModel = songPlayingLiveData.getValue();
-        if (musicModel == null /*|| TextUtils.isEmpty(musicModel.getChorusNo())*/) {
-            return;
-        }
-        //musicStartPlay(context, musicModel);
         ktvServiceProtocol.becomeSolo();
     }
 
