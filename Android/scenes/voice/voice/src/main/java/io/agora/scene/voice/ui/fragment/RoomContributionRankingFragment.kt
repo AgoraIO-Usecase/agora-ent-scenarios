@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.model.RoomRankViewModel
 import io.agora.scene.voice.ui.adapter.RoomContributionRankingViewHolder
 import io.agora.voice.baseui.BaseUiFragment
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
@@ -24,6 +23,7 @@ import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
+import io.agora.scene.voice.model.VoiceUserListViewModel
 import io.agora.voice.network.tools.bean.VRGiftBean
 import io.agora.voice.network.tools.bean.VRankingMemberBean
 
@@ -46,7 +46,7 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
     private var total = 0
     private var isEnd = false
 
-    private lateinit var roomRankViewModel: RoomRankViewModel
+    private lateinit var roomRankViewModel: VoiceUserListViewModel
 
     private var contributionAdapter: BaseRecyclerViewAdapter<VoiceItemContributionRankingBinding, VRankingMemberBean, RoomContributionRankingViewHolder>? =
         null
@@ -61,10 +61,7 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomRankViewModel = ViewModelProvider(
-            this,
-            io.agora.scene.voice.model.RoomRankViewModelFactory()
-        )[RoomRankViewModel::class.java]
+        roomRankViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
 
         arguments?.apply {
             roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?

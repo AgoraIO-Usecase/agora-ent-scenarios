@@ -24,7 +24,7 @@ import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.bean.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
+import io.agora.scene.voice.model.VoiceCreateViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.baseui.BaseUiActivity
@@ -58,7 +58,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     private var roomType = 0
     private var encryption: String = ""
     private var roomName: String = ""
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var curVoiceRoomModel: VoiceRoomModel? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityCreateRoomLayoutBinding {
@@ -68,7 +68,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         chickPrivate()
         initListener()
         voiceRoomObservable()

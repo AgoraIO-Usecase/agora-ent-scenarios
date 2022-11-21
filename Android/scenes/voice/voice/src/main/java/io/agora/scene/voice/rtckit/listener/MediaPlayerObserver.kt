@@ -1,4 +1,4 @@
-package io.agora.voice.rtckit.middle
+package io.agora.scene.voice.rtckit.listener
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
