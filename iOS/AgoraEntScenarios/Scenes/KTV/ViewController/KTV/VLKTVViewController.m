@@ -166,6 +166,8 @@ VLPopScoreViewDelegate
     [super viewDidAppear:animated];
     [UIViewController popGestureClose:self];
     
+    [self createMediaPlayer];
+    
     //请求已点歌曲
     VL(weakSelf);
     [self refreshChoosedSongList:^{
@@ -184,7 +186,7 @@ VLPopScoreViewDelegate
 - (void)viewDidDisappear:(BOOL)animated
 {
     streamId = -1;
-    self.rtcMediaPlayer = nil;
+    [self destroyMediaPlayer];
 
     if(self.mediaPlayerConnection) {
 //        [self disableMediaChannel];
@@ -410,8 +412,8 @@ VLPopScoreViewDelegate
     [LEEAlert popForceLeaveRoomDialogWithCompletion:^{
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                [weakSelf destroyMediaPlayer];
-                [weakSelf leaveRTCChannel];
+//                [weakSelf destroyMediaPlayer];
+//                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
             }
         }
@@ -474,14 +476,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
         } else if (state == AgoraMediaPlayerStatePlayBackCompleted) {
             VLLog(@"Playback Completed");
         } else if (state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLLog(@"Playback all loop completed");
-                VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
-                    [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
-                }
-                [self playNextSong:0];
-            });
+            VLLog(@"Playback all loop completed");
+            VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
+            if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+                [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
+            }
+            [self playNextSong];
         } else if (state == AgoraMediaPlayerStateStopped) {
         }
     });
@@ -505,6 +505,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 //                    VLLog(@"发送失败");
                 }
             }];
+            //check invalid
+            if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
+                KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
+                [self stopCurrentSong];
+                [self loadAndPlaySong];
+            }
         }
 }
 
@@ -586,7 +592,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
     
-    VLLog(@"onLyricResult %@", lyricUrl);
+    KTVLogInfo(@"onLyricResult %@", lyricUrl);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
     if(!callback) {
@@ -620,7 +626,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 status:(AgoraMusicContentCenterPreloadStatus)status
                    msg:(nonnull NSString *)msg
               lyricUrl:(nonnull NSString *)lyricUrl {
-    VLLog(@"Agora - onPreLoadEvent: %ld", status);
+    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
         return;
     }
@@ -674,7 +680,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        [weakSelf destroyMediaPlayer];
+//        [weakSelf destroyMediaPlayer];
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
@@ -708,7 +714,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     
-    VLLog(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
+    [self stopCurrentSong];
+    KTVLogInfo(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
 
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
@@ -763,11 +770,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
+    KTVLogInfo(@"loadLyric: %ld", songNo);
+//    [KTVLog infoWithText:[NSString stringWithFormat:@"loadLyric: %ld", songNo] tag:nil];
     NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
+    if ([requestId length] == 0) {
+        if (block) {
+            block(nil);
+        }
+        return;
+    }
     [self.lyricCallbacks setObject:block forKey:requestId];
 }
 
 - (void)loadMusic:(NSString *)songCode withCallback:(LoadMusicCallback)block {
+    KTVLogInfo(@"loadMusic: %@", songCode);
     NSInteger songCodeIntValue = [songCode integerValue];
     NSInteger error = [self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue];
     if(error == 0) {
@@ -793,7 +809,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)openMusicWithSongCode:(NSInteger )songCode {
-    VLLog(@"Agora - MediaPlayer playing %ld", songCode);
+    KTVLogInfo(@"Agora - MediaPlayer playing %ld", songCode);
     if(self.rtcMediaPlayer != nil) {
         self.currentPlayingSongNo = [NSString stringWithFormat:@"%ld", songCode];
         [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
@@ -811,10 +827,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self cancelLoadAndPlay];
 }
 
-- (void)playNextSong:(int)isMasterInterrupt {
+- (void)playNextSong {
     [self stopCurrentSong];
-    [self deleteSongEvent:self.selSongsArray.firstObject
-        isMasterInterrupt:isMasterInterrupt];
+    [self deleteSongEvent:self.selSongsArray.firstObject];
     VLLog(@"RTC media player stop");
 }
 
@@ -872,10 +887,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 /// 销毁播放器
 - (void)destroyMediaPlayer {
+    if (self.rtcMediaPlayer == nil) {
+        return;
+    }
     [self.rtcMediaPlayer stop];
     VLLog(@"Agora - RTCMediaPlayer stop");
     [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
     VLLog(@"Agora - Destroy media player");
+    self.rtcMediaPlayer = nil;
+}
+
+
+/// create media player
+- (void)createMediaPlayer {
+    [self destroyMediaPlayer];
+    
+    _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
+    // 调节本地播放音量。0-100
+    [_rtcMediaPlayer adjustPlayoutVolume:200];
+//    调节远端用户听到的音量。0-400
+    [_rtcMediaPlayer adjustPublishSignalVolume:200];
 }
 
 - (void)joinRTCChannel {
@@ -927,6 +958,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     contentCenterConfiguration.mccUid = [VLUserCenter.user.id integerValue];
     contentCenterConfiguration.token = VLUserCenter.user.agoraRTMToken;
     VLLog(@"AgoraMcc: %@, %@\n", contentCenterConfiguration.appId, contentCenterConfiguration.token);
+    [AgoraMusicContentCenter destroy];
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
 }
 
@@ -1097,6 +1129,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
+#pragma mark VLPopChooseSongViewDelegate
+- (void)chooseSongView:(VLPopChooseSongView*)view tabbarDidClick:(NSUInteger)tabIndex {
+    if (tabIndex != 1) {
+        return;
+    }
+    
+    [self refreshChoosedSongList:nil];
+}
+
 #pragma mark - VLChooseBelcantoViewDelegate
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view
                     itemTapped:(VLBelcantoModel *)model
@@ -1194,9 +1235,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (weakSelf.selSongsArray.count >= 1) {
                 if([weakSelf isRoomOwner]
                    && [weakSelf isCurrentSongMainSinger:VLUserCenter.user.userNo] == NO) {
-                    [weakSelf playNextSong:1];
+                    [weakSelf playNextSong];
                 } else {
-                    [weakSelf playNextSong:0];
+                    [weakSelf playNextSong];
                 }
                 
                 VLLog(@"---Change song---");
@@ -1209,7 +1250,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.rtcMediaPlayer selectAudioTrack:1];
         [self sendTrackModeMessage:1];
     } else if (type == VLKTVMVViewActionTypeExit) {
-        [self playNextSong:0];
+        [self playNextSong];
     }
 }
 
@@ -1251,7 +1292,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)downloadLrcFinishedWithUrl:(NSString *)url {
-    VLLog(@"\n歌词下载完成\n%@",url);
+    KTVLogInfo(@"download lrc finished %@",url);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:url];
     if(!callback) {
@@ -1267,7 +1308,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
-    VLLog(@"\n歌词下载失败\n%@\n%@",url,error);
+    KTVLogInfo(@"download lrc fail %@: %@",url,error);
     
     LyricCallback callback = [self.lyricCallbacks objectForKey:url];
     if(!callback) {
@@ -1425,11 +1466,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)deleteSongEvent:(VLRoomSelSongModel *)model isMasterInterrupt:(int)isMasterInterrupt {
-    if(model == nil
-       || self.roomModel == nil
-       || self.roomModel.roomNo == nil
-       || model.songNo == nil) {
+- (void)deleteSongEvent:(VLRoomSelSongModel *)model {
+    if([model.songNo length] == 0 || [self.roomModel.roomNo length] == 0) {
         return;
     }
     
@@ -1438,6 +1476,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {
+        if (error) {
+            KTVLogInfo(@"deleteSongEvent fail: %@ %ld", model.songName, error.code);
+        }
     }];
 }
 
@@ -1599,7 +1640,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setAgoraMcc:(AgoraMusicContentCenter *)AgoraMcc {
     [_AgoraMcc registerEventDelegate:nil];
     [[AppContext shared] unregisterEventDelegate:self];
-    [AgoraMusicContentCenter destroy];
     _AgoraMcc = AgoraMcc;
     if (_AgoraMcc != nil) {
         [[AppContext shared] registerEventDelegate:self];
@@ -1682,17 +1722,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - lazy getter
-- (id<AgoraRtcMediaPlayerProtocol>)rtcMediaPlayer {
-    if (!_rtcMediaPlayer) {
-        _rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:self];
-        // 调节本地播放音量。0-100
-         [_rtcMediaPlayer adjustPlayoutVolume:200];
-//         调节远端用户听到的音量。0-400
-         [_rtcMediaPlayer adjustPublishSignalVolume:200];
-    }
-    return _rtcMediaPlayer;
-}
-
 - (VLKTVSettingView *)settingView {
     if (!_settingView) {
         _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];

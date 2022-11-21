@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 置顶歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)PinSongWithInput:(KTVMakeSongTopInputModel*)inputModel
+- (void)pinSongWithInput:(KTVMakeSongTopInputModel*)inputModel
               completion:(void(^)(NSError* _Nullable))completion;
 
 
