@@ -40,8 +40,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 获取礼物列表
     /// - Parameters:
     ///
-    func fetchGiftContribute(_ roomId: String,
-                             completion: @escaping (Error?, [VRUser]?) -> Void)
+    func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void)
     /// 获取人员列表
     /// - Parameters:
     ///
@@ -108,6 +107,11 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func agreeInvite(completion: @escaping (Error?, Bool) -> Void)
+    
+    /// 拒绝邀请
+    /// - Parameters:
+    ///
+    func refuseInvite(completion: @escaping (Error?, Bool) -> Void)
 
     /// 申请上麦
     /// - Parameters:

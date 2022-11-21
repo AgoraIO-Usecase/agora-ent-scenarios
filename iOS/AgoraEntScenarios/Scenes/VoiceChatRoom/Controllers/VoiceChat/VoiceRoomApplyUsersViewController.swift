@@ -15,7 +15,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
 
     private var roomId: String?
     
-    private var serviceImp: ChatRoomServiceImp = ChatRoomServiceImp()
+    private var serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
 
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
 
