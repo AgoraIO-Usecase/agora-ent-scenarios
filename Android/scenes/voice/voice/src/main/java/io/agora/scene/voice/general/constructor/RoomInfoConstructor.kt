@@ -2,11 +2,9 @@ package io.agora.scene.voice.general.constructor
 
 import android.text.TextUtils
 import com.google.gson.reflect.TypeToken
-import io.agora.scene.voice.bean.MicInfoBean
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.bean.RoomRankUserBean
-import io.agora.scene.voice.bean.RoomUserInfoBean
+import io.agora.scene.voice.bean.*
 import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.config.ConfigConstants
@@ -28,36 +26,46 @@ object RoomInfoConstructor {
         soundEffect = voiceRoomModel.soundEffect
     }
 
-    fun RoomKitBean.convertByRoomInfo(roomInfo: VRoomBean.RoomsBean) {
-        roomId = roomInfo.room_id ?: ""
-        chatroomId = roomInfo.chatroom_id ?: ""
-        channelId = roomInfo.channel_id ?: ""
-        ownerId = roomInfo.owner?.uid ?: ""
-        roomType = roomInfo.type
-        isOwner = curUserIsHost(roomInfo.owner?.uid)
-        soundEffect = roomInfo.soundSelection
-    }
-
-    fun RoomKitBean.convertByRoomDetailInfo(roomDetails: VRoomInfoBean.VRoomDetail) {
-        roomId = roomDetails.room_id ?: ""
-        chatroomId = roomDetails.chatroom_id ?: ""
-        channelId = roomDetails.channel_id ?: ""
-        ownerId = roomDetails.owner?.uid ?: ""
-        roomType = roomDetails.type
-        isOwner = curUserIsHost(roomDetails.owner?.uid)
-        soundEffect = roomDetails.soundSelection
-    }
-
     /** Check if you are a host */
     private fun curUserIsHost(ownerId: String?): Boolean {
         return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
     }
 
     /**
-     * 服务端roomInfo io.agora.voice.imkit.bean 转 ui io.agora.voice.imkit.bean
+     * 服务端roomInfo bean 转 ui bean
      */
-    fun serverRoomInfo2UiRoomInfo(roomDetail: VRoomInfoBean.VRoomDetail): io.agora.scene.voice.bean.RoomInfoBean {
-        val roomInfo = io.agora.scene.voice.bean.RoomInfoBean().apply {
+    fun voiceRoomModel2UiRoomInfo(roomModel: VoiceRoomModel): RoomInfoBean {
+        val roomInfo = RoomInfoBean().apply {
+            channelId = roomModel.channelId
+            chatroomName = roomModel.roomName
+            owner = voiceMemberUser2UiUser(roomModel.owner)
+            memberCount = roomModel.memberCount
+            // 普通观众 memberCount +1
+            if (owner?.rtcUid != VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                memberCount += 1
+            }
+            soundSelection = roomModel.soundEffect
+            roomType = roomModel.roomType
+        }
+        return roomInfo
+    }
+
+    private fun voiceMemberUser2UiUser(vUser: VoiceMemberModel?): RoomUserInfoBean? {
+        if (vUser == null) return null
+        return RoomUserInfoBean().apply {
+            userId = vUser.uid ?: ""
+            chatUid = vUser.chatUid ?: ""
+            rtcUid = vUser.rtcUid
+            username = vUser.nickName ?: ""
+            userAvatar = vUser.portrait ?: ""
+        }
+    }
+
+    /**
+     * 服务端roomInfo bean 转 ui bean
+     */
+    fun serverRoomInfo2UiRoomInfo(roomDetail: VRoomInfoBean.VRoomDetail): RoomInfoBean {
+        val roomInfo = RoomInfoBean().apply {
             channelId = roomDetail.channel_id ?: ""
             chatroomName = roomDetail.name ?: ""
             owner = serverUser2UiUser(roomDetail.owner)
