@@ -908,7 +908,7 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_SEAT_INFO,
                        onCreated: { [weak self] object in
-                agoraPrint("imp seat subscribe oncreated...")
+                agoraPrint("imp seat subscribe oncreated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
                       let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
@@ -918,7 +918,7 @@ extension KTVSyncManagerServiceImp {
                 self.seatMap["\(model.seatIndex)"] = model
                 self.seatListDidChanged?(KTVSubscribeCreated.rawValue, model)
             }, onUpdated: { [weak self] object in
-                agoraPrint("imp seat subscribe onupdated...")
+                agoraPrint("imp seat subscribe onupdated... [\(object.getId())]")
                 guard let self = self,
                       let jsonStr = object.toJson(),
                       let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
@@ -928,7 +928,7 @@ extension KTVSyncManagerServiceImp {
                 self.seatMap["\(model.seatIndex)"] = model
                 self.seatListDidChanged?(KTVSubscribeUpdated.rawValue, model)
             }, onDeleted: { [weak self] object in
-                agoraPrint("imp seat subscribe ondeleted...")
+                agoraPrint("imp seat subscribe ondeleted... [\(object.getId())]")
                 guard let self = self else {
                     return
                 }
@@ -1044,12 +1044,11 @@ extension KTVSyncManagerServiceImp {
     
     private func _removeAllUserChooseSong(userNo: String = VLUserCenter.user.userNo) {
         let userSongLists = self.songList.filter({ $0.userNo == userNo})
-        userSongLists.forEach { model in
+        //reverse delete songs to fix conflicts (user A remove song1 & user B update song1.status = 2)
+        userSongLists.reversed().forEach { model in
             self._removeChooseSong(songId: model.objectId) { error in
-                
             }
         }
-        
     }
 
     private func _removeChooseSong(songId: String?, completion: @escaping (Error?) -> Void) {
@@ -1117,7 +1116,7 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onCreated...")
+                agoraPrint("imp song subscribe onCreated... [\(object.getId())]")
                 self.songList.append(model)
                 self._sortChooseSongList()
                 self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
@@ -1129,7 +1128,7 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onUpdated...")
+                agoraPrint("imp song subscribe onUpdated... [\(object.getId())]")
                 self.songList = self.songList.filter({ $0.objectId != model.objectId })
                 self.songList.append(model)
                 self._sortChooseSongList()
@@ -1141,7 +1140,7 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onDeleted...")
+                agoraPrint("imp song subscribe onDeleted... [\(object.getId())]")
                 self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                 self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
 //               self._markCurrentSongIfNeed()
