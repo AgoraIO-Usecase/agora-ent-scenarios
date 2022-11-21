@@ -49,7 +49,7 @@ class VMNorSetTableViewCell: UITableViewCell {
         contentView.addSubview(contentLabel)
 
         indView.frame = CGRect(x: screenWidth - 40, y: 22, width: 20, height: 20)
-        indView.image = UIImage("arrow_right 1")
+        indView.image = UIImage("arrow_right")
         contentView.addSubview(indView)
 
         selectionStyle = .none

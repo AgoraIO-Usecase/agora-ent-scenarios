@@ -13,6 +13,7 @@ import AgoraChat.AgoraChatError
 private let cSceneId = "scene_chatRoom"
 
 class ChatRoomServiceImp: NSObject {
+    private static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
@@ -20,6 +21,15 @@ class ChatRoomServiceImp: NSObject {
 }
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
+    
+    // 单例
+    @objc public class func getSharedInstance() -> ChatRoomServiceImp {
+        guard let instance = _sharedInstance else {
+            _sharedInstance = ChatRoomServiceImp()
+            return _sharedInstance!
+        }
+        return instance
+    }
 
     func convertError(error: AgoraChatError?) -> Error? {
         let vmError = VoiceRoomError()
@@ -86,7 +96,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func fetchGiftContribute(_ roomId: String, completion: @escaping (Error?, [VRUser]?) -> Void) {
+    func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void) {
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
             if let ranking_list = map?["ranking_list"]?.toArray() {
                 completion(self.convertError(error: error),ranking_list.kj.modelArray(VRUser.self))
@@ -218,7 +228,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func refuseInvite(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
+    func refuseInvite(completion: @escaping (Error?, Bool) -> Void) {
         
     }
     
@@ -399,23 +409,27 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     let updateRoom: VRRoomEntity = room
                     updateRoom.member_count = updateRoom.member_count ?? 0 + 1
                     let params = updateRoom.kj.JSONObject()
-                    SyncUtil
-                        .scene(id: roomId)?
-                        .update(key: "",
-                                data: params,
-                                success: {[weak self] obj in
-                            print("updateUserCount success")
-                            //获取IM信息
-                            self?.initIM(with: room.name ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
-                                VLUserCenter.user.im_token = im_token
-                                VLUserCenter.user.chat_uid = chat_uid
-                                completion(nil, updateRoom)
-                            }
-                        },
-                                fail: { error in
-                            print("updateUserCount fail")
-                            completion(error, nil)
-                        })
+                    
+                    //获取IM信息
+                    self.initIM(with: room.name ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
+                        VLUserCenter.user.im_token = im_token
+                        VLUserCenter.user.chat_uid = chat_uid
+                        completion(nil, updateRoom)
+                    }
+                    
+                    initScene{
+                        SyncUtil
+                            .scene(id: roomId)?
+                            .update(key: "",
+                                    data: params,
+                                    success: { obj in
+                                print("updateUserCount success")
+                            },
+                                    fail: { error in
+                                print("updateUserCount fail")
+                                completion(error, nil)
+                            })
+                    }
                 }
             }
         }
