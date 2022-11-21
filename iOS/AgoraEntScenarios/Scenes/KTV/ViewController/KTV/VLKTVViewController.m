@@ -695,6 +695,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     if (model == nil || [model waittingForChorus]) {
         VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
+        //刷新MV里的视图
+        [self.MVView updateUIWithSong:nil onSeat:self.isOnMicSeat];
         return;
     }
     if (model.status != 2 && [model readyToPlay]) {
