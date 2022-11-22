@@ -68,7 +68,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.getRoomList(0, 0)
+        voiceRoomViewModel.getRoomList(0)
         voiceRoomViewModel.roomListObservable().observe(requireActivity()) { response: Resource<List<VoiceRoomModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceRoomModel>>() {
                 override fun onSuccess(dataList: List<VoiceRoomModel>?) {
@@ -92,7 +92,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     if (value == true) {
                         curVoiceRoomModel?.let {
                             // 房间列表进入需要置换 token 与获取 im 配置
-                            voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword, true)
+                            voiceRoomViewModel.joinRoom(it.roomId, true)
                         }
                     } else {
                         dismissLoading()
@@ -144,7 +144,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         } else {
             // 房间列表进入需要置换 token 与获取 im 配置
             showLoading(false)
-            voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, voiceRoomModel.roomPassword, true)
+            voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, true)
         }
     }
 
@@ -186,6 +186,6 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     }
 
     override fun onRefresh() {
-        voiceRoomViewModel.getRoomList(0, 0)
+        voiceRoomViewModel.getRoomList(0)
     }
 }

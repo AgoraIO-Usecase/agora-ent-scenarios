@@ -104,7 +104,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                 override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
                     curVoiceRoomModel = voiceRoomModel
                     voiceRoomModel?.let {
-                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                        voiceRoomViewModel.joinRoom(it.roomId)
                     }
                 }
             })
