@@ -1226,7 +1226,7 @@ class KTVSyncManagerServiceImp(
             }
 
             override fun onDeleted(item: IObject?) {
-                item ?: return
+                //item ?: return
                 chooseSongSubscriber?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                     null
