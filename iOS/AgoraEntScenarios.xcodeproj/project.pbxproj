@@ -44,7 +44,6 @@
 		057DD9E5290B9495001329E6 /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B6290B9495001329E6 /* VoiceRoomRequest.swift */; };
 		057DD9E6290B9495001329E6 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B7290B9495001329E6 /* VoiceRoomBusinessRequest.swift */; };
 		057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C3290B9495001329E6 /* VoiceRoomIMManager.swift */; };
-		057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C5290B9495001329E6 /* ASRTCKit.swift */; };
 		057DD9F1290B9495001329E6 /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C8290B9495001329E6 /* UIColor+extension.swift */; };
 		057DD9F2290B9495001329E6 /* UIButtonLayoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C9290B9495001329E6 /* UIButtonLayoutExtension.swift */; };
 		057DD9F3290B9495001329E6 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CA290B9495001329E6 /* UIButton+Extension.swift */; };
@@ -403,6 +402,7 @@
 		E333F64F29150ECB0031B35F /* VoiceChatServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64B29150ECB0031B35F /* VoiceChatServiceModel.swift */; };
 		E333F65029150ECB0031B35F /* VoiceServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */; };
 		E333F65129150ECB0031B35F /* ChatRoomServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */; };
+		E358F7D7292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E358F7D6292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -462,7 +462,6 @@
 		057DD9B6290B9495001329E6 /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
 		057DD9B7290B9495001329E6 /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		057DD9C3290B9495001329E6 /* VoiceRoomIMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomIMManager.swift; sourceTree = "<group>"; };
-		057DD9C5290B9495001329E6 /* ASRTCKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASRTCKit.swift; sourceTree = "<group>"; };
 		057DD9C8290B9495001329E6 /* UIColor+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+extension.swift"; sourceTree = "<group>"; };
 		057DD9C9290B9495001329E6 /* UIButtonLayoutExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonLayoutExtension.swift; sourceTree = "<group>"; };
 		057DD9CA290B9495001329E6 /* UIButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
@@ -954,6 +953,7 @@
 		E333F64B29150ECB0031B35F /* VoiceChatServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatServiceModel.swift; sourceTree = "<group>"; };
 		E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceServiceProtocol.swift; sourceTree = "<group>"; };
 		E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceProtocol.swift; sourceTree = "<group>"; };
+		E358F7D6292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRTCManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1084,8 +1084,8 @@
 		057DD9C4290B9495001329E6 /* AgoraRtcKit */ = {
 			isa = PBXGroup;
 			children = (
+				E358F7D6292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift */,
 				057DDA0B290B9778001329E6 /* AgoraSceneConfig.swift */,
-				057DD9C5290B9495001329E6 /* ASRTCKit.swift */,
 			);
 			path = AgoraRtcKit;
 			sourceTree = "<group>";
@@ -2728,6 +2728,7 @@
 				DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */,
 				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
 				DD8417BD29090C520026B624 /* VLCreateRoomView.m in Sources */,
+				E358F7D7292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift in Sources */,
 				DD8417AB29090C520026B624 /* VLKTVItemBaseView.m in Sources */,
 				0510B824290B72FC0063E57A /* VRRoomMenuBarEntity.swift in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
@@ -2736,7 +2737,6 @@
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
 				DD8417A729090C520026B624 /* VLKTVSwitcherView.m in Sources */,
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
-				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
 				05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */,
 				DD8417BC29090C520026B624 /* VLNoBodyOnLineView.m in Sources */,
@@ -3222,7 +3222,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
@@ -3259,7 +3259,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
