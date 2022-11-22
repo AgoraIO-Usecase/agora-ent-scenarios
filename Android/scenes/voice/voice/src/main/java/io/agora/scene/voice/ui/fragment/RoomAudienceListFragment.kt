@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.model.RoomRankViewModel
 import io.agora.scene.voice.ui.adapter.RoomAudienceListViewHolder
 import io.agora.voice.baseui.BaseUiFragment
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
@@ -25,6 +24,7 @@ import io.agora.scene.voice.R
 import io.agora.secnceui.annotation.MicClickAction
 import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
+import io.agora.scene.voice.model.VoiceUserListViewModel
 import io.agora.voice.network.tools.VRValueCallBack
 import io.agora.voice.network.tools.bean.VMemberBean
 import io.agora.voice.network.tools.bean.VRoomUserBean
@@ -47,7 +47,7 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
 
     private var roomKitBean: RoomKitBean? = null
 
-    private lateinit var roomRankViewModel: RoomRankViewModel
+    private lateinit var roomRankViewModel: VoiceUserListViewModel
 
     private var pageSize = 10
     private var cursor = ""
@@ -64,8 +64,7 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomRankViewModel =
-            ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[RoomRankViewModel::class.java]
+        roomRankViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
         arguments?.apply {
             roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
             roomKitBean?.let {
@@ -166,24 +165,25 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
         if (roomId.isNullOrEmpty() || uid.isNullOrEmpty()) return
         context?.let { parentContext ->
             if (action == MicClickAction.Invite) {
-                io.agora.scene.voice.general.net.ChatroomHttpManager.getInstance(parentContext).invitationMic(roomId, uid, object :
-                    VRValueCallBack<Boolean> {
-                    override fun onSuccess(var1: Boolean?) {
-                        if (var1 != true) return
-                        ThreadManager.getInstance().runOnMainThread(object :Runnable{
-                            override fun run() {
-                                activity?.let {
-                                    ToastTools.show(it, it.getString(R.string.voice_chatroom_host_invitation_sent))
+                io.agora.scene.voice.general.net.ChatroomHttpManager.getInstance(parentContext)
+                    .invitationMic(roomId, uid, object :
+                        VRValueCallBack<Boolean> {
+                        override fun onSuccess(var1: Boolean?) {
+                            if (var1 != true) return
+                            ThreadManager.getInstance().runOnMainThread(object : Runnable {
+                                override fun run() {
+                                    activity?.let {
+                                        ToastTools.show(it, it.getString(R.string.voice_chatroom_host_invitation_sent))
+                                    }
                                 }
-                            }
 
-                        })
-                    }
+                            })
+                        }
 
-                    override fun onError(var1: Int, var2: String?) {
+                        override fun onError(var1: Int, var2: String?) {
 
-                    }
-                })
+                        }
+                    })
             } else if (action == MicClickAction.KickOff) {
                 io.agora.scene.voice.general.net.ChatroomHttpManager.getInstance(parentContext)
                     .kickMic(roomId, uid, -1, object :

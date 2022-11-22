@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
+import io.agora.scene.voice.model.VoiceCreateViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
@@ -27,11 +26,11 @@ import io.agora.voice.buddy.config.RouterParams
 import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools.show
+import io.agora.voice.buddy.tool.ToastTools
 import io.agora.voice.imkit.manager.ChatroomHelper
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var listAdapter: VoiceRoomListAdapter? = null
 
     private var curVoiceRoomModel: VoiceRoomModel? = null
@@ -47,7 +46,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         binding?.let {
             initAdapter(it.recycler)
             it.swipeLayout.setOnRefreshListener(this)
@@ -97,7 +96,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                         }
                     } else {
                         dismissLoading()
-                        show(requireActivity(), getString(R.string.voice_room_check_password), Toast.LENGTH_SHORT)
+                        ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
                     }
                 }
 
@@ -144,6 +143,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             showInputDialog(voiceRoomModel)
         } else {
             // 房间列表进入需要置换 token 与获取 im 配置
+            showLoading(false)
             voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, voiceRoomModel.roomPassword, true)
         }
     }
