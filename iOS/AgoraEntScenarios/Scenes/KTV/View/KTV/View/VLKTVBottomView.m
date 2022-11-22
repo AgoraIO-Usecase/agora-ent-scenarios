@@ -6,7 +6,6 @@
 #import "VLKTVBottomView.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
-#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "AppContext+KTV.h"
