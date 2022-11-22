@@ -6,6 +6,7 @@ import io.agora.scene.voice.general.net.ChatroomHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.network.tools.VRValueCallBack
 import io.agora.voice.network.tools.bean.VRMicBean
 import io.agora.voice.network.tools.bean.VRMicListBean
@@ -197,16 +198,17 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun getMicInfo(context: Context, roomId: String): LiveData<Resource<VRMicBean>> {
         val resource = object : NetworkOnlyResource<VRMicBean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VRMicBean>>) {
-                ChatroomHttpManager.getInstance(context)
-                    .getMicInfo(roomId, object : VRValueCallBack<VRMicBean> {
-                        override fun onSuccess(data: VRMicBean) {
-                            callBack.onSuccess(createLiveData(data))
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            callBack.onError(code, desc)
-                        }
-                    })
+//                ChatroomHttpManager.getInstance(context)
+//                    .getMicInfo(roomId, object : VRValueCallBack<VRMicBean> {
+//                        override fun onSuccess(data: VRMicBean) {
+//                            callBack.onSuccess(createLiveData(data))
+//                        }
+//
+//                        override fun onError(code: Int, desc: String) {
+//                            callBack.onError(code, desc)
+//                        }
+//                    })
+                ChatroomIMManager.getInstance()
             }
         }
         return resource.asLiveData()

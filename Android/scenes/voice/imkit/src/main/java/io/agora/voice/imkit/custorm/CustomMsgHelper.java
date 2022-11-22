@@ -15,7 +15,7 @@ import io.agora.MessageListener;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
-import io.agora.voice.imkit.manager.ChatroomHelper;
+import io.agora.voice.imkit.manager.ChatroomIMManager;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。
@@ -90,9 +90,9 @@ public class CustomMsgHelper implements MessageListener {
     public void onMessageReceived(List<ChatMessage> messages) {
         for (ChatMessage message : messages) {
             if (message.getType() == ChatMessage.Type.TXT){
-                AllNormalList.add(ChatroomHelper.getInstance().parseChatMessage(message));
+                AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
                 if(listener != null) {
-                    listener.onReceiveNormalMsg(ChatroomHelper.getInstance().parseChatMessage(message));
+                    listener.onReceiveNormalMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                 }
             }
             // 先判断是否自定义消息
@@ -109,27 +109,27 @@ public class CustomMsgHelper implements MessageListener {
             switch (msgType) {
                 case CHATROOM_INVITE_SITE:
                     if(listener != null) {
-                        listener.onReceiveInviteSite(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveInviteSite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_APPLY_SITE:
                     if(listener != null) {
-                        listener.onReceiveApplySite(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_CANCEL_APPLY_SITE:
                     if(listener != null) {
-                        listener.onReceiveCancelApplySite(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveCancelApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_INVITE_REFUSED_SITE:
                     if(listener != null) {
-                        listener.onReceiveInviteRefusedSite(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveInviteRefusedSite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_DECLINE_APPLY:
                     if(listener != null) {
-                        listener.onReceiveDeclineApply(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveDeclineApply(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
 
@@ -151,25 +151,25 @@ public class CustomMsgHelper implements MessageListener {
             // 最后返回各自的消息类型
             switch (msgType) {
                 case CHATROOM_GIFT:
-                    AllGiftList.add(ChatroomHelper.getInstance().parseChatMessage(message));
+                    AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if(listener != null) {
-                        listener.onReceiveGiftMsg(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveGiftMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_PRAISE:
                     if(listener != null) {
-                        listener.onReceivePraiseMsg(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceivePraiseMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_SYSTEM:
-                    AllNormalList.add(ChatroomHelper.getInstance().parseChatMessage(message));
+                    AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if (listener != null){
-                        listener.onReceiveSystem(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.onReceiveSystem(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_UPDATE_ROBOT_VOLUME:
                     if (listener != null){
-                        listener.voiceRoomUpdateRobotVolume(ChatroomHelper.getInstance().parseChatMessage(message));
+                        listener.voiceRoomUpdateRobotVolume(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
             }
         }
@@ -347,8 +347,8 @@ public class CustomMsgHelper implements MessageListener {
             @Override
             public void onSuccess() {
                 if(callBack != null) {
-                    AllGiftList.add(ChatroomHelper.getInstance().parseChatMessage(sendMessage));
-                    callBack.onSuccess(ChatroomHelper.getInstance().parseChatMessage(sendMessage));
+                    AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
+                    callBack.onSuccess(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
                 }
             }
 
