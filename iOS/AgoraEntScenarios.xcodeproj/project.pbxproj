@@ -2126,7 +2126,6 @@
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
 				DDA1995028FFE579009D3E61 /* Cache */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
-				DDA1995728FFE579009D3E61 /* UserCenter */,
 				DDA1995A28FFE579009D3E61 /* Helper */,
 				DDA1995D28FFE579009D3E61 /* AgoraSyncManager */,
 			);
@@ -2172,6 +2171,7 @@
 		DDA1995A28FFE579009D3E61 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				DDA1995728FFE579009D3E61 /* UserCenter */,
 				DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */,
 				DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */,
 			);
