@@ -12,7 +12,6 @@ import io.agora.voice.imkit.bean.ChatroomMicBean
 import io.agora.voice.imkit.custorm.CustomMsgHelper
 import io.agora.voice.imkit.custorm.CustomMsgType
 import io.agora.voice.imkit.custorm.OnMsgCallBack
-import kotlin.collections.ArrayList
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -49,22 +48,18 @@ class ChatroomProtocolDelegate constructor(
         }
     }
 
-
-
     /**
-     * 获取所有麦位信息
+     * 从服务端获取所有麦位信息
      */
-    fun getMicInfo() : ArrayList<MutableMap<String, ChatroomMicBean>>{
-        val micInfoList = ArrayList<MutableMap<String, ChatroomMicBean>>()
+    fun getMicInfoFromServer() : MutableMap<String, ChatroomMicBean>{
+        var micInfoMap = mutableMapOf<String, ChatroomMicBean>()
         roomManager.asyncFetchChatRoomAllAttributesFromServer(roomId,object :
             ValueCallBack<MutableMap<String, String>>{
             override fun onSuccess(value: MutableMap<String, String>?) {
-                val attributeMap = mutableMapOf<String, ChatroomMicBean>()
                 for (entry in value?.entries!!) {
                     var bean = GsonTools.toBean(entry.value, ChatroomMicBean::class.java)
                     if (bean != null){
-                        attributeMap[entry.key] = bean
-                        micInfoList.add(attributeMap)
+                        micInfoMap[entry.key] = bean
                     }
                 }
             }
@@ -74,13 +69,37 @@ class ChatroomProtocolDelegate constructor(
             }
 
         })
-        return micInfoList
+        return micInfoMap
     }
 
     /**
-     * 获取指定麦位信息
+     * 从本地缓存获取所有麦位信息
      */
-    fun getMicInfoByIndex(micIndex: Int) : ChatroomMicBean{
+    fun getMicInfo(): MutableMap<String, ChatroomMicBean>{
+        val micInfoMap = mutableMapOf<String, ChatroomMicBean>()
+        var localMap =  ChatroomCacheManager.cacheManager.getMicInfoMap()
+        if (localMap != null){
+            for (entry in localMap.entries) {
+                var bean = GsonTools.toBean(entry.value, ChatroomMicBean::class.java)
+                if (bean != null){
+                    micInfoMap[entry.key] = bean
+                }
+            }
+        }
+        return micInfoMap
+    }
+
+    /**
+     * 从本地获取指定麦位信息
+     */
+    fun getMicInfo(micIndex:Int): ChatroomMicBean? {
+        return ChatroomCacheManager.cacheManager.getMicInfoByIndex(micIndex)
+    }
+
+     /**
+     * 从服务端获取指定麦位信息
+     */
+    fun getMicInfoByIndexFromServer(micIndex: Int) : ChatroomMicBean{
         val keyList: MutableList<String> = java.util.ArrayList()
         var micBean = ChatroomMicBean(-99,-99,null)
         keyList.add(getMicIndex(micIndex))
@@ -114,11 +133,11 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
         var fromKey = getMicIndex(fromMicIndex)
         var toKey = getMicIndex(toMicIndex)
-        var fromBean = getMicInfoByIndex(fromMicIndex)
-        var toMicBean =  getMicInfoByIndex(toMicIndex)
+        var fromBean = getMicInfo(fromMicIndex)
+        var toMicBean =  getMicInfo(toMicIndex)
         var fromBeanValue = GsonTools.beanToString(fromBean)
         var toBeanValue = GsonTools.beanToString(toMicBean)
-        if (toMicBean.status == -1){
+        if (toMicBean != null && toMicBean.status == -1){
             if (toBeanValue != null){
                 attributeMap?.put(fromKey,toBeanValue )
             }
@@ -274,7 +293,7 @@ class ChatroomProtocolDelegate constructor(
      * 更新指定麦位信息
      */
     private fun updateMic(micIndex: Int, status: Int,isForced:Boolean,callback: CallBack){
-        val chatroomMicBean = getMicInfoByIndex(micIndex)
+        val chatroomMicBean = getMicInfo(micIndex) ?: return
         chatroomMicBean.status = status
         chatroomMicBean.mic_index = micIndex
         var value = GsonTools.beanToString(chatroomMicBean)
@@ -361,6 +380,6 @@ class ChatroomProtocolDelegate constructor(
             6 -> { micIndex = "mic_6" }
             7 -> { micIndex = "mic_7" }
         }
-        return micIndex;
+        return micIndex
     }
 }
