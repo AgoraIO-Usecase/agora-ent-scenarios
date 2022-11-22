@@ -43,7 +43,7 @@ import io.agora.voice.imkit.custorm.CustomMsgType;
 import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.R;
-import io.agora.voice.imkit.manager.ChatroomHelper;
+import io.agora.voice.imkit.manager.ChatroomIMManager;
 
 /**
  * MessagesView
@@ -81,7 +81,7 @@ public class RoomMessagesView extends RelativeLayout{
     public void init(String chatroomId,boolean isOwner){
         this.chatroomId = chatroomId;
         this.isOwner = isOwner;
-        adapter = new ListAdapter(getContext(), ChatroomHelper.getInstance().getMessageData(chatroomId));
+        adapter = new ListAdapter(getContext(), ChatroomIMManager.getInstance().getMessageData(chatroomId));
         ScrollSpeedLinearLayoutManger scrollSpeedLinearLayoutManger = new ScrollSpeedLinearLayoutManger(getContext());
         //设置item滑动速度
         scrollSpeedLinearLayoutManger.setSpeedSlow();
@@ -203,7 +203,7 @@ public class RoomMessagesView extends RelativeLayout{
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             String from = "";
             final ChatMessageData message = messages.get(position);
-            from = ChatroomHelper.getInstance().getUserName(message);
+            from = ChatroomIMManager.getInstance().getUserName(message);
             String s = message.getContent();
             if (holder instanceof MyViewHolder){
                 if (isOwner){
@@ -213,7 +213,7 @@ public class RoomMessagesView extends RelativeLayout{
                 }
                 showText(((MyViewHolder) holder).content, from, s);
             }else if (holder instanceof SystemViewHolder){
-                from = ChatroomHelper.getInstance().getSystemUserName(message);
+                from = ChatroomIMManager.getInstance().getSystemUserName(message);
                 showSystemMsg(((SystemViewHolder) holder).name ,from,"");
             }
 

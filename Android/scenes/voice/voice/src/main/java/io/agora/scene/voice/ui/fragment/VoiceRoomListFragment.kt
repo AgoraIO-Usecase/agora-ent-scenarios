@@ -27,7 +27,7 @@ import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
-import io.agora.voice.imkit.manager.ChatroomHelper
+import io.agora.voice.imkit.manager.ChatroomIMManager
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
     private lateinit var voiceRoomViewModel: VoiceCreateViewModel
@@ -113,8 +113,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice room list chat_username:$chatUsername".logD()
                     "Voice room list im_token:$chatToken".logD()
-                    if (!ChatroomHelper.getInstance().isLoggedIn) {
-                        ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
+                    if (!ChatroomIMManager.getInstance().isLoggedIn) {
+                        ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
                             override fun onSuccess() {
                                 ThreadManager.getInstance().runOnMainThread {
                                     goChatroomPage()
