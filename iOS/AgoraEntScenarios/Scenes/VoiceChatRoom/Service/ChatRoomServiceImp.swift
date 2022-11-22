@@ -566,6 +566,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     if isOwner {
                         SyncUtil.leaveScene(id: roomId)
                         self.roomList?.remove(at: index)
+                        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                     } else {
                         let updateRoom: VRRoomEntity = room
                         updateRoom.member_count = updateRoom.member_count ?? 0 - 1
