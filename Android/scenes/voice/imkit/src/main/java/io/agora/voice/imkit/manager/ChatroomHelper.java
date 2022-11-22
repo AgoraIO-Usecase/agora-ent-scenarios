@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custormgift.CustomMsgHelper;
-import io.agora.voice.imkit.custormgift.OnCustomMsgReceiveListener;
-import io.agora.voice.imkit.custormgift.OnMsgCallBack;
+import io.agora.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.voice.imkit.custorm.OnCustomMsgReceiveListener;
+import io.agora.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.CallBack;
 import io.agora.ChatRoomChangeListener;
 import io.agora.ConnectionListener;
@@ -31,6 +31,7 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
     private ArrayList<ChatMessageData> data = new ArrayList<>();
     public OnChatroomEventReceiveListener chatroomListener;
     public OnChatroomConnectionListener chatroomConnectionListener;
+    private ChatroomProtocolDelegate delegate;
     private static final String TAG = "ChatroomHelper";
 
     public static ChatroomHelper getInstance() {
@@ -58,6 +59,8 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         setConnectionListener();
         //设置相关的房间信息
         CustomMsgHelper.getInstance().setChatRoomInfo(chatroomId);
+        //设置语聊房协议代理
+        delegate = new ChatroomProtocolDelegate(chatroomId);
 
     }
 
@@ -478,6 +481,10 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         message.setBody(textMessageBody);
         message.setAttribute("userName",nick);
         ChatClient.getInstance().chatManager().saveMessage(message);
+    }
+
+    public void leaveMicMic(int micIndex, CallBack callBack){
+        delegate.leaveMicMic(micIndex,callBack);
     }
 
 }
