@@ -331,19 +331,6 @@ extension VoiceRoomViewController {
                 
             }
         }
-        //guard let roomId = roomInfo?.room?.room_id else { return }
-//        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .cancelApply(roomId: roomId), params: [:]) { dic, error in
-//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-//                    self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
-//                } else {
-//                    self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-//                }
-//            } else {
-////                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
-//            }
-//        }
     }
 
     func userCancelApplyAlert() {

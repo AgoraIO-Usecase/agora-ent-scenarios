@@ -186,6 +186,16 @@ extension VoiceRoomViewController {
                 let joinSuccess = rtcJoinSuccess && IMJoinSuccess
                 if !joinSuccess {
                     self?.didHeaderAction(with: .back, destroyed: true)
+                } else {
+                    if self?.roomInfo?.room?.member_list == nil {
+                        self?.roomInfo?.room?.member_list = [VRUser]()
+                    }
+                    self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+                        if error != nil {
+                            self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+                        }
+                    })
                 }
             }
         }
@@ -210,17 +220,6 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
-                if self?.isOwner ?? false {
-                    if self?.roomInfo?.room?.member_list == nil {
-                        self?.roomInfo?.room?.member_list = [VRUser]()
-                    }
-                    self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
-                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
-                        if error != nil {
-                            self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
-                        }
-                    })
-                }
                 self?.roomInfo = info
                 guard let mics = self?.roomInfo?.mic_info else { return }
                 ChatRoomServiceImp.getSharedInstance().mics = mics
