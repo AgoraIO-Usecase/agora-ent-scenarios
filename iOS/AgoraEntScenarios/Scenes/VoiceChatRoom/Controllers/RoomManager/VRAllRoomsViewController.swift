@@ -39,7 +39,7 @@ extension VRAllRoomsViewController {
     }
 
     private func fetchRooms(cursor: String) {
-        serviceImp?.fetchRoomList(page: 0) { error, rooms in
+        ChatRoomServiceImp.getSharedInstance().fetchRoomList(page: 0) { error, rooms in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}

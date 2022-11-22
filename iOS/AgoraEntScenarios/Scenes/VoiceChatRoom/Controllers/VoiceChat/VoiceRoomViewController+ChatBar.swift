@@ -289,7 +289,7 @@ extension VoiceRoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        serviceImp?.startMicSeatApply(index: index) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().startMicSeatApply(index: index) { error, flag in
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
@@ -319,7 +319,7 @@ extension VoiceRoomViewController {
     func cancelRequestSpeak(index: Int?) {
         guard let local_index = self.local_index else {return}
         guard let user: VRUser = self.roomInfo?.room?.member_list?[local_index] else {return}
-        serviceImp?.endMicSeatApply(chat_uid: user.chat_uid ?? "") { error, flag in
+        ChatRoomServiceImp.getSharedInstance().endMicSeatApply(chat_uid: user.chat_uid ?? "") { error, flag in
             if error == nil {
                 if flag {
                     self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
