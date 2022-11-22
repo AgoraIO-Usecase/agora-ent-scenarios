@@ -12,15 +12,137 @@ import AgoraChat.AgoraChatError
 
 private let cSceneId = "scene_chatRoom"
 
-class ChatRoomServiceImp: NSObject {
+public class ChatRoomServiceImp: NSObject {
     private static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
+    public var mics: [VRRoomMic] = [VRRoomMic]()
+    public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
     var syncUtilsInited: Bool = false
+    @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
+}
+
+extension ChatRoomServiceImp: VoiceRoomIMDelegate {
+    
+    public func chatTokenWillExpire(code: AgoraChatErrorCode) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.chatTokenWillExpire)) {
+            self.roomServiceDelegate?.chatTokenWillExpire()
+        }
+    }
+    
+    public func receiveTextMessage(roomId: String, message: VoiceRoomChatEntity) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.receiveTextMessage(roomId:message:))) {
+            self.roomServiceDelegate?.receiveTextMessage(roomId: roomId, message: message)
+        }
+    }
+    
+    public func receiveGift(roomId: String, meta: [String : String]?) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveGift(roomId:gift:))) {
+            guard let dic = meta else { return }
+            let gift = model(from: dic, VoiceRoomGiftEntity.self)
+            self.roomServiceDelegate?.onReceiveGift(roomId: roomId, gift: gift)
+        }
+    }
+    
+    public func receiveApplySite(roomId: String, meta: [String : String]?) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
+            guard let map = meta?["user"]?.z.jsonToDictionary() else { return }
+            let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
+            self.applicants.append(apply)
+            self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
+        }
+    }
+    
+    public func receiveCancelApplySite(roomId: String, chat_uid: String) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequestRejected(roomId:chat_uid:))) {
+            self.roomServiceDelegate?.onReceiveSeatRequestRejected(roomId: roomId, chat_uid: chat_uid)
+        }
+    }
+    
+    public func receiveInviteSite(roomId: String, meta: [String : String]?) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatInvitation(roomId:user:))) {
+            guard let map = meta?["user"] else { return }
+            guard let user = model(from: map, VRUser.self) else { return }
+            if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "" {
+                return
+            }
+            self.roomServiceDelegate?.onReceiveSeatInvitation(roomId: roomId, user: user)
+        }
+    }
+    
+    public func refuseInvite(roomId: String, meta: [String : String]?) {
+        
+    }
+    
+    public func userJoinedRoom(roomId: String, username: String, ext: [String : Any]?) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserJoinedRoom(roomId:user:))) {
+            guard let map = ext else { return }
+            self.roomServiceDelegate?.onUserJoinedRoom(roomId: roomId, user: model(from: map, VRUser.self))
+        }
+    }
+    
+    public func announcementChanged(roomId: String, content: String) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onAnnouncementChanged(roomId:content:))) {
+            self.roomServiceDelegate?.onAnnouncementChanged(roomId: roomId, content: content)
+        }
+    }
+    
+    public func voiceRoomUpdateRobotVolume(roomId: String, volume: String) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onRobotVolumeUpdated(roomId:volume:))) {
+            self.roomServiceDelegate?.onRobotVolumeUpdated(roomId: roomId, volume: volume)
+        }
+    }
+    
+    public func userBeKicked(roomId: String, reason: AgoraChatroomBeKickedReason) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserBeKicked(roomId:reason:))) {
+            self.roomServiceDelegate?.onUserBeKicked(roomId: roomId, reason: ChatRoomServiceKickedReason(rawValue: UInt(reason.rawValue)) ?? .removed)
+        }
+    }
+    
+    public func roomAttributesDidUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onRoomSiteDidUpdated(roomId:attributeMap:from:))) {
+            self.roomServiceDelegate?.onRoomSiteDidUpdated(roomId: roomId, attributeMap: attributeMap, from: fromId)
+        }
+    }
+    
+    public func memberLeave(roomId: String, userName: String) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onMemberLeave(roomId:userName:))) {
+            self.roomServiceDelegate?.onMemberLeave(roomId: roomId, userName: userName)
+        }
+    }
+    
 }
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
+    
+    func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
+        VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
+    }
+    
+    func enableRobot(enable: Bool,completion: @escaping (Error?) -> Void) {
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["use_robot":(enable ? "1":"0")], completion: { error in
+            completion(self.convertError(error: error))
+        })
+    }
+    
+    func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void) {
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["robot_volume":"\(value)"], completion: { error in
+            completion(self.convertError(error: error))
+        })
+    }
+    
+    
+    func subscribeEvent(with delegate: ChatRoomServiceSubscribeDelegate) {
+        VoiceRoomIMManager.shared?.delegate = self
+        VoiceRoomIMManager.shared?.addChatRoomListener()
+        self.roomServiceDelegate = delegate
+    }
+    
+    func unsubscribeEvent() {
+        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        self.roomServiceDelegate = nil
+    }
     
     // 单例
     @objc public class func getSharedInstance() -> ChatRoomServiceImp {
@@ -35,15 +157,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let vmError = VoiceRoomError()
         vmError.code = "\(error?.code ?? .chatroomNotJoined)"
         vmError.message = error?.errorDescription
-        return vmError
+        return error == nil ? nil:vmError
     }
     
     func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
-//        var keys = ["ranking_list","member_list","gift_amount","robot_volume","use_robot"]
-//        if entity.owner == nil {
-//            keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
-//        }
-        var keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
+        let keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
         let roomInfo = VRRoomInfo()
         roomInfo.room = entity
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: keys, completion: { error, map in
@@ -90,8 +208,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func inviteUserToMic(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-        let user = VoiceRoomIMManager.shared?.members.first(where: { $0.chat_uid == chatUid })
+    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
+        let user = self.userList?.first(where: { $0.chat_uid == chatUid })
         user?.mic_index = index
         VoiceRoomIMManager.shared?.sendCustomMessage(roomId: VoiceRoomIMManager.shared?.currentRoomId ?? "", event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
@@ -121,7 +239,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func forbidMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         if mic.status == 3 {
@@ -135,7 +253,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func unForbidMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         mic.status = 0
@@ -145,7 +263,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func lockMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         if mic.status == 2 {
@@ -159,7 +277,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func unLockMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         mic.status = 0
@@ -187,7 +305,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func muteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         mic.status = 1
@@ -197,7 +315,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func unmuteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
-        guard let mic = VoiceRoomIMManager.shared?.mics[mic_index] else {
+        guard let mic = self.mics[safe: mic_index] else {
             return
         }
         mic.status = 0
@@ -214,7 +332,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void) {
-        if VoiceRoomIMManager.shared?.mics[safe: new_index]?.member != nil {
+        if self.mics[safe: new_index]?.member != nil {
             completion(self.normalError(),false)
             return
         }
@@ -234,9 +352,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         
     }
     
-    func agreeInvite(completion: @escaping (Error?, Bool) -> Void) {
+    func acceptMicSeatInvitation(completion: @escaping (Error?, Bool) -> Void) {
         let mic = VRRoomMic()
-        let user = VoiceRoomIMManager.shared?.members.first(where: {
+        let user = serviceImp?.userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
         })
         if user?.mic_index ?? 0 > 1 {
@@ -255,7 +373,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     /// - Parameters:
     ///   - chat_user: 提交的用户模型，包含申请的麦位信息，若没有顺序分配
     ///   - completion: 回调
-    func submitApply(index: Int?,completion: @escaping (Error?, Bool) -> Void) {
+    func startMicSeatApply(index: Int?,completion: @escaping (Error?, Bool) -> Void) {
         let apply = VoiceRoomApply()
         apply.created_at = UInt64(Date().timeIntervalSince1970)
         apply.member = VoiceRoomUserInfo.shared.user
@@ -269,15 +387,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func cancelApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
+    func endMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chat_uid, event: VoiceRoomCancelApplySite, customExt: [:], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
         })
     }
     
-    func agreeApply(chatUid: String, completion: @escaping (Error?) -> Void) {
+    func endMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
         var mic_index = 1
-        let user = VoiceRoomIMManager.shared?.applicants.first(where: {
+        let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
         })
         if user?.member?.mic_index ?? 0 < 1 {
@@ -297,7 +415,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func findMicIndex() -> Int {
         var mic_index = 0
         for i in 0...7 {
-            let mic = VoiceRoomIMManager.shared?.mics[safe: i]
+            let mic = self.mics[safe: i]
             if mic?.member == nil {
                 mic_index = mic?.mic_index ?? 1
                 break
@@ -502,7 +620,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             }
             mics.append(item)
         }
-        VoiceRoomIMManager.shared?.mics = mics
+        self.mics = mics
         var micsMap = [String:String]()
         for (idx,item) in mics.enumerated() {
             micsMap["mic_\(idx)"] = item.kj.JSONString()

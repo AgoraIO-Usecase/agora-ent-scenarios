@@ -12,6 +12,8 @@ import ZSwiftBaseLib
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
+var serviceImp: ChatRoomServiceImp? = ChatRoomServiceImp.getSharedInstance()
+
 @objc public final class VRRoomsViewController: VRBaseViewController {
     private var index: Int = 0 {
         didSet {
@@ -40,15 +42,9 @@ let page_size = 15
         currentUser = user
         VoiceRoomIMManager.shared?.configIM(appkey: "81691796#990293")
 
-        // MARK: - you can replace request host call this.
-
-      //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
-        //if user.hasVoiceRoomUserInfo {
-            mapUser(user: user)
+        //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
+        mapUser(user: user)
         self.showContent()
-//        } else {
-//            login()
-//        }
     }
 
     override public func viewDidLoad() {
@@ -62,6 +58,10 @@ let page_size = 15
         view.bringSubviewToFront(navigation)
         viewsAction()
         childViewControllersEvent()
+    }
+    
+    deinit {
+        serviceImp = nil
     }
 }
 
@@ -153,6 +153,7 @@ extension VRRoomsViewController {
                 VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
                     if error == nil {
+                        self.mapUser(user: VLUserCenter.user)
                         let info: VRRoomInfo = VRRoomInfo()
                         info.room = room
                         info.mic_info = nil

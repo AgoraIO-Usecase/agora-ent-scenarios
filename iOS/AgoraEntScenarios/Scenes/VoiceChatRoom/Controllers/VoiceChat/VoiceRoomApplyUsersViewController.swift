@@ -38,7 +38,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     // MARK: - Table view data source
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        VoiceRoomIMManager.shared?.applicants.count ?? 0
+        serviceImp?.applicants.count ?? 0
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -48,10 +48,10 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
         }
         // Configure the cell...
         cell?.selectionStyle = .none
-        cell?.refresh(item: VoiceRoomIMManager.shared?.applicants[safe: indexPath.row])
+        cell?.refresh(item: serviceImp?.applicants[safe: indexPath.row])
         cell?.agreeClosure = { [weak self] in
             self?.agreeUserApply(user: $0)
-            VoiceRoomIMManager.shared?.applicants[safe: indexPath.row]?.member?.invited = true
+            serviceImp?.applicants[safe: indexPath.row]?.member?.invited = true
             self?.tableView.reloadData()
         }
         return cell ?? VoiceRoomApplyCell()
