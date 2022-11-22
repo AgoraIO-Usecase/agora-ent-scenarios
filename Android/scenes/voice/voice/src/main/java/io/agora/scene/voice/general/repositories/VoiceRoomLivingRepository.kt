@@ -6,6 +6,7 @@ import io.agora.scene.voice.general.net.ChatroomHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.network.tools.VRValueCallBack
 import io.agora.voice.network.tools.bean.VRMicBean
@@ -368,9 +369,13 @@ class VoiceRoomLivingRepository : BaseRepository() {
 //                    })
                 voiceServiceProtocol.lockMic(micIndex, completion ={ error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        ThreadManager.getInstance().runOnMainThread{
+                            callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        }
                     } else {
-                        callBack.onError(error, "")
+                        ThreadManager.getInstance().runOnMainThread{
+                            callBack.onError(error, "")
+                        }
                     }
                 } )
             }
