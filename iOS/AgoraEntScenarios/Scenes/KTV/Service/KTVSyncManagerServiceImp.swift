@@ -88,11 +88,11 @@ private func _hideLoadingIfNeed() {
         return roomNo
     }
     
-    private func _unsubscribe() {
+    private func _unsubscribeAll() {
         guard let channelName = roomNo else {
             return
         }
-        
+        agoraPrint("imp all unsubscribe...")
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
@@ -441,6 +441,7 @@ private func _hideLoadingIfNeed() {
 
     //MARK: subscribe
     func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
+        _unsubscribeAll()
         userListCountDidChanged = changedBlock
         _subscribeOnlineUsers {
         }
@@ -495,6 +496,10 @@ private func _hideLoadingIfNeed() {
         singingScoreDidChanged = changedBlock
         _subscribeSingScore()
     }
+    
+    func unsubscribeAll() {
+        _unsubscribeAll()
+    }
 }
 
 
@@ -517,7 +522,7 @@ extension KTVSyncManagerServiceImp {
         //remove current user's choose song
         _removeAllUserChooseSong()
 
-        _unsubscribe()
+        _unsubscribeAll()
         SyncUtil.leaveScene(id: channelName)
         roomNo = nil
         completion(nil)
@@ -528,7 +533,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
-        _unsubscribe()
+        _unsubscribeAll()
         SyncUtil.scene(id: channelName)?.deleteScenes()
         roomNo = nil
         completion(nil)
@@ -604,7 +609,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
-        agoraPrint("imp user subscribe ...")
+        agoraPrint("imp user subscribe...")
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
