@@ -76,8 +76,7 @@ extension VoiceRoomInviteUsersController {
     }
 
     @objc private func fetchUsers() {
-        serviceImp?.fetchRoomMembers { error, users in
-            self.tableView.refreshControl?.endRefreshing()
+        ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
             if users != nil , error == nil {
                 if self.apply == nil {
                     let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()
@@ -100,7 +99,7 @@ extension VoiceRoomInviteUsersController {
         if idx <= 0 {return}
         
         let chat_uid: String = user?.uid ?? ""
-        serviceImp?.startMicSeatInvitation(chatUid: chat_uid, index: idx) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx) { error, flag in
             if error == nil {
                 self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
             } else {
