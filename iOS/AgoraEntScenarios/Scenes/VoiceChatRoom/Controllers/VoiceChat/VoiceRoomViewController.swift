@@ -44,7 +44,7 @@ class VoiceRoomViewController: VRBaseViewController {
     var preView: VMPresentView!
     var noticeView: VMNoticeView!
     var isShowPreSentView: Bool = false
-    var rtckit: ASRTCKit = .getSharedInstance()
+    var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
     var local_index: Int?
@@ -480,7 +480,6 @@ extension VoiceRoomViewController {
             return
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
-//        let params: [String: String] = ["use_robot": flag == true ? "1" : "0" ]
         ChatRoomServiceImp.getSharedInstance().enableRobot(enable: flag) { error in
             if error == nil {
                 if self.alienCanPlay {
@@ -502,7 +501,6 @@ extension VoiceRoomViewController {
 
     // announcement
     func updateNotice(with str: String) {
-//        let params: [String: String] = ["announcement": str]
         ChatRoomServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
@@ -520,7 +518,7 @@ extension VoiceRoomViewController {
             if error == nil {
                 // 如果返回的结果为true 表示上麦成功
                 guard let room = self.roomInfo?.room else { return }
-                var newRoom = room
+                let newRoom = room
                 newRoom.robot_volume = UInt(Vol)
                 self.roomInfo?.room = newRoom
                 self.rtckit.adjustAudioMixingVolume(with: Vol)
@@ -819,7 +817,7 @@ extension VoiceRoomViewController: SVGAPlayerDelegate {
 
 // MARK: - ASManagerDelegate
 
-extension VoiceRoomViewController: ASManagerDelegate {
+extension VoiceRoomViewController: VMManagerDelegate {
     func didRtcLocalUserJoinedOfUid(uid: UInt) {}
 
     func didRtcRemoteUserJoinedOfUid(uid: UInt) {}
