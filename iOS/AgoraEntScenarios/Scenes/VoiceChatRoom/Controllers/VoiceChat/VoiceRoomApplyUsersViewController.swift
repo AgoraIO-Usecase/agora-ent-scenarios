@@ -73,24 +73,6 @@ extension VoiceRoomApplyUsersViewController {
         self.tableView.refreshControl?.endRefreshing()
         self.tableView.reloadData()
     }
-//
-//    @objc private func fetchUsers() {
-//        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchApplyMembers(roomId: roomId ?? "", cursor: apply?.cursor ?? "", pageSize: 15), params: [:], classType: VoiceRoomApplyEntity.self) { model, error in
-//            self.tableView.refreshControl?.endRefreshing()
-//            if model != nil, error == nil {
-//                if self.apply == nil {
-//                    self.apply = model
-//                } else {
-//                    self.apply?.cursor = model?.cursor
-//                    self.apply?.apply_list?.append(contentsOf: model?.apply_list ?? [])
-//                }
-//                self.tableView.reloadData()
-//            } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")")
-//            }
-//            self.empty.isHidden = (self.apply?.apply_list?.count ?? 0 != 0)
-//        }
-//    }
 
     private func agreeUserApply(user: VoiceRoomApply?) {
         SVProgressHUD.show()
@@ -103,17 +85,5 @@ extension VoiceRoomApplyUsersViewController {
                 self.view.makeToast("Agree failed!".localized())
             }
         }
-//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .agreeApply(roomId: roomId ?? ""), params: ["uid": user?.member?.uid ?? ""]) { dic, error in
-//            SVProgressHUD.dismiss()
-//            if dic != nil, error == nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.view.makeToast("Agree success!".localized())
-//                } else {
-//                    self.view.makeToast("Agree failed!".localized())
-//                }
-//            } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")")
-//            }
-//        }
     }
 }

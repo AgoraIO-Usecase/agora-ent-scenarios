@@ -68,7 +68,7 @@ var serviceImp: ChatRoomServiceImp? = ChatRoomServiceImp.getSharedInstance()
 extension VRRoomsViewController {
     private func mapUser(user: VLLoginModel?) {
         let current = VRUser()
-        current.chat_uid = user?.chat_uid
+        current.chat_uid = user?.id
         current.rtc_uid = user?.rtc_uid
         current.im_token = user?.im_token
         current.authorization = user?.authorization
