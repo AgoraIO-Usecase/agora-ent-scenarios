@@ -389,7 +389,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func endMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
         var mic_index = 1
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
