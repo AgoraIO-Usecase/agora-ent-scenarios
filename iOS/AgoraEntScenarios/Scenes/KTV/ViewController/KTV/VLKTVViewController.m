@@ -642,7 +642,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else{
         self.isNowMicMuted = NO;
     }
-    [self.RTCkit muteLocalAudioStream:mute];
+    [self.RTCkit adjustRecordingSignalVolume:mute ? 0 : 100];
     
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
                                                         completion:^(NSError * error) {
