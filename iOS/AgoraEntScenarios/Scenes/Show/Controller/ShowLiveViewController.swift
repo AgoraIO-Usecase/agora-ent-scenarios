@@ -11,7 +11,10 @@ import AgoraRtcKit
 class ShowLiveViewController: UIViewController {
 
     var room: ShowRoomListModel?
-    var agoraKit: AgoraRtcEngineKit?
+    
+    lazy var agoraKitManager: ShowAgoraKitManager = {
+        return ShowAgoraKitManager()
+    }()
     
     private var roomOwnerId: UInt {
         get{
@@ -31,7 +34,7 @@ class ShowLiveViewController: UIViewController {
     
     // 音乐
     private lazy var musicManager: ShowMusicManager? = {
-        guard let agorakit = agoraKit else { return nil }
+        guard let agorakit = agoraKitManager.agoraKit else { return nil }
         return ShowMusicManager(agoraKit: agorakit)
     }()
     
@@ -41,19 +44,10 @@ class ShowLiveViewController: UIViewController {
         return view
     }()
     
-    private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
-        let config = AgoraRtcEngineConfig()
-        config.appId = KeyCenter.AppId
-        config.channelProfile = .liveBroadcasting
-        config.areaCode = .global
-        return config
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
-        setupAgoraKit()
         joinChannel()
         subscribeChatMsg()
         UIApplication.shared.isIdleTimerDisabled = true
@@ -73,44 +67,27 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    private func setupAgoraKit() {
-        if agoraKit == nil {
-            agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: self)
-        }else{
-            agoraKit?.delegate = self
+    private func leaveRoom(){
+        agoraKitManager.leaveChannel()
+        dismiss(animated: true) {
+            AppContext.showServiceImp.leaveRoom { error in
+                print("error == \(error.debugDescription)")
+            }
         }
-        let roleOptions = AgoraClientRoleOptions()
-        roleOptions.audienceLatencyLevel = role == .audience ? .ultraLowLatency : .lowLatency
-        agoraKit?.setClientRole(role, options: roleOptions)
-        agoraKit?.enableVideo()
-        agoraKit?.enableAudio()
-        agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
     }
     
     private func joinChannel() {
+        agoraKitManager.delegate = self
         guard let channelName = room?.roomNo, let uid: UInt = UInt(currentUserId),let ownerId = room?.ownerId else {
             return
         }
-        
-        let ret = agoraKit?.joinChannel(byToken: KeyCenter.Token, channelId: channelName, info: nil, uid: uid)
-        print("=======chnnelId == \(channelName), uid === \(uid)")
+        let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView)
         if ret == 0 {
             print("进入房间")
         }else{
             print("进入房间失败=====\(ret.debugDescription)")
-            showAlert(title: "进入房间失败", message: "Error \(ret.debugDescription) occur")
+            showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
         }
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = liveView.canvasView
-        canvas.renderMode = .hidden
-        if role == .broadcaster {
-            canvas.uid = uid
-            agoraKit?.setupLocalVideo(canvas)
-        } else {
-            canvas.uid = UInt(ownerId) ?? 0
-            agoraKit?.setupRemoteVideo(canvas)
-        }
-        agoraKit?.startPreview()
         sendMessageWithText("join_live_room".show_localized)
     }
     
@@ -136,15 +113,6 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    func showAlert(title: String? = nil, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .cancel) { action in
-//            self.dismiss(animated: true)
-        }
-        alertController.addAction(action)
-        present(alertController, animated: true, completion: nil)
-    }
-    
 }
 
 
@@ -155,7 +123,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
-        showAlert(title: "Error", message: "Error \(errorCode.rawValue) occur")
+        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
 
     }
     
@@ -175,7 +143,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         if roomOwnerId == uid {
             let vc = ShowReceiveLiveFinishAlertVC()
             vc.dismissAlert { [weak self] in
-                self?.dismiss(animated: true)
+                self?.leaveRoom()
             }
             present(vc, animated: true)
         }
@@ -206,14 +174,12 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickCloseButton() {
-        agoraKit?.leaveChannel()
-        agoraKit?.disableAudio()
-        agoraKit?.disableVideo()
-        AgoraRtcEngineKit.destroy()
-        dismiss(animated: true) {
-            AppContext.showServiceImp.leaveRoom { error in
-                print("error == \(error.debugDescription)")
+        if role == .broadcaster {
+            showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
+                self?.leaveRoom()
             }
+        }else {
+            leaveRoom()
         }
     }
     
@@ -238,8 +204,17 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickSettingButton() {
         let settingVC = ShowAdvancedSettingVC()
-        settingVC.agoraKit = agoraKit
+        settingVC.agoraKit = agoraKitManager.agoraKit
         navigationController?.pushViewController(settingVC, animated: true)
     }
     
+}
+
+
+extension ShowLiveViewController {
+    private func showError(title: String, errMsg: String) {
+        showAlert(title: title, message: errMsg) { [weak self] in
+            self?.leaveRoom()
+        }
+    }
 }

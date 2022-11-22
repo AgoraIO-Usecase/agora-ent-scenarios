@@ -14,12 +14,12 @@ class ShowSettingManager {
     
     private let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     private let dimensionsItems: [CGSize] = [
-        CGSize(width: 320, height: 240),
-        CGSize(width: 480, height: 360),
-        CGSize(width: 360, height: 640),
-        CGSize(width: 960, height: 540),
-        CGSize(width: 960, height: 720),
-        CGSize(width: 1280, height: 720),
+        ShowAgoraVideoDimensions._320x240.sizeValue(),
+        ShowAgoraVideoDimensions._480x360.sizeValue(),
+        ShowAgoraVideoDimensions._360x640.sizeValue(),
+        ShowAgoraVideoDimensions._960x540.sizeValue(),
+        ShowAgoraVideoDimensions._960x720.sizeValue(),
+        ShowAgoraVideoDimensions._1280x720.sizeValue()
     ]
     private let fpsItems: [AgoraVideoFrameRate] = [
         .fps1,
@@ -36,6 +36,7 @@ class ShowSettingManager {
         defaultSetting()
     }
     
+    // 默认设置
     private func defaultSetting() {
         
         agoraKit.setLowlightEnhanceOptions(ShowSettingKey.lowlightEnhance.boolValue(), options: AgoraLowlightEnhanceOptions())
@@ -64,6 +65,14 @@ class ShowSettingManager {
         let h265On = ShowSettingKey.H265.boolValue()
         agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(h265On)}")
         agoraKit.setParameters("{\"engine.video.codec_type\":\"\(h265On ? 3 : 2)\"}")
+    }
+    
+    // 预设模式
+    func presetForSingleBroadcast() {
+        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: ShowAgoraVideoDimensions._960x720.sizeValue()))
+        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: .fps15))
+        ShowSettingKey.bitRate.writeValue(1800)
+        ShowSettingKey.H265.writeValue(true)
     }
     
 }

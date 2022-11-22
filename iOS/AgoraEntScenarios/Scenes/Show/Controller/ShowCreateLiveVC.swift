@@ -13,28 +13,14 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var agoraKit: AgoraRtcEngineKit?
     private var selectedResolution = 0
-    private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
-        return AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
-                                       frameRate: .fps30,
-                                       bitrate: AgoraVideoBitrateStandard,
-                                       orientationMode: .fixedPortrait,
-                                       mirrorMode: .auto)
-    }()
     
-    private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
-       let config = AgoraRtcEngineConfig()
-        config.appId = KeyCenter.AppId
-        config.channelProfile = .liveBroadcasting
-        config.areaCode = .global
-        return config
-    }()
-    
+    private let agoraKitManager = ShowAgoraKitManager()
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        setupAgoraKit()
+        agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
     }
     
@@ -78,7 +64,7 @@ class ShowCreateLiveVC: UIViewController {
             make.edges.equalToSuperview()
         }
     }
-    
+    /*
     private func setupAgoraKit() {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
 //        agoraKit?.setLogFile(LogUtils.sdkLogPath())
@@ -94,7 +80,7 @@ class ShowCreateLiveVC: UIViewController {
         agoraKit?.enableAudio()
         agoraKit?.enableVideo()
         agoraKit?.startPreview()
-    }
+    }*/
     
     @objc private func didClickCancelButton(){
         dismiss(animated: true)
@@ -104,7 +90,8 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickCameraBtnAction() {
-        agoraKit?.switchCamera()
+//        agoraKit?.switchCamera()
+        agoraKitManager.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
@@ -127,8 +114,9 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
             wSelf.selectedResolution = index
-            wSelf.videoEncoderConfig.dimensions = CGSize(width: resolution.width, height: resolution.height)
-            wSelf.agoraKit?.setVideoEncoderConfiguration(wSelf.videoEncoderConfig)
+            wSelf.agoraKitManager.setVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.videoEncoderConfig.dimensions = CGSize(width: resolution.width, height: resolution.height)
+//            wSelf.agoraKit?.setVideoEncoderConfiguration(wSelf.videoEncoderConfig)
         }
     }
     
@@ -147,8 +135,10 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
             let liveVC = ShowLiveViewController()
             liveVC.room = detailModel
-            liveVC.agoraKit = self?.agoraKit
-            self?.navigationController?.pushViewController(liveVC, animated: false)
+//            liveVC.agoraKit = self?.agoraKitManager.agoraKit
+            guard let wSelf = self else { return }
+            liveVC.agoraKitManager = wSelf.agoraKitManager
+            wSelf.navigationController?.pushViewController(liveVC, animated: false)
         }
     }
 

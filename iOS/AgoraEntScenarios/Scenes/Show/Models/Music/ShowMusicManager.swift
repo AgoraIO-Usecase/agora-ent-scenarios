@@ -31,6 +31,17 @@ class ShowMusicManager: NSObject {
     }()
     
     // 混响选项
+    private lazy var mixPresets: [AgoraAudioEffectPreset] = {
+        return [
+            .off,
+            .roomAcousticsKTV,
+            .roomAcousVocalConcer,
+            .roomAcousStudio,
+            .roomAcousSpatial
+        ]
+    }()
+    
+    // 混响选项
 //    private lazy var mixPresets:
     
     // 背景音乐
@@ -120,14 +131,14 @@ extension ShowMusicManager {
         }
     }
     
-    // 选择音乐美声模式
+    // 选择音乐美声
     func setBeautyIndex(_ index: Int?) {
         agoraKit.setVoiceBeautifierPreset(beautyPresets[index ?? 0])
     }
     
-    // 选择混响模式
+    // 选择混响
     func setMixIndex(_ index: Int?){
-        
+        agoraKit.setAudioEffectPreset(mixPresets[index ?? 0])
     }
 
 }
@@ -140,7 +151,7 @@ extension ShowMusicManager {
             return
         }
        let musicPath = bundle.path(forResource: musicNames[index], ofType: "wav") ?? ""
-        agoraKit.startAudioMixing(musicPath, loopback: true, cycle: -1)
+        agoraKit.startAudioMixing(musicPath, loopback: false, cycle: -1)
     }
 }
 

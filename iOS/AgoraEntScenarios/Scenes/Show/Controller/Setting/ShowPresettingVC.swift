@@ -14,6 +14,14 @@ private let ShowPresettingCellID = "ShowPresettingCellID"
 class ShowPresettingVC: UIViewController {
     
     var didSelectedIndex: ((_ index: Int)->())?
+    
+    private var selectedModel: ShowPresettingModel? {
+        didSet {
+            oldValue?.isSelected = false
+            selectedModel?.isSelected = true
+        }
+    }
+    
     private var dataArray: [ShowPresettingModel] = {
         let model1 = ShowPresettingModel(title: "预设1", desc: "倒垃圾来得及啊了解到拉进来的房间法律监督福利卡冷冻机房垃圾袋发来得及垃圾房间来得及发动机法拉三等奖爱讲道理")
         let model2 = ShowPresettingModel(title: "预设2", desc: "倒垃圾来得及啊理解多拉点了法兰蝶阀拉杜拉拉的发放的拉链都发了法拉第发令肌肤垃圾袋拉进来的房间爱劳动快乐")
@@ -45,7 +53,7 @@ class ShowPresettingVC: UIViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        modalPresentationStyle = .overCurrentContext
+        modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
     }
     
@@ -128,8 +136,7 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let model = dataArray[indexPath.row]
-        model.isSelected = true
+        selectedModel = dataArray[indexPath.row]
         tableView.reloadData()
         didSelectedIndex?(indexPath.row)
 //        dismiss(animated: true)
