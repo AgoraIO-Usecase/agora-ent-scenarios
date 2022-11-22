@@ -3,7 +3,7 @@
 
     <style name="show_roundStyle">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">2%</item>
+        <item name="cornerSize">6%</item>
     </style>
 
 </resources>
