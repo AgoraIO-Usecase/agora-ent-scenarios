@@ -44,7 +44,7 @@
 		057DD9E5290B9495001329E6 /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B6290B9495001329E6 /* VoiceRoomRequest.swift */; };
 		057DD9E6290B9495001329E6 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B7290B9495001329E6 /* VoiceRoomBusinessRequest.swift */; };
 		057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C3290B9495001329E6 /* VoiceRoomIMManager.swift */; };
-		057DD9F0290B9495001329E6 /* VoiceRoomRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C5290B9495001329E6 /* VoiceRoomRTCManager.swift */; };
+		057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C5290B9495001329E6 /* ASRTCKit.swift */; };
 		057DD9F1290B9495001329E6 /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C8290B9495001329E6 /* UIColor+extension.swift */; };
 		057DD9F2290B9495001329E6 /* UIButtonLayoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C9290B9495001329E6 /* UIButtonLayoutExtension.swift */; };
 		057DD9F3290B9495001329E6 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CA290B9495001329E6 /* UIButton+Extension.swift */; };
@@ -462,7 +462,7 @@
 		057DD9B6290B9495001329E6 /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
 		057DD9B7290B9495001329E6 /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		057DD9C3290B9495001329E6 /* VoiceRoomIMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomIMManager.swift; sourceTree = "<group>"; };
-		057DD9C5290B9495001329E6 /* VoiceRoomRTCManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRTCManager.swift; sourceTree = "<group>"; };
+		057DD9C5290B9495001329E6 /* ASRTCKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASRTCKit.swift; sourceTree = "<group>"; };
 		057DD9C8290B9495001329E6 /* UIColor+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+extension.swift"; sourceTree = "<group>"; };
 		057DD9C9290B9495001329E6 /* UIButtonLayoutExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonLayoutExtension.swift; sourceTree = "<group>"; };
 		057DD9CA290B9495001329E6 /* UIButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
@@ -1085,7 +1085,7 @@
 			isa = PBXGroup;
 			children = (
 				057DDA0B290B9778001329E6 /* AgoraSceneConfig.swift */,
-				057DD9C5290B9495001329E6 /* VoiceRoomRTCManager.swift */,
+				057DD9C5290B9495001329E6 /* ASRTCKit.swift */,
 			);
 			path = AgoraRtcKit;
 			sourceTree = "<group>";
@@ -2736,7 +2736,7 @@
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
 				DD8417A729090C520026B624 /* VLKTVSwitcherView.m in Sources */,
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
-				057DD9F0290B9495001329E6 /* VoiceRoomRTCManager.swift in Sources */,
+				057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
 				05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */,
 				DD8417BC29090C520026B624 /* VLNoBodyOnLineView.m in Sources */,

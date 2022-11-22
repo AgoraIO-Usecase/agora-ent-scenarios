@@ -77,6 +77,7 @@ extension VoiceRoomInviteUsersController {
 
     @objc private func fetchUsers() {
         ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
+            self.tableView.refreshControl?.endRefreshing()
             if users != nil , error == nil {
                 if self.apply == nil {
                     let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()

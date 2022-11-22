@@ -37,12 +37,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
-        serviceImp?.applicants.append(applicant)
+        ChatRoomServiceImp.getSharedInstance().applicants.append(applicant)
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
     }
     
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
-        serviceImp?.applicants = serviceImp?.applicants.filter({
+        ChatRoomServiceImp.getSharedInstance().applicants = ChatRoomServiceImp.getSharedInstance().applicants.filter({
             $0.member?.chat_uid != chat_uid
         }) ?? []
     }
@@ -57,7 +57,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         info?.room?.member_count! += 1
         roomInfo = info
         self.roomInfo?.room?.member_list?.append(user)
-        serviceImp?.userList = self.roomInfo?.room?.member_list ?? []
+        ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
@@ -71,7 +71,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
-        serviceImp?.unsubscribeEvent()
+        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         var message = ""
         switch reason {
         case .removed: message = "you are removed by owner!"
@@ -101,7 +101,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
             $0.chat_uid != userName
         })
-        serviceImp?.userList = self.roomInfo?.room?.member_list ?? []
+        ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
     }
     
     func receiveTextMessage(roomId: String, message: VoiceRoomChatEntity) {
@@ -130,7 +130,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
 
             let status = mic.status
             let mic_index = mic.mic_index
-            serviceImp?.mics[mic.mic_index] = mic
+            ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             if !isOwner {
                 refreshHandsUp(status: status)
                 if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
