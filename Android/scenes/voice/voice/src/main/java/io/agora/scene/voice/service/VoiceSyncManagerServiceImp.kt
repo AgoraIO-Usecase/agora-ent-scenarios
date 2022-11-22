@@ -2,7 +2,7 @@ package io.agora.scene.voice.service
 
 import android.content.Context
 import android.text.TextUtils
-import io.agora.scene.voice.bean.GiftBean
+import io.agora.CallBack
 import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
@@ -10,6 +10,7 @@ import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
 import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
 import io.agora.voice.network.tools.VRDefaultValueCallBack
@@ -306,6 +307,19 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun lockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().lockMic(micIndex,object : CallBack{
+            override fun onSuccess() {
+                ThreadManager.getInstance().runOnIOThread {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                }
+            }
+
+            override fun onError(code: Int, error: String?) {
+                ThreadManager.getInstance().runOnIOThread {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                }
+            }
+        })
     }
 
     /**
