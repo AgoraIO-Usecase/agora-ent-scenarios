@@ -139,6 +139,7 @@ public class RethinkSyncManager: NSObject {
                            type: SocketType,
                            isAdd: Bool = false)
     {
+        //check connect status
         _reConnectIfNeed()
         
         var newParams = params
@@ -207,7 +208,7 @@ public class RethinkSyncManager: NSObject {
     }
     
     private func _reConnectIfNeed() {
-        guard socket?.readyState != .OPEN else { return }
+        guard socket?.readyState != .OPEN, socket?.readyState != .CONNECTING else { return }
         reConnect()
     }
 }
