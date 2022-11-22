@@ -7,6 +7,7 @@
 import UIKit
 
 class NetworkManager {
+    
     public enum TokenGeneratorType: Int {
         case token006 = 0
         case token007 = 1
