@@ -693,10 +693,7 @@ class RoomObservableViewDelegate constructor(
                                         override fun onError(code: Int, desc: String) {
                                             ToastTools.show(
                                                 activity,
-                                                activity.getString(
-                                                    R.string.voice_chatroom_mic_exchange_mic_failed,
-                                                    desc
-                                                ),
+                                                activity.getString(R.string.voice_chatroom_mic_exchange_mic_failed),
                                             )
                                         }
                                     })
@@ -853,10 +850,6 @@ class RoomObservableViewDelegate constructor(
 
         // 用户点击上台
         fun onUserClickOnStage(micIndex: Int)
-    }
-
-    fun initSdkJoin(roomKitBean: RoomKitBean, password: String?) {
-        roomLivingViewModel.initSdkJoin(roomKitBean, password)
     }
 
     fun destroy() {
