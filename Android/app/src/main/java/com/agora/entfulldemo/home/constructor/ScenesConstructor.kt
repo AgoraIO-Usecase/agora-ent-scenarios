@@ -8,47 +8,47 @@ import com.agora.entfulldemo.R
  */
 object ScenesConstructor {
 
-    enum class SceneType {
-        Ktv_Online,
-        Voice_Chat,
-        Meta_Live,
-        Meta_Chat,
-        Games,
-    }
 
     @JvmStatic
     fun buildData(context: Context): MutableList<ScenesModel> {
         return mutableListOf(
             ScenesModel(
-                SceneType.Ktv_Online,
+                "io.agora.scene.ktv.create.RoomListActivity",
                 context.getString(R.string.ktv_online),
                 R.mipmap.bg_btn_home1,
                 R.mipmap.bg_btn_home_ktv,
                 true
             ),
             ScenesModel(
-                SceneType.Voice_Chat,
+                "io.agora.scene.voice.ui.activity.VoiceRoomListActivity",
                 context.getString(R.string.voice_chat),
                 R.mipmap.bg_btn_home1,
                 R.mipmap.bg_btn_home_ktv,
                 true
             ),
             ScenesModel(
-                SceneType.Meta_Live,
+                "io.agora.scene.show.RoomListActivity",
+                context.getString(R.string.show_live),
+                R.mipmap.bg_btn_home1,
+                R.mipmap.bg_btn_home_ktv,
+                true
+            ),
+            ScenesModel(
+                "",
                 context.getString(R.string.meta_live),
                 R.mipmap.bg_btn_home2,
                 R.mipmap.bg_btn_home_live,
                 false
             ),
             ScenesModel(
-                SceneType.Meta_Chat,
+                "",
                 context.getString(R.string.meta_chatting),
                 R.mipmap.bg_btn_home3,
                 R.mipmap.bg_btn_home_chat,
                 false
             ),
             ScenesModel(
-                SceneType.Games,
+                "",
                 context.getString(R.string.interactive_games),
                 R.mipmap.bg_btn_home4,
                 R.mipmap.bg_btn_home_youxi,

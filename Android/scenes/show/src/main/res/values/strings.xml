@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="show_create_room">创建房间</string>
+    <string name="show_create_tips1">欢迎来到声网秀场直播！</string>
+    <string name="show_living">直播中</string>
+    <string name="show_room_id">ID: %s</string>
+    <string name="show_user_count">%d 人</string>
+    <string name="show_app_name">秀场直播</string>
+</resources>
