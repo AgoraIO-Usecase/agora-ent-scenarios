@@ -31,7 +31,7 @@ import io.agora.voice.buddy.tool.FastClickTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
-import io.agora.voice.imkit.manager.ChatroomHelper
+import io.agora.voice.imkit.manager.ChatroomIMManager
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
     private var soundSelectAdapter: VoiceRoomSoundSelectionAdapter? = null
@@ -116,8 +116,8 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice create room chat_username:$chatUsername".logD()
                     "Voice create room im_token:$chatToken".logD()
-                    if (!ChatroomHelper.getInstance().isLoggedIn) {
-                        ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
+                    if (!ChatroomIMManager.getInstance().isLoggedIn) {
+                        ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
                             override fun onSuccess() {
                                 ThreadManager.getInstance().runOnMainThread {
                                     goVoiceRoom()

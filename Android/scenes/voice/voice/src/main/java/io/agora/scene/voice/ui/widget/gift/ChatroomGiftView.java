@@ -34,7 +34,7 @@ import io.agora.voice.imkit.bean.ChatMessageData;
 import io.agora.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
-import io.agora.voice.imkit.manager.ChatroomHelper;
+import io.agora.voice.imkit.manager.ChatroomIMManager;
 
 
 public class ChatroomGiftView extends LinearLayout {
@@ -179,8 +179,8 @@ public class ChatroomGiftView extends LinearLayout {
         public void show(ShapeableImageView avatar, ImageView icon, TextView name, ChatMessageData message) {
             int resId = 0;
             String gift_id = CustomMsgHelper.getInstance().getMsgGiftId(message);
-            String userName = ChatroomHelper.getInstance().getUserName(message);
-            String userPortrait = ChatroomHelper.getInstance().getUserPortrait(message);
+            String userName = ChatroomIMManager.getInstance().getUserName(message);
+            String userPortrait = ChatroomIMManager.getInstance().getUserPortrait(message);
             GiftBean giftBean = GiftRepository.getGiftById(context, gift_id);
             try {
                 resId = context.getResources().getIdentifier(userPortrait, "drawable", context.getPackageName());
