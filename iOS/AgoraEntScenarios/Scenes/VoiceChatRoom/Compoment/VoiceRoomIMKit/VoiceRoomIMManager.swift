@@ -22,17 +22,17 @@ public let VoiceRoomJoinedMember = "chatroom_join"
 @objc public protocol VoiceRoomIMDelegate: NSObjectProtocol {
     /// Description you'll call login api,when you receive this message
     /// - Parameter code: AgoraChatErrorCode
-    func chatTokenDidExpire(code: AgoraChatErrorCode)
-    /// Description you'll call login api,when you receive this message
-    /// - Parameter code: AgoraChatErrorCode
     func chatTokenWillExpire(code: AgoraChatErrorCode)
-
-    func receiveTextMessage(roomId: String, message: AgoraChatMessage)
+    /// Description receive text message
+    /// - Parameters:
+    ///   - roomId: AgoraChat's uid
+    ///   - message: VoiceRoomChatEntity
+    func receiveTextMessage(roomId: String, message: VoiceRoomChatEntity)
 
     func receiveGift(roomId: String, meta: [String: String]?)
 
     func receiveApplySite(roomId: String, meta: [String: String]?)
-    
+
     func receiveCancelApplySite(roomId: String, chat_uid: String)
 
     func receiveInviteSite(roomId: String, meta: [String: String]?)
@@ -49,8 +49,6 @@ public let VoiceRoomJoinedMember = "chatroom_join"
 
     func roomAttributesDidUpdated(roomId: String, attributeMap: [String: String]?, from fromId: String)
 
-    func roomAttributesDidRemoved(roomId: String, attributes: [String]?, from fromId: String)
-
     func memberLeave(roomId: String, userName: String)
 }
 
@@ -59,12 +57,6 @@ fileprivate let once = VoiceRoomIMManager()
 @objc public class VoiceRoomIMManager: NSObject, AgoraChatManagerDelegate, AgoraChatroomManagerDelegate, AgoraChatClientDelegate {
     
     public var currentRoomId = ""
-    
-    public var mics: [VRRoomMic] = [VRRoomMic]()
-    
-    public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
-    
-    public var members: [VRUser] = [VRUser]()
     
     @objc public static var shared: VoiceRoomIMManager? = once
 
@@ -108,16 +100,21 @@ fileprivate let once = VoiceRoomIMManager()
 public extension VoiceRoomIMManager {
     // MARK: - AgoraChatClientDelegate
 
-    func tokenDidExpire(_ aErrorCode: AgoraChatErrorCode) {
-        if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.chatTokenDidExpire(code:))) {
-            self.delegate?.chatTokenDidExpire(code: aErrorCode)
-        }
-    }
-
     func tokenWillExpire(_ aErrorCode: AgoraChatErrorCode) {
         if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.chatTokenWillExpire(code:))) {
             self.delegate?.chatTokenWillExpire(code: aErrorCode)
         }
+    }
+    
+    func getItem(dic: [String: String], join: Bool) -> VoiceRoomChatEntity {
+        let item = VoiceRoomChatEntity()
+        item.userName = dic["userName"]
+        item.content = dic["content"]
+        item.joined = join
+        item.attributeContent = item.attributeContent
+        item.width = item.width
+        item.height = item.height
+        return item
     }
 
     // MARK: - AgoraChatManagerDelegate
@@ -126,7 +123,11 @@ public extension VoiceRoomIMManager {
         for message in aMessages {
             if message.body is AgoraChatTextMessageBody {
                 if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveTextMessage(roomId:message:))) {
-                    self.delegate?.receiveTextMessage(roomId: self.currentRoomId, message: message)
+                    if let body = message.body as? AgoraChatTextMessageBody, let userName = message.ext?["userName"] as? String {
+                        let dic = ["userName": userName, "content": body.text]
+                        let entity = self.getItem(dic: dic, join: false)
+                        self.delegate?.receiveTextMessage(roomId: self.currentRoomId, message: entity)
+                    }
                 }
                 continue
             }
@@ -204,12 +205,6 @@ public extension VoiceRoomIMManager {
         }
     }
 
-    func chatroomAttributesDidRemoved(_ roomId: String, attributes: [String]?, from fromId: String) {
-        if delegate != nil, delegate!.responds(to: #selector(VoiceRoomIMDelegate.roomAttributesDidRemoved(roomId:attributes:from:))), roomId == currentRoomId {
-            self.delegate?.roomAttributesDidRemoved(roomId: roomId, attributes: attributes, from: fromId)
-        }
-    }
-
     func userDidLeave(_ aChatroom: AgoraChatroom, user aUsername: String) {
         if self.delegate != nil, self.delegate!.responds(to: #selector(VoiceRoomIMDelegate.memberLeave(roomId:userName:))), aChatroom.chatroomId == currentRoomId {
             self.delegate?.memberLeave(roomId: self.currentRoomId, userName: aUsername)
@@ -277,5 +272,11 @@ public extension VoiceRoomIMManager {
     
     func fetchChatroomAttributes(keys:[String],completion: ((AgoraChatError?,[String:String]?) -> ())?) {
         AgoraChatClient.shared().roomManager?.fetchChatroomAttributes(self.currentRoomId, keys: keys,completion: completion)
+    }
+    
+    func updateAnnouncement(content: String,completion: @escaping (Bool) -> Void) {
+        AgoraChatClient.shared().roomManager?.updateChatroomAnnouncement(withId: self.currentRoomId, announcement: content,completion: { room, error in
+            completion(error == nil)
+        })
     }
 }
