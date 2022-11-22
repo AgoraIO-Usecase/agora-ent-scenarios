@@ -37,7 +37,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
-        ChatRoomServiceImp.getSharedInstance().applicants.append(applicant)
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
     }
     
