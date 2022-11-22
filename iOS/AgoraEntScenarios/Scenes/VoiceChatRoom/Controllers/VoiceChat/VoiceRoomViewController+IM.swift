@@ -55,9 +55,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         let info = roomInfo
         info?.room?.member_count! += 1
         roomInfo = info
-        self.roomInfo?.room?.member_list?.append(user)
-        ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
-        self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        if VoiceRoomUserInfo.shared.user?.chat_uid ?? "" == user.chat_uid ?? "" {
+            self.roomInfo?.room?.member_list?.append(user)
+            ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+            self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        }
     }
     
     func onAnnouncementChanged(roomId: String, content: String) {
