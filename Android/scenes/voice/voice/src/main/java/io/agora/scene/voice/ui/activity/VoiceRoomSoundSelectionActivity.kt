@@ -21,7 +21,7 @@ import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
+import io.agora.scene.voice.model.VoiceCreateViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.adapter.OnItemClickListener
@@ -35,7 +35,7 @@ import io.agora.voice.imkit.manager.ChatroomHelper
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
     private var soundSelectAdapter: VoiceRoomSoundSelectionAdapter? = null
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var isPublic = true
     private var roomName: String = ""
     private var encryption: String = ""
@@ -50,7 +50,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         initIntent()
         initAdapter()
         initListener()

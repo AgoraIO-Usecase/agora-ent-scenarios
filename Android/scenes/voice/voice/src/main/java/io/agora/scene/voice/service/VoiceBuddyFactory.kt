@@ -1,5 +1,6 @@
 package io.agora.scene.voice.service
 
+import io.agora.scene.voice.rtckit.RtcChannelTemp
 import io.agora.voice.buddy.IVoiceBuddy
 
 /**
@@ -8,6 +9,7 @@ import io.agora.voice.buddy.IVoiceBuddy
 class VoiceBuddyFactory {
 
     private var voiceUser: IVoiceBuddy? = null
+    val rtcChannelTemp = RtcChannelTemp()
 
     companion object {
 

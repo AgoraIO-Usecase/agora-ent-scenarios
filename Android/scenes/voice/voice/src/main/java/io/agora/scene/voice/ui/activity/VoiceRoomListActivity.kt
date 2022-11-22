@@ -23,7 +23,7 @@ import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.utils.StatusBarCompat
 import io.agora.voice.buddy.config.RouterPath
-import io.agora.voice.buddy.tool.DeviceTools.dp2px
+import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.FastClickTools
 import io.agora.voice.buddy.tool.ResourcesTools
 
@@ -115,7 +115,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
                 fragment.itemCountListener = { count ->
                     title?.let { textView ->
                         val layoutParams = textView.layoutParams
-                        layoutParams.height = dp2px(baseContext, 26f)
+                        layoutParams.height = DeviceTools.dp2px(baseContext, 26f)
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)

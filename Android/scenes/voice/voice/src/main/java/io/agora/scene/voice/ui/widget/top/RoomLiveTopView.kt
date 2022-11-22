@@ -79,31 +79,25 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             }
 
             // 房主头像
-            binding.ivChatroomOwner.setImageResource(
-                ResourcesTools.getDrawableId(
-                    binding.ivChatroomOwner.context,
-                    chatroomInfo.owner?.userAvatar ?: ConfigConstants.DefaultAvatar
-                )
-            )
+            ImageTools.loadImage(binding.ivChatroomOwner,chatroomInfo.owner?.userAvatar)
             val topGifts = chatroomInfo.topRankUsers
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
             } else {
                 llChatroomMemberRank.isVisible = true
                 topGifts.forEachIndexed { index, audienceBean ->
-                    val resId = ResourcesTools.getDrawableId(llChatroomMemberRank.context, audienceBean.userAvatar)
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            binding.ivChatroomMember1.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember1,audienceBean.userAvatar)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            binding.ivChatroomMember2.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember2,audienceBean.userAvatar)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            binding.ivChatroomMember3.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember3,audienceBean.userAvatar)
                         }
                         else -> {
                             return
@@ -121,19 +115,18 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             } else {
                 llChatroomMemberRank.isVisible = true
                 topGifts.forEachIndexed { index, audienceBean ->
-                    val resId = ResourcesTools.getDrawableId(llChatroomMemberRank.context, audienceBean.userAvatar)
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            binding.ivChatroomMember1.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember1,audienceBean.userAvatar)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            binding.ivChatroomMember2.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember2,audienceBean.userAvatar)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            binding.ivChatroomMember3.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember3,audienceBean.userAvatar)
                         }
                         else -> {
                             return

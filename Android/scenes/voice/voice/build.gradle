@@ -68,7 +68,6 @@ dependencies {
     implementation project(":scenes:voice:buddy")
     implementation project(':scenes:voice:imkit')
     implementation project(':scenes:voice:network')
-    implementation project(':scenes:voice:rtckit')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
