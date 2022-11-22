@@ -446,7 +446,11 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.leaveMicMic(micIndex,callBack);
     }
 
-    public void getMicInfo(){
-        delegate.getMicInfo();
+    public void closeMic(int micIndex, CallBack callBack){
+        delegate.closeMic(micIndex,callBack);
+    }
+
+    public void lockMic(int micIndex, CallBack callBack){
+        delegate.lockMic(micIndex,callBack);
     }
 }
