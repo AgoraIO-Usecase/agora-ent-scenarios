@@ -191,16 +191,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
-                $0.key.hasSuffix("mic_")
+                $0.key.hasPrefix("mic_")
             })
             var micsJson = [Dictionary<String,Any>]()
             if mics?.keys.count ?? 0 > 0 {
                 for key in mics!.keys {
                     micsJson.append(mics?[key]?.z.jsonToDictionary() ?? [:])
                 }
-                roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self).sorted(by: {
-                    $0.mic_index < $1.mic_index
-                })
+                let micArray = micsJson.kj.modelArray(VRRoomMic.self)
+                roomInfo.mic_info = micArray.sorted(by: {$0.mic_index < $1.mic_index })
             }
             if entity.owner == nil {
                 roomInfo.room?.owner = roomInfo.mic_info?.first?.member
