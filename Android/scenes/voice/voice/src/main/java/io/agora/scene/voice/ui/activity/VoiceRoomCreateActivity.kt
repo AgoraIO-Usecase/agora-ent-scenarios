@@ -145,7 +145,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                 override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
                     curVoiceRoomModel = voiceRoomModel
                     voiceRoomModel?.let {
-                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                        voiceRoomViewModel.joinRoom(it.roomId)
                     }
                 }
             })
