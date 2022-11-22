@@ -1448,14 +1448,11 @@ public class RoomLivingViewModel extends ViewModel {
                 mRtcEngine.muteRemoteAudioStream((int) (UserManager.getInstance().getUser().id * 10 + 1), true);
             } else if (music.getChorusNo().equals(UserManager.getInstance().getUser().userNo)) {
                 // 合唱者加入后，合唱者mute 点歌者mpk流
-                Log.d(TAG, "RoomLivingViewModel pig 1111 ");
                 List<RoomSeatModel> seatList = seatListLiveData.getValue();
                 RoomSeatModel mainSinger = null;
                 if (seatList != null) {
                     for (RoomSeatModel model : seatList) {
-                        Log.d(TAG, "RoomLivingViewModel pig 2222 ");
                         if (model.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
-                            Log.d(TAG, "RoomLivingViewModel pig 3333 ");
                             mainSinger = model;
                         }
                     }
