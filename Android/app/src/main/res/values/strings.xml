@@ -31,6 +31,7 @@
     <string name="logoff_account">注销账号</string>
     <string name="logoff">注销</string>
 
+    <string name="show_live">秀场直播</string>
     <string name="voice_chat">语聊房</string>
     <string name="meta_live">元直播</string>
     <string name="meta_chatting">元语聊</string>
