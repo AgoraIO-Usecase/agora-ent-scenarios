@@ -254,7 +254,6 @@ VLPopScoreViewDelegate
             // 下麦消息
             
             // 被下麦用户刷新UI
-            //TODO 需要重新review
             if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
