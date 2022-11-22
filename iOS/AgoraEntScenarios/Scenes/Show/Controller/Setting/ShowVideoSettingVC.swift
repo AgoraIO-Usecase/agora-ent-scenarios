@@ -42,6 +42,10 @@ class ShowVideoSettingVC: UIViewController {
             make.edges.equalToSuperview()
         }
     }
+    
+    func reloadData(){
+        tableView.reloadData()
+    }
 }
 
 extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
@@ -73,7 +77,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if data.type() == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title(), value: data.floatValue(), minValue: 100, maxValue: 1000) { value in
+            cell.setTitle(data.title(), value: data.floatValue(), minValue: 200, maxValue: 2000) { value in
                 
             } sliderValueChangedAction: { value in
                 data.writeValue(value)
@@ -103,12 +107,4 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         }
         return cell
     }
-}
-
-
-extension ShowVideoSettingVC: JXCategoryListContentViewDelegate {
-    func listView() -> UIView! {
-        return view
-    }
-    
 }

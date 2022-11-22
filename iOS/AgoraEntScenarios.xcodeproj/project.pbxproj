@@ -131,8 +131,6 @@
 		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
 		A81ECFF12921E01200B40454 /* ShowAdvancedSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */; };
 		A81ECFF32921E07A00B40454 /* ShowVideoSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */; };
-		A81ECFF52921E09500B40454 /* ShowAudioSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */; };
-		A81ECFF72921E3B400B40454 /* ShowCaptureSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */; };
 		A81ECFFC2921EA4300B40454 /* ShowNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFFB2921EA4300B40454 /* ShowNavigationBar.swift */; };
 		A81ED01B292244F800B40454 /* ShowSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED01A292244F800B40454 /* ShowSettingSwitchCell.swift */; };
 		A81ED01D2922451D00B40454 /* ShowSettingBaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ED01C2922451D00B40454 /* ShowSettingBaseCell.swift */; };
@@ -142,6 +140,8 @@
 		A82E14A8292634A500832D00 /* ShowSettingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E14A7292634A500832D00 /* ShowSettingManager.swift */; };
 		A82E14AB29277C8700832D00 /* ShowMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E14AA29277C8700832D00 /* ShowMusicManager.swift */; };
 		A82E14AD292788A400832D00 /* ShowMusicModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E14AC292788A400832D00 /* ShowMusicModel.swift */; };
+		A82E14B1292C6B0600832D00 /* UIViewController+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E14B0292C6B0600832D00 /* UIViewController+Show.swift */; };
+		A82E14B3292CCC3C00832D00 /* ShowAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E14B2292CCC3C00832D00 /* ShowAgoraKitManager.swift */; };
 		A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD1F2918C87C00A41D8D /* UIView+Show.swift */; };
 		A845AD222918D24600A41D8D /* ShowSelectQualityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */; };
 		A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */; };
@@ -182,7 +182,6 @@
 		A8F372482924926500CEA88D /* ShowPresettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F372472924926500CEA88D /* ShowPresettingModel.swift */; };
 		A8F3724D2924A5EE00CEA88D /* AEACategoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F372492924A5ED00CEA88D /* AEACategoryView.m */; };
 		A8F3724E2924A5EE00CEA88D /* AEAListContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F3724B2924A5ED00CEA88D /* AEAListContainerView.m */; };
-		A8F372532924A64D00CEA88D /* AEACategoryImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F3724F2924A64D00CEA88D /* AEACategoryImageCell.m */; };
 		A8F372542924A64D00CEA88D /* AEACategoryTitleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A8F372522924A64D00CEA88D /* AEACategoryTitleCell.m */; };
 		A8F372572924B58300CEA88D /* ShowReceivePKAlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F372562924B58300CEA88D /* ShowReceivePKAlertVC.swift */; };
 		A8F3725A2924BCB900CEA88D /* ShowReceivePKView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F372592924BCB900CEA88D /* ShowReceivePKView.swift */; };
@@ -616,8 +615,6 @@
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAdvancedSettingVC.swift; sourceTree = "<group>"; };
 		A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowVideoSettingVC.swift; sourceTree = "<group>"; };
-		A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAudioSettingVC.swift; sourceTree = "<group>"; };
-		A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCaptureSettingVC.swift; sourceTree = "<group>"; };
 		A81ECFFB2921EA4300B40454 /* ShowNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNavigationBar.swift; sourceTree = "<group>"; };
 		A81ED01A292244F800B40454 /* ShowSettingSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingSwitchCell.swift; sourceTree = "<group>"; };
 		A81ED01C2922451D00B40454 /* ShowSettingBaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingBaseCell.swift; sourceTree = "<group>"; };
@@ -627,6 +624,8 @@
 		A82E14A7292634A500832D00 /* ShowSettingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingManager.swift; sourceTree = "<group>"; };
 		A82E14AA29277C8700832D00 /* ShowMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicManager.swift; sourceTree = "<group>"; };
 		A82E14AC292788A400832D00 /* ShowMusicModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicModel.swift; sourceTree = "<group>"; };
+		A82E14B0292C6B0600832D00 /* UIViewController+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Show.swift"; sourceTree = "<group>"; };
+		A82E14B2292CCC3C00832D00 /* ShowAgoraKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowAgoraKitManager.swift; sourceTree = "<group>"; };
 		A845AD1F2918C87C00A41D8D /* UIView+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Show.swift"; sourceTree = "<group>"; };
 		A845AD212918D24600A41D8D /* ShowSelectQualityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityVC.swift; sourceTree = "<group>"; };
 		A845AD232918D36C00A41D8D /* ShowSelectQualityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSelectQualityCell.swift; sourceTree = "<group>"; };
@@ -669,8 +668,6 @@
 		A8F3724A2924A5ED00CEA88D /* AEAListContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEAListContainerView.h; sourceTree = "<group>"; };
 		A8F3724B2924A5ED00CEA88D /* AEAListContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEAListContainerView.m; sourceTree = "<group>"; };
 		A8F3724C2924A5ED00CEA88D /* AEACategoryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEACategoryView.h; sourceTree = "<group>"; };
-		A8F3724F2924A64D00CEA88D /* AEACategoryImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEACategoryImageCell.m; sourceTree = "<group>"; };
-		A8F372502924A64D00CEA88D /* AEACategoryImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEACategoryImageCell.h; sourceTree = "<group>"; };
 		A8F372512924A64D00CEA88D /* AEACategoryTitleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEACategoryTitleCell.h; sourceTree = "<group>"; };
 		A8F372522924A64D00CEA88D /* AEACategoryTitleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEACategoryTitleCell.m; sourceTree = "<group>"; };
 		A8F372562924B58300CEA88D /* ShowReceivePKAlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceivePKAlertVC.swift; sourceTree = "<group>"; };
@@ -1401,8 +1398,6 @@
 		A81ECFFA2921EA2100B40454 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				A8F372502924A64D00CEA88D /* AEACategoryImageCell.h */,
-				A8F3724F2924A64D00CEA88D /* AEACategoryImageCell.m */,
 				A8F372512924A64D00CEA88D /* AEACategoryTitleCell.h */,
 				A8F372522924A64D00CEA88D /* AEACategoryTitleCell.m */,
 				A8F3724C2924A5ED00CEA88D /* AEACategoryView.h */,
@@ -1468,6 +1463,7 @@
 				A82E14A929277C4D00832D00 /* Music */,
 				A81ED019292244AE00B40454 /* Setting */,
 				A845AD39291B82AE00A41D8D /* ShowChatModel.swift */,
+				A82E14B2292CCC3C00832D00 /* ShowAgoraKitManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1479,8 +1475,6 @@
 				A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */,
 				A8F3723B2923995B00CEA88D /* ShowSettingActionSheetVC.swift */,
 				A8F372432924818500CEA88D /* ShowPresettingVC.swift */,
-				A81ECFF42921E09500B40454 /* ShowAudioSettingVC.swift */,
-				A81ECFF62921E3B400B40454 /* ShowCaptureSettingVC.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1585,6 +1579,7 @@
 				A88D14292914B0A300F5DF6A /* NSString+Show.swift */,
 				A845AD1F2918C87C00A41D8D /* UIView+Show.swift */,
 				DD0260232925E96200D88B68 /* Date+Show.swift */,
+				A82E14B0292C6B0600832D00 /* UIViewController+Show.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3145,6 +3140,7 @@
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84179929090C520026B624 /* VLBelcantoModel.m in Sources */,
 				A845AD242918D36C00A41D8D /* ShowSelectQualityCell.swift in Sources */,
+				A82E14B1292C6B0600832D00 /* UIViewController+Show.swift in Sources */,
 				05FFE734290F74560024D22F /* AgoraChatRoom3DRtcView.swift in Sources */,
 				A81ECFF32921E07A00B40454 /* ShowVideoSettingVC.swift in Sources */,
 				DD84179C29090C520026B624 /* VLRoomPersonIteimCCell.m in Sources */,
@@ -3277,10 +3273,8 @@
 				DDA19A1428FFE579009D3E61 /* SyncManager+Info.swift in Sources */,
 				DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */,
 				DDA19A3228FFE57A009D3E61 /* EKWrapperView.swift in Sources */,
-				A81ECFF52921E09500B40454 /* ShowAudioSettingVC.swift in Sources */,
 				05FFE702290F706C0024D22F /* VoiceRoomChatCell.swift in Sources */,
 				057DDA02290B9495001329E6 /* VoiceRoomPasswordAlert.swift in Sources */,
-				A8F372532924A64D00CEA88D /* AEACategoryImageCell.m in Sources */,
 				057DD9FA290B9495001329E6 /* VRVerifyCodeView.swift in Sources */,
 				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
@@ -3398,9 +3392,9 @@
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
 				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,
 				DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */,
+				A82E14B3292CCC3C00832D00 /* ShowAgoraKitManager.swift in Sources */,
 				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
 				DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */,
-				A81ECFF72921E3B400B40454 /* ShowCaptureSettingVC.swift in Sources */,
 				057DD9FC290B9495001329E6 /* VoiceRoomEmojiManager.swift in Sources */,
 				DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */,
 				DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */,

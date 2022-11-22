@@ -6,6 +6,31 @@
 //
 
 import Foundation
+import AgoraRtcKit
+
+enum ShowAgoraVideoDimensions: String {
+    
+    case _320x240 = "320x240"
+    case _480x360 = "480x360"
+    case _360x640 = "360x640"
+    case _960x540 = "960x540"
+    case _960x720 = "960x720"
+    case _1280x720 = "1280x720"
+     
+    func sizeValue() -> CGSize{
+        let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
+        guard let first = arr.first, let width = Float(first), let last = arr.last, let height = Float(last) else {
+            return CGSize(width: 320, height: 240)
+        }
+        return CGSize(width: CGFloat(width), height: CGFloat(height))
+    }
+}
+
+extension AgoraVideoFrameRate {
+    func stringValue() -> String {
+        return "\(rawValue) fps"
+    }
+}
 
 enum ShowSettingKey: String {
     
@@ -68,7 +93,7 @@ enum ShowSettingKey: String {
         case .PVC:
             return .aSwitch
         case .SR:
-            return .slider
+            return .aSwitch
         case .BFrame:
             return .aSwitch
         case .videoCaptureSize:
@@ -85,9 +110,22 @@ enum ShowSettingKey: String {
     func items() -> [String] {
         switch self {
         case .videoCaptureSize:
-            return ["320x240","480x360","360x640","960x540","960x720","1280x720"]
+            return [ShowAgoraVideoDimensions._320x240.rawValue,
+                    ShowAgoraVideoDimensions._480x360.rawValue,
+                    ShowAgoraVideoDimensions._360x640.rawValue,
+                    ShowAgoraVideoDimensions._960x540.rawValue,
+                    ShowAgoraVideoDimensions._960x720.rawValue,
+                    ShowAgoraVideoDimensions._1280x720.rawValue
+            ]
         case .FPS:
-            return ["1 fps","7 fps","10 fps","15 fps","24 fps","30 fps","60 fps"]
+            return [AgoraVideoFrameRate.fps1.stringValue(),
+                    AgoraVideoFrameRate.fps7.stringValue(),
+                    AgoraVideoFrameRate.fps10.stringValue(),
+                    AgoraVideoFrameRate.fps15.stringValue(),
+                    AgoraVideoFrameRate.fps24.stringValue(),
+                    AgoraVideoFrameRate.fps30.stringValue(),
+                    AgoraVideoFrameRate.fps60.stringValue()
+            ]
         default:
             return []
         }
