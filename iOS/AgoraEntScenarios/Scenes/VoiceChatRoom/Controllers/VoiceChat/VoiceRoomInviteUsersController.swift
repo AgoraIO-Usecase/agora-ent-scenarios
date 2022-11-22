@@ -61,11 +61,11 @@ public class VoiceRoomInviteUsersController: UITableViewController {
         return cell ?? VoiceRoomInviteCell()
     }
 
-    override public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if apply?.cursor != nil, (apply?.members?.count ?? 0) - 2 == indexPath.row, (apply?.total ?? 0) >= (apply?.members?.count ?? 0) {
-            fetchUsers()
-        }
-    }
+//    override public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if apply?.cursor != nil, (apply?.members?.count ?? 0) - 2 == indexPath.row, (apply?.total ?? 0) >= (apply?.members?.count ?? 0) {
+//            fetchUsers()
+//        }
+//    }
 }
 
 extension VoiceRoomInviteUsersController {
@@ -86,6 +86,7 @@ extension VoiceRoomInviteUsersController {
                 } else {
                     self.apply?.members?.append(contentsOf: users ?? [])
                 }
+                self.empty.isHidden = (self.apply?.members?.count ?? 0) > 0
                 self.tableView.reloadData()
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
