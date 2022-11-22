@@ -3,7 +3,7 @@ package io.agora.voice.imkit.bean;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.agora.voice.imkit.custormgift.CustomMsgType;
+import io.agora.voice.imkit.custorm.CustomMsgType;
 
 public class ChatMessageData {
     private String from;
