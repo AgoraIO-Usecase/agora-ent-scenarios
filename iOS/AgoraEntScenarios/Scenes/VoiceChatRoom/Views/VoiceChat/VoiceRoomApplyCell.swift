@@ -45,7 +45,7 @@ public class VoiceRoomApplyCell: UITableViewCell {
         userName.text = item?.member?.name
         avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
         operation.setTitle(item?.member?.invited == true ? LanguageManager.localValue(key: "Accepted") : LanguageManager.localValue(key: "Accept"), for: .normal)
-        operation.setBackgroundImage(UIImage(item?.member?.invited == true ? "" : "blue_btn_bg"), for: .normal)
+        operation.backgroundColor = UIColor.systemBlue
         var color = UIColor.white
         if item?.member?.invited == true {
             color = UIColor(0x979CBB)
