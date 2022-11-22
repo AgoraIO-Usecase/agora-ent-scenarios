@@ -146,7 +146,7 @@ extension VoiceRoomViewController {
                     //加入房间成功后，需要先更新
                     if self.isOwner == true {
                         //房主更新环信KV
-                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ChatRoomServiceImp.getSharedInstance().createMics() ?? [:], completion: { error in
+                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ChatRoomServiceImp.getSharedInstance().createMics() , completion: { error in
                             if error == nil {
                                 self.roomInfo?.room?.member_list = [VRUser]()
                                 self.roomInfo?.room?.ranking_list = [VRUser]()
@@ -162,6 +162,7 @@ extension VoiceRoomViewController {
                         //观众更新拉取详情后更新kv
                        self.requestRoomDetail()
                        guard let user = VoiceRoomUserInfo.shared.user else {return}
+                       user.mic_index = -1
                        VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
                            if error == nil {
                                
@@ -187,15 +188,7 @@ extension VoiceRoomViewController {
                 if !joinSuccess {
                     self?.didHeaderAction(with: .back, destroyed: true)
                 } else {
-                    if self?.roomInfo?.room?.member_list == nil {
-                        self?.roomInfo?.room?.member_list = [VRUser]()
-                    }
-                    self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
-                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
-                        if error != nil {
-                            self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
-                        }
-                    })
+                    
                 }
             }
         }
@@ -222,6 +215,15 @@ extension VoiceRoomViewController {
                 guard let info = room_info else { return }
                 self?.roomInfo = info
                 guard let mics = self?.roomInfo?.mic_info else { return }
+                if self?.roomInfo?.room?.member_list == nil {
+                    self?.roomInfo?.room?.member_list = [VRUser]()
+                }
+                self?.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
+                VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self?.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+                    if error != nil {
+                        self?.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+                    }
+                })
                 ChatRoomServiceImp.getSharedInstance().mics = mics
                 ChatRoomServiceImp.getSharedInstance().userList = self?.roomInfo?.room?.member_list
             } else {
