@@ -34,8 +34,6 @@ let page_size = 15
     }()
 
     private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
-
-    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
     
     @objc convenience init(user: VLLoginModel) {
         self.init()
@@ -150,7 +148,7 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        serviceImp.joinRoom(room.room_id ?? "") { error, room_entity in
+        ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
             if error == nil, room_entity != nil {
                 VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()

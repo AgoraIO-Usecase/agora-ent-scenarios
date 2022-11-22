@@ -14,7 +14,6 @@ public class VoiceRoomGiftersViewController: UITableViewController {
 
    // private var dataSource = VoiceRoomContributions()
     private var dataSource: [VRUser]?
-    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
     override public func viewDidLoad() {
         super.viewDidLoad()
         tableView.tableFooterView(UIView()).registerCell(VoiceRoomGifterCell.self, forCellReuseIdentifier: "VoiceRoomGifterCell").rowHeight(73).backgroundColor(.white).separatorInset(edge: UIEdgeInsets(top: 72, left: 15, bottom: 0, right: 15)).separatorColor(UIColor(0xF2F2F2)).showsVerticalScrollIndicator(false)
@@ -67,7 +66,7 @@ extension VoiceRoomGiftersViewController {
     }
 
     @objc private func fetchList() {
-        serviceImp.fetchGiftContribute { error, users in
+        ChatRoomServiceImp.getSharedInstance().fetchGiftContribute { error, users in
             if error == nil, users != nil {
                 self.tableView.refreshControl?.endRefreshing()
                 if users?.count ?? 0 > 0 {
