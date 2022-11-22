@@ -193,7 +193,7 @@ interface VoiceServiceProtocol {
     fun cancelApply(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 发送礼物上麦
+     * 发送礼物
      * @param roomId 房间id
      * @param giftInfo 礼物
      */

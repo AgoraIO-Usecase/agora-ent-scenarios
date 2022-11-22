@@ -2,18 +2,6 @@ package io.agora.scene.voice.rtckit
 
 import io.agora.voice.buddy.config.ConfigConstants
 
-/**初始化*/
-data class RtcInitConfig constructor(var appId: String)
-
-/**频道配置*/
-data class RtcChannelConfig constructor(
-    var rtcToken: String = "",
-    var channelId: String = "",
-    var rtcUid: Int = 0,
-    var isBroadcaster: Boolean = true,
-    var soundType: Int = ConfigConstants.SoundSelection.Social_Chat
-)
-
 /**当前频道数据*/
 data class RtcChannelTemp constructor(
     var broadcaster: Boolean = true, // 是否是主播模式

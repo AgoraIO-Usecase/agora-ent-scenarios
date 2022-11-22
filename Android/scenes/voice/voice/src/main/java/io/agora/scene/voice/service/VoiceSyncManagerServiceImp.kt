@@ -1,7 +1,6 @@
 package io.agora.scene.voice.service
 
 import android.content.Context
-import android.os.SystemClock
 import android.text.TextUtils
 import io.agora.scene.voice.bean.GiftBean
 import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
@@ -16,6 +15,7 @@ import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
 import io.agora.voice.network.tools.VRDefaultValueCallBack
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.collections.HashMap
 
 /**
  * @author create by zhangwei03
@@ -33,6 +33,7 @@ class VoiceSyncManagerServiceImp(
     private var mSceneReference: SceneReference? = null
 
     private val roomMap = mutableMapOf<String, VoiceRoomModel>() // key: roomNo
+    private val objIdOfRoomNo = mutableMapOf<String, String>() // objectId of room no
 
     private val roomSubscribeListener = mutableListOf<Sync.EventListener>()
 
@@ -48,6 +49,7 @@ class VoiceSyncManagerServiceImp(
                             val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
                             ret.add(voiceRoom)
                             roomMap[voiceRoom.roomId] = voiceRoom
+                            objIdOfRoomNo[voiceRoom.roomId] = iObj.id
                         } catch (e: Exception) {
                             "voice room list get scene error: ${e.message}".logE()
                         }
@@ -74,7 +76,7 @@ class VoiceSyncManagerServiceImp(
         completion: (error: Int, result: VoiceRoomModel) -> Unit
     ) {
         // 1、根据用户输入信息创建房间信息
-        val currentMilliseconds = SystemClock.elapsedRealtime()
+        val currentMilliseconds = System.currentTimeMillis()
         val voiceRoomModel = VoiceRoomModel().apply {
             roomId = currentMilliseconds.toString()
             channelId = currentMilliseconds.toString()
@@ -94,7 +96,7 @@ class VoiceSyncManagerServiceImp(
         }
         // 2、置换token,获取im 配置，创建房间需要这里的数据
         requestToolboxService(
-            channelName = inputModel.roomName,
+            channelId = voiceRoomModel.channelId,
             chatroomName = inputModel.roomName,
             completion = { error, chatroomId ->
                 if (error != VoiceServiceProtocol.ERR_OK) {
@@ -107,7 +109,7 @@ class VoiceSyncManagerServiceImp(
                 // 3、创建房间
                 initScene {
                     val scene = Scene()
-                    scene.id = voiceRoomModel.channelId
+                    scene.id = voiceRoomModel.roomId
                     scene.userId = owner.uid
                     scene.property = GsonTools.beanToMap(voiceRoomModel)
                     Sync.Instance().createScene(scene, object : Sync.Callback {
@@ -136,22 +138,23 @@ class VoiceSyncManagerServiceImp(
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     val curRoomInfo = roomMap[roomId] ?: return
-                    mSceneReference?.update(
-                        "member_count",
-                        curRoomInfo.memberCount + 1,
-                        object : Sync.DataItemCallback {
-                            override fun onSuccess(result: IObject?) {
-                                "syncManager update on onSuccess ${result?.id}".logE()
-                            }
+                    curRoomInfo.memberCount = curRoomInfo.memberCount + 1
+                    val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
+                        putAll(GsonTools.beanToMap(curRoomInfo))
+                    }
+                    mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
+                        override fun onSuccess(result: IObject?) {
+                            "syncManager update on onSuccess ${result?.id}".logE()
+                        }
 
-                            override fun onFail(exception: SyncManagerException?) {
-                                "syncManager update onFail ${exception?.message}".logE()
-                            }
-                        })
+                        override fun onFail(exception: SyncManagerException?) {
+                            "syncManager update onFail ${exception?.message}".logE()
+                        }
+                    })
                     innerSubscribeRoomChanged()
                     if (needConvertConfig) {
                         requestToolboxService(
-                            channelName = curRoomInfo.channelId,
+                            channelId = curRoomInfo.channelId,
                             chatroomName = curRoomInfo.roomName,
                             completion = { error, chatroomId ->
                                 completion.invoke(error, error == VoiceServiceProtocol.ERR_OK)
@@ -193,7 +196,11 @@ class VoiceSyncManagerServiceImp(
             })
         } else {
             val curRoomInfo = roomMap[roomId] ?: return
-            mSceneReference?.update("member_count", curRoomInfo.memberCount - 1, object : Sync.DataItemCallback {
+            curRoomInfo.memberCount = curRoomInfo.memberCount - 1
+            val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
+                putAll(GsonTools.beanToMap(curRoomInfo))
+            }
+            mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
 
                 override fun onSuccess(result: IObject?) {
                     ThreadManager.getInstance().runOnIOThread {
@@ -321,10 +328,11 @@ class VoiceSyncManagerServiceImp(
 
     /**
      * toolbox service api 置换token, 获取im 配置
-     * @param channelName
+     * @param channelId rtc 频道号
+     * @param chatroomName im 房间名
      */
     private fun requestToolboxService(
-        channelName: String,
+        channelId: String,
         chatroomName: String,
         completion: (error: Int, chatroomId: String) -> Unit,
     ) {
@@ -332,8 +340,8 @@ class VoiceSyncManagerServiceImp(
         val createImRoom = AtomicBoolean(false)
         var chatRoomId = ""
         VRToolboxServerHttpManager.get().generateToken(
-            channelName,
-            VoiceBuddyFactory.get().getVoiceBuddy().userId(),
+            channelId,
+            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
             callBack = object : VRDefaultValueCallBack<VRGenerateTokenResponse> {
                 override fun onSuccess(response: VRGenerateTokenResponse?) {
                     response?.let {
