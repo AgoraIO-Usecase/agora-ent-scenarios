@@ -29,7 +29,7 @@ import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel
-import io.agora.scene.voice.rtckit.RtcRoomController
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.config.ConfigConstants
@@ -49,7 +49,7 @@ import kotlin.random.Random
  */
 class RoomObservableViewDelegate constructor(
     private val activity: FragmentActivity,
-    private val roomLivingViewModel:VoiceRoomLivingViewModel,
+    private val roomLivingViewModel: VoiceRoomLivingViewModel,
     private val roomKitBean: RoomKitBean,
     private val iRoomTopView: IRoomLiveTopView, // 头部
     private val iRoomMicView: IRoomMicView, // 麦位
@@ -94,14 +94,14 @@ class RoomObservableViewDelegate constructor(
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     if (data != true) return
-                    RtcRoomController.get().rtcChannelTemp.isUseBot = true
+                    VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = true
                     roomAudioSettingDialog?.updateBoxCheckBoxView(true)
                     // 创建房间，第⼀次启动机器⼈后播放音效：
-                    if (RtcRoomController.get().rtcChannelTemp.firstActiveBot) {
-                        RtcRoomController.get().rtcChannelTemp.firstActiveBot = false
-                        RtcRoomController.get().updateEffectVolume(RtcRoomController.get().rtcChannelTemp.botVolume)
+                    if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
+                        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+                        AgoraRtcEngineController.get().updateEffectVolume(VoiceBuddyFactory.get().rtcChannelTemp.botVolume)
                         RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
-                            RtcRoomController.get().playMusic(it)
+                            AgoraRtcEngineController.get().playMusic(it)
                         }
                     }
                 }
@@ -113,8 +113,8 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     if (data != true) return
                     // 关闭机器人，暂停所有音效播放
-                    RtcRoomController.get().rtcChannelTemp.isUseBot = false
-                    RtcRoomController.get().resetMediaPlayer()
+                    VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = false
+                    AgoraRtcEngineController.get().resetMediaPlayer()
                 }
             })
         }
@@ -125,15 +125,15 @@ class RoomObservableViewDelegate constructor(
                     "robotVolume update：$data".logE()
                     data?.let {
                         if (it.second) {
-                            RtcRoomController.get().rtcChannelTemp.botVolume = it.first
-                            RtcRoomController.get().updateEffectVolume(it.first)
+                            VoiceBuddyFactory.get().rtcChannelTemp.botVolume = it.first
+                            AgoraRtcEngineController.get().updateEffectVolume(it.first)
                         }
                     }
                 }
             })
         }
         // 麦位音量监听
-        RtcRoomController.get().setMicVolumeListener(object : RtcMicVolumeListener() {
+        AgoraRtcEngineController.get().setMicVolumeListener(object : RtcMicVolumeListener() {
             // 更新机器人音量
             override fun onBotVolume(speaker: Int, finished: Boolean) {
                 if (finished) {
@@ -148,7 +148,7 @@ class RoomObservableViewDelegate constructor(
                 if (rtcUid == 0) {
                     // 自己,没有关麦
                     val myselfIndex = mySelfIndex()
-                    if (myselfIndex >= 0 && !RtcRoomController.get().rtcChannelTemp.isLocalAudioMute) {
+                    if (myselfIndex >= 0 && !VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute) {
                         iRoomMicView.updateVolume(myselfIndex, volume)
                     }
                 } else {
@@ -331,18 +331,18 @@ class RoomObservableViewDelegate constructor(
         kvLocalUser?.let {
             myselfMicInfo = it
         }
-        RtcRoomController.get().switchRole(mySelfIndex() >= 0)
+        AgoraRtcEngineController.get().switchRole(mySelfIndex() >= 0)
 
         if (mySelfMicStatus() == MicStatus.Normal) {
             // 状态正常
-            RtcRoomController.get().enableLocalAudio(false)
+            AgoraRtcEngineController.get().enableLocalAudio(false)
         } else {
             // 其他状态
-            RtcRoomController.get().enableLocalAudio(true)
+            AgoraRtcEngineController.get().enableLocalAudio(true)
         }
         // 机器人麦位
         updateMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
-            RtcRoomController.get().rtcChannelTemp.isUseBot = it.micStatus == MicStatus.BotActivated
+            VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = it.micStatus == MicStatus.BotActivated
         }
     }
 
@@ -365,8 +365,8 @@ class RoomObservableViewDelegate constructor(
      */
     fun onRoomDetails(vRoomInfoBean: VRoomInfoBean) {
         val isUseBot = vRoomInfoBean.room?.isUse_robot ?: false
-        RtcRoomController.get().rtcChannelTemp.isUseBot = isUseBot
-        RtcRoomController.get().rtcChannelTemp.botVolume =
+        VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = isUseBot
+        VoiceBuddyFactory.get().rtcChannelTemp.botVolume =
             vRoomInfoBean.room?.robot_volume ?: ConfigConstants.RotDefaultVolume
 
         val ownerUid = vRoomInfoBean.room?.owner?.uid ?: ""
@@ -384,7 +384,7 @@ class RoomObservableViewDelegate constructor(
                         // 自己
                         if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                             myselfMicInfo = micInfo
-                            RtcRoomController.get().rtcChannelTemp.isLocalAudioMute =
+                            VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute =
                                 micInfo.micStatus != MicStatus.Normal
                         }
                         micMap[micIndex] = rtcUid
@@ -456,10 +456,10 @@ class RoomObservableViewDelegate constructor(
                 val audioSettingsInfo = RoomAudioSettingsBean(
                     enable = roomKitBean.isOwner,
                     roomType = roomKitBean.roomType,
-                    botOpen = RtcRoomController.get().rtcChannelTemp.isUseBot,
-                    botVolume = RtcRoomController.get().rtcChannelTemp.botVolume,
+                    botOpen = VoiceBuddyFactory.get().rtcChannelTemp.isUseBot,
+                    botVolume = VoiceBuddyFactory.get().rtcChannelTemp.botVolume,
                     soundSelection = roomKitBean.soundEffect,
-                    anisMode = RtcRoomController.get().rtcChannelTemp.anisMode,
+                    anisMode = VoiceBuddyFactory.get().rtcChannelTemp.anisMode,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -503,10 +503,10 @@ class RoomObservableViewDelegate constructor(
                 override fun onSoundEffect(soundSelection: SoundSelectionBean, isCurrentUsing: Boolean) {
                     if (isCurrentUsing) {
                         // 试听音效需要开启机器人
-                        if (RtcRoomController.get().rtcChannelTemp.isUseBot) {
+                        if (VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
                             RoomSoundAudioConstructor.soundSelectionAudioMap[soundSelection.soundSelectionType]?.let {
                                 // 播放最佳音效说明
-                                RtcRoomController.get().playMusic(it)
+                                AgoraRtcEngineController.get().playMusic(it)
                             }
                         } else {
                             onBotMicClick(false, activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
@@ -539,26 +539,26 @@ class RoomObservableViewDelegate constructor(
             }
         }
         ainsDialog.anisModeCallback = {
-            RtcRoomController.get().rtcChannelTemp.anisMode = it.anisMode
-            RtcRoomController.get().deNoise(it.anisMode)
-            if (roomKitBean.isOwner && RtcRoomController.get().rtcChannelTemp.isUseBot && RtcRoomController.get().rtcChannelTemp.firstSwitchAnis) {
-                RtcRoomController.get().rtcChannelTemp.firstSwitchAnis = false
+            VoiceBuddyFactory.get().rtcChannelTemp.anisMode = it.anisMode
+            AgoraRtcEngineController.get().deNoise(it.anisMode)
+            if (roomKitBean.isOwner && VoiceBuddyFactory.get().rtcChannelTemp.isUseBot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
+                VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
 
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
                     // 播放AI 降噪介绍
-                    RtcRoomController.get().playMusic(soundAudioList)
+                    AgoraRtcEngineController.get().playMusic(soundAudioList)
                 }
             }
         }
         ainsDialog.anisSoundCallback = { position, ainsSoundBean ->
             "onAINSDialog anisSoundCallback：$ainsSoundBean".logE(TAG)
-            if (RtcRoomController.get().rtcChannelTemp.isUseBot) {
+            if (VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
                 ainsDialog.updateAnisSoundsAdapter(position, true)
                 RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
                     val audioUrl =
                         if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_High) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
                     // 试听降噪音效
-                    RtcRoomController.get()
+                    AgoraRtcEngineController.get()
                         .playMusic(soundAudioBean.soundId, audioUrl, soundAudioBean.speakerType)
                 }
             } else {
@@ -741,7 +741,7 @@ class RoomObservableViewDelegate constructor(
      * 自己关麦
      */
     fun muteLocalAudio(mute: Boolean, index: Int = -1) {
-        RtcRoomController.get().enableLocalAudio(mute)
+        AgoraRtcEngineController.get().enableLocalAudio(mute)
         val micIndex = if (index < 0) mySelfIndex() else index
         if (mute) {
             roomLivingViewModel.closeMic(activity, roomKitBean.roomId, micIndex)
@@ -843,7 +843,6 @@ class RoomObservableViewDelegate constructor(
                 }
             }
         }
-
     }
 
     var onRoomViewDelegateListener: OnRoomViewDelegateListener? = null
@@ -854,5 +853,13 @@ class RoomObservableViewDelegate constructor(
 
         // 用户点击上台
         fun onUserClickOnStage(micIndex: Int)
+    }
+
+    fun initSdkJoin(roomKitBean: RoomKitBean, password: String?) {
+        roomLivingViewModel.initSdkJoin(roomKitBean, password)
+    }
+
+    fun destroy() {
+        AgoraRtcEngineController.get().destroy()
     }
 }
