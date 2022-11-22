@@ -40,7 +40,6 @@ import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel
-import io.agora.scene.voice.rtckit.RtcRoomController
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
@@ -127,7 +126,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
                         binding.chatBottom.showMicVisible(
-                            RtcRoomController.get().rtcChannelTemp.isLocalAudioMute,
+                            VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute,
                             roomObservableDelegate.isOnMic()
                         )
                     }
@@ -210,11 +209,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     override fun onItemClick(data: MicInfoBean, view: View, position: Int, viewType: Long) {
                         if (roomKitBean.isOwner) {
                             roomObservableDelegate.onBotMicClick(
-                                RtcRoomController.get().rtcChannelTemp.isUseBot,
+                                VoiceBuddyFactory.get().rtcChannelTemp.isUseBot,
                                 getString(R.string.voice_chatroom_open_bot_prompt)
                             )
                         } else {
-                            if (!RtcRoomController.get().rtcChannelTemp.isUseBot) {
+                            if (!VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
                                 ToastTools.showTips(
                                     this@ChatroomLiveActivity,
                                     getString(R.string.voice_chatroom_only_host_can_change_robot)
@@ -223,7 +222,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         }
                     }
                 }
-            ).setUpAdapter(RtcRoomController.get().rtcChannelTemp.isUseBot)
+            ).setUpAdapter(VoiceBuddyFactory.get().rtcChannelTemp.isUseBot)
         } else { // 空间音效房间
             binding.likeView.isVisible = false
             binding.rvChatroom2dMicLayout.isVisible = false
@@ -247,11 +246,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     override fun onItemClick(data: MicInfoBean, view: View, position: Int, viewType: Long) {
                         if (roomKitBean.isOwner) {
                             roomObservableDelegate.onBotMicClick(
-                                RtcRoomController.get().rtcChannelTemp.isUseBot,
+                                VoiceBuddyFactory.get().rtcChannelTemp.isUseBot,
                                 getString(R.string.voice_chatroom_open_bot_prompt)
                             )
                         } else {
-                            if (!RtcRoomController.get().rtcChannelTemp.isUseBot) {
+                            if (!VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
                                 ToastTools.showTips(
                                     this@ChatroomLiveActivity,
                                     getString(R.string.voice_chatroom_only_host_can_change_robot)
@@ -260,7 +259,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         }
                     }
                 },
-            ).setUpMicInfoMap(RtcRoomController.get().rtcChannelTemp.isUseBot)
+            ).setUpMicInfoMap(VoiceBuddyFactory.get().rtcChannelTemp.isUseBot)
         }
         binding.cTopView.setTitleMaxWidth()
         roomObservableDelegate.onRoomModel(voiceRoomModel)
@@ -321,7 +320,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             )
                             return
                         }
-                        if (RtcRoomController.get().rtcChannelTemp.isLocalAudioMute) {
+                        if (VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute) {
                             binding.chatBottom.setEnableMic(true)
                             roomObservableDelegate.muteLocalAudio(false)
                         } else {
@@ -403,9 +402,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     override fun finish() {
         ChatClient.getInstance().chatroomManager().leaveChatRoom(roomKitBean.chatroomId)
         binding.chatroomGiftView.clear()
-        RtcRoomController.get().destroy()
+        roomObservableDelegate.destroy()
         ChatroomConfigManager.getInstance().removeChatRoomListener(this)
-        roomLivingViewModel.leaveRoom(this, roomKitBean.roomId)
         ChatroomHelper.getInstance().logout(false)
         super.finish()
     }
@@ -517,7 +515,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.rvChatroom3dMicLayout.receiverAttributeMap(newMicMap)
                 }
                 binding.chatBottom.showMicVisible(
-                    RtcRoomController.get().rtcChannelTemp.isLocalAudioMute, roomObservableDelegate.isOnMic()
+                    VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute, roomObservableDelegate.isOnMic()
                 )
                 if (!roomKitBean.isOwner) {
                     Log.e("liveActivity", "roomAttributesDidUpdated:  ${roomObservableDelegate.isOnMic()}")
@@ -585,7 +583,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.voiceRoomUpdateRobotVolume(roomId, volume)
         "voiceRoomUpdateRobotVolume roomId:$roomId,volume:$volume".logE()
         if (TextUtils.equals(roomId, roomKitBean.chatroomId)) {
-            RtcRoomController.get().rtcChannelTemp.botVolume = volume?.toInt() ?: ConfigConstants.RotDefaultVolume
+            VoiceBuddyFactory.get().rtcChannelTemp.botVolume = volume?.toInt() ?: ConfigConstants.RotDefaultVolume
         }
     }
 

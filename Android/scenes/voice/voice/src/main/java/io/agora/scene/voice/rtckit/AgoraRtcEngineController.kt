@@ -17,7 +17,7 @@ import io.agora.voice.network.tools.VRValueCallBack
 /**
  * @author create by zhangwei03
  */
-class RtcRoomController {
+class AgoraRtcEngineController {
 
     companion object {
 
@@ -26,13 +26,10 @@ class RtcRoomController {
     }
 
     object InstanceHelper {
-        val sSingle = RtcRoomController()
+        val sSingle = AgoraRtcEngineController()
     }
 
     private var rtcEngine: RtcEngineEx? = null
-
-    /**房间临时数据*/
-    val rtcChannelTemp = RtcChannelTemp()
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
@@ -44,33 +41,25 @@ class RtcRoomController {
 
     /**加入rtc频道*/
     fun joinChannel(
-        context: Context,
-        roomId: String,
-        userId: Int,
-        broadcaster: Boolean = false,
+        context: Context, channelId: String, rtcUid: Int, soundEffect: Int, broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
     ) {
-        initRtcEngine(context, VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId())
-        val rtcChannelConfig = RtcChannelConfig().apply {
-            channelId = roomId
-            rtcUid = userId
-            isBroadcaster = broadcaster
-        }
+        initRtcEngine(context)
         this.joinCallback = joinCallback
-        rtcChannelTemp.broadcaster = broadcaster
-        checkJoinChannel(rtcChannelConfig)
+        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
     }
 
-    private fun initRtcEngine(context: Context, appId: String): Boolean {
+    private fun initRtcEngine(context: Context): Boolean {
         if (rtcEngine != null) {
             return false
         }
-        synchronized(RtcRoomController::class.java) {
+        synchronized(AgoraRtcEngineController::class.java) {
             if (rtcEngine != null) return false
             //初始化RTC
             val config = RtcEngineConfig()
             config.mContext = context
-            config.mAppId = appId
+            config.mAppId = VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()
             config.mEventHandler = object : IRtcEngineEventHandler() {
 
                 override fun onError(err: Int) {
@@ -81,7 +70,7 @@ class RtcRoomController {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
                     // 默认开启降噪
-                    deNoise(rtcChannelTemp.anisMode)
+                    deNoise(VoiceBuddyFactory.get().rtcChannelTemp.anisMode)
                     joinCallback?.onSuccess(true)
                 }
 
@@ -128,14 +117,19 @@ class RtcRoomController {
         }
     }
 
-    private fun checkJoinChannel(config: RtcChannelConfig): Boolean {
-        if (config.channelId.isEmpty() || config.rtcUid < 0) {
-            "join channel error roomId or rtcUid illegal!(roomId:${config.channelId},rtcUid:${config.rtcUid})".logE()
+    private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
+        "joinChannel channelId:$channelId,rtcToken:${
+            VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()
+        },rtcUid:$rtcUid".logE()
+        if (channelId.isEmpty() || rtcUid < 0) {
+            val msg = "join channel error roomId or rtcUid illegal!(roomId:${channelId},rtcUid:${rtcUid})"
+            msg.logE()
+            joinCallback?.onError(Constants.ERR_FAILED, msg)
             return false
         }
 
         rtcEngine?.apply {
-            when (config.soundType) {
+            when (soundEffect) {
                 ConfigConstants.SoundSelection.Social_Chat,
                 ConfigConstants.SoundSelection.Karaoke -> { // 社交语聊，ktv
                     setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
@@ -155,18 +149,20 @@ class RtcRoomController {
                 }
             }
         }
-        if (config.isBroadcaster) {
+        if (isBroadcaster) {
             // 音效默认50
             rtcEngine?.adjustAudioMixingVolume(ConfigConstants.RotDefaultVolume)
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        val status = rtcEngine?.joinChannel(config.rtcToken, config.channelId, "", config.rtcUid)
+        val status = rtcEngine?.joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken(), channelId, "", rtcUid)
         // 启用用户音量提示。
         rtcEngine?.enableAudioVolumeIndication(1000, 3, false)
         if (status != IRtcEngineEventHandler.ErrorCode.ERR_OK) {
-            "join channel error status not ERR_OK!".logE()
+            val msg = "join channel error status not ERR_OK $status!"
+            msg.logE()
+            joinCallback?.onError(Constants.ERR_FAILED, msg)
             return false
         }
         return true
@@ -177,13 +173,13 @@ class RtcRoomController {
      * @param broadcaster
      */
     fun switchRole(broadcaster: Boolean) {
-        if (this.rtcChannelTemp.broadcaster == broadcaster) return
+        if (VoiceBuddyFactory.get().rtcChannelTemp.broadcaster == broadcaster) return
         if (broadcaster) {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        this.rtcChannelTemp.broadcaster = broadcaster
+        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
     }
 
     /**
@@ -242,7 +238,7 @@ class RtcRoomController {
         soundAudioQueue.addAll(soundAudioList)
         // 取队列第一个播放
         soundAudioQueue.removeFirstOrNull()?.let {
-            openMediaPlayer(it.audioUrl,  it.speakerType)
+            openMediaPlayer(it.audioUrl, it.speakerType)
         }
     }
 
@@ -254,7 +250,7 @@ class RtcRoomController {
      */
     fun playMusic(soundId: Int, audioUrl: String, speakerType: Int) {
         resetMediaPlayer()
-        openMediaPlayer(audioUrl,  speakerType)
+        openMediaPlayer(audioUrl, speakerType)
     }
 
     /**
@@ -274,13 +270,13 @@ class RtcRoomController {
      * 本地mute/unmute
      */
     fun enableLocalAudio(mute: Boolean) {
-        if (rtcChannelTemp.isLocalAudioMute == mute) return
-        rtcChannelTemp.isLocalAudioMute = mute
+        if (VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute == mute) return
+        VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute = mute
         rtcEngine?.enableLocalAudio(mute)
     }
 
     fun destroy() {
-        rtcChannelTemp.reset()
+        VoiceBuddyFactory.get().rtcChannelTemp.reset()
         rtcEngine?.leaveChannel()
         mediaPlayer?.apply {
             unRegisterPlayerObserver(firstMediaPlayerObserver)
@@ -316,7 +312,7 @@ class RtcRoomController {
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, true)
                         soundAudioQueue.removeFirstOrNull()?.let {
-                            openMediaPlayer(it.audioUrl,  it.speakerType)
+                            openMediaPlayer(it.audioUrl, it.speakerType)
                         }
                     }
                 }

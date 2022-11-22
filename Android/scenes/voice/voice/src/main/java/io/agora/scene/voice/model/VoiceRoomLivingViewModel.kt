@@ -2,6 +2,7 @@ package io.agora.scene.voice.model
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
@@ -10,8 +11,7 @@ import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.scene.voice.general.livedatas.SingleSourceLiveData
 import io.agora.scene.voice.general.repositories.NetworkOnlyResource
 import io.agora.scene.voice.general.repositories.VoiceRoomLivingRepository
-import io.agora.scene.voice.rtckit.RtcChannelTemp
-import io.agora.scene.voice.rtckit.RtcRoomController
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
@@ -37,7 +37,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     private val _roomDetailsObservable: SingleSourceLiveData<Resource<VRoomInfoBean>> = SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
-    private val _leaveObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _roomNoticeObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _closeBotObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
@@ -62,9 +61,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**加入im房间&&rtc 频道*/
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
-
-    /**来开im 房间&& rtc 频道*/
-    fun leaveObservable(): LiveData<Resource<Boolean>> = _leaveObservable
 
     /**更新公告*/
     fun roomNoticeObservable(): LiveData<Resource<Boolean>> = _roomNoticeObservable
@@ -127,14 +123,15 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun initSdkJoin(roomKitBean: RoomKitBean, password: String?) {
         joinRtcChannel.set(false)
         joinImRoom.set(false)
-        RtcRoomController.get().joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().application(),
+        AgoraRtcEngineController.get().joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().application(),
             roomKitBean.channelId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(), roomKitBean.isOwner,
+            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRDefaultValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
                     "rtc  joinChannel onSuccess ".logE()
                     joinRtcChannel.set(true)
-                    joinRoom(roomKitBean.roomId, password)
+                    checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
@@ -155,7 +152,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 override fun onSuccess(value: ChatRoom?) {
                     "im  joinChatRoom onSuccess ".logE()
                     joinImRoom.set(true)
-                    joinRoom(roomKitBean.roomId, password)
+                    checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
@@ -171,21 +168,16 @@ class VoiceRoomLivingViewModel : ViewModel() {
             })
     }
 
-    fun joinRoom(roomId: String?, password: String?) {
+    private fun checkJoinRoom() {
         if (joinRtcChannel.get() && joinImRoom.get()) {
             ThreadManager.getInstance().runOnMainThreadDelay({
-                _joinObservable.setSource(
-                    mRepository.joinRoom(
-                        VoiceBuddyFactory.get().getVoiceBuddy().application(),
-                        roomId, password
-                    )
-                )
+                _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
+                    override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                        callBack.onSuccess(MutableLiveData(true))
+                    }
+                }.asLiveData())
             }, 200)
         }
-    }
-
-    fun leaveRoom(context: Context, roomId: String?) {
-        _leaveObservable.setSource(mRepository.leaveRoom(context, roomId))
     }
 
 
