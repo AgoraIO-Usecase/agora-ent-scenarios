@@ -44,7 +44,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
         ChatRoomServiceImp.getSharedInstance().applicants = ChatRoomServiceImp.getSharedInstance().applicants.filter({
             $0.member?.chat_uid != chat_uid
-        }) ?? []
+        })
     }
     
     func onReceiveSeatInvitation(roomId: String, user: VRUser) {
