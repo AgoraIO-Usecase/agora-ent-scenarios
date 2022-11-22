@@ -91,10 +91,7 @@ class VoiceRoomViewController: VRBaseViewController {
         isOwner = user.uid == owner.uid
         local_index = isOwner ? 0 : nil
         vmType = getSceneType(type)
-
-        VoiceRoomIMManager.shared?.delegate = self
-        VoiceRoomIMManager.shared?.addChatRoomListener()
-
+        serviceImp?.subscribeEvent(with: self)
         // 加载RTC+IM
         loadKit()
         // 布局UI
@@ -113,8 +110,7 @@ class VoiceRoomViewController: VRBaseViewController {
     deinit {
         leaveRoom()
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomIMManager.shared?.delegate = nil
-        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+        serviceImp?.unsubscribeEvent()
     }
 }
 
@@ -127,6 +123,53 @@ extension VoiceRoomViewController {
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
 
+        var rtcJoinSuccess = false
+        var IMJoinSuccess = false
+
+        let VMGroup = DispatchGroup()
+        let VMQueue = DispatchQueue(label: "com.agora.vm.www")
+
+        VMGroup.enter()
+        VMQueue.async { [weak self] in
+            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
+            VMGroup.leave()
+        }
+
+        VMGroup.enter()
+        VMQueue.async { [weak self] in
+
+            VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { [weak self] room, error in
+                guard let self = self else { return }
+                if error == nil {
+                    IMJoinSuccess = true
+                    // 获取房间详情
+                    //加入房间成功后，需要先更新
+                    if self.isOwner == true {
+                        //房主更新环信KV
+                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: serviceImp?.createMics() ?? [:], completion: { error in
+                            if error == nil {
+                                self.roomInfo?.room?.member_list = [VRUser]()
+                                self.roomInfo?.room?.ranking_list = [VRUser]()
+                                if let info = self.roomInfo {
+                                    info.mic_info = serviceImp?.mics
+                                    self.roomInfo = info
+                                }
+                            } else {
+                                
+                            }
+                        })
+                    } else {
+                        //观众更新拉取详情后更新kv
+                       self.requestRoomDetail()
+                       guard let user = VoiceRoomUserInfo.shared.user else {return}
+                       VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+                           if error == nil {
+                               
+                           } else {
+                               
+                           }
+                       })
+                    }
         let ret: Bool = rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ?? .social) == 0
 
         VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { [weak self] room, error in
@@ -160,9 +203,15 @@ extension VoiceRoomViewController {
                        }
                    })
                 }
-            } else {
-                self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
-                self.view.makeToast("join IM failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+            })
+        }
+
+        VMGroup.notify(queue: VMQueue) { [weak self] in
+            DispatchQueue.main.async {
+                let joinSuccess = rtcJoinSuccess && IMJoinSuccess
+                if !joinSuccess {
+                    self?.didHeaderAction(with: .back, destroyed: true)
+                }
             }
         })
     }
@@ -199,7 +248,8 @@ extension VoiceRoomViewController {
                 }
                 self?.roomInfo = info
                 guard let mics = self?.roomInfo?.mic_info else { return }
-                VoiceRoomIMManager.shared?.mics = mics
+                serviceImp?.mics = mics
+                serviceImp?.userList = self?.roomInfo?.room?.member_list
             } else {
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
@@ -215,6 +265,7 @@ extension VoiceRoomViewController {
             }
         }
 //        guard let room_id = roomInfo?.room?.room_id else { return }
+
 //        ChatRoomServiceImp.getSharedInstance().fetchGiftContribute(room_id) {[weak self] error, list in
 //            if error == nil {
 //                guard let list = list else { return }
@@ -456,7 +507,7 @@ extension VoiceRoomViewController {
         }
         guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
 //        let params: [String: String] = ["use_robot": flag == true ? "1" : "0" ]
-        ChatRoomServiceImp.getSharedInstance().modifyRoomInfo(key: "announcement", value: flag == true ? "1" : "0" ) { error, flag in
+        serviceImp?.enableRobot(enable: true, completion: { error in
             if error == nil {
                 if self.alienCanPlay {
                     self.rtckit.adjustAudioMixingVolume(with: 50)
@@ -472,26 +523,26 @@ extension VoiceRoomViewController {
             } else {
                 print("激活机器人失败")
             }
-        }
+        })
     }
 
     // announcement
     func updateNotice(with str: String) {
 //        let params: [String: String] = ["announcement": str]
-        ChatRoomServiceImp.getSharedInstance().modifyRoomInfo(key: "announcement", value: str) { error, flag in
-            if error == nil {
-                // 如果返回的结果为true 表示上麦成功
+        serviceImp?.updateAnnouncement(content: str, completion: { result in
+            if result {
+                // 如果返回的结果为true 更新成功
                 self.view.makeToast("Notice Posted".localized())
                 self.roomInfo?.room?.announcement = str
             } else {
                 self.view.makeToast("Post Failed".localized())
             }
-        }
+        })
     }
 
     func updateVolume(_ Vol: Int) {
         if isOwner == false { return }
-        ChatRoomServiceImp.getSharedInstance().modifyRoomInfo(key: "robot_volume", value: "\(Vol)") { error, flag in
+        serviceImp?.updateRobotVolume(value: Vol, completion: { error in
             if error == nil {
                 // 如果返回的结果为true 表示上麦成功
                 guard let room = self.roomInfo?.room else { return }
@@ -502,7 +553,7 @@ extension VoiceRoomViewController {
             } else {
 
             }
-        }
+        })
 //        let params: [String: String] = ["robot_volume": "\(Vol)"]
 //            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: params, completion: { error in
 //            if error == nil {
@@ -805,7 +856,7 @@ extension VoiceRoomViewController {
     func agreeInvite() {
         ChatRoomServiceImp.getSharedInstance().agreeInvite { error, flag in
             
-        }
+        })
 //        if let roomId = roomInfo?.room?.room_id {
 //            VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .agreeInvite(roomId: roomId), params: [:]) { _, _ in
 //            }

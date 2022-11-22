@@ -17,7 +17,7 @@ public class VoiceRoomInviteUsersController: UITableViewController {
     private var idx = 0
 
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No audience yet", image: nil).backgroundColor(.white)
-    
+
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
         if mic_index != nil {
@@ -92,50 +92,20 @@ extension VoiceRoomInviteUsersController {
             self.view.makeToast("\(error?.localizedDescription ?? "")")
         }
         
-//        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomMembers(roomId: roomId ?? "", cursor: apply?.cursor ?? "", pageSize: 15), params: [:], classType: VoiceRoomAudiencesEntity.self) { model, error in
-//            self.tableView.refreshControl?.endRefreshing()
-//            if model != nil, error == nil {
-//                if self.apply == nil {
-//                    self.apply = model
-//                } else {
-//                    self.apply?.cursor = model?.cursor
-//                    self.apply?.members?.append(contentsOf: model?.members ?? [])
-//                }
-//                self.tableView.reloadData()
-//            } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")")
-//            }
-//            self.view.makeToast("\(error?.localizedDescription ?? "")")
-//        }
     }
 
     private func inviteUser(user: VRUser?) {
         SVProgressHUD.show()
-//        var params: [String: Any] = ["uid": user?.uid ?? ""]
-//        if idx > 0 {
-//            params = ["uid": user?.uid ?? "", "mic_index": idx]
-//        }
         if idx <= 0 {return}
         
         let chat_uid: String = user?.uid ?? ""
-        ChatRoomServiceImp.getSharedInstance().inviteUserToMic(chatUid: chat_uid, index: idx) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx) { error, flag in
             if error == nil {
                 self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
             } else {
                 
             }
         }
-//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .inviteUserToMic(roomId: roomId ?? ""), params: params) { dic, error in
-//            SVProgressHUD.dismiss()
-//            if dic != nil, error == nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.view.makeToast("Invitation sent!".localized())
-//                } else {
-//                    self.view.makeToast("Invited failed!".localized())
-//                }
-//            } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")")
-//            }
-//        }
+
     }
 }
