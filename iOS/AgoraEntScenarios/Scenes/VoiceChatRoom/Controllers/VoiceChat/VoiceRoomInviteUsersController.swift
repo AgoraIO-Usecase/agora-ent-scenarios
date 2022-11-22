@@ -17,8 +17,7 @@ public class VoiceRoomInviteUsersController: UITableViewController {
     private var idx = 0
 
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No audience yet", image: nil).backgroundColor(.white)
-
-    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
+    
     public convenience init(roomId: String, mic_index: Int?) {
         self.init()
         if mic_index != nil {
@@ -77,7 +76,7 @@ extension VoiceRoomInviteUsersController {
     }
 
     @objc private func fetchUsers() {
-        serviceImp.fetchRoomMembers { error, users in
+        ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
             if users != nil , error == nil {
                 if self.apply == nil {
                     let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()
@@ -119,7 +118,7 @@ extension VoiceRoomInviteUsersController {
         if idx <= 0 {return}
         
         let chat_uid: String = user?.uid ?? ""
-        serviceImp.inviteUserToMic(chatUid: chat_uid, index: idx) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().inviteUserToMic(chatUid: chat_uid, index: idx) { error, flag in
             if error == nil {
                 self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
             } else {

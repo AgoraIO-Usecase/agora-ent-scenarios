@@ -14,8 +14,6 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     private var apply: VoiceRoomApplyEntity?
 
     private var roomId: String?
-    
-    private var serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
 
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
 
@@ -97,7 +95,7 @@ extension VoiceRoomApplyUsersViewController {
     private func agreeUserApply(user: VoiceRoomApply?) {
         SVProgressHUD.show()
         guard let user = user?.member else { return }
-        self.serviceImp.agreeApply(chatUid: user.chat_uid ?? "") { error in
+        ChatRoomServiceImp.getSharedInstance().agreeApply(chatUid: user.chat_uid ?? "") { error in
             SVProgressHUD.dismiss()
             if error == nil {
                 self.view.makeToast("Agree success!".localized())

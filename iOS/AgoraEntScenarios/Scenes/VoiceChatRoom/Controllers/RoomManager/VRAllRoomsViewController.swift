@@ -17,7 +17,6 @@ public class VRAllRoomsViewController: UIViewController {
 
     lazy var roomList: VRRoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
 
-    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
     override public func viewDidLoad() {
         super.viewDidLoad()
         view.addSubViews([empty, roomList])
@@ -40,7 +39,7 @@ extension VRAllRoomsViewController {
     }
 
     private func fetchRooms(cursor: String) {
-        serviceImp.fetchRoomList(page: 0) { error, rooms in
+        ChatRoomServiceImp.getSharedInstance().fetchRoomList(page: 0) { error, rooms in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}

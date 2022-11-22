@@ -39,10 +39,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
-        var keys = ["ranking_list","member_list","gift_amount","robot_volume","use_robot"]
-        if entity.owner == nil {
-            keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
-        }
+//        var keys = ["ranking_list","member_list","gift_amount","robot_volume","use_robot"]
+//        if entity.owner == nil {
+//            keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
+//        }
+        var keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
         let roomInfo = VRRoomInfo()
         roomInfo.room = entity
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: keys, completion: { error, map in
@@ -72,14 +73,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
-                $0.key.hasSuffix("mic_")
+                $0.key.hasPrefix("mic_")
             })
             var micsJson = [Dictionary<String,Any>]()
             if mics?.keys.count ?? 0 > 0 {
                 for key in mics!.keys {
                     micsJson.append(mics?[key]?.z.jsonToDictionary() ?? [:])
                 }
-                roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self)
+                let micArray = micsJson.kj.modelArray(VRRoomMic.self)
+                roomInfo.mic_info = micArray.sorted(by: {$0.mic_index < $1.mic_index })
             }
             if entity.owner == nil {
                 roomInfo.room?.owner = roomInfo.mic_info?.first?.member
