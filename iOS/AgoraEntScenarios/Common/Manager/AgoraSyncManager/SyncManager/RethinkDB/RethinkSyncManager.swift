@@ -82,11 +82,13 @@ public class RethinkSyncManager: NSObject {
         })
         timer?.fire()
         RunLoop.main.add(timer!, forMode: .common)
-        guard !onUpdatedBlocks.isEmpty else { return }
-        // 重连后重新订阅
-        onUpdatedBlocks.keys.forEach({
-            subscribe(channelName: $0)
-        })
+        
+        //TODO: subscribe always fail because of socket.readyState is connecting status
+//        guard !onUpdatedBlocks.isEmpty else { return }
+//        // 重连后重新订阅
+//        onUpdatedBlocks.keys.forEach({
+//            subscribe(channelName: $0)
+//        })
     }
 
     public func disConnect(isRemove: Bool) {
@@ -137,6 +139,8 @@ public class RethinkSyncManager: NSObject {
                            type: SocketType,
                            isAdd: Bool = false)
     {
+        _reConnectIfNeed()
+        
         var newParams = params
         var propsId: String = objectId ?? UUID().uuid16string()
         if objectId == nil && params is [String: Any] {
@@ -199,6 +203,10 @@ public class RethinkSyncManager: NSObject {
 
     @objc
     private func enterForegroundNotification() {
+        _reConnectIfNeed()
+    }
+    
+    private func _reConnectIfNeed() {
         guard socket?.readyState != .OPEN else { return }
         reConnect()
     }
@@ -209,6 +217,12 @@ extension RethinkSyncManager: SRWebSocketDelegate {
         Log.info(text: "连接状态 status == \(webSocket.readyState.rawValue)", tag: "connect")
         connectBlock?(webSocket.readyState.rawValue == 1 ? 0 : webSocket.readyState.rawValue)
         connectBlock = nil
+        
+        guard socket?.readyState == .OPEN else { return }
+        // 重连成功后重新订阅
+        onUpdatedBlocks.keys.forEach({
+            subscribe(channelName: $0)
+        })
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didReceiveMessage message: Any) {
@@ -220,7 +234,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             return
         }
         if let msg = dict?["msg"] as? String, msg == "success" {
-            Log.info(text: "消息发送成功", tag: "socket")
+            Log.info(text: "消息发送成功: [\(dict?["requestId"] ?? "")]", tag: "socket")
         }
         let params = dict?["data"] as? [String: Any]
         let channelName = dict?["channelName"] as? String ?? ""
@@ -281,7 +295,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didFailWithError error: Error) {
-        Log.errorText(text: error.localizedDescription, tag: "error")
+        Log.errorText(text: "socket fail: \(error.localizedDescription)", tag: "error")
         connectBlock?(-1)
     }
 
