@@ -9,4 +9,4 @@ data class RoomUserInfoBean constructor(
     var rtcUid: Int = -1,
     var username: String = "",
     var userAvatar: String = "",
-) : io.agora.scene.voice.bean.BaseRoomBean
+) : BaseRoomBean

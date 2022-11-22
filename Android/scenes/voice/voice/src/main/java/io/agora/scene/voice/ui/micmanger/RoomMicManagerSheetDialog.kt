@@ -19,6 +19,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.ui.mic.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceDialogMicManagerBinding
 import io.agora.secnceui.annotation.MicStatus
+import io.agora.voice.buddy.tool.ImageTools
 
 class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicManagerBinding>() {
 
@@ -42,7 +43,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
         arguments?.getBoolean(KEY_IS_MYSELF, false) ?: false
     }
 
-    var onItemClickListener: OnItemClickListener<MicManagerBean>?=null
+    var onItemClickListener: OnItemClickListener<MicManagerBean>? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogMicManagerBinding {
         return VoiceDialogMicManagerBinding.inflate(inflater, container, false)
@@ -70,7 +71,8 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             setOnApplyWindowInsets(root)
             val itemDecoration =
                 MaterialDividerItemDecoration(root.context, MaterialDividerItemDecoration.HORIZONTAL).apply {
-                    dividerColor = ResourcesCompat.getColor(root.context.resources, R.color.voice_divider_color_1f979797, null)
+                    dividerColor =
+                        ResourcesCompat.getColor(root.context.resources, R.color.voice_divider_color_1f979797, null)
                     dividerThickness = 1.dp.toInt()
                 }
             rvChatroomMicManager.addItemDecoration(itemDecoration)
@@ -108,9 +110,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             } else { // 有人
                 binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 ivMicInnerIcon.isVisible = false
-                ivMicInfo.setImageResource(
-                    ResourcesTools.getDrawableId(ivMicInfo.context, micInfo.userInfo?.userAvatar ?: "")
-                )
+                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
                 mtMicUsername.text = micInfo.userInfo?.username ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag
 //                when (micInfo.micStatus) {

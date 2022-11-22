@@ -12,13 +12,14 @@ import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.secnceui.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicBinding
+import io.agora.voice.buddy.tool.ImageTools
 
 /**
  * @author create by zhangwei03
  *
  * 普通麦位
  */
-class Room2DMicView : ConstraintLayout , IRoomMicBinding {
+class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
     private lateinit var mBinding: VoiceViewRoom2dMicBinding
 
@@ -45,9 +46,8 @@ class Room2DMicView : ConstraintLayout , IRoomMicBinding {
 
                 ivMicInnerIcon.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                ivMicInfo.setImageResource(
-                    ResourcesTools.getDrawableId(ivMicInfo.context, micInfo.userInfo?.userAvatar ?: "")
-                )
+                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.userInfo?.userAvatar ?: "")
+                ImageTools.loadImage(ivMicInfo, botDrawable)
                 mtMicUsername.text = micInfo.userInfo?.username ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
@@ -83,9 +83,7 @@ class Room2DMicView : ConstraintLayout , IRoomMicBinding {
                 } else { // 有人
                     ivMicTag.isVisible = true
                     ivMicInnerIcon.isVisible = false
-                    ivMicInfo.setImageResource(
-                        ResourcesTools.getDrawableId(ivMicInfo.context, micInfo.userInfo?.userAvatar ?: "")
-                    )
+                    ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
                     mtMicUsername.text = micInfo.userInfo?.username ?: ""
                     if (micInfo.ownerTag) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
