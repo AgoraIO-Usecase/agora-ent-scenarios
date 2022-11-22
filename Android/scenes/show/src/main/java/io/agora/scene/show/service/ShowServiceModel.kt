@@ -12,24 +12,30 @@ enum class ShowRoomRequestStatus(val value: Int){
     end(4)// 已结束
 }
 
-// 房间列表信息
-data class ShowRoomListModel(
+// 房间详情信息
+data class ShowRoomDetailModel(
     val roomNo: String,
     val roomName: String,
     val roomUserCount: Int,
     val thumbnailId: String,
     val ownerId: String,
-    val roomStatus: ShowRoomStatus = ShowRoomStatus.activity,
+    val roomStatus: Int = ShowRoomStatus.activity.value,
     val crateAt: Double,
     val updateAt: Double,
-
-    var objectId: String? = ""
-): java.io.Serializable
-
-// 房间详情信息
-data class ShowRoomDetailModel(
-    val roomName: String
-)
+): java.io.Serializable {
+    fun toMap(): Map<String, Any>{
+        return mapOf(
+            Pair("roomNo", roomNo),
+            Pair("roomName", roomName),
+            Pair("roomUserCount", 0),
+            Pair("thumbnailId", ""),
+            Pair("ownerId", ownerId),
+            Pair("roomStatus", roomStatus),
+            Pair("crateAt", crateAt),
+            Pair("updateAt", updateAt),
+        )
+    }
+}
 
 //用户信息
 data class ShowUser(

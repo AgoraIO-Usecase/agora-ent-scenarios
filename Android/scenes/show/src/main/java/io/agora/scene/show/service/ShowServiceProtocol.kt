@@ -1,5 +1,7 @@
 package io.agora.scene.show.service
 
+import android.os.Handler
+import android.os.Looper
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 
@@ -16,7 +18,7 @@ interface ShowServiceProtocol {
     companion object {
         private val instance by lazy {
             ShowSyncManagerServiceImpl(AgoraApplication.the()){
-                ToastUtils.showToast(it.message)
+                Handler(Looper.getMainLooper()).post{ ToastUtils.showToast(it.message) }
             }
         }
 
@@ -25,26 +27,26 @@ interface ShowServiceProtocol {
 
     // 获取房间列表
     fun getRoomList(
-        success: (List<ShowRoomListModel>) -> Unit,
+        success: (List<ShowRoomDetailModel>) -> Unit,
         error: ((Exception) -> Unit)? = null
     )
 
     // 创建房间
     fun createRoom(
-        room: ShowRoomListModel,
+        roomName: String,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)? = null
     )
 
     // 加入房间
     fun joinRoom(
-        room: ShowRoomListModel,
+        roomNo: String,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)? = null
     )
 
     // 离开房间
-    fun leaveRoom(success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
+    fun leaveRoom()
 
     // 获取当前房间所有用户
     fun getAllUserList(success: (List<ShowUser>) -> Unit, error: ((Exception) -> Unit)? = null)
