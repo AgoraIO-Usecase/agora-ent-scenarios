@@ -12,6 +12,8 @@ import ZSwiftBaseLib
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
+var serviceImp: ChatRoomServiceImp? = ChatRoomServiceImp.getSharedInstance()
+
 @objc public final class VRRoomsViewController: VRBaseViewController {
     private var index: Int = 0 {
         didSet {
@@ -34,23 +36,15 @@ let page_size = 15
     }()
 
     private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
-
-    private let serviceImp: ChatRoomServiceImp = ChatRoomServiceImp.getSharedInstance()
     
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
         VoiceRoomIMManager.shared?.configIM(appkey: "81691796#990293")
 
-        // MARK: - you can replace request host call this.
-
-      //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
-        //if user.hasVoiceRoomUserInfo {
-            mapUser(user: user)
+        //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
+        mapUser(user: user)
         self.showContent()
-//        } else {
-//            login()
-//        }
     }
 
     override public func viewDidLoad() {
@@ -64,6 +58,10 @@ let page_size = 15
         view.bringSubviewToFront(navigation)
         viewsAction()
         childViewControllersEvent()
+    }
+    
+    deinit {
+        serviceImp = nil
     }
 }
 
@@ -150,11 +148,12 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        serviceImp.joinRoom(room.room_id ?? "") { error, room_entity in
+        serviceImp?.joinRoom(room.room_id ?? "") { error, room_entity in
             if error == nil, room_entity != nil {
                 VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
                     if error == nil {
+                        self.mapUser(user: VLUserCenter.user)
                         let info: VRRoomInfo = VRRoomInfo()
                         info.room = room
                         info.mic_info = nil
