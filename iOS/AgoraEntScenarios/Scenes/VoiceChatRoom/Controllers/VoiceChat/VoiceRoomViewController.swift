@@ -769,7 +769,6 @@ extension VoiceRoomViewController {
                 self?.notifySeverLeave()
                 self?.rtckit.leaveChannel()
                 // giveupStage()
-                self?.cancelRequestSpeak(index: nil)
                 self?.ownerBack()
             }
         }

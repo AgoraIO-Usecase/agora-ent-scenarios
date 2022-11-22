@@ -38,7 +38,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     // MARK: - Table view data source
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        ChatRoomServiceImp.getSharedInstance().applicants.count ?? 0
+        ChatRoomServiceImp.getSharedInstance().applicants.count 
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -67,6 +67,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
 extension VoiceRoomApplyUsersViewController {
     @objc func refresh() {
         self.perform(#selector(refreshEnd), afterDelay: 1)
+        self.empty.isHidden = ChatRoomServiceImp.getSharedInstance().applicants.count  > 0
     }
     
     @objc func refreshEnd() {

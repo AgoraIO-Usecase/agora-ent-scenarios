@@ -123,45 +123,43 @@ extension VoiceRoomViewController {
         gift.userName = VoiceRoomUserInfo.shared.user?.name ?? ""
         gift.portrait = VoiceRoomUserInfo.shared.user?.portrait ?? userAvatar
         if let chatroom_id = roomInfo?.room?.chatroom_id, let uid = roomInfo?.room?.owner?.uid, let id = gift.gift_id, let name = gift.gift_name, let value = gift.gift_price, let count = gift.gift_count {
-            notifyServerGiftInfo(id: id, count: count, uid: uid) {
-                VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id": id, "gift_name": name, "gift_price": value, "gift_count": count, "userName": VoiceRoomUserInfo.shared.user?.name ?? "", "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
-                    guard let self = self else { return }
-                    if error == nil, message != nil {
-                        let amount = Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
-                        if var currentAmount = VoiceRoomUserInfo.shared.user?.amount {
-                            currentAmount += amount
-                            VoiceRoomUserInfo.shared.user?.amount = currentAmount
-                        }
-                        if var room_amount = self.roomInfo?.room?.gift_amount {
-                            room_amount += amount
-                            self.roomInfo?.room?.gift_amount = room_amount
-                        }
-                        if self.roomInfo?.room?.ranking_list == nil {
-                            self.roomInfo?.room?.ranking_list = [VRUser]()
-                        }
-                        if let c = Int(count), let v = Int(value), var amount = VoiceRoomUserInfo.shared.user?.amount {
-                            amount += c * v
-                            VoiceRoomUserInfo.shared.user?.amount = amount
-                        }
-                        self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
-                        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
-                            if error != nil {
-                                self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
-                            }
-                        })
-                        var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
-                        if giftList == nil {
-                            giftList = self.giftList()
-                            self.view.addSubview(giftList!)
-                        }
-                        giftList?.gifts.append(gift)
-                        giftList?.cellAnimation()
-                        
-                    } else {
-                        self.view.makeToast("Send failed \(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+            VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id": id, "gift_name": name, "gift_price": value, "gift_count": count, "userName": VoiceRoomUserInfo.shared.user?.name ?? "", "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
+                guard let self = self else { return }
+                if error == nil, message != nil {
+                    let amount = Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
+                    if var currentAmount = VoiceRoomUserInfo.shared.user?.amount {
+                        currentAmount += amount
+                        VoiceRoomUserInfo.shared.user?.amount = currentAmount
                     }
-                })
-            }
+                    if var room_amount = self.roomInfo?.room?.gift_amount {
+                        room_amount += amount
+                        self.roomInfo?.room?.gift_amount = room_amount
+                    }
+                    if self.roomInfo?.room?.ranking_list == nil {
+                        self.roomInfo?.room?.ranking_list = [VRUser]()
+                    }
+                    if let c = Int(count), let v = Int(value), var amount = VoiceRoomUserInfo.shared.user?.amount {
+                        amount += c * v
+                        VoiceRoomUserInfo.shared.user?.amount = amount
+                    }
+                    self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
+                    VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
+                        if error != nil {
+                            self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
+                        }
+                    })
+                    var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
+                    if giftList == nil {
+                        giftList = self.giftList()
+                        self.view.addSubview(giftList!)
+                    }
+                    giftList?.gifts.append(gift)
+                    giftList?.cellAnimation()
+                    
+                } else {
+                    self.view.makeToast("Send failed \(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
+                }
+            })
         }
     }
 
