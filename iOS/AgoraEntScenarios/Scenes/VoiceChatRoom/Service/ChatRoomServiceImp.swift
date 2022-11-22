@@ -191,7 +191,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
-                $0.key.hasSuffix("mic_")
+                $0.key.hasPrefix("mic_")
             })
             var micsJson = [Dictionary<String,Any>]()
             if mics?.keys.count ?? 0 > 0 {
@@ -378,7 +378,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             apply.index = self.findMicIndex()
         }
-        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", event: VoiceRoomApplySite, customExt: ["user" : apply.kj.JSONString()], completion: { message, error in
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomApplySite, customExt: ["user" : apply.kj.JSONString()], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
         })
     }
