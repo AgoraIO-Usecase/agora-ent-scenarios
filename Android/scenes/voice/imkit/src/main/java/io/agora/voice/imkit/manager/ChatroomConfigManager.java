@@ -38,7 +38,7 @@ public class ChatroomConfigManager {
 
     public void initRoomConfig(Context context, String imKey) {
         this.mContext = context;
-        ChatOptions options = initChatOptions(context, imKey);
+        ChatOptions options = initChatOptions(imKey);
         if (!isMainProcess(context)) {
             Log.e(TAG, "enter the service process!");
             return;
@@ -48,7 +48,7 @@ public class ChatroomConfigManager {
     }
 
     private void registerListener(){
-        ChatroomHelper.getInstance().setChatRoomConnectionListener(new OnChatroomConnectionListener() {
+        ChatroomIMManager.getInstance().setChatRoomConnectionListener(new OnChatroomConnectionListener() {
             @Override
             public void onConnected() {
                 EMLog.i(TAG, "onConnected");
@@ -75,7 +75,7 @@ public class ChatroomConfigManager {
 
             }
         });
-        ChatroomHelper.getInstance().setOnCustomMsgReceiveListener(new OnCustomMsgReceiveListener() {
+        ChatroomIMManager.getInstance().setOnCustomMsgReceiveListener(new OnCustomMsgReceiveListener() {
             @Override
             public void onReceiveGiftMsg(ChatMessageData message) {
                 try {
@@ -105,7 +105,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveApplySite(ChatMessageData message) {
-                Log.e("setOnCustomMsgReceiveListener","onReceiveApplySite");
+                Log.e(TAG,"onReceiveApplySite");
                 try {
                     for (ChatroomListener listener : ChatroomConfigManager.this.messageListeners) {
                         listener.receiveApplySite(message.getConversationId(), message);
@@ -117,7 +117,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveCancelApplySite(ChatMessageData message) {
-                Log.e("setOnCustomMsgReceiveListener","onReceiveCancelApplySite");
+                Log.e(TAG,"onReceiveCancelApplySite");
                 try {
                     for (ChatroomListener listener : ChatroomConfigManager.this.messageListeners) {
                         listener.receiveCancelApplySite(message.getConversationId(), message);
@@ -129,7 +129,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteSite(ChatMessageData message) {
-                Log.e("setOnCustomMsgReceiveListener","onReceiveInviteSite");
+                Log.e(TAG,"onReceiveInviteSite");
                 try {
                     for (ChatroomListener listener : ChatroomConfigManager.this.messageListeners) {
                         listener.receiveInviteSite(message.getConversationId(), message);
@@ -141,7 +141,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteRefusedSite(ChatMessageData message) {
-                Log.e("setOnCustomMsgReceiveListener","onReceiveInviteRefusedSite");
+                Log.e(TAG,"onReceiveInviteRefusedSite");
                 try {
                     for (ChatroomListener listener : ChatroomConfigManager.this.messageListeners) {
                         listener.receiveInviteRefusedSite(message.getConversationId(), message);
@@ -153,7 +153,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveDeclineApply(ChatMessageData message) {
-                Log.e("setOnCustomMsgReceiveListener","onReceiveDeclineApply");
+                Log.e(TAG,"onReceiveDeclineApply");
                 try {
                     for (ChatroomListener listener : ChatroomConfigManager.this.messageListeners) {
                         listener.receiveDeclineApply(message.getConversationId(), message);
@@ -186,7 +186,7 @@ public class ChatroomConfigManager {
             }
         });
 
-        ChatroomHelper.getInstance().setChatRoomListener(new OnChatroomEventReceiveListener() {
+        ChatroomIMManager.getInstance().setChatRoomEventListener(new OnChatroomEventReceiveListener() {
             @Override
             public void onRoomDestroyed(String roomId) {
                 try {
@@ -270,9 +270,8 @@ public class ChatroomConfigManager {
         return mContext;
     }
 
-    private ChatOptions initChatOptions(Context context,String imKey){
+    private ChatOptions initChatOptions(String imKey){
         ChatOptions options = new ChatOptions();
-//        options.setAppKey("81399972#1002901");
         options.setAppKey(imKey);
         options.setAutoLogin(false);
         return options;
@@ -322,8 +321,8 @@ public class ChatroomConfigManager {
     public void removeChatRoomListener(ChatroomListener listener){
         if (listener != null) {
             this.messageListeners.remove(listener);
-            ChatroomHelper.getInstance().removeChatRoomChangeListener();
-            ChatroomHelper.getInstance().removeChatRoomConnectionListener();
+            ChatroomIMManager.getInstance().removeChatRoomChangeListener();
+            ChatroomIMManager.getInstance().removeChatRoomConnectionListener();
             CustomMsgHelper.getInstance().removeListener();
         }
     }

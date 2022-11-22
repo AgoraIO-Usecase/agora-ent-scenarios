@@ -24,21 +24,21 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.util.EMLog;
 
-public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListener {
-    private static ChatroomHelper instance;
-    private ChatroomHelper(){}
+public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
+    private static ChatroomIMManager instance;
+    private ChatroomIMManager(){}
     private String chatroomId;
     private ArrayList<ChatMessageData> data = new ArrayList<>();
-    public OnChatroomEventReceiveListener chatroomListener;
+    public OnChatroomEventReceiveListener chatroomEventListener;
     public OnChatroomConnectionListener chatroomConnectionListener;
     private ChatroomProtocolDelegate delegate;
-    private static final String TAG = "ChatroomHelper";
+    private static final String TAG = "ChatroomIMManager";
 
-    public static ChatroomHelper getInstance() {
+    public static ChatroomIMManager getInstance() {
         if(instance == null) {
-            synchronized (ChatroomHelper.class) {
+            synchronized (ChatroomIMManager.class) {
                 if(instance == null) {
-                    instance = new ChatroomHelper();
+                    instance = new ChatroomIMManager();
                 }
             }
         }
@@ -61,7 +61,6 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         CustomMsgHelper.getInstance().setChatRoomInfo(chatroomId);
         //设置语聊房协议代理
         delegate = new ChatroomProtocolDelegate(chatroomId);
-
     }
 
 
@@ -92,8 +91,8 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         ChatClient.getInstance().removeConnectionListener(this);
     }
 
-    public void setChatRoomListener(OnChatroomEventReceiveListener listener){
-        this.chatroomListener = listener;
+    public void setChatRoomEventListener(OnChatroomEventReceiveListener listener){
+        this.chatroomEventListener = listener;
     }
 
     public void setChatRoomConnectionListener(OnChatroomConnectionListener listener){
@@ -169,6 +168,21 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         });
     }
 
+    /**
+     * 插入欢迎消息
+     * @param content
+     * @param nick
+     */
+    public void saveWelcomeMsg(String content,String nick){
+        ChatMessage message = ChatMessage.createSendMessage(ChatMessage.Type.TXT);
+        message.setChatType(ChatMessage.ChatType.ChatRoom);
+        message.setTo(chatroomId);
+        TextMessageBody textMessageBody = new TextMessageBody(content);
+        message.setBody(textMessageBody);
+        message.setAttribute("userName",nick);
+        ChatClient.getInstance().chatManager().saveMessage(message);
+    }
+
     public ArrayList<ChatMessageData> getMessageData(String chatroomId){
         data.clear();
         Conversation conversation = ChatClient.getInstance().chatManager().getConversation(chatroomId, Conversation.ConversationType.ChatRoom, true);
@@ -202,53 +216,6 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         chatMessageData.setExt(chatMessage.ext());
         return chatMessageData;
     }
-
-    /**
-     * 获取礼物消息中礼物的id
-     * @param msg
-     * @return
-     */
-    public String getMsgGiftId(ChatMessageData msg) {
-        return CustomMsgHelper.getInstance().getMsgGiftId(msg);
-    }
-
-    /**
-     * 获取礼物消息中礼物的数量
-     * @param msg
-     * @return
-     */
-    public int getMsgGiftNum(ChatMessageData msg) {
-        return CustomMsgHelper.getInstance().getMsgGiftNum(msg);
-    }
-
-    /**
-     * 获取点赞消息中点赞的数目
-     * @param msg
-     * @return
-     */
-    public int getMsgPraiseNum(ChatMessageData msg) {
-        return CustomMsgHelper.getInstance().getMsgPraiseNum(msg);
-    }
-
-
-    /**
-     * 判断是否是礼物消息
-     * @param msg
-     * @return
-     */
-    public boolean isGiftMsg(ChatMessageData msg) {
-        return CustomMsgHelper.getInstance().isGiftMsg(msg);
-    }
-
-    /**
-     * 判断是否是点赞消息
-     * @param msg
-     * @return
-     */
-    public boolean isPraiseMsg(ChatMessageData msg) {
-        return CustomMsgHelper.getInstance().isPraiseMsg(msg);
-    }
-
 
     public void setOnCustomMsgReceiveListener(OnCustomMsgReceiveListener listener) {
         CustomMsgHelper.getInstance().setOnCustomMsgReceiveListener(listener);
@@ -303,26 +270,26 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
 
     @Override
     public void onChatRoomDestroyed(String s, String s1) {
-        if (chatroomListener != null)
-            chatroomListener.onRoomDestroyed(s);
+        if (chatroomEventListener != null)
+            chatroomEventListener.onRoomDestroyed(s);
     }
 
     @Override
     public void onMemberJoined(String s, String s1) {
-        if (chatroomListener != null)
-            chatroomListener.onMemberJoined(s,s1);
+        if (chatroomEventListener != null)
+            chatroomEventListener.onMemberJoined(s,s1);
     }
 
     @Override
     public void onMemberExited(String s, String s1, String s2) {
-        if (chatroomListener != null)
-            chatroomListener.onMemberExited(s,s1,s2);
+        if (chatroomEventListener != null)
+            chatroomEventListener.onMemberExited(s,s1,s2);
     }
 
     @Override
     public void onRemovedFromChatRoom(int i, String roomId, String s1, String s2) {
-        if (chatroomListener != null)
-            chatroomListener.onKicked(roomId,i);
+        if (chatroomEventListener != null)
+            chatroomEventListener.onKicked(roomId,i);
     }
 
     @Override
@@ -366,22 +333,24 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
     }
 
     @Override
-    public void onAnnouncementChanged(String s, String s1) {
-        if (chatroomListener != null)
-            chatroomListener.onAnnouncementChanged(s,s1);
+    public void onAnnouncementChanged(String roomId, String announcement) {
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onAnnouncementChanged(roomId,announcement);
     }
 
     @Override
     public void onAttributesUpdate(String roomId, Map<String, String> attributeMap, String from) {
-        if (chatroomListener != null)
-            chatroomListener.onAttributesUpdate(roomId,attributeMap,from);
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onAttributesUpdate(roomId,attributeMap,from);
     }
 
     @Override
     public void onAttributesRemoved(String roomId, List<String> keyList, String from) {
-        if (chatroomListener != null)
-            chatroomListener.onAttributesRemoved(roomId,keyList,from);
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onAttributesRemoved(roomId,keyList,from);
     }
+
+    //////////////////////Connection///////////////////////////
 
     @Override
     public void onConnected() {
@@ -473,18 +442,11 @@ public class ChatroomHelper implements ChatRoomChangeListener, ConnectionListene
         });
     }
 
-    public void saveWelcomeMsg(String content,String nick){
-        ChatMessage message = ChatMessage.createSendMessage(ChatMessage.Type.TXT);
-        message.setChatType(ChatMessage.ChatType.ChatRoom);
-        message.setTo(chatroomId);
-        TextMessageBody textMessageBody = new TextMessageBody(content);
-        message.setBody(textMessageBody);
-        message.setAttribute("userName",nick);
-        ChatClient.getInstance().chatManager().saveMessage(message);
-    }
-
     public void leaveMicMic(int micIndex, CallBack callBack){
         delegate.leaveMicMic(micIndex,callBack);
     }
 
+    public void getMicInfo(){
+        delegate.getMicInfo();
+    }
 }

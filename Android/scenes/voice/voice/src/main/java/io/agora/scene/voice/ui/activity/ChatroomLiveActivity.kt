@@ -48,7 +48,7 @@ import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.secnceui.annotation.MicStatus
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.voice.imkit.manager.ChatroomConfigManager
-import io.agora.voice.imkit.manager.ChatroomHelper
+import io.agora.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.imkit.manager.ChatroomListener
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
@@ -103,8 +103,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
         handsDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
         giftViewDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
-        ChatroomHelper.getInstance().init(roomKitBean.chatroomId)
-        ChatroomHelper.getInstance().saveWelcomeMsg(
+        ChatroomIMManager.getInstance().init(roomKitBean.chatroomId)
+        ChatroomIMManager.getInstance().saveWelcomeMsg(
             getString(R.string.voice_room_welcome),
             VoiceBuddyFactory.get().getVoiceBuddy().nickName()
         )
@@ -374,7 +374,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
             override fun onSendMessage(content: String?) {
                 if (!content.isNullOrEmpty())
-                    ChatroomHelper.getInstance().sendTxtMsg(content,
+                    ChatroomIMManager.getInstance().sendTxtMsg(content,
                         VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
                         object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
@@ -404,7 +404,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         ChatroomConfigManager.getInstance().removeChatRoomListener(this)
-        ChatroomHelper.getInstance().logout(false)
+        ChatroomIMManager.getInstance().logout(false)
         super.finish()
     }
 
