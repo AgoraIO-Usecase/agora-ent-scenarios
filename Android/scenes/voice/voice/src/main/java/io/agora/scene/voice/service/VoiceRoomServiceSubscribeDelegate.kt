@@ -1,0 +1,99 @@
+package io.agora.scene.voice.service
+
+import io.agora.voice.imkit.bean.ChatMessageData
+import io.agora.voice.network.tools.bean.VMemberBean
+
+/**
+ * @author create by zhangwei03
+ *
+ * im kv 回调协议
+ */
+interface VoiceRoomServiceSubscribeDelegate {
+    /**
+     * 收到礼物消息
+     * @param roomId 环信IMSDK聊天室id
+     * @param message 消息模型
+     */
+    fun onReceiveGift(roomId: String, message: ChatMessageData){}
+
+    /**
+     * 收到上麦申请消息
+     * @param roomId 环信IM SDK聊天室id
+     * @param message 消息模型
+     */
+    fun onReceiveSeatRequest(roomId: String, message: ChatMessageData) {}
+
+    /**
+     * 收到取消上麦申请消息
+     * @param roomId 环信IM SDK聊天室id
+     * @param chatUid 环信IM SDK 用户id
+     */
+    fun onReceiveSeatRequestCancel(roomId: String, chatUid: String) {}
+
+    /**
+     * 接收邀请消息
+     * @param roomId 环信IM SDK聊天室id
+     */
+    fun onReceiveSeatInvitation(roomId: String, message: ChatMessageData) {}
+
+    /**
+     * 接收拒绝邀请消息
+     *  @param roomId 环信IM SDK聊天室id
+     */
+    fun onReceiveSeatRefuse(roomId: String, message: ChatMessageData?) {}
+
+    /**
+     * 接收拒绝申请消息
+     *  @param roomId 环信IM SDK聊天室id
+     */
+    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
+
+    /**
+     * 用户加入聊天室回调，带所有用户信息
+     *  @param roomId 环信IM SDK聊天室id
+     *  @param user 用户数据
+     */
+    fun onUserJoinedRoom(roomId: String, user: VMemberBean) {}
+
+    /**
+     * 用户离开房间
+     * @param roomId 环信IM SDK聊天室id
+     * @param chatUid 离开的环信用户id
+     */
+    fun onMemberLeave(roomId: String, chatUid: String) {}
+
+    /**
+     * 聊天室公告更新
+     * @param roomId 环信IM SDK聊天室id
+     * @param content 公告变化内容
+     */
+    fun onAnnouncementChanged(roomId: String, content: String) {}
+
+    /**
+     * 机器人音量更新
+     * @param roomId 环信IM SDK聊天室id
+     * @param volume 音量数值
+     */
+    fun onRobotVolumeUpdated(roomId: String, volume: String) {}
+
+    /**
+     * 聊天室成员被踢出房间
+     * @param roomId 环信IM SDK聊天室id
+     * @param reason 被踢出房间
+     */
+    fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {}
+
+    /**
+     *  聊天室自定义麦位属性发生变化
+     * @param roomId 环信IM SDK聊天室id
+     * @param attributeMap 变换的属性kv
+     * @param fromId 谁操作发生的变化
+     */
+    fun onRoomSiteDidUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
+}
+
+enum class VoiceRoomServiceKickedReason{
+    removed,
+    destroyed,
+    offLined,
+}

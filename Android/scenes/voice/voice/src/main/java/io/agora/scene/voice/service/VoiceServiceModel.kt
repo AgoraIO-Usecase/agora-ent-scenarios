@@ -45,11 +45,21 @@ data class VoiceRoomModel constructor(
     @SerializedName("chatroom_id") var chatroomId: String = "",
     @SerializedName("created_at") var createdAt: Long = 0,
     @SerializedName("roomPassword") var roomPassword: String = "",
+    @Transient var rankingList: List<VoiceRankUserModel>? = null,
+    @Transient var memberList: List<VoiceMemberModel>? = null,
+    @Transient var giftAmount: Int = 0,
+    @Transient var userRobot: Boolean = false,
+    @Transient var robotVolume: Int = 50,
 ) : BaseRoomBean
 
 data class VoiceMicInfoModel constructor(
-    var index: Int = 0,
-    var userInfo: VoiceMemberModel? = null,
-    var micStatus: Int = -1, // 座位状态
+    @SerializedName("mic_index") var micIndex: Int = 0,
+    var member: VoiceMemberModel? = null,
+    @SerializedName("status") var micStatus: Int = -1, // 座位状态
     var userStatus: Int = -1, // 用户状态，备用
+) : BaseRoomBean
+
+data class VoiceRoomInfo constructor(
+    var roomInfo: VoiceRoomModel? = null,
+    var micInfo: List<VoiceMicInfoModel>? = null
 ) : BaseRoomBean

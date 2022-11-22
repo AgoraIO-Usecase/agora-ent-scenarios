@@ -19,12 +19,11 @@ class VoiceCreateRepository : BaseRepository() {
     /**
      * 获取房间列表
      * @param page 第几页，暂未用到
-     * @param roomType 房间类型，暂未用到
      */
-    fun fetchRoomList(page: Int, roomType: Int): LiveData<Resource<List<VoiceRoomModel>>> {
+    fun fetchRoomList(page: Int): LiveData<Resource<List<VoiceRoomModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceRoomModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRoomModel>>>) {
-                voiceServiceProtocol.fetchRoomList(page, roomType, completion = { error, result ->
+                voiceServiceProtocol.fetchRoomList(page, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -91,18 +90,13 @@ class VoiceCreateRepository : BaseRepository() {
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param password 密码
      * @param needConvertConfig false
      */
-    fun joinRoom(
-        roomId: String,
-        password: String? = null,
-        needConvertConfig: Boolean = false,
-    ): LiveData<Resource<Boolean>> {
+    fun joinRoom(roomId: String, needConvertConfig: Boolean = false, ): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
 
-                voiceServiceProtocol.joinRoom(roomId, password ?: "", needConvertConfig, completion = { error, result ->
+                voiceServiceProtocol.joinRoom(roomId, needConvertConfig, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
