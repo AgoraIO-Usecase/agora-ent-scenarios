@@ -16,7 +16,7 @@ public class VRNormalRoomsViewController: UIViewController {
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No Chat Room yet", image: nil)
 
     lazy var roomList: VRRoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
-
+    
     override public func viewDidLoad() {
         super.viewDidLoad()
         view.addSubViews([empty, roomList])

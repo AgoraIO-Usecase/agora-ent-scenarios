@@ -14,7 +14,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     private var apply: VoiceRoomApplyEntity?
 
     private var roomId: String?
-
+    
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
@@ -38,7 +38,7 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
     // MARK: - Table view data source
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        serviceImp?.applicants.count ?? 0
+        ChatRoomServiceImp.getSharedInstance().applicants.count ?? 0
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -48,10 +48,10 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
         }
         // Configure the cell...
         cell?.selectionStyle = .none
-        cell?.refresh(item: serviceImp?.applicants[safe: indexPath.row])
+        cell?.refresh(item: ChatRoomServiceImp.getSharedInstance().applicants[safe: indexPath.row])
         cell?.agreeClosure = { [weak self] in
             self?.agreeUserApply(user: $0)
-            serviceImp?.applicants[safe: indexPath.row]?.member?.invited = true
+            ChatRoomServiceImp.getSharedInstance().applicants[safe: indexPath.row]?.member?.invited = true
             self?.tableView.reloadData()
         }
         return cell ?? VoiceRoomApplyCell()
@@ -95,7 +95,7 @@ extension VoiceRoomApplyUsersViewController {
     private func agreeUserApply(user: VoiceRoomApply?) {
         SVProgressHUD.show()
         guard let user = user?.member else { return }
-        ChatRoomServiceImp.getSharedInstance().agreeApply(chatUid: user.chat_uid ?? "") { error in
+        ChatRoomServiceImp.getSharedInstance().endMicSeatApply(chatUid: user.chat_uid ?? "") { error in
             SVProgressHUD.dismiss()
             if error == nil {
                 self.view.makeToast("Agree success!".localized())
