@@ -244,7 +244,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     // 锁麦
     fun lockMic(context: Context, roomId: String, micIndex: Int) {
-        _lockMicObservable.setSource(mRepository.lockMic(context, roomId, micIndex))
+        _lockMicObservable.setSource(mRepository.lockMic(micIndex))
     }
 
     // 取消锁麦
