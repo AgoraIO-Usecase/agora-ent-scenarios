@@ -37,9 +37,28 @@ class VoiceSyncManagerServiceImp(
 
     private val roomSubscribeListener = mutableListOf<Sync.EventListener>()
 
-    override fun fetchRoomList(
-        page: Int, type: Int, completion: (error: Int, result: List<VoiceRoomModel>) -> Unit
-    ) {
+    private val roomServiceSubscribeDelegates = mutableListOf<VoiceRoomServiceSubscribeDelegate>()
+
+    /**
+     * 注册订阅
+     * @param delegate 聊天室内IM回调处理
+     */
+    override fun subscribeEvent(delegate: VoiceRoomServiceSubscribeDelegate) {
+        roomServiceSubscribeDelegates.add(delegate)
+    }
+
+    /**
+     *  取消订阅
+     */
+    override fun unsubscribeEvent() {
+        roomServiceSubscribeDelegates.clear()
+    }
+
+    /**
+     * 获取房间列表
+     * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
+     */
+    override fun fetchRoomList(page: Int, completion: (error: Int, result: List<VoiceRoomModel>) -> Unit) {
         initScene {
             Sync.Instance().getScenes(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
@@ -71,9 +90,12 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
+    /**
+     * 创建房间
+     * @param inputModel 输入的房间信息
+     */
     override fun createRoom(
-        inputModel: VoiceCreateRoomModel,
-        completion: (error: Int, result: VoiceRoomModel) -> Unit
+        inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit
     ) {
         // 1、根据用户输入信息创建房间信息
         val currentMilliseconds = System.currentTimeMillis()
@@ -127,11 +149,13 @@ class VoiceSyncManagerServiceImp(
             })
     }
 
+    /**
+     * 加入房间
+     * @param roomId 房间id
+     * @param needConvertConfig 是否需要重新获取token && im 配置，创建房间后加入不需要(false), 直接加入需要(true)
+     */
     override fun joinRoom(
-        roomId: String,
-        password: String,
-        needConvertConfig: Boolean,
-        completion: (error: Int, result: Boolean) -> Unit
+        roomId: String, needConvertConfig: Boolean, completion: (error: Int, result: Boolean) -> Unit
     ) {
         initScene {
             Sync.Instance().joinScene(roomId, object : Sync.JoinSceneCallback {
@@ -171,7 +195,7 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    override fun leaveRoom(roomId: String, isOwner: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
         val cacheRoom = roomMap[roomId] ?: return
         // 取消所有订阅
         roomSubscribeListener.forEach {
@@ -226,75 +250,154 @@ class VoiceSyncManagerServiceImp(
         mSceneReference = null
     }
 
-    override fun fetchRoomDetail(roomId: String, completion: (error: Int, result: VoiceRoomModel) -> Unit) {
+    /**
+     * 获取房间详情
+     * @param voiceRoomModel 房间概要
+     */
+    override fun fetchRoomDetail(
+        voiceRoomModel: VoiceRoomModel,
+        completion: (error: Int, result: VoiceRoomInfo) -> Unit
+    ) {
     }
 
-    override fun inviteUserToMic(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 获取排行榜列表
+     */
+    override fun fetchGiftContribute(completion: (error: Int, result: VoiceRankUserModel) -> Unit) {
     }
 
+    /**
+     * 获取用户列表
+     */
+    override fun fetchRoomMembers(completion: (error: Int, result: VoiceMemberModel) -> Unit) {
+    }
+
+    /**
+     * 邀请用户上麦
+     * @param chatUid im uid
+     */
+    override fun startMicSeatInvitation(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+    }
+
+    /**
+     * 拒绝上麦
+     * @param roomId 房间id
+     * @param userId 用户id
+     */
     override fun refuseInviteToMic(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun forbidMic(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    override fun forbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun unForbidMic(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 取消禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    override fun unForbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun lockMic(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 锁麦
+     * @param micIndex 麦位index
+     */
+    override fun lockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun unLockMic(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 取消锁麦
+     * @param micIndex 麦位index
+     */
+    override fun unLockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun kickOff(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 踢用户下麦
+     * @param micIndex 麦位index
+     */
+    override fun kickOff(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun leaveMic(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 下麦
+     * @param micIndex 麦位index
+     */
+    override fun leaveMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun muteLocal(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * mute
+     * @param micIndex 麦位index
+     */
+    override fun muteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun unMuteLocal(roomId: String, micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * unMute
+     * @param micIndex 麦位index
+     */
+    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun changeMic(
-        roomId: String,
-        userId: String,
-        oldIndex: Int,
-        newIndex: Int,
-        completion: (error: Int, result: Boolean) -> Unit
-    ) {
+    /**
+     * 换麦
+     * @param oldIndex 老麦位index
+     * @param newIndex 新麦位index
+     */
+    override fun changeMic(oldIndex: Int, newIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun refuseInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 接受邀请
+     */
+    override fun acceptMicSeatInvitation(completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun agreeInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 拒绝邀请
+     */
+    override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun submitApply(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 申请上麦
+     */
+    override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun cancelApply(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 取消上麦
+     * @param chatUid im uid
+     */
+    override fun endMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
-    override fun sendGift(roomId: String, giftInfo: GiftBean, completion: (error: Int, result: Boolean) -> Unit) {
+    /**
+     * 更新公告
+     * @param content 公告内容
+     */
+    override fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit) {
+
     }
 
-    override fun fetchGiftContribute(roomId: String, completion: (error: Int, result: VoiceRankUserModel) -> Unit) {
+    /**
+     * 是否启用机器人
+     * @param enable true 启动机器人，false 关闭机器人
+     */
+    override fun enableRobot(enable: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
+
     }
 
-    override fun fetchRoomMembers(roomId: String, completion: (error: Int, result: VoiceMemberModel) -> Unit) {
-    }
+    /**
+     * 更新机器人音量
+     * @param value 音量
+     */
+    override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
 
-    override fun modifyRoomInfo(
-        roomId: String,
-        key: String,
-        value: String,
-        completion: (error: Int, result: Boolean) -> Unit
-    ) {
     }
 
     private fun initScene(complete: () -> Unit) {

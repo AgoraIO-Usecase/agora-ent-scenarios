@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="io.agora.scene.voice">
 
     <!-- 访问网络权限 -->
@@ -24,7 +25,8 @@
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/voice_net_config"
-        android:theme="@style/voice_Theme.AgoraScenesChatroom">
+        android:theme="@style/voice_Theme.AgoraScenesChatroom"
+        tools:replace="android:label">
         <activity android:name="io.agora.scene.voice.ui.activity.ChatroomSplashActivity"
             android:exported="true"
             android:screenOrientation="portrait">
