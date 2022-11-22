@@ -198,6 +198,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun getMicInfo(context: Context, roomId: String): LiveData<Resource<VRMicBean>> {
         val resource = object : NetworkOnlyResource<VRMicBean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VRMicBean>>) {
+//                此方法返回数据处理有问题 处于未调用状态
 //                ChatroomHttpManager.getInstance(context)
 //                    .getMicInfo(roomId, object : VRValueCallBack<VRMicBean> {
 //                        override fun onSuccess(data: VRMicBean) {
@@ -208,7 +209,6 @@ class VoiceRoomLivingRepository : BaseRepository() {
 //                            callBack.onError(code, desc)
 //                        }
 //                    })
-                ChatroomIMManager.getInstance()
             }
         }
         return resource.asLiveData()
@@ -353,19 +353,26 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 锁麦
-    fun lockMic(context: Context, roomId: String, micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+    fun lockMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
-                ChatroomHttpManager.getInstance(context)
-                    .lockMic(roomId, micIndex, object : VRValueCallBack<Boolean> {
-                        override fun onSuccess(data: Boolean) {
-                            callBack.onSuccess(createLiveData(Pair(micIndex, data)))
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            callBack.onError(code, desc)
-                        }
-                    })
+//                ChatroomHttpManager.getInstance(context)
+//                    .lockMic(roomId, micIndex, object : VRValueCallBack<Boolean> {
+//                        override fun onSuccess(data: Boolean) {
+//                            callBack.onSuccess(createLiveData(Pair(micIndex, data)))
+//                        }
+//
+//                        override fun onError(code: Int, desc: String) {
+//                            callBack.onError(code, desc)
+//                        }
+//                    })
+                voiceServiceProtocol.lockMic(micIndex, completion ={ error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                    } else {
+                        callBack.onError(error, "")
+                    }
+                } )
             }
         }
         return resource.asLiveData()
