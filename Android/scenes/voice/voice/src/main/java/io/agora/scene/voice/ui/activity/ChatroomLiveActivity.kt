@@ -16,8 +16,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import io.agora.voice.imkit.bean.ChatMessageData
 import com.alibaba.android.arouter.facade.annotation.Route
-import io.agora.voice.imkit.custormgift.CustomMsgHelper
-import io.agora.voice.imkit.custormgift.OnMsgCallBack
+import io.agora.voice.imkit.custorm.CustomMsgHelper
+import io.agora.voice.imkit.custorm.OnMsgCallBack
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback

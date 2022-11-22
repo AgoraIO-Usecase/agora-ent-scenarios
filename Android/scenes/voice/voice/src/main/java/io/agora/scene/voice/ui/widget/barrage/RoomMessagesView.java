@@ -38,8 +38,8 @@ import java.util.ArrayList;
 
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custormgift.CustomMsgHelper;
-import io.agora.voice.imkit.custormgift.CustomMsgType;
+import io.agora.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.voice.imkit.custorm.CustomMsgType;
 import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.R;
