@@ -84,13 +84,13 @@ public enum updateRoomState {
     ///   - roomId: 环信IMSDK聊天室id
     ///   - attributeMap: 变换的属性kv
     ///   - fromId: 谁操作发生的变化
-    func onRoomSiteDidUpdated(roomId: String, attributeMap: [String: String]?, from fromId: String)
+    func onSeatUpdated(roomId: String, attributeMap: [String: String]?, from fromId: String)
     
     /// Description 成员离开
     /// - Parameters:
     ///   - roomId: 环信IMSDK聊天室id
     ///   - userName: 离开的环信用户id
-    func onMemberLeave(roomId: String, userName: String)
+    func onUserLeftRoom(roomId: String, userName: String)
     
 }
 
@@ -119,11 +119,6 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     ///
     func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void)
 
-    /// 邀请上卖
-    /// - Parameters:
-    ///
-    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
-
     /// 获取礼物列表
     /// - Parameters:
     ///
@@ -141,7 +136,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
 
     /// 取消禁言指定麦位
     /// - Parameters:
-    /// 
+    ///
     func unForbidMic(mic_index: Int,
                      completion: @escaping (Error?, Bool) -> Void)
 
@@ -183,6 +178,11 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
+    
+    /// 邀请上卖
+    /// - Parameters:
+    ///
+    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 接受邀请
     /// - Parameters:
@@ -202,14 +202,14 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 取消上麦
     /// - Parameters:
     ///
-    func endMicSeatApply(chat_uid: String,
+    func cancelMicSeatApply(chat_uid: String,
                      completion: @escaping (Error?, Bool) -> Void)
     
     /// Description 同意申请
     /// - Parameters:
     ///   - user: VRUser instance
     ///   - completion: 回调
-    func endMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void)
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void)
 
     /// 获取房间列表
     /// - Parameters:

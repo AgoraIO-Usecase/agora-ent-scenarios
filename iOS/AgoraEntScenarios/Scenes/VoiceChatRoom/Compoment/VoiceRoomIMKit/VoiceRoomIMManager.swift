@@ -118,7 +118,6 @@ public extension VoiceRoomIMManager {
     }
 
     // MARK: - AgoraChatManagerDelegate
-
     func messagesDidReceive(_ aMessages: [AgoraChatMessage]) {
         for message in aMessages {
             if message.body is AgoraChatTextMessageBody {
