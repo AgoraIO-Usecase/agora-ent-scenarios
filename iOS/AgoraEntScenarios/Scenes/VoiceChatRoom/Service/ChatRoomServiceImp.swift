@@ -191,15 +191,16 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
-                $0.key.hasPrefix("mic_")
+                $0.key.hasSuffix("mic_")
             })
             var micsJson = [Dictionary<String,Any>]()
             if mics?.keys.count ?? 0 > 0 {
                 for key in mics!.keys {
                     micsJson.append(mics?[key]?.z.jsonToDictionary() ?? [:])
                 }
-                let micArray = micsJson.kj.modelArray(VRRoomMic.self)
-                roomInfo.mic_info = micArray.sorted(by: {$0.mic_index < $1.mic_index })
+                roomInfo.mic_info = micsJson.kj.modelArray(VRRoomMic.self).sorted(by: {
+                    $0.mic_index < $1.mic_index
+                })
             }
             if entity.owner == nil {
                 roomInfo.room?.owner = roomInfo.mic_info?.first?.member
@@ -231,12 +232,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             }
         })
     }
-    
-    func modifyRoomInfo(key: String,value: String, completion: @escaping (Error?, Bool) -> Void) {
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: [key:value], completion: { error in
-            completion(self.convertError(error: error),error == nil)
-        })
-    }
+
     
     func forbidMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
@@ -354,7 +350,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func acceptMicSeatInvitation(completion: @escaping (Error?, Bool) -> Void) {
         let mic = VRRoomMic()
-        let user = serviceImp?.userList?.first(where: {
+        let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
         })
         if user?.mic_index ?? 0 > 1 {
