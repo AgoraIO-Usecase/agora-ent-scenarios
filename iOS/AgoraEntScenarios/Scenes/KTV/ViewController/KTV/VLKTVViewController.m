@@ -203,7 +203,6 @@ VLPopScoreViewDelegate
     
     [AgoraRtcEngineKit destroy];
     VLLog(@"Agora - destroy RTCEngine");
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [self.lyricCallbacks removeAllObjects];
     [self.musicCallbacks removeAllObjects];
@@ -255,13 +254,10 @@ VLPopScoreViewDelegate
             // 下麦消息
             
             // 被下麦用户刷新UI
-            //TODO 需要重新review
             if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
-                
-                [weakSelf setSelfAudience];
                 [weakSelf resetChorusStatus:model.userNo];
             }
             
@@ -648,7 +644,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else{
         self.isNowMicMuted = NO;
     }
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
+    [self.RTCkit adjustRecordingSignalVolume:mute ? 0 : 100];
     
     [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
                                                         completion:^(NSError * error) {
@@ -921,6 +917,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [AgoraRtcEngineKit destroy];
     
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    //use game streaming in solo mode, chrous profile in chrous mode
+    [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
@@ -969,13 +967,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
 }
 
-- (void)setSelfAudience {
-    [self.RTCkit muteLocalVideoStream:YES];
-    [self.RTCkit muteLocalAudioStream:YES];
-    [self.RTCkit setClientRole:AgoraClientRoleAudience];
-    [self resetPlayer];
-}
-
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         VLLog(@"Agora - Leave RTC channel");
@@ -988,10 +979,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setPublishCameraTrack:!self.isNowCameraMuted];
     [option setPublishMicrophoneTrack:!self.isNowMicMuted];
     [option setPublishCustomAudioTrack:NO];
+    [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
     [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
     [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
+    [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
 
@@ -1669,6 +1662,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
     _isOnMicSeat = isOnMicSeat;
     
+    //start mic once enter seat
+    if(isOnMicSeat) {
+        [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
+    } else {
+        [self.RTCkit setClientRole:AgoraClientRoleAudience];
+        [self resetPlayer];
+    }
+    [self.RTCkit enableLocalAudio:isOnMicSeat];
+    
+    
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
     self.isNowCameraMuted = info.isVideoMuted;
@@ -1682,7 +1685,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isNowMicMuted = isNowMicMuted;
     
     if(oldValue != isNowMicMuted) {
-        [self.RTCkit enableLocalAudio:!isNowMicMuted];
         [self.bottomView updateAudioBtn:isNowMicMuted];
     }
 }
