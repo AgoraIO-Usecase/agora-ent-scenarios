@@ -77,8 +77,8 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     
     public func userJoinedRoom(roomId: String, username: String, ext: [String : Any]?) {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserJoinedRoom(roomId:user:))) {
-            guard let map = ext else { return }
-            self.roomServiceDelegate?.onUserJoinedRoom(roomId: roomId, user: model(from: map, VRUser.self))
+            guard let map = ext,let userMap = map["user"] as? String else { return }
+            self.roomServiceDelegate?.onUserJoinedRoom(roomId: roomId, user: model(from: userMap.z.jsonToDictionary(), VRUser.self))
         }
     }
     
@@ -212,7 +212,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
         let user = self.userList?.first(where: { $0.chat_uid == chatUid })
         user?.mic_index = index
-        VoiceRoomIMManager.shared?.sendCustomMessage(roomId: VoiceRoomIMManager.shared?.currentRoomId ?? "", event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
         })
     }
