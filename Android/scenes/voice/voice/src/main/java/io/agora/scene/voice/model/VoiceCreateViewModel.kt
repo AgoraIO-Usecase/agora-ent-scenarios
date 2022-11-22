@@ -40,10 +40,9 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
     /**
      * 获取房间列表
      * @param page 第几页，暂未用到
-     * @param roomType 房间类型，暂未用到
      */
-    fun getRoomList(page: Int, roomType: Int) {
-        _roomListObservable.setSource(voiceRoomRepository.fetchRoomList(page, roomType))
+    fun getRoomList(page: Int) {
+        _roomListObservable.setSource(voiceRoomRepository.fetchRoomList(page))
     }
 
     /**
@@ -79,10 +78,9 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param password 房间密码
      * @param needRequestConfig 是否需要置换rtcToken 与 获取 im 配置
      */
-    fun joinRoom(roomId: String, password: String? = null, needRequestConfig: Boolean = false) {
-        _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId, password,needRequestConfig))
+    fun joinRoom(roomId: String, needRequestConfig: Boolean = false) {
+        _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId,needRequestConfig))
     }
 }
