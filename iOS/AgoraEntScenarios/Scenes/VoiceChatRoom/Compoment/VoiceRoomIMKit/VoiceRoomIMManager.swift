@@ -71,6 +71,9 @@ fileprivate let once = VoiceRoomIMManager()
 //        options.setValue("https://a1.chat.agora.io", forKeyPath: "chatServer")
         options.setValue("https://a1.chat.agora.io", forKeyPath: "restServer")
         AgoraChatClient.shared().initializeSDK(with: options)
+        #if DEBUG
+        print("sdk version:\(AgoraChatClient.shared().version)")
+        #endif
     }
 
     @objc public func loginIM(userName: String, token: String, completion: @escaping (String, AgoraChatError?) -> Void) {
@@ -118,7 +121,6 @@ public extension VoiceRoomIMManager {
     }
 
     // MARK: - AgoraChatManagerDelegate
-
     func messagesDidReceive(_ aMessages: [AgoraChatMessage]) {
         for message in aMessages {
             if message.body is AgoraChatTextMessageBody {

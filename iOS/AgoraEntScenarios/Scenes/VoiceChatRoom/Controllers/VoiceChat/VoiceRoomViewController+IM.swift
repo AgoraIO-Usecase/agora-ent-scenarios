@@ -13,6 +13,7 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
+    
     func chatTokenWillExpire() {
         self.reLogin()
     }
@@ -90,11 +91,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.didHeaderAction(with: .back, destroyed: destroyed)
     }
     
-    func onRoomSiteDidUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
+    func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
         updateMic(attributeMap, fromId: fromId)
     }
     
-    func onMemberLeave(roomId: String, userName: String) {
+    func onUserLeftRoom(roomId: String, userName: String) {
         let info = roomInfo
         let count: Int = info?.room?.member_count ?? 0
         info?.room?.member_count = count - 1

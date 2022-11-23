@@ -101,20 +101,21 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     }
     
     public func roomAttributesDidUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onRoomSiteDidUpdated(roomId:attributeMap:from:))) {
-            self.roomServiceDelegate?.onRoomSiteDidUpdated(roomId: roomId, attributeMap: attributeMap, from: fromId)
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onSeatUpdated(roomId:attributeMap:from:))) {
+            self.roomServiceDelegate?.onSeatUpdated(roomId: roomId, attributeMap: attributeMap, from: fromId)
         }
     }
     
     public func memberLeave(roomId: String, userName: String) {
-        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onMemberLeave(roomId:userName:))) {
-            self.roomServiceDelegate?.onMemberLeave(roomId: roomId, userName: userName)
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserLeftRoom(roomId:userName:))) {
+            self.roomServiceDelegate?.onUserLeftRoom(roomId: roomId, userName: userName)
         }
     }
     
 }
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
+    
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
@@ -383,13 +384,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func endMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
+    func cancelMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chat_uid, event: VoiceRoomCancelApplySite, customExt: [:], completion: { message, error in
             completion(self.convertError(error: error),error == nil)
         })
     }
     
-    func endMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
         var mic_index = 1
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
