@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.custorm;
+package io.agora.scene.voice.imkit.custorm;
 
 import android.text.TextUtils;
 

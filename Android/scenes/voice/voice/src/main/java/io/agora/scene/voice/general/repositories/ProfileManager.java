@@ -8,7 +8,7 @@ import org.json.JSONException;
 
 import io.agora.voice.buddy.tool.GsonTools;
 import io.agora.chat.ChatClient;
-import io.agora.voice.imkit.manager.ChatroomConfigManager;
+import io.agora.scene.voice.imkit.manager.ChatroomConfigManager;
 import io.agora.voice.network.tools.bean.VRUserBean;
 
 public class ProfileManager {

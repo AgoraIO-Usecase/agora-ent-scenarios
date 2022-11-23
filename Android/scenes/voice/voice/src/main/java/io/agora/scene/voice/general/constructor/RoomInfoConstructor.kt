@@ -112,7 +112,7 @@ object RoomInfoConstructor {
     }
 
     /**
-     * 服务端roomInfo io.agora.voice.imkit.bean 转 麦位 ui io.agora.voice.imkit.bean
+     * 服务端roomInfo io.agora.scene.voice.imkit.bean 转 麦位 ui io.agora.scene.voice.imkit.bean
      */
     fun convertMicUiBean(
         vRoomMicInfoList: List<VoiceMicInfoModel>,
@@ -155,7 +155,7 @@ object RoomInfoConstructor {
     }
 
     /**
-     * micInfo map转换ui io.agora.voice.imkit.bean
+     * micInfo map转换ui io.agora.scene.voice.imkit.bean
      */
     fun convertMicInfoMap2UiBean(micInfoMap: Map<String, VoiceMicInfoModel>, ownerUid: String): Map<Int, MicInfoBean> {
         val micInfoBeanMap = mutableMapOf<Int, MicInfoBean>()
