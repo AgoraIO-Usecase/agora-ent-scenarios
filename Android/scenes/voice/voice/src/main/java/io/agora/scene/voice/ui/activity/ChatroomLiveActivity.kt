@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.view.ViewCompat
@@ -41,6 +40,7 @@ import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceRoomInfo
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomHandsViewDelegate
@@ -53,7 +53,6 @@ import io.agora.voice.imkit.manager.ChatroomListener
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
-import io.agora.voice.network.tools.bean.VRoomInfoBean
 
 @Route(path = RouterPath.ChatroomPath)
 class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
@@ -91,8 +90,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.onCreate(savedInstanceState)
         StatusBarCompat.setLightStatusBar(this, false)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
-        giftViewDelegate = RoomGiftViewDelegate.getInstance(this, binding.chatroomGiftView, binding.svgaView)
-        handsDelegate = RoomHandsViewDelegate.getInstance(this, binding.chatBottom)
+        giftViewDelegate =
+            RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
+        handsDelegate = RoomHandsViewDelegate.getInstance(this, roomLivingViewModel, binding.chatBottom)
         initListeners()
         initData()
         initView()
@@ -110,19 +110,20 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         )
         binding.messageView.refreshSelectLast()
         ChatroomConfigManager.getInstance().setChatRoomListener(this)
+        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
     private fun initListeners() {
         // 房间详情
-        roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VRoomInfoBean> ->
-            parseResource(response, object : OnResourceParseCallback<VRoomInfoBean>() {
+        roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
-                override fun onLoading(data: VRoomInfoBean?) {
+                override fun onLoading(data: VoiceRoomInfo?) {
                     super.onLoading(data)
                     showLoading(false)
                 }
 
-                override fun onSuccess(data: VRoomInfoBean?) {
+                override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
                         binding.chatBottom.showMicVisible(
@@ -168,10 +169,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             binding.clMain.setPaddingRelative(0, systemInset.top, 0, systemInset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.clMain.setOnTouchListener(OnTouchListener { v, event ->
+        binding.clMain.setOnTouchListener { v, event ->
             reset()
             false
-        })
+        }
         binding.messageView.setMessageViewListener(object : RoomMessagesView.MessageViewListener {
             override fun onItemClickListener(message: ChatMessageData?) {
             }
@@ -263,14 +264,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
         binding.cTopView.setTitleMaxWidth()
         roomObservableDelegate.onRoomModel(voiceRoomModel)
-        // 头部 如果是创建房间进来有详情
-//        roomInfoBean?.let {
-//            roomObservableDelegate.onRoomDetails(it)
-//            binding.chatBottom.showMicVisible(
-//                RtcRoomController.get().isLocalAudioMute,
-//                roomObservableDelegate.isOnMic()
-//            )
-//        }
         roomObservableDelegate.onRoomViewDelegateListener = this
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {

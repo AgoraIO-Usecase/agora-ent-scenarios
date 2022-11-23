@@ -30,7 +30,7 @@ interface VoiceServiceProtocol {
      * 注册订阅
      * @param delegate 聊天室内IM回调处理
      */
-    fun subscribeEvent(delegate: VoiceRoomServiceSubscribeDelegate)
+    fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate)
 
     /**
      *  取消订阅
@@ -81,25 +81,25 @@ interface VoiceServiceProtocol {
     /**
      * 获取排行榜列表
      */
-    fun fetchGiftContribute(completion: (error: Int, result: VoiceRankUserModel) -> Unit)
+    fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>) -> Unit)
 
     /**
      * 获取用户列表
      */
-    fun fetchRoomMembers(completion: (error: Int, result: VoiceMemberModel) -> Unit)
+    fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
      * 邀请用户上麦
      * @param chatUid im uid
      */
-    fun startMicSeatInvitation(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun startMicSeatInvitation(chatUid: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 拒绝上麦
      * @param roomId 房间id
      * @param userId 用户id
      */
-    fun refuseInviteToMic(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun refuseInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 禁言指定麦位置
@@ -168,14 +168,21 @@ interface VoiceServiceProtocol {
 
     /**
      * 申请上麦
+     * @param micIndex 麦位index
      */
     fun startMicSeatApply(micIndex: Int? = null, completion: (error: Int, result: Boolean) -> Unit)
+
+    /**
+     * 同意申请
+     * @param chatUid 环信用户id
+     */
+    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 取消上麦
      * @param chatUid im uid
      */
-    fun endMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 更新公告

@@ -1,6 +1,5 @@
 package io.agora.scene.voice.model
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,14 +12,14 @@ import io.agora.scene.voice.general.repositories.NetworkOnlyResource
 import io.agora.scene.voice.general.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceRankUserModel
+import io.agora.scene.voice.service.VoiceRoomInfo
+import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.network.tools.VRDefaultValueCallBack
-import io.agora.voice.network.tools.bean.VRMicBean
-import io.agora.voice.network.tools.bean.VRMicListBean
-import io.agora.voice.network.tools.bean.VRoomInfoBean
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -35,14 +34,12 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val joinRtcChannel = AtomicBoolean(false)
     private val joinImRoom = AtomicBoolean(false)
 
-    private val _roomDetailsObservable: SingleSourceLiveData<Resource<VRoomInfoBean>> = SingleSourceLiveData()
+    private val _roomDetailsObservable: SingleSourceLiveData<Resource<VoiceRoomInfo>> = SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _roomNoticeObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _closeBotObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _robotVolumeObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
-    private val _applyMicListObservable: SingleSourceLiveData<Resource<VRMicListBean>> = SingleSourceLiveData()
-    private val _micInfoObservable: SingleSourceLiveData<Resource<VRMicBean>> = SingleSourceLiveData()
     private val _closeMicObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
     private val _cancelCloseMicObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
     private val _leaveMicObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
@@ -53,11 +50,15 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _lockMicObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
     private val _cancelLockMicObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
     private val _invitationMicObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
-    private val _applySubmitMicObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
-    private val _rejectSubmitMicObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _acceptMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _startMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _cancelMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _changeMicObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _acceptMicSeatInvitationObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
+    private val _giftContributeObservable: SingleSourceLiveData<Resource<List<VoiceRankUserModel>>> = SingleSourceLiveData()
 
     /**房间详情*/
-    fun roomDetailsObservable(): LiveData<Resource<VRoomInfoBean>> = _roomDetailsObservable
+    fun roomDetailsObservable(): LiveData<Resource<VoiceRoomInfo>> = _roomDetailsObservable
 
     /**加入im房间&&rtc 频道*/
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
@@ -73,12 +74,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**改变机器人音量*/
     fun robotVolumeObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _robotVolumeObservable
-
-    /**获取申请列表*/
-    fun applyMicListObservable(): LiveData<Resource<VRMicListBean>> = _applyMicListObservable
-
-    /**麦位信息*/
-    fun micInfoObservable(): LiveData<Resource<VRMicBean>> = _micInfoObservable
 
     /**关麦*/
     fun closeMicObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _closeMicObservable
@@ -111,13 +106,25 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun invitationMicObservable(): LiveData<Resource<Boolean>> = _invitationMicObservable
 
     /**同意上麦申请*/
-    fun applySubmitMicObservable(): LiveData<Resource<Boolean>> = _applySubmitMicObservable
+    fun acceptMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _acceptMicSeatApplyObservable
 
-    /**拒绝上麦申请*/
-    fun rejectSubmitMicObservable(): LiveData<Resource<Boolean>> = _rejectSubmitMicObservable
+    /**申请上麦*/
+    fun startMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _startMicSeatApplyObservable
 
-    fun getDetails(context: Context?, roomId: String?) {
-        _roomDetailsObservable.setSource(mRepository.getRoomInfo(context, roomId))
+    /**取消申请*/
+    fun cancelMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _cancelMicSeatApplyObservable
+
+    /**换麦*/
+    fun changeMicObservable(): LiveData<Resource<Boolean>> = _changeMicObservable
+
+    /**接受邀请*/
+    fun acceptMicSeatInvitationObservable(): LiveData<Resource<Boolean>> = _acceptMicSeatInvitationObservable
+
+    /**获取礼物列表*/
+    fun giftContributeObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _giftContributeObservable
+
+    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
+        _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }
 
     fun initSdkJoin(roomKitBean: RoomKitBean, password: String?) {
@@ -180,90 +187,98 @@ class VoiceRoomLivingViewModel : ViewModel() {
         }
     }
 
-
-    fun activeBot(context: Context, roomId: String, active: Boolean) {
-        if (active) {
-            _openBotObservable.setSource(mRepository.activeBot(context, roomId, true))
-        } else {
-            _closeBotObservable.setSource(mRepository.activeBot(context, roomId, false))
-        }
+    // 开启/关闭机器人
+    fun enableRobot(active: Boolean) {
+        _openBotObservable.setSource(mRepository.enableRobot(active))
     }
 
-    fun updateBotVolume(context: Context, roomId: String, robotVolume: Int) {
-        _robotVolumeObservable.setSource(mRepository.changeRobotVolume(context, roomId, robotVolume))
+    // 更新机器人音量
+    fun updateBotVolume(robotVolume: Int) {
+        _robotVolumeObservable.setSource(mRepository.updateRobotVolume(robotVolume))
     }
 
-    fun updateRoomNotice(context: Context, roomId: String, notice: String) {
-        _roomNoticeObservable.setSource(mRepository.updateRoomNotice(context, roomId, notice))
-    }
-
-    // 获取上麦申请列表
-    fun getApplyMicList(context: Context, roomId: String, cursor: String, micIndex: Int) {
-        _applyMicListObservable.setSource(mRepository.getApplyMicList(context, roomId, cursor, micIndex))
-    }
-
-    // 获取麦位信息
-    fun getMicInfo(context: Context, roomId: String) {
-        _micInfoObservable.setSource(mRepository.getMicInfo(context, roomId))
+    // 更新公告
+    fun updateAnnouncement(notice: String) {
+        _roomNoticeObservable.setSource(mRepository.updateAnnouncement(notice))
     }
 
     // 关麦
-    fun closeMic(context: Context, roomId: String, micIndex: Int) {
-        _closeMicObservable.setSource(mRepository.closeMic(context, roomId, micIndex))
+    fun muteLocal(micIndex: Int) {
+        _closeMicObservable.setSource(mRepository.muteLocal(micIndex))
     }
 
     // 取消关麦
-    fun cancelCloseMic(context: Context, roomId: String, micIndex: Int) {
-        _cancelCloseMicObservable.setSource(mRepository.cancelCloseMic(context, roomId, micIndex))
+    fun unMuteLocal(micIndex: Int) {
+        _cancelCloseMicObservable.setSource(mRepository.unMuteLocal(micIndex))
     }
 
     // 下麦
-    fun leaveMicMic(context: Context, roomId: String, micIndex: Int) {
-        _leaveMicObservable.setSource(mRepository.leaveMicMic(context, roomId, micIndex))
+    fun leaveMicMic(micIndex: Int) {
+        _leaveMicObservable.setSource(mRepository.leaveMic(micIndex))
     }
 
     // 禁言指定麦位
-    fun muteMic(context: Context, roomId: String, micIndex: Int) {
-        _muteMicObservable.setSource(mRepository.muteMic(context, roomId, micIndex))
+    fun forbidMic(micIndex: Int) {
+        _muteMicObservable.setSource(mRepository.forbidMic(micIndex))
     }
 
     // 取消指定麦位禁言
-    fun cancelMuteMic(context: Context, roomId: String, micIndex: Int) {
-        _cancelMuteMicObservable.setSource(mRepository.cancelMuteMic(context, roomId, micIndex))
+    fun cancelMuteMic(micIndex: Int) {
+        _cancelMuteMicObservable.setSource(mRepository.unForbidMic(micIndex))
     }
 
     // 踢用户下麦
-    fun kickMic(context: Context, roomId: String, userId: String, micIndex: Int) {
-        _kickMicObservable.setSource(mRepository.kickMic(context, roomId, userId, micIndex))
+    fun kickOff(micIndex: Int) {
+        _kickMicObservable.setSource(mRepository.kickOff(micIndex))
+    }
+
+    //  邀请上麦
+    fun startMicSeatInvitation(chatUid: String, micIndex: Int?) {
+        _invitationMicObservable.setSource(mRepository.startMicSeatInvitation(chatUid, micIndex))
+    }
+
+    // 接受邀请
+    fun acceptMicSeatInvitation() {
+        _acceptMicSeatInvitationObservable.setSource(mRepository.acceptMicSeatInvitation())
     }
 
     // 用户拒绝上麦申请
-    fun rejectMicInvitation(context: Context, roomId: String) {
-        _rejectMicInvitationObservable.setSource(mRepository.rejectMicInvitation(context, roomId))
+    fun refuseInvite() {
+        _rejectMicInvitationObservable.setSource(mRepository.refuseInvite())
     }
 
     // 锁麦
-    fun lockMic(context: Context, roomId: String, micIndex: Int) {
+    fun lockMic(micIndex: Int) {
         _lockMicObservable.setSource(mRepository.lockMic(micIndex))
     }
 
     // 取消锁麦
-    fun cancelLockMic(context: Context, roomId: String, micIndex: Int) {
-        _cancelLockMicObservable.setSource(mRepository.cancelLockMic(context, roomId, micIndex))
+    fun unLockMic(micIndex: Int) {
+        _cancelLockMicObservable.setSource(mRepository.unLockMic(micIndex))
     }
 
-    //  邀请上麦
-    fun invitationMic(context: Context, roomId: String, userId: String) {
-        _invitationMicObservable.setSource(mRepository.invitationMic(context, roomId, userId))
+    // 申请上麦
+    fun startMicSeatApply(micIndex: Int?){
+        _startMicSeatApplyObservable.setSource(mRepository.startMicSeatApply(micIndex))
+    }
+
+    //取消上麦
+    fun cancelMicSeatApply(chatUid: String){
+        _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatUid))
     }
 
     // 同意上麦申请
-    fun applySubmitMic(context: Context, roomId: String, userId: String, micIndex: Int) {
-        _applySubmitMicObservable.setSource(mRepository.applySubmitMic(context, roomId, userId, micIndex))
+    fun acceptMicSeatApply(chatUid: String) {
+        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(chatUid))
     }
 
-    // 拒绝上麦申请
-    fun rejectSubmitMic(context: Context, roomId: String, userId: String) {
-        _rejectSubmitMicObservable.setSource(mRepository.rejectSubmitMic(context, roomId, userId))
+    // 换麦
+    fun changeMic(oldIndex: Int,newIndex:Int) {
+        _changeMicObservable.setSource(mRepository.changeMic(oldIndex, newIndex))
+    }
+
+    //  获取礼物列
+    fun fetchGiftContribute(){
+        _giftContributeObservable.setSource(mRepository.fetchGiftContribute())
     }
 }
