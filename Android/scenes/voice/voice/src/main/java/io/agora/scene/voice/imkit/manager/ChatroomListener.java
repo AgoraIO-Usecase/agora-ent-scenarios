@@ -1,9 +1,9 @@
-package io.agora.voice.imkit.manager;
+package io.agora.scene.voice.imkit.manager;
 
 import java.util.List;
 import java.util.Map;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
 
 public interface ChatroomListener {
     //收到正常文本消息

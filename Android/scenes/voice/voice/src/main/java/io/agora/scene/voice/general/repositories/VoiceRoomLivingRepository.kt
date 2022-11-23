@@ -243,7 +243,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun lockMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
-                voiceServiceProtocol.lockMic(micIndex, completion = { error, result ->
+                voiceServiceProtocol.lockMic(micIndex, completion = { map,error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {

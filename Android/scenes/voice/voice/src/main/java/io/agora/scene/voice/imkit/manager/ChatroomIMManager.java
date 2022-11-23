@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager;
+package io.agora.scene.voice.imkit.manager;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,18 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.imkit.custorm.OnCustomMsgReceiveListener;
-import io.agora.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.CallBack;
 import io.agora.ChatRoomChangeListener;
 import io.agora.ConnectionListener;
+import io.agora.ValueCallBack;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
+import io.agora.scene.voice.service.VoiceMicInfoModel;
 import io.agora.util.EMLog;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
@@ -442,15 +444,146 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         });
     }
 
-    public void leaveMicMic(int micIndex, CallBack callBack){
-        delegate.leaveMicMic(micIndex,callBack);
+    /**
+     * 邀请上麦
+     * @param chatUid
+     * @param callBack
+     */
+    public void invitationMic(String chatUid,CallBack callBack){delegate.invitationMic(chatUid,callBack);}
+
+    /**
+     * 禁言指定麦位置
+     * @param micIndex
+     * @param callBack
+     */
+    public void forbidMic(int micIndex,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.forbidMic(micIndex,callBack);
     }
 
-    public void closeMic(int micIndex, CallBack callBack){
-        delegate.closeMic(micIndex,callBack);
+    /**
+     * 取消禁言指定麦位置
+     * @param micIndex
+     * @param callBack
+     */
+    public void unForbidMic(int micIndex,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.unForbidMic(micIndex,callBack);
     }
 
-    public void lockMic(int micIndex, CallBack callBack){
+    /**
+     * 锁麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void lockMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
         delegate.lockMic(micIndex,callBack);
     }
+
+    /**
+     * 取消锁麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void unLockMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.unLockMic(micIndex, callBack);
+    }
+
+    /**
+     * 踢用户下麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void kickOff(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.kickOff(micIndex, callBack);
+    }
+
+    /**
+     * 下麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void leaveMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.leaveMic(micIndex,callBack);
+    }
+
+    /**
+     * 关麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void muteLocal(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.muteLocal(micIndex,callBack);
+    }
+
+    /**
+     * 取消关麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void unMuteLocal(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.unMuteLocal(micIndex,callBack);
+    }
+
+    /**
+     * 换麦
+     * @param oldIndex
+     * @param newIndex
+     * @param callBack
+     */
+    public void changeMic(int oldIndex,int newIndex,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.changeMic(oldIndex,newIndex,callBack);
+    }
+
+
+    /**
+     * 接受邀请
+     * @param callBack
+     */
+    public void acceptMicSeatInvitation(ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.acceptMicSeatInvitation(null,callBack);
+    }
+
+    /**
+     * 拒绝邀请
+     * @param chatUid
+     * @param callBack
+     */
+    public void refuseInvite(String chatUid,CallBack callBack){ delegate.refuseInviteToMic(chatUid,callBack);}
+
+    /**
+     * 申请上麦
+     * @param micIndex
+     * @param callBack
+     */
+    public void startMicSeatApply(int micIndex, CallBack callBack){ delegate.startMicSeatApply(null,callBack);}
+
+    /**
+     * 同意申请
+     * @param callBack
+     */
+    public void acceptMicSeatApply(ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.acceptMicSeatApply(null,callBack);
+    }
+
+    /**
+     * 取消上麦
+     * @param chatUid
+     * @param callBack
+     */
+    public void cancelMicSeatApply(String chatUid,CallBack callBack){
+        delegate.cancelSubmitMic(chatUid,callBack);
+    }
+
+
+    /**
+     * 更新公告
+     * @param content
+     */
+    public void updateAnnouncement(String content,CallBack callBack){
+        delegate.updateAnnouncement(content, callBack);
+    }
+
+    public void enableRobot(){}
+    public void updateRobotVolume(){}
+
+
 }

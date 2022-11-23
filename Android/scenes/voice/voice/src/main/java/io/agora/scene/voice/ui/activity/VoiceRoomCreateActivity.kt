@@ -37,7 +37,7 @@ import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools.show
-import io.agora.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
