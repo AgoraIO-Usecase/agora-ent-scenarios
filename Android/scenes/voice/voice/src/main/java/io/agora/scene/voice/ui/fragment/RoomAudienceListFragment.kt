@@ -25,9 +25,7 @@ import io.agora.secnceui.annotation.MicClickAction
 import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.scene.voice.model.VoiceUserListViewModel
-import io.agora.voice.network.tools.VRValueCallBack
-import io.agora.voice.network.tools.bean.VMemberBean
-import io.agora.voice.network.tools.bean.VRoomUserBean
+import io.agora.scene.voice.service.VoiceMemberModel
 
 class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
@@ -47,15 +45,13 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
 
     private var roomKitBean: RoomKitBean? = null
 
-    private lateinit var roomRankViewModel: VoiceUserListViewModel
+    private lateinit var userListViewModel: VoiceUserListViewModel
 
-    private var pageSize = 10
-    private var cursor = ""
     private var total = 0
     private var isEnd = false
-    private val members = mutableListOf<VMemberBean>()
+    private val members = mutableListOf<VoiceMemberModel>()
 
-    private var audienceAdapter: BaseRecyclerViewAdapter<VoiceItemRoomAudienceListBinding, VMemberBean, RoomAudienceListViewHolder>? =
+    private var audienceAdapter: BaseRecyclerViewAdapter<VoiceItemRoomAudienceListBinding, VoiceMemberModel, RoomAudienceListViewHolder>? =
         null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceFragmentAudienceListBinding {
@@ -64,42 +60,18 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomRankViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
+        userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
         arguments?.apply {
             roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
             roomKitBean?.let {
-                roomRankViewModel.getMembers(requireContext(), it.roomId, pageSize, cursor)
+                userListViewModel.fetchRoomMembers()
             }
         }
         binding?.apply {
             initAdapter(rvAudienceList)
             slAudienceList.setOnRefreshListener(this@RoomAudienceListFragment)
         }
-        roomRankViewModel.membersObservable().observe(requireActivity()) { response: Resource<VRoomUserBean> ->
-            parseResource(response, object : OnResourceParseCallback<VRoomUserBean>() {
-                override fun onSuccess(data: VRoomUserBean?) {
-                    binding?.slAudienceList?.isRefreshing = false
-                    "getMembers cursor：${data?.cursor}，total：${data?.total}".logE()
-                    if (data == null) return
-                    cursor = data.cursor ?: ""
-                    total = data.total
-                    checkEmpty()
-                    if (!data.members.isNullOrEmpty()) {
-                        if (data.members.size < pageSize) {
-                            isEnd = true
-                        }
-                        audienceAdapter?.addItems(data.members)
-                    } else {
-                        isEnd = true
-                    }
-                }
-
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    binding?.slAudienceList?.isRefreshing = false
-                }
-            })
-        }
+        onObservable()
     }
 
     private fun checkEmpty() {
@@ -119,16 +91,18 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
             BaseRecyclerViewAdapter(
                 members,
                 null,
-                object : OnItemChildClickListener<VMemberBean> {
+                object : OnItemChildClickListener<VoiceMemberModel> {
                     override fun onItemChildClick(
-                        data: VMemberBean?,
+                        data: VoiceMemberModel?,
                         extData: Any?,
                         view: View,
                         position: Int,
                         itemViewType: Long
                     ) {
-                        if (extData is Int) {
-                            handleRequest(roomKitBean?.roomId, data?.uid, extData)
+                        data?.chatUid?.let {
+                            if (extData is Int) {
+                                handleRequest(it, extData)
+                            }
                         }
                     }
                 },
@@ -149,61 +123,47 @@ class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding
         recyclerView.adapter = audienceAdapter
     }
 
-    override fun onRefresh() {
-        if (isEnd || cursor.isEmpty()) {
-            ThreadManager.getInstance().runOnMainThreadDelay({
-                binding?.slAudienceList?.isRefreshing = false
-            }, 1500)
-        } else {
-            roomKitBean?.let {
-                roomRankViewModel.getMembers(requireContext(), it.roomId, pageSize, cursor)
-            }
+    private fun onObservable() {
+        userListViewModel.membersObservable().observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
+            parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
+                override fun onSuccess(data: List<VoiceMemberModel>?) {
+                    binding?.slAudienceList?.isRefreshing = false
+                    "getMembers total：${data?.size}".logE()
+                    if (data == null) return
+                    total = data.size
+                    checkEmpty()
+                    isEnd = true
+                    if (data.isNotEmpty()) {
+                        audienceAdapter?.addItems(data)
+                    } else {
+                        isEnd = true
+                    }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    binding?.slAudienceList?.isRefreshing = false
+                }
+            })
+        }
+        userListViewModel.kickOffObservable().observe(requireActivity()) {
+            // TODO:
+        }
+        userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) {
+            // TODO:
         }
     }
 
-    private fun handleRequest(roomId: String?, uid: String?, @MicClickAction action: Int) {
-        if (roomId.isNullOrEmpty() || uid.isNullOrEmpty()) return
-        context?.let { parentContext ->
-            if (action == MicClickAction.Invite) {
-                io.agora.scene.voice.general.net.ChatroomHttpManager.getInstance(parentContext)
-                    .invitationMic(roomId, uid, object :
-                        VRValueCallBack<Boolean> {
-                        override fun onSuccess(var1: Boolean?) {
-                            if (var1 != true) return
-                            ThreadManager.getInstance().runOnMainThread(object : Runnable {
-                                override fun run() {
-                                    activity?.let {
-                                        ToastTools.show(it, it.getString(R.string.voice_chatroom_host_invitation_sent))
-                                    }
-                                }
+    override fun onRefresh() {
+        userListViewModel.fetchRoomMembers()
+    }
 
-                            })
-                        }
-
-                        override fun onError(var1: Int, var2: String?) {
-
-                        }
-                    })
-            } else if (action == MicClickAction.KickOff) {
-                io.agora.scene.voice.general.net.ChatroomHttpManager.getInstance(parentContext)
-                    .kickMic(roomId, uid, -1, object :
-                        VRValueCallBack<Boolean> {
-                        override fun onSuccess(var1: Boolean?) {
-                            if (var1 != true) return
-                            activity?.let {
-                                ToastTools.show(it, "kickMic success")
-                            }
-                        }
-
-                        override fun onError(var1: Int, var2: String?) {
-                            activity?.let {
-                                ToastTools.show(it, "kickMic onError $var1 $var2")
-                            }
-                        }
-                    })
-            }
+    private fun handleRequest(uid: String, @MicClickAction action: Int) {
+        if (action == MicClickAction.Invite) {
+            userListViewModel.startMicSeatInvitation(uid, -1)
+        } else if (action == MicClickAction.KickOff) {
+            // TODO: 计算当前用户麦位
+            userListViewModel.kickOff(-1)
         }
-
-
     }
 }
