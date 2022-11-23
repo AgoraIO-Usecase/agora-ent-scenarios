@@ -7,7 +7,7 @@ import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
 import io.agora.voice.buddy.tool.GsonTools
-import io.agora.scene.voice.imkit.bean.ChatroomMicBean
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import java.io.*
 
 class ChatroomCacheManager {
@@ -52,11 +52,11 @@ class ChatroomCacheManager {
     /**
      * 获取指定麦位的Mic信息
      */
-    fun getMicInfoByIndex(micIndex: Int): ChatroomMicBean?{
+    fun getMicInfoByIndex(micIndex: Int): VoiceMicInfoModel?{
         var indexTag = "mic_$micIndex"
         val localAttributeMap = getMicInfoMap()
         if (localAttributeMap != null && localAttributeMap.containsKey(indexTag)){
-            return GsonTools.toBean(localAttributeMap[indexTag], ChatroomMicBean::class.java)
+            return GsonTools.toBean(localAttributeMap[indexTag], VoiceMicInfoModel::class.java)
         }
         return null
     }
