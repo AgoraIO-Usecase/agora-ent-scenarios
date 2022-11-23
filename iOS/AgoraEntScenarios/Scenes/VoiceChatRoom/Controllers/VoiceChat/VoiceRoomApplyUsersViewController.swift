@@ -77,9 +77,10 @@ extension VoiceRoomApplyUsersViewController {
 
     private func agreeUserApply(user: VoiceRoomApply?) {
         SVProgressHUD.show()
-        guard let user = user?.member else { return }
-        ChatRoomServiceImp.getSharedInstance().acceptMicSeatApply(chatUid: user.chat_uid ?? "", completion: { error in
+        guard let user1 = user?.member else { return }
+        ChatRoomServiceImp.getSharedInstance().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: { error in
             SVProgressHUD.dismiss()
+            self.tableView.reloadData()
             if error == nil {
                 self.view.makeToast("Agree success!".localized())
             } else {
