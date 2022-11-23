@@ -123,7 +123,6 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
-    
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         VoiceRoomIMManager.shared?.updateAnnouncement(content: content, completion: completion)
     }
@@ -217,14 +216,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-        let user = self.userList?.first(where: { $0.chat_uid == chatUid })
-        user?.mic_index = index
-        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
-            completion(self.convertError(error: error),error == nil)
-        })
-    }
-    
     func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void) {
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
             if let ranking_list = map?["ranking_list"]?.toArray() {
@@ -252,6 +243,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             mic.status = 2
         }
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = mic.status
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -262,6 +256,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         mic.status = 0
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = 0
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -276,6 +273,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             mic.status = 3
         }
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = mic.status
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -286,6 +286,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         mic.status = 0
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = 0
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -295,6 +298,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = mic_index
         mic.status = -1
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[mic_index] = mic
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -304,6 +310,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = mic_index
         mic.status = -1
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[mic_index] = mic
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -314,6 +323,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         mic.status = 1
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = 1
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -324,6 +336,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         mic.status = 0
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[safe: mic_index]?.status = 0
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -348,6 +363,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         new_mic.mic_index = new_index
         new_mic.member = VoiceRoomUserInfo.shared.user
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)":old_mic.kj.JSONString(),"mic_\(new_index)":new_mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.mics[old_index] = old_mic
+                self.mics[new_index] = new_mic
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -356,7 +375,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         
     }
     
-    func acceptMicSeatInvitation(completion: @escaping (Error?, Bool) -> Void) {
+    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
+        let user = self.userList?.first(where: { $0.chat_uid == chatUid })
+        user?.mic_index = index
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: VoiceRoomInviteSite, customExt: ["user" : user?.kj.JSONString() ?? ""], completion: { message, error in
+            completion(self.convertError(error: error),error == nil)
+        })
+    }
+    
+    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
         let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
@@ -376,16 +403,18 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.chat_uid ?? ""
                 }
-                var currentMic = self.mics[safe: mic.mic_index]
+                let currentMic = self.mics[safe: mic.mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic.mic_index]  = mic
-                    NotificationCenter.default.post(name: Notification.Name("updateMicInfo"), object: mic)
+                    completion(nil,currentMic)
                 } else {
-                    completion(self.normalError(),false)
+                    completion(self.normalError(),nil)
                     return
                 }
+            } else {
+                completion(self.convertError(error: error),nil)
             }
-            completion(self.convertError(error: error),error == nil)
+            
         })
     }
     
@@ -413,7 +442,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?) -> Void) {
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void) {
         var mic_index = 1
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
@@ -432,16 +461,17 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                 }
-                var currentMic = self.mics[safe: user?.index ?? 1]
+                let currentMic = self.mics[safe: user?.index ?? 1]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
-                    NotificationCenter.default.post(name: Notification.Name("updateMicInfo"), object: mic)
+                    completion(nil,currentMic)
                 } else {
-                    completion(self.normalError())
+                    completion(self.normalError(),nil)
                     return
                 }
+            } else {
+                completion(self.convertError(error: error),nil)
             }
-            completion(self.convertError(error: error))
         })
     }
     
