@@ -34,7 +34,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/beauty_IOS_lite"
         model.key = "smooth"
         model.value = 0.8
-        model.name = "磨皮"
+        model.name = "磨皮".show_localized
         model.icon = "meiyan_icon_mopi"
         dataArray.append(model)
         
@@ -42,7 +42,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/beauty_IOS_lite"
         model.key = "whiten"
         model.value = 0.35
-        model.name = "美白"
+        model.name = "美白".show_localized
         model.icon = "meiyan_icon_meibai"
         dataArray.append(model)
         
@@ -50,7 +50,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Overall"
         model.value = 0.35
-        model.name = "瘦脸"
+        model.name = "瘦脸".show_localized
         model.icon = "meiyan_icon_shoulian"
         dataArray.append(model)
         
@@ -58,7 +58,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Cheekbone"
         model.value = 0.2
-        model.name = "瘦颧骨"
+        model.name = "瘦颧骨".show_localized
         model.icon = "meiyan_icon_shouquangu"
         dataArray.append(model)
         
@@ -66,7 +66,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Eye"
         model.value = 0.4
-        model.name = "大眼"
+        model.name = "大眼".show_localized
         model.icon = "meiyan_icon_dayan"
         dataArray.append(model)
         
@@ -74,7 +74,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Nose"
         model.value = 0.2
-        model.name = "瘦鼻"
+        model.name = "瘦鼻".show_localized
         model.icon = "meiyan_icon_shoubi"
         dataArray.append(model)
         
@@ -82,7 +82,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Chin"
         model.value = 0.6
-        model.name = "下巴"
+        model.name = "下巴".show_localized
         model.icon = "meiyan_icon_xiaba"
         dataArray.append(model)
         
@@ -90,7 +90,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Jawbone"
         model.value = 0.2
-        model.name = "下颌骨"
+        model.name = "下颌骨".show_localized
         model.icon = "meiyan_icon_xiahegu"
         dataArray.append(model)
         
@@ -98,7 +98,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Forehead"
         model.value = 0
-        model.name = "额头"
+        model.name = "额头".show_localized
         model.icon = "meiyan_icon_etou"
         dataArray.append(model)
         
@@ -106,23 +106,15 @@ class ByteBeautyModel: ByteBaseModel {
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_ZoomMouth"
         model.value = 0.1
-        model.name = "嘴型"
+        model.name = "嘴型".show_localized
         model.icon = "meiyan_icon_zuixing"
         dataArray.append(model)
-        
-        model = ByteBeautyModel()
-        model.path = "/beauty_4Items"
-        model.key = "BEF_BEAUTY_BRIGHTEN_EYE"
-        model.value = 0.5
-        model.name = "亮眼"
-        model.icon = "meiyan_icon_liangyan"
-        dataArray.append(model)
-        
+    
         model = ByteBeautyModel()
         model.path = "/beauty_4Items"
         model.key = "BEF_BEAUTY_WHITEN_TEETH"
         model.value = 0.6
-        model.name = "美牙"
+        model.name = "美牙".show_localized
         model.icon = "meiyan_icon_meiya"
         dataArray.append(model)
         
@@ -141,7 +133,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.key = "Filter_ALL"
         model.value = 0.5
         model.makupValue = 0.6
-        model.name = "白皙"
+        model.name = "白皙".show_localized
         model.icon = "meiyan_fgz_baixi"
         dataArray.append(model)
         
@@ -150,7 +142,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.key = "Filter_ALL"
         model.value = 0.5
         model.makupValue = 0.6
-        model.name = "甜美"
+        model.name = "甜美".show_localized
         model.icon = "meiyan_fgz_tianmei"
         dataArray.append(model)
         
@@ -159,7 +151,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.key = "Filter_ALL"
         model.value = 0.5
         model.makupValue = 0.6
-        model.name = "C位"
+        model.name = "C位".show_localized
         model.icon = "meiyan_fgz_cwei"
         dataArray.append(model)
         
@@ -168,7 +160,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.key = "Filter_ALL"
         model.value = 0.5
         model.makupValue = 0.6
-        model.name = "元气"
+        model.name = "元气".show_localized
         model.icon = "meiyan_fgz_yuanqi"
         dataArray.append(model)
     
@@ -185,70 +177,70 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "Filter_02_14"
         model.value = 0.4
-        model.name = "奶油"
+        model.name = "奶油".show_localized
         model.icon = "meiyan_lj_naiyou"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_07_06"
         model.value = 0.4
-        model.name = "马卡龙"
+        model.name = "马卡龙".show_localized
         model.icon = "meiyan_lj_makalong"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_03_20"
         model.value = 0.4
-        model.name = "氧气"
+        model.name = "氧气".show_localized
         model.icon = "meiyan_lj_yangqi"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_11_09"
         model.value = 0.4
-        model.name = "物语"
+        model.name = "物语".show_localized
         model.icon = "meiyan_lj_wuyu"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_31_Po9"
         model.value = 0.4
-        model.name = "海边人像"
+        model.name = "海边人像".show_localized
         model.icon = "meiyan_lj_haibian"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_05_10"
         model.value = 0.4
-        model.name = "洛丽塔"
+        model.name = "洛丽塔".show_localized
         model.icon = "meiyan_lj_luolita"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_06_03"
         model.value = 0.4
-        model.name = "蜜桃"
+        model.name = "蜜桃".show_localized
         model.icon = "meiyan_lj_mitao"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_09_19"
         model.value = 0.4
-        model.name = "樱花"
+        model.name = "樱花".show_localized
         model.icon = "meiyan_lj_yinghua"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_12_08"
         model.value = 0.4
-        model.name = "北海道"
+        model.name = "北海道".show_localized
         model.icon = "meiyan_lj_beihaidao"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "Filter_45_S3"
         model.value = 0.4
-        model.name = "旅途"
+        model.name = "旅途".show_localized
         model.icon = "meiyan_lj_lvtu"
         dataArray.append(model)
     
@@ -264,13 +256,13 @@ class ByteBeautyModel: ByteBaseModel {
         
         model = ByteBeautyModel()
         model.path = "biti"
-        model.name = "鼻涕"
+        model.name = "鼻涕".show_localized
         model.icon = "meiyan_lj_naiyou"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "test_sticker"
-        model.name = "周年狂欢"
+        model.name = "周年狂欢".show_localized
         model.icon = "meiyan_lj_makalong"
         dataArray.append(model)
         
