@@ -89,15 +89,23 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId, isOwner: self.isOwner) { _, _ in
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in
             
         }
         self.didHeaderAction(with: .back, destroyed: destroyed)
     }
     
     func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-        updateMic(attributeMap, fromId: fromId)
+        if attributeMap!.keys.contains(where: { text in
+            text.hasPrefix("mic_")
+        }) {
+            updateMic(attributeMap, fromId: fromId)
+        }
     }
+    
+//    func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
+//        updateMic(attributeMap, fromId: fromId)
+//    }
     
     func onUserLeftRoom(roomId: String, userName: String) {
         let info = roomInfo
