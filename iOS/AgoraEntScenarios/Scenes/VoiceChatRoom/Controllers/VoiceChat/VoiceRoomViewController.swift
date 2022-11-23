@@ -410,7 +410,7 @@ extension VoiceRoomViewController {
 
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId, isOwner: self.isOwner) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in
             
         }
         
@@ -419,7 +419,7 @@ extension VoiceRoomViewController {
 //                debugPrint("result:\(result)")
 //            }
 //        }
-        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+       // VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
