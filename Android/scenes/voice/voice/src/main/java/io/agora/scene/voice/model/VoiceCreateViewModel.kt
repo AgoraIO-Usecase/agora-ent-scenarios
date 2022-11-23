@@ -78,9 +78,8 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param needRequestConfig 是否需要置换rtcToken 与 获取 im 配置
      */
-    fun joinRoom(roomId: String, needRequestConfig: Boolean = false) {
-        _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId,needRequestConfig))
+    fun joinRoom(roomId: String) {
+        _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId))
     }
 }
