@@ -2,6 +2,7 @@ package io.agora.scene.voice.service
 
 import android.content.Context
 import android.text.TextUtils
+import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
@@ -11,6 +12,7 @@ import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.voice.buddy.config.ConfigConstants
 import kotlin.collections.HashMap
 
 /**
@@ -255,8 +257,13 @@ class VoiceSyncManagerServiceImp(
     /**
      * 举手列表
      */
-    override fun fetchRaisedList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
-
+    override fun fetchRaisedList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
+       var raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
+        if (raisedList != null && raisedList.size > 0){
+            completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
+        }else{
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED,raisedList)
+        }
     }
 
     /**
@@ -264,13 +271,32 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().startMicSeatApply(object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+            }
+        })
     }
 
     /**
      * 同意申请
      * @param chatUid 环信用户id
      */
-    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().acceptMicSeatApply(chatUid,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+            }
+        })
     }
 
     /**
@@ -278,6 +304,15 @@ class VoiceSyncManagerServiceImp(
      * @param chatUid im uid
      */
     override fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().cancelMicSeatApply(chatUid,object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+            }
+        })
     }
 
     /**
@@ -289,16 +324,35 @@ class VoiceSyncManagerServiceImp(
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
+        ChatroomIMManager.getInstance().invitationMic(chatUid,object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+            }
+        })
     }
 
     /**
      * 接受邀请
      */
-    override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().acceptMicSeatInvitation(object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+            }
+        })
     }
 
     /**
-     * 拒绝邀请
+     * 拒绝邀请 (未实现)
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
     }
@@ -307,45 +361,85 @@ class VoiceSyncManagerServiceImp(
      * mute
      * @param micIndex 麦位index
      */
-    override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().muteLocal(micIndex,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+            }
+        })
     }
 
     /**
      * unMute
      * @param micIndex 麦位index
      */
-    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().unMuteLocal(micIndex,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+            }
+        })
     }
 
     /**
      * 禁言指定麦位置
      * @param micIndex 麦位index
      */
-    override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().forbidMic(micIndex,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
      * 取消禁言指定麦位置
      * @param micIndex 麦位index
      */
-    override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().unForbidMic(micIndex,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
      * 锁麦
      * @param micIndex 麦位index
      */
-    override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
-        ChatroomIMManager.getInstance().lockMic(micIndex, object :ValueCallBack<Map<Int,VoiceMicInfoModel>>{
-            override fun onSuccess(value: Map<Int, VoiceMicInfoModel>?) {
+    override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().lockMic(micIndex, object :ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
                 ThreadManager.getInstance().runOnIOThread {
-//                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, value)
                 }
             }
 
             override fun onError(error: Int, errorMsg: String?) {
                 ThreadManager.getInstance().runOnIOThread {
-//                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                 }
             }
 
@@ -356,21 +450,49 @@ class VoiceSyncManagerServiceImp(
      * 取消锁麦
      * @param micIndex 麦位index
      */
-    override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().unLockMic(micIndex,object :
+            ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
      * 踢用户下麦
      * @param micIndex 麦位index
      */
-    override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().kickOff(micIndex,object : ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
      * 下麦
      * @param micIndex 麦位index
      */
-    override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
+        ChatroomIMManager.getInstance().leaveMic(micIndex,object : ValueCallBack<VoiceMicInfoModel>{
+            override fun onSuccess(value: VoiceMicInfoModel) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
@@ -381,8 +503,18 @@ class VoiceSyncManagerServiceImp(
     override fun changeMic(
         oldIndex: Int,
         newIndex: Int,
-        completion: (error: Int, result: Map<String, VoiceMicInfoModel>) -> Unit
+        completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit
     ) {
+        ChatroomIMManager.getInstance().changeMic(oldIndex,newIndex,object :
+            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>>{
+            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
@@ -390,15 +522,32 @@ class VoiceSyncManagerServiceImp(
      * @param content 公告内容
      */
     override fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().updateAnnouncement(content,object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+            }
 
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+            }
+        })
     }
 
     /**
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    override fun enableRobot(enable: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun enableRobot(enable: Boolean, completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit) {
+        ChatroomIMManager.getInstance().enableRobot(enable,object :
+            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>>{
+            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+            }
 
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+            }
+        })
     }
 
     /**
@@ -406,7 +555,15 @@ class VoiceSyncManagerServiceImp(
      * @param value 音量
      */
     override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().updateRobotVolume(value,object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+            }
 
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+            }
+        })
     }
 
     private fun initScene(complete: () -> Unit) {

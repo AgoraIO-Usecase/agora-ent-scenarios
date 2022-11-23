@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.agora.CallBack;
 import io.agora.ChatRoomChangeListener;
@@ -23,6 +24,8 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
+import io.agora.scene.voice.service.VoiceBuddyFactory;
+import io.agora.scene.voice.service.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceMicInfoModel;
 import io.agora.util.EMLog;
 
@@ -445,18 +448,37 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
+     * 初始化麦位信息
+     * @param roomType
+     * @param callBack
+     */
+    public void initMicInfo(int roomType,CallBack callBack){
+        VoiceMemberModel voiceMemberModel = new VoiceMemberModel(
+                VoiceBuddyFactory.get().getVoiceBuddy().userId(),
+                VoiceBuddyFactory.get().getVoiceBuddy().chatUid(),
+                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                0);
+        delegate.initMicInfo(roomType,voiceMemberModel,callBack);
+    }
+
+    /**
      * 邀请上麦
      * @param chatUid
      * @param callBack
      */
-    public void invitationMic(String chatUid,CallBack callBack){delegate.invitationMic(chatUid,callBack);}
+    public void invitationMic(String chatUid,CallBack callBack){delegate.invitationMic(chatUid,null,callBack);}
+
+    public void invitationMic(String chatUid,int micIndex,CallBack callBack){delegate.invitationMic(chatUid,micIndex,callBack);}
+
 
     /**
      * 禁言指定麦位置
      * @param micIndex
      * @param callBack
      */
-    public void forbidMic(int micIndex,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void forbidMic(int micIndex,ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.forbidMic(micIndex,callBack);
     }
 
@@ -465,7 +487,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void unForbidMic(int micIndex,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void unForbidMic(int micIndex,ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.unForbidMic(micIndex,callBack);
     }
 
@@ -474,7 +496,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void lockMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void lockMic(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.lockMic(micIndex,callBack);
     }
 
@@ -483,7 +505,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void unLockMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void unLockMic(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.unLockMic(micIndex, callBack);
     }
 
@@ -492,7 +514,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void kickOff(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void kickOff(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.kickOff(micIndex, callBack);
     }
 
@@ -501,7 +523,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void leaveMic(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void leaveMic(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.leaveMic(micIndex,callBack);
     }
 
@@ -510,7 +532,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void muteLocal(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void muteLocal(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.muteLocal(micIndex,callBack);
     }
 
@@ -519,7 +541,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void unMuteLocal(int micIndex, ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void unMuteLocal(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.unMuteLocal(micIndex,callBack);
     }
 
@@ -538,7 +560,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * 接受邀请
      * @param callBack
      */
-    public void acceptMicSeatInvitation(ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void acceptMicSeatInvitation(ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.acceptMicSeatInvitation(null,callBack);
     }
 
@@ -554,13 +576,15 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param micIndex
      * @param callBack
      */
-    public void startMicSeatApply(int micIndex, CallBack callBack){ delegate.startMicSeatApply(null,callBack);}
+    public void startMicSeatApply(int micIndex, CallBack callBack){ delegate.startMicSeatApply(micIndex,callBack);}
+    public void startMicSeatApply(CallBack callBack){ delegate.startMicSeatApply(null,callBack);}
+
 
     /**
      * 同意申请
      * @param callBack
      */
-    public void acceptMicSeatApply(ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void acceptMicSeatApply(String chatUid,ValueCallBack<VoiceMicInfoModel> callBack){
         delegate.acceptMicSeatApply(null,callBack);
     }
 
@@ -582,8 +606,31 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.updateAnnouncement(content, callBack);
     }
 
-    public void enableRobot(){}
-    public void updateRobotVolume(){}
+    /**
+     * 举手列表
+     * @return
+     */
+    public Set<VoiceMemberModel> fetchRaisedList(){
+        return delegate.fetchRaisedList();
+    }
+
+    /**
+     * 是否启用机器人
+     * @param enable true 启动机器人，false 关闭机器人
+     * @param callBack
+     */
+    public void enableRobot(Boolean enable,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+        delegate.enableRobot(enable,callBack);
+    }
+
+    /**
+     * 更新机器人音量
+     * @param volume
+     * @param callBack
+     */
+    public void updateRobotVolume(int volume,CallBack callBack){
+        delegate.updateRobotVolume(volume,callBack);
+    }
 
 
 }

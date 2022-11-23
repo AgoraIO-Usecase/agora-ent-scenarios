@@ -83,7 +83,7 @@ interface VoiceServiceProtocol {
     /**
      * 举手列表
      */
-    fun fetchRaisedList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
+    fun fetchRaisedList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit)
 
     /**
      * 申请上麦
@@ -95,7 +95,7 @@ interface VoiceServiceProtocol {
      * 同意申请
      * @param chatUid 环信用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消上麦
@@ -112,7 +112,7 @@ interface VoiceServiceProtocol {
     /**
      * 接受邀请
      */
-    fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 拒绝邀请
@@ -123,49 +123,49 @@ interface VoiceServiceProtocol {
      * mute
      * @param micIndex 麦位index
      */
-    fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * unMute
      * @param micIndex 麦位index
      */
-    fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 禁言指定麦位置
      * @param micIndex 麦位index
      */
-    fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消禁言指定麦位置
      * @param micIndex 麦位index
      */
-    fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 锁麦
      * @param micIndex 麦位index
      */
-    fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消锁麦
      * @param micIndex 麦位index
      */
-    fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 踢用户下麦
      * @param micIndex 麦位index
      */
-    fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 下麦
      * @param micIndex 麦位index
      */
-    fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+    fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 换麦
@@ -175,7 +175,7 @@ interface VoiceServiceProtocol {
     fun changeMic(
         oldIndex: Int,
         newIndex: Int,
-        completion: (error: Int, result: Map<String, VoiceMicInfoModel>) -> Unit
+        completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit
     )
 
     /**
@@ -188,7 +188,7 @@ interface VoiceServiceProtocol {
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    fun enableRobot(enable: Boolean, completion: (error: Int, result: Boolean) -> Unit)
+    fun enableRobot(enable: Boolean, completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit)
 
     /**
      * 更新机器人音量

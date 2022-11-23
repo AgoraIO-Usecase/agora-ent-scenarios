@@ -41,9 +41,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.enableRobot(useRobot, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+//                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        callBack.onError(error)
+//                        callBack.onError(error)
                     }
                 })
             }
