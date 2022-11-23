@@ -1,6 +1,8 @@
 package io.agora.scene.voice.imkit.manager
 
+import android.text.TextUtils
 import io.agora.CallBack
+import io.agora.ResultCallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
@@ -13,6 +15,7 @@ import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.voice.buddy.config.ConfigConstants
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -20,39 +23,40 @@ class ChatroomProtocolDelegate constructor(
     companion object {
         private const val TAG = "ChatroomProtocolDelegate"
     }
-    var roomManager  : ChatRoomManager = ChatClient.getInstance().chatroomManager()
+    private var roomManager  : ChatRoomManager = ChatClient.getInstance().chatroomManager()
     lateinit var ownerBean : VoiceMemberModel
 
     /////////////////////// mic ///////////////////////////
 
     /**
-     * 初始化麦位信息 （这里缺少 房间类型参数  3D空间音频初始化麦位信息和普通房间有区别）
+     * 初始化麦位信息
      */
-    fun initMicInfo(ownerBean:VoiceMemberModel,callBack: CallBack){
+    fun initMicInfo(roomType: Int, ownerBean:VoiceMemberModel, callBack: CallBack){
         val attributeMap = mutableMapOf<String, String>()
         this@ChatroomProtocolDelegate.ownerBean = ownerBean
-        for (i in 1..7) {
-            var key = "mic_"
-            var status = -1
-            key += i
-            if (i >= 6) status = -2
-            var mBean = GsonTools.beanToString(VoiceMicInfoModel(i,null,status))
-            if (mBean != null){
-                attributeMap[key] = mBean
-            }
-        }
-        var oBean = GsonTools.beanToString(VoiceMicInfoModel(0,ownerBean,0))
-        if (oBean != null){
-            attributeMap["mic_0"] = oBean
-            roomManager.asyncSetChatroomAttributesForced(roomId,attributeMap,true
-            ) { code, result_map ->
-                if (code == 200){
-                    callBack.onSuccess()
-                    "update result onSuccess: ".logE(TAG)
-                }else{
-                    callBack.onError(code,result_map.toString())
-                    "update result onError: $code $result_map ".logE(TAG)
+        if (roomType == ConfigConstants.RoomType.Common_Chatroom ){
+            attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0,ownerBean,0)).toString()
+            for (i in 1..7) {
+                var key = "mic_"
+                var status = -1
+                key += i
+                if (i >= 6) status = -2
+                var mBean = GsonTools.beanToString(VoiceMicInfoModel(i,null,status))
+                if (mBean != null){
+                    attributeMap[key] = mBean
                 }
+            }
+        }else if (roomType == ConfigConstants.RoomType.Spatial_Chatroom){
+
+        }
+        roomManager.asyncSetChatroomAttributesForced(roomId,attributeMap,true
+        ) { code, result_map ->
+            if (code == 200){
+                callBack.onSuccess()
+                "update result onSuccess: ".logE(TAG)
+            }else{
+                callBack.onError(code,result_map.toString())
+                "update result onError: $code $result_map ".logE(TAG)
             }
         }
     }
@@ -131,7 +135,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 下麦
      */
-    fun leaveMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun leaveMic(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,-1,false,callback)
     }
 
@@ -140,12 +144,12 @@ class ChatroomProtocolDelegate constructor(
      */
     fun changeMic(fromMicIndex: Int,toMicIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
         val attributeMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
-        var fromKey = getMicIndex(fromMicIndex)
-        var toKey = getMicIndex(toMicIndex)
-        var fromBean = getMicInfo(fromMicIndex)
-        var toMicBean =  getMicInfo(toMicIndex)
-        var fromBeanValue = GsonTools.beanToString(fromBean)
-        var toBeanValue = GsonTools.beanToString(toMicBean)
+        val fromKey = getMicIndex(fromMicIndex)
+        val toKey = getMicIndex(toMicIndex)
+        val fromBean = getMicInfo(fromMicIndex)
+        val toMicBean =  getMicInfo(toMicIndex)
+        val fromBeanValue = GsonTools.beanToString(fromBean)
+        val toBeanValue = GsonTools.beanToString(toMicBean)
         if (toMicBean != null && fromBean != null && toMicBean.micStatus == -1){
             if (toBeanValue != null){
                 attributeMap?.put(fromKey,toBeanValue )
@@ -172,58 +176,56 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 关麦
      */
-    fun muteLocal(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun muteLocal(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,0,false,callback)
     }
 
     /**
      * 取消关麦
      */
-    fun unMuteLocal(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun unMuteLocal(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,1,false,callback)
     }
 
     /**
      * 禁言指定麦位
      */
-    fun forbidMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun forbidMic(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,2,true,callback)
     }
     /**
      * 取消指定麦位禁言
      */
-    fun unForbidMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun unForbidMic(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,-1,true,callback)
     }
 
     /**
      * 踢用户下麦
      */
-    fun kickOff(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun kickOff(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,-1,true,callback)
     }
 
     /**
      * 锁麦
      */
-    fun lockMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun lockMic(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,3,true,callback)
     }
 
     /**
      * 取消锁麦
      */
-    fun unLockMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun unLockMic(micIndex: Int,callback: ValueCallBack<VoiceMicInfoModel>){
         updateMicByResult(micIndex,-1,true,callback)
     }
 
-
-    /////////////////////////// user ////////////////////////
     /**
-     * 获取上麦申请列表（需要用到 ApplyListBean 等imkit 挪动到voice下 加上）
+     * 获取上麦申请列表
      */
-    fun getApplyMicList(){
-
+    fun fetchRaisedList():MutableSet<VoiceMemberModel>{
+        return ChatroomCacheManager.cacheManager.getSubmitMicList()
     }
 
     /**
@@ -240,13 +242,13 @@ class ChatroomProtocolDelegate constructor(
         if (micIndex != null){
             attributeMap["mic_index"] = micIndex.toString()
         }
-        sendChatroomEvent(userBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
+        sendChatroomEvent(true,userBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
     }
 
     /**
      * 同意上麦申请
      */
-    fun acceptMicSeatApply(micIndex:Int? = null ,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun acceptMicSeatApply(micIndex:Int? = null,callback: ValueCallBack<VoiceMicInfoModel>){
         if (micIndex != null){
             updateMicByResult(micIndex,0,false,callback)
         }else{
@@ -268,7 +270,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         var userBeam = VoiceMemberModel(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(chatUid,CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
+        sendChatroomEvent(true,chatUid,CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
     }
 
     /**
@@ -281,11 +283,11 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 邀请上麦
      */
-    fun invitationMic(chatUid:String,callback: CallBack){
+    fun invitationMic(chatUid:String,micIndex: Int? = null,callback: CallBack){
         val attributeMap = mutableMapOf<String, String>()
         var userBeam = VoiceMemberModel(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(chatUid,CustomMsgType.CHATROOM_INVITE_SITE,attributeMap,callback)
+        sendChatroomEvent(true,chatUid,CustomMsgType.CHATROOM_INVITE_SITE,attributeMap,callback)
     }
 
     /**
@@ -296,13 +298,13 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         var userBeam = VoiceMemberModel(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(chatUid,CustomMsgType.CHATROOM_INVITE_REFUSED_SITE,attributeMap,callback)
+        sendChatroomEvent(true,chatUid,CustomMsgType.CHATROOM_INVITE_REFUSED_SITE,attributeMap,callback)
     }
 
     /**
      * 用户同意上麦邀请
      */
-    fun acceptMicSeatInvitation(micIndex:Int? = null,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    fun acceptMicSeatInvitation(micIndex:Int? = null,callback: ValueCallBack<VoiceMicInfoModel>){
         if (micIndex != null){
             updateMicByResult(micIndex,0,false,callback)
         }else{
@@ -331,8 +333,39 @@ class ChatroomProtocolDelegate constructor(
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    fun enableRobot(enable: Boolean,callback: CallBack){
-
+    fun enableRobot(enable: Boolean,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        val attributeMap = mutableMapOf<String, String>()
+        val currentUser = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+        var robot6 = VoiceMicInfoModel()
+        var robot7 = VoiceMicInfoModel()
+        if (TextUtils.equals(ownerBean.chatUid,currentUser)){
+            if (enable){
+                robot6.micIndex = 6
+                robot6.micStatus = 5
+                robot7.micIndex = 7
+                robot7.micStatus = 5
+            }else{
+                robot6.micIndex = 6
+                robot6.micStatus = -2
+                robot7.micIndex = 7
+                robot7.micStatus = -2
+            }
+            attributeMap["mic_6"] = GsonTools.beanToString(robot6).toString()
+            attributeMap["mic_7"] = GsonTools.beanToString(robot7).toString()
+            roomManager.asyncSetChatroomAttributes(roomId,attributeMap,true
+            ) { code, result ->
+                if (code == 200 && result.isEmpty()){
+                    var map = mutableMapOf<Int, VoiceMicInfoModel>()
+                    map[6] = robot6
+                    map[7] = robot7
+                    callback.onSuccess(map)
+                    "update result onSuccess: ".logE(TAG)
+                }else{
+                    callback.onError(code,result.toString())
+                    "update result onError: $code $result ".logE(TAG)
+                }
+            }
+        }
     }
 
     /**
@@ -340,52 +373,16 @@ class ChatroomProtocolDelegate constructor(
      * @param value 音量
      */
     fun updateRobotVolume(value: Int,callback: CallBack){
-
-    }
-
-    /**
-     * 更新指定麦位信息
-     */
-    private fun updateMic(micIndex: Int, status: Int,isForced:Boolean,callback: CallBack){
-        val voiceMicInfo = getMicInfo(micIndex) ?: return
-        voiceMicInfo.micStatus = status
-        voiceMicInfo.micIndex = micIndex
-        var value = GsonTools.beanToString(voiceMicInfo)
-        if (value != null && isForced){
-            roomManager.asyncSetChatroomAttribute(roomId,getMicIndex(micIndex),
-                value, true,object : CallBack{
-                    override fun onSuccess() {
-                        callback.onSuccess()
-                        "updateMic onSuccess: ".logE(TAG)
-                    }
-
-                    override fun onError(code: Int, desc: String?) {
-                        callback.onError(code,desc)
-                        "updateMic onError: $code $desc".logE(TAG)
-                    }
-                })
-        }else{
-            roomManager.asyncSetChatroomAttributeForced(roomId,getMicIndex(micIndex),
-                value, true,object : CallBack{
-                    override fun onSuccess() {
-                        callback.onSuccess()
-                        "Forced updateMic onSuccess: ".logE(TAG)
-                    }
-
-                    override fun onError(code: Int, desc: String?) {
-                        callback.onError(code,desc)
-                        "Forced updateMic onError: $code $desc".logE(TAG)
-                    }
-                })
-        }
+        val attributeMap = mutableMapOf<String, String>()
+        attributeMap["volume"] = value.toString()
+        sendChatroomEvent(false,roomId,CustomMsgType.CHATROOM_UPDATE_ROBOT_VOLUME,attributeMap,callback)
     }
 
     /**
      * 更新指定麦位信息并返回更新成功的麦位信息
      */
-    private fun updateMicByResult(micIndex: Int, status: Int,isForced:Boolean,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+    private fun updateMicByResult(micIndex: Int, status: Int,isForced:Boolean,callback: ValueCallBack<VoiceMicInfoModel>){
         val voiceMicInfo = getMicInfo(micIndex) ?: return
-        val attributeMap = mutableMapOf<Int, VoiceMicInfoModel>()
         voiceMicInfo.micStatus = status
         voiceMicInfo.micIndex = micIndex
         var value = GsonTools.beanToString(voiceMicInfo)
@@ -393,8 +390,7 @@ class ChatroomProtocolDelegate constructor(
             roomManager.asyncSetChatroomAttribute(roomId,getMicIndex(micIndex),
                 value, true,object : CallBack{
                     override fun onSuccess() {
-                        attributeMap[micIndex] = voiceMicInfo
-                        callback.onSuccess(attributeMap)
+                        callback.onSuccess(voiceMicInfo)
                         "updateMic onSuccess: ".logE(TAG)
                     }
 
@@ -407,8 +403,7 @@ class ChatroomProtocolDelegate constructor(
             roomManager.asyncSetChatroomAttributeForced(roomId,getMicIndex(micIndex),
                 value, true,object : CallBack{
                     override fun onSuccess() {
-                        attributeMap[micIndex] = voiceMicInfo
-                        callback.onSuccess(attributeMap)
+                        callback.onSuccess(voiceMicInfo)
                         "Forced updateMic onSuccess: ".logE(TAG)
                     }
 
@@ -420,20 +415,36 @@ class ChatroomProtocolDelegate constructor(
         }
     }
 
-    private fun sendChatroomEvent(chatUid:String?,eventType:CustomMsgType,
+    private fun sendChatroomEvent(isSingle:Boolean,chatUid:String?,eventType:CustomMsgType,
                           params:MutableMap<String,String>,callback: CallBack){
-        CustomMsgHelper.getInstance().sendCustomSingleMsg(chatUid,
-            eventType.getName(),params,object : OnMsgCallBack() {
+        if (isSingle){
+            CustomMsgHelper.getInstance().sendCustomSingleMsg(chatUid,
+                eventType.getName(),params,object : OnMsgCallBack() {
+                    override fun onSuccess(message: ChatMessageData?) {
+                        callback.onSuccess()
+                        "sendCustomSingleMsg onSuccess: $message".logE(TAG)
+                    }
+
+                    override fun onError(messageId: String?, code: Int, desc: String?) {
+                        callback.onError(code,desc)
+                        "sendCustomSingleMsg onError: $code $desc".logE(TAG)
+                    }
+                })
+        }else{
+            CustomMsgHelper.getInstance().sendCustomMsg(roomId,params,object :OnMsgCallBack(){
                 override fun onSuccess(message: ChatMessageData?) {
                     callback.onSuccess()
-                    "sendCustomSingleMsg onSuccess: $message".logE(TAG)
+                    "sendCustomMsg onSuccess: $message".logE(TAG)
                 }
 
                 override fun onError(messageId: String?, code: Int, desc: String?) {
+                    super.onError(messageId, code, desc)
                     callback.onError(code,desc)
-                    "sendCustomSingleMsg onError: $code $desc".logE(TAG)
+                    "sendCustomMsg onError: $code $desc".logE(TAG)
                 }
             })
+        }
+
     }
 
     /**
