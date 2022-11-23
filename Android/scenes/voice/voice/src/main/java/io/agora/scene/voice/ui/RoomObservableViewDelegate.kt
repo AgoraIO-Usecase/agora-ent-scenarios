@@ -6,39 +6,41 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import androidx.fragment.app.FragmentActivity
+import io.agora.scene.voice.R
 import io.agora.scene.voice.bean.*
-import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor
+import io.agora.scene.voice.model.VoiceRoomLivingViewModel
+import io.agora.scene.voice.rtckit.AgoraRtcEngineController
+import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceRankUserModel
+import io.agora.scene.voice.service.VoiceRoomInfo
+import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.ainoise.RoomAINSSheetDialog
 import io.agora.scene.voice.ui.audiosettings.RoomAudioSettingsSheetDialog
 import io.agora.scene.voice.ui.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.common.CommonSheetAlertDialog
 import io.agora.scene.voice.ui.dialog.RoomContributionAndAudienceSheetDialog
 import io.agora.scene.voice.ui.dialog.RoomNoticeSheetDialog
+import io.agora.scene.voice.ui.fragment.ChatroomHandsDialog
 import io.agora.scene.voice.ui.mic.IRoomMicView
 import io.agora.scene.voice.ui.micmanger.RoomMicManagerSheetDialog
 import io.agora.scene.voice.ui.soundselection.RoomSocialChatSheetDialog
 import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionConstructor
 import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionSheetDialog
+import io.agora.scene.voice.ui.spatialaudio.RoomSpatialAudioSheetDialog
+import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
+import io.agora.secnceui.annotation.MicClickAction
+import io.agora.secnceui.annotation.MicStatus
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.baseui.interfaces.IParserSource
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
-import io.agora.scene.voice.R
-import io.agora.scene.voice.model.VoiceRoomLivingViewModel
-import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceRankUserModel
-import io.agora.scene.voice.service.VoiceRoomInfo
-import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.secnceui.annotation.MicClickAction
-import io.agora.secnceui.annotation.MicStatus
-import io.agora.scene.voice.ui.spatialaudio.RoomSpatialAudioSheetDialog
+import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.voice.buddy.tool.ToastTools
 import kotlin.random.Random
 
 /**
@@ -52,6 +54,7 @@ class RoomObservableViewDelegate constructor(
     private val roomKitBean: RoomKitBean,
     private val iRoomTopView: IRoomLiveTopView, // 头部
     private val iRoomMicView: IRoomMicView, // 麦位
+    private val chatPrimaryMenuView: ChatPrimaryMenuView, // 底部
 ) : IParserSource {
     companion object {
         private const val TAG = "RoomObservableDelegate"
@@ -61,6 +64,12 @@ class RoomObservableViewDelegate constructor(
     private val micMap = mutableMapOf<Int, Int>()
 
     private var myselfMicInfo: MicInfoBean? = null
+
+    /**举手dialog*/
+    private var handsDialog: ChatroomHandsDialog? = null
+
+    /**申请上麦标志*/
+    private var isRequesting: Boolean = false
 
     fun isOnMic(): Boolean {
         return mySelfIndex() >= 0
@@ -311,16 +320,46 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 榜单
-        roomLivingViewModel.giftContributeObservable().observe(activity){response:Resource<List<VoiceRankUserModel>> ->
-            parseResource(response,object :OnResourceParseCallback<List<VoiceRankUserModel>>(){
-                override fun onSuccess(data: List<VoiceRankUserModel>?) {
-                    data?.let {
-                        val rankList = RoomInfoConstructor.convertServerRankToUiRank(it)
-                        if (activity.isFinishing) return
-                        ThreadManager.getInstance().runOnMainThread {
-                            iRoomTopView.onRankMember(rankList)
+        roomLivingViewModel.giftContributeObservable()
+            .observe(activity) { response: Resource<List<VoiceRankUserModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
+                    override fun onSuccess(data: List<VoiceRankUserModel>?) {
+                        data?.let {
+                            val rankList = RoomInfoConstructor.convertServerRankToUiRank(it)
+                            if (activity.isFinishing) return
+                            ThreadManager.getInstance().runOnMainThread {
+                                iRoomTopView.onRankMember(rankList)
+                            }
                         }
                     }
+                })
+            }
+
+        roomLivingViewModel.cancelMicSeatApplyObservable().observe(activity) { result: Resource<Boolean> ->
+            parseResource(result, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_success))
+                    chatPrimaryMenuView.setShowHandStatus(false, false)
+                    isRequesting = false
+                }
+
+                override fun onError(code: Int, message: String) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_fail))
+                }
+            })
+        }
+        roomLivingViewModel.cancelMicSeatApplyObservable().observe(activity) { result: Resource<Boolean> ->
+            parseResource(result, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_apply_success))
+                    chatPrimaryMenuView.setShowHandStatus(false, true)
+                    isRequesting = true
+                }
+
+                override fun onError(code: Int, message: String) {
+                    ToastTools.show(
+                        activity, activity.getString(R.string.voice_chatroom_mic_apply_fail),
+                    )
                 }
             })
         }
@@ -820,5 +859,59 @@ class RoomObservableViewDelegate constructor(
 
     fun destroy() {
         AgoraRtcEngineController.get().destroy()
+    }
+
+    /**房主举手弹框*/
+    fun showOwnerHandsDialog() {
+        handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
+        if (handsDialog == null) {
+            handsDialog = ChatroomHandsDialog.newInstance
+        }
+        handsDialog?.show(activity.supportFragmentManager, "room_hands")
+        chatPrimaryMenuView.setShowHandStatus(true, false)
+    }
+
+    /**用户举手举手*/
+    fun showMemberHandsDialog(micIndex: Int) {
+        CommonSheetAlertDialog()
+            .contentText(
+                if (isRequesting)
+                    activity.getString(R.string.voice_chatroom_cancel_request_speak)
+                else activity.getString(R.string.voice_chatroom_request_speak)
+            )
+            .rightText(activity.getString(R.string.voice_room_confirm))
+            .leftText(activity.getString(R.string.voice_room_cancel))
+            .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
+                override fun onConfirmClick() {
+                    if (isRequesting) {
+                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUid())
+                    } else {
+                        roomLivingViewModel.startMicSeatApply(-1)
+                    }
+                }
+
+                override fun onCancelClick() {}
+            })
+            .show(activity.supportFragmentManager, "room_hands_apply")
+    }
+
+    fun onUserClickOnStage(micIndex: Int) {
+        if (isRequesting) {
+            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_submit_sent))
+        } else {
+            showMemberHandsDialog(micIndex)
+        }
+    }
+
+    fun handsCheck(map: Map<String, String>) {
+        handsDialog?.check(map)
+    }
+
+    fun handsUpdate(index: Int) {
+        handsDialog?.update(index)
+    }
+
+    fun resetRequest() {
+        isRequesting = false
     }
 }
