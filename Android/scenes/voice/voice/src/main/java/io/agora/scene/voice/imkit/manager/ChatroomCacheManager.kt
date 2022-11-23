@@ -15,8 +15,7 @@ class ChatroomCacheManager {
     private var mEditor: SharedPreferences.Editor? = null
     private var mSharedPreferences: SharedPreferences? = null
     private val mMicInfoMap = mutableMapOf<String, String>()
-    private val attributeMap = mutableMapOf<String, VoiceMemberModel>()
-    private val submitMicList: MutableList<VoiceMemberModel> = mutableListOf<VoiceMemberModel>()
+    private val submitMicList: MutableSet<VoiceMemberModel> = HashSet()
 
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
@@ -65,16 +64,13 @@ class ChatroomCacheManager {
      * 设置申请上麦列表
      */
     fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
-        if (voiceMemberBean.chatUid != null && !attributeMap.containsKey(voiceMemberBean.chatUid)){
-            submitMicList.add(voiceMemberBean)
-            attributeMap[voiceMemberBean.chatUid!!] = voiceMemberBean
-        }
+        submitMicList.add(voiceMemberBean)
     }
 
     /**
      * 获取申请上麦成员列表
      */
-    fun getSubmitMicList():MutableList<VoiceMemberModel>{
+    fun getSubmitMicList():MutableSet<VoiceMemberModel>{
         return submitMicList
     }
 
@@ -82,7 +78,6 @@ class ChatroomCacheManager {
      * 从申请列表移除指定成员对象
      */
     fun removeSubmitMember(voiceMemberBean: VoiceMemberModel){
-        attributeMap.remove(voiceMemberBean.chatUid)
         submitMicList.remove(voiceMemberBean)
     }
 
