@@ -649,18 +649,16 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                     data: params,
                                     success: { obj in
                                 print("updateUserCount success")
-                                VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+                                
                             },
                                     fail: { error in
                                 print("updateUserCount fail")
-                                VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                             })
+                        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                     }
                 }
             }
         }
-        
-        
     }
     
     func createMics() -> [String:String] {
