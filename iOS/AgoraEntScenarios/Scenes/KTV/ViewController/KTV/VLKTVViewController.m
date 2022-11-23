@@ -520,7 +520,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (![dict[@"cmd"] isEqualToString:@"setLrcTime"] && ![dict[@"cmd"] isEqualToString:@"testDelay"]) {
         VLLog(@"receiveStreamMessageFromUid::%ld---message::%@",uid, dict);
     }
-    VLLog(@"返回数据:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+    VLLog(@"recv message: %@, streamID: %d, uid: %d",dict,(int)streamId,(int)uid);
     if ([dict[@"cmd"] isEqualToString:@"setLrcTime"]) {  //同步歌词
         long type = [dict[@"time"] longValue];
         if(type == 0) {
@@ -536,7 +536,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             float postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
-            
+//            KTVLogInfo(@"setLrcTime: %.2f/%.2f, songNo: %@", self.currentTime, self.currentDuration, self.currentPlayingSongNo);
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
                 [_MVView start];
@@ -692,7 +692,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (model == nil || [model waittingForChorus]) {
         VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
         //刷新MV里的视图
-        [self.MVView updateUIWithSong:nil onSeat:self.isOnMicSeat];
+        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
     if (model.status != 2 && [model readyToPlay]) {
