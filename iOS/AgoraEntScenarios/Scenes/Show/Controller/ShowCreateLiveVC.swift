@@ -41,6 +41,8 @@ class ShowCreateLiveVC: UIViewController {
         return option
     }()
     
+    private lazy var beautyVC = ShowBeautySettingVC()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
@@ -87,6 +89,10 @@ class ShowCreateLiveVC: UIViewController {
         createView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        beautyVC.dismissed = { [weak self] in
+            self?.createView.hideBottomViews = false
+        }
     }
     
     private func setupAgoraKit() {
@@ -94,12 +100,15 @@ class ShowCreateLiveVC: UIViewController {
 //        agoraKit?.setLogFile(LogUtils.sdkLogPath())
         agoraKit?.setClientRole(.broadcaster)
         agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
+        
+        agoraKit?.setVideoFrameDelegate(self)
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
         let canvas = AgoraRtcVideoCanvas()
         canvas.uid = 0
         canvas.renderMode = .hidden
         canvas.view = localView
+        canvas.mirrorMode = .disabled
         agoraKit?.setupLocalVideo(canvas)
         agoraKit?.enableAudio()
         agoraKit?.enableVideo()
@@ -119,11 +128,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickBeautyBtnAction() {
         createView.hideBottomViews = true
-        let beautyVC = ShowBeautySettingVC()
         present(beautyVC, animated: true)
-        beautyVC.dismissed = { [weak self] in
-            self?.createView.hideBottomViews = false
-        }
     }
     
     func onClickQualityBtnAction() {
@@ -162,4 +167,27 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
     }
 
+}
+
+extension ShowCreateLiveVC: AgoraVideoFrameDelegate {
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        return true
+    }
+    
+    func getVideoFormatPreference() -> AgoraVideoFormat {
+        .cvPixelBGRA
+    }
+    
+    func getVideoFrameProcessMode() -> AgoraVideoFrameProcessMode {
+        .readWrite
+    }
+    
+    func getMirrorApplied() -> Bool {
+        true
+    }
+    
+    func getRotationApplied() -> Bool {
+        false
+    }
 }

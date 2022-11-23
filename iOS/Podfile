@@ -32,6 +32,8 @@ def all_pods
   pod 'LEEAlert'
   #滚动视图
   pod 'JXCategoryView'
+  # 火山美颜
+  pod 'bytedEffect', :path => 'bytedEffect.podspec'
   
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'

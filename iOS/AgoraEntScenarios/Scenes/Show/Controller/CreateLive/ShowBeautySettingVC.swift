@@ -8,17 +8,30 @@
 import UIKit
 import JXCategoryView
 
+enum ShowBeautyFaceVCType: CaseIterable {
+    case beauty
+    case filter
+    case style
+    case sticker
+    
+    var title: String {
+        switch self {
+        case .beauty: return "create_beauty_setting_beauty_face".show_localized
+        case .filter: return "create_beauty_setting_filter".show_localized
+        case .style: return "create_beauty_setting_special_effects".show_localized
+        case .sticker: return "create_beauty_setting_sticker".show_localized
+        }
+    }
+}
+
 class ShowBeautySettingVC: UIViewController {
     
     var selectedItem: ((_ item: String)->())?
     var dismissed: (()->())?
     
     private var slider: UISlider!
-    private let titles = ["create_beauty_setting_beauty_face".show_localized,
-                          "create_beauty_setting_filter".show_localized,
-                          "create_beauty_setting_special_effects".show_localized,
-                          "create_beauty_setting_make_up".show_localized,
-                          "create_beauty_setting_bg".show_localized]
+    private let titles = ShowBeautyFaceVCType.allCases.map({ $0.title })
+    private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
     
     // 背景
     private lazy var bgView: UIView = {
@@ -30,8 +43,14 @@ class ShowBeautySettingVC: UIViewController {
     // 对比按钮
     private lazy var compareButton: UIButton = {
         let compareButton = UIButton(type: .custom)
-        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
-        compareButton.addTarget(self, action: #selector(didClickCompareButton), for: .touchUpInside)
+        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .selected)
+        compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare")?
+                                .withTintColor(.show_zi03,
+                                               renderingMode: .alwaysOriginal), for: .normal)
+        compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
+        compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
+        compareButton.isSelected = true
+        compareButton.cornerRadius(18)
         return compareButton
     }()
     
@@ -70,11 +89,24 @@ class ShowBeautySettingVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    private var beautyFaceVC: ShowBeautyFaceVC? {
+        didSet {
+            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue in
+                guard let self = self else { return }
+                self.slider.isHidden = isHiddenValue
+                self.compareButton.isHidden = isHiddenValue
+                self.slider.setValue(Float(value), animated: true)
+            }
+            beautyFaceVC?.reloadData()
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        beautyFaceVC = vcs.first
     }
-    
+
     private func setupUI(){
         view.backgroundColor = .clear
         
@@ -82,6 +114,7 @@ class ShowBeautySettingVC: UIViewController {
         slider = UISlider()
         slider.minimumTrackTintColor = .show_zi03
         slider.maximumTrackTintColor = .show_slider_tint
+        slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)
@@ -96,6 +129,7 @@ class ShowBeautySettingVC: UIViewController {
         compareButton.snp.makeConstraints { make in
             make.centerY.equalTo(slider)
             make.right.equalTo(-20)
+            make.width.height.equalTo(36)
         }
         
         view.addSubview(bgView)
@@ -127,6 +161,10 @@ class ShowBeautySettingVC: UIViewController {
         bgView.setRoundingCorners([.topLeft, .topRight], radius: 20)
     }
 
+    @objc
+    private func onTapSliderHandler(sender: UISlider) {
+        beautyFaceVC?.changeValueHandler(value: CGFloat(sender.value))
+    }
 }
 
 extension ShowBeautySettingVC {
@@ -137,24 +175,31 @@ extension ShowBeautySettingVC {
     }
     
     // 点击对比按钮
-    @objc private func didClickCompareButton(){
-        
+    @objc private func didClickCompareButton(sender: UIButton){
+        sender.isSelected = !sender.isSelected
+        ByteBeautyManager.shareManager.isEnableBeauty = sender.isSelected
     }
 }
 
 
 extension ShowBeautySettingVC: JXCategoryViewDelegate {
-    
+    func categoryView(_ categoryView: JXCategoryBaseView!, didSelectedItemAt index: Int) {
+        beautyFaceVC = vcs[index]
+        if index == vcs.count - 1 {
+            slider.isHidden = true
+            compareButton.isHidden = true
+        }
+    }
 }
 
 extension ShowBeautySettingVC: JXCategoryListContainerViewDelegate {
     
-    func number(ofListsInlistContainerView listContainerView: JXCategoryListContainerView!) -> Int {
+    func number(ofListsInlistContainerView listContainerView: JXCategoryListContainerView?) -> Int {
         titles.count
     }
     
-    func listContainerView(_ listContainerView: JXCategoryListContainerView!, initListFor index: Int) -> JXCategoryListContentViewDelegate! {
-        return ShowBeautyFaceVC()
+    func listContainerView(_ listContainerView: JXCategoryListContainerView?,
+                           initListFor index: Int) -> JXCategoryListContentViewDelegate? {
+        vcs[index]
     }
-    
 }
