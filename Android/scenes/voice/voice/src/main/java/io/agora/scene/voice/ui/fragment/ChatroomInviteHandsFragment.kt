@@ -1,11 +1,8 @@
 package io.agora.scene.voice.ui.fragment
 
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.buddy.tool.ToastTools.show
 import io.agora.voice.baseui.BaseUiFragment
 import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
 import io.agora.scene.voice.model.VoiceUserListViewModel
-import io.agora.voice.network.tools.bean.VMemberBean
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
@@ -13,30 +10,24 @@ import io.agora.scene.voice.R
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import android.widget.LinearLayout
-import io.agora.voice.network.tools.bean.VRoomUserBean
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.scene.voice.general.net.ChatroomHttpManager
-import io.agora.voice.network.tools.VRValueCallBack
-import android.app.Activity
-import android.text.TextUtils
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
+import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.voice.baseui.general.net.Resource
 import java.util.ArrayList
 import java.util.HashMap
 
 class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomInviteAdapter.onActionListener {
-    private lateinit var handsViewModel: VoiceUserListViewModel
-    private val dataList: MutableList<VMemberBean> = ArrayList()
+    private lateinit var userListViewModel: VoiceUserListViewModel
+    private val dataList: MutableList<VoiceMemberModel> = ArrayList()
     private var adapter: ChatroomInviteAdapter? = null
     private val pageSize = 10
-    private var cursor = ""
     private var listener: itemCountListener? = null
     private var roomId: String? = null
     private val map: MutableMap<String, Boolean> = HashMap()
@@ -82,40 +73,14 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     private fun initViewModel() {
-        handsViewModel = ViewModelProvider(this).get(VoiceUserListViewModel::class.java)
-        handsViewModel.getInviteObservable().observe(requireActivity()) { response: Resource<VRoomUserBean> ->
-            parseResource(response, object : OnResourceParseCallback<VRoomUserBean?>() {
-                override fun onSuccess(data: VRoomUserBean?) {
+        userListViewModel = ViewModelProvider(this).get(VoiceUserListViewModel::class.java)
+        userListViewModel.getInviteObservable().observe(requireActivity()){ response: Resource<List<VoiceMemberModel>> ->
+            parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
+                override fun onSuccess(data: List<VoiceMemberModel>?) {
                     var total = 0
                     if (data == null) return
-                    cursor = data.cursor
                     dataList.clear()
-                    if (!adapter?.data.isNullOrEmpty()) {
-                        adapter?.data?.let {
-                            dataList.addAll(it)
-                            total = dataList.size
-                            "total1:$total".logE(TAG)
-                            for (member in it) {
-                                if (member.mic_index != -1) {
-                                    dataList.remove(member)
-                                    total -= 1
-                                }
-                            }
-                        }
-
-                    } else {
-                        dataList.addAll(data.members)
-                        total = dataList.size
-                        ("total2:" + +total).logE(TAG)
-                        if (data.members.size > 0) {
-                            for (member in data.members) {
-                                if (member.mic_index != -1) {
-                                    dataList.remove(member)
-                                    total -= 1
-                                }
-                            }
-                        }
-                    }
+                    dataList.addAll(data)
                     if (isRefreshing) {
                         adapter?.data = dataList
                     } else {
@@ -133,6 +98,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     }
                 }
             })
+        }
+
+        userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()){
+            // TODO:
         }
     }
 
@@ -156,9 +125,9 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     if (findLastVisibleItemPosition == lm.itemCount - 1) {
                         ThreadManager.getInstance().runOnMainThread {
                             isLoadingNextPage = true
-                            if (!TextUtils.isEmpty(cursor)) {
-                                pullData()
-                            }
+//                            if (!TextUtils.isEmpty(cursor)) {
+//                                pullData()
+//                            }
                         }
                     }
                 }
@@ -168,7 +137,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
 
     private fun pullData() {
         ThreadManager.getInstance().runOnMainThread {
-            handsViewModel.getInviteList(requireActivity(), roomId, pageSize, cursor)
+            userListViewModel.getInviteList()
             isLoadingNextPage = false
         }
     }
@@ -180,37 +149,13 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     fun reset() {
-        cursor = ""
         isRefreshing = true
-        handsViewModel.getInviteList(requireActivity(), roomId, pageSize, cursor)
+        userListViewModel.getInviteList()
     }
 
     override fun onItemActionClick(view: View, position: Int, uid: String) {
-        ChatroomHttpManager.getInstance(activity).invitationMic(roomId, uid, object : VRValueCallBack<Boolean> {
-            override fun onSuccess(var1: Boolean) {
-                "onActionClick Invite onSuccess $uid".logE(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    val activity: Activity? = activity
-                    if (activity != null) {
-                        show(
-                            activity,
-                            activity.getString(R.string.voice_chatroom_host_invitation_sent),
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                    map[uid] = true
-                    adapter?.setInvited(map)
-                }
-            }
-
-            override fun onError(code: Int, desc: String) {
-                "onActionClick Invite onError $code $desc".logE(TAG)
-                val activity: Activity? = activity
-                if (activity != null) {
-                    show(activity, activity.getString(R.string.voice_room_send_invited_fail), Toast.LENGTH_SHORT)
-                }
-            }
-        })
+        // TODO:
+        userListViewModel.startMicSeatInvitation(uid,-1)
     }
 
     interface itemCountListener {

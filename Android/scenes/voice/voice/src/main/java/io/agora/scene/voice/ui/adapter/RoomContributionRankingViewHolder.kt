@@ -5,15 +5,14 @@ import android.graphics.Typeface
 import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
+import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.buddy.tool.ImageTools
-import io.agora.voice.buddy.tool.ResourcesTools
-import io.agora.voice.network.tools.bean.VRankingMemberBean
 
 class RoomContributionRankingViewHolder(val binding: VoiceItemContributionRankingBinding) :
-    BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemContributionRankingBinding, VRankingMemberBean>(binding) {
+    BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemContributionRankingBinding, VoiceRankUserModel>(binding) {
 
-    override fun binding(data: VRankingMemberBean?, selectedIndex: Int) {
+    override fun binding(data: VoiceRankUserModel?, selectedIndex: Int) {
         data?.let {
             setRankNumber()
             ImageTools.loadImage(binding.ivAudienceAvatar, it.portrait)
