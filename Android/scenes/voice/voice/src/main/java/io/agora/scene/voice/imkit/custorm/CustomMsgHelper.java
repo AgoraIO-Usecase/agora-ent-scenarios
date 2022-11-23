@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.custorm;
+package io.agora.scene.voice.imkit.custorm;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.bean.ChatroomConstants;
 import io.agora.CallBack;
 import io.agora.MessageListener;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
-import io.agora.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.bean.ChatroomConstants;
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。

@@ -37,13 +37,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.imkit.custorm.CustomMsgType;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.R;
-import io.agora.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 
 /**
  * MessagesView

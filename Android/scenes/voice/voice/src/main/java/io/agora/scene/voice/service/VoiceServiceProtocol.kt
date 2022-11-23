@@ -117,7 +117,7 @@ interface VoiceServiceProtocol {
      * 锁麦
      * @param micIndex 麦位index
      */
-    fun lockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
+    fun lockMic(micIndex: Int, completion: (map: MutableMap<Int, VoiceMicInfoModel>,error: Int, result: Boolean) -> Unit)
 
     /**
      * 取消锁麦
