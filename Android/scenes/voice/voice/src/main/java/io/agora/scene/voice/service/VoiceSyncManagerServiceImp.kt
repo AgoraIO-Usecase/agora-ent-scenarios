@@ -2,7 +2,7 @@ package io.agora.scene.voice.service
 
 import android.content.Context
 import android.text.TextUtils
-import io.agora.CallBack
+import io.agora.ValueCallBack
 import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
@@ -309,17 +309,19 @@ class VoiceSyncManagerServiceImp(
      * 锁麦
      * @param micIndex 麦位index
      */
-    override fun lockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-        ChatroomIMManager.getInstance().lockMic(micIndex,object : CallBack{
-            override fun onSuccess() {
+    override fun lockMic(micIndex: Int, completion: (map: MutableMap<Int, VoiceMicInfoModel>,error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().lockMic(micIndex,object :
+            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>> {
+            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
                 ThreadManager.getInstance().runOnIOThread {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                    value?.let { completion.invoke(it,VoiceServiceProtocol.ERR_OK, true) }
                 }
             }
 
             override fun onError(code: Int, error: String?) {
                 ThreadManager.getInstance().runOnIOThread {
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    val attributeMap = mutableMapOf<Int, VoiceMicInfoModel>()
+                    completion.invoke(attributeMap,VoiceServiceProtocol.ERR_FAILED, false)
                 }
             }
         })
