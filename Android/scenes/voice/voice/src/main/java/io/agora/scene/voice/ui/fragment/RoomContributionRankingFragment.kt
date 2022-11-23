@@ -24,8 +24,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.scene.voice.model.VoiceUserListViewModel
-import io.agora.voice.network.tools.bean.VRGiftBean
-import io.agora.voice.network.tools.bean.VRankingMemberBean
+import io.agora.scene.voice.service.VoiceRankUserModel
 
 class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContributionRankingBinding>(),
     OnRefreshListener {
@@ -48,7 +47,7 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
 
     private lateinit var roomRankViewModel: VoiceUserListViewModel
 
-    private var contributionAdapter: BaseRecyclerViewAdapter<VoiceItemContributionRankingBinding, VRankingMemberBean, RoomContributionRankingViewHolder>? =
+    private var contributionAdapter: BaseRecyclerViewAdapter<VoiceItemContributionRankingBinding, VoiceRankUserModel, RoomContributionRankingViewHolder>? =
         null
 
 
@@ -63,28 +62,22 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
         super.onViewCreated(view, savedInstanceState)
         roomRankViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
 
-        arguments?.apply {
-            roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
-            roomKitBean?.let {
-                roomRankViewModel.getGifts(requireContext(), it.roomId)
-            }
-        }
+        roomKitBean = arguments?.getSerializable(KEY_ROOM_INFO) as RoomKitBean?
         binding?.apply {
             initAdapter(rvContributionRanking)
             slContributionRanking.setOnRefreshListener(this@RoomContributionRankingFragment)
         }
-        roomRankViewModel.giftsObservable().observe(requireActivity()) { response: Resource<VRGiftBean> ->
-            parseResource(response, object : OnResourceParseCallback<VRGiftBean>() {
-                override fun onSuccess(data: VRGiftBean?) {
+        roomRankViewModel.fetchGiftContribute()
+        roomRankViewModel.giftsObservable().observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
+            parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
+                override fun onSuccess(data: List<VoiceRankUserModel>?) {
                     binding?.slContributionRanking?.isRefreshing = false
-                    total = data?.ranking_list?.size ?: 0
+                    total = data?.size ?: 0
                     "getGifts total：${total}".logD()
                     if (data == null) return
                     isEnd = true
                     checkEmpty()
-                    if (!data.ranking_list.isNullOrEmpty()) {
-                        contributionAdapter?.submitListAndPurge(data.ranking_list)
-                    }
+                    contributionAdapter?.submitListAndPurge(data)
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -132,7 +125,7 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
             }, 1500)
         } else {
             roomKitBean?.let {
-                roomRankViewModel.getGifts(requireContext(), it.roomId)
+                roomRankViewModel.fetchGiftContribute()
             }
         }
     }
