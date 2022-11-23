@@ -38,13 +38,13 @@ class VoiceSyncManagerServiceImp(
 
     private val roomSubscribeListener = mutableListOf<Sync.EventListener>()
 
-    private val roomServiceSubscribeDelegates = mutableListOf<VoiceRoomServiceSubscribeDelegate>()
+    private val roomServiceSubscribeDelegates = mutableListOf<VoiceRoomSubscribeDelegate>()
 
     /**
      * 注册订阅
      * @param delegate 聊天室内IM回调处理
      */
-    override fun subscribeEvent(delegate: VoiceRoomServiceSubscribeDelegate) {
+    override fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate) {
         roomServiceSubscribeDelegates.add(delegate)
     }
 
@@ -146,7 +146,6 @@ class VoiceSyncManagerServiceImp(
                         }
                     })
                 }
-
             })
     }
 
@@ -264,20 +263,24 @@ class VoiceSyncManagerServiceImp(
     /**
      * 获取排行榜列表
      */
-    override fun fetchGiftContribute(completion: (error: Int, result: VoiceRankUserModel) -> Unit) {
+    override fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>) -> Unit) {
     }
 
     /**
      * 获取用户列表
      */
-    override fun fetchRoomMembers(completion: (error: Int, result: VoiceMemberModel) -> Unit) {
+    override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
     }
 
     /**
      * 邀请用户上麦
      * @param chatUid im uid
      */
-    override fun startMicSeatInvitation(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun startMicSeatInvitation(
+        chatUid: String,
+        micIndex: Int?,
+        completion: (error: Int, result: Boolean) -> Unit
+    ) {
     }
 
     /**
@@ -285,7 +288,7 @@ class VoiceSyncManagerServiceImp(
      * @param roomId 房间id
      * @param userId 用户id
      */
-    override fun refuseInviteToMic(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun refuseInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
     /**
@@ -379,15 +382,23 @@ class VoiceSyncManagerServiceImp(
 
     /**
      * 申请上麦
+     * @param micIndex 麦位index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
+    }
+
+    /**
+     * 同意申请
+     * @param chatUid 环信用户id
+     */
+    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
     /**
      * 取消上麦
      * @param chatUid im uid
      */
-    override fun endMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
     }
 
     /**

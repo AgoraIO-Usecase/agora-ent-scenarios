@@ -9,20 +9,21 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.agora.scene.voice.service.VoiceMemberModel;
 import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.scene.voice.R;
-import io.agora.voice.network.tools.bean.VMemberBean;
 
-public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBean> {
+public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;
     private Map<String,Boolean> checkMap = new HashMap<>();
 
     @Override
-    public RoomBaseRecyclerViewAdapter.ViewHolder<VMemberBean> getViewHolder(ViewGroup parent, int viewType) {
+    public RoomBaseRecyclerViewAdapter.ViewHolder<VoiceMemberModel> getViewHolder(ViewGroup parent, int viewType) {
         return new inviteViewHolder(LayoutInflater.from (parent.getContext()).inflate (R.layout.voice_item_hands_raised, parent, false));
     }
 
-    public class inviteViewHolder extends ViewHolder<VMemberBean> {
+    public class inviteViewHolder extends ViewHolder<VoiceMemberModel> {
         private ShapeableImageView avatar;
         private MaterialTextView name;
         private MaterialTextView action;
@@ -32,7 +33,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBe
         }
 
         @Override
-        public void setData(VMemberBean item, int position) {
+        public void setData(VoiceMemberModel item, int position) {
             int resId = 0;
             try {
                 resId = mContext.getResources().getIdentifier(item.getPortrait(), "drawable", mContext.getPackageName());
@@ -42,7 +43,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBe
             if (resId != 0){
                 avatar.setImageResource(resId);
             }
-            name.setText(item.getName());
+            name.setText(item.getNickName());
             action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

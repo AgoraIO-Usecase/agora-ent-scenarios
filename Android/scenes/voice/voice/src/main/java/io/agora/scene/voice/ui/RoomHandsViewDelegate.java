@@ -4,20 +4,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import java.util.Map;
 
+import io.agora.scene.voice.model.VoiceRoomLivingViewModel;
 import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.scene.voice.ui.common.CommonSheetAlertDialog;
 import io.agora.scene.voice.ui.fragment.ChatroomHandsDialog;
+import io.agora.voice.baseui.general.callback.OnResourceParseCallback;
+import io.agora.voice.baseui.interfaces.IParserSource;
 import io.agora.voice.buddy.tool.ToastTools;
 import io.agora.scene.voice.R;
-import io.agora.scene.voice.general.net.ChatroomHttpManager;
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView;
-import io.agora.voice.network.tools.VRValueCallBack;
 
-public class RoomHandsViewDelegate {
+public class RoomHandsViewDelegate implements IParserSource {
     private FragmentActivity activity;
     private ChatroomHandsDialog dialog;
     private String roomId;
@@ -25,13 +27,50 @@ public class RoomHandsViewDelegate {
     private String owner;
     private boolean isRequest;
 
-    RoomHandsViewDelegate(FragmentActivity activity, ChatPrimaryMenuView view) {
+    private VoiceRoomLivingViewModel roomLivingViewModel;
+
+    RoomHandsViewDelegate(FragmentActivity activity, VoiceRoomLivingViewModel roomLivingViewModel, ChatPrimaryMenuView view) {
         this.activity = activity;
+        this.roomLivingViewModel = roomLivingViewModel;
         this.chatPrimaryMenuView = view;
+        onViewModelObservable();
     }
 
-    public static RoomHandsViewDelegate getInstance(FragmentActivity activity, ChatPrimaryMenuView view) {
-        return new RoomHandsViewDelegate(activity, view);
+    private void onViewModelObservable() {
+        roomLivingViewModel.cancelMicSeatApplyObservable().observe(activity, result -> {
+            parseResource(result, new OnResourceParseCallback<Boolean>() {
+                @Override
+                public void onSuccess(@Nullable Boolean data) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_success), Toast.LENGTH_SHORT);
+                    chatPrimaryMenuView.setShowHandStatus(false, false);
+                    isRequest = false;
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_fail), Toast.LENGTH_SHORT);
+                }
+            });
+        });
+        roomLivingViewModel.cancelMicSeatApplyObservable().observe(activity, result -> {
+            parseResource(result, new OnResourceParseCallback<Boolean>() {
+                @Override
+                public void onSuccess(@Nullable Boolean data) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_apply_success), Toast.LENGTH_SHORT);
+                    chatPrimaryMenuView.setShowHandStatus(false, true);
+                    isRequest = true;
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_apply_fail), Toast.LENGTH_SHORT);
+                }
+            });
+        });
+    }
+
+    public static RoomHandsViewDelegate getInstance(FragmentActivity activity, VoiceRoomLivingViewModel roomLivingViewModel, ChatPrimaryMenuView view) {
+        return new RoomHandsViewDelegate(activity, roomLivingViewModel, view);
     }
 
     public void onRoomDetails(String roomId, String owner) {
@@ -86,39 +125,14 @@ public class RoomHandsViewDelegate {
                     @Override
                     public void onConfirmClick() {
                         if (isRequest) {
-                            ChatroomHttpManager.getInstance(activity).cancelSubmitMic(roomId, new VRValueCallBack<Boolean>() {
-                                @Override
-                                public void onSuccess(Boolean var1) {
-                                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_success), Toast.LENGTH_SHORT);
-                                    chatPrimaryMenuView.setShowHandStatus(false, false);
-                                    isRequest = false;
-                                }
-
-                                @Override
-                                public void onError(int code, String desc) {
-                                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_fail), Toast.LENGTH_SHORT);
-                                }
-                            });
+                            roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUid());
                         } else {
-                            ChatroomHttpManager.getInstance(activity).submitMic(roomId, micIndex, new VRValueCallBack<Boolean>() {
-                                @Override
-                                public void onSuccess(Boolean var1) {
-                                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_apply_success), Toast.LENGTH_SHORT);
-                                    chatPrimaryMenuView.setShowHandStatus(false, true);
-                                    isRequest = true;
-                                }
-
-                                @Override
-                                public void onError(int code, String desc) {
-                                    ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_apply_fail), Toast.LENGTH_SHORT);
-                                }
-                            });
+                            roomLivingViewModel.startMicSeatApply(-1);
                         }
                     }
 
                     @Override
                     public void onCancelClick() {
-
                     }
                 })
                 .show(activity.getSupportFragmentManager(), "room_hands_apply");
