@@ -317,7 +317,7 @@ extension VoiceRoomViewController {
     func cancelRequestSpeak(index: Int?) {
         guard let local_index = self.local_index else {return}
         guard let user: VRUser = self.roomInfo?.room?.member_list?[local_index] else {return}
-        ChatRoomServiceImp.getSharedInstance().endMicSeatApply(chat_uid: user.chat_uid ?? "") { error, flag in
+        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: user.chat_uid ?? "") { error, flag in
             if error == nil {
                 if flag {
                     self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
