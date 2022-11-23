@@ -372,7 +372,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 var currentMic = self.mics[safe: mic.mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic.mic_index]  = mic
-                    NotificationCenter.default.post(name: Notification.Name("updaateMicInfo"), object: nil)
+                    NotificationCenter.default.post(name: Notification.Name("updateMicInfo"), object: nil)
                 } else {
                     completion(self.normalError(),false)
                     return
@@ -428,7 +428,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 var currentMic = self.mics[safe: user?.index ?? 1]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
-                    NotificationCenter.default.post(name: Notification.Name("updaateMicInfo"), object: nil)
+                    NotificationCenter.default.post(name: Notification.Name("updateMicInfo"), object: nil)
                 } else {
                     completion(self.normalError())
                     return
