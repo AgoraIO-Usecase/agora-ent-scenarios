@@ -624,10 +624,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 status:(AgoraMusicContentCenterPreloadStatus)status
                    msg:(nonnull NSString *)msg
               lyricUrl:(nonnull NSString *)lyricUrl {
-    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
         return;
     }
+    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     NSString* sSongCode = [NSString stringWithFormat:@"%ld", songCode];
     LoadMusicCallback block = [self.musicCallbacks objectForKey:sSongCode];
     if(!block) {
@@ -723,17 +723,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-            VLLog(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@", model.songNo, model.songName);
+            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@, lyricUrl: %@", model.songNo, model.songName, lyricUrl);
             if (lyricUrl == nil) {
                 return;
             }
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
             [weakSelf loadMusic:model.songNo withCallback:^(AgoraMusicContentCenterPreloadStatus status){
+                KTVLogInfo(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@, status: %ld", model.songNo, model.songName, status);
                 if (status != AgoraMusicContentCenterPreloadStatusOK) {
                     return;
                 }
-                VLLog(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@", model.songNo, model.songName);
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
                 weakSelf.isPlayerPublish = YES;
                 [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
@@ -750,7 +750,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (lyricUrl == nil) {
                 return;
             }
-            VLLog(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
+            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
             weakSelf.currentPlayingSongNo = model.songNo;
