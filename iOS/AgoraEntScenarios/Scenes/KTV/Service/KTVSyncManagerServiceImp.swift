@@ -732,7 +732,7 @@ extension KTVSyncManagerServiceImp {
         return seatArray
     }
 
-    private func _getUserSeatInfo(seatIndex: Int) -> VLRoomSeatModel {
+    private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel?) -> VLRoomSeatModel {
         let user = VLUserCenter.user
         let seatInfo = VLRoomSeatModel()
         seatInfo.seatIndex = seatIndex
@@ -740,15 +740,30 @@ extension KTVSyncManagerServiceImp {
         seatInfo.userNo = user.userNo
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
-        /// 是否自己静音
-        seatInfo.isAudioMuted = 1
-        /// 是否开启视频
-        seatInfo.isVideoMuted = 1
+        
+        
+        if let m = model {
+            /// 是否自己静音
+            seatInfo.isAudioMuted = m.isAudioMuted
+            /// 是否开启视频
+            seatInfo.isVideoMuted = m.isVideoMuted
 
-        /// 新增, 判断当前歌曲是否是自己点的
-        seatInfo.isOwner = false
+            /// 新增, 判断当前歌曲是否是自己点的
+            seatInfo.isOwner = m.isOwner
 
-        seatInfo.isJoinedChorus = false
+            seatInfo.isJoinedChorus = m.isJoinedChorus
+        } else {
+            /// 是否自己静音
+            seatInfo.isAudioMuted = 1
+            /// 是否开启视频
+            seatInfo.isVideoMuted = 1
+
+            /// 新增, 判断当前歌曲是否是自己点的
+            seatInfo.isOwner = false
+
+            seatInfo.isJoinedChorus = false
+        }
+        
 
         return seatInfo
     }
@@ -766,7 +781,7 @@ extension KTVSyncManagerServiceImp {
 
             // update seat info (user avater/nick name did changed) if seat existed
             if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex)
+                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, seat)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
                     completion(self._getInitSeats())
