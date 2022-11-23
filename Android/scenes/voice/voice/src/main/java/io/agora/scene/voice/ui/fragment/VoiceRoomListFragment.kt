@@ -27,7 +27,7 @@ import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
-import io.agora.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() , SwipeRefreshLayout.OnRefreshListener{
     private lateinit var voiceRoomViewModel: VoiceCreateViewModel

@@ -1,6 +1,6 @@
-package io.agora.voice.imkit.custorm;
+package io.agora.scene.voice.imkit.custorm;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
 
 /**
  * 定义接收到的消息类型

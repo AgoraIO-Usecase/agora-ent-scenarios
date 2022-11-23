@@ -1,6 +1,6 @@
-package io.agora.voice.imkit.custorm;
+package io.agora.scene.voice.imkit.custorm;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.CallBack;
 
 public abstract class OnMsgCallBack implements CallBack {

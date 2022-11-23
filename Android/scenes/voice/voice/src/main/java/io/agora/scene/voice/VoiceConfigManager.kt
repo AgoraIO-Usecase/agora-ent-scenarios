@@ -5,7 +5,7 @@ import com.opensource.svgaplayer.SVGASoundManager
 import com.opensource.svgaplayer.utils.log.SVGALogger
 import io.agora.scene.voice.general.interfaceOrImplement.UserActivityLifecycleCallbacks
 import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.voice.imkit.manager.ChatroomConfigManager
+import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.voice.network.http.toolbox.VoiceToolboxRequestApi
 
 /**
