@@ -1,10 +1,7 @@
 package io.agora.scene.show.service
 
-import android.os.Handler
-import android.os.Looper
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
-
 
 
 interface ShowServiceProtocol {
@@ -18,7 +15,7 @@ interface ShowServiceProtocol {
     companion object {
         private val instance by lazy {
             ShowSyncManagerServiceImpl(AgoraApplication.the()){
-                Handler(Looper.getMainLooper()).post{ ToastUtils.showToast(it.message) }
+                ToastUtils.showToast(it.message)
             }
         }
 

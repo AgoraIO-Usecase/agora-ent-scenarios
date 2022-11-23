@@ -6,4 +6,9 @@
     <string name="show_room_id">ID: %s</string>
     <string name="show_user_count">%d人</string>
     <string name="show_app_name">秀场直播</string>
+    <string name="show_live_top_close">Close</string>
+    <string name="show_live_bottom_chat">Let\'s Chat</string>
+    <string name="show_live_perms_leak_tip" >缺少直播需要的权限，是否重新申请？</string>
+    <string name="show_live_yes">Yes</string>
+    <string name="show_live_no">No</string>
 </resources>

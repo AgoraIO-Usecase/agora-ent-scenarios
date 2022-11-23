@@ -16,7 +16,7 @@
         android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="160:234"
         android:src="@mipmap/icon_room_cover1"
-        app:shapeAppearance="@style/show_roundStyle" />
+        app:shapeAppearance="@style/show_roundStyle_6" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvLiving"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:background="@drawable/show_room_item_text_bg"
-        android:drawableStart="@mipmap/show_ic_living"
+        android:drawableStart="@mipmap/show_list_living"
         android:drawablePadding="3dp"
         android:gravity="center"
         android:paddingHorizontal="5dp"
@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:drawableStart="@mipmap/show_ic_user_tag"
+        android:drawableStart="@mipmap/show_list_user_tag"
         android:gravity="end"
         android:textColor="@color/white"
         android:textSize="10sp"
