@@ -21,6 +21,13 @@ public class ChatRoomServiceImp: NSObject {
     public var applicants: [VoiceRoomApply] = [VoiceRoomApply]()
     var syncUtilsInited: Bool = false
     @objc public weak var roomServiceDelegate:ChatRoomServiceSubscribeDelegate?
+    
+    func cleanCache() {
+        self.userList = nil
+        self.roomId = nil
+        self.mics.removeAll()
+        self.applicants.removeAll()
+    }
 }
 
 extension ChatRoomServiceImp: VoiceRoomIMDelegate {

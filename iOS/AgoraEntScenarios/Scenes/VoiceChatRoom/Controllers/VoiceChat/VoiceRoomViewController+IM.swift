@@ -38,6 +38,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
+        ChatRoomServiceImp.getSharedInstance().applicants.append(applicant)
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
     }
     
@@ -87,6 +88,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if reason == .destroyed {
             destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
+        }
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId, isOwner: self.isOwner) { _, _ in
+            
         }
         self.didHeaderAction(with: .back, destroyed: destroyed)
     }
