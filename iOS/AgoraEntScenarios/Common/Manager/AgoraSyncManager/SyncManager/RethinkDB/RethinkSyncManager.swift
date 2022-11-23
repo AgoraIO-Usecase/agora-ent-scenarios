@@ -31,7 +31,7 @@ enum SocketType: String {
     case ping
 }
 
-enum SocketConnectState: Int {
+public enum SocketConnectState: Int {
     case connecting = 0
     case open = 1
     case fail = 2
@@ -56,6 +56,8 @@ public class RethinkSyncManager: NSObject {
     var appId: String = ""
     var channelName: String = ""
     var sceneName: String!
+    
+    private var completeBlock: SuccessBlockInt?
 
     /// init
     /// - Parameters:
@@ -68,7 +70,7 @@ public class RethinkSyncManager: NSObject {
         channelName = config.channelName
         appId = config.appId
         reConnect(isRemove: true)
-        complete?(0)
+        completeBlock = complete
         NotificationCenter.default.addObserver(self, selector: #selector(enterForegroundNotification),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
@@ -221,6 +223,12 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             connectStateBlock?(SocketConnectState(rawValue: webSocket.readyState.rawValue) ?? .closed)
         }
         state = webSocket.readyState
+        
+        if let complete = completeBlock {
+            complete(state == .OPEN ? 0 : -1)
+            completeBlock = nil
+        }
+        
         guard socket?.readyState == .OPEN, !onUpdatedBlocks.isEmpty else { return }
         // 重连成功后重新订阅
         onUpdatedBlocks.keys.forEach({
