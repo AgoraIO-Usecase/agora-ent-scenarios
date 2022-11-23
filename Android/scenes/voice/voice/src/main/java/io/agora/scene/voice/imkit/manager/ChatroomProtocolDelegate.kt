@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager
+package io.agora.scene.voice.imkit.manager
 
 import io.agora.CallBack
 import io.agora.ValueCallBack
@@ -6,12 +6,12 @@ import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.imkit.bean.ChatMessageData
-import io.agora.voice.imkit.bean.ChatMicMemberBean
-import io.agora.voice.imkit.bean.ChatroomMicBean
-import io.agora.voice.imkit.custorm.CustomMsgHelper
-import io.agora.voice.imkit.custorm.CustomMsgType
-import io.agora.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.bean.ChatMicMemberBean
+import io.agora.scene.voice.imkit.bean.ChatroomMicBean
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
+import io.agora.scene.voice.imkit.custorm.CustomMsgType
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String

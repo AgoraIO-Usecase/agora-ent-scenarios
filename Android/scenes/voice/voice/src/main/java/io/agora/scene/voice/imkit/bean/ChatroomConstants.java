@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.bean;
+package io.agora.scene.voice.imkit.bean;
 
 /**
  * chatroom constant

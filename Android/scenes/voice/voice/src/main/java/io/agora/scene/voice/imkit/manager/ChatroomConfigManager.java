@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager;
+package io.agora.scene.voice.imkit.manager;
 
 import android.app.Application;
 import android.content.Context;
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.imkit.custorm.OnCustomMsgReceiveListener;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatOptions;
 import io.agora.util.EMLog;

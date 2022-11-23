@@ -1,6 +1,6 @@
 package io.agora.scene.voice.service
 
-import io.agora.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.voice.network.tools.bean.VMemberBean
 
 /**

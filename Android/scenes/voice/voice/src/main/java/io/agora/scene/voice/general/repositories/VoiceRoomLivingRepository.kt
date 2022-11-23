@@ -7,7 +7,6 @@ import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.network.tools.VRValueCallBack
 import io.agora.voice.network.tools.bean.VRMicBean
 import io.agora.voice.network.tools.bean.VRMicListBean

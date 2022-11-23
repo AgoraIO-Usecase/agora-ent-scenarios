@@ -10,7 +10,7 @@ import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
 import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
 import io.agora.voice.network.tools.VRDefaultValueCallBack

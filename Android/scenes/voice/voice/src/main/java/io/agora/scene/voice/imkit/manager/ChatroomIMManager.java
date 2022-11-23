@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager;
+package io.agora.scene.voice.imkit.manager;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,10 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.imkit.custorm.OnCustomMsgReceiveListener;
-import io.agora.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.CallBack;
 import io.agora.ChatRoomChangeListener;
 import io.agora.ConnectionListener;
@@ -22,6 +18,10 @@ import io.agora.chat.ChatMessage;
 import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.util.EMLog;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
