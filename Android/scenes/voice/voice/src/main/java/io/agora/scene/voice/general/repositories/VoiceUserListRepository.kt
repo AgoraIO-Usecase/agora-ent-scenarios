@@ -1,35 +1,74 @@
 package io.agora.scene.voice.general.repositories
 
-import android.content.Context
 import androidx.lifecycle.LiveData
-import io.agora.voice.network.tools.bean.VRMicListBean
-import io.agora.scene.voice.general.net.ChatroomHttpManager
+import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.service.VoiceRankUserModel
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.network.tools.VRValueCallBack
-import io.agora.voice.network.tools.bean.VRoomUserBean
-import io.agora.voice.network.tools.bean.VRGiftBean
 
 class VoiceUserListRepository : BaseRepository() {
 
     /**
+     * voice chat protocol
+     */
+    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+
+    // 踢用户下麦
+    fun kickOff(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+                voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    // 邀请用户上麦
+    fun startMicSeatInvitation(chatUid: String, micIndex: Int?): LiveData<Resource<Boolean>> {
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.startMicSeatInvitation(chatUid, micIndex, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    // 同意上麦申请
+    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<Boolean>> {
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    /**
      * 举手列表
      */
-    fun getRaisedList(
-        context: Context, roomId: String?, pageSize: Int, cursor: String?
-    ): LiveData<Resource<VRMicListBean>> {
-        val resource = object : NetworkOnlyResource<VRMicListBean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VRMicListBean>>) {
-                ChatroomHttpManager.getInstance(context)
-                    .getApplyMicList(roomId, pageSize, cursor, object : VRValueCallBack<VRMicListBean> {
-                        override fun onSuccess(var1: VRMicListBean) {
-                            callBack.onSuccess(createLiveData(var1))
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            callBack.onError(code, desc)
-                        }
-                    })
+    fun getRaisedList(): LiveData<Resource<List<VoiceMemberModel>>> {
+        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
+                // TODO:
             }
         }
         return resource.asLiveData()
@@ -38,43 +77,45 @@ class VoiceUserListRepository : BaseRepository() {
     /**
      * 邀请列表
      */
-    fun getInvitedList(
-        context: Context, roomId: String?, pageSize: Int, cursor: String?
-    ): LiveData<Resource<VRoomUserBean>> {
-        val resource = object : NetworkOnlyResource<VRoomUserBean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VRoomUserBean>>) {
-                ChatroomHttpManager.getInstance(context)
-                    .getRoomMembers(roomId, pageSize, cursor, object : VRValueCallBack<VRoomUserBean> {
-                        override fun onSuccess(var1: VRoomUserBean) {
-                            callBack.onSuccess(createLiveData(var1))
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            callBack.onError(code, desc)
-                        }
-                    })
+    fun getInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
+        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
+                // TODO:
             }
         }
         return resource.asLiveData()
     }
 
-    /**
-     * 礼物榜单
-     */
-    fun getGifts(context: Context, roomId: String?): LiveData<Resource<VRGiftBean>> {
-        val resource = object : NetworkOnlyResource<VRGiftBean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VRGiftBean>>) {
-                ChatroomHttpManager.getInstance(context).getGiftList(roomId, object : VRValueCallBack<VRGiftBean> {
-                    override fun onSuccess(var1: VRGiftBean) {
-                        callBack.onSuccess(createLiveData(var1))
-                    }
-
-                    override fun onError(code: Int, desc: String) {
-                        callBack.onError(code, desc)
+    // 获取礼物榜单
+    fun fetchGiftContribute(): LiveData<Resource<List<VoiceRankUserModel>>> {
+        val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
+                voiceServiceProtocol.fetchGiftContribute( completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
                     }
                 })
             }
         }
         return resource.asLiveData()
     }
+
+    // 获取用户列表
+    fun fetchRoomMembers(): LiveData<Resource<List<VoiceMemberModel>>> {
+        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
+                voiceServiceProtocol.fetchRoomMembers( completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
 }
