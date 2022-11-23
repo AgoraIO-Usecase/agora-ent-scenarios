@@ -590,7 +590,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         
     }
     
-    func leaveRoom(_ roomId: String, isOwner: Bool, completion: @escaping (Error?, Bool) -> Void) {
+    // todo 去掉owner
+    func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
         
         /**
          先拿到对应的房间信息
@@ -600,6 +601,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         if let roomList = self.roomList {
             for (index,room) in roomList.enumerated() {
                 if room.room_id == roomId {
+                    var isOwner = false
+                    if let owner_uid = room.owner?.uid {
+                        isOwner = owner_uid == VLUserCenter.user.userNo
+                    }
                     if isOwner {
                         SyncUtil.scene(id: roomId)?.deleteScenes()
                         self.roomList?.remove(at: index)

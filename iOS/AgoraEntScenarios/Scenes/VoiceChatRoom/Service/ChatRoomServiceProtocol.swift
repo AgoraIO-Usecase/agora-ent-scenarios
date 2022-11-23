@@ -112,7 +112,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 离开房间
     /// - Parameters:
     ///
-    func leaveRoom(_ roomId: String, isOwner: Bool, completion: @escaping (Error?, Bool) -> Void)
+    func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void)
     
     /// 获取房间详情
     /// - Parameters:
