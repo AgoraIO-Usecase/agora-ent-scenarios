@@ -99,7 +99,6 @@ extension VoiceRoomInviteUsersController {
     private func inviteUser(user: VRUser?) {
         SVProgressHUD.show()
         if idx <= 0 {return}
-        
         let chat_uid: String = user?.uid ?? ""
         ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx) { error, flag in
             if error == nil {
