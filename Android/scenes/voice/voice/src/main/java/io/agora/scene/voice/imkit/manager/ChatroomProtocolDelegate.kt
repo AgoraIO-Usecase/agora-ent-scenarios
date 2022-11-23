@@ -7,11 +7,10 @@ import io.agora.chat.ChatRoomManager
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.scene.voice.imkit.bean.ChatMicMemberBean
-import io.agora.scene.voice.imkit.bean.ChatroomMicBean
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
 
@@ -22,14 +21,14 @@ class ChatroomProtocolDelegate constructor(
         private const val TAG = "ChatroomProtocolDelegate"
     }
     var roomManager  : ChatRoomManager = ChatClient.getInstance().chatroomManager()
-    lateinit var ownerBean : ChatMicMemberBean
+    lateinit var ownerBean : VoiceMemberModel
 
     /////////////////////// mic ///////////////////////////
 
     /**
      * 初始化麦位信息 （这里缺少 房间类型参数  3D空间音频初始化麦位信息和普通房间有区别）
      */
-    fun initMicInfo(ownerBean:ChatMicMemberBean,callBack: CallBack){
+    fun initMicInfo(ownerBean:VoiceMemberModel,callBack: CallBack){
         val attributeMap = mutableMapOf<String, String>()
         this@ChatroomProtocolDelegate.ownerBean = ownerBean
         for (i in 1..7) {
@@ -37,29 +36,37 @@ class ChatroomProtocolDelegate constructor(
             var status = -1
             key += i
             if (i >= 6) status = -2
-            var mBean = GsonTools.beanToString(ChatroomMicBean(status,i,null))
+            var mBean = GsonTools.beanToString(VoiceMicInfoModel(i,null,status))
             if (mBean != null){
                 attributeMap[key] = mBean
             }
         }
-        var oBean = GsonTools.beanToString(ChatroomMicBean(0,0,ownerBean))
+        var oBean = GsonTools.beanToString(VoiceMicInfoModel(0,ownerBean,0))
         if (oBean != null){
             attributeMap["mic_0"] = oBean
             roomManager.asyncSetChatroomAttributesForced(roomId,attributeMap,true
-            ) { code, result_map -> resultCallback(code,result_map.toString(),callBack) }
+            ) { code, result_map ->
+                if (code == 200){
+                    callBack.onSuccess()
+                    "update result onSuccess: ".logE(TAG)
+                }else{
+                    callBack.onError(code,result_map.toString())
+                    "update result onError: $code $result_map ".logE(TAG)
+                }
+            }
         }
     }
 
     /**
      * 从服务端获取所有麦位信息
      */
-    fun getMicInfoFromServer() : MutableMap<String, ChatroomMicBean>{
-        var micInfoMap = mutableMapOf<String, ChatroomMicBean>()
+    fun getMicInfoFromServer() : MutableMap<String, VoiceMicInfoModel>{
+        var micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
         roomManager.asyncFetchChatRoomAllAttributesFromServer(roomId,object :
             ValueCallBack<MutableMap<String, String>>{
             override fun onSuccess(value: MutableMap<String, String>?) {
                 for (entry in value?.entries!!) {
-                    var bean = GsonTools.toBean(entry.value, ChatroomMicBean::class.java)
+                    var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
                     if (bean != null){
                         micInfoMap[entry.key] = bean
                     }
@@ -77,12 +84,12 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 从本地缓存获取所有麦位信息
      */
-    fun getMicInfo(): MutableMap<String, ChatroomMicBean>{
-        val micInfoMap = mutableMapOf<String, ChatroomMicBean>()
+    fun getMicInfo(): MutableMap<String, VoiceMicInfoModel>{
+        val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
         var localMap =  ChatroomCacheManager.cacheManager.getMicInfoMap()
         if (localMap != null){
             for (entry in localMap.entries) {
-                var bean = GsonTools.toBean(entry.value, ChatroomMicBean::class.java)
+                var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
                 if (bean != null){
                     micInfoMap[entry.key] = bean
                 }
@@ -94,22 +101,22 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 从本地获取指定麦位信息
      */
-    fun getMicInfo(micIndex:Int): VoiceMicInfoModel? {
+    private fun getMicInfo(micIndex:Int): VoiceMicInfoModel? {
         return ChatroomCacheManager.cacheManager.getMicInfoByIndex(micIndex)
     }
 
      /**
      * 从服务端获取指定麦位信息
      */
-    fun getMicInfoByIndexFromServer(micIndex: Int) : ChatroomMicBean{
+    fun getMicInfoByIndexFromServer(micIndex: Int) : VoiceMicInfoModel{
         val keyList: MutableList<String> = java.util.ArrayList()
-        var micBean = ChatroomMicBean(-99,-99,null)
+        var micBean = VoiceMicInfoModel(-99,null,-99)
         keyList.add(getMicIndex(micIndex))
         roomManager.asyncFetchChatroomAttributesFromServer(roomId,keyList,object :
             ValueCallBack<MutableMap<String, String>>{
             override fun onSuccess(value: MutableMap<String, String>?) {
                 for (entry in value?.entries!!) {
-                    micBean = GsonTools.toBean(entry.value, ChatroomMicBean::class.java)!!
+                    micBean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)!!
                     "getMicInfoByIndex onSuccess: ".logE(TAG)
                 }
             }
@@ -124,14 +131,14 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 下麦
      */
-    fun leaveMic(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,-1,false,callback)
+    fun leaveMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,-1,false,callback)
     }
 
     /**
      * 交换麦位
      */
-    fun changeMic(fromMicIndex: Int,toMicIndex: Int,callback: CallBack){
+    fun changeMic(fromMicIndex: Int,toMicIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
         val attributeMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
         var fromKey = getMicIndex(fromMicIndex)
         var toKey = getMicIndex(toMicIndex)
@@ -139,7 +146,7 @@ class ChatroomProtocolDelegate constructor(
         var toMicBean =  getMicInfo(toMicIndex)
         var fromBeanValue = GsonTools.beanToString(fromBean)
         var toBeanValue = GsonTools.beanToString(toMicBean)
-        if (toMicBean != null && toMicBean.micStatus == -1){
+        if (toMicBean != null && fromBean != null && toMicBean.micStatus == -1){
             if (toBeanValue != null){
                 attributeMap?.put(fromKey,toBeanValue )
             }
@@ -147,56 +154,67 @@ class ChatroomProtocolDelegate constructor(
                 attributeMap?.put(toKey, fromBeanValue)
             }
             roomManager.asyncSetChatroomAttributes(roomId,attributeMap,true
-            ) { code, result_map -> resultCallback(code,result_map.toString(),callback) }
+            ) { code, result_map ->
+                if (code == 200){
+                    var map = mutableMapOf<Int, VoiceMicInfoModel>()
+                    map[fromMicIndex] = toMicBean
+                    map[toMicIndex] = fromBean
+                    callback.onSuccess(map)
+                    "update result onSuccess: ".logE(TAG)
+                }else{
+                    callback.onError(code,result_map.toString())
+                    "update result onError: $code $result_map ".logE(TAG)
+                }
+            }
         }
     }
 
     /**
      * 关麦
      */
-    fun muteLocal(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,0,false,callback)
+    fun muteLocal(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,0,false,callback)
     }
 
     /**
      * 取消关麦
      */
-    fun unMuteLocal(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,1,false,callback)
+    fun unMuteLocal(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,1,false,callback)
     }
 
     /**
      * 禁言指定麦位
      */
-    fun forbidMic(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,2,true,callback)
+    fun forbidMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,2,true,callback)
     }
     /**
      * 取消指定麦位禁言
      */
-    fun unForbidMic(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,-1,true,callback)
+    fun unForbidMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,-1,true,callback)
     }
 
     /**
      * 踢用户下麦
      */
-    fun kickOff(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,-1,true,callback)
+    fun kickOff(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,-1,true,callback)
     }
 
     /**
      * 锁麦
      */
-    fun lockMic(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,3,true,callback)
+    fun lockMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,3,true,callback)
     }
 
     /**
      * 取消锁麦
      */
-    fun unLockMic(micIndex: Int,callback: CallBack){
-        updateMic(micIndex,-1,true,callback)
+    fun unLockMic(micIndex: Int,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
+        updateMicByResult(micIndex,-1,true,callback)
     }
 
 
@@ -211,24 +229,28 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 申请上麦
      */
-    fun submitMic(micIndex:Int? = null, callback: CallBack){
+    fun startMicSeatApply(micIndex:Int? = null, callback: CallBack){
         val attributeMap = mutableMapOf<String, String>()
-        // TODO:  这里的user bean对象 等im模块移动到 voice下面 复用ProfileManager存的VRUserBean 或者考虑将存储当前用户信息整体挪到im kit
-        attributeMap["user"] = ""
+        var userBean = VoiceMemberModel()
+        userBean.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+        userBean.rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
+        userBean.nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
+        userBean.portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+        attributeMap["user"] = GsonTools.beanToString(userBean).toString()
         if (micIndex != null){
             attributeMap["mic_index"] = micIndex.toString()
         }
-        sendChatroomEvent(ownerBean.chat_uid, CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
+        sendChatroomEvent(userBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
     }
 
     /**
      * 同意上麦申请
      */
-    fun applySubmitMic(micIndex:Int? = null ,callback: CallBack){
+    fun acceptMicSeatApply(micIndex:Int? = null ,callback: ValueCallBack<Map<Int,VoiceMicInfoModel>>){
         if (micIndex != null){
-            updateMic(micIndex,0,false,callback)
+            updateMicByResult(micIndex,0,false,callback)
         }else{
-            updateMic(getFirstFreeMic(),0,false,callback)
+            updateMicByResult(getFirstFreeMic(),0,false,callback)
         }
     }
 
@@ -242,11 +264,11 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 撤销上麦申请
      */
-    fun cancelSubmitMic(callback: CallBack){
+    fun cancelSubmitMic(chatUid: String,callback: CallBack){
         val attributeMap = mutableMapOf<String, String>()
-        // TODO:  这里的user bean对象 等im模块移动到 voice下面 复用ProfileManager存的VRUserBean 或者考虑将存储当前用户信息整体挪到im kit
-        attributeMap["user"] = ""
-        sendChatroomEvent(ownerBean.chat_uid,CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
+        var userBeam = VoiceMemberModel(chatUid)
+        attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
+        sendChatroomEvent(chatUid,CustomMsgType.CHATROOM_APPLY_SITE,attributeMap,callback)
     }
 
     /**
@@ -290,6 +312,36 @@ class ChatroomProtocolDelegate constructor(
 
     /////////////////////////// room ///////////////////////////////
 
+    /**
+     * 更新公告
+     */
+    fun updateAnnouncement(content: String, callback: CallBack){
+        roomManager.asyncUpdateChatRoomAnnouncement(roomId,content,object : CallBack{
+            override fun onSuccess() {
+                callback.onSuccess()
+            }
+
+            override fun onError(code: Int, error: String?) {
+                callback.onError(code,error)
+            }
+        })
+    }
+
+    /**
+     * 是否启用机器人
+     * @param enable true 启动机器人，false 关闭机器人
+     */
+    fun enableRobot(enable: Boolean,callback: CallBack){
+
+    }
+
+    /**
+     * 更新机器人音量
+     * @param value 音量
+     */
+    fun updateRobotVolume(value: Int,callback: CallBack){
+
+    }
 
     /**
      * 更新指定麦位信息
@@ -368,13 +420,13 @@ class ChatroomProtocolDelegate constructor(
         }
     }
 
-    private fun sendChatroomEvent(chatUid:String,eventType:CustomMsgType,
+    private fun sendChatroomEvent(chatUid:String?,eventType:CustomMsgType,
                           params:MutableMap<String,String>,callback: CallBack){
         CustomMsgHelper.getInstance().sendCustomSingleMsg(chatUid,
             eventType.getName(),params,object : OnMsgCallBack() {
                 override fun onSuccess(message: ChatMessageData?) {
                     callback.onSuccess()
-                    "sendCustomSingleMsg onSuccess:".logE(TAG)
+                    "sendCustomSingleMsg onSuccess: $message".logE(TAG)
                 }
 
                 override fun onError(messageId: String?, code: Int, desc: String?) {
@@ -384,26 +436,16 @@ class ChatroomProtocolDelegate constructor(
             })
     }
 
-    private fun resultCallback(code:Int,desc:String,callback:CallBack){
-        if (code == 200){
-            callback.onSuccess()
-            "update result onSuccess: ".logE(TAG)
-        }else{
-            callback.onError(code,desc)
-            "update result onError: $code $desc ".logE(TAG)
-        }
-    }
-
     /**
      *  按麦位顺序查询空麦位
      */
     private fun getFirstFreeMic():Int{
-        var indexList: MutableList<Int> =  mutableListOf<Int>()
+        var indexList: MutableList<Int> = mutableListOf<Int>()
         var micInfo = ChatroomCacheManager.cacheManager.getMicInfoMap() as MutableMap<String, String>
         for (mutableEntry in micInfo) {
-            var bean =  GsonTools.toBean(mutableEntry.value,ChatroomMicBean::class.java)
-            if (bean != null && bean.status == -1){
-                indexList.add(bean.mic_index)
+            var bean =  GsonTools.toBean(mutableEntry.value,VoiceMicInfoModel::class.java)
+            if (bean != null && bean.micStatus == -1){
+                indexList.add(bean.micIndex)
             }
         }
         indexList.sortBy { it }
