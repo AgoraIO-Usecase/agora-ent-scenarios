@@ -16,9 +16,7 @@ interface VoiceServiceProtocol {
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
-                error?.message?.let {
-                    "voice chat protocol error：$it".logE()
-                }
+                "voice chat protocol error：${error?.message}".logE()
             }
         }
 
@@ -51,32 +49,26 @@ interface VoiceServiceProtocol {
      * @param inputModel 输入的房间信息
      */
     fun createRoom(
-        inputModel: VoiceCreateRoomModel,
-        completion: (error: Int, result: VoiceRoomModel) -> Unit
+        inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit
     )
 
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param needConvertConfig 是否需要重新获取token && im 配置，创建房间后加入不需要(false), 直接加入需要(true)
      */
-    fun joinRoom(
-        roomId: String,
-        needConvertConfig: Boolean = false,
-        completion: (error: Int, result: Boolean) -> Unit
-    )
-
-    /**
-     * 获取房间详情
-     * @param voiceRoomModel 房间概要
-     */
-    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo) -> Unit)
+    fun joinRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 离开房间
      * @param roomId 房间id
      */
     fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit)
+
+    /**
+     * 获取房间详情
+     * @param voiceRoomModel 房间概要
+     */
+    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo) -> Unit)
 
     /**
      * 获取排行榜列表
@@ -89,82 +81,9 @@ interface VoiceServiceProtocol {
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
-     * 邀请用户上麦
-     * @param chatUid im uid
+     * 举手列表
      */
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 拒绝上麦
-     * @param roomId 房间id
-     * @param userId 用户id
-     */
-    fun refuseInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 禁言指定麦位置
-     * @param micIndex 麦位index
-     */
-    fun forbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 取消禁言指定麦位置
-     * @param micIndex 麦位index
-     */
-    fun unForbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 锁麦
-     * @param micIndex 麦位index
-     */
-    fun lockMic(micIndex: Int, completion: (map: MutableMap<Int, VoiceMicInfoModel>,error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 取消锁麦
-     * @param micIndex 麦位index
-     */
-    fun unLockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 踢用户下麦
-     * @param micIndex 麦位index
-     */
-    fun kickOff(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 下麦
-     * @param micIndex 麦位index
-     */
-    fun leaveMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * mute
-     * @param micIndex 麦位index
-     */
-    fun muteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * unMute
-     * @param micIndex 麦位index
-     */
-    fun unMuteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 换麦
-     * @param oldIndex 老麦位index
-     * @param newIndex 新麦位index
-     */
-    fun changeMic(oldIndex: Int, newIndex: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 接受邀请
-     */
-    fun acceptMicSeatInvitation(completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
-     * 拒绝邀请
-     */
-    fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit)
+    fun fetchRaisedList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
      * 申请上麦
@@ -176,13 +95,88 @@ interface VoiceServiceProtocol {
      * 同意申请
      * @param chatUid 环信用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
 
     /**
      * 取消上麦
      * @param chatUid im uid
      */
     fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+
+    /**
+     * 邀请用户上麦
+     * @param chatUid im uid
+     */
+    fun startMicSeatInvitation(chatUid: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
+
+    /**
+     * 接受邀请
+     */
+    fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 拒绝邀请
+     */
+    fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit)
+
+    /**
+     * mute
+     * @param micIndex 麦位index
+     */
+    fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * unMute
+     * @param micIndex 麦位index
+     */
+    fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 取消禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 锁麦
+     * @param micIndex 麦位index
+     */
+    fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 取消锁麦
+     * @param micIndex 麦位index
+     */
+    fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 踢用户下麦
+     * @param micIndex 麦位index
+     */
+    fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 下麦
+     * @param micIndex 麦位index
+     */
+    fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit)
+
+    /**
+     * 换麦
+     * @param oldIndex 老麦位index
+     * @param newIndex 新麦位index
+     */
+    fun changeMic(
+        oldIndex: Int,
+        newIndex: Int,
+        completion: (error: Int, result: Map<String, VoiceMicInfoModel>) -> Unit
+    )
 
     /**
      * 更新公告
