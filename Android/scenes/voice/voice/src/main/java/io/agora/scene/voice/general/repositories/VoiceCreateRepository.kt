@@ -90,13 +90,11 @@ class VoiceCreateRepository : BaseRepository() {
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param needConvertConfig false
      */
-    fun joinRoom(roomId: String, needConvertConfig: Boolean = false, ): LiveData<Resource<Boolean>> {
+    fun joinRoom(roomId: String): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-
-                voiceServiceProtocol.joinRoom(roomId, needConvertConfig, completion = { error, result ->
+                voiceServiceProtocol.joinRoom(roomId, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
