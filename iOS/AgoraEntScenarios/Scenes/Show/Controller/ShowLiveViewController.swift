@@ -36,6 +36,7 @@ class ShowLiveViewController: UIViewController {
         config.areaCode = .global
         return config
     }()
+    private lazy var beautyVC = ShowBeautySettingVC()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,6 +70,7 @@ class ShowLiveViewController: UIViewController {
         let roleOptions = AgoraClientRoleOptions()
         roleOptions.audienceLatencyLevel = role == .audience ? .ultraLowLatency : .lowLatency
         agoraKit?.setClientRole(role, options: roleOptions)
+        agoraKit?.setVideoFrameDelegate(self)
         agoraKit?.enableVideo()
         agoraKit?.enableAudio()
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
@@ -88,6 +90,7 @@ class ShowLiveViewController: UIViewController {
         canvas.renderMode = .hidden
         canvas.uid = uid
         if role == .broadcaster {
+            canvas.mirrorMode = .disabled
             agoraKit?.setupLocalVideo(canvas)
         } else {
             agoraKit?.setupRemoteVideo(canvas)
@@ -123,6 +126,29 @@ class ShowLiveViewController: UIViewController {
     }
     
     
+}
+
+extension ShowLiveViewController: AgoraVideoFrameDelegate {
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        return true
+    }
+    
+    func getVideoFormatPreference() -> AgoraVideoFormat {
+        .cvPixelBGRA
+    }
+    
+    func getVideoFrameProcessMode() -> AgoraVideoFrameProcessMode {
+        .readWrite
+    }
+    
+    func getMirrorApplied() -> Bool {
+        true
+    }
+    
+    func getRotationApplied() -> Bool {
+        false
+    }
 }
 
 
@@ -175,6 +201,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickCloseButton() {
+        ByteBeautyManager.shareManager.destroy()
         dismiss(animated: true) {
             AppContext.showServiceImp.leaveRoom { error in
                 print("error == \(error.debugDescription)")
@@ -197,7 +224,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickBeautyButton() {
-        let beautyVC = ShowBeautySettingVC()
         present(beautyVC, animated: true)
     }
     

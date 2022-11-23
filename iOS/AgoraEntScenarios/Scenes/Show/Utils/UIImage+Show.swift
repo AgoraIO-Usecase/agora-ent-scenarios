@@ -11,4 +11,10 @@ extension UIImage {
     @objc static func show_sceneImage(name: String) -> UIImage? {
         return sceneImage(name: name, bundleName: "showResource")
     }
+    
+    @objc
+    static func show_byteBeautyImage(name: String?) -> UIImage? {
+        guard let imageName = name else { return nil }
+        return sceneImage(name: imageName, bundleName: "ByteBeautyResource")
+    }
 }

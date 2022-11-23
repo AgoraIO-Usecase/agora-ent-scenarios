@@ -10,6 +10,8 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
+    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool) -> Void)?
+    
     var defalutSelectIndex = 0
    
     private lazy var collectionView: UICollectionView = {
@@ -23,13 +25,83 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.register(ShowBeautyFaceCell.self, forCellWithReuseIdentifier: NSStringFromClass(ShowBeautyFaceCell.self))
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
+    
+    private lazy var dataArray: [ByteBeautyModel] = {
+        switch type {
+        case .beauty: return ByteBeautyModel.createBeautyData()
+        case .style: return ByteBeautyModel.createStyleData()
+        case .filter: return ByteBeautyModel.createFilterData()
+        case .sticker: return ByteBeautyModel.createStickerData()
+        }
+    }()
+    
+    private var type: ShowBeautyFaceVCType = .beauty
+    
+    init(type: ShowBeautyFaceVCType) {
+        super.init(nibName: nil, bundle: nil)
+        self.type = type
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
         configDefaultSelect()
+    }
+    
+    func changeValueHandler(value: CGFloat) {
+        guard value > 0 else { return }
+        setBeautyHandler(value: value)
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
+    }
+    
+    private func setBeautyHandler(value: CGFloat) {
+        let model = dataArray[defalutSelectIndex]
+        model.value = value
+        switch type {
+        case .beauty:
+            if value <= 0 {
+                ByteBeautyManager.shareManager.reset(datas: dataArray)
+                return
+            }
+            ByteBeautyManager.shareManager.setBeauty(path: model.path,
+                                                     key: model.key,
+                                                     value: model.value)
+            
+        case .filter:
+            if value <= 0 {
+                ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
+                return
+            }
+            ByteBeautyManager.shareManager.setFilter(path: model.path,
+                                                     value: model.value)
+            
+        case .style:
+            if value <= 0 {
+                ByteBeautyManager.shareManager.reset(datas: dataArray)
+                ByteBeautyManager.shareManager.reset(datas: dataArray,
+                                                     key: "Makeup_ALL")
+                return
+            }
+            ByteBeautyManager.shareManager.setStyle(path: model.path,
+                                                    key: model.key,
+                                                    value: model.value)
+            ByteBeautyManager.shareManager.setStyle(path: model.path,
+                                                    key: "Makeup_ALL",
+                                                    value: model.makupValue)
+            
+        case .sticker:
+            ByteBeautyManager.shareManager.setSticker(path: model.path)
+        }
     }
     
     private func setUpUI(){
@@ -57,16 +129,29 @@ class ShowBeautyFaceVC: UIViewController {
 extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        dataArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell: ShowBeautyFaceCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowBeautyFaceCell.self), for: indexPath) as! ShowBeautyFaceCell
+        let cell: ShowBeautyFaceCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowBeautyFaceCell.self),
+                                                                          for: indexPath) as! ShowBeautyFaceCell
+        let model = dataArray[indexPath.item]
+        cell.setupModel(model: model)
+        if indexPath.item == 0 {
+            selectedItemClosure?(model.value, model.path == nil)
+        }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        defalutSelectIndex = indexPath.item
+        let model = dataArray[indexPath.item]
+        setBeautyHandler(value: model.value)
+        if type == .sticker {
+            selectedItemClosure?(0, true)
+            return
+        }
+        selectedItemClosure?(model.value, model.path == nil)
     }
 }
 
