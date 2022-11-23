@@ -734,10 +734,8 @@ extension VoiceRoomViewController {
     }
 
     @objc private func leaveRoom() {
-        if let room_id = roomInfo?.room?.room_id {
-            VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .leaveRoom(roomId: room_id), params: [:]) { map, err in
-                print(map?["result"] as? Bool ?? false)
-            }
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "", isOwner: self.isOwner) { _, _ in
+            
         }
     }
 
@@ -745,20 +743,12 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().refuseInvite { error, flag in
             
         }
-//        if let roomId = roomInfo?.room?.room_id {
-//            VoiceRoomBusinessRequest.shared.sendGETRequest(api: .refuseInvite(roomId: roomId), params: [:]) { _, _ in
-//            }
-//        }
     }
 
     func agreeInvite() {
         ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { _, _ in
                 
         })
-//        if let roomId = roomInfo?.room?.room_id {
-//            VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .agreeInvite(roomId: roomId), params: [:]) { _, _ in
-//            }
-//        }
     }
 
     func showEndLive() {
