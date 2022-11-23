@@ -6,14 +6,17 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
-import io.agora.voice.buddy.tool.GsonTools
+import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.voice.buddy.tool.GsonTools
 import java.io.*
 
 class ChatroomCacheManager {
     private var mEditor: SharedPreferences.Editor? = null
     private var mSharedPreferences: SharedPreferences? = null
-    private val mMicInfoTag = "AT_MIC_INFO"
+    private val mMicInfoMap = mutableMapOf<String, String>()
+    private val attributeMap = mutableMapOf<String, VoiceMemberModel>()
+    private val submitMicList: MutableList<VoiceMemberModel> = mutableListOf<VoiceMemberModel>()
 
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
@@ -30,15 +33,13 @@ class ChatroomCacheManager {
     /**
      * 设置Mic信息
      */
-    fun setMicInfo(kvMap: MutableMap<String,String>?){
-        val localAttributeMap = getMicInfoMap()
-        if (localAttributeMap != null){
-            for (entry in kvMap?.entries!!) {
-                localAttributeMap[entry.key] = entry.value
-            }
-            putMap(cacheManager.mMicInfoTag,localAttributeMap)
+    fun setMicInfo(kvMap: MutableMap<String,String>){
+        if (mMicInfoMap.isEmpty()){
+            mMicInfoMap.putAll(kvMap)
         }else{
-            putMap(cacheManager.mMicInfoTag,kvMap)
+            for (mutableEntry in kvMap) {
+                mMicInfoMap[mutableEntry.key] = mutableEntry.value
+            }
         }
     }
 
@@ -46,17 +47,16 @@ class ChatroomCacheManager {
      * 获取Mic信息
      */
     fun getMicInfoMap(): MutableMap<String, String>? {
-        return getMap(cacheManager.mMicInfoTag)
+        return mMicInfoMap
     }
 
     /**
      * 获取指定麦位的Mic信息
      */
     fun getMicInfoByIndex(micIndex: Int): VoiceMicInfoModel?{
-        var indexTag = "mic_$micIndex"
-        val localAttributeMap = getMicInfoMap()
-        if (localAttributeMap != null && localAttributeMap.containsKey(indexTag)){
-            return GsonTools.toBean(localAttributeMap[indexTag], VoiceMicInfoModel::class.java)
+        val indexTag = "mic_$micIndex"
+        if (mMicInfoMap.isNotEmpty() && mMicInfoMap.containsKey(indexTag)){
+            return GsonTools.toBean(mMicInfoMap[indexTag], VoiceMicInfoModel::class.java)
         }
         return null
     }
@@ -64,15 +64,26 @@ class ChatroomCacheManager {
     /**
      * 设置申请上麦列表
      */
-    fun setSubmitMicList(){
-
+    fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
+        if (voiceMemberBean.chatUid != null && !attributeMap.containsKey(voiceMemberBean.chatUid)){
+            submitMicList.add(voiceMemberBean)
+            attributeMap[voiceMemberBean.chatUid!!] = voiceMemberBean
+        }
     }
 
     /**
-     * 获取申请上麦列表
+     * 获取申请上麦成员列表
      */
-    fun getSubmitMicList(){
+    fun getSubmitMicList():MutableList<VoiceMemberModel>{
+        return submitMicList
+    }
 
+    /**
+     * 从申请列表移除指定成员对象
+     */
+    fun removeSubmitMember(voiceMemberBean: VoiceMemberModel){
+        attributeMap.remove(voiceMemberBean.chatUid)
+        submitMicList.remove(voiceMemberBean)
     }
 
     /**
