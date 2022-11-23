@@ -89,6 +89,9 @@ public class RethinkSyncManager: NSObject {
                           "requestId": UUID().uuid16string()]
             let data = Utils.toJsonString(dict: params)?.data(using: .utf8)
             try? self?.socket?.send(dataNoCopy: data)
+            
+            //check connect status
+            self?._reConnectIfNeed()
         })
         timer?.fire()
         RunLoop.main.add(timer!, forMode: .common)
@@ -114,7 +117,7 @@ public class RethinkSyncManager: NSObject {
         guard let dict = try? JSONSerialization.jsonObject(with: jsonData,
                                                            options: .mutableContainers)
         else {
-            Log.errorText(text: "数据转成失败", tag: nil)
+            Log.errorText(text: "data convert fail", tag: nil)
             return
         }
         writeData(channelName: channelName, params: dict, objectId: objectId, type: .send)
@@ -142,9 +145,6 @@ public class RethinkSyncManager: NSObject {
                            type: SocketType,
                            isAdd: Bool = false)
     {
-        //check connect status
-        _reConnectIfNeed()
-        
         var newParams = params
         var propsId: String = objectId ?? UUID().uuid16string()
         if objectId == nil && params is [String: Any] {
@@ -218,7 +218,7 @@ public class RethinkSyncManager: NSObject {
 
 extension RethinkSyncManager: SRWebSocketDelegate {
     public func webSocketDidOpen(_ webSocket: SRWebSocket) {
-        Log.info(text: "连接状态 status == \(webSocket.readyState.rawValue)", tag: "connect")
+        Log.info(text: "connect status == \(webSocket.readyState.rawValue)", tag: "connect")
         if state != webSocket.readyState {
             connectStateBlock?(SocketConnectState(rawValue: webSocket.readyState.rawValue) ?? .closed)
         }
@@ -245,7 +245,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             return
         }
         if let msg = dict?["msg"] as? String, msg == "success" {
-            Log.info(text: "消息发送成功: [\(dict?["requestId"] ?? "")]", tag: "socket")
+            Log.info(text: "send msg success: [\(dict?["requestId"] ?? "")]", tag: "socket")
         }
         let params = dict?["data"] as? [String: Any]
         let channelName = dict?["channelName"] as? String ?? ""
@@ -302,7 +302,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
                 successBlock(attrs ?? [])
             }
         }
-        Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "收到消息")
+        Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "recv_msg")
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didFailWithError error: Error) {

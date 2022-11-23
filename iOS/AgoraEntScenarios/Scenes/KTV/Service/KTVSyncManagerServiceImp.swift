@@ -61,6 +61,8 @@ private func _hideLoadingIfNeed() {
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
     private var singingScoreDidChanged: ((Double) -> Void)?
+    
+    private var publishScore: Double?
 
     private var roomNo: String? {
         didSet {
@@ -1064,6 +1066,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         agoraPrint("imp song delete... [\(objectId)]")
+        self.publishScore = nil
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
@@ -1169,6 +1172,12 @@ extension KTVSyncManagerServiceImp {
             agoraPrint("_addSingingScore channelName = nil")
             return
         }
+        
+        if let publishScore = publishScore, abs(publishScore - score) < 0.01  {
+            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
+            return
+        }
+        
         agoraPrint("imp singing score add ... [\(score)]")
 
         let params = [
@@ -1179,8 +1188,9 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SINGING_SCORE_INFO)
             .add(data: params,
-                 success: {_ in 
+                 success: { [weak self] _ in
                 agoraPrint("imp singing score add success...")
+                self?.publishScore = score
                 finished()
             }, fail: { error in
                 agoraPrint("imp singing score add fail :\(error.message)...")
