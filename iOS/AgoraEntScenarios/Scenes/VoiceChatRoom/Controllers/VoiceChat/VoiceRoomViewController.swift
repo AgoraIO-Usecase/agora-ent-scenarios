@@ -99,6 +99,7 @@ class VoiceRoomViewController: VRBaseViewController {
         // 处理底部事件
         charBarEvents()
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -800,6 +801,11 @@ extension VoiceRoomViewController {
             vc.dismiss(animated: true)
         }
         presentViewController(vc)
+    }
+    
+    @objc func updateMicInfo(noti: Notification){
+        guard let obj: VRRoomMic = noti.object as? VRRoomMic else {return}
+        self.rtcView.updateUser(obj)
     }
 }
 
