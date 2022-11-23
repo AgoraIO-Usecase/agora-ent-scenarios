@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoomTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivOwnerAvatar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/show_roundStyle_50"
+            tools:src="@mipmap/portrait01" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRoomName"
+            android:layout_width="154dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:paddingHorizontal="8dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/ivOwnerAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivOwnerAvatar"
+            tools:text="Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRoomId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:paddingStart="8dp"
+            android:singleLine="true"
+            android:textColor="@color/white_80_percent"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/tvTimer"
+            app:layout_constraintStart_toStartOf="@id/tvRoomName"
+            app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+            tools:text="ID: 11234477" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/show_live_top_green_dot"
+            android:drawablePadding="5dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingEnd="8dp"
+            android:textColor="@color/white_80_percent"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/tvRoomName"
+            app:layout_constraintStart_toEndOf="@id/tvRoomId"
+            app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+            tools:text="00:00:00" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUserCount"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="4dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:layout_marginEnd="10dp"
+        android:drawableTop="@mipmap/show_live_top_user_tag"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingVertical="5dp"
+        android:textColor="@color/white_80_percent"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/ivClose"
+        app:layout_constraintTop_toTopOf="@id/clRoomTitle"
+        tools:text="1.5K" />
+
+    <ImageView
+        android:id="@+id/ivClose"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="4dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
+        android:padding="10dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/show_live_top_close"
+        app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/clRoomTitle"
+        android:contentDescription="@string/show_live_top_close" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

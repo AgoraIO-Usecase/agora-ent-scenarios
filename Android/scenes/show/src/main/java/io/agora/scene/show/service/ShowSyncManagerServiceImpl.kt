@@ -59,7 +59,7 @@ class ShowSyncManagerServiceImpl(
                 roomName,
                 0,
                 "",
-                UserManager.getInstance().user.userNo,
+                UserManager.getInstance().user.id.toString(),
                 ShowRoomStatus.activity.value,
                 System.currentTimeMillis().toDouble(),
                 System.currentTimeMillis().toDouble()
@@ -94,6 +94,10 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("There is a room joined or joining now!"))
             return
         }
+        if(roomMap[roomNo] == null){
+            error?.invoke(RuntimeException("The room has been destroyed!"))
+            return
+        }
         currRoomNo = roomNo
         initSync {
             Sync.Instance().joinScene(
@@ -119,7 +123,7 @@ class ShowSyncManagerServiceImpl(
             return
         }
         val roomDetail = roomMap[currRoomNo] ?: return
-        if(roomDetail.ownerId == UserManager.getInstance().user.userNo){
+        if(roomDetail.ownerId == UserManager.getInstance().user.id.toString()){
             val roomNo = currRoomNo
             currSceneReference?.delete(object:Sync.Callback{
                 override fun onSuccess() {

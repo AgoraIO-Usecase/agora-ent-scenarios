@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="show_roundStyle">
+    <style name="show_roundStyle_6">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">6%</item>
+    </style>
+
+    <style name="show_roundStyle_50">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
 </resources>
