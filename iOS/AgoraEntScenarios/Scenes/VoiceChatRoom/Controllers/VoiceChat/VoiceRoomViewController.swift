@@ -734,7 +734,7 @@ extension VoiceRoomViewController {
     }
 
     @objc private func leaveRoom() {
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "", isOwner: self.isOwner) { _, _ in
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "") { _, _ in
             
         }
     }
@@ -746,7 +746,7 @@ extension VoiceRoomViewController {
     }
 
     func agreeInvite() {
-        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { _, _ in
+        ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { error, mic in
                 
         })
     }
