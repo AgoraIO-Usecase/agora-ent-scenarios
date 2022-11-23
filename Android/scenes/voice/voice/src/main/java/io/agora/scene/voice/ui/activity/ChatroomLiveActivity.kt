@@ -14,10 +14,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import io.agora.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.bean.ChatMessageData
 import com.alibaba.android.arouter.facade.annotation.Route
-import io.agora.voice.imkit.custorm.CustomMsgHelper
-import io.agora.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
@@ -47,9 +47,9 @@ import io.agora.scene.voice.ui.RoomHandsViewDelegate
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.secnceui.annotation.MicStatus
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
-import io.agora.voice.imkit.manager.ChatroomConfigManager
-import io.agora.voice.imkit.manager.ChatroomIMManager
-import io.agora.voice.imkit.manager.ChatroomListener
+import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.imkit.manager.ChatroomListener
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest

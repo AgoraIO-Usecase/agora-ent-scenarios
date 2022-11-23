@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import io.agora.voice.buddy.tool.internal.InternalThreadFactory;
 
 /**
- * Thread io.agora.voice.imkit.manager
+ * Thread io.agora.scene.voice.imkit.manager
  */
 public class ThreadManager {
     private static volatile ThreadManager instance;

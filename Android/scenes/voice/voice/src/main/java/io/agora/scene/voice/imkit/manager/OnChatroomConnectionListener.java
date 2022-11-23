@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager;
+package io.agora.scene.voice.imkit.manager;
 
 public interface OnChatroomConnectionListener {
     /**

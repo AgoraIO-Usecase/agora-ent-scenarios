@@ -1,4 +1,4 @@
-package io.agora.voice.imkit.manager
+package io.agora.scene.voice.imkit.manager
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,7 +7,7 @@ import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
 import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.imkit.bean.ChatroomMicBean
+import io.agora.scene.voice.imkit.bean.ChatroomMicBean
 import java.io.*
 
 class ChatroomCacheManager {
