@@ -43,10 +43,10 @@ import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomInfo
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
-import io.agora.scene.voice.ui.RoomHandsViewDelegate
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.secnceui.annotation.MicStatus
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.imkit.manager.ChatroomListener
@@ -66,7 +66,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private lateinit var giftViewDelegate: RoomGiftViewDelegate
-    private lateinit var handsDelegate: RoomHandsViewDelegate
 
     /**
      * 代理头部view以及麦位view
@@ -92,7 +91,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         giftViewDelegate =
             RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
-        handsDelegate = RoomHandsViewDelegate.getInstance(this, roomLivingViewModel, binding.chatBottom)
         initListeners()
         initData()
         initView()
@@ -101,7 +99,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
-        handsDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
         giftViewDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
         ChatroomIMManager.getInstance().init(roomKitBean.chatroomId)
         ChatroomIMManager.getInstance().saveWelcomeMsg(
@@ -197,7 +194,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     roomLivingViewModel,
                     roomKitBean,
                     binding.cTopView,
-                    binding.rvChatroom2dMicLayout
+                    binding.rvChatroom2dMicLayout,
+                    binding.chatBottom
                 )
             binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom2dMicLayout.onItemClickListener(
@@ -234,7 +232,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     roomLivingViewModel,
                     roomKitBean,
                     binding.cTopView,
-                    binding.rvChatroom3dMicLayout
+                    binding.rvChatroom3dMicLayout,
+                    binding.chatBottom
                 )
             binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom3dMicLayout.onItemClickListener(
@@ -308,8 +307,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         if (roomObservableDelegate.mySelfMicStatus() == MicStatus.ForceMute) {
                             // 被禁言
                             ToastTools.show(
-                                this@ChatroomLiveActivity,
-                                getString(R.string.voice_chatroom_mic_muted_by_host)
+                                this@ChatroomLiveActivity, getString(R.string.voice_chatroom_mic_muted_by_host)
                             )
                             return
                         }
@@ -322,16 +320,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         }
                     }
                     R.id.voice_extend_item_hand_up -> {
-                        "extend_item_hand_up isOwner:${handsDelegate.isOwner}".logE("onChatExtendMenuItemClick")
-                        if (handsDelegate.isOwner) {
-                            if (this@ChatroomLiveActivity::handsDelegate.isInitialized) {
-                                handsDelegate.showOwnerHandsDialog()
-                                binding.chatBottom.setShowHandStatus(true, false)
-                            }
+                        "extend_item_hand_up isOwner:${roomKitBean.isOwner}".logD()
+                        if (roomKitBean.isOwner) {
+                            roomObservableDelegate.showOwnerHandsDialog()
                         } else {
-                            if (this@ChatroomLiveActivity::handsDelegate.isInitialized) {
-                                handsDelegate.showMemberHandsDialog(-1)
-                            }
+                            roomObservableDelegate.showMemberHandsDialog(-1)
                         }
                     }
                     R.id.voice_extend_item_gift -> {
@@ -499,7 +492,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             }
             ThreadManager.getInstance().runOnMainThread {
                 if (roomKitBean.isOwner) {
-                    handsDelegate.check(handsCheckMap)
+                    roomObservableDelegate.handsCheck(handsCheckMap)
                 }
                 roomObservableDelegate.onUpdateMicMap(newMicMap)
                 if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
@@ -513,7 +506,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 if (!roomKitBean.isOwner) {
                     Log.e("liveActivity", "roomAttributesDidUpdated:  ${roomObservableDelegate.isOnMic()}")
                     binding.chatBottom.setEnableHand(roomObservableDelegate.isOnMic())
-                    handsDelegate.resetRequest()
+                    roomObservableDelegate.resetRequest()
                 }
             }
         }
@@ -524,7 +517,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         Log.e("ChatroomLiveActivity", "receiveCancelApplySite" + message.toString())
         ThreadManager.getInstance().runOnMainThread {
             //刷新 owner 申请列表
-            handsDelegate.update(0)
+            roomObservableDelegate.handsUpdate(0)
         }
     }
 
@@ -581,15 +574,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     override fun onInvitation(micIndex: Int) {
-        if (this@ChatroomLiveActivity::handsDelegate.isInitialized) {
-            handsDelegate.showOwnerHandsDialog()
-            binding.chatBottom.setShowHandStatus(true, false)
+        if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
+            roomObservableDelegate.showOwnerHandsDialog()
         }
     }
 
     override fun onUserClickOnStage(micIndex: Int) {
-        if (this@ChatroomLiveActivity::handsDelegate.isInitialized) {
-            handsDelegate.onUserClickOnStage(micIndex)
+        if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
+            roomObservableDelegate.onUserClickOnStage(micIndex)
         }
     }
 

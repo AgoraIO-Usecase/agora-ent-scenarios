@@ -20,7 +20,7 @@ class VoiceUserListRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -52,7 +52,7 @@ class VoiceUserListRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+//                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }

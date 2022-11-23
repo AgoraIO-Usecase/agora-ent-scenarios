@@ -131,7 +131,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.muteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -149,7 +149,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.unMuteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -165,7 +165,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.leaveMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -181,7 +181,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.forbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -197,7 +197,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.unForbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -213,7 +213,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -243,9 +243,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun lockMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
-                voiceServiceProtocol.lockMic(micIndex, completion = { map,error, result ->
+                voiceServiceProtocol.lockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -261,7 +261,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.unLockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -293,7 +293,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+//                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -309,7 +309,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.changeMic(oldIndex,newIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+//                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -325,7 +325,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.acceptMicSeatInvitation( completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+//                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
