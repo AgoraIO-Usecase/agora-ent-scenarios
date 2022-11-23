@@ -4,18 +4,18 @@ import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
+import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.secnceui.annotation.MicClickAction
 import io.agora.voice.buddy.tool.ImageTools
-import io.agora.voice.network.tools.bean.VMemberBean
 
 class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomAudienceListBinding) :
-    BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemRoomAudienceListBinding, VMemberBean>(binding) {
+    BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemRoomAudienceListBinding, VoiceMemberModel>(binding) {
 
-    override fun binding(data: VMemberBean?, selectedIndex: Int) {
+    override fun binding(data: VoiceMemberModel?, selectedIndex: Int) {
         data?.let { audienceInfo ->
-            binding.mtAudienceUsername.text = audienceInfo.name
+            binding.mtAudienceUsername.text = audienceInfo.nickName
             ImageTools.loadImage(binding.ivAudienceAvatar, audienceInfo.portrait)
-            if (audienceInfo.mic_index == -1) {
+            if (audienceInfo.micIndex == -1) {
                 // 不在麦位上
                 binding.mtAudienceAction.apply {
                     isClickable = true
