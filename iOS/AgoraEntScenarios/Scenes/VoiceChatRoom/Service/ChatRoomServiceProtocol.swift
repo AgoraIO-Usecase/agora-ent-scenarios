@@ -187,7 +187,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 接受邀请
     /// - Parameters:
     ///
-    func acceptMicSeatInvitation(completion: @escaping (Error?, Int?) -> Void)
+    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void)
     
     /// 拒绝邀请
     /// - Parameters:
@@ -209,7 +209,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - user: VRUser instance
     ///   - completion: 回调
-    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,Int?) -> Void)
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void)
 
     /// 获取房间列表
     /// - Parameters:

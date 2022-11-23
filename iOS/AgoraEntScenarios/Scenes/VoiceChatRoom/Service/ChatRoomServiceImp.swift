@@ -383,7 +383,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func acceptMicSeatInvitation(completion: @escaping (Error?, Int?) -> Void) {
+    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
         let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
@@ -403,10 +403,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.chat_uid ?? ""
                 }
-                var currentMic = self.mics[safe: mic.mic_index]
+                let currentMic = self.mics[safe: mic.mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic.mic_index]  = mic
-                    completion(nil,mic.mic_index)
+                    completion(nil,currentMic)
                 } else {
                     completion(self.normalError(),nil)
                     return
@@ -442,7 +442,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,Int?) -> Void) {
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void) {
         var mic_index = 1
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
@@ -464,7 +464,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 let currentMic = self.mics[safe: user?.index ?? 1]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
-                    completion(nil,mic_index)
+                    completion(nil,currentMic)
                 } else {
                     completion(self.normalError(),nil)
                     return
