@@ -110,6 +110,7 @@ class VoiceRoomViewController: VRBaseViewController {
     deinit {
         leaveRoom()
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        ChatRoomServiceImp.getSharedInstance().cleanCache()
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
     }
 }
