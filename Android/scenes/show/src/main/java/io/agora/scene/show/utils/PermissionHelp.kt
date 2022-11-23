@@ -17,13 +17,16 @@ class PermissionHelp(val activity: ComponentActivity) {
     private var unGranted: (() -> Unit)? = null
     private val requestPermissionLauncher =
         activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            val granted = granted
+            val unGranted = unGranted
+            this.granted = null
+            this.unGranted = null
+
             if (isGranted) {
                 granted?.invoke()
             } else {
                 unGranted?.invoke()
             }
-            granted = null
-            unGranted = null
         }
     private val appSettingLauncher =
         activity.registerForActivityResult(object : ActivityResultContract<String, Boolean>(){
@@ -45,13 +48,16 @@ class PermissionHelp(val activity: ComponentActivity) {
             }
 
         }){ isGranted ->
+            val granted = granted
+            val unGranted = unGranted
+            this.granted = null
+            this.unGranted = null
+
             if (isGranted) {
                 granted?.invoke()
             } else {
                 unGranted?.invoke()
             }
-            granted = null
-            unGranted = null
         }
 
 
