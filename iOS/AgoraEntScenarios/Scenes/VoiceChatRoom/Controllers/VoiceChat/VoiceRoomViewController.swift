@@ -751,7 +751,7 @@ extension VoiceRoomViewController {
 
     func agreeInvite() {
         ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { _, _ in
-            
+                
         })
 //        if let roomId = roomInfo?.room?.room_id {
 //            VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .agreeInvite(roomId: roomId), params: [:]) { _, _ in

@@ -362,6 +362,22 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.status = 0
         mic.member = user
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(user?.mic_index ?? 1)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.userList?.first(where: {
+                    $0.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? ""
+                })?.mic_index = mic.mic_index
+                self.applicants.removeAll {
+                    $0.member?.chat_uid ?? "" == user?.chat_uid ?? ""
+                }
+                var currentMic = self.mics[safe: mic.mic_index]
+                if currentMic?.status ?? 0 == -1 {
+                    self.mics[mic.mic_index]  = mic
+                    NotificationCenter.default.post(name: Notification.Name("updaateMicInfo"), object: nil)
+                } else {
+                    completion(self.normalError(),false)
+                    return
+                }
+            }
             completion(self.convertError(error: error),error == nil)
         })
     }
@@ -405,6 +421,19 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.status = 0
         mic.member = user?.member
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+            if error == nil {
+                self.applicants.removeAll {
+                    $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
+                }
+                var currentMic = self.mics[safe: user?.index ?? 1]
+                if currentMic?.status ?? 0 == -1 {
+                    self.mics[mic_index]  = mic
+                    NotificationCenter.default.post(name: Notification.Name("updaateMicInfo"), object: nil)
+                } else {
+                    completion(self.normalError())
+                    return
+                }
+            }
             completion(self.convertError(error: error))
         })
     }
