@@ -11,11 +11,6 @@ import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
-import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
-import io.agora.voice.network.tools.VRDefaultValueCallBack
-import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.HashMap
 
 /**
@@ -118,7 +113,7 @@ class VoiceSyncManagerServiceImp(
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
         // 2、置换token,获取im 配置，创建房间需要这里的数据
-        requestToolboxService(
+        VRToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = inputModel.roomName,
             completion = { error, chatroomId ->
@@ -152,11 +147,8 @@ class VoiceSyncManagerServiceImp(
     /**
      * 加入房间
      * @param roomId 房间id
-     * @param needConvertConfig 是否需要重新获取token && im 配置，创建房间后加入不需要(false), 直接加入需要(true)
      */
-    override fun joinRoom(
-        roomId: String, needConvertConfig: Boolean, completion: (error: Int, result: Boolean) -> Unit
-    ) {
+    override fun joinRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
         initScene {
             Sync.Instance().joinScene(roomId, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
@@ -176,16 +168,7 @@ class VoiceSyncManagerServiceImp(
                         }
                     })
                     innerSubscribeRoomChanged()
-                    if (needConvertConfig) {
-                        requestToolboxService(
-                            channelId = curRoomInfo.channelId,
-                            chatroomName = curRoomInfo.roomName,
-                            completion = { error, chatroomId ->
-                                completion.invoke(error, error == VoiceServiceProtocol.ERR_OK)
-                            })
-                    } else {
-                        completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-                    }
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -195,6 +178,10 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
+    /**
+     * 离开房间
+     * @param roomId 房间id
+     */
     override fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
         val cacheRoom = roomMap[roomId] ?: return
         // 取消所有订阅
@@ -243,13 +230,6 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    private fun resetCacheInfo(roomId: String, isRoomDestroyed: Boolean = false) {
-        if (isRoomDestroyed) {
-            roomMap.remove(roomId)
-        }
-        mSceneReference = null
-    }
-
     /**
      * 获取房间详情
      * @param voiceRoomModel 房间概要
@@ -273,113 +253,10 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 邀请用户上麦
-     * @param chatUid im uid
+     * 举手列表
      */
-    override fun startMicSeatInvitation(
-        chatUid: String,
-        micIndex: Int?,
-        completion: (error: Int, result: Boolean) -> Unit
-    ) {
-    }
+    override fun fetchRaisedList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
 
-    /**
-     * 拒绝上麦
-     * @param roomId 房间id
-     * @param userId 用户id
-     */
-    override fun refuseInvite(roomId: String, userId: String, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 禁言指定麦位置
-     * @param micIndex 麦位index
-     */
-    override fun forbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 取消禁言指定麦位置
-     * @param micIndex 麦位index
-     */
-    override fun unForbidMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 锁麦
-     * @param micIndex 麦位index
-     */
-    override fun lockMic(micIndex: Int, completion: (map: MutableMap<Int, VoiceMicInfoModel>,error: Int, result: Boolean) -> Unit) {
-        ChatroomIMManager.getInstance().lockMic(micIndex,object :
-            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>> {
-            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
-                ThreadManager.getInstance().runOnIOThread {
-                    value?.let { completion.invoke(it,VoiceServiceProtocol.ERR_OK, true) }
-                }
-            }
-
-            override fun onError(code: Int, error: String?) {
-                ThreadManager.getInstance().runOnIOThread {
-                    val attributeMap = mutableMapOf<Int, VoiceMicInfoModel>()
-                    completion.invoke(attributeMap,VoiceServiceProtocol.ERR_FAILED, false)
-                }
-            }
-        })
-    }
-
-    /**
-     * 取消锁麦
-     * @param micIndex 麦位index
-     */
-    override fun unLockMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 踢用户下麦
-     * @param micIndex 麦位index
-     */
-    override fun kickOff(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 下麦
-     * @param micIndex 麦位index
-     */
-    override fun leaveMic(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * mute
-     * @param micIndex 麦位index
-     */
-    override fun muteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * unMute
-     * @param micIndex 麦位index
-     */
-    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 换麦
-     * @param oldIndex 老麦位index
-     * @param newIndex 新麦位index
-     */
-    override fun changeMic(oldIndex: Int, newIndex: Int, completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 接受邀请
-     */
-    override fun acceptMicSeatInvitation(completion: (error: Int, result: Boolean) -> Unit) {
-    }
-
-    /**
-     * 拒绝邀请
-     */
-    override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
     }
 
     /**
@@ -393,7 +270,7 @@ class VoiceSyncManagerServiceImp(
      * 同意申请
      * @param chatUid 环信用户id
      */
-    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
     }
 
     /**
@@ -401,6 +278,111 @@ class VoiceSyncManagerServiceImp(
      * @param chatUid im uid
      */
     override fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
+    }
+
+    /**
+     * 邀请用户上麦
+     * @param chatUid im uid
+     */
+    override fun startMicSeatInvitation(
+        chatUid: String,
+        micIndex: Int?,
+        completion: (error: Int, result: Boolean) -> Unit
+    ) {
+    }
+
+    /**
+     * 接受邀请
+     */
+    override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 拒绝邀请
+     */
+    override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
+    }
+
+    /**
+     * mute
+     * @param micIndex 麦位index
+     */
+    override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * unMute
+     * @param micIndex 麦位index
+     */
+    override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 取消禁言指定麦位置
+     * @param micIndex 麦位index
+     */
+    override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 锁麦
+     * @param micIndex 麦位index
+     */
+    override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+        ChatroomIMManager.getInstance().lockMic(micIndex, object :ValueCallBack<Map<Int,VoiceMicInfoModel>>{
+            override fun onSuccess(value: Map<Int, VoiceMicInfoModel>?) {
+                ThreadManager.getInstance().runOnIOThread {
+//                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                }
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                ThreadManager.getInstance().runOnIOThread {
+//                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                }
+            }
+
+        })
+    }
+
+    /**
+     * 取消锁麦
+     * @param micIndex 麦位index
+     */
+    override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 踢用户下麦
+     * @param micIndex 麦位index
+     */
+    override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 下麦
+     * @param micIndex 麦位index
+     */
+    override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel) -> Unit) {
+    }
+
+    /**
+     * 换麦
+     * @param oldIndex 老麦位index
+     * @param newIndex 新麦位index
+     */
+    override fun changeMic(
+        oldIndex: Int,
+        newIndex: Int,
+        completion: (error: Int, result: Map<String, VoiceMicInfoModel>) -> Unit
+    ) {
     }
 
     /**
@@ -456,63 +438,6 @@ class VoiceSyncManagerServiceImp(
         )
     }
 
-    /**
-     * toolbox service api 置换token, 获取im 配置
-     * @param channelId rtc 频道号
-     * @param chatroomName im 房间名
-     */
-    private fun requestToolboxService(
-        channelId: String,
-        chatroomName: String,
-        completion: (error: Int, chatroomId: String) -> Unit,
-    ) {
-        val generateToken = AtomicBoolean(false)
-        val createImRoom = AtomicBoolean(false)
-        var chatRoomId = ""
-        VRToolboxServerHttpManager.get().generateToken(
-            channelId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
-            callBack = object : VRDefaultValueCallBack<VRGenerateTokenResponse> {
-                override fun onSuccess(response: VRGenerateTokenResponse?) {
-                    response?.let {
-                        generateToken.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
-                        if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, chatRoomId)
-                        }
-                    }
-                }
-
-                override fun onError(var1: Int, var2: String?) {
-                    "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, chatRoomId)
-                }
-            })
-        VRToolboxServerHttpManager.get().createImRoom(
-            chatroomName = chatroomName,
-            chatroomOwner = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-            traceId = UUID.randomUUID().toString(),
-            username = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-            nickname = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-            callBack = object : VRDefaultValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    response?.let {
-                        createImRoom.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatConfig(response.userName, response.token)
-                        chatRoomId = response.chatId
-                        if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, chatRoomId)
-                        }
-                    }
-                }
-
-                override fun onError(var1: Int, var2: String?) {
-                    "SyncToolboxService create room error code:$var1,msg:$var2".logE()
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, chatRoomId)
-                }
-            })
-    }
-
     /**订阅房间变化*/
     private fun innerSubscribeRoomChanged() {
         val listener = object : Sync.EventListener {
@@ -539,5 +464,12 @@ class VoiceSyncManagerServiceImp(
         }
         mSceneReference?.subscribe(listener)
         roomSubscribeListener.add(listener)
+    }
+
+    private fun resetCacheInfo(roomId: String, isRoomDestroyed: Boolean = false) {
+        if (isRoomDestroyed) {
+            roomMap.remove(roomId)
+        }
+        mSceneReference = null
     }
 }

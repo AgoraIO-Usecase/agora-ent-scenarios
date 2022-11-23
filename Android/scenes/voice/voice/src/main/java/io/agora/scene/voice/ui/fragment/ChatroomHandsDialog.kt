@@ -181,7 +181,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
         }
     }
 
-    fun check(map: Map<String?, String>) {
+    fun check(map: Map<String, String>) {
         inviteHandsFragment?.micChanged(map)
     }
 
