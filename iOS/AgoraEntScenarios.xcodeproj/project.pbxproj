@@ -458,6 +458,22 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		E73147A12925E6A20032198F /* ByteBeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E73147A02925E6A20032198F /* ByteBeautyResource.bundle */; };
+		E73147A629260A540032198F /* ByteBeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73147A529260A540032198F /* ByteBeautyModel.swift */; };
+		E73147C42926214B0032198F /* BEResourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147AC292621470032198F /* BEResourceHelper.m */; };
+		E73147C52926214B0032198F /* BEEffectManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147AD292621470032198F /* BEEffectManager.mm */; };
+		E73147C72926214B0032198F /* BERender.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147B6292621490032198F /* BERender.mm */; };
+		E73147C82926214B0032198F /* BERenderHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147B7292621490032198F /* BERenderHelper.m */; };
+		E73147C92926214B0032198F /* BEEffectResourceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147B9292621490032198F /* BEEffectResourceHelper.m */; };
+		E73147CA2926214B0032198F /* BEFrameProcessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147BB2926214A0032198F /* BEFrameProcessor.mm */; };
+		E73147CB2926214B0032198F /* BEGLTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147BC2926214A0032198F /* BEGLTexture.m */; };
+		E73147CC2926214B0032198F /* BEImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147BD2926214A0032198F /* BEImageUtils.m */; };
+		E73147CD2926214B0032198F /* BEOpenGLRenderHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147BE2926214A0032198F /* BEOpenGLRenderHelper.m */; };
+		E73147CE2926214B0032198F /* BELicenseHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147BF2926214A0032198F /* BELicenseHelper.mm */; };
+		E73147CF2926214B0032198F /* BEPixelBufferInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147C12926214B0032198F /* BEPixelBufferInfo.m */; };
+		E73147D02926214B0032198F /* BEHttpRequestProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147C32926214B0032198F /* BEHttpRequestProvider.mm */; };
+		E73147D3292622A80032198F /* BundleUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147D2292622A80032198F /* BundleUtil.m */; };
+		E73147D5292726810032198F /* ByteBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73147D4292726810032198F /* ByteBeautyManager.swift */; };
 		E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */; };
 		E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */; };
 		E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3120291A46DD00412D42 /* ShowSegmentView.swift */; };
@@ -1074,6 +1090,37 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		E73147A02925E6A20032198F /* ByteBeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ByteBeautyResource.bundle; sourceTree = "<group>"; };
+		E73147A529260A540032198F /* ByteBeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBeautyModel.swift; sourceTree = "<group>"; };
+		E73147A8292621460032198F /* BERender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BERender.h; sourceTree = "<group>"; };
+		E73147AA292621470032198F /* BEImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEImageUtils.h; sourceTree = "<group>"; };
+		E73147AB292621470032198F /* BERenderHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BERenderHelper.h; sourceTree = "<group>"; };
+		E73147AC292621470032198F /* BEResourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEResourceHelper.m; sourceTree = "<group>"; };
+		E73147AD292621470032198F /* BEEffectManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BEEffectManager.mm; sourceTree = "<group>"; };
+		E73147AE292621480032198F /* BEFrameProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEFrameProcessor.h; sourceTree = "<group>"; };
+		E73147AF292621480032198F /* BEPixelBufferInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEPixelBufferInfo.h; sourceTree = "<group>"; };
+		E73147B0292621480032198F /* BEEffectResourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEEffectResourceHelper.h; sourceTree = "<group>"; };
+		E73147B1292621480032198F /* BEResourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEResourceHelper.h; sourceTree = "<group>"; };
+		E73147B2292621480032198F /* BEOpenGLRenderHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEOpenGLRenderHelper.h; sourceTree = "<group>"; };
+		E73147B3292621480032198F /* macro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macro.h; sourceTree = "<group>"; };
+		E73147B4292621490032198F /* BEGLTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEGLTexture.h; sourceTree = "<group>"; };
+		E73147B6292621490032198F /* BERender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BERender.mm; sourceTree = "<group>"; };
+		E73147B7292621490032198F /* BERenderHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BERenderHelper.m; sourceTree = "<group>"; };
+		E73147B8292621490032198F /* BELicenseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BELicenseHelper.h; sourceTree = "<group>"; };
+		E73147B9292621490032198F /* BEEffectResourceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEEffectResourceHelper.m; sourceTree = "<group>"; };
+		E73147BA2926214A0032198F /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
+		E73147BB2926214A0032198F /* BEFrameProcessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BEFrameProcessor.mm; sourceTree = "<group>"; };
+		E73147BC2926214A0032198F /* BEGLTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEGLTexture.m; sourceTree = "<group>"; };
+		E73147BD2926214A0032198F /* BEImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEImageUtils.m; sourceTree = "<group>"; };
+		E73147BE2926214A0032198F /* BEOpenGLRenderHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEOpenGLRenderHelper.m; sourceTree = "<group>"; };
+		E73147BF2926214A0032198F /* BELicenseHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BELicenseHelper.mm; sourceTree = "<group>"; };
+		E73147C02926214B0032198F /* BEEffectManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEEffectManager.h; sourceTree = "<group>"; };
+		E73147C12926214B0032198F /* BEPixelBufferInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEPixelBufferInfo.m; sourceTree = "<group>"; };
+		E73147C22926214B0032198F /* BEHttpRequestProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEHttpRequestProvider.h; sourceTree = "<group>"; };
+		E73147C32926214B0032198F /* BEHttpRequestProvider.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BEHttpRequestProvider.mm; sourceTree = "<group>"; };
+		E73147D1292622A80032198F /* BundleUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BundleUtil.h; sourceTree = "<group>"; };
+		E73147D2292622A80032198F /* BundleUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleUtil.m; sourceTree = "<group>"; };
+		E73147D4292726810032198F /* ByteBeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteBeautyManager.swift; sourceTree = "<group>"; };
 		E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPKInviteView.swift; sourceTree = "<group>"; };
 		E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyAndInviteView.swift; sourceTree = "<group>"; };
 		E74A3120291A46DD00412D42 /* ShowSegmentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSegmentView.swift; sourceTree = "<group>"; };
@@ -1447,6 +1494,7 @@
 		A845AD38291B824400A41D8D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E73147A229260A1A0032198F /* BeautyFace */,
 				A81ED019292244AE00B40454 /* Setting */,
 				A845AD39291B82AE00A41D8D /* ShowChatModel.swift */,
 			);
@@ -1499,6 +1547,7 @@
 		A8B5617F2910FB19004F34D1 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				E73147A72926211D0032198F /* ByteBeaufy */,
 				DDBF78882918D5920001855B /* Service */,
 				A8B5618729111022004F34D1 /* Common */,
 				A8B561902912080C004F34D1 /* Utils */,
@@ -1506,6 +1555,7 @@
 				A845AD38291B824400A41D8D /* Models */,
 				A8B561802910FB2A004F34D1 /* Controller */,
 				A8B5618B29111258004F34D1 /* showResource.bundle */,
+				E73147A02925E6A20032198F /* ByteBeautyResource.bundle */,
 			);
 			path = Show;
 			sourceTree = "<group>";
@@ -2811,6 +2861,50 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
+		E73147A229260A1A0032198F /* BeautyFace */ = {
+			isa = PBXGroup;
+			children = (
+				E73147A529260A540032198F /* ByteBeautyModel.swift */,
+			);
+			path = BeautyFace;
+			sourceTree = "<group>";
+		};
+		E73147A72926211D0032198F /* ByteBeaufy */ = {
+			isa = PBXGroup;
+			children = (
+				E73147D1292622A80032198F /* BundleUtil.h */,
+				E73147D2292622A80032198F /* BundleUtil.m */,
+				E73147C02926214B0032198F /* BEEffectManager.h */,
+				E73147AD292621470032198F /* BEEffectManager.mm */,
+				E73147B0292621480032198F /* BEEffectResourceHelper.h */,
+				E73147B9292621490032198F /* BEEffectResourceHelper.m */,
+				E73147AE292621480032198F /* BEFrameProcessor.h */,
+				E73147BB2926214A0032198F /* BEFrameProcessor.mm */,
+				E73147B4292621490032198F /* BEGLTexture.h */,
+				E73147BC2926214A0032198F /* BEGLTexture.m */,
+				E73147C22926214B0032198F /* BEHttpRequestProvider.h */,
+				E73147C32926214B0032198F /* BEHttpRequestProvider.mm */,
+				E73147AA292621470032198F /* BEImageUtils.h */,
+				E73147BD2926214A0032198F /* BEImageUtils.m */,
+				E73147B8292621490032198F /* BELicenseHelper.h */,
+				E73147BF2926214A0032198F /* BELicenseHelper.mm */,
+				E73147B2292621480032198F /* BEOpenGLRenderHelper.h */,
+				E73147BE2926214A0032198F /* BEOpenGLRenderHelper.m */,
+				E73147AF292621480032198F /* BEPixelBufferInfo.h */,
+				E73147C12926214B0032198F /* BEPixelBufferInfo.m */,
+				E73147A8292621460032198F /* BERender.h */,
+				E73147B6292621490032198F /* BERender.mm */,
+				E73147AB292621470032198F /* BERenderHelper.h */,
+				E73147B7292621490032198F /* BERenderHelper.m */,
+				E73147B1292621480032198F /* BEResourceHelper.h */,
+				E73147AC292621470032198F /* BEResourceHelper.m */,
+				E73147BA2926214A0032198F /* Core.h */,
+				E73147B3292621480032198F /* macro.h */,
+				E73147D4292726810032198F /* ByteBeautyManager.swift */,
+			);
+			path = ByteBeaufy;
+			sourceTree = "<group>";
+		};
 		E74A311B2919FBA700412D42 /* PKInvite */ = {
 			isa = PBXGroup;
 			children = (
@@ -2851,6 +2945,7 @@
 				DD2A43C428FFCEE7004CEDCF /* Frameworks */,
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */,
+				13E25B09C8A60BC93CE96D93 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -2972,6 +3067,7 @@
 				DD84177729090C520026B624 /* entertainment.html in Resources */,
 				DD84179029090C520026B624 /* Media.xcassets in Resources */,
 				DD84176229090C520026B624 /* index.html in Resources */,
+				E73147A12925E6A20032198F /* ByteBeautyResource.bundle in Resources */,
 				DDA19A2628FFE57A009D3E61 /* AgoraSyncManager.podspec in Resources */,
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				DD84177829090C520026B624 /* entertainment.js in Resources */,
@@ -3004,6 +3100,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		13E25B09C8A60BC93CE96D93 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3068,6 +3181,7 @@
 				A8F3724E2924A5EE00CEA88D /* AEAListContainerView.m in Sources */,
 				A8F3725C2924D25100CEA88D /* ShowReceiveLiveFinishAlertVC.swift in Sources */,
 				DDA19A1628FFE579009D3E61 /* RtmSyncManager+Handle.swift in Sources */,
+				E73147CA2926214B0032198F /* BEFrameProcessor.mm in Sources */,
 				DDA19A6C28FFE57A009D3E61 /* EKRatingSymbolsContainerView.swift in Sources */,
 				DDA19A6828FFE57A009D3E61 /* EKTextField.swift in Sources */,
 				057DDA00290B9495001329E6 /* CrossDissolveAnimation.swift in Sources */,
@@ -3090,6 +3204,7 @@
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
 				E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
+				E73147CD2926214B0032198F /* BEOpenGLRenderHelper.m in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				A81ED01F2922457400B40454 /* ShowSettingSegmentCell.swift in Sources */,
 				05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */,
@@ -3105,6 +3220,8 @@
 				05FFE732290F74560024D22F /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				0510B825290B72FC0063E57A /* VRUser.swift in Sources */,
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
+				E73147A629260A540032198F /* ByteBeautyModel.swift in Sources */,
+				E73147C82926214B0032198F /* BERenderHelper.m in Sources */,
 				A845AD3A291B82AE00A41D8D /* ShowChatModel.swift in Sources */,
 				DD8417A729090C520026B624 /* VLKTVSwitcherView.m in Sources */,
 				DD8417A429090C520026B624 /* VLListEmptyView.m in Sources */,
@@ -3154,6 +3271,7 @@
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
 				057DD9F3290B9495001329E6 /* UIButton+Extension.swift in Sources */,
 				05FFE711290F706C0024D22F /* VoiceRoomApplyAlert.swift in Sources */,
+				E73147CF2926214B0032198F /* BEPixelBufferInfo.m in Sources */,
 				057DD9F7290B9495001329E6 /* String + Extension.swift in Sources */,
 				DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */,
 				DD8417A829090C520026B624 /* VLKTVKindsCell.m in Sources */,
@@ -3209,6 +3327,7 @@
 				DD84178129090C520026B624 /* VLDiscoveryItemTCell.m in Sources */,
 				057DD9FE290B9495001329E6 /* FlipHorizontalAnimation.swift in Sources */,
 				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
+				E73147D3292622A80032198F /* BundleUtil.m in Sources */,
 				0510B862290B7A6E0063E57A /* VRCreateRoomViewController.swift in Sources */,
 				0510B852290B799E0063E57A /* VRCreateRoomView.swift in Sources */,
 				DD8417A029090C520026B624 /* VLKTVBottomView.m in Sources */,
@@ -3283,9 +3402,11 @@
 				0510B839290B77330063E57A /* VRSoundEffectsCell.swift in Sources */,
 				0510B82B290B730E0063E57A /* VoiceRoomChatModel.swift in Sources */,
 				DD8417BF29090C520026B624 /* VLHomeOnLineListView.m in Sources */,
+				E73147CE2926214B0032198F /* BELicenseHelper.mm in Sources */,
 				057DDA0A290B9496001329E6 /* Notification+Presentation.swift in Sources */,
 				A845AD2F291A16C700A41D8D /* ShowRoomBottomBar.swift in Sources */,
 				05FFE70C290F706C0024D22F /* VMSoundSelTableViewCell.swift in Sources */,
+				E73147C42926214B0032198F /* BEResourceHelper.m in Sources */,
 				0510B867290B7A6E0063E57A /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
@@ -3336,6 +3457,7 @@
 				DDA19A2E28FFE57A009D3E61 /* EKWindowProvider.swift in Sources */,
 				05FFE6FC290F706C0024D22F /* VoiceRoomSwitchBar.swift in Sources */,
 				DDA19A3828FFE57A009D3E61 /* UIView+Utils.swift in Sources */,
+				E73147C92926214B0032198F /* BEEffectResourceHelper.m in Sources */,
 				DDA19A2F28FFE57A009D3E61 /* EKWindow.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				05FFE73C290F74EE0024D22F /* VMPresentView.swift in Sources */,
@@ -3357,6 +3479,7 @@
 				DD84179A29090C520026B624 /* VLKTVSelBgModel.m in Sources */,
 				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
 				0510B850290B799E0063E57A /* VRSoundEffectsList.swift in Sources */,
+				E73147CC2926214B0032198F /* BEImageUtils.m in Sources */,
 				05FFE6F0290F706C0024D22F /* VoiceRoomGifterCell.swift in Sources */,
 				05FFE737290F74560024D22F /* AgoraChatRoomHeaderView.swift in Sources */,
 				0510B835290B77330063E57A /* VRCreateRoomCardCell.swift in Sources */,
@@ -3409,6 +3532,7 @@
 				057DD9E6290B9495001329E6 /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD84178C29090C520026B624 /* VLLoginModel.m in Sources */,
 				DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */,
+				E73147CB2926214B0032198F /* BEGLTexture.m in Sources */,
 				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */,
 				DDA19A6A28FFE57A009D3E61 /* EKButtonBarView.swift in Sources */,
@@ -3420,6 +3544,7 @@
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
 				DDA19A4A28FFE57A009D3E61 /* EKAttributes+Duration.swift in Sources */,
 				DDA19A6228FFE57A009D3E61 /* EKImageNoteMessageView.swift in Sources */,
+				E73147C72926214B0032198F /* BERender.mm in Sources */,
 				0510B82A290B730E0063E57A /* VoiceRoomGiftEntity.swift in Sources */,
 				A8F372422923A0BD00CEA88D /* ShowSettingHeaderView.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
@@ -3440,10 +3565,12 @@
 				05FFE700290F706C0024D22F /* VoiceRoomAudienceCell.swift in Sources */,
 				05FFE735290F74560024D22F /* AgoraChatRoomBaseUserCollectionViewCell.swift in Sources */,
 				DDA19A6528FFE57A009D3E61 /* EKAccessoryNoteMessageView.swift in Sources */,
+				E73147C52926214B0032198F /* BEEffectManager.mm in Sources */,
 				05FFE704290F706C0024D22F /* VoiceRoomInviteCell.swift in Sources */,
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				A845AD202918C87C00A41D8D /* UIView+Show.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
+				E73147D02926214B0032198F /* BEHttpRequestProvider.mm in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
 				A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
@@ -3458,6 +3585,7 @@
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
 				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
+				E73147D5292726810032198F /* ByteBeautyManager.swift in Sources */,
 				05FFE6F3290F706C0024D22F /* VoiceRoomUserView.swift in Sources */,
 				DD84179629090C520026B624 /* RtcMusicLrcMessage.m in Sources */,
 				057DDA0C290B9778001329E6 /* AgoraSceneConfig.swift in Sources */,
@@ -3645,8 +3773,16 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1",
+					"GLES_SILENCE_DEPRECATION=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
@@ -3684,8 +3820,16 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = JDPG69R49Z;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"GPB_USE_PROTOBUF_FRAMEWORK_IMPORTS=1",
+					"GLES_SILENCE_DEPRECATION=1",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";

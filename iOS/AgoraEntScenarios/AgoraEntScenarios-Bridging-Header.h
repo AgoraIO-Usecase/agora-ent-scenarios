@@ -15,3 +15,4 @@
 #import "BaseViewController.h"
 #import "AEACategoryView.h"
 #import "AEAListContainerView.h"
+#import "BEFrameProcessor.h"
