@@ -410,16 +410,20 @@ extension VoiceRoomViewController {
 
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in
-            
+        if self.local_index == nil {
+            ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in
+                
+            }
+        } else {
+            ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index!) { error, result in
+                if error == nil {
+                    ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in
+                        
+                    }
+                }
+            }
         }
-        
-//        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .leaveRoom(roomId: roomId), params: [:]) { dic, error in
-//            if let result = dic?["result"] as? Bool, error == nil, result {
-//                debugPrint("result:\(result)")
-//            }
-//        }
-       // VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -815,9 +819,13 @@ extension VoiceRoomViewController: SVGAPlayerDelegate {
 // MARK: - ASManagerDelegate
 
 extension VoiceRoomViewController: VMManagerDelegate {
-    func didRtcLocalUserJoinedOfUid(uid: UInt) {}
+    func didRtcLocalUserJoinedOfUid(uid: UInt) {
+        
+    }
 
-    func didRtcRemoteUserJoinedOfUid(uid: UInt) {}
+    func didRtcRemoteUserJoinedOfUid(uid: UInt) {
+        
+    }
 
     func didRtcUserOfflineOfUid(uid: UInt) {}
 
