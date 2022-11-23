@@ -485,7 +485,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
        didChangedToPosition:(NSInteger)position {
-    //只有主唱才能发送消息
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //只有主唱才能发送消息
         VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
         if ([songModel.userNo isEqualToString:VLUserCenter.user.userNo]) { //主唱
 //            VLLog(@"didChangedToPosition-----%@,%ld",playerKit,position);
@@ -494,22 +495,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 @"duration":@([self getTotalTime]),
                 @"time":@(position),
             };
-            [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
-                if (ifSuccess) {
-//                    VLLog(@"发送成功");
-                }else{
-//                    VLLog(@"发送失败");
-                }
+            [self sendStremMessageWithDict:dict success:^(BOOL success) {
             }];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                //check invalid
-                if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
-                    KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
-                    [self stopCurrentSong];
-                    [self loadAndPlaySong];
-                }
-            });
+            
+            //check invalid
+            if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
+                KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
+                [self stopCurrentSong];
+                [self loadAndPlaySong];
+            }
         }
+    });
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -741,8 +737,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [weakSelf.MVView start];
                 [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
                 //TODO why always NO?
-                [weakSelf.MVView updateUIWithUserOnSeat:NO
-                                                   song:model];
+                [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
@@ -761,8 +756,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.MVView start];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             //TODO why always NO?
-            [weakSelf.MVView updateUIWithUserOnSeat:NO
-                                           song:model];
+            [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
         }];
     }
 }
@@ -946,6 +940,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     
     VLLog(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    
+    KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
