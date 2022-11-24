@@ -132,52 +132,52 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func forbidMic(mic_index: Int,
-                   completion: @escaping (Error?, Bool) -> Void)
+                   completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 取消禁言指定麦位
     /// - Parameters:
     ///
     func unForbidMic(mic_index: Int,
-                     completion: @escaping (Error?, Bool) -> Void)
+                     completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 锁麦
     /// - Parameters:
     ///
     func lockMic(mic_index: Int,
-                 completion: @escaping (Error?, Bool) -> Void)
+                 completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 取消锁麦
     /// - Parameters:
     ///
     func unLockMic(mic_index: Int,
-                   completion: @escaping (Error?, Bool) -> Void)
+                   completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 踢用户下麦
     /// - Parameters:
     ///
     func kickOff(mic_index: Int,
-                 completion: @escaping (Error?, Bool) -> Void)
+                 completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 下麦
     /// - Parameters:
     ///
     func leaveMic(mic_index: Int,
-                  completion: @escaping (Error?, Bool) -> Void)
+                  completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// mute
     /// - Parameters:
     ///
-    func muteLocal(mic_index: Int,completion: @escaping (Error?, Bool) -> Void)
+    func muteLocal(mic_index: Int,completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// unmute
     /// - Parameters:
     ///
-    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void)
+    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 换麦
     /// - Parameters:
     ///
-    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
+    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, [Int:VRRoomMic]?) -> Void)
     
     /// 邀请上卖
     /// - Parameters:
