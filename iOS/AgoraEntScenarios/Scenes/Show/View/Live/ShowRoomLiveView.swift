@@ -16,7 +16,7 @@ class ShowRoomLiveView: UIView {
     
     var room: ShowRoomListModel? {
         didSet{
-            roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomId, time: "")
+            roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
             countView.count = room?.roomUserCount ?? 1
         }
     }

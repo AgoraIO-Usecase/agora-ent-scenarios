@@ -6,12 +6,10 @@
 //
 
 #import "AEACategoryView.h"
-#import "AEACategoryImageCell.h"
 #import "AEACategoryTitleCell.h"
 
 
 static NSString * const kTitleCellID = @"AEACategoryTitleCell";
-static NSString * const kImageCellID = @"AEACategoryImageCell";
 
 @implementation AEACategoryItem
 
@@ -40,7 +38,9 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
 @end
 
 @interface AEACategoryView ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
-
+{
+    NSInteger _selectedIndex;
+}
 @property (nonatomic, strong) UICollectionView *collectionView;
 
 @property (nonatomic, strong)  UIView *lineView;
@@ -59,6 +59,11 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
     AEACategoryView *view = [AEACategoryView new];
     [view createSubviewsWithLayout:layout];
     return view;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self scrollIndicatorToSelectedIndexAnimated:NO];
 }
 
 - (void)createSubviewsWithLayout:(AEACategoryViewLayout *)categoryLayout {
@@ -80,7 +85,6 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
     _collectionView.clipsToBounds = YES;
     
     [_collectionView registerClass:AEACategoryTitleCell.class forCellWithReuseIdentifier:kTitleCellID];
-    [_collectionView registerClass:AEACategoryImageCell.class forCellWithReuseIdentifier:kImageCellID];
     
     UIView *lineView = [UIView new];
     self.lineView = lineView;
@@ -93,8 +97,8 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
     lineView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [[_collectionView.topAnchor constraintEqualToAnchor:self.topAnchor] setActive:YES];
-    [[_collectionView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:5] setActive:YES];
-    [[_collectionView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:-5] setActive:YES];
+    [[_collectionView.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:0] setActive:YES];
+    [[_collectionView.rightAnchor constraintEqualToAnchor:self.rightAnchor constant:0] setActive:YES];
     [[_collectionView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor] setActive:YES];
     [[_collectionView.heightAnchor constraintEqualToConstant:categoryLayout.itemSize.height + 14] setActive:YES];
     
@@ -104,15 +108,19 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
     [[lineView.heightAnchor constraintEqualToConstant:1] setActive:YES];
 }
 
+- (void)setIndicator:(UIView *)indicator {
+    _indicator = indicator;
+    [self addSubview:_indicator];
+}
+
 - (void)setDefaultSelectedIndex:(NSInteger)defaultSelectedIndex {
     _defaultSelectedIndex = defaultSelectedIndex;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:defaultSelectedIndex inSection:0];
-        if ([self.collectionView numberOfItemsInSection:0] <= defaultSelectedIndex) {
-            return;
-        }
-        [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition: UICollectionViewScrollPositionLeft];
-    });
+    _selectedIndex = defaultSelectedIndex;
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:defaultSelectedIndex inSection:0];
+    if ([self.collectionView numberOfItemsInSection:0] <= defaultSelectedIndex) {
+        return;
+    }
+    [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition: UICollectionViewScrollPositionNone];
 }
 
 - (void)setTitles:(NSArray<NSString *> *)titles {
@@ -132,6 +140,22 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
     self.lineView.hidden = !showBottomLine;
 }
 
+- (void)scrollIndicatorToSelectedIndexAnimated:(BOOL) animated {
+    UICollectionViewCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:_selectedIndex inSection:0]];
+    if (cell) {
+        void (^changeCenter)(void) = ^{
+            self.indicator.center = CGPointMake(cell.center.x, self.bounds.size.height - self.indicator.bounds.size.height);
+        };
+        if (animated){
+            [UIView animateWithDuration:0.2 animations:^{
+                changeCenter();
+            }];
+        }else{
+            changeCenter();
+        }
+    }
+}
+
 #pragma mark -- UICollectionViewDataSource & UICollectionViewDelegate
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -140,17 +164,13 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     id data = self.dataArray[indexPath.item];
-    if ([data isKindOfClass:[NSString class]]) {
-        AEACategoryTitleCell *titleCell = [collectionView dequeueReusableCellWithReuseIdentifier:kTitleCellID forIndexPath:indexPath];
-        titleCell.title = (NSString *)data;
-        return titleCell;
-    }
-    
-    AEACategoryItem *item = data;
-    AEACategoryImageCell *imageCell = [collectionView dequeueReusableCellWithReuseIdentifier:kImageCellID forIndexPath:indexPath];
-    imageCell.selectedImage = item.selectedImage;
-    imageCell.normalImage = item.normalImage;
-    return imageCell;
+    AEACategoryTitleCell *titleCell = [collectionView dequeueReusableCellWithReuseIdentifier:kTitleCellID forIndexPath:indexPath];
+    titleCell.titleFont = _titleFont;
+    titleCell.titleSelectedFont = _titleSelectedFont;
+    titleCell.titleColor = _titleColor;
+    titleCell.titleSelectedColor = _titleSelectedColor;
+    titleCell.title = (NSString *)data;
+    return titleCell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -159,6 +179,8 @@ static NSString * const kImageCellID = @"AEACategoryImageCell";
         [self.delegate categoryView:self didSelectItem:item index:indexPath.item];
     }
     [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+    _selectedIndex = indexPath.item;
+    [self scrollIndicatorToSelectedIndexAnimated:YES];
 }
 
 
