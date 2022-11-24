@@ -41,17 +41,21 @@ enum ShowSettingKey: String {
         case label
     }
     
-    case lowlightEnhance    // 暗光增强
-    case colorEnhance       // 色彩增强
-    case videoDenoiser      // 降噪
-    case beauty             // 美颜
-    case PVC                // pvc
-    case SR                 // 超分
-    case BFrame             // b帧
-    case videoCaptureSize   // 视频采集分辨率
-    case FPS                // 帧率
-    case H265               // h265
-    case bitRate            // 码率
+    case lowlightEnhance        // 暗光增强
+    case colorEnhance           // 色彩增强
+    case videoDenoiser          // 降噪
+    case beauty                 // 美颜
+    case PVC                    // pvc
+    case SR                     // 超分
+    case BFrame                 // b帧
+    case videoCaptureSize       // 视频采集分辨率
+    case FPS                    // 帧率
+    case H265                   // h265
+    case videoBitRate           // 视频码率
+    case earmonitoring          // 耳返
+    case recordingSignalVolume  // 人声音量
+    case musincVolume           // 音乐音量
+    case audioBitRate           // 音频码率
     
     func title() -> String {
         switch self {
@@ -73,10 +77,18 @@ enum ShowSettingKey: String {
             return "show_advance_setting_videoCaptureSize_title".show_localized
         case .FPS:
             return "show_advance_setting_FPS_title".show_localized
-        case .bitRate:
+        case .videoBitRate:
             return "show_advance_setting_bitRate_title".show_localized
         case .H265:
             return "show_advance_setting_H265_title".show_localized
+        case .earmonitoring:
+            return "show_advance_setting_earmonitoring_title".show_localized
+        case .recordingSignalVolume:
+            return "show_advance_setting_recordingVolume_title".show_localized
+        case .musincVolume:
+            return "show_advance_setting_musicVolume_title".show_localized
+        case .audioBitRate:
+            return "show_advance_setting_audio_bitRate_title".show_localized
         }
     }
     
@@ -102,8 +114,29 @@ enum ShowSettingKey: String {
             return .label
         case .H265:
             return .aSwitch
-        case .bitRate:
+        case .videoBitRate:
             return .slider
+        case .earmonitoring:
+            return .aSwitch
+        case .recordingSignalVolume:
+            return .slider
+        case .musincVolume:
+            return .slider
+        case .audioBitRate:
+            return .label
+        }
+    }
+    
+    func sliderValueScope() -> (Float, Float) {
+        switch self {
+        case .videoBitRate:
+            return (200, 2000)
+        case .recordingSignalVolume:
+            return (0, 100)
+        case .musincVolume:
+            return (0, 100)
+        default:
+            return (0,0)
         }
     }
     
@@ -126,6 +159,8 @@ enum ShowSettingKey: String {
                     AgoraVideoFrameRate.fps30.stringValue(),
                     AgoraVideoFrameRate.fps60.stringValue()
             ]
+        case .audioBitRate:
+            return ["2","3","5"]
         default:
             return []
         }

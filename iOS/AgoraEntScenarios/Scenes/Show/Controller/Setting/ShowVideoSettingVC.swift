@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import JXCategoryView
 
 private let SwitchCellID = "SwitchCellID"
 private let SegmentCellID = "SegmentCellID"
@@ -77,7 +76,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if data.type() == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title(), value: data.floatValue(), minValue: 200, maxValue: 2000) { value in
+            cell.setTitle(data.title(), value: data.floatValue(), minValue: data.sliderValueScope().0, maxValue: data.sliderValueScope().1) { value in
                 
             } sliderValueChangedAction: { value in
                 data.writeValue(value)

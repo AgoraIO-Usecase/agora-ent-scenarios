@@ -34,6 +34,12 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
+    weak var videoFrameDelegate: AgoraVideoFrameDelegate? {
+        didSet {
+            agoraKit.setVideoFrameDelegate(videoFrameDelegate)
+        }
+    }
+    
     override init() {
         super.init()
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
@@ -44,16 +50,14 @@ class ShowAgoraKitManager: NSObject {
     func startPreview(canvasView: UIView) {
         agoraKit?.setClientRole(.broadcaster)
         agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
-        /// 开启扬声器
-        agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
+//        agoraKit?.setVideoFrameDelegate(self)
         let canvas = AgoraRtcVideoCanvas()
-//        canvas.uid = UInt(VLUserCenter.user.id) ?? 0
         canvas.renderMode = .hidden
+        canvas.mirrorMode = .disabled
         canvas.view = canvasView
-        agoraKit?.setupLocalVideo(canvas)
-        agoraKit?.enableAudio()
-        agoraKit?.enableVideo()
-        agoraKit?.startPreview()
+        agoraKit.setupLocalVideo(canvas)
+        agoraKit.enableVideo()
+        agoraKit.startPreview()
     }
     
     /// 切换摄像头
@@ -72,6 +76,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.leaveChannel({stats in
             print("leave channel: \(stats)")
         })
+        agoraKit.stopPreview()
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
         AgoraRtcEngineKit.destroy()
@@ -84,8 +89,6 @@ class ShowAgoraKitManager: NSObject {
         roleOptions.audienceLatencyLevel = role == .audience ? .ultraLowLatency : .lowLatency
         agoraKit?.setClientRole(role, options: roleOptions)
         agoraKit?.enableVideo()
-        agoraKit?.enableAudio()
-        agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
         
         let ret = agoraKit?.joinChannel(byToken: nil, channelId: channelName, info: nil, uid: uid)
         let canvas = AgoraRtcVideoCanvas()
@@ -93,11 +96,14 @@ class ShowAgoraKitManager: NSObject {
         canvas.renderMode = .hidden
         if role == .broadcaster {
             canvas.uid = uid
-            agoraKit?.setupLocalVideo(canvas)
-            agoraKit?.startPreview()
+            canvas.mirrorMode = .disabled
+            agoraKit.setDefaultAudioRouteToSpeakerphone(true)
+            agoraKit.enableAudio()
+            agoraKit.setupLocalVideo(canvas)
+            agoraKit.startPreview()
         } else {
             canvas.uid = UInt(ownerId) ?? 0
-            agoraKit?.setupRemoteVideo(canvas)
+            agoraKit.setupRemoteVideo(canvas)
         }
         return ret
     }
