@@ -912,6 +912,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
     //use game streaming in solo mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
+    
+    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
+    [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
+    [self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
+    [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
@@ -1138,8 +1143,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                     itemTapped:(VLBelcantoModel *)model
                      withIndex:(NSInteger)index {
     self.selBelcantoModel = model;
-    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
-                        scenario:AgoraAudioScenarioGameStreaming];
     if (index == 0) {
         [self.RTCkit setVoiceBeautifierPreset:AgoraVoiceBeautifierPresetOff];
     }else if (index == 1){
@@ -1387,16 +1390,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //音效设置
 - (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
     if (effectType == VLKTVSoundEffectTypeHeFeng) {
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:3 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeXiaoDiao){
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:2 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeDaDiao){
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:1 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeNone) {
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
     }
     VLLog(@"Agora - Setting effect type to %lu", effectType);
