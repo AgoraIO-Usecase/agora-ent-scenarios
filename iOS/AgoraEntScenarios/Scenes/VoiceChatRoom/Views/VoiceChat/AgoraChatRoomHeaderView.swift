@@ -319,8 +319,8 @@ class AgoraChatRoomHeaderView: UIView {
         if let rankList = entity.ranking_list {
             if rankList.count == 0 { return }
 
-            if let fImg = rankList[0].portrait {
-                rankFBtn.setImage(UIImage(fImg), for: .normal)
+            if let fImg: String = rankList[0].portrait {
+                rankFBtn.setImage(getImage(with: fImg), for: .normal)
                 rankFBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
 //                    make.centerY.equalTo(self.backBtn)
@@ -331,7 +331,7 @@ class AgoraChatRoomHeaderView: UIView {
 
             if rankList.count < 2 { return }
             if let sImg = rankList[1].portrait {
-                rankSBtn.setImage(UIImage(sImg), for: .normal)
+                rankSBtn.setImage(getImage(with: sImg), for: .normal)
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
 //                self.rankFBtn.snp.remakeConstraints { make in
@@ -354,7 +354,7 @@ class AgoraChatRoomHeaderView: UIView {
 
             if rankList.count < 3 { return }
             if let tImg = rankList[2].portrait {
-                rankTBtn.setImage(UIImage(tImg), for: .normal)
+                rankTBtn.setImage(getImage(with: tImg), for: .normal)
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
                 rankTBtn.isHidden = false
@@ -396,5 +396,17 @@ class AgoraChatRoomHeaderView: UIView {
             soundType = "Social Chat".localized()
         }
         return soundType
+    }
+    
+    func getImage(with url: String) -> UIImage? {
+        if let img_url: URL = URL(string: url) {
+            if let data: Data = try? Data(contentsOf: img_url) {
+                if let img: UIImage = UIImage(data: data) {
+                    return img
+                }
+            }
+            
+        }
+        return nil
     }
 }
