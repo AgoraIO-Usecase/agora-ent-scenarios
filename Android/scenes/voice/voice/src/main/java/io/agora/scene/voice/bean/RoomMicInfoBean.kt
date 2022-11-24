@@ -1,20 +1,11 @@
 package io.agora.scene.voice.bean
 
-import io.agora.scene.voice.service.VoiceMemberModel
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.secnceui.annotation.*
-
-data class MicInfoBean constructor(
-    var index: Int = 0,
-    var userInfo: VoiceMemberModel? = null,
-    var ownerTag: Boolean = false,
-    @MicStatus var micStatus: Int = MicStatus.Idle,
-    var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
-) : BaseRoomBean
+import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.secnceui.annotation.MicClickAction
 
 data class BotMicInfoBean constructor(
-    var blueBot: MicInfoBean,
-    var redBot: MicInfoBean
+    var blueBot: VoiceMicInfoModel,
+    var redBot: VoiceMicInfoModel
 ) : BaseRoomBean
 
 data class MicManagerBean constructor(

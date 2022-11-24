@@ -13,7 +13,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.ui.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.mic.IRoomMicBinding
 import io.agora.voice.baseui.adapter.OnItemClickListener
@@ -21,9 +20,10 @@ import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.R
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.ui.mic.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceViewRoom3dMicLayoutBinding
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.hypot
@@ -83,18 +83,18 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     // 点按动画
     private var micClickAnimator: ValueAnimator? = null
 
-    private var onItemClickListener: OnItemClickListener<MicInfoBean>? = null
-    private var onBotClickListener: OnItemClickListener<MicInfoBean>? = null
+    private var onItemClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
+    private var onBotClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
 
     /**麦位数据信息*/
-    private val micInfoMap = mutableMapOf<Int, MicInfoBean>()
+    private val micInfoMap = mutableMapOf<Int, VoiceMicInfoModel>()
 
     /**麦位view信息*/
     private val micViewMap = mutableMapOf<Int, IRoomMicBinding>()
 
     fun onItemClickListener(
-        onItemClickListener: OnItemClickListener<MicInfoBean>,
-        onBotClickListener: OnItemClickListener<MicInfoBean>
+        onItemClickListener: OnItemClickListener<VoiceMicInfoModel>,
+        onBotClickListener: OnItemClickListener<VoiceMicInfoModel>
     ) = apply {
         this.onItemClickListener = onItemClickListener
         this.onBotClickListener = onBotClickListener
@@ -217,7 +217,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     }
 
     private fun canMove(): Boolean {
-        val centerRtcUid = micInfoMap[ConfigConstants.MicConstant.KeyIndex4]?.userInfo?.rtcUid ?: -1
+        val centerRtcUid = micInfoMap[ConfigConstants.MicConstant.KeyIndex4]?.member?.rtcUid ?: -1
         return centerRtcUid == myRtcUid()
     }
 
@@ -354,9 +354,9 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         childView.isClickable = isClickable
     }
 
-    override fun onInitMic(micInfoList: List<MicInfoBean>, isBotActive: Boolean) {
+    override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean) {
         micInfoList.forEach { micInfo ->
-            val index = micInfo.index
+            val index = micInfo.micIndex
             micInfoMap[index] = micInfo
             micViewMap[index]?.apply {
                 binding(micInfo)
@@ -370,29 +370,21 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex5]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 binding.micV2Blue.binding(this)
-                micViewMap[ConfigConstants.MicConstant.KeyIndex5]?.let {
-                    it.binding(this)
-                }
+                micViewMap[ConfigConstants.MicConstant.KeyIndex5]?.binding(this)
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                 this.micStatus = MicStatus.BotActivated
-                micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
-                    it.binding(this)
-                }
+                micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
             }
         } else {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex5]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 binding.micV2Blue.binding(this)
-                micViewMap[ConfigConstants.MicConstant.KeyIndex5]?.let {
-                    it.binding(this)
-                }
+                micViewMap[ConfigConstants.MicConstant.KeyIndex5]?.binding(this)
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                 this.micStatus = MicStatus.BotActivated
-                micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
-                    it.binding(this)
-                }
+                micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
             }
         }
     }
@@ -437,14 +429,14 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         micInfoMap.entries.forEach { entry ->
             val index = entry.key
             val micInfo = entry.value
-            if (TextUtils.equals(micInfo.userInfo?.userId, uid)) {
+            if (TextUtils.equals(micInfo.member?.userId, uid)) {
                 return index
             }
         }
         return -1
     }
 
-    override fun receiverAttributeMap(newMicMap: Map<Int, MicInfoBean>) {
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
                 val index = entry.key
@@ -462,6 +454,19 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 val value = newMicMap[ConfigConstants.MicConstant.KeyIndex5]
                 activeBot(value?.micStatus == MicStatus.BotActivated)
             }
+        }
+    }
+
+    override fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
+        // TODO:
+        val index = micInfoModel.micIndex
+        micInfoMap[index] = micInfoModel
+        micViewMap[index]?.apply {
+            binding(micInfoModel)
+        }
+        // 机器人
+        if (index == ConfigConstants.MicConstant.KeyIndex5 || index == ConfigConstants.MicConstant.KeyIndex6) {
+            activeBot(micInfoModel.micStatus == MicStatus.BotActivated)
         }
     }
 

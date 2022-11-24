@@ -2,8 +2,10 @@ package io.agora.scene.voice.general.constructor
 
 import android.text.TextUtils
 import com.google.gson.reflect.TypeToken
-import io.agora.scene.voice.bean.*
-import io.agora.scene.voice.service.*
+import io.agora.scene.voice.bean.RoomKitBean
+import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.config.ConfigConstants
 
@@ -29,61 +31,18 @@ object RoomInfoConstructor {
     }
 
     /**
-     * 服务端roomInfo bean 转 ui bean
+     * 扩展麦位数据
      */
-    fun voiceRoomModel2UiRoomInfo(roomModel: VoiceRoomModel): RoomInfoBean {
-        val roomInfo = RoomInfoBean().apply {
-            channelId = roomModel.channelId
-            chatroomName = roomModel.roomName
-            owner = roomModel.owner
-            memberCount = roomModel.memberCount
-            // 普通观众 memberCount +1
-            if (owner?.rtcUid != VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                memberCount += 1
-            }
-            soundSelection = roomModel.soundEffect
-            roomType = roomModel.roomType
-        }
-        return roomInfo
-    }
-
-    /**
-     * 服务端roomInfo bean 转 ui bean
-     */
-    fun serverRoomInfo2UiRoomInfo(roomDetail: VoiceRoomModel): RoomInfoBean {
-        val roomInfo = RoomInfoBean().apply {
-            channelId = roomDetail.channelId
-            chatroomName = roomDetail.roomName
-            owner = roomDetail.owner
-            memberCount = roomDetail.memberCount
-            // 普通观众 memberCount +1
-            if (owner?.rtcUid != VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                memberCount += 1
-            }
-            giftCount = roomDetail.giftAmount
-            watchCount = roomDetail.clickCount
-            soundSelection = roomDetail.soundEffect
-            roomType = roomDetail.roomType
-        }
-        roomDetail.rankingList?.let { rankList ->
-            roomInfo.topRankUsers = rankList
-        }
-        return roomInfo
-    }
-
-    /**
-     * 服务端roomInfo io.agora.scene.voice.imkit.bean 转 麦位 ui io.agora.scene.voice.imkit.bean
-     */
-    fun convertMicUiBean(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<MicInfoBean> {
-        val micInfoList = mutableListOf<MicInfoBean>()
+    fun extendMicInfoList(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<VoiceMicInfoModel> {
+        val micInfoList = mutableListOf<VoiceMicInfoModel>()
         val interceptIndex = if (roomType == ConfigConstants.RoomType.Common_Chatroom) 5 else 4
         for (i in vMicInfoList.indices) {
             if (i > interceptIndex) break
             val serverMicInfo = vMicInfoList[i]
-            val micInfo = MicInfoBean().apply {
-                index = serverMicInfo.micIndex
+            val micInfo = VoiceMicInfoModel().apply {
+                micIndex = serverMicInfo.micIndex
                 serverMicInfo.member?.let { roomUser ->
-                    userInfo = roomUser
+                    member = roomUser
                     ownerTag = !TextUtils.isEmpty(ownerUid) && TextUtils.equals(ownerUid, roomUser.userId)
                     // 有人默认显示音量柱
                     audioVolumeType = ConfigConstants.VolumeType.Volume_None
@@ -111,19 +70,19 @@ object RoomInfoConstructor {
     }
 
     /**
-     * micInfo map转换ui io.agora.scene.voice.imkit.bean
+     * 扩展麦位数据
      */
-    fun convertMicInfoMap2UiBean(micInfoMap: Map<String, VoiceMicInfoModel>, ownerUid: String): Map<Int, MicInfoBean> {
-        val micInfoBeanMap = mutableMapOf<Int, MicInfoBean>()
+    fun extendMicInfoMap(micInfoMap: Map<String, VoiceMicInfoModel>, ownerUid: String): Map<Int, VoiceMicInfoModel> {
+        val micInfoBeanMap = mutableMapOf<Int, VoiceMicInfoModel>()
         micInfoMap.entries.forEach { entry ->
             var index = ConfigConstants.MicConstant.micMap[entry.key]
             if (index == null) index = -1
             entry.value.let { attrBean ->
-                val micInfo = MicInfoBean().apply {
-                    this.index = index
+                val micInfo = VoiceMicInfoModel().apply {
+                    this.micIndex = index
                     this.micStatus = attrBean.micStatus
                     attrBean.member?.let { roomUser ->
-                        userInfo = roomUser
+                        member = roomUser
                         ownerTag = !TextUtils.isEmpty(ownerUid) && TextUtils.equals(ownerUid, roomUser.userId)
                     }
                 }

@@ -1,15 +1,15 @@
 package io.agora.scene.voice.ui.mic.flat
 
 import io.agora.scene.voice.bean.BotMicInfoBean
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.baseui.adapter.OnItemChildClickListener
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceItemRoom2dBotMicBinding
+import io.agora.scene.voice.service.VoiceMicInfoModel
 
 class Room2DBotMicAdapter constructor(
     dataList: List<BotMicInfoBean>,
@@ -61,10 +61,18 @@ class Room2DBotMicAdapter constructor(
         notifyItemChanged(0)
     }
 
-    fun receiverAttributeMap(newMicMap: Map<Int, MicInfoBean>) {
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex6)) {
             val value = newMicMap[ConfigConstants.MicConstant.KeyIndex6]
             activeBot(value?.micStatus == MicStatus.BotActivated)
+        }
+    }
+
+    fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
+        if (micInfoModel.micIndex == ConfigConstants.MicConstant.KeyIndex6
+            || micInfoModel.micIndex == ConfigConstants.MicConstant.KeyIndex7
+        ) {
+            activeBot(micInfoModel.micStatus == MicStatus.BotActivated)
         }
     }
 }

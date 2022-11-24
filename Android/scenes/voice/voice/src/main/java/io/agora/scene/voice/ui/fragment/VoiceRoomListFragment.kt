@@ -146,9 +146,9 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             chatroomName = voiceRoomModel.roomName,
             completion = { error, chatroomId ->
                 if (error == VoiceServiceProtocol.ERR_OK) {
-                    voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
-                } else {
-                    // 麦位变化
+                    ThreadManager.getInstance().runOnMainThread {
+                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
+                    }
                 }
             })
     }

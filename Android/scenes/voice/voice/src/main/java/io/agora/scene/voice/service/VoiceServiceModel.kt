@@ -2,6 +2,7 @@ package io.agora.scene.voice.service
 
 import com.google.gson.annotations.SerializedName
 import io.agora.scene.voice.bean.BaseRoomBean
+import io.agora.voice.buddy.config.ConfigConstants
 
 /**
  *创建房间数据
@@ -66,6 +67,8 @@ data class VoiceMicInfoModel constructor(
     var member: VoiceMemberModel? = null,
     @SerializedName("status") var micStatus: Int = -1, // 座位状态
     var userStatus: Int = -1, // 用户状态，备用
+    @Transient var ownerTag: Boolean = false,
+    @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
 ) : BaseRoomBean
 
 /**
