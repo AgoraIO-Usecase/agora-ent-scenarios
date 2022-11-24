@@ -37,10 +37,14 @@ class ShowLiveViewController: UIViewController {
         return config
     }()
     private lazy var beautyVC = ShowBeautySettingVC()
+    //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
+    private lazy var applyAndInviteView = ShowApplyAndInviteView()
+    private lazy var applyView = ShowApplyView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         setupAgoraKit()
         joinChannel()
@@ -86,9 +90,10 @@ class ShowLiveViewController: UIViewController {
             print("进入房间")
         }
         let canvas = AgoraRtcVideoCanvas()
-        canvas.view = liveView.canvasView
+        canvas.view = liveView.canvasView.localView
         canvas.renderMode = .hidden
         canvas.uid = uid
+        liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
         if role == .broadcaster {
             canvas.mirrorMode = .disabled
             agoraKit?.setupLocalVideo(canvas)
@@ -167,30 +172,46 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-//        LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
-//        liveView.sendMessage(userName: "\(uid)", message: "Join_Live_Room".localized, messageType: .message)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = uid
+        videoCanvas.view = liveView.canvasView.remoteView
+        videoCanvas.renderMode = .hidden
+        agoraKit?.setupRemoteVideo(videoCanvas)
+        liveView.canvasView.setRemoteUserInfo(name: "\(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-//        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
-//        didOfflineOfUid(uid: uid)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = uid
+        videoCanvas.view = nil
+        videoCanvas.renderMode = .hidden
+        agoraKit?.setupRemoteVideo(videoCanvas)
+        liveView.canvasView.setRemoteUserInfo(name: "")
+        liveView.canvasView.canvasType = .none
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
-//        localVideo.statsInfo?.updateChannelStats(stats)
+        realTimeView.statsInfo?.updateChannelStats(stats)
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
-//        localVideo.statsInfo?.updateLocalAudioStats(stats)
+        realTimeView.statsInfo?.updateLocalAudioStats(stats)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
-//        remoteVideo.statsInfo?.updateVideoStats(stats)
-//        LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
+        realTimeView.statsInfo?.updateVideoStats(stats)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
-//        remoteVideo.statsInfo?.updateAudioStats(stats)
+        realTimeView.statsInfo?.updateAudioStats(stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
+        realTimeView.statsInfo?.updateUplinkNetworkInfo(networkInfo)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
+        realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
     }
 }
 
@@ -210,17 +231,17 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickPKButton(_ button: ShowRedDotButton) {
-        
+        let pkInviteView = ShowPKInviteView()
+        AlertManager.show(view: pkInviteView, alertPostion: .bottom)
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
-        /*
-        let vc = ShowReceiveLiveFinishAlertVC()
-        vc.dismissAlert { [weak self] in
-            self?.dismiss(animated: true)
+        if role == .broadcaster {
+            AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
+            
+        } else {
+            AlertManager.show(view: applyView, alertPostion: .bottom)
         }
-        present(vc, animated: true)
-         */
     }
     
     func onClickBeautyButton() {
