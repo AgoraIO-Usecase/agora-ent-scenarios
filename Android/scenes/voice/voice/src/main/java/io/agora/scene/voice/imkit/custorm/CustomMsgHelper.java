@@ -252,9 +252,14 @@ public class CustomMsgHelper implements MessageListener {
         sendGiftMsg(params, callBack);
     }
 
+    /**
+     * 发送系统消息（成员加入）
+     * @param nickName
+     * @param portrait
+     * @param callBack
+     */
     public void sendSystemMsg(String nickName,String portrait, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
-        params.put(ChatroomConstants.MSG_KEY_MEMBER_ADD, "member_add");
         params.put(MsgConstant.CUSTOM_GIFT_USERNAME,nickName);
         params.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
         sendSystemMsg(params, callBack);

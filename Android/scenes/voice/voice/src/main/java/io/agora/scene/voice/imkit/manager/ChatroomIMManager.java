@@ -274,26 +274,26 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
 
     @Override
-    public void onChatRoomDestroyed(String s, String s1) {
-        if (chatroomEventListener != null)
-            chatroomEventListener.onRoomDestroyed(s);
+    public void onChatRoomDestroyed(String roomId, String s1) {
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onRoomDestroyed(roomId);
     }
 
     @Override
-    public void onMemberJoined(String s, String s1) {
-        if (chatroomEventListener != null)
-            chatroomEventListener.onMemberJoined(s,s1);
+    public void onMemberJoined(String roomId, String s1) {
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onMemberJoined(roomId,s1);
     }
 
     @Override
-    public void onMemberExited(String s, String s1, String s2) {
-        if (chatroomEventListener != null)
-            chatroomEventListener.onMemberExited(s,s1,s2);
+    public void onMemberExited(String roomId, String s1, String s2) {
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
+            chatroomEventListener.onMemberExited(roomId,s1,s2);
     }
 
     @Override
     public void onRemovedFromChatRoom(int i, String roomId, String s1, String s2) {
-        if (chatroomEventListener != null)
+        if (chatroomEventListener != null && TextUtils.equals(roomId,chatroomId))
             chatroomEventListener.onKicked(roomId,i);
     }
 

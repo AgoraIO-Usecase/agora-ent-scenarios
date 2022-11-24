@@ -8,6 +8,7 @@ import android.util.Base64
 import androidx.annotation.Nullable
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.voice.buddy.tool.GsonTools
 import java.io.*
 
@@ -16,6 +17,8 @@ class ChatroomCacheManager {
     private var mSharedPreferences: SharedPreferences? = null
     private val mMicInfoMap = mutableMapOf<String, String>()
     private val submitMicList: MutableSet<VoiceMemberModel> = HashSet()
+    private val roomMemberList: MutableSet<VoiceMemberModel> = HashSet()
+    private val giftContributeList: MutableSet<VoiceRankUserModel> = HashSet()
 
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
@@ -40,6 +43,13 @@ class ChatroomCacheManager {
                 mMicInfoMap[mutableEntry.key] = mutableEntry.value
             }
         }
+    }
+
+    /**
+     * 清除本地MicInfo信息
+     */
+    fun clearMicInfo(){
+        mMicInfoMap.clear()
     }
 
     /**
@@ -79,6 +89,13 @@ class ChatroomCacheManager {
      */
     fun removeSubmitMember(voiceMemberBean: VoiceMemberModel){
         submitMicList.remove(voiceMemberBean)
+    }
+
+    /**
+     * 清除本地申请列表
+     */
+    fun clearSubmitList(){
+        submitMicList.clear()
     }
 
     /**

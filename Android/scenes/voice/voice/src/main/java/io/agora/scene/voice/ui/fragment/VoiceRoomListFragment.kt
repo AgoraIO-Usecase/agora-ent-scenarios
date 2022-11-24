@@ -174,8 +174,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 .build(RouterPath.ChatroomPath)
                 .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
                 .navigation()
-            dismissLoading()
         }
+        dismissLoading()
     }
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
