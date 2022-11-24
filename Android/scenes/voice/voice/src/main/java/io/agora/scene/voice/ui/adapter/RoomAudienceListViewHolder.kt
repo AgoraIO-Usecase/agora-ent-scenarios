@@ -5,7 +5,7 @@ import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.service.VoiceMemberModel
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.voice.buddy.tool.ImageTools
 
 class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomAudienceListBinding) :

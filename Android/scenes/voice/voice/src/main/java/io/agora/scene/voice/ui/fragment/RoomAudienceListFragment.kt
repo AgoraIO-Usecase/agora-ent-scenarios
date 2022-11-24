@@ -21,7 +21,7 @@ import io.agora.voice.buddy.tool.*
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.scene.voice.R
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.scene.voice.model.VoiceUserListViewModel
