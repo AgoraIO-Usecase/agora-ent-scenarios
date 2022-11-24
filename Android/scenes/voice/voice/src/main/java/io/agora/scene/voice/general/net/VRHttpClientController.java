@@ -1,4 +1,4 @@
-package io.agora.voice.network.http;
+package io.agora.scene.voice.general.net;
 
 import android.content.Context;
 import android.os.Build;
