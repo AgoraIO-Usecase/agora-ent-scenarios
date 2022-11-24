@@ -42,6 +42,10 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         createContainer.layer.shadowColor = UIColor(red: 0, green: 0.55, blue: 0.98, alpha: 0.2).cgColor
         createContainer.layer.shadowOpacity = 1
     }
+    
+    deinit {
+        SVProgressHUD.dismiss()
+    }
 
     @objc func goLive() {
         if name.isEmpty {

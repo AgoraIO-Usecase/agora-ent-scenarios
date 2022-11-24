@@ -10,11 +10,11 @@ import ZSwiftBaseLib
 
 public class VRNormalRoomsViewController: UIViewController {
     public var didSelected: ((VRRoomEntity) -> Void)?
-
+    
     public var totalCountClosure: ((Int) -> Void)?
-
+    
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), title: "No Chat Room yet", image: nil)
-
+    
     lazy var roomList: VRRoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
     
     override public func viewDidLoad() {
@@ -26,10 +26,11 @@ public class VRNormalRoomsViewController: UIViewController {
         roomList.refreshControl?.addTarget(self, action: #selector(refresh), for: .valueChanged)
         NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: NSNotification.Name("refreshList"), object: nil)
     }
-
+    
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
+    
 }
 
 extension VRNormalRoomsViewController {
