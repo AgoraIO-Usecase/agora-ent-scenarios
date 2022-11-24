@@ -9,7 +9,6 @@
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "VLAPIRequest.h"
 #import "KTVMacro.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;

@@ -66,6 +66,8 @@ protocol ISyncManager {
                         fail: FailBlock?)
     func unsubscribeScene(reference: SceneReference,
                           fail: FailBlock?)
+    
+    func subscribeConnectState(state: @escaping  ConnectBlockState)
 }
 
 public protocol IObject {

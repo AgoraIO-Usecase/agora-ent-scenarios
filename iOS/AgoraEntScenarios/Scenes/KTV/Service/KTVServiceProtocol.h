@@ -173,6 +173,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅歌曲评分变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
+
+
+
+/// 取消全部订阅
+- (void)unsubscribeAll;
 @end
 
 NS_ASSUME_NONNULL_END
