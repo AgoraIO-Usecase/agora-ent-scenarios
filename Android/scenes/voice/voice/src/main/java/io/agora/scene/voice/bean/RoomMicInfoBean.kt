@@ -1,7 +1,7 @@
 package io.agora.scene.voice.bean
 
 import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 
 data class BotMicInfoBean constructor(
     var blueBot: VoiceMicInfoModel,
