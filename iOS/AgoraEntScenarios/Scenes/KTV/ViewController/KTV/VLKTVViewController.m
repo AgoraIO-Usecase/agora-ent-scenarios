@@ -103,6 +103,8 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) double currentVoicePitch;
 
+@property (nonatomic, assign) AgoraConnectionChangedReason connectionChangedReason;
+
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 
 @end
@@ -494,6 +496,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 @"duration":@([self getTotalTime]),
                 @"time":@(position),
             };
+            
+            if (self.connectionChangedReason != AgoraConnectionChangedReasonJoinSuccess
+                && self.connectionChangedReason != AgoraConnectionChangedReasonRejoinSuccess) {
+                KTVLogInfo(@"didChangedToPosition: ts: %.2f duration: %.2f, songNo: %@ connectionChangedReason: %ld",
+                           self.currentTime, self.currentDuration, self.currentPlayingSongNo, self.connectionChangedReason);
+            }
             [self sendStremMessageWithDict:dict success:^(BOOL success) {
             }];
             
@@ -531,7 +539,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             float postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
-//            KTVLogInfo(@"setLrcTime: %.2f/%.2f, songNo: %@", self.currentTime, self.currentDuration, self.currentPlayingSongNo);
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
                 [_MVView start];
@@ -584,6 +591,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 connectionChangedToState:(AgoraConnectionState)state
            reason:(AgoraConnectionChangedReason)reason {
+    self.connectionChangedReason = reason;
     KTVLogInfo(@"Agora - join RTC channel with connectionChangedToState: %ld, reason: %ld", state, reason);
 }
 
