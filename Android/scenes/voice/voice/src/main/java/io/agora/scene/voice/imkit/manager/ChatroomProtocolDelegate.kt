@@ -41,9 +41,8 @@ class ChatroomProtocolDelegate constructor(
             attributeMap["robot_volume"] = "50"
             attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, 0)).toString()
             for (i in 1..7) {
-                var key = "mic_"
+                var key = "mic_$i"
                 var status = -1
-                key += i
                 if (i >= 6) status = -2
                 var mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
                 if (mBean != null) {
@@ -574,34 +573,7 @@ class ChatroomProtocolDelegate constructor(
         return indexList[indexList.lastIndex]
     }
 
-    fun getMicIndex(index: Int): String {
-        var micIndex = ""
-        when (index) {
-            0 -> {
-                micIndex = "mic_0"
-            }
-            1 -> {
-                micIndex = "mic_1"
-            }
-            2 -> {
-                micIndex = "mic_2"
-            }
-            3 -> {
-                micIndex = "mic_3"
-            }
-            4 -> {
-                micIndex = "mic_4"
-            }
-            5 -> {
-                micIndex = "mic_5"
-            }
-            6 -> {
-                micIndex = "mic_6"
-            }
-            7 -> {
-                micIndex = "mic_7"
-            }
-        }
-        return micIndex
+    private fun getMicIndex(index: Int): String {
+        return "mic_$index"
     }
 }
