@@ -146,6 +146,8 @@ extension VoiceRoomViewController {
                     VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
                         if error != nil {
                             self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
+                        } else {
+                            self.requestRankList()
                         }
                     })
                     var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
