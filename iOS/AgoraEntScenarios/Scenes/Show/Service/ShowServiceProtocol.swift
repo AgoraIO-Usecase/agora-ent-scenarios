@@ -129,23 +129,58 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - user: 用户
     ///   - completion: <#completion description#>
-    func cancelMicSeatInvitation(user: ShowUser,
+    func cancelMicSeatInvitation(userId: String,
                                  completion: @escaping (Error?) -> Void)
     
     /// 观众同意连麦
     /// - Parameters:
-    ///   - invitation: 连麦邀请对象
     ///   - completion: <#completion description#>
-    func acceptMicSeatInvitation(invitation:ShowMicSeatInvitation,
-                                 completion: @escaping (Error?) -> Void)
+    func acceptMicSeatInvitation(completion: @escaping (Error?) -> Void)
     
     /// 观众拒绝连麦
     /// - Parameters:
-    ///   - invitation: 连麦邀请对象
     ///   - completion: <#completion description#>
-    func rejectMicSeatInvitation(invitation:ShowMicSeatInvitation,
-                                 completion: @escaping (Error?) -> Void)
+    func rejectMicSeatInvitation(completion: @escaping (Error?) -> Void)
     
     
     
+    /// 获取PK邀请列表
+    /// - Parameter completion: <#completion description#>
+    func getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void)
+    
+    /// 观众订阅连麦邀请
+    /// - Parameter subscribeClosure: <#subscribeClosure description#>
+    func subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void)
+    
+    /// 创建PK邀请
+    /// - Parameters:
+    ///   - user: 邀请用户
+    ///   - completion: <#completion description#>
+    func createPKInvitation(room: ShowRoomListModel,
+                            completion: @escaping (Error?) -> Void)
+    
+    /// 同意PK
+    /// - Parameters:
+    ///   - completion: <#completion description#>
+    func acceptPKInvitation(completion: @escaping (Error?) -> Void)
+    
+    /// 拒绝PK
+    /// - Parameters:
+    ///   - completion: <#completion description#>
+    func rejectPKInvitation(completion: @escaping (Error?) -> Void)
+    
+    
+    
+    /// 获取互动列表
+    /// - Parameter completion: <#completion description#>
+    func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void)
+    
+    /// 订阅互动邀请
+    /// - Parameter subscribeClosure: <#subscribeClosure description#>
+    func subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void)
+    
+    
+    /// 停止互动
+    /// - Parameter completion: <#completion description#>
+    func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void)
 }
