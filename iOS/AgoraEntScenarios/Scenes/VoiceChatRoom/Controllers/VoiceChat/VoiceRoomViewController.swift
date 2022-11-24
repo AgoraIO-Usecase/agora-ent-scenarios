@@ -672,6 +672,8 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, micMap in
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
+                self.roomInfo?.mic_info?[from] = old_mic
+                self.roomInfo?.mic_info?[to] = new_mic
                 self.rtcView.updateUser(old_mic)
                 self.rtcView.updateUser(new_mic)
             } else {
