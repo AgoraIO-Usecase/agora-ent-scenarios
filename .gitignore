@@ -6,4 +6,5 @@ Pods
 Podfile.lock
 **/*.xcworkspace/*
 **/xcuserdata
-KeyCenter.swift
+**/ByteEffectLib/*
+iOS/AgoraEntScenarios/KeyCenter.swift

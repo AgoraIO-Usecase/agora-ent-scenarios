@@ -33,11 +33,13 @@ class ShowPresettingVC: UIViewController {
         return headerView
     }()
     
+    /*
     private lazy var segmentControl: UISegmentedControl = {
         let segmentCtrl = UISegmentedControl(items: ["show_advance_setting_presetting_mode_0".show_localized,"show_advance_setting_presetting_mode_1".show_localized])
         segmentCtrl.selectedSegmentIndex = 0
         return segmentCtrl
     }()
+     */
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -94,6 +96,7 @@ class ShowPresettingVC: UIViewController {
             make.height.equalTo(42)
         }
         
+        /*
         view.addSubview(segmentControl)
         segmentControl.snp.makeConstraints { make in
             make.left.equalTo(15)
@@ -101,11 +104,12 @@ class ShowPresettingVC: UIViewController {
             make.right.equalTo(-15)
             make.height.equalTo(42)
         }
+         */
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            make.top.equalTo(segmentControl.snp.bottom)
+            make.top.equalTo(headerView.snp.bottom)
         }
     }
     

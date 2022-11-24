@@ -13,14 +13,7 @@ class ShowSettingManager {
     private var agoraKit: AgoraRtcEngineKit!
     
     private let videoEncoderConfig = AgoraVideoEncoderConfiguration()
-    private let dimensionsItems: [CGSize] = [
-        ShowAgoraVideoDimensions._320x240.sizeValue(),
-        ShowAgoraVideoDimensions._480x360.sizeValue(),
-        ShowAgoraVideoDimensions._360x640.sizeValue(),
-        ShowAgoraVideoDimensions._960x540.sizeValue(),
-        ShowAgoraVideoDimensions._960x720.sizeValue(),
-        ShowAgoraVideoDimensions._1280x720.sizeValue()
-    ]
+    private let dimensionsItems: [CGSize] = ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     private let fpsItems: [AgoraVideoFrameRate] = [
         .fps1,
         .fps7,
@@ -85,7 +78,7 @@ class ShowSettingManager {
     
     // 预设模式
     func presetForSingleBroadcast() {
-        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: ShowAgoraVideoDimensions._960x720.sizeValue()))
+        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: ShowAgoraVideoDimensions._960x720.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: .fps15))
         ShowSettingKey.videoBitRate.writeValue(1800)
         ShowSettingKey.H265.writeValue(true)
@@ -98,9 +91,9 @@ extension ShowSettingManager {
     /// 更新设置
     /// - Parameter key: 要更新的key
     func updateSettingForkey(_ key: ShowSettingKey) {
-        let isOn = key.boolValue()
-        let index = key.intValue()
-        let sliderValue = key.floatValue()
+        let isOn = key.boolValue
+        let index = key.intValue
+        let sliderValue = key.floatValue
         
         switch key {
         case .lowlightEnhance:
