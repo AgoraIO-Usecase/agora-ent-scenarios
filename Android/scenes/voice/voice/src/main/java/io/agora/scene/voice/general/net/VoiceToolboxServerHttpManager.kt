@@ -8,13 +8,6 @@ import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.network.http.VRHttpCallback
-import io.agora.voice.network.http.VRHttpClientManager
-import io.agora.voice.network.http.toolbox.VRCreateRoomResponse
-import io.agora.voice.network.http.toolbox.VRGenerateTokenResponse
-import io.agora.voice.network.http.toolbox.VoiceToolboxRequestApi
-import io.agora.voice.network.tools.VRDefaultValueCallBack
-import io.agora.voice.network.tools.VRValueCallBack
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * @author create by zhangwei03
  */
-class VRToolboxServerHttpManager {
+class VoiceToolboxServerHttpManager {
 
     private val TAG = "VoiceToolboxServerHttpManager"
 
@@ -34,14 +27,14 @@ class VRToolboxServerHttpManager {
 
     companion object {
         @JvmStatic
-        fun get(): VRToolboxServerHttpManager {
+        fun get(): VoiceToolboxServerHttpManager {
             val sSingle = InstanceHelper.sSingle
             return sSingle
         }
     }
 
     internal object InstanceHelper {
-        val sSingle = VRToolboxServerHttpManager()
+        val sSingle = VoiceToolboxServerHttpManager()
     }
 
     /**
@@ -198,7 +191,7 @@ class VRToolboxServerHttpManager {
         generateToken(
             channelId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
-            callBack = object : VRDefaultValueCallBack<VRGenerateTokenResponse> {
+            callBack = object : VRValueCallBack<VRGenerateTokenResponse> {
                 override fun onSuccess(response: VRGenerateTokenResponse?) {
                     response?.let {
                         generateToken.set(true)
@@ -220,7 +213,7 @@ class VRToolboxServerHttpManager {
             traceId = UUID.randomUUID().toString(),
             username = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
             nickname = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-            callBack = object : VRDefaultValueCallBack<VRCreateRoomResponse> {
+            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
                 override fun onSuccess(response: VRCreateRoomResponse?) {
                     response?.let {
                         createImRoom.set(true)

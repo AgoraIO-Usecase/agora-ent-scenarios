@@ -1,9 +1,0 @@
-apply from: '../voice.gradle'
-
-dependencies {
-
-    api rootProject.ext.deps.core_ktx
-
-    compileOnly rootProject.ext.deps.gson
-    compileOnly project(':scenes:voice:buddy')
-}

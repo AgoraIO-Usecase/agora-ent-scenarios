@@ -18,7 +18,7 @@ data class VoiceCreateRoomModel constructor(
  * 用户数据
  */
 data class VoiceMemberModel constructor(
-    @SerializedName("uid") var uid: String? = null,
+    @SerializedName("uid") var userId: String? = null,
     @SerializedName("chat_uid") var chatUid: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,

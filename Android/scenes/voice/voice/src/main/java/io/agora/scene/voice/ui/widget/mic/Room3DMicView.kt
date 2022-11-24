@@ -82,8 +82,8 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 }
             } else { // 有人
                 ivMicInnerIcon.isVisible = false
-                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
-                mtMicUsername.text = micInfo.userInfo?.username ?: ""
+                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.portrait)
+                mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
                 if (micInfo.ownerTag) {
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                         R.drawable.voice_icon_room_mic_owner_tag, 0, 0, 0
