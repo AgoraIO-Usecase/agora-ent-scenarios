@@ -332,7 +332,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onMemberJoinedChorus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
-                getBinding().lrcControlView.getPitchView().updateLocalPitch(0);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
@@ -344,6 +343,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.playerMusicLrcDataLiveData.observe(this, lrcData -> {
+            if (lrcData == null) getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.no_lrc));
             getBinding().lrcControlView.getLrcView().setLrcData(lrcData);
             getBinding().lrcControlView.getPitchView().setLrcData(lrcData);
         });
