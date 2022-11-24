@@ -100,7 +100,7 @@ class ShowAgoraKitManager: NSObject {
             agoraKit.setupRemoteVideo(canvas)
         }
         
-        let ret = agoraKit?.joinChannel(byToken: nil, channelId: channelName, info: nil, uid: uid)
+        let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRtcToken(), channelId: channelName, info: nil, uid: uid)
         return ret
     }
     

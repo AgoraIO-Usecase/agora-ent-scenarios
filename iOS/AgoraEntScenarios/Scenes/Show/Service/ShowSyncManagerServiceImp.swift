@@ -119,13 +119,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomId = channelName
-                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
-                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token007,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
                     guard let self = self,
-                          let rtcToken = rtcToken,
-                          let rtmToken = rtmToken
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
-                        agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
@@ -154,13 +156,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomId = channelName
-                NetworkManager.shared.generateAllToken(channelName: channelName ?? "",
-                                                       uid: "\(UserInfo.userId)") { rtcToken, rtmToken in
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
                     guard let self = self,
-                          let rtcToken = rtcToken,
-                          let rtmToken = rtmToken
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
                     else {
-                        agoraAssert(rtcToken != nil && rtmToken != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
