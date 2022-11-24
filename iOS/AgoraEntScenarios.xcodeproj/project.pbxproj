@@ -477,6 +477,7 @@
 		E73147D02926214B0032198F /* BEHttpRequestProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = E73147C32926214B0032198F /* BEHttpRequestProvider.mm */; };
 		E73147D3292622A80032198F /* BundleUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E73147D2292622A80032198F /* BundleUtil.m */; };
 		E73147D5292726810032198F /* ByteBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73147D4292726810032198F /* ByteBeautyManager.swift */; };
+		E73147D7292F11530032198F /* ShowCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73147D6292F11530032198F /* ShowCanvasView.swift */; };
 		E74A311D2919FBD700412D42 /* ShowPKInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */; };
 		E74A311F291A457100412D42 /* ShowApplyAndInviteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */; };
 		E74A3121291A46DD00412D42 /* ShowSegmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74A3120291A46DD00412D42 /* ShowSegmentView.swift */; };
@@ -1126,6 +1127,7 @@
 		E73147D1292622A80032198F /* BundleUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BundleUtil.h; sourceTree = "<group>"; };
 		E73147D2292622A80032198F /* BundleUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BundleUtil.m; sourceTree = "<group>"; };
 		E73147D4292726810032198F /* ByteBeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteBeautyManager.swift; sourceTree = "<group>"; };
+		E73147D6292F11530032198F /* ShowCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowCanvasView.swift; sourceTree = "<group>"; };
 		E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPKInviteView.swift; sourceTree = "<group>"; };
 		E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowApplyAndInviteView.swift; sourceTree = "<group>"; };
 		E74A3120291A46DD00412D42 /* ShowSegmentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSegmentView.swift; sourceTree = "<group>"; };
@@ -1499,6 +1501,7 @@
 				A845AD2C291A163200A41D8D /* ShowRoomMembersCountView.swift */,
 				A845AD2E291A16C700A41D8D /* ShowRoomBottomBar.swift */,
 				A845AD30291A3CDC00A41D8D /* ShowRoomLiveView.swift */,
+				E73147D6292F11530032198F /* ShowCanvasView.swift */,
 				A845AD36291A415200A41D8D /* ShowRoomChatCell.swift */,
 			);
 			path = Live;
@@ -3426,6 +3429,7 @@
 				0510B867290B7A6E0063E57A /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
+				E73147D7292F11530032198F /* ShowCanvasView.swift in Sources */,
 				DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */,
 				E74A3135291B97DD00412D42 /* ShowToolMenuView.swift in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,

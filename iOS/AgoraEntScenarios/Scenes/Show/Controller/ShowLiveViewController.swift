@@ -45,10 +45,14 @@ class ShowLiveViewController: UIViewController {
     }()
     
     private lazy var beautyVC = ShowBeautySettingVC()
+    //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
+    private lazy var applyAndInviteView = ShowApplyAndInviteView()
+    private lazy var applyView = ShowApplyView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         joinChannel()
         subscribeChatMsg()
@@ -91,6 +95,20 @@ class ShowLiveViewController: UIViewController {
             print("进入房间失败=====\(ret.debugDescription)")
             showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
         }
+        
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = liveView.canvasView.localView
+        canvas.renderMode = .hidden
+        canvas.uid = uid
+        liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
+        if role == .broadcaster {
+            canvas.mirrorMode = .disabled
+            agoraKitManager.agoraKit?.setupLocalVideo(canvas)
+        } else {
+            agoraKitManager.agoraKit?.setupRemoteVideo(canvas)
+        }
+        agoraKitManager.agoraKit?.startPreview()
+        
         sendMessageWithText("join_live_room".show_localized)
     }
     
@@ -136,37 +154,55 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-//        LogUtils.log(message: "remote user join: \(uid) \(elapsed)ms", level: .info)
-//        liveView.sendMessage(userName: "\(uid)", message: "Join_Live_Room".localized, messageType: .message)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = uid
+        videoCanvas.view = liveView.canvasView.remoteView
+        videoCanvas.renderMode = .hidden
+        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+        liveView.canvasView.setRemoteUserInfo(name: "\(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
 //        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
 //        didOfflineOfUid(uid: uid)
-        if roomOwnerId == uid {
-            let vc = ShowReceiveLiveFinishAlertVC()
-            vc.dismissAlert { [weak self] in
-                self?.leaveRoom()
-            }
-            present(vc, animated: true)
-        }
+//        if roomOwnerId == uid {
+//            let vc = ShowReceiveLiveFinishAlertVC()
+//            vc.dismissAlert { [weak self] in
+//                self?.leaveRoom()
+//            }
+//            present(vc, animated: true)
+//        }
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = uid
+        videoCanvas.view = nil
+        videoCanvas.renderMode = .hidden
+        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+        liveView.canvasView.setRemoteUserInfo(name: "")
+        liveView.canvasView.canvasType = .none
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
-//        localVideo.statsInfo?.updateChannelStats(stats)
+        realTimeView.statsInfo?.updateChannelStats(stats)
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
-//        localVideo.statsInfo?.updateLocalAudioStats(stats)
+        realTimeView.statsInfo?.updateLocalAudioStats(stats)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
-//        remoteVideo.statsInfo?.updateVideoStats(stats)
-//        LogUtils.log(message: "remoteVideoWidth== \(stats.width) Height == \(stats.height)", level: .info)
+        realTimeView.statsInfo?.updateVideoStats(stats)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
-//        remoteVideo.statsInfo?.updateAudioStats(stats)
+        realTimeView.statsInfo?.updateAudioStats(stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
+        realTimeView.statsInfo?.updateUplinkNetworkInfo(networkInfo)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
+        realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
     }
 }
 
@@ -187,11 +223,17 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickPKButton(_ button: ShowRedDotButton) {
-        
+        let pkInviteView = ShowPKInviteView()
+        AlertManager.show(view: pkInviteView, alertPostion: .bottom)
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
-        
+        if role == .broadcaster {
+            AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
+            
+        } else {
+            AlertManager.show(view: applyView, alertPostion: .bottom)
+        }
     }
     
     func onClickBeautyButton() {
