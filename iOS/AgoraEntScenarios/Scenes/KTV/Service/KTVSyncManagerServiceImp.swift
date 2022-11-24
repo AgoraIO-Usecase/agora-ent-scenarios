@@ -739,7 +739,7 @@ extension KTVSyncManagerServiceImp {
         return seatArray
     }
 
-    private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel?) -> VLRoomSeatModel {
+    private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel? = nil) -> VLRoomSeatModel {
         let user = VLUserCenter.user
         let seatInfo = VLRoomSeatModel()
         seatInfo.seatIndex = seatIndex
@@ -788,7 +788,7 @@ extension KTVSyncManagerServiceImp {
 
             // update seat info (user avater/nick name did changed) if seat existed
             if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, seat)
+                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
                     completion(self._getInitSeats())
