@@ -3,8 +3,10 @@ package io.agora.scene.voice.ui.mic
 import android.content.Context
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.scene.voice.R
-import io.agora.scene.voice.annotation.*
-import io.agora.scene.voice.bean.*
+import io.agora.scene.voice.bean.BotMicInfoBean
+import io.agora.scene.voice.bean.MicInfoBean
+import io.agora.scene.voice.bean.MicManagerBean
+import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.secnceui.annotation.MicClickAction
 import io.agora.secnceui.annotation.MicStatus
 
@@ -26,18 +28,18 @@ internal object RoomMicConstructor {
             index = 6,
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-            userInfo = RoomUserInfoBean().apply {
-                username = context.getString(R.string.voice_chatroom_agora_blue)
-                userAvatar = "voice_icon_room_blue_robot"
+            userInfo = VoiceMemberModel().apply {
+                nickName = context.getString(R.string.voice_chatroom_agora_blue)
+                portrait = "voice_icon_room_blue_robot"
             }
         )
         val redBot = MicInfoBean(
             index = 7,
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-            userInfo = RoomUserInfoBean().apply {
-                username = context.getString(R.string.voice_chatroom_agora_red)
-                userAvatar = "voice_icon_room_red_robot"
+            userInfo = VoiceMemberModel().apply {
+                nickName = context.getString(R.string.voice_chatroom_agora_red)
+                portrait = "voice_icon_room_red_robot"
             }
         )
         return mutableListOf(BotMicInfoBean(blueBot, redBot))
@@ -55,18 +57,18 @@ internal object RoomMicConstructor {
                 index = 2,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-                userInfo = RoomUserInfoBean().apply {
-                    username = context.getString(R.string.voice_chatroom_agora_blue)
-                    userAvatar = "icon_chatroom_blue_robot"
+                userInfo = VoiceMemberModel().apply {
+                    nickName = context.getString(R.string.voice_chatroom_agora_blue)
+                    portrait = "voice_icon_room_blue_robot"
                 }
             ),
             ConfigConstants.MicConstant.KeyIndex6 to MicInfoBean(
                 index = 3,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-                userInfo = RoomUserInfoBean().apply {
-                    username = context.getString(R.string.voice_chatroom_agora_red)
-                    userAvatar = "icon_chatroom_red_robot"
+                userInfo = VoiceMemberModel().apply {
+                    nickName = context.getString(R.string.voice_chatroom_agora_red)
+                    portrait = "voice_icon_room_red_robot"
                 }
             ),
         )

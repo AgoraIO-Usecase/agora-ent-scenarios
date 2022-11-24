@@ -48,10 +48,10 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 @Override
                 public void onClick(View view) {
                     if (listener != null)
-                        listener.onItemActionClick(view,position,item.getUid());
+                        listener.onItemActionClick(view,position,item.getUserId());
                 }
             });
-            if (checkMap.containsKey(item.getUid())){
+            if (checkMap.containsKey(item.getUserId())){
                 action.setText(mContext.getString(R.string.voice_room_invited));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                 action.setEnabled(false);

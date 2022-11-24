@@ -85,10 +85,10 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     isRefreshing = false
                     adapter?.data?.let {
                         for (applyListBean in it) {
-                            if (map.containsKey(applyListBean.uid)) {
+                            if (map.containsKey(applyListBean.userId)) {
                                 adapter?.setAccepted(
-                                    applyListBean.uid,
-                                    true == map[applyListBean.uid]
+                                    applyListBean.userId,
+                                    true == map[applyListBean.userId]
                                 )
                             }
                         }

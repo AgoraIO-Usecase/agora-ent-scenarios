@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.scene.voice.bean.RoomRankUserBean
 import io.agora.voice.buddy.tool.*
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.voice.buddy.tool.DeviceTools.number2K
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
+import io.agora.scene.voice.service.VoiceRankUserModel
 
 class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView {
 
@@ -57,7 +57,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onChatroomInfo(chatroomInfo: io.agora.scene.voice.bean.RoomInfoBean) {
         this.roomInfo = chatroomInfo
         binding.apply {
-            mtChatroomOwnerName.text = chatroomInfo.owner?.username
+            mtChatroomOwnerName.text = chatroomInfo.owner?.nickName
             mtChatroomName.text = chatroomInfo.chatroomName
             val memberText = roomInfo.memberCount.number2K()
             mtChatroomMembers.text = memberText
@@ -79,7 +79,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             }
 
             // 房主头像
-            ImageTools.loadImage(binding.ivChatroomOwner,chatroomInfo.owner?.userAvatar)
+            ImageTools.loadImage(binding.ivChatroomOwner,chatroomInfo.owner?.portrait)
             val topGifts = chatroomInfo.topRankUsers
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
@@ -89,15 +89,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember1,audienceBean.portrait)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember2,audienceBean.portrait)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember3,audienceBean.portrait)
                         }
                         else -> {
                             return
@@ -108,7 +108,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
-    override fun onRankMember(topGifts: List<RoomRankUserBean>) {
+    override fun onRankMember(topGifts: List<VoiceRankUserModel>) {
         binding.apply {
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
@@ -118,15 +118,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember1,audienceBean.portrait)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember2,audienceBean.portrait)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3,audienceBean.userAvatar)
+                            ImageTools.loadImage(ivChatroomMember3,audienceBean.portrait)
                         }
                         else -> {
                             return

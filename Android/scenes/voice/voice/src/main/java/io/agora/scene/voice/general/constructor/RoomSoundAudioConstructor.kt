@@ -1,5 +1,6 @@
-package io.agora.scene.voice.bean
+package io.agora.scene.voice.general.constructor
 
+import io.agora.scene.voice.bean.SoundAudioBean
 import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.voice.buddy.config.ConfigConstants
 

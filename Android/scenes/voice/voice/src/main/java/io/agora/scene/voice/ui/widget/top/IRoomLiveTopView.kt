@@ -1,13 +1,13 @@
 package io.agora.scene.voice.ui.widget.top
 
 import io.agora.scene.voice.bean.RoomInfoBean
-import io.agora.scene.voice.bean.RoomRankUserBean
+import io.agora.scene.voice.service.VoiceRankUserModel
 
 interface IRoomLiveTopView {
     /**头部初始化*/
     fun onChatroomInfo(chatroomInfo: RoomInfoBean)
 
-    fun onRankMember(topRankUsers: List<RoomRankUserBean>)
+    fun onRankMember(topRankUsers: List<VoiceRankUserModel>)
 
     /**需要特殊处理*/
     fun subMemberCount(){}
