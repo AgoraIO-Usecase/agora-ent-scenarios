@@ -9,10 +9,8 @@
 #import "VLKTVViewController.h"
 #import "VLRoomSeatModel.h"
 #import "VLRoomListModel.h"
-//#import "AgoraRtm.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
@@ -60,6 +58,10 @@
 }
 
 - (void)createBtnAction:(VLAddRoomModel *)roomModel {  //房主创建
+    if (roomModel.isPrivate && roomModel.password.length != 4) {
+        return;
+    }
+    
     KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];

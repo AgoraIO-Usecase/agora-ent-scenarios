@@ -81,7 +81,7 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"语聊房",@"subTitleStr":@""},
+//            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"语聊房",@"subTitleStr":@""},
             @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"在线K歌房",@"subTitleStr":@""},
             @{@"bgImgStr":@"home_live_bg",@"iconImgStr":@"home_live_icon",@"titleStr":@"元直播",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)},
             @{@"bgImgStr":@"home_talk_bg",@"iconImgStr":@"home_talk_icon",@"titleStr":@"元语聊",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)},
