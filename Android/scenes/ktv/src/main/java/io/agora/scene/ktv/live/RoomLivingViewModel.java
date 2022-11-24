@@ -1582,8 +1582,13 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onLyricResult(String requestId, String lyricUrl) {
+                if (lyricUrl == null) {
+                    Log.e(TAG, "iAgoraMusicContentCenter.onLyricResult lyricUrl is null");
+                    ToastUtils.showToast("lyricUrl is null");
+                    preloadMusic(isOwnSong, isChorus, music);
+                    return;
+                }
                 DownloadManager.getInstance().download(mContext, lyricUrl, file -> {
-
                     if (file.getName().endsWith(".zip")) {
                         ZipUtils.unZipAsync(file.getAbsolutePath(),
                                 file.getAbsolutePath().replace(".zip", ""),
@@ -1662,7 +1667,6 @@ public class RoomLivingViewModel extends ViewModel {
                         offset = curTime - mLastRecvPlayPosTime;
                         if (offset <= 1000) {
                             curTs = mRecvedPlayPosition + offset;
-                            //mHandler.obtainMessage(ACTION_UPDATE_TIME, curTs).sendToTarget();
                             playerMusicPlayPositionChangeLiveData.postValue(curTs);
                         }
                     }
