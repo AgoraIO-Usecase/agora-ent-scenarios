@@ -1,4 +1,4 @@
-package io.agora.voice.network.http;
+package io.agora.scene.voice.general.net;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 
 import io.agora.voice.buddy.tool.ThreadManager;
-
 
 public class VRHttpClientManager {
     private static final String TAG = "HttpClientManager";
