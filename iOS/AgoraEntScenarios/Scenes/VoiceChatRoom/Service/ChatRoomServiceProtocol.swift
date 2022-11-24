@@ -127,6 +127,11 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void)
+    
+    
+    /// Description 申请列表
+    /// - Parameter completion: 回调
+    func fetchApplicantsList(completion: @escaping (Error?, [VoiceRoomApply]?) -> Void)
 
     /// 禁言指定麦位
     /// - Parameters:
