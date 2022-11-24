@@ -450,10 +450,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
         })
-        if user?.member?.mic_index ?? 0 < 1 {
+        if user?.index ?? 0 < 1 {
             mic_index = self.findMicIndex()
         } else {
-            mic_index = user?.member?.mic_index ?? 1
+            mic_index = user?.index ?? 1
         }
         let mic = VRRoomMic()
         mic.mic_index = mic_index
@@ -467,7 +467,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 let currentMic = self.mics[safe: user?.index ?? 1]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
-                    completion(nil,currentMic)
+                    completion(nil,mic)
                 } else {
                     completion(self.normalError(),nil)
                     return
