@@ -9,16 +9,15 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.bean.MicManagerBean
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.dialog.BaseSheetDialog
 import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.ui.mic.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceDialogMicManagerBinding
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.voice.buddy.tool.ImageTools
 
 class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicManagerBinding>() {
@@ -33,8 +32,8 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
 
     private val micManagerList = mutableListOf<MicManagerBean>()
 
-    private val micInfo: MicInfoBean? by lazy {
-        arguments?.get(KEY_MIC_INFO) as? MicInfoBean
+    private val micInfo: VoiceMicInfoModel? by lazy {
+        arguments?.get(KEY_MIC_INFO) as? VoiceMicInfoModel
     }
     private val isOwner: Boolean by lazy {
         arguments?.getBoolean(KEY_IS_OWNER, false) ?: false
@@ -81,13 +80,13 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
         }
     }
 
-    private fun bindingMicInfo(micInfo: MicInfoBean) {
+    private fun bindingMicInfo(micInfo: VoiceMicInfoModel) {
         binding?.apply {
             // 座位状态
-            if (micInfo.userInfo == null) { // 没人
+            if (micInfo.member == null) { // 没人
                 binding?.mtChatroomMicTag?.isVisible = false
                 ivMicInnerIcon.isVisible = true
-                mtMicUsername.text = micInfo.index.toString()
+                mtMicUsername.text = micInfo.micIndex.toString()
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
                         ivMicTag.isVisible = false
@@ -110,8 +109,8 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             } else { // 有人
                 binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 ivMicInnerIcon.isVisible = false
-                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.portrait)
-                mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
+                ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag
 //                when (micInfo.micStatus) {
 //                    MicStatus.Mute,

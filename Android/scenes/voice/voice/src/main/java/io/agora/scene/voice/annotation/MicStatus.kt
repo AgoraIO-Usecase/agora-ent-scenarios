@@ -1,4 +1,4 @@
-package io.agora.secnceui.annotation
+package io.agora.scene.voice.annotation
 
 import androidx.annotation.IntDef
 
@@ -8,7 +8,7 @@ import androidx.annotation.IntDef
  * 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲 5:机器人专属激活状态 -2:机器人专属关闭状态
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
-@kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.SOURCE)
 @IntDef(
     MicStatus.Unknown,
     MicStatus.Idle,

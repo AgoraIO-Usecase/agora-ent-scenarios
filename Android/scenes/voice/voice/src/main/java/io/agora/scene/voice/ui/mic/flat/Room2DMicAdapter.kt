@@ -1,20 +1,20 @@
 package io.agora.scene.voice.ui.mic.flat
 
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.DeviceTools.dp
 import io.agora.secnceui.annotation.MicClickAction
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceItemRoom2dMicBinding
+import io.agora.scene.voice.service.VoiceMicInfoModel
 
 class Room2DMicAdapter constructor(
-    dataList: List<MicInfoBean>?,
-    listener: OnItemClickListener<MicInfoBean>?,
+    dataList: List<VoiceMicInfoModel>?,
+    listener: OnItemClickListener<VoiceMicInfoModel>?,
     viewHolderClass: Class<Room2DMicViewHolder>
 ) :
-    BaseRecyclerViewAdapter<VoiceItemRoom2dMicBinding, MicInfoBean, Room2DMicViewHolder>(
+    BaseRecyclerViewAdapter<VoiceItemRoom2dMicBinding, VoiceMicInfoModel, Room2DMicViewHolder>(
         dataList, listener, viewHolderClass
     ) {
 
@@ -43,7 +43,7 @@ class Room2DMicAdapter constructor(
                 if (micInfo.micStatus == MicStatus.LockForceMute) {
                     micInfo.micStatus = MicStatus.Lock
                 } else {
-                    if (micInfo.userInfo == null) {
+                    if (micInfo.member == null) {
                         micInfo.micStatus = MicStatus.Idle
                     } else {
                         micInfo.micStatus = MicStatus.Normal
@@ -56,7 +56,7 @@ class Room2DMicAdapter constructor(
             }
             // 关闭座位（房主操作）
             MicClickAction.UnMute -> {
-                if (micInfo.userInfo == null) {
+                if (micInfo.member == null) {
                     micInfo.micStatus = MicStatus.Idle
                 } else {
                     micInfo.micStatus = MicStatus.Normal
@@ -75,7 +75,7 @@ class Room2DMicAdapter constructor(
                 if (micInfo.micStatus == MicStatus.LockForceMute) {
                     micInfo.micStatus = MicStatus.ForceMute
                 } else {
-                    if (micInfo.userInfo == null) {
+                    if (micInfo.member == null) {
                         micInfo.micStatus = MicStatus.Idle
                     } else {
                         micInfo.micStatus = MicStatus.Normal
@@ -105,15 +105,15 @@ class Room2DMicAdapter constructor(
         notifyItemChanged(micIndex)
     }
 
-    fun receiverAttributeMap(newMicMap: Map<Int, MicInfoBean>) {
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         var needUpdate = false
         // 是否只更新一条
-        var onlyOneUpdate = newMicMap.size == 1
+        val onlyOneUpdate = newMicMap.size == 1
         var onlyUpdateItemIndex = -1
         newMicMap.entries.forEach { entry ->
             val index = entry.key
             if (index >= 0 && index < dataList.size) {
-                dataList.set(index, entry.value)
+                dataList[index] = entry.value
                 needUpdate = true
                 if (onlyOneUpdate) onlyUpdateItemIndex = index
             }
@@ -124,6 +124,14 @@ class Room2DMicAdapter constructor(
             } else {
                 notifyItemRangeChanged(0,dataList.size,true)
             }
+        }
+    }
+
+    fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
+        val index = micInfoModel.micIndex
+        if (index>=0 && index<dataList.size){
+            dataList[index] = micInfoModel
+            notifyItemChanged(index)
         }
     }
 
