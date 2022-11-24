@@ -233,7 +233,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
 
     
-    func forbidMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func forbidMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
@@ -246,24 +246,24 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[safe: mic_index]?.status = mic.status
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func unForbidMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func unForbidMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 0
+        mic.status = mic.member == nil ? -1:0
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[safe: mic_index]?.status = 0
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func lockMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func lockMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
@@ -276,24 +276,24 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[safe: mic_index]?.status = mic.status
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func unLockMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func unLockMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = 0
+        mic.status = mic.member == nil ? -1:0
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[safe: mic_index]?.status = 0
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func kickOff(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func kickOff(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
         mic.mic_index = mic_index
         mic.status = -1
@@ -301,11 +301,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[mic_index] = mic
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func leaveMic(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func leaveMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
         mic.mic_index = mic_index
         mic.status = -1
@@ -313,11 +313,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[mic_index] = mic
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func muteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func muteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
@@ -326,11 +326,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[safe: mic_index]?.status = 1
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
-    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, Bool) -> Void) {
+    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
@@ -339,7 +339,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             if error == nil {
                 self.mics[safe: mic_index]?.status = 0
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),mic)
         })
     }
     
@@ -350,9 +350,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return error
     }
     
-    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void) {
+    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, [Int:VRRoomMic]?) -> Void) {
         if self.mics[safe: new_index]?.member != nil {
-            completion(self.normalError(),false)
+            completion(self.normalError(),nil)
             return
         }
         let old_mic = VRRoomMic()
@@ -367,7 +367,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.mics[old_index] = old_mic
                 self.mics[new_index] = new_mic
             }
-            completion(self.convertError(error: error),error == nil)
+            completion(self.convertError(error: error),[old_index:old_mic,new_index:new_mic])
         })
     }
     
