@@ -17,6 +17,7 @@ class ChatroomCacheManager {
     private var mSharedPreferences: SharedPreferences? = null
     private val mMicInfoMap = mutableMapOf<String, String>()
     private val submitMicList: MutableSet<VoiceMemberModel> = HashSet()
+    private val submitMicMap:MutableMap<String,String> = HashMap()
     private val roomMemberList: MutableSet<VoiceMemberModel> = HashSet()
     private val giftContributeList: MutableSet<VoiceRankUserModel> = HashSet()
 
@@ -96,6 +97,10 @@ class ChatroomCacheManager {
      */
     fun clearSubmitList(){
         submitMicList.clear()
+    }
+
+    fun setMemberList(member:VoiceMemberModel){
+
     }
 
     /**
