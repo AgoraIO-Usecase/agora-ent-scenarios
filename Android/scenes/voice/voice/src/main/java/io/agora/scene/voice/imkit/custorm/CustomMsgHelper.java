@@ -14,8 +14,10 @@ import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
-import io.agora.scene.voice.imkit.bean.ChatroomConstants;
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.service.VoiceMemberModel;
+import io.agora.voice.buddy.tool.GsonTools;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。
@@ -116,6 +118,13 @@ public class CustomMsgHelper implements MessageListener {
                     if(listener != null) {
                         listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
+                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    if (map.containsKey("user")){
+                        VoiceMemberModel memberModel = GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
+                        if (memberModel != null){
+                            ChatroomCacheManager.Companion.getCacheManager().setSubmitMicList(memberModel);
+                        }
+                    }
                     break;
                 case CHATROOM_CANCEL_APPLY_SITE:
                     if(listener != null) {
@@ -165,6 +174,14 @@ public class CustomMsgHelper implements MessageListener {
                     AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if (listener != null){
                         listener.onReceiveSystem(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    }
+                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    if (map.containsKey(MsgConstant.CUSTOM_GIFT_USERNAME) && map.containsKey(MsgConstant.CUSTOM_GIFT_PORTRAIT)){
+                        VoiceMemberModel memberModel = new VoiceMemberModel();
+                        memberModel.setNickName(map.get(MsgConstant.CUSTOM_GIFT_USERNAME));
+                        memberModel.setChatUid(message.getFrom());
+                        memberModel.setPortrait(MsgConstant.CUSTOM_GIFT_PORTRAIT);
+                        ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
                     }
                     break;
                 case CHATROOM_UPDATE_ROBOT_VOLUME:
@@ -252,9 +269,14 @@ public class CustomMsgHelper implements MessageListener {
         sendGiftMsg(params, callBack);
     }
 
+    /**
+     * 发送系统消息（成员加入）
+     * @param nickName
+     * @param portrait
+     * @param callBack
+     */
     public void sendSystemMsg(String nickName,String portrait, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
-        params.put(ChatroomConstants.MSG_KEY_MEMBER_ADD, "member_add");
         params.put(MsgConstant.CUSTOM_GIFT_USERNAME,nickName);
         params.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
         sendSystemMsg(params, callBack);
