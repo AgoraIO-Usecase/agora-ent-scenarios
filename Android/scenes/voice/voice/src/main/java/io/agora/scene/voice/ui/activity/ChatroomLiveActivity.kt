@@ -488,7 +488,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             val newMicMap = RoomInfoConstructor.convertMicInfoMap2UiBean(micInfoMap, roomKitBean.ownerId)
             val handsCheckMap = mutableMapOf<String, String>()
             micInfoMap.forEach { (t, u) ->
-                handsCheckMap[t] = u.member?.uid ?: ""
+                handsCheckMap[t] = u.member?.userId ?: ""
             }
             ThreadManager.getInstance().runOnMainThread {
                 if (roomKitBean.isOwner) {

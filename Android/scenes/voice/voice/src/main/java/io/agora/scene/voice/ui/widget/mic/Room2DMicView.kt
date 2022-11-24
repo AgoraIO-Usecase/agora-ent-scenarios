@@ -46,9 +46,9 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
                 ivMicInnerIcon.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.userInfo?.userAvatar ?: "")
+                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.userInfo?.portrait ?: "")
                 ImageTools.loadImage(ivMicInfo, botDrawable)
-                mtMicUsername.text = micInfo.userInfo?.username ?: ""
+                mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
                 )
@@ -83,8 +83,8 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 } else { // 有人
                     ivMicTag.isVisible = true
                     ivMicInnerIcon.isVisible = false
-                    ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
-                    mtMicUsername.text = micInfo.userInfo?.username ?: ""
+                    ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.portrait)
+                    mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
                     if (micInfo.ownerTag) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.voice_icon_room_mic_owner_tag, 0, 0, 0
