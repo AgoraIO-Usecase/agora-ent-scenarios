@@ -112,8 +112,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         }
         inputPasswordDialog.clearContent();
         inputPasswordDialog.iSingleCallback = (type, o) -> {
-            data.setPassword((String) o);
-            // RoomManager.getInstance().setAgoraRoom(data);
             roomCreateViewModel.joinRoom(data.getRoomNo(), (String) o);
         };
         inputPasswordDialog.show();
