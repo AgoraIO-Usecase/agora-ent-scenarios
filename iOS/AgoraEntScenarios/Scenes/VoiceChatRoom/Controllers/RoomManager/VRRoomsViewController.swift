@@ -119,8 +119,11 @@ extension VRRoomsViewController {
             presentViewController(vc)
             alert.actionEvents = {
                 if $0 == 31 {
-                    room.roomPassword = alert.code
-                    self.validatePassword(room: room, password: alert.code)
+                    if room.roomPassword == alert.code {
+                        self.loginIMThenPush(room: room)
+                    } else {
+                        self.view.makeToast("Incorrect Password".localized())
+                    }
                 }
                 vc.dismiss(animated: true)
             }
