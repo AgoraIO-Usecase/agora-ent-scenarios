@@ -157,6 +157,10 @@
 }
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
+    if (![listModel.password isEqualToString:inputText]) {
+        return;
+    }
+    
     KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.userNo;
