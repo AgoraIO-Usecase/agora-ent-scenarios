@@ -98,9 +98,9 @@ extension VoiceRoomInviteUsersController {
 
     private func inviteUser(user: VRUser?) {
         SVProgressHUD.show()
-        if idx <= 0 {return}
-        let chat_uid: String = user?.uid ?? ""
-        ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx) { error, flag in
+        let chat_uid: String = user?.chat_uid ?? ""
+        ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
+            SVProgressHUD.dismiss()
             if error == nil {
                 self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
             } else {
