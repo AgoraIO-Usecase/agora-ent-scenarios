@@ -16,3 +16,4 @@
 #import "AEACategoryView.h"
 #import "AEAListContainerView.h"
 #import "BEFrameProcessor.h"
+@import YYModel;

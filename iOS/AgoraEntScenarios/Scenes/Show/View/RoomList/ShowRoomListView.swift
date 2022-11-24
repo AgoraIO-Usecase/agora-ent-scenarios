@@ -94,7 +94,7 @@ extension ShowRoomListView: UICollectionViewDataSource, UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: ShowRoomListCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(ShowRoomListCell.self), for: indexPath) as! ShowRoomListCell
         let room = roomList[indexPath.item]
-        cell.setBgImge(room.thumbnailId ?? "0", name: room.roomName, id: room.roomNo, count: room.roomUserCount)
+        cell.setBgImge(room.thumbnailId ?? "0", name: room.roomName, id: room.roomId, count: room.roomUserCount)
         return cell
     }
     

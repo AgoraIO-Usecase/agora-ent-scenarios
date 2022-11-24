@@ -3,7 +3,7 @@
 local.properties
 .idea
 Pods
-Podfile.lock
 **/*.xcworkspace/*
 **/xcuserdata
 KeyCenter.swift
+**/ByteEffectLib/*

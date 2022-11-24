@@ -42,6 +42,7 @@ class ShowChatInputView: UIView {
         button.setImage(UIImage.show_sceneImage(name: "show_live_chat_bar_emoji_nor"), for: .normal)
         button.setImage(UIImage.show_sceneImage(name: "show_live_chat_bar_emoji_nor"), for: .selected)
         button.addTarget(self, action: #selector(didClickEmojiButton), for: .touchUpInside)
+        button.isHidden = true
         return button
     }()
     

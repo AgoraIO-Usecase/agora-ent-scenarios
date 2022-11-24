@@ -11,6 +11,7 @@ import MJRefresh
 class ShowRoomListVC: ShowBaseViewController {
 
     private var roomListView: ShowRoomListView!
+    private var roomList: [ShowRoomListModel]?
     
     override func preferredNavigationBarHidden() -> Bool {
         return true
@@ -28,12 +29,17 @@ class ShowRoomListVC: ShowBaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        getRoomList()
+//        getRoomList()
         addRefresh()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        getRoomList()
+    }
+    
     private func setUpUI(){
-      
         // 背景图
         let bgView = UIImageView()
         bgView.image = UIImage.show_sceneImage(name: "show_list_Bg")
@@ -60,7 +66,7 @@ class ShowRoomListVC: ShowBaseViewController {
         let preVC = ShowCreateLiveVC()
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        preNC.modalPresentationStyle = .overCurrentContext
+        preNC.modalPresentationStyle = .fullScreen
         present(preNC, animated: true)
     }
     
@@ -71,7 +77,7 @@ class ShowRoomListVC: ShowBaseViewController {
                 let vc = ShowLiveViewController()
                 vc.room = room
                 let nc = UINavigationController(rootViewController: vc)
-                nc.modalPresentationStyle = .overCurrentContext
+                nc.modalPresentationStyle = .fullScreen
                 self?.present(nc, animated: true)
             }
         }
@@ -81,6 +87,7 @@ class ShowRoomListVC: ShowBaseViewController {
         AppContext.showServiceImp.getRoomList(page: 1) { [weak self] error, roomList in
             if let list = roomList {
                 self?.roomListView.roomList = list
+                self?.roomList = list
             }
             self?.roomListView.collectionView.mj_header?.endRefreshing()
         }

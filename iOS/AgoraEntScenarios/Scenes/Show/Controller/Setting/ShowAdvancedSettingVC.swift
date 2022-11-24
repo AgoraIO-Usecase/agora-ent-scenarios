@@ -6,41 +6,62 @@
 //
 
 import UIKit
-import JXCategoryView
+//import JXCategoryView
+import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
 
+    var agoraKit: AgoraRtcEngineKit! {
+        didSet {
+            settingManager = ShowSettingManager(agoraKit: agoraKit)
+        }
+    }
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    private let titles = ["show_advance_setting_video_title".show_localized,
-                          "show_advance_setting_audio_title".show_localized,
-                          "show_advance_setting_capture_title".show_localized]
+    private var settingManager: ShowSettingManager!
     
-    // 指示条
-    private lazy var indicator: JXCategoryIndicatorLineView = {
-        let indicator = JXCategoryIndicatorLineView()
-        indicator.indicatorWidth = 66
-        indicator.indicatorHeight = 2
-        indicator.indicatorColor = .show_zi03
-        return indicator
+    private let titles = ["show_advance_setting_video_title".show_localized,
+                          "show_advance_setting_audio_title".show_localized]
+    
+    private lazy var videoSettingVC: ShowVideoSettingVC = {
+        return createSettingVCForIndex(0)
     }()
     
-    // 分类
-    private lazy var segmentedView: JXCategoryTitleView = {
-        let segmentedView = JXCategoryTitleView()
-        segmentedView.isTitleColorGradientEnabled = true
+    private lazy var audioSettingVC: ShowVideoSettingVC = {
+        return createSettingVCForIndex(1)
+    }()
+    
+    // 指示条
+    private lazy var indicator: UIView = {
+        let indicator = UIView()
+        indicator.size = CGSize(width: 66, height: 2)
+        indicator.backgroundColor = .show_zi03
+        return indicator
+    }()
+     
+    private lazy var segmentedView: AEACategoryView = {
+        let layout = AEACategoryViewLayout()
+        layout.itemSize = CGSize(width: Screen.width * 0.5, height: 40)
+        let segmentedView = AEACategoryView(layout: layout)
         segmentedView.titles = titles
+        segmentedView.delegate = self
         segmentedView.titleFont = .show_R_14
         segmentedView.titleSelectedFont = .show_navi_title
         segmentedView.titleColor = .show_Ellipse5
         segmentedView.titleSelectedColor = .show_Ellipse7
         segmentedView.backgroundColor = .clear
         segmentedView.defaultSelectedIndex = 0
-        segmentedView.indicators = [self.indicator]
+        segmentedView.indicator = indicator
         return segmentedView
     }()
-
+    
+    private lazy var listContainerView: AEAListContainerView = {
+        let containerView = AEAListContainerView()
+        containerView.dataSource = self
+        containerView.setSelectedIndex(0)
+        return containerView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,11 +71,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-//        view.bringSubviewToFront(naviBar)
-    }
-    
     private func setUpUI() {
         view.backgroundColor = .white
         
@@ -62,17 +78,13 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         segmentedView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(naviBar.snp.bottom)
-            make.height.equalTo(30)
         }
-        
-        if let listContainerView = JXCategoryListContainerView(type: .scrollView, delegate: self) {
-            segmentedView.listContainer = listContainerView
-            view.addSubview(listContainerView)
-            listContainerView.snp.makeConstraints { make in
-                make.left.right.equalToSuperview()
-                make.top.equalTo(segmentedView.snp.bottom).offset(25)
-                make.bottom.equalToSuperview()
-            }
+    
+        view.addSubview(listContainerView)
+        listContainerView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.top.equalTo(segmentedView.snp.bottom).offset(10)
+            make.bottom.equalToSuperview()
         }
     }
     
@@ -80,10 +92,35 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         // 标题
         naviBar.title = "show_advanced_setting_title".show_localized
         // 右边按钮
-//        let saveBarButtonItem = ShowBarButtonItem(title: "show_advanced_setting_save".show_localized, target: self, action: #selector(didClickSaveBarButton))
         let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
         naviBar.rightItems = [preSetButtonItem]
         view.addSubview(naviBar)
+    }
+    
+    private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
+        let videoSettings: [ShowSettingKey] = [
+            .lowlightEnhance,
+            .colorEnhance,
+            .videoDenoiser,
+            .beauty,
+            .videoCaptureSize,
+            .FPS,
+            .videoBitRate,
+            .PVC,
+            .SR
+        ]
+        let audioSettings: [ShowSettingKey]  = [
+            .earmonitoring,
+            .recordingSignalVolume,
+            .musincVolume,
+            .audioBitRate
+        ]
+        let settings = [videoSettings, audioSettings]
+        
+        let vc = ShowVideoSettingVC()
+        vc.settingManager = settingManager
+        vc.dataArray = settings[index]
+        return vc
     }
   
 }
@@ -93,6 +130,11 @@ extension ShowAdvancedSettingVC {
     // 点击预设按钮
     @objc private func didClickPreSetBarButton() {
         let vc = ShowPresettingVC()
+        vc.didSelectedIndex = {[weak self] index in
+            self?.settingManager.presetForSingleBroadcast()
+            self?.videoSettingVC.reloadData()
+            self?.audioSettingVC.reloadData()
+        }
         present(vc, animated: true)
     }
     
@@ -102,15 +144,18 @@ extension ShowAdvancedSettingVC {
     }
 }
 
+extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
+    
+    func listContainerView(_ listContainerView: AEAListContainerView, viewControllerFor index: Int) -> UIViewController {
+        if index == 0 {
+            return videoSettingVC
+        }
+        return audioSettingVC
+    }
+}
 
-extension ShowAdvancedSettingVC: JXCategoryListContainerViewDelegate {
-    
-    func number(ofListsInlistContainerView listContainerView: JXCategoryListContainerView!) -> Int {
-        titles.count
+extension ShowAdvancedSettingVC: AEACategoryViewDelegate {
+    func categoryView(_ categoryView: AEACategoryView, didSelect item: AEACategoryItem, index: Int) {
+        listContainerView.setSelectedIndex(index)
     }
-    
-    func listContainerView(_ listContainerView: JXCategoryListContainerView!, initListFor index: Int) -> JXCategoryListContentViewDelegate! {
-        return ShowVideoSettingVC()
-    }
-    
 }
