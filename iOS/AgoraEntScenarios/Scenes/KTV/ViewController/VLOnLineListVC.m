@@ -157,7 +157,7 @@
 }
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
-    if (![listModel.password isEqualToString:inputText]) {
+    if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
         return;
     }
     
@@ -168,7 +168,7 @@
 
     VL(weakSelf);
     [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                        completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
