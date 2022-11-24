@@ -2,7 +2,6 @@ package io.agora.scene.voice.imkit.manager
 
 import android.text.TextUtils
 import io.agora.CallBack
-import io.agora.ResultCallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
@@ -35,6 +34,8 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         this@ChatroomProtocolDelegate.ownerBean = ownerBean
         if (roomType == ConfigConstants.RoomType.Common_Chatroom ){
+            attributeMap["use_robot"] = "0"
+            attributeMap["robot_volume"] = "50"
             attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0,ownerBean,0)).toString()
             for (i in 1..7) {
                 var key = "mic_"
@@ -69,10 +70,14 @@ class ChatroomProtocolDelegate constructor(
         roomManager.asyncFetchChatRoomAllAttributesFromServer(roomId,object :
             ValueCallBack<MutableMap<String, String>>{
             override fun onSuccess(value: MutableMap<String, String>?) {
-                for (entry in value?.entries!!) {
-                    var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
-                    if (bean != null){
-                        micInfoMap[entry.key] = bean
+                value?.let {
+                    ChatroomCacheManager.cacheManager.clearMicInfo()
+                    ChatroomCacheManager.cacheManager.setMicInfo(it)
+                    for (entry in value.entries) {
+                        var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+                        if (bean != null){
+                            micInfoMap[entry.key] = bean
+                        }
                     }
                 }
             }
@@ -338,20 +343,24 @@ class ChatroomProtocolDelegate constructor(
         val currentUser = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
         var robot6 = VoiceMicInfoModel()
         var robot7 = VoiceMicInfoModel()
+        var isEnable:String
         if (TextUtils.equals(ownerBean.chatUid,currentUser)){
             if (enable){
                 robot6.micIndex = 6
                 robot6.micStatus = 5
                 robot7.micIndex = 7
                 robot7.micStatus = 5
+                isEnable = "1"
             }else{
                 robot6.micIndex = 6
                 robot6.micStatus = -2
                 robot7.micIndex = 7
                 robot7.micStatus = -2
+                isEnable = "0"
             }
             attributeMap["mic_6"] = GsonTools.beanToString(robot6).toString()
             attributeMap["mic_7"] = GsonTools.beanToString(robot7).toString()
+            attributeMap["use_robot"] = isEnable
             roomManager.asyncSetChatroomAttributes(roomId,attributeMap,true
             ) { code, result ->
                 if (code == 200 && result.isEmpty()){
@@ -373,9 +382,16 @@ class ChatroomProtocolDelegate constructor(
      * @param value 音量
      */
     fun updateRobotVolume(value: Int,callback: CallBack){
-        val attributeMap = mutableMapOf<String, String>()
-        attributeMap["volume"] = value.toString()
-        sendChatroomEvent(false,roomId,CustomMsgType.CHATROOM_UPDATE_ROBOT_VOLUME,attributeMap,callback)
+        roomManager.asyncSetChatroomAttribute(roomId,"robot_volume",value.toString(),true,object :
+            CallBack{
+            override fun onSuccess() {
+                callback.onSuccess()
+            }
+
+            override fun onError(code: Int, error: String?) {
+                callback.onError(code,error)
+            }
+        })
     }
 
     /**
