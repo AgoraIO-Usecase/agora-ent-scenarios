@@ -105,11 +105,16 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .beauty,
             .videoCaptureSize,
             .FPS,
-            .bitRate,
+            .videoBitRate,
             .PVC,
             .SR
         ]
-        let audioSettings: [ShowSettingKey]  = []
+        let audioSettings: [ShowSettingKey]  = [
+            .earmonitoring,
+            .recordingSignalVolume,
+            .musincVolume,
+            .audioBitRate
+        ]
         let settings = [videoSettings, audioSettings]
         
         let vc = ShowVideoSettingVC()

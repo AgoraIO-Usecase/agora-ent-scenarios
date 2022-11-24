@@ -69,7 +69,7 @@ class ShowRoomInfoView: UIView {
     
     deinit {
         print("------ShowRoomInfoView ----- 销毁-----")
-        timer.invalidate()
+//        timer.invalidate()
     }
     
     override init(frame: CGRect) {

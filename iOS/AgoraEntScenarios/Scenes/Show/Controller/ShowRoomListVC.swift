@@ -11,6 +11,7 @@ import MJRefresh
 class ShowRoomListVC: ShowBaseViewController {
 
     private var roomListView: ShowRoomListView!
+    private var roomList: [ShowRoomListModel]?
     
     override func preferredNavigationBarHidden() -> Bool {
         return true
@@ -86,6 +87,7 @@ class ShowRoomListVC: ShowBaseViewController {
         AppContext.showServiceImp.getRoomList(page: 1) { [weak self] error, roomList in
             if let list = roomList {
                 self?.roomListView.roomList = list
+                self?.roomList = list
             }
             self?.roomListView.collectionView.mj_header?.endRefreshing()
         }
