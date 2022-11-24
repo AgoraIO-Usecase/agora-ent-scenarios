@@ -6,13 +6,13 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.voice.bean.SoundAudioBean
+import io.agora.scene.voice.general.net.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.network.tools.VRValueCallBack
 
 /**
  * @author create by zhangwei03
