@@ -15,6 +15,8 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
 
     private var roomId: String?
     
+    var agreeApply:((VRRoomMic) -> Void)?
+    
     lazy var empty: VREmptyView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 360), title: "No one raised hands yet", image: nil).backgroundColor(.white)
 
     public convenience init(roomId: String) {
@@ -84,6 +86,9 @@ extension VoiceRoomApplyUsersViewController {
         guard let user1 = user?.member else { return }
         ChatRoomServiceImp.getSharedInstance().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: { error,mic  in
             SVProgressHUD.dismiss()
+            if self.agreeApply != nil,let mic = mic {
+                self.agreeApply!(mic)
+            }
             self.tableView.reloadData()
             if error == nil {
                 self.view.makeToast("Agree success!".localized())
