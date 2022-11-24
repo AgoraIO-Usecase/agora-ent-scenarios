@@ -187,12 +187,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         }
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
-            roomLivingViewModel.init();
-
-        });
-        if (roomLivingViewModel.isRoomOwner()) {
+            // TODO workaround 先强制申请权限， 避免首次安装无声
+            toggleAudioRun = () -> roomLivingViewModel.init();
             requestRecordPermission();
-        }
+        });
 
         if (!TextUtils.isEmpty(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption())) {
             setPlayerBgFromMsg(Integer.parseInt(roomLivingViewModel.roomInfoLiveData.getValue().getBgOption()));
@@ -334,6 +332,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().lrcControlView.onMemberJoinedChorus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PLAYING) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
+                getBinding().lrcControlView.getPitchView().updateLocalPitch(0);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
@@ -634,6 +633,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private Runnable toggleVideoRun;
+    private Runnable toggleAudioRun;
 
     //开启 关闭摄像头
     private void toggleSelfVideo(boolean isOpen) {
@@ -647,12 +647,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             toggleVideoRun.run();
             toggleVideoRun = null;
         }
-        // TODO ?
-//        VLRoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
-//        if (seatLocal != null && seatLocal.isSelfMuted() == 0) {
-//            RTCManager.getInstance().getRtcEngine().disableAudio();
-//            RTCManager.getInstance().getRtcEngine().enableAudio();
-//        }
+        if (toggleAudioRun != null) {
+            toggleAudioRun.run();
+            toggleAudioRun = null;
+        }
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {

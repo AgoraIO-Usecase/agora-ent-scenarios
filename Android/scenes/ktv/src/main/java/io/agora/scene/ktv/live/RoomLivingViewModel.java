@@ -175,18 +175,20 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void release() {
         streamId = 0;
-        mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
-        mRtcEngine.leaveChannel();
-        mPlayer.stop();
         if (mPlayer != null) {
+            mPlayer.stop();
             mPlayer.destroy();
             mPlayer = null;
         }
+
         if (iAgoraMusicContentCenter != null) {
             IAgoraMusicContentCenter.destroy();
             iAgoraMusicContentCenter = null;
         }
+
         if (mRtcEngine != null) {
+            mRtcEngine.enableInEarMonitoring(false, Constants.EAR_MONITORING_FILTER_NONE);
+            mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
         }
@@ -366,24 +368,9 @@ public class RoomLivingViewModel extends ViewModel {
                         getSongChosenList();
                     } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getUserNo())) {
                         //推送切歌逻辑
-                        // val bean2 = RTMMessageBean()
-                        // bean2.headUrl = UserManager.getInstance().user.headUrl
-                        // bean2.messageType = KtvConstant.MESSAGE_ROOM_TYPE_SWITCH_SONGS
-                        // bean2.roomNo = agoraRoom.roomNo
-                        // bean2.userNo = UserManager.getInstance().user.userNo
-                        // RTMManager.getInstance().sendMessage(gson.toJson(bean2))
-                        // getSongOrdersList(true)
                     }
                 } else if (roomSeatModel.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
                     // 被房主下麦克的合唱者
-                    // RoomManager.getInstance().mMusicModel.isChorus = false;
-                    // RoomManager.getInstance().mMusicModel.user1Id = ""
-                    // RoomManager.getInstance().mMusicModel.type =
-                    //         MemberMusicModel.SingType.Single
-                    // getISingleCallback().onSingleCallback(
-                    //         KtvConstant.CALLBACK_TYPE_ROOM_SEAT_CHANGE,
-                    //         null
-                    // );
                 }
             }
             return null;
