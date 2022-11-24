@@ -8,9 +8,15 @@
 import UIKit
 
 class NetworkManager {
-    enum AgoraTokenType: Int {
+    public enum TokenGeneratorType: Int {
+        case token006 = 0
+        case token007 = 1
+    }
+    
+    public enum AgoraTokenType: Int {
         case rtc = 1
         case rtm = 2
+        case chat = 3
     }
 
     enum HTTPMethods: String {
@@ -38,58 +44,43 @@ class NetworkManager {
     static let shared = NetworkManager()
     private init() {}
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-
-    func generateRTCToken(channelName: String,
-                          uid: String,
-                          success: @escaping (String?) -> Void)
-    {
-        generateToken(channelName: channelName,
-                      uid: uid,
-                      type: .rtc,
-                      success: success)
-    }
-
-    func generateRTMToken(channelName: String,
-                          uid: String,
-                          success: @escaping (String?) -> Void)
-    {
-        generateToken(channelName: channelName,
-                      uid: uid,
-                      type: .rtm,
-                      success: success)
-    }
-
-    /// get rtc token & rtmtoken
+    
+    /// get tokens
     /// - Parameters:
     ///   - channelName: <#channelName description#>
     ///   - uid: <#uid description#>
-    ///   - success: {"rtc token", "rtm token"}
-    func generateAllToken(channelName: String,
-                          uid: String,
-                          success: @escaping (String?, String?) -> Void)
+    ///   - tokenGeneratorType: token types
+    ///   - tokenTypes: [token type :  token string]
+    func generateTokens(channelName: String,
+                        uid: String,
+                        tokenGeneratorType: TokenGeneratorType,
+                        tokenTypes: [AgoraTokenType],
+                        success: @escaping ([Int: String]) -> Void)
     {
         let group = DispatchGroup()
-        var token: (String?, String?) = (nil, nil)
-        group.enter()
-        generateRTMToken(channelName: channelName,
-                         uid: uid) { rtmToken in
-            token.1 = rtmToken
-            group.leave()
-        }
-        group.enter()
-        generateRTCToken(channelName: channelName,
-                         uid: uid) { rtcToken in
-            token.0 = rtcToken
-            group.leave()
+        var tokenMap: [Int: String] = [Int:String]()
+        
+        tokenTypes.forEach { type in
+            group.enter()
+            generateToken(channelName: channelName,
+                          uid: uid,
+                          tokenType: tokenGeneratorType,
+                          type: type) { token in
+                if let token = token, token.count > 0 {
+                    tokenMap[type.rawValue] = token
+                }
+                group.leave()
+            }
         }
 
         group.notify(queue: DispatchQueue.main) {
-            success(token.0, token.1)
+            success(tokenMap)
         }
     }
 
     func generateToken(channelName: String,
                        uid: String,
+                       tokenType: TokenGeneratorType,
                        type: AgoraTokenType,
                        success: @escaping (String?) -> Void)
     {
@@ -100,23 +91,76 @@ class NetworkManager {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
-                      "expire": 900,
+                      "expire": 1500,
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/token006/generate", params: params, success: { response in
+//        ToastView.showWait(text: "loading...", view: nil)
+        let url = tokenType == .token006 ?
+        "https://toolbox.bj2.agoralab.co/v1/token006/generate"
+        : "https://toolbox.bj2.agoralab.co/v1/token/generate"
+        NetworkManager.shared.postRequest(urlString: url,
+                                          params: params,
+                                          success: { response in
             let data = response["data"] as? [String: String]
             let token = data?["token"]
-            KeyCenter.Token = token
             print(response)
             success(token)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil)
-            ToastView.hidden()
+//            ToastView.hidden()
+        })
+    }
+    
+    
+    /// generator easemob im token & uid
+    /// - Parameters:
+    ///   - channelName: <#channelName description#>
+    ///   - nickName: <#nickName description#>
+    ///   - password: <#password description#>
+    ///   - uid: <#uid description#>
+    ///   - success: success description {roomid, uid}
+    func generateIMConfig(channelName: String,
+                          nickName: String,
+                          password: String,
+                          uid: String,
+                          success: @escaping (String?, String?) -> Void) {
+        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
+            success(nil, nil)
+            return
+        }
+        let chatParams = [
+            "name": channelName,
+            "description": "test",
+            "owner": uid,
+        ]
+        let userParams = [
+            "username": uid,
+            "password": password,
+            "nickname": nickName,
+        ]
+        let params = ["appId": KeyCenter.AppId,
+                      "chat": chatParams,
+                      "src": "iOS",
+                      "traceId": NSString.withUUID().md5,
+                      "user": userParams] as [String: Any]
+//        ToastView.showWait(text: "loading...", view: nil)
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
+                                          params: params,
+                                          success: { response in
+            let data = response["data"] as? [String: String]
+            let roomId = data?["chatId"]
+            let userName = data?["userName"]
+            print(response)
+            success(roomId, userName)
+//            ToastView.hidden()
+        }, failure: { error in
+            print(error)
+            success(nil, nil)
+//            ToastView.hidden()
         })
     }
 
@@ -175,7 +219,8 @@ class NetworkManager {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         if method == .POST {
-            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [], options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
+            request.httpBody = try? JSONSerialization.data(withJSONObject: params ?? [],
+                                                           options: .sortedKeys) // convertParams(params: params).data(using: .utf8)
         }
         let curl = request.cURL(pretty: true)
         debugPrint("curl == \(curl)")

@@ -36,8 +36,12 @@ import Foundation
         return KeyCenter.Certificate
     }
 
-    @objc func appToken() -> String? {
-        return KeyCenter.Token
+    @objc func appRtcToken() -> String? {
+        return VLUserCenter.user.agoraRTCToken
+    }
+    
+    @objc func appRtmToken() -> String? {
+        return VLUserCenter.user.agoraRTMToken
     }
 
     @objc func appHostUrl() -> String {

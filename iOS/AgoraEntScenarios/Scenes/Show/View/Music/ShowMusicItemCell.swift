@@ -16,13 +16,6 @@ import UIKit
     // 选中标识
     fileprivate var indicatorImgView: UIImageView!
     
-    override var isSelected: Bool {
-        didSet{
-            indicatorImgView.isHidden = !isSelected
-            nameLabel.textColor = isSelected ? .show_main_text : .show_beauty_deselect
-        }
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -47,7 +40,7 @@ import UIKit
         
         // 图
         imageView = UIImageView()
-        imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
+//        imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
         contentView.addSubview(imageView)
         
         // 蒙版
@@ -85,9 +78,11 @@ import UIKit
         }
     }
     
-    func setImage(_ image: String, name: String) {
+     func setImage(_ image: String, name: String, isSelected: Bool = false) {
         imageView.image = UIImage.show_sceneImage(name: image)
         nameLabel.text = name
+        indicatorImgView.isHidden = !isSelected
+        nameLabel.textColor = isSelected ? .show_main_text : .show_beauty_deselect
     }
 }
 

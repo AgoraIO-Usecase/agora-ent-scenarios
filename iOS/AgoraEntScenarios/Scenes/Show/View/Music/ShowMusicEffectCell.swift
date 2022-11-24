@@ -7,12 +7,12 @@
 
 import UIKit
 
-//private let ImageTopItemCellID = "ImageTopItemCellID"
-//private let ImageBackgroudItemCellID = "ImageBackgroudItemCellID"
-//private let ImageOnlyItemCellID = "ImageOnlyItemCellID"
-
 
 class ShowMusicEffectCell: UITableViewCell {
+    
+    typealias ShowMusicEffectCellSelectAction = ((_ index: Int)->())
+    
+    private var selectAction: ShowMusicEffectCellSelectAction?
     
     enum LayoutStyle: String {
         case imageTop   // 图片在上
@@ -20,10 +20,18 @@ class ShowMusicEffectCell: UITableViewCell {
         case imageOnly  // 只有图片
     }
     
-    struct CellData {
+    class CellData {
         let image: String
         let title: String
         let style: LayoutStyle
+        var isSelected: Bool
+        
+        init(image: String, title: String, style: LayoutStyle, isSelected: Bool) {
+            self.image = image
+            self.title = title
+            self.style = style
+            self.isSelected = isSelected
+        }
     }
     
     private lazy var titleLabel: UILabel = {
@@ -79,11 +87,11 @@ class ShowMusicEffectCell: UITableViewCell {
         }
     }
     
-    func setTitle(_ title: String, dataArray: [CellData], defaultSelectIndex: Int) {
+    func setTitle(_ title: String, dataArray: [CellData], selectAction: @escaping ShowMusicEffectCellSelectAction) {
         titleLabel.text = title
         self.dataArray = dataArray
         collectionView.reloadData()
-        collectionView.selectItem(at: IndexPath(item: defaultSelectIndex, section: 0), animated: true, scrollPosition: .left)
+        self.selectAction = selectAction
     }
 }
 
@@ -97,7 +105,11 @@ extension ShowMusicEffectCell: UICollectionViewDelegateFlowLayout, UICollectionV
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let item = dataArray[indexPath.item]
         let cell: ShowMusicItemCell = collectionView.dequeueReusableCell(withReuseIdentifier: item.style.rawValue, for: indexPath) as! ShowMusicItemCell
-        cell.setImage(item.image, name: item.title)
+        cell.setImage(item.image, name: item.title, isSelected: item.isSelected)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        selectAction?(indexPath.item)
     }
 }

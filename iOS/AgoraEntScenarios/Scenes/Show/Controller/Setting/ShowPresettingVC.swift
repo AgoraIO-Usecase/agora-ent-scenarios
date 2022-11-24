@@ -14,6 +14,14 @@ private let ShowPresettingCellID = "ShowPresettingCellID"
 class ShowPresettingVC: UIViewController {
     
     var didSelectedIndex: ((_ index: Int)->())?
+    
+    private var selectedModel: ShowPresettingModel? {
+        didSet {
+            oldValue?.isSelected = false
+            selectedModel?.isSelected = true
+        }
+    }
+    
     private var dataArray: [ShowPresettingModel] = {
         let model1 = ShowPresettingModel(title: "预设1", desc: "倒垃圾来得及啊了解到拉进来的房间法律监督福利卡冷冻机房垃圾袋发来得及垃圾房间来得及发动机法拉三等奖爱讲道理")
         let model2 = ShowPresettingModel(title: "预设2", desc: "倒垃圾来得及啊理解多拉点了法兰蝶阀拉杜拉拉的发放的拉链都发了法拉第发令肌肤垃圾袋拉进来的房间爱劳动快乐")
@@ -25,11 +33,13 @@ class ShowPresettingVC: UIViewController {
         return headerView
     }()
     
+    /*
     private lazy var segmentControl: UISegmentedControl = {
         let segmentCtrl = UISegmentedControl(items: ["show_advance_setting_presetting_mode_0".show_localized,"show_advance_setting_presetting_mode_1".show_localized])
         segmentCtrl.selectedSegmentIndex = 0
         return segmentCtrl
     }()
+     */
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -45,7 +55,7 @@ class ShowPresettingVC: UIViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        modalPresentationStyle = .overCurrentContext
+        modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
     }
     
@@ -86,6 +96,7 @@ class ShowPresettingVC: UIViewController {
             make.height.equalTo(42)
         }
         
+        /*
         view.addSubview(segmentControl)
         segmentControl.snp.makeConstraints { make in
             make.left.equalTo(15)
@@ -93,11 +104,12 @@ class ShowPresettingVC: UIViewController {
             make.right.equalTo(-15)
             make.height.equalTo(42)
         }
+         */
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            make.top.equalTo(segmentControl.snp.bottom)
+            make.top.equalTo(headerView.snp.bottom)
         }
     }
     
@@ -128,8 +140,7 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let model = dataArray[indexPath.row]
-        model.isSelected = true
+        selectedModel = dataArray[indexPath.row]
         tableView.reloadData()
         didSelectedIndex?(indexPath.row)
 //        dismiss(animated: true)

@@ -13,6 +13,15 @@ private let imgViewHeight: CGFloat = 32
 
 class ShowRoomInfoView: UIView {
     
+    private var startTime: Int64!
+    
+    private lazy var timer: Timer = {
+        let timer = Timer.scheduledTimer(withTimeInterval: 1, block: {[weak self] t in
+            self?.updateTime()
+        }, repeats: true)
+        return timer
+    }()
+    
     // 背景
     private lazy var bgView: UIView = {
         let view = UIView()
@@ -58,6 +67,11 @@ class ShowRoomInfoView: UIView {
         return label
     }()
     
+    deinit {
+        print("------ShowRoomInfoView ----- 销毁-----")
+//        timer.invalidate()
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -102,15 +116,29 @@ class ShowRoomInfoView: UIView {
         }
     }
     
-    func setRoomInfo(avatar: String?, name: String?, id: String?, time: String?) {
+    func setRoomInfo(avatar: String?, name: String?, id: String?, time: Int64?) {
         headImgView.sd_setImage(with: URL(string: avatar ?? ""))
         nameLabel.text = name
         idLabel.text = id
+        if let startTime = time {
+            self.startTime = startTime
+            updateTime()
+            timer.fire()
+        }
+    }
+    
+    private func updateTime(){
         let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_live_duration")!)
         attachment.bounds = CGRect(x: -4, y: 0, width: 6, height: 6)
-        let attriTipsImg = NSAttributedString(attachment: attachment)
-        let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
-        attriTips.append(NSAttributedString(string: " 00:00:00"))
-        timeLabel.attributedText = attriTips
+        let attriImg = NSAttributedString(attachment: attachment)
+        let attriText = NSMutableAttributedString(attributedString: attriImg)
+        let duration = Int64(Date().timeIntervalSince1970) - startTime / 1000
+        let seconds = duration % 60
+        let minutes = duration / 60 % 60
+        let hours = duration / 3600
+        let durationStr = String(format: " %02d:%02d:%02d", hours, minutes, seconds)
+        attriText.append(NSAttributedString(string: durationStr))
+        timeLabel.attributedText = attriText
+        
     }
 }
