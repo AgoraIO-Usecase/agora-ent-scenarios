@@ -1585,6 +1585,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if (lyricUrl == null) {
                     Log.e(TAG, "iAgoraMusicContentCenter.onLyricResult lyricUrl is null");
                     ToastUtils.showToast("lyricUrl is null");
+                    playerMusicLrcDataLiveData.postValue(null);
                     preloadMusic(isOwnSong, isChorus, music);
                     return;
                 }

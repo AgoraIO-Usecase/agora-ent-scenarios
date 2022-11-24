@@ -163,4 +163,6 @@
 
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
 
+    <string name="no_lrc">暂无歌词 </string>
+
 </resources>

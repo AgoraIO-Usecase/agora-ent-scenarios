@@ -23,7 +23,7 @@
     <io.agora.lyrics_view.LrcView
         android:id="@+id/lrcView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="100dp"
         android:background="#00000000"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
@@ -41,7 +41,7 @@
     <View
         android:id="@+id/bgd_control_layout_lrc"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="60dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
 
