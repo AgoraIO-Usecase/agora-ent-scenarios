@@ -58,6 +58,10 @@
 }
 
 - (void)createBtnAction:(VLAddRoomModel *)roomModel {  //房主创建
+    if (roomModel.isPrivate && roomModel.password.length != 4) {
+        return;
+    }
+    
     KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
