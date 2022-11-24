@@ -232,6 +232,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
 
+    func fetchApplicantsList(completion: @escaping (Error?, [VoiceRoomApply]?) -> Void) {
+        completion(nil,self.applicants)
+    }
     
     func forbidMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {

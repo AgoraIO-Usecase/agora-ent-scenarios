@@ -66,8 +66,12 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
 
 extension VoiceRoomApplyUsersViewController {
     @objc func refresh() {
-        self.perform(#selector(refreshEnd), afterDelay: 1)
-        self.empty.isHidden = ChatRoomServiceImp.getSharedInstance().applicants.count  > 0
+        ChatRoomServiceImp.getSharedInstance().fetchApplicantsList { error, applicants in
+            self.refreshEnd()
+            if error == nil,let datas = applicants {
+                self.empty.isHidden = datas.count > 0
+            }
+        }
     }
     
     @objc func refreshEnd() {
