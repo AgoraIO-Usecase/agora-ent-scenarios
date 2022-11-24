@@ -242,17 +242,6 @@ extension VoiceRoomViewController {
                 self.roomInfo = info
             }
         }
-//        guard let room_id = roomInfo?.room?.room_id else { return }
-//        ChatRoomServiceImp.getSharedInstance().fetchGiftContribute(room_id) {[weak self] error, list in
-//            if error == nil {
-//                guard let list = list else { return }
-//                let info = self?.roomInfo
-//                info?.room?.ranking_list = list
-//                self?.roomInfo = info
-//            } else {
-//                self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
-//            }
-//        }
     }
 
     func layoutUI() {
@@ -672,6 +661,8 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, micMap in
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
+                self.roomInfo?.mic_info?[from] = old_mic
+                self.roomInfo?.mic_info?[to] = new_mic
                 self.rtcView.updateUser(old_mic)
                 self.rtcView.updateUser(new_mic)
             } else {
