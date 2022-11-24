@@ -34,12 +34,6 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    weak var videoFrameDelegate: AgoraVideoFrameDelegate? {
-        didSet {
-            agoraKit.setVideoFrameDelegate(videoFrameDelegate)
-        }
-    }
-    
     override init() {
         super.init()
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
@@ -50,7 +44,7 @@ class ShowAgoraKitManager: NSObject {
     func startPreview(canvasView: UIView) {
         agoraKit?.setClientRole(.broadcaster)
         agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
-//        agoraKit?.setVideoFrameDelegate(self)
+        agoraKit?.setVideoFrameDelegate(self)
         let canvas = AgoraRtcVideoCanvas()
         canvas.renderMode = .hidden
         canvas.mirrorMode = .disabled
@@ -90,13 +84,13 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.setClientRole(role, options: roleOptions)
         agoraKit?.enableVideo()
         
-        let ret = agoraKit?.joinChannel(byToken: nil, channelId: channelName, info: nil, uid: uid)
         let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
         canvas.renderMode = .hidden
         if role == .broadcaster {
             canvas.uid = uid
             canvas.mirrorMode = .disabled
+            agoraKit?.setVideoFrameDelegate(self)
             agoraKit.setDefaultAudioRouteToSpeakerphone(true)
             agoraKit.enableAudio()
             agoraKit.setupLocalVideo(canvas)
@@ -105,8 +99,35 @@ class ShowAgoraKitManager: NSObject {
             canvas.uid = UInt(ownerId) ?? 0
             agoraKit.setupRemoteVideo(canvas)
         }
+        
+        let ret = agoraKit?.joinChannel(byToken: nil, channelId: channelName, info: nil, uid: uid)
         return ret
     }
     
 }
 
+
+extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
+    
+    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        return true
+    }
+    
+    func getVideoFormatPreference() -> AgoraVideoFormat {
+        .cvPixelBGRA
+    }
+    
+    func getVideoFrameProcessMode() -> AgoraVideoFrameProcessMode {
+        .readWrite
+    }
+    
+    func getMirrorApplied() -> Bool {
+        true
+    }
+    
+    func getRotationApplied() -> Bool {
+        false
+    }
+    
+}

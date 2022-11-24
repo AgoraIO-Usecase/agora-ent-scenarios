@@ -23,7 +23,6 @@ class ShowCreateLiveVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
         agoraKitManager.startPreview(canvasView: localView)
-        agoraKitManager.agoraKit.setVideoFrameDelegate(self)
         configNaviBar()
     }
     
@@ -148,27 +147,4 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
     }
 
-}
-
-extension ShowCreateLiveVC: AgoraVideoFrameDelegate {
-    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-        return true
-    }
-    
-    func getVideoFormatPreference() -> AgoraVideoFormat {
-        .cvPixelBGRA
-    }
-    
-    func getVideoFrameProcessMode() -> AgoraVideoFrameProcessMode {
-        .readWrite
-    }
-    
-    func getMirrorApplied() -> Bool {
-        true
-    }
-    
-    func getRotationApplied() -> Bool {
-        false
-    }
 }

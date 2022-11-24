@@ -118,29 +118,6 @@ class ShowLiveViewController: UIViewController {
     
 }
 
-extension ShowLiveViewController: AgoraVideoFrameDelegate {
-    func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-        return true
-    }
-    
-    func getVideoFormatPreference() -> AgoraVideoFormat {
-        .cvPixelBGRA
-    }
-    
-    func getVideoFrameProcessMode() -> AgoraVideoFrameProcessMode {
-        .readWrite
-    }
-    
-    func getMirrorApplied() -> Bool {
-        true
-    }
-    
-    func getRotationApplied() -> Bool {
-        false
-    }
-}
-
 
 extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
