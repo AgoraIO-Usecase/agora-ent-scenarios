@@ -617,6 +617,7 @@ extension VoiceRoomViewController {
             if error == nil,let mic = mic {
                 self.rtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
+                self.local_index = nil
             }
         }
         
@@ -715,7 +716,10 @@ extension VoiceRoomViewController {
 
     func agreeInvite() {
         ChatRoomServiceImp.getSharedInstance().acceptMicSeatInvitation(completion: { error, mic in
-                
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
+                self.local_index = mic.mic_index
+            }
         })
     }
 
