@@ -26,7 +26,7 @@ class ShowRoomLiveView: UIView {
             bottomBar.delegate = delegate
         }
     }
-    var canvasView: UIView = UIView()
+    lazy var canvasView = ShowCanvasView()
     
     private var chatArray = [ShowChatModel]()
     
