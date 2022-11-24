@@ -155,7 +155,9 @@ extension VoiceRoomViewController {
                                 if let info = self.roomInfo {
                                     info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                                     self.roomInfo = info
+                                    ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
                                 }
+                                
                             } else {
                                 
                             }
