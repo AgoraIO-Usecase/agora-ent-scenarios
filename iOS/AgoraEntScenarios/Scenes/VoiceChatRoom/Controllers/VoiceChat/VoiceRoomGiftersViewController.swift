@@ -75,13 +75,6 @@ extension VoiceRoomGiftersViewController {
                 }
             }
         }
-//        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchGiftContribute(roomId: room_id), params: [:], classType: VoiceRoomContributions.self) { contributions, error in
-//            self.tableView.refreshControl?.endRefreshing()
-//            if error == nil, contributions != nil, contributions?.ranking_list?.count ?? 0 > 0 {
-//                self.dataSource = contributions!
-//                self.tableView.reloadData()
-//            }
-//        }
     }
 }
 

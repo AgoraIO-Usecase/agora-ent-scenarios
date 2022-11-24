@@ -30,6 +30,10 @@ public final class VRCreateRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    deinit {
+        SVProgressHUD.dismiss()
+    }
 }
 
 extension VRCreateRoomViewController {
