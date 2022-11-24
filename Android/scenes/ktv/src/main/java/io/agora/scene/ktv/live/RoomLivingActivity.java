@@ -131,6 +131,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                     if (item.isMaster() && position == 0) {
                         binding.tvRoomOwner.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.tvRoomOwner.setVisibility(View.GONE);
                     }
 
                     // microphone
