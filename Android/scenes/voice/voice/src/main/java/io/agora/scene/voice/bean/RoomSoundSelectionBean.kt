@@ -3,6 +3,9 @@ package io.agora.scene.voice.bean
 import androidx.annotation.DrawableRes
 import io.agora.voice.buddy.config.ConfigConstants
 
+/**
+ * 最佳音效介绍
+ */
 data class SoundSelectionBean constructor(
     val soundSelectionType: Int = ConfigConstants.SoundSelection.Social_Chat,
     val index: Int = 0,

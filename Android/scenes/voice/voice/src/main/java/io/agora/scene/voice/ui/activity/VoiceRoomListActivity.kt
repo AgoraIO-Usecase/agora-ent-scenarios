@@ -83,8 +83,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         })
         binding.avatarLayout.isVisible = false
         binding.avatarLayout.setOnClickListener {
-            if (FastClickTools.isFastClick(it)) return@setOnClickListener
-            startActivity(Intent(this@VoiceRoomListActivity, ChatroomProfileActivity::class.java))
         }
     }
 
