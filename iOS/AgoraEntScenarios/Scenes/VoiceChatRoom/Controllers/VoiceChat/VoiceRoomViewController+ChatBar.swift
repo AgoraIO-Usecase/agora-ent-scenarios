@@ -127,7 +127,7 @@ extension VoiceRoomViewController {
     func sendGift(gift: VoiceRoomGiftEntity) {
         gift.userName = VoiceRoomUserInfo.shared.user?.name ?? ""
         gift.portrait = VoiceRoomUserInfo.shared.user?.portrait ?? userAvatar
-        if let chatroom_id = roomInfo?.room?.chatroom_id, let uid = roomInfo?.room?.owner?.uid, let id = gift.gift_id, let name = gift.gift_name, let value = gift.gift_price, let count = gift.gift_count {
+        if let chatroom_id = roomInfo?.room?.chatroom_id, let id = gift.gift_id, let name = gift.gift_name, let value = gift.gift_price, let count = gift.gift_count {
             VoiceRoomIMManager.shared?.sendCustomMessage(roomId: chatroom_id, event: VoiceRoomGift, customExt: ["gift_id": id, "gift_name": name, "gift_price": value, "gift_count": count, "userName": VoiceRoomUserInfo.shared.user?.name ?? "", "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? self.userAvatar], completion: { [weak self] message, error in
                 guard let self = self else { return }
                 if error == nil, message != nil {
@@ -147,7 +147,13 @@ extension VoiceRoomViewController {
                         amount += c * v
                         VoiceRoomUserInfo.shared.user?.amount = amount
                     }
-                    self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
+                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? ""
+                    })
+                    if ranker == nil {
+                        self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
+                    } else {
+                        ranker?.amount = VoiceRoomUserInfo.shared.user?.amount
+                    }
                     VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["ranking_list":self.roomInfo?.room?.ranking_list?.kj.JSONString() ?? ""], completion: { error in
                         if error != nil {
                             self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
