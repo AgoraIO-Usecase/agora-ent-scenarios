@@ -102,10 +102,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         }
     }
     
-//    func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-//        updateMic(attributeMap, fromId: fromId)
-//    }
-    
     func onUserLeftRoom(roomId: String, userName: String) {
         let info = roomInfo
         let count: Int = info?.room?.member_count ?? 0

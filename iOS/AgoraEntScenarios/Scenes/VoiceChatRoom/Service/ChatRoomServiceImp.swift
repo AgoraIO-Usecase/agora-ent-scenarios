@@ -641,7 +641,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     if isOwner {
                         SyncUtil.scene(id: roomId)?.deleteScenes()
                         self.roomList?.remove(at: index)
-                        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+                        VoiceRoomIMManager.shared?.userDestroyedChatroom()
                     } else {
                         let updateRoom: VRRoomEntity = room
                         updateRoom.member_count = updateRoom.member_count ?? 0 - 1
