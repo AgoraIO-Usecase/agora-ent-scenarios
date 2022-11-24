@@ -110,8 +110,8 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
             } else { // 有人
                 binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 ivMicInnerIcon.isVisible = false
-                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.userAvatar)
-                mtMicUsername.text = micInfo.userInfo?.username ?: ""
+                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.portrait)
+                mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag
 //                when (micInfo.micStatus) {
 //                    MicStatus.Mute,

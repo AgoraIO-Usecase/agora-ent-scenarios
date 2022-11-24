@@ -4,7 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
-import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
+import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.voice.buddy.tool.GsonTools
@@ -109,12 +109,12 @@ class VoiceSyncManagerServiceImp(
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-            uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
             micIndex = 0
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
         // 2、置换token,获取im 配置，创建房间需要这里的数据
-        VRToolboxServerHttpManager.get().requestToolboxService(
+        VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = inputModel.roomName,
             completion = { error, chatroomId ->
@@ -129,7 +129,7 @@ class VoiceSyncManagerServiceImp(
                 initScene {
                     val scene = Scene()
                     scene.id = voiceRoomModel.roomId
-                    scene.userId = owner.uid
+                    scene.userId = owner.userId
                     scene.property = GsonTools.beanToMap(voiceRoomModel)
                     Sync.Instance().createScene(scene, object : Sync.Callback {
                         override fun onSuccess() {
@@ -190,7 +190,7 @@ class VoiceSyncManagerServiceImp(
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
-        if (TextUtils.equals(cacheRoom.owner?.uid, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+        if (TextUtils.equals(cacheRoom.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
             // 移除房间
             mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
@@ -254,9 +254,9 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 举手列表
+     * 申请列表
      */
-    override fun fetchRaisedList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
+    override fun fetchApplicantsList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
        var raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
         if (raisedList != null && raisedList.size > 0){
             completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
