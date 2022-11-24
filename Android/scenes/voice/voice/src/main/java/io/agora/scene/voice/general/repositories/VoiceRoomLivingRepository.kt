@@ -126,12 +126,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 本地禁麦
      */
-    fun muteLocal(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun muteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.muteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -144,12 +144,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 取消本地禁麦
      */
-    fun unMuteLocal(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun unMuteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unMuteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -160,12 +160,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 下麦
-    fun leaveMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun leaveMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.leaveMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -176,12 +176,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 禁言指定麦位
-    fun forbidMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun forbidMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.forbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -192,12 +192,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 取消指定麦位禁言
-    fun unForbidMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun unForbidMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unForbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData( result))
                     } else {
                         callBack.onError(error)
                     }
@@ -208,12 +208,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 踢用户下麦
-    fun kickOff(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -240,12 +240,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 锁麦
-    fun lockMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun lockMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.lockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -256,12 +256,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 取消锁麦
-    fun unLockMic(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun unLockMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unLockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -288,12 +288,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(result))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -304,12 +304,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 换麦
-    fun changeMic(oldIndex: Int,newIndex:Int): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.changeMic(oldIndex,newIndex, completion = { error, result ->
+    fun changeMic(oldIndex: Int, newIndex: Int): LiveData<Resource<Map<Int,VoiceMicInfoModel>>> {
+        val resource = object : NetworkOnlyResource<Map<Int,VoiceMicInfoModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Map<Int,VoiceMicInfoModel>>>) {
+                voiceServiceProtocol.changeMic(oldIndex, newIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(result))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -320,12 +320,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 接受邀请
-    fun acceptMicSeatInvitation(): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.acceptMicSeatInvitation( completion = { error, result ->
+    fun acceptMicSeatInvitation(): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
+                voiceServiceProtocol.acceptMicSeatInvitation(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(result))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -339,7 +339,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun fetchGiftContribute(): LiveData<Resource<List<VoiceRankUserModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
-                voiceServiceProtocol.fetchGiftContribute( completion = { error, result ->
+                voiceServiceProtocol.fetchGiftContribute(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -355,9 +355,25 @@ class VoiceRoomLivingRepository : BaseRepository() {
     fun fetchRoomMembers(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                voiceServiceProtocol.fetchRoomMembers( completion = { error, result ->
+                voiceServiceProtocol.fetchRoomMembers(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    // 获取申请列表
+    fun fetchApplicantsList(): LiveData<Resource<List<VoiceMemberModel>>> {
+        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
+                voiceServiceProtocol.fetchApplicantsList(completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result.toList()))
                     } else {
                         callBack.onError(error)
                     }
