@@ -10,6 +10,9 @@ import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.scene.voice.general.livedatas.SingleSourceLiveData
 import io.agora.scene.voice.general.repositories.NetworkOnlyResource
 import io.agora.scene.voice.general.repositories.VoiceRoomLivingRepository
+import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRankUserModel
@@ -181,6 +184,18 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                     override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                         callBack.onSuccess(MutableLiveData(true))
+                        CustomMsgHelper.getInstance().sendSystemMsg(
+                            VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+                            VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack(){
+                                override fun onSuccess(message: ChatMessageData?) {
+                                    "sendSystemMsg onSuccess $message".logE()
+                                }
+
+                                override fun onError(messageId: String?, code: Int, error: String?) {
+                                    "sendSystemMsg onFail $code $error".logE()
+                                }
+                            }
+                        )
                     }
                 }.asLiveData())
             }, 200)

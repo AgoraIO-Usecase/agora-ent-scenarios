@@ -12,7 +12,6 @@ import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.voice.buddy.config.ConfigConstants
 import kotlin.collections.HashMap
 
 /**
