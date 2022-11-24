@@ -558,8 +558,10 @@ extension VoiceRoomViewController {
     // 禁言指定麦位
     func mute(with index: Int) {
 //        guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().forbidMic(mic_index: index) { error, flag in
-            
+        ChatRoomServiceImp.getSharedInstance().forbidMic(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
+            }
         }
     }
 
@@ -570,40 +572,50 @@ extension VoiceRoomViewController {
                 return
             }
         }
-        ChatRoomServiceImp.getSharedInstance().unForbidMic(mic_index: index) { error, flag in
-            if error == nil, flag == true {
+        ChatRoomServiceImp.getSharedInstance().unForbidMic(mic_index: index) { error, mic in
+            if error == nil {
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
+                if let mic = mic {
+                    self.rtcView.updateUser(mic)
+                }
             }
         }
     }
 
     // 踢用户下麦
     func kickoff(with index: Int) {
-        ChatRoomServiceImp.getSharedInstance().kickOff(mic_index: index) { error, flag in
-            
+        ChatRoomServiceImp.getSharedInstance().kickOff(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
+            }
         }
     }
 
     // 锁麦
     func lock(with index: Int) {
-        ChatRoomServiceImp.getSharedInstance().lockMic(mic_index: index) { error, flag in
-            
+        ChatRoomServiceImp.getSharedInstance().lockMic(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
+            }
         }
 
     }
 
     // 取消锁麦
     func unLock(with index: Int) {
-        ChatRoomServiceImp.getSharedInstance().unLockMic(mic_index: index) { Error, flag in
-            
+        ChatRoomServiceImp.getSharedInstance().unLockMic(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
+            }
         }
     }
 
     // 下麦
     func leaveMic(with index: Int) {
         chatBar.refresh(event: .mic, state: .selected, asCreator: false)
-        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, flag in
-            if error == nil {
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
+                self.rtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
             }
         }
@@ -613,31 +625,19 @@ extension VoiceRoomViewController {
 
     // mute自己
     func muteLocal(with index: Int) {
-        ChatRoomServiceImp.getSharedInstance().muteLocal(mic_index: index) { error, flag in
-            if error == nil {
+        ChatRoomServiceImp.getSharedInstance().muteLocal(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
+                self.rtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
-  //      guard let roomId = roomInfo?.room?.room_id else { return }
-//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .closeMic(roomId: roomId), params: ["mic_index": index]) { dic, error in
-//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
-//                    self.rtckit.muteLocalAudioStream(mute: true)
-//                } else {}
-//            } else {
-////                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
-//            }
-//        }
     }
 
     // unmute自己
     func unmuteLocal(with index: Int) {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-
         /**
          1.如果房主禁言了用户，用户没办法解除禁言
          2.如果客户mute了自己，房主没办法打开用户
@@ -649,25 +649,16 @@ extension VoiceRoomViewController {
             }
         }
         
-        ChatRoomServiceImp.getSharedInstance().unmuteLocal(mic_index: index) { error, flag in
-            if error == nil {
+        ChatRoomServiceImp.getSharedInstance().unmuteLocal(mic_index: index) { error, mic in
+            if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: false)
+                self.rtcView.updateUser(mic)
             } else {
                 
             }
         }
 
-//        VoiceRoomBusinessRequest.shared.sendDELETERequest(api: .cancelCloseMic(roomId: roomId, index: index), params: [:]) { dic, error in
-//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
-//                    self.rtckit.muteLocalAudioStream(mute: false)
-//                } else {}
-//            } else {
-////                self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
-//            }
-//        }
     }
 
     func changeMic(from: Int, to: Int) {
@@ -677,45 +668,18 @@ extension VoiceRoomViewController {
                 return
             }
         }
-        
-        ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, flag in
-            if error == nil {
+        ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, micMap in
+            if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
-                self.micExchange(from, to: to)
+                self.rtcView.updateUser(old_mic)
+                self.rtcView.updateUser(new_mic)
             } else {
                 
             }
         }
 
-//        guard let roomId = roomInfo?.room?.room_id else { return }
-//        let params: [String: Int] = [
-//            "from": from,
-//            "to": to,
-//        ]
-//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .exchangeMic(roomId: roomId), params: params) { dic, error in
-//            self.dismiss(animated: true)
-//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.local_index = to
-//                    self.micExchange(from, to: to)
-//                } else {}
-//            } else {}
-//        }
     }
 
-    func micExchange(_ from: Int, to: Int) {
-        // 立即更新麦位位置
-        guard let fromUser: VRRoomMic = roomInfo?.mic_info![from] else { return }
-        fromUser.mic_index = to
-
-        guard let toUser: VRRoomMic = roomInfo?.mic_info![to] else { return }
-        toUser.mic_index = from
-
-        roomInfo?.mic_info![from] = toUser
-        roomInfo?.mic_info![to] = fromUser
-        rtcView.updateUser(fromUser)
-        rtcView.updateUser(toUser)
-    }
 
     func showMuteView(with index: Int) {
         let isHairScreen = SwiftyFitsize.isFullScreen
