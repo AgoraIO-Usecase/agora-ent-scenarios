@@ -228,7 +228,6 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
-        //观众看到打分
         if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
             //audience use sync to update pitch value, main singer don't
             weakSelf.currentVoicePitch = score;
@@ -830,7 +829,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLLog(@"RTC media player stop");
 }
 
-- (void)requestOnSeatWithIndex:(NSInteger)index {
+- (void)enterSeatWithIndex:(NSInteger)index {
     
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
     inputModel.seatIndex = index;
@@ -1084,7 +1083,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             BOOL isOnSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
             if (!isOnSeat) {
                 //not yet seated
-                [self requestOnSeatWithIndex:seatIndex];
+                [self enterSeatWithIndex:seatIndex];
             }
         }
     }
