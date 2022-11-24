@@ -48,9 +48,7 @@ interface VoiceServiceProtocol {
      * 创建房间
      * @param inputModel 输入的房间信息
      */
-    fun createRoom(
-        inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit
-    )
+    fun createRoom(inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit)
 
     /**
      * 加入房间
