@@ -3,13 +3,6 @@
     package="io.agora.scene.voice">
 
     <application>
-
-        <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomSplashActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
-
         <activity
             android:name="io.agora.scene.voice.ui.activity.ChatroomLiveActivity"
             android:exported="false"
@@ -33,22 +26,11 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomProfileActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
-
-        <activity
             android:name="io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/voice_Theme.AgoraScenesChatroom" />
 
-        <activity
-            android:name="io.agora.scene.voice.ui.activity.ChatroomDisclaimerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
     </application>
 
 </manifest>

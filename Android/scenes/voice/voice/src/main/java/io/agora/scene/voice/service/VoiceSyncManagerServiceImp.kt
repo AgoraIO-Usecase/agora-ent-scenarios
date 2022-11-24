@@ -12,7 +12,6 @@ import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.voice.buddy.config.ConfigConstants
 import kotlin.collections.HashMap
 
 /**
@@ -110,7 +109,7 @@ class VoiceSyncManagerServiceImp(
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-            uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
             micIndex = 0
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
@@ -130,7 +129,7 @@ class VoiceSyncManagerServiceImp(
                 initScene {
                     val scene = Scene()
                     scene.id = voiceRoomModel.roomId
-                    scene.userId = owner.uid
+                    scene.userId = owner.userId
                     scene.property = GsonTools.beanToMap(voiceRoomModel)
                     Sync.Instance().createScene(scene, object : Sync.Callback {
                         override fun onSuccess() {
@@ -191,7 +190,7 @@ class VoiceSyncManagerServiceImp(
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
-        if (TextUtils.equals(cacheRoom.owner?.uid, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+        if (TextUtils.equals(cacheRoom.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
             // 移除房间
             mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
@@ -255,9 +254,9 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 举手列表
+     * 申请列表
      */
-    override fun fetchRaisedList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
+    override fun fetchApplicantsList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
        var raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
         if (raisedList != null && raisedList.size > 0){
             completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
