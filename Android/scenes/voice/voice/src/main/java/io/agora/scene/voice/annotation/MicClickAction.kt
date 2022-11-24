@@ -1,21 +1,22 @@
-package io.agora.secnceui.annotation
+package io.agora.scene.voice.annotation
 
 import androidx.annotation.IntDef
 
 /**
  * 麦位管理点击事件
  */
-@kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.SOURCE)
 @IntDef(
     MicClickAction.Invite,
-    MicClickAction.ForceMute,
-    MicClickAction.ForceUnMute,
+    MicClickAction.ForbidMic,
+    MicClickAction.UnForbidMic,
     MicClickAction.Mute,
     MicClickAction.UnMute,
     MicClickAction.Lock,
     MicClickAction.UnLock,
     MicClickAction.KickOff,
     MicClickAction.OffStage,
+    MicClickAction.Accept,
 )
 annotation class MicClickAction {
     companion object {
@@ -23,10 +24,10 @@ annotation class MicClickAction {
         const val Invite = 0
 
         // 禁言（房主操作）
-        const val ForceMute = 1
+        const val ForbidMic = 1
 
         // 取消禁言（房主操作）
-        const val ForceUnMute = 2
+        const val UnForbidMic = 2
 
         // 关麦（麦位用户操作包括房主操作自己）
         const val Mute = 3
@@ -45,5 +46,8 @@ annotation class MicClickAction {
 
         // 下麦（嘉宾操作）
         const val OffStage = 8
+
+        // 同意邀请/同意申请
+        const val Accept = 9
     }
 }

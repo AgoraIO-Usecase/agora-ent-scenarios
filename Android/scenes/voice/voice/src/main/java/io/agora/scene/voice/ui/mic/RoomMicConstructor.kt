@@ -7,7 +7,7 @@ import io.agora.scene.voice.bean.BotMicInfoBean
 import io.agora.scene.voice.bean.MicManagerBean
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.annotation.MicStatus
 
 internal object RoomMicConstructor {
@@ -88,7 +88,7 @@ internal object RoomMicConstructor {
                 } else {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForceMute),
+                        MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }
@@ -102,7 +102,7 @@ internal object RoomMicConstructor {
                 } else {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.ForceUnMute),
+                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }
@@ -112,13 +112,13 @@ internal object RoomMicConstructor {
                 if (micInfo.member == null) {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.ForceUnMute),
+                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 } else {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_kickoff), true, MicClickAction.KickOff),
-                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.ForceUnMute),
+                        MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
                         MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                     )
                 }
@@ -127,7 +127,7 @@ internal object RoomMicConstructor {
             MicStatus.Lock -> {
                 mutableListOf(
                     MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForceMute),
+                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
                     MicManagerBean(context.getString(R.string.voice_room_unblock), true, MicClickAction.UnLock)
                 )
             }
@@ -135,7 +135,7 @@ internal object RoomMicConstructor {
             MicStatus.LockForceMute -> {
                 mutableListOf(
                     MicManagerBean(context.getString(R.string.voice_room_invite), false, MicClickAction.Invite),
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.ForceUnMute),
+                    MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.UnForbidMic),
                     MicManagerBean(context.getString(R.string.voice_room_unblock), true, MicClickAction.UnLock)
                 )
             }
@@ -143,7 +143,7 @@ internal object RoomMicConstructor {
             MicStatus.Idle -> {
                 mutableListOf(
                     MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
-                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForceMute),
+                    MicManagerBean(context.getString(R.string.voice_room_mute), true, MicClickAction.ForbidMic),
                     MicManagerBean(context.getString(R.string.voice_room_block), true, MicClickAction.Lock)
                 )
             }
@@ -173,7 +173,7 @@ internal object RoomMicConstructor {
             // 有⼈-禁麦（被房主强制静音）
             MicStatus.ForceMute -> {
                 mutableListOf(
-                    MicManagerBean(context.getString(R.string.voice_room_unmute), false, MicClickAction.ForceUnMute),
+                    MicManagerBean(context.getString(R.string.voice_room_unmute), false, MicClickAction.UnForbidMic),
                     MicManagerBean(context.getString(R.string.voice_room_off_stage), true, MicClickAction.OffStage)
                 )
             }

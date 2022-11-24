@@ -4,7 +4,7 @@ import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceItemRoom2dMicBinding
 import io.agora.scene.voice.service.VoiceMicInfoModel
@@ -24,85 +24,6 @@ class Room2DMicAdapter constructor(
         layoutParams.width = size
         holder.mBinding.root.layoutParams = layoutParams
         super.onBindViewHolder(holder, position)
-    }
-
-    fun updateMicStatusByAction(micIndex: Int, @MicClickAction action: Int) {
-        if (micIndex >= dataList.size) return
-        val micInfo = dataList[micIndex]
-        when (action) {
-            MicClickAction.ForceMute -> {
-                // 禁言（房主操作）
-                if (micInfo.micStatus == MicStatus.Lock) {
-                    micInfo.micStatus = MicStatus.LockForceMute
-                } else {
-                    micInfo.micStatus = MicStatus.ForceMute
-                }
-            }
-            // 取消禁言（房主操作）
-            MicClickAction.ForceUnMute -> {
-                if (micInfo.micStatus == MicStatus.LockForceMute) {
-                    micInfo.micStatus = MicStatus.Lock
-                } else {
-                    if (micInfo.member == null) {
-                        micInfo.micStatus = MicStatus.Idle
-                    } else {
-                        micInfo.micStatus = MicStatus.Normal
-                    }
-                }
-            }
-            // 关麦（麦位用户操作包括房主操作自己）
-            MicClickAction.Mute -> {
-                micInfo.micStatus = MicStatus.Mute
-            }
-            // 关闭座位（房主操作）
-            MicClickAction.UnMute -> {
-                if (micInfo.member == null) {
-                    micInfo.micStatus = MicStatus.Idle
-                } else {
-                    micInfo.micStatus = MicStatus.Normal
-                }
-            }
-            // 关闭座位（房主操作）
-            MicClickAction.Lock -> {
-                if (micInfo.micStatus == MicStatus.ForceMute) {
-                    micInfo.micStatus = MicStatus.LockForceMute
-                } else {
-                    micInfo.micStatus = MicStatus.Lock
-                }
-            }
-            // 打开座位（房主操作）
-            MicClickAction.UnLock -> {
-                if (micInfo.micStatus == MicStatus.LockForceMute) {
-                    micInfo.micStatus = MicStatus.ForceMute
-                } else {
-                    if (micInfo.member == null) {
-                        micInfo.micStatus = MicStatus.Idle
-                    } else {
-                        micInfo.micStatus = MicStatus.Normal
-                    }
-                }
-            }
-            // 强制下麦（房主操作）
-            MicClickAction.KickOff -> {
-                if (micInfo.micStatus == MicStatus.ForceMute) {
-                    micInfo.micStatus = MicStatus.ForceMute
-                } else {
-                    micInfo.micStatus = MicStatus.Idle
-                }
-            }
-            // 下麦（嘉宾操作）
-            MicClickAction.OffStage -> {
-                if (micInfo.micStatus == MicStatus.ForceMute) {
-                    micInfo.micStatus = MicStatus.ForceMute
-                } else {
-                    micInfo.micStatus = MicStatus.Idle
-                }
-            }
-            MicClickAction.Invite -> {
-                // TODO()
-            }
-        }
-        notifyItemChanged(micIndex)
     }
 
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {

@@ -29,7 +29,7 @@ import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionSheetDialog
 import io.agora.scene.voice.ui.spatialaudio.RoomSpatialAudioSheetDialog
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
-import io.agora.secnceui.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.annotation.MicStatus
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
@@ -660,11 +660,11 @@ class RoomObservableViewDelegate constructor(
                                 ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
                             }
                         }
-                        MicClickAction.ForceMute -> {
+                        MicClickAction.ForbidMic -> {
                             // 房主禁言其他座位
                             roomLivingViewModel.forbidMic(micInfo.micIndex)
                         }
-                        MicClickAction.ForceUnMute -> {
+                        MicClickAction.UnForbidMic -> {
                             // 房主取消禁言其他座位
                             if (data.enable) {
                                 roomLivingViewModel.cancelMuteMic(micInfo.micIndex)
