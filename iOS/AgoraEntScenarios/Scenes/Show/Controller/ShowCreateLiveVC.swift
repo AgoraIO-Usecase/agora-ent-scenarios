@@ -116,6 +116,7 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     @objc private func didClickCancelButton(){
+        ByteBeautyManager.shareManager.destroy()
         dismiss(animated: true)
     }
 }
