@@ -8,7 +8,7 @@
 import Foundation
 import AgoraRtcKit
 
-enum ShowAgoraVideoDimensions: String {
+enum ShowAgoraVideoDimensions: String, CaseIterable {
     
     case _320x240 = "320x240"
     case _480x360 = "480x360"
@@ -17,7 +17,7 @@ enum ShowAgoraVideoDimensions: String {
     case _960x720 = "960x720"
     case _1280x720 = "1280x720"
      
-    func sizeValue() -> CGSize{
+    var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
         guard let first = arr.first, let width = Float(first), let last = arr.last, let height = Float(last) else {
             return CGSize(width: 320, height: 240)
@@ -32,7 +32,7 @@ extension AgoraVideoFrameRate {
     }
 }
 
-enum ShowSettingKey: String {
+enum ShowSettingKey: String, CaseIterable {
     
     enum KeyType {
         case aSwitch
@@ -57,7 +57,7 @@ enum ShowSettingKey: String {
     case musincVolume           // 音乐音量
     case audioBitRate           // 音频码率
     
-    func title() -> String {
+    var title: String {
         switch self {
         case .lowlightEnhance:
             return "show_advance_setting_lowlight_title".show_localized
@@ -92,7 +92,7 @@ enum ShowSettingKey: String {
         }
     }
     
-    func type() -> KeyType {
+    var type: KeyType {
         switch self {
         case .lowlightEnhance:
             return .aSwitch
@@ -127,7 +127,7 @@ enum ShowSettingKey: String {
         }
     }
     
-    func sliderValueScope() -> (Float, Float) {
+    var sliderValueScope: (Float, Float) {
         switch self {
         case .videoBitRate:
             return (200, 2000)
@@ -140,16 +140,17 @@ enum ShowSettingKey: String {
         }
     }
     
-    func items() -> [String] {
+    var items: [String] {
         switch self {
         case .videoCaptureSize:
-            return [ShowAgoraVideoDimensions._320x240.rawValue,
-                    ShowAgoraVideoDimensions._480x360.rawValue,
-                    ShowAgoraVideoDimensions._360x640.rawValue,
-                    ShowAgoraVideoDimensions._960x540.rawValue,
-                    ShowAgoraVideoDimensions._960x720.rawValue,
-                    ShowAgoraVideoDimensions._1280x720.rawValue
-            ]
+//            return [ShowAgoraVideoDimensions._320x240.rawValue,
+//                    ShowAgoraVideoDimensions._480x360.rawValue,
+//                    ShowAgoraVideoDimensions._360x640.rawValue,
+//                    ShowAgoraVideoDimensions._960x540.rawValue,
+//                    ShowAgoraVideoDimensions._960x720.rawValue,
+//                    ShowAgoraVideoDimensions._1280x720.rawValue
+//            ]
+            return ShowAgoraVideoDimensions.allCases.map({ $0.rawValue })
         case .FPS:
             return [AgoraVideoFrameRate.fps1.stringValue(),
                     AgoraVideoFrameRate.fps7.stringValue(),
@@ -166,15 +167,15 @@ enum ShowSettingKey: String {
         }
     }
     
-    func boolValue() -> Bool {
+    var boolValue: Bool {
         return UserDefaults.standard.bool(forKey: self.rawValue)
     }
     
-    func floatValue() -> Float {
+    var floatValue: Float {
         return UserDefaults.standard.float(forKey: self.rawValue)
     }
     
-    func intValue() -> Int {
+    var intValue: Int {
         return UserDefaults.standard.integer(forKey: self.rawValue)
     }
     

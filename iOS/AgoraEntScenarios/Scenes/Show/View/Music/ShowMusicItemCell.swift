@@ -40,7 +40,7 @@ import UIKit
         
         // 图
         imageView = UIImageView()
-        imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
+//        imageView.image = UIImage.show_sceneImage(name: "show_beauty_none")
         contentView.addSubview(imageView)
         
         // 蒙版

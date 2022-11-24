@@ -57,26 +57,26 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         
         let data = dataArray[indexPath.row]
         var cell: UITableViewCell!
-        if data.type() == .aSwitch {
+        if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            cell.setTitle(data.title(), isOn: data.boolValue()) { isOn in
+            cell.setTitle(data.title, isOn: data.boolValue) { isOn in
                 data.writeValue(isOn)
                 self.settingManager.updateSettingForkey(data)
             } detailButtonAction: {
                 
             }
             return cell
-        }else if data.type() == .segment {
+        }else if data.type == .segment {
             let cell = tableView.dequeueReusableCell(withIdentifier: SegmentCellID, for: indexPath) as! ShowSettingSegmentCell
             
-            cell.setTitle(data.title(), items: data.items(), defaultSelectIndex: data.intValue()) { index in
+            cell.setTitle(data.title, items: data.items, defaultSelectIndex: data.intValue) { index in
                 data.writeValue(index)
                 self.settingManager.updateSettingForkey(data)
             }
             return cell
-        }else if data.type() == .slider {
+        }else if data.type == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title(), value: data.floatValue(), minValue: data.sliderValueScope().0, maxValue: data.sliderValueScope().1) { value in
+            cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) { value in
                 
             } sliderValueChangedAction: { value in
                 data.writeValue(value)
@@ -84,15 +84,15 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             }
 
             return cell
-        }else if data.type() == .label {
+        }else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
-            let index = data.intValue()
-            let value = data.items()[index]
-            cell.setTitle(data.title(), value: value) {
+            let index = data.intValue
+            let value = data.items[index]
+            cell.setTitle(data.title, value: value) {
                 let vc = ShowSettingActionSheetVC()
-                vc.title = data.title()
-                vc.defaultSelectedIndex = data.intValue()
-                vc.dataArray = data.items()
+                vc.title = data.title
+                vc.defaultSelectedIndex = data.intValue
+                vc.dataArray = data.items
                 vc.didSelectedIndex = { index in
                     data.writeValue(index)
                     self.settingManager.updateSettingForkey(data)

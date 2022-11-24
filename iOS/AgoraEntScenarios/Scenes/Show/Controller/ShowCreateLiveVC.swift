@@ -127,7 +127,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickStartBtnAction() {
         guard let roomName = createView.roomName, roomName.count > 0 else {
-            ToastView.show(text: "房间名称不能为空")
+            ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return
         }
         let room = ShowRoomListModel()
