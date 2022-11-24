@@ -8,6 +8,7 @@ import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoom
 import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.scene.voice.general.livedatas.SingleSourceLiveData
+import io.agora.scene.voice.general.net.VRValueCallBack
 import io.agora.scene.voice.general.repositories.NetworkOnlyResource
 import io.agora.scene.voice.general.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
@@ -16,7 +17,6 @@ import io.agora.voice.baseui.general.callback.ResultCallBack
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.network.tools.VRDefaultValueCallBack
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -132,7 +132,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomKitBean.channelId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
             roomKitBean.soundEffect, roomKitBean.isOwner,
-            object : VRDefaultValueCallBack<Boolean> {
+            object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
                     "rtc  joinChannel onSuccess ".logE()
                     joinRtcChannel.set(true)

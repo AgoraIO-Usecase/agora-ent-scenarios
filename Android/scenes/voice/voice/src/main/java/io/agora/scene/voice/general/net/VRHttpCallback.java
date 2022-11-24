@@ -1,4 +1,4 @@
-package io.agora.voice.network.http;
+package io.agora.scene.voice.general.net;
 
 public interface VRHttpCallback {
  /**
@@ -6,7 +6,7 @@ public interface VRHttpCallback {
   *
   * @param result
   */
- void onSuccess(String result);
+ default void onSuccess(String result){}
 
  /**
   * 失败时的回调
@@ -14,6 +14,6 @@ public interface VRHttpCallback {
   * @param code
   * @param msg
   */
- void onError(int code,String msg);
+ default void onError(int code,String msg){}
 
 }

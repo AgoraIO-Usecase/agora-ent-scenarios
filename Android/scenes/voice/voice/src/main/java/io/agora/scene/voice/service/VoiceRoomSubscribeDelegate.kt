@@ -1,7 +1,6 @@
 package io.agora.scene.voice.service
 
 import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.voice.network.tools.bean.VMemberBean
 
 /**
  * @author create by zhangwei03
@@ -67,7 +66,7 @@ interface VoiceRoomSubscribeDelegate {
      *  @param roomId 环信IM SDK聊天室id
      *  @param user 用户数据
      */
-    fun onUserJoinedRoom(roomId: String, user: VMemberBean) {}
+    fun onUserJoinedRoom(roomId: String, user: VoiceMemberModel) {}
 
     /**
      * 用户离开房间

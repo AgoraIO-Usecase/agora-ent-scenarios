@@ -1,4 +1,4 @@
-package io.agora.voice.network.tools;
+package io.agora.scene.voice.general.net;
 
 public interface VRValueCallBack<T> {
     void onSuccess(T var1);

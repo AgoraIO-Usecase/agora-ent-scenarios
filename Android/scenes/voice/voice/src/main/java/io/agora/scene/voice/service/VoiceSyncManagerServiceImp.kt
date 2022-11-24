@@ -4,7 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
-import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
+import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.voice.buddy.tool.GsonTools
@@ -114,7 +114,7 @@ class VoiceSyncManagerServiceImp(
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
         // 2、置换token,获取im 配置，创建房间需要这里的数据
-        VRToolboxServerHttpManager.get().requestToolboxService(
+        VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = inputModel.roomName,
             completion = { error, chatroomId ->

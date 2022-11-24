@@ -13,23 +13,19 @@ import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.general.net.VRToolboxServerHttpManager
+import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.model.VoiceCreateViewModel
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
-import io.agora.syncmanager.rtm.Scene
-import io.agora.syncmanager.rtm.Sync
-import io.agora.syncmanager.rtm.SyncManagerException
 import io.agora.voice.baseui.BaseUiFragment
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.config.RouterParams
 import io.agora.voice.buddy.config.RouterPath
-import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
@@ -145,7 +141,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     }
 
     private fun gotoJoinRoom(voiceRoomModel: VoiceRoomModel) {
-        VRToolboxServerHttpManager.get().requestToolboxService(
+        VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = voiceRoomModel.roomName,
             completion = { error, chatroomId ->
