@@ -48,6 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray<AEACategoryItem *> *items;
 
 @property (weak, nonatomic) id<AEACategoryViewDelegate> delegate;
+@property (nullable,strong, nonatomic) UIFont *titleFont;
+@property (nullable,strong, nonatomic) UIFont *titleSelectedFont;
+@property (nullable,strong, nonatomic) UIColor *titleColor;
+@property (nullable,strong, nonatomic) UIColor *titleSelectedColor;
+@property (nullable,strong, nonatomic) UIView *indicator;
 
 + (instancetype)defaultCategoryView;
 

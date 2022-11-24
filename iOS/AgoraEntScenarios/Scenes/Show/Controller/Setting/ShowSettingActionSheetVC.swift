@@ -15,6 +15,7 @@ private let ShowActionSheetCellID = "ShowActionSheetCellID"
 
 class ShowSettingActionSheetVC: UIViewController {
     
+    var defaultSelectedIndex: Int = 0
     var didSelectedIndex: ((_ index: Int)->())?
     var dataArray = [String]()
     
@@ -73,6 +74,8 @@ class ShowSettingActionSheetVC: UIViewController {
             make.left.bottom.right.equalToSuperview()
             make.height.equalTo(TableRowHeight * CGFloat(dataArray.count) + TableFooterHeight + TableHeaderHeight)
         }
+        
+        tableView.selectRow(at: IndexPath(row: defaultSelectedIndex, section: 0), animated: false, scrollPosition: .none)
     }
     
     override func viewDidLayoutSubviews() {

@@ -27,8 +27,9 @@
 
 - (void)setupUI {
     _titleLabel = [UILabel new];
-    _titleLabel.textColor = [UIColor blackColor];
+    _titleLabel.textColor = [UIColor colorWithRed:0 green:0 blue:0 alpha: 0.5];
     _titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
+    _titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.contentView addSubview:_titleLabel];
     
     _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -42,11 +43,14 @@
 - (void)setTitle:(NSString *)title {
     _title = title;
     self.titleLabel.text = title;
+    _titleLabel.textColor = self.isSelected ? _titleSelectedColor : _titleColor;
+    _titleLabel.font = self.isSelected ? _titleSelectedFont : _titleFont;
 }
 
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
-    _titleLabel.textColor = [UIColor colorWithRed:0 green:0 blue:0 alpha: selected ? 1 : 0.5];
+    _titleLabel.textColor = selected ? _titleSelectedColor : _titleColor;
+    _titleLabel.font = selected ? _titleSelectedFont : _titleFont;
 }
 
 

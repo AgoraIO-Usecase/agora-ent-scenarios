@@ -6,3 +6,4 @@ Pods
 **/*.xcworkspace/*
 **/xcuserdata
 KeyCenter.swift
+**/ByteEffectLib/*

@@ -13,38 +13,16 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var agoraKit: AgoraRtcEngineKit?
     private var selectedResolution = 0
-    private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
-        return AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
-                                       frameRate: .fps30,
-                                       bitrate: AgoraVideoBitrateStandard,
-                                       orientationMode: .fixedPortrait,
-                                       mirrorMode: .auto)
-    }()
     
-    private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
-       let config = AgoraRtcEngineConfig()
-        config.appId = KeyCenter.AppId
-        config.channelProfile = .liveBroadcasting
-        config.areaCode = .global
-        return config
-    }()
-    
-    private lazy var channelMediaOptions: AgoraRtcChannelMediaOptions = {
-       let option = AgoraRtcChannelMediaOptions()
-        option.publishMicrophoneTrack = true
-        option.publishCameraTrack = true
-        option.clientRoleType = .broadcaster
-        option.autoSubscribeVideo = true
-        option.autoSubscribeAudio = true
-        return option
-    }()
-    
+    private let agoraKitManager = ShowAgoraKitManager()
+        
+    private lazy var beautyVC = ShowBeautySettingVC()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        setupAgoraKit()
+        agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
     }
     
@@ -87,24 +65,31 @@ class ShowCreateLiveVC: UIViewController {
         createView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        beautyVC.dismissed = { [weak self] in
+            self?.createView.hideBottomViews = false
+        }
     }
-    
+    /*
     private func setupAgoraKit() {
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
 //        agoraKit?.setLogFile(LogUtils.sdkLogPath())
         agoraKit?.setClientRole(.broadcaster)
         agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
+        
+        agoraKit?.setVideoFrameDelegate(self)
         /// 开启扬声器
         agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
         let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = 0
+        canvas.uid = UInt(VLUserCenter.user.id) ?? 0
         canvas.renderMode = .hidden
         canvas.view = localView
+        canvas.mirrorMode = .disabled
         agoraKit?.setupLocalVideo(canvas)
         agoraKit?.enableAudio()
         agoraKit?.enableVideo()
         agoraKit?.startPreview()
-    }
+    }*/
     
     @objc private func didClickCancelButton(){
         dismiss(animated: true)
@@ -114,16 +99,13 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickCameraBtnAction() {
-        agoraKit?.switchCamera()
+//        agoraKit?.switchCamera()
+        agoraKitManager.switchCamera()
     }
     
     func onClickBeautyBtnAction() {
         createView.hideBottomViews = true
-        let beautyVC = ShowBeautySettingVC()
         present(beautyVC, animated: true)
-        beautyVC.dismissed = { [weak self] in
-            self?.createView.hideBottomViews = false
-        }
     }
     
     func onClickQualityBtnAction() {
@@ -137,28 +119,31 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
             wSelf.selectedResolution = index
-            wSelf.videoEncoderConfig.dimensions = CGSize(width: resolution.width, height: resolution.height)
-            wSelf.agoraKit?.setVideoEncoderConfiguration(wSelf.videoEncoderConfig)
+            wSelf.agoraKitManager.setVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.videoEncoderConfig.dimensions = CGSize(width: resolution.width, height: resolution.height)
+//            wSelf.agoraKit?.setVideoEncoderConfiguration(wSelf.videoEncoderConfig)
         }
     }
     
     func onClickStartBtnAction() {
         guard let roomName = createView.roomName, roomName.count > 0 else {
-            ToastView.show(text: "房间名称不能为空")
+            ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return
         }
         let room = ShowRoomListModel()
         room.roomName = createView.roomName
         room.roomId = createView.roomNo
         room.thumbnailId = createView.roomBg
-        room.ownerId = VLUserCenter.user.userNo
+        room.ownerId = VLUserCenter.user.id
         room.ownerAvater = VLUserCenter.user.headUrl
         room.createdAt = Date().millionsecondSince1970()
         AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
             let liveVC = ShowLiveViewController()
             liveVC.room = detailModel
-            liveVC.agoraKit = self?.agoraKit
-            self?.navigationController?.pushViewController(liveVC, animated: false)
+//            liveVC.agoraKit = self?.agoraKitManager.agoraKit
+            guard let wSelf = self else { return }
+            liveVC.agoraKitManager = wSelf.agoraKitManager
+            wSelf.navigationController?.pushViewController(liveVC, animated: false)
         }
     }
 
