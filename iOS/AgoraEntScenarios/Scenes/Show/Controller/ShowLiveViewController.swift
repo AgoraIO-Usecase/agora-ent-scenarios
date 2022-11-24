@@ -75,7 +75,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func joinChannel() {
-        guard let channelName = room?.roomNo, let uid: UInt = UInt(currentUserId) else {
+        guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId) else {
             return
         }
         

@@ -149,7 +149,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         }
         let room = ShowRoomListModel()
         room.roomName = createView.roomName
-        room.roomNo = createView.roomNo
+        room.roomId = createView.roomNo
         room.thumbnailId = createView.roomBg
         room.ownerId = VLUserCenter.user.userNo
         room.ownerAvater = VLUserCenter.user.headUrl
