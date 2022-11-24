@@ -1,6 +1,6 @@
 package io.agora.scene.voice.ui.mic
 
-import io.agora.scene.voice.bean.MicInfoBean
+import io.agora.scene.voice.service.VoiceMicInfoModel
 
 /**
  * @author create by zhangwei03
@@ -8,7 +8,7 @@ import io.agora.scene.voice.bean.MicInfoBean
 interface IRoomMicView {
 
     /**初始化麦位数据*/
-    fun onInitMic(micInfoList: List<MicInfoBean>, isBotActive: Boolean)
+    fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean)
 
     /**开关机器人*/
     fun activeBot(active: Boolean)
@@ -19,7 +19,11 @@ interface IRoomMicView {
     /**机器人音量指示*/
     fun updateBotVolume(speakerType: Int, volume: Int)
 
-    fun receiverAttributeMap(newMicMap: Map<Int, MicInfoBean>)
+    /**多麦位更新*/
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
+
+    /**单麦位更新*/
+    fun onSeatUpdated(micInfoModel: VoiceMicInfoModel)
 
     /**是否在麦位上,-1 不在*/
     fun findMicByUid(uid: String): Int

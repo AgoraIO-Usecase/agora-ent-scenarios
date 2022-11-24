@@ -6,12 +6,11 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.databinding.VoiceViewRoom3dMicBinding
-import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.scene.voice.R
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.voice.buddy.tool.ImageTools
 
 /**
@@ -55,11 +54,11 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
         arrowAnim = null
     }
 
-    override fun binding(micInfo: MicInfoBean) {
+    override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
-            if (micInfo.userInfo == null) { // 没人
+            if (micInfo.member == null) { // 没人
                 ivMicInnerIcon.isVisible = true
-                mtMicUsername.text = micInfo.index.toString()
+                mtMicUsername.text = micInfo.micIndex.toString()
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
@@ -82,8 +81,8 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 }
             } else { // 有人
                 ivMicInnerIcon.isVisible = false
-                ImageTools.loadImage(ivMicInfo, micInfo.userInfo?.portrait)
-                mtMicUsername.text = micInfo.userInfo?.nickName ?: ""
+                ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                mtMicUsername.text = micInfo.member?.nickName ?: ""
                 if (micInfo.ownerTag) {
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                         R.drawable.voice_icon_room_mic_owner_tag, 0, 0, 0

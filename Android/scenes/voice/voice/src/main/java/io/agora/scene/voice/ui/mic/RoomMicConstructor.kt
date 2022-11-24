@@ -4,40 +4,40 @@ import android.content.Context
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.bean.BotMicInfoBean
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.bean.MicManagerBean
 import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import io.agora.secnceui.annotation.MicClickAction
-import io.agora.secnceui.annotation.MicStatus
+import io.agora.scene.voice.annotation.MicStatus
 
 internal object RoomMicConstructor {
 
-    fun builderDefault2dMicList(): MutableList<MicInfoBean> {
+    fun builderDefault2dMicList(): MutableList<VoiceMicInfoModel> {
         return mutableListOf(
-            MicInfoBean(index = 0),
-            MicInfoBean(index = 1),
-            MicInfoBean(index = 2),
-            MicInfoBean(index = 3),
-            MicInfoBean(index = 4),
-            MicInfoBean(index = 5)
+            VoiceMicInfoModel(micIndex = 0),
+            VoiceMicInfoModel(micIndex = 1),
+            VoiceMicInfoModel(micIndex = 2),
+            VoiceMicInfoModel(micIndex = 3),
+            VoiceMicInfoModel(micIndex = 4),
+            VoiceMicInfoModel(micIndex = 5)
         )
     }
 
     fun builderDefault2dBotMicList(context: Context, isUserBot: Boolean = false): MutableList<BotMicInfoBean> {
-        val blueBot = MicInfoBean(
-            index = 6,
+        val blueBot = VoiceMicInfoModel(
+            micIndex = 6,
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-            userInfo = VoiceMemberModel().apply {
+            member = VoiceMemberModel().apply {
                 nickName = context.getString(R.string.voice_chatroom_agora_blue)
                 portrait = "voice_icon_room_blue_robot"
             }
         )
-        val redBot = MicInfoBean(
-            index = 7,
+        val redBot = VoiceMicInfoModel(
+            micIndex = 7,
             micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
             audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-            userInfo = VoiceMemberModel().apply {
+            member = VoiceMemberModel().apply {
                 nickName = context.getString(R.string.voice_chatroom_agora_red)
                 portrait = "voice_icon_room_red_robot"
             }
@@ -45,28 +45,28 @@ internal object RoomMicConstructor {
         return mutableListOf(BotMicInfoBean(blueBot, redBot))
     }
 
-    fun builderDefault3dMicMap(context: Context, isUserBot: Boolean = false): Map<Int, MicInfoBean> {
+    fun builderDefault3dMicMap(context: Context, isUserBot: Boolean = false): Map<Int, VoiceMicInfoModel> {
         return mutableMapOf(
-            ConfigConstants.MicConstant.KeyIndex0 to MicInfoBean(index = 0),
-            ConfigConstants.MicConstant.KeyIndex1 to MicInfoBean(index = 1),
-            ConfigConstants.MicConstant.KeyIndex2 to MicInfoBean(index = 5),
-            ConfigConstants.MicConstant.KeyIndex3 to MicInfoBean(index = 6),
+            ConfigConstants.MicConstant.KeyIndex0 to VoiceMicInfoModel(micIndex = 0),
+            ConfigConstants.MicConstant.KeyIndex1 to VoiceMicInfoModel(micIndex = 1),
+            ConfigConstants.MicConstant.KeyIndex2 to VoiceMicInfoModel(micIndex = 5),
+            ConfigConstants.MicConstant.KeyIndex3 to VoiceMicInfoModel(micIndex = 6),
             // mic4 中间座位
-            ConfigConstants.MicConstant.KeyIndex4 to MicInfoBean(index = 4),
-            ConfigConstants.MicConstant.KeyIndex5 to MicInfoBean(
-                index = 2,
+            ConfigConstants.MicConstant.KeyIndex4 to VoiceMicInfoModel(micIndex = 4),
+            ConfigConstants.MicConstant.KeyIndex5 to VoiceMicInfoModel(
+                micIndex = 2,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-                userInfo = VoiceMemberModel().apply {
+                member = VoiceMemberModel().apply {
                     nickName = context.getString(R.string.voice_chatroom_agora_blue)
                     portrait = "voice_icon_room_blue_robot"
                 }
             ),
-            ConfigConstants.MicConstant.KeyIndex6 to MicInfoBean(
-                index = 3,
+            ConfigConstants.MicConstant.KeyIndex6 to VoiceMicInfoModel(
+                micIndex = 3,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
-                userInfo = VoiceMemberModel().apply {
+                member = VoiceMemberModel().apply {
                     nickName = context.getString(R.string.voice_chatroom_agora_red)
                     portrait = "voice_icon_room_red_robot"
                 }
@@ -78,7 +78,7 @@ internal object RoomMicConstructor {
      * 房主点击麦位管理
      */
     fun builderOwnerMicMangerList(
-        context: Context, micInfo: MicInfoBean, isMyself: Boolean
+        context: Context, micInfo: VoiceMicInfoModel, isMyself: Boolean
     ): MutableList<MicManagerBean> {
         return when (micInfo.micStatus) {
             // 正常
@@ -109,7 +109,7 @@ internal object RoomMicConstructor {
             }
             // 禁言 :有人、没人
             MicStatus.ForceMute -> {
-                if (micInfo.userInfo == null) {
+                if (micInfo.member == null) {
                     mutableListOf(
                         MicManagerBean(context.getString(R.string.voice_room_invite), true, MicClickAction.Invite),
                         MicManagerBean(context.getString(R.string.voice_room_unmute), true, MicClickAction.ForceUnMute),
@@ -154,7 +154,7 @@ internal object RoomMicConstructor {
     /**
      * 嘉宾点击麦位管理
      */
-    fun builderGuestMicMangerList(context: Context, micInfo: MicInfoBean): MutableList<MicManagerBean> {
+    fun builderGuestMicMangerList(context: Context, micInfo: VoiceMicInfoModel): MutableList<MicManagerBean> {
         return when (micInfo.micStatus) {
             // 有⼈-正常
             MicStatus.Normal -> {

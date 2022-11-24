@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.voice.bean.BotMicInfoBean
-import io.agora.scene.voice.bean.MicInfoBean
 import io.agora.scene.voice.ui.mic.IRoomMicView
 import io.agora.voice.baseui.adapter.OnItemChildClickListener
 import io.agora.voice.baseui.adapter.OnItemClickListener
@@ -20,6 +19,7 @@ import io.agora.voice.buddy.tool.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.ui.mic.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicLayoutBinding
+import io.agora.scene.voice.service.VoiceMicInfoModel
 
 class Room2DMicLayout : ConstraintLayout, IRoomMicView {
 
@@ -28,12 +28,12 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
     private var room2DMicAdapter: Room2DMicAdapter? = null
     private var room2DMicBotAdapter: Room2DBotMicAdapter? = null
 
-    private var onMicClickListener: OnItemClickListener<MicInfoBean>? = null
-    private var onBotMicClickListener: OnItemClickListener<MicInfoBean>? = null
+    private var onMicClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
+    private var onBotMicClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
 
     fun onItemClickListener(
-        onMicClickListener: OnItemClickListener<MicInfoBean>,
-        onBotMicClickListener: OnItemClickListener<MicInfoBean>
+        onMicClickListener: OnItemClickListener<VoiceMicInfoModel>,
+        onBotMicClickListener: OnItemClickListener<VoiceMicInfoModel>
     ) = apply {
         this.onMicClickListener = onMicClickListener
         this.onBotMicClickListener = onBotMicClickListener
@@ -73,7 +73,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
                     override fun onItemChildClick(
                         data: BotMicInfoBean?, extData: Any?, view: View, position: Int, itemViewType: Long
                     ) {
-                        if (extData is MicInfoBean) {
+                        if (extData is VoiceMicInfoModel) {
                             onBotMicClickListener?.onItemClick(extData, view, position, itemViewType)
                         }
                     }
@@ -104,7 +104,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
         }
     }
 
-    override fun onInitMic(micInfoList: List<MicInfoBean>, isBotActive: Boolean) {
+    override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean) {
         room2DMicAdapter?.submitListAndPurge(micInfoList)
         room2DMicBotAdapter?.activeBot(isBotActive)
     }
@@ -123,16 +123,21 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
 
     override fun findMicByUid(uid: String): Int {
         room2DMicAdapter?.dataList?.forEachIndexed { index, micInfoBean ->
-            if (TextUtils.equals(micInfoBean.userInfo?.userId, uid)) {
+            if (TextUtils.equals(micInfoBean.member?.userId, uid)) {
                 return index
             }
         }
         return -1
     }
 
-    override fun receiverAttributeMap(newMicMap: Map<Int, MicInfoBean>) {
-        room2DMicAdapter?.receiverAttributeMap(newMicMap)
-        room2DMicBotAdapter?.receiverAttributeMap(newMicMap)
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
+        room2DMicAdapter?.onSeatUpdated(newMicMap)
+        room2DMicBotAdapter?.onSeatUpdated(newMicMap)
+    }
+
+    override fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
+        room2DMicAdapter?.onSeatUpdated(micInfoModel)
+        room2DMicBotAdapter?.onSeatUpdated(micInfoModel)
     }
 
     private var myRtcUid: Int = -1
