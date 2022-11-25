@@ -225,7 +225,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         let apply = ShowMicSeatApply()
         apply.userId = VLUserCenter.user.id
         apply.userName = VLUserCenter.user.name
-        apply.userAvatar = VLUserCenter.user.headUrl
+        apply.avatar = VLUserCenter.user.headUrl
         apply.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addMicSeatApply(apply: apply, completion: completion)
     }
@@ -266,14 +266,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func createMicSeatInvitation(user: ShowUser, completion: @escaping (Error?) -> Void) {
-        let invitation = ShowMicSeatInvitation()
-        invitation.userId = user.userId
-        invitation.userName = user.userName
-        invitation.userAvatar = user.avatar
-        invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        invitation.fromUserId = VLUserCenter.user.id
-        
-        _addMicSeatInvitation(invitation: invitation, completion: completion)
+        user.status = .waitting
+        _addMicSeatInvitation(invitation: user, completion: completion)
     }
     
     func cancelMicSeatInvitation(userId: String, completion: @escaping (Error?) -> Void) {
@@ -317,6 +311,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
         _subscribePKInvitationChanged(roomId: roomId, subscribeClosure: subscribeClosure)
+    }
+    
+    func getCurrentApplyUser(roomId: String?, completion: @escaping (ShowRoomListModel?) -> Void) {
+        _getCurrentApplyUser(roomId: roomId, completion: completion)
     }
     
     func createPKInvitation(room: ShowRoomListModel,
@@ -832,7 +830,7 @@ extension ShowSyncManagerServiceImp {
                        })
     }
     
-    func _addMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+    func _addMicSeatInvitation(invitation: ShowUser, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
 //            assert(false, "channelName = nil")
             agoraPrint("_addMicSeatInvitation channelName = nil")
@@ -1067,6 +1065,18 @@ extension ShowSyncManagerServiceImp {
         }
         
         _removeInteraction(interaction: interaction) { error in
+        }
+    }
+    
+    func _getCurrentApplyUser(roomId: String?, completion: @escaping (ShowRoomListModel?) -> Void) {
+        guard let channelName = roomId else {
+            agoraPrint("_updatePKInvitation channelName = nil")
+            return
+        }
+        agoraPrint("imp pk invitation update...")
+        getRoomList(page: 0) { _, roomList in
+            let model = roomList?.filter({ $0.roomId == channelName && $0.interactStatus != .idle }).first
+            completion(model)
         }
     }
 }
