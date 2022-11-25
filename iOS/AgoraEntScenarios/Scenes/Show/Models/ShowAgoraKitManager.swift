@@ -49,6 +49,11 @@ class ShowAgoraKitManager: NSObject {
         canvas.renderMode = .hidden
         canvas.mirrorMode = .disabled
         canvas.view = canvasView
+        let config = AgoraCameraCapturerConfiguration()
+//        config.cameraDirection = .front
+        config.dimensions = CGSize(width: 1280, height: 720)
+        agoraKit.setCameraCapturerConfiguration(config)
+        
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()

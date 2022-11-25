@@ -10,16 +10,17 @@ import UIKit
 import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
+    
+    var mode: ShowMode?
+    var isBroadcaster = true
 
-    var agoraKit: AgoraRtcEngineKit! {
-        didSet {
-            settingManager = ShowSettingManager(agoraKit: agoraKit)
-        }
-    }
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    private var settingManager: ShowSettingManager!
+    var settingManager: ShowSettingManager!
+    
+    // 当前设置的预设值
+    var presetModeName: String?
     
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized]
@@ -98,29 +99,48 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
-        let videoSettings: [ShowSettingKey] = [
+        // 主播端设置
+        let broadcasterVideoSettings: [ShowSettingKey] = [
             .lowlightEnhance,
             .colorEnhance,
             .videoDenoiser,
-            .beauty,
             .videoCaptureSize,
             .FPS,
             .videoBitRate,
             .PVC,
             .SR
         ]
+        // 观众端设置
+        let audienceVideoSettings: [ShowSettingKey] = [
+            .SR
+        ]
+        
         let audioSettings: [ShowSettingKey]  = [
             .earmonitoring,
             .recordingSignalVolume,
             .musincVolume,
             .audioBitRate
         ]
-        let settings = [videoSettings, audioSettings]
+        let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings,[]]
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
         vc.dataArray = settings[index]
+        vc.willChangeSettingParams = {[weak self] in
+            guard let wSelf = self else { return false }
+            return wSelf.showModifyAlertIfNeeded()
+        }
         return vc
+    }
+    
+    // 判断是否需要显示修改预设值的弹窗
+    private func showModifyAlertIfNeeded() -> Bool {
+        if presetModeName != nil {
+            showAlert(message: "当前处于\"\(presetModeName!)\"最佳效果配置修改参数后视频体验将改变") {
+                self.presetModeName = nil
+            }
+        }
+        return presetModeName == nil
     }
   
 }
@@ -130,10 +150,12 @@ extension ShowAdvancedSettingVC {
     // 点击预设按钮
     @objc private func didClickPreSetBarButton() {
         let vc = ShowPresettingVC()
-        vc.didSelectedIndex = {[weak self] index in
-            self?.settingManager.presetForSingleBroadcast()
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .signle)
             self?.videoSettingVC.reloadData()
             self?.audioSettingVC.reloadData()
+            ToastView.show(text: "音频设置已更新至\"\(modeName)\"最佳配置")
+            self?.presetModeName = modeName
         }
         present(vc, animated: true)
     }
