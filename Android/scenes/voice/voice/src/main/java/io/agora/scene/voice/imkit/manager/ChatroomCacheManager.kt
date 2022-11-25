@@ -8,7 +8,6 @@ import android.util.Base64
 import androidx.annotation.Nullable
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.voice.buddy.tool.GsonTools
 import java.io.*
 
@@ -16,10 +15,15 @@ class ChatroomCacheManager {
     private var mEditor: SharedPreferences.Editor? = null
     private var mSharedPreferences: SharedPreferences? = null
     private val mMicInfoMap = mutableMapOf<String, String>()
-    private val submitMicList: MutableSet<VoiceMemberModel> = HashSet()
-    private val submitMicMap:MutableMap<String,String> = HashMap()
-    private val roomMemberList: MutableSet<VoiceMemberModel> = HashSet()
-    private val giftContributeList: MutableSet<VoiceRankUserModel> = HashSet()
+
+    private val submitMicList = mutableListOf<VoiceMemberModel>()
+    private val submitMicMap = mutableMapOf<String, VoiceMemberModel>()
+
+    private val roomMemberList = mutableListOf<VoiceMemberModel>()
+    private val roomMemberMap = mutableMapOf<String, VoiceMemberModel>()
+
+    private val giftContributeList = mutableListOf<VoiceMemberModel>()
+    private val giftContributeMap = mutableMapOf<String, VoiceMemberModel>()
 
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
@@ -41,7 +45,9 @@ class ChatroomCacheManager {
             mMicInfoMap.putAll(kvMap)
         }else{
             for (mutableEntry in kvMap) {
-                mMicInfoMap[mutableEntry.key] = mutableEntry.value
+                if ( mutableEntry.key.contains("mic_")){
+                    mMicInfoMap[mutableEntry.key] = mutableEntry.value
+                }
             }
         }
     }
@@ -75,32 +81,80 @@ class ChatroomCacheManager {
      * 设置申请上麦列表
      */
     fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
-        submitMicList.add(voiceMemberBean)
+        val chatUid = voiceMemberBean.chatUid
+        if (chatUid != null){
+            submitMicMap[chatUid] = voiceMemberBean
+            submitMicList.clear()
+            for (entry in submitMicMap.entries) {
+                submitMicList.add(entry.value)
+            }
+        }
     }
 
     /**
      * 获取申请上麦成员列表
      */
-    fun getSubmitMicList():MutableSet<VoiceMemberModel>{
+    fun getSubmitMicList():MutableList<VoiceMemberModel>{
         return submitMicList
     }
 
     /**
      * 从申请列表移除指定成员对象
      */
-    fun removeSubmitMember(voiceMemberBean: VoiceMemberModel){
-        submitMicList.remove(voiceMemberBean)
+    fun removeSubmitMember(chatUid: String){
+        submitMicMap.remove(chatUid)
+        submitMicList.clear()
+        for (entry in submitMicMap.entries) {
+            submitMicList.add(entry.value)
+        }
     }
 
     /**
      * 清除本地申请列表
      */
     fun clearSubmitList(){
+        submitMicMap.clear()
         submitMicList.clear()
     }
 
+    /**
+     * 设置成员列表
+     */
     fun setMemberList(member:VoiceMemberModel){
+        val chatUid = member.chatUid
+        if (chatUid != null){
+            roomMemberMap[chatUid] = member
+            roomMemberList.clear()
+            for (entry in roomMemberMap.entries) {
+                roomMemberList.add(entry.value)
+            }
+        }
+    }
 
+    /**
+     * 获取成员列表
+     */
+    fun getMemberList():MutableList<VoiceMemberModel>{
+        return roomMemberList
+    }
+
+    /**
+     * 从成员列表中移除指定成员
+     */
+    fun removeMember(chatUid: String){
+        roomMemberMap.remove(chatUid)
+        roomMemberList.clear()
+        for (entry in roomMemberMap.entries) {
+            roomMemberList.add(entry.value)
+        }
+    }
+
+    /**
+     * 清除成员列表
+     */
+    fun clearMemberList(){
+        roomMemberList.clear()
+        roomMemberMap.clear()
     }
 
     /**
