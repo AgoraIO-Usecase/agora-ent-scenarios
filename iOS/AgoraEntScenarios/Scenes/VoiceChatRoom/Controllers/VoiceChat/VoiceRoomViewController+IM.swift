@@ -202,6 +202,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
 
     func refreshHandsUp(status: Int) {
+        switch status {
+        case <#pattern#>:
+            <#code#>
+        default:
+            <#code#>
+        }
         if status == -1 {
             chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
         } else {
