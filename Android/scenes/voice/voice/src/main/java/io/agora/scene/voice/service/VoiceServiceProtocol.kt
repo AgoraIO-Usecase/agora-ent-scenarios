@@ -66,7 +66,7 @@ interface VoiceServiceProtocol {
      * 获取房间详情
      * @param voiceRoomModel 房间概要
      */
-    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo) -> Unit)
+    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo?) -> Unit)
 
     /**
      * 获取排行榜列表

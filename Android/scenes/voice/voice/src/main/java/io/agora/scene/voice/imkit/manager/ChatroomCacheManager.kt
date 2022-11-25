@@ -42,7 +42,7 @@ class ChatroomCacheManager {
     /**
      * 设置Mic信息
      */
-    fun setMicInfo(kvMap: MutableMap<String,String>){
+    fun setMicInfo(kvMap: Map<String,String>){
         if (mMicInfoMap.isEmpty()){
             mMicInfoMap.putAll(kvMap)
         }else{
@@ -141,7 +141,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 从成员列表中移除指定成员
+     * 从成员列表中移除指定成员( 成员退出回调中调用 )
      */
     fun removeMember(chatUid: String){
         roomMemberMap.remove(chatUid)

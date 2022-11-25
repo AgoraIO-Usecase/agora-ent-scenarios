@@ -106,7 +106,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         )
         binding.messageView.refreshSelectLast()
         ChatroomConfigManager.getInstance().setChatRoomListener(this)
-        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
+//        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
     private fun initListeners() {
@@ -117,6 +117,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onLoading(data: VoiceRoomInfo?) {
                     super.onLoading(data)
                     showLoading(false)
+                }
+
+                override fun onHideLoading() {
+                    super.onHideLoading()
+                    dismissLoading()
                 }
 
                 override fun onSuccess(data: VoiceRoomInfo?) {
@@ -131,6 +136,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
                 override fun onSuccess(data: Boolean?) {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
+                    roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
 
                 override fun onHideLoading() {
