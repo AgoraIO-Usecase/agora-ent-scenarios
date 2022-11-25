@@ -225,11 +225,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void) {
-        VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["member_list"], completion: { error, map in
-            if let member_list = map?["member_list"]?.toArray() {
-                completion(self.convertError(error: error),member_list.kj.modelArray(VRUser.self))
-            }
-        })
+        if self.userList?.count ?? 0 > 0 {
+            completion(nil,self.userList)
+        } else {
+            VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["member_list"], completion: { error, map in
+                if let member_list = map?["member_list"]?.toArray() {
+                    completion(self.convertError(error: error),member_list.kj.modelArray(VRUser.self))
+                }
+            })
+        }
     }
 
     func fetchApplicantsList(completion: @escaping (Error?, [VoiceRoomApply]?) -> Void) {
