@@ -21,6 +21,8 @@ enum ShowApplyAndInviteType: String, CaseIterable {
 }
 
 class ShowApplyAndInviteView: UIView {
+    var applyStatusClosure: ((ShowInteractionStatus) -> Void)?
+    
     private lazy var segmentView: ShowSegmentView = {
         let segmentView = ShowSegmentView(frame: CGRect(x: 10,
                                                         y: 23,
@@ -180,6 +182,7 @@ class ShowApplyAndInviteView: UIView {
         UIView.animate(withDuration: 0.25) {
             self.layoutIfNeeded()
         }
+        applyStatusClosure?(.idle)
     }
 }
 extension ShowApplyAndInviteView: AGETableViewDelegate {
@@ -193,6 +196,7 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
             guard let self = self else { return }
             if self.type == .apply {
                 self.getInviteList()
+                self.applyStatusClosure?(.onSeat)
             } else {
                 self.getInviteList()
             }

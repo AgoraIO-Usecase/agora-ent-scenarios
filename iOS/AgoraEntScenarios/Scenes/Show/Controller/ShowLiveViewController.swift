@@ -120,6 +120,10 @@ class ShowLiveViewController: UIViewController {
                 self?.liveView.addChatModel(model)
             }
         })
+        
+        applyAndInviteView.applyStatusClosure = { [weak self] status in
+            self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
+        }
     }
     
     private func sendMessageWithText(_ text: String) {
