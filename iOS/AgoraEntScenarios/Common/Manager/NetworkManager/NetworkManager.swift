@@ -135,7 +135,7 @@ class NetworkManager {
             return
         }
         var chatParams = [
-            "name": nickName,
+            "name": channelName,
             "description": "test",
             "owner": uid,
         ]
