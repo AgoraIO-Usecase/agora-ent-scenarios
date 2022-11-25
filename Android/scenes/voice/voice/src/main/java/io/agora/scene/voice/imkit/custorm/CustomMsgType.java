@@ -19,7 +19,7 @@ public enum CustomMsgType {
     CHATROOM_APPLY_SITE("chatroom_applySiteNotify"),
 
     /**
-     * 取消申请消息 （暂无用）
+     * 取消申请消息
      */
     CHATROOM_CANCEL_APPLY_SITE("chatroom_cancelApplySiteNotify"),
 

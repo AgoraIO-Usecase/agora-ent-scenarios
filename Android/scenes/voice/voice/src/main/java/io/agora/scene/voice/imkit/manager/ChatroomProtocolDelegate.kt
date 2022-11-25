@@ -5,9 +5,8 @@ import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
+import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.annotation.MicStatus
-import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
@@ -15,8 +14,10 @@ import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.annotation.MicClickAction
+import io.agora.scene.voice.service.VoiceRoomApply
 import io.agora.voice.buddy.config.ConfigConstants
+import io.agora.voice.buddy.tool.GsonTools
+import io.agora.voice.buddy.tool.LogTools.logE
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -39,11 +40,11 @@ class ChatroomProtocolDelegate constructor(
         if (roomType == ConfigConstants.RoomType.Common_Chatroom) {
             attributeMap["use_robot"] = "0"
             attributeMap["robot_volume"] = "50"
-            attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, 0)).toString()
+            attributeMap["mic_0"] = GsonTools.beanToString(VoiceMicInfoModel(0, ownerBean, MicStatus.Normal)).toString()
             for (i in 1..7) {
                 var key = "mic_$i"
-                var status = -1
-                if (i >= 6) status = -2
+                var status = MicStatus.Idle
+                if (i >= 6) status = MicStatus.BotInactive
                 var mBean = GsonTools.beanToString(VoiceMicInfoModel(i, null, status))
                 if (mBean != null) {
                     attributeMap[key] = mBean
@@ -70,7 +71,11 @@ class ChatroomProtocolDelegate constructor(
      */
     fun getMicInfoFromServer(): MutableMap<String, VoiceMicInfoModel> {
         var micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
-        roomManager.asyncFetchChatRoomAllAttributesFromServer(roomId, object :
+        val keyList: MutableList<String> = java.util.ArrayList()
+        for (i in 0..7) {
+            keyList[i] = "mic_$i"
+        }
+        roomManager.asyncFetchChatroomAttributesFromServer(roomId,keyList,object :
             ValueCallBack<MutableMap<String, String>> {
             override fun onSuccess(value: MutableMap<String, String>?) {
                 value?.let {
@@ -234,7 +239,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 获取上麦申请列表
      */
-    fun fetchRaisedList(): MutableSet<VoiceMemberModel> {
+    fun fetchRaisedList(): MutableList<VoiceMemberModel> {
         return ChatroomCacheManager.cacheManager.getSubmitMicList()
     }
 
@@ -243,16 +248,19 @@ class ChatroomProtocolDelegate constructor(
      */
     fun startMicSeatApply(micIndex: Int? = null, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var userBean = VoiceMemberModel()
-        userBean.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
-        userBean.rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
-        userBean.nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-        userBean.portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
-        attributeMap["user"] = GsonTools.beanToString(userBean).toString()
+        var voiceRoomApply = VoiceRoomApply()
+        var memberBean = VoiceMemberModel()
+        memberBean.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+        memberBean.rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
+        memberBean.nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
+        memberBean.portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+        voiceRoomApply.member = memberBean
+        voiceRoomApply.created_at = System.currentTimeMillis()
         if (micIndex != null) {
-            attributeMap["mic_index"] = micIndex.toString()
+            voiceRoomApply.index = micIndex
         }
-        sendChatroomEvent(true, userBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
+        attributeMap["user"] = GsonTools.beanToString(voiceRoomApply).toString()
+        sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
 
     /**
@@ -280,14 +288,14 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         var userBeam = VoiceMemberModel(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
+        sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
 
     /**
      * 邀请上麦列表
      */
-    fun invitationMicList() {
-        // TODO:  需要完成房间信息协议 拿到 memberList
+    fun fetchRoomMembers():MutableList<VoiceMemberModel> {
+        return ChatroomCacheManager.cacheManager.getMemberList()
     }
 
     /**
@@ -308,7 +316,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         var userBeam = VoiceMemberModel(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
+        sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
     }
 
     /**
@@ -352,15 +360,15 @@ class ChatroomProtocolDelegate constructor(
         if (TextUtils.equals(ownerBean.chatUid, currentUser)) {
             if (enable) {
                 robot6.micIndex = 6
-                robot6.micStatus = 5
+                robot6.micStatus = MicStatus.BotActivated
                 robot7.micIndex = 7
-                robot7.micStatus = 5
+                robot7.micStatus = MicStatus.BotActivated
                 isEnable = "1"
             } else {
                 robot6.micIndex = 6
-                robot6.micStatus = -2
+                robot6.micStatus = MicStatus.BotInactive
                 robot7.micIndex = 7
-                robot7.micStatus = -2
+                robot7.micStatus = MicStatus.BotInactive
                 isEnable = "0"
             }
             attributeMap["mic_6"] = GsonTools.beanToString(robot6).toString()
@@ -562,11 +570,13 @@ class ChatroomProtocolDelegate constructor(
      */
     private fun getFirstFreeMic(): Int {
         var indexList: MutableList<Int> = mutableListOf<Int>()
-        var micInfo = ChatroomCacheManager.cacheManager.getMicInfoMap() as MutableMap<String, String>
-        for (mutableEntry in micInfo) {
-            var bean = GsonTools.toBean(mutableEntry.value, VoiceMicInfoModel::class.java)
-            if (bean != null && bean.micStatus == -1) {
-                indexList.add(bean.micIndex)
+        var micInfo = ChatroomCacheManager.cacheManager.getMicInfoMap()
+        if (micInfo != null) {
+            for (mutableEntry in micInfo) {
+                var bean = GsonTools.toBean(mutableEntry.value, VoiceMicInfoModel::class.java)
+                if (bean != null && bean.micStatus == -1) {
+                    indexList.add(bean.micIndex)
+                }
             }
         }
         indexList.sortBy { it }

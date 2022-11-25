@@ -115,9 +115,6 @@ public class CustomMsgHelper implements MessageListener {
                     }
                     break;
                 case CHATROOM_APPLY_SITE:
-                    if(listener != null) {
-                        listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    }
                     Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if (map.containsKey("user")){
                         VoiceMemberModel memberModel = GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
@@ -125,11 +122,15 @@ public class CustomMsgHelper implements MessageListener {
                             ChatroomCacheManager.Companion.getCacheManager().setSubmitMicList(memberModel);
                         }
                     }
+                    if(listener != null) {
+                        listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    }
                     break;
                 case CHATROOM_CANCEL_APPLY_SITE:
                     if(listener != null) {
                         listener.onReceiveCancelApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
+                    ChatroomCacheManager.Companion.getCacheManager().removeSubmitMember(message.getFrom());
                     break;
                 case CHATROOM_INVITE_REFUSED_SITE:
                     if(listener != null) {
