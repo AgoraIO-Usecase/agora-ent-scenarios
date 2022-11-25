@@ -12,6 +12,9 @@ class ShowSettingManager {
     
     private var agoraKit: AgoraRtcEngineKit!
     
+    // 预设类型
+    private var presetType: ShowPresetType?
+    
     private let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     private let dimensionsItems: [CGSize] = ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     private let fpsItems: [AgoraVideoFrameRate] = [
@@ -30,18 +33,15 @@ class ShowSettingManager {
     }
     
     // 默认设置
-    private func defaultSetting() {
+    func defaultSetting() {
+        
+        updatePresetForType(presetType ?? .show_low, mode: .signle)
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoCaptureSize)
         updateSettingForkey(.beauty)
         updateSettingForkey(.PVC)
         updateSettingForkey(.SR)
-        updateSettingForkey(.BFrame)
-        updateSettingForkey(.videoCaptureSize)
-        updateSettingForkey(.videoBitRate)
-        updateSettingForkey(.FPS)
-        updateSettingForkey(.H265)
         updateSettingForkey(.earmonitoring)
         updateSettingForkey(.recordingSignalVolume)
         updateSettingForkey(.musincVolume)
@@ -77,13 +77,45 @@ class ShowSettingManager {
     }
     
     // 预设模式
-    func presetForSingleBroadcast() {
-        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: ShowAgoraVideoDimensions._960x720.sizeValue))
-        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: .fps15))
-        ShowSettingKey.videoBitRate.writeValue(1800)
-        ShowSettingKey.H265.writeValue(true)
+    private func _presetValuesWith(dimensions: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captrueSize: ShowAgoraVideoDimensions) {
+        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: dimensions.sizeValue))
+        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
+        ShowSettingKey.videoBitRate.writeValue(bitRate)
+        ShowSettingKey.H265.writeValue(h265On)
+        
+        updateSettingForkey(.videoCaptureSize)
+        updateSettingForkey(.videoBitRate)
+        updateSettingForkey(.FPS)
+        updateSettingForkey(.H265)
+//        let config = AgoraCameraCapturerConfiguration()
+//        config.dimensions = dimensions.sizeValue
+//        agoraKit.setCameraCapturerConfiguration(config)
     }
     
+    func updatePresetForType(_ type: ShowPresetType, mode: ShowMode) {
+        switch type {
+        case .show_low:
+            switch mode {
+            case .signle:
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: true, captrueSize: ._1280x720)
+            case .pk:
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 700, h265On: false, captrueSize: ._1280x720)
+            }
+            break
+        case .show_medium:
+            switch mode {
+            case .signle:
+                _presetValuesWith(dimensions: ._1280x720, fps: .fps15, bitRate: 1800, h265On: true, captrueSize: ._1280x720)
+            case .pk:
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captrueSize: ._1280x720)
+            }
+            
+            break
+        case .show_high:
+            
+            break
+        }
+    }
 }
 
 extension ShowSettingManager {
