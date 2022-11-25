@@ -34,7 +34,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.room?.gift_amount = gift_amount
         }
         //刷新礼物贡献总数，头部
-        self.requestRankList()
+        let seconds: [Double] = [1,2,3]
+        guard let refreshSeconds = seconds.randomElement() else { return }
+        Throttler.throttle(delay: .seconds(refreshSeconds)) {
+            self.requestRankList()
+        }
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {

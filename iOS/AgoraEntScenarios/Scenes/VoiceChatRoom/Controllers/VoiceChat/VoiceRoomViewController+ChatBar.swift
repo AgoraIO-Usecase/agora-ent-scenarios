@@ -154,7 +154,11 @@ extension VoiceRoomViewController {
                         if error != nil {
                             self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
                         } else {
-                            self.requestRankList()
+                            let seconds: [Double] = [1,2,3]
+                            guard let refreshSeconds = seconds.randomElement() else { return }
+                            Throttler.throttle(delay: .seconds(refreshSeconds)) {
+                                self.requestRankList()
+                            }
                         }
                     })
                     var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
