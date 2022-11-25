@@ -285,6 +285,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             mic.status = 3
         }
+        mic.member = nil
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[safe: mic_index]?.status = mic.status

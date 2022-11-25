@@ -610,6 +610,7 @@ extension VoiceRoomViewController {
                 self.rtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
+                self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
             }
         }
         
