@@ -61,7 +61,11 @@ var serviceImp: ChatRoomServiceImp? = ChatRoomServiceImp.getSharedInstance()
     }
     
     deinit {
-        serviceImp = nil
+        print("\(self.swiftClassName ?? "") is destroyed!")
+        VoiceRoomIMManager.shared = nil
+        ChatRoomServiceImp._sharedInstance = nil
+        VoiceRoomUserInfo.shared.user = nil
+        VoiceRoomUserInfo.shared.currentRoomOwner = nil
     }
 }
 
