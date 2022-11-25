@@ -145,10 +145,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
 
             let status = mic.status
             let mic_index = mic.mic_index
-            let liveMic = ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index]
-            if liveMic.mic_index == mic_index,!isOwner {
+            if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
                 refreshHandsUp(status: status)
             }
+            let same = ChatRoomServiceImp.getSharedInstance().mics.filter {
+                $0.member?.chat_uid ?? "" == fromId
+            }
+            let old = same.first { $0.member?.mic_index ?? 1 != mic_index}
+            ChatRoomServiceImp.getSharedInstance().mics[safe: old?.mic_index ?? 1]?.member = nil
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                 $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
@@ -180,6 +184,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 if mic.member != nil {
                     mic.member?.mic_index = mic_index
                 }
+                roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 roomInfo?.mic_info?[mic_index] = mic
                 rtcView.updateUser(mic)
                 if let user = mic.member {
