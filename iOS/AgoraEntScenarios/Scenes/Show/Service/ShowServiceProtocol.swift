@@ -53,10 +53,6 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: 完成回调   (错误信息， 用户列表)
     func getAllUserList(completion: @escaping (Error?, [ShowUser]?) -> Void)
     
-    
-    
-    
-    
     /// 发送聊天消息
     /// - Parameters:
     ///   - message: <#message description#>
@@ -107,7 +103,11 @@ protocol ShowServiceProtocol: NSObjectProtocol {
                             completion: @escaping (Error?) -> Void)
     
     
-    
+    /// 获取当前连麦或PK的主播
+    /// - Parameters:
+    ///   - roomId: 房间ID
+    ///   - completion: 回调当前用户
+    func getCurrentApplyUser(roomId: String?, completion: @escaping (ShowRoomListModel?) -> Void)
     
     
     /// 获取上麦邀请列表

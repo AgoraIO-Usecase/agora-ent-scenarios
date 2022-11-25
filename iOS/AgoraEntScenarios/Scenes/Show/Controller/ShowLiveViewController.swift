@@ -47,7 +47,7 @@ class ShowLiveViewController: UIViewController {
     private lazy var beautyVC = ShowBeautySettingVC()
     //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
-    private lazy var applyAndInviteView = ShowApplyAndInviteView()
+    private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
     
     override func viewDidLoad() {
