@@ -55,7 +55,7 @@ class ShowLiveViewController: UIViewController {
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         joinChannel()
-        subscribeChatMsg()
+        _subscribeServiceEvent()
         UIApplication.shared.isIdleTimerDisabled = true
     }
     
@@ -112,16 +112,6 @@ class ShowLiveViewController: UIViewController {
         sendMessageWithText("join_live_room".show_localized)
     }
     
-    private func subscribeChatMsg(){
-        
-        AppContext.showServiceImp.subscribeMessageChanged(subscribeClosure: { [weak self] status, msg in
-            if let text = msg.message {
-                let model = ShowChatModel(userName: msg.userName ?? "", text: text)
-                self?.liveView.addChatModel(model)
-            }
-        })
-    }
-    
     private func sendMessageWithText(_ text: String) {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
@@ -133,7 +123,48 @@ class ShowLiveViewController: UIViewController {
             print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }
-    
+}
+
+//MARK: service subscribe
+extension ShowLiveViewController {
+    private func _subscribeServiceEvent() {
+        let service = AppContext.showServiceImp
+        //user did changed
+        service.subscribeUserChanged { status, user in
+            
+        }
+        
+        service.subscribeMessageChanged(subscribeClosure: { [weak self] status, msg in
+            if let text = msg.message {
+                let model = ShowChatModel(userName: msg.userName ?? "", text: text)
+                self?.liveView.addChatModel(model)
+            }
+        })
+        
+        service.subscribePKInvitationChanged { [weak self] (status, invitation) in
+            if invitation.status == .waitting {
+                let vc = ShowReceivePKAlertVC()
+                vc.name = invitation.fromName ?? ""
+                vc.dismissWithResult { result in
+                    let imp = AppContext.showServiceImp
+                    switch result {
+                    case .accept:
+                        AppContext.showServiceImp.acceptPKInvitation { error in
+                            
+                        }
+                        break
+                    default:
+                        imp.rejectPKInvitation { error in
+                            
+                        }
+                        break
+                    }
+                }
+                
+                self?.present(vc, animated: true)
+            }
+        }
+    }
 }
 
 

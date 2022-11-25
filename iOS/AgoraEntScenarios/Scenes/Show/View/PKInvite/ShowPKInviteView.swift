@@ -179,7 +179,14 @@ class ShowPKInviteViewCell: UITableViewCell {
             avatarImageView.sd_setImage(with: URL(string: info.ownerAvater ?? ""),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             nameLabel.text = info.ownerName
-            statusButton.isEnabled = info.interactStatus == .pking ? false : true
+            pkStatus = info.interactStatus == .pking  ? .pking : .invite
+        }
+    }
+    var pkStatus: ShowPKInviteStatus = .invite {
+        didSet {
+            statusButton.setTitle(pkStatus.title, for: .normal)
+            statusButton.setTitleColor(pkStatus.titleColor, for: .normal)
+            statusButton.setBackgroundImage(pkStatus.bgImage, for: .normal)
         }
     }
     private lazy var avatarImageView: AGEImageView = {
@@ -195,9 +202,6 @@ class ShowPKInviteViewCell: UITableViewCell {
     }()
     private lazy var statusButton: UIButton = {
         let button = UIButton()
-        button.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
-        button.setTitle("邀请".show_localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14)
         button.addTargetFor(self, action: #selector(onTapStatusButton(sender:)), for: .touchUpInside)
         return button
@@ -248,5 +252,9 @@ class ShowPKInviteViewCell: UITableViewCell {
     @objc
     private func onTapStatusButton(sender: UIButton) {
         print("sender == \(sender.titleLabel?.text ?? "")")
+        guard let invitation = pkUserInvitation else { return }
+        AppContext.showServiceImp.createPKInvitation(room: invitation) { error in
+            
+        }
     }
 }
