@@ -231,6 +231,9 @@ extension VoiceRoomViewController {
                 ChatRoomServiceImp.getSharedInstance().mics = mics
                 ChatRoomServiceImp.getSharedInstance().userList = self?.roomInfo?.room?.member_list
             } else {
+                self?.notifySeverLeave()
+                self?.rtckit.leaveChannel()
+                self?.leaveRoom()
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
         }
