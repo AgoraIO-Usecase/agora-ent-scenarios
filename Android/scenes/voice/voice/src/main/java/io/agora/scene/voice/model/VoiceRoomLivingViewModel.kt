@@ -138,13 +138,13 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    "rtc  joinChannel onSuccess ".logE()
+                    "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logE()
                     joinRtcChannel.set(true)
                     checkJoinRoom()
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    "rtc  joinChannel onError $error  $errorMsg".logE()
+                    "rtc  joinChannel onError channelId:${roomKitBean.channelId},$error  $errorMsg".logE()
                     ThreadManager.getInstance().runOnMainThread {
                         _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -159,7 +159,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         ChatClient.getInstance().chatroomManager()
             .joinChatRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
-                    "im  joinChatRoom onSuccess ".logE()
+                    "im  joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logE()
                     joinImRoom.set(true)
                     checkJoinRoom()
                 }
@@ -172,7 +172,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
                             }
                         }.asLiveData())
                     }
-                    "im  joinChatRoom onError $error  $errorMsg".logE()
+                    "im  joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg".logE()
                 }
             })
     }
