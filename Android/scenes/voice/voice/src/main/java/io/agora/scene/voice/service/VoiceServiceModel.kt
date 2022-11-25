@@ -31,9 +31,9 @@ data class VoiceMemberModel constructor(
  * 贡献榜
  */
 data class VoiceRankUserModel constructor(
-    val name: String? = null,
-    val portrait: String = "",
-    val amount: Int = 0
+    var name: String? = null,
+    var portrait: String? = "",
+    var amount: Int? = 0
 ) : BaseRoomBean
 
 /**
@@ -93,7 +93,13 @@ data class VoiceRoomInfo constructor(
  * 礼物
  */
 data class VoiceGiftModel constructor(
-    var id: String = "",
+    var gift_id: String? = "",
+    var gift_count:String? = "",
+    var gift_name: String? = "",
+    var gift_price: String? = "",
+    var userName: String? = "",
+    var portrait: String? = "",
+    var isChecked: Boolean? = false
 )
 
 /**
