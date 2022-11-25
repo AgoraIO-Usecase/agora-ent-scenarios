@@ -611,7 +611,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param callBack
      */
     public void acceptMicSeatApply(String chatUid,ValueCallBack<VoiceMicInfoModel> callBack){
-        delegate.acceptMicSeatApply(null,callBack);
+        delegate.acceptMicSeatApply(chatUid,null,callBack);
     }
 
     /**
