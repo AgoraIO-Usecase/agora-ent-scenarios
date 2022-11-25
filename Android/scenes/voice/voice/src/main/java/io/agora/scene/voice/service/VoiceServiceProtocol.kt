@@ -186,7 +186,7 @@ interface VoiceServiceProtocol {
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    fun enableRobot(enable: Boolean, completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit)
+    fun enableRobot(enable: Boolean, completion: (error: Int, enable: Boolean) -> Unit)
 
     /**
      * 更新机器人音量
