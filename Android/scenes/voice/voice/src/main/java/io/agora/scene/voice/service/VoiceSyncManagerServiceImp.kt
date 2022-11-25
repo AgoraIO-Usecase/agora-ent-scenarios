@@ -574,15 +574,15 @@ class VoiceSyncManagerServiceImp(
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    override fun enableRobot(enable: Boolean, completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit) {
+    override fun enableRobot(enable: Boolean, completion: (error: Int, enable:Boolean) -> Unit) {
         ChatroomIMManager.getInstance().enableRobot(enable,object :
-            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>>{
-            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
+            ValueCallBack<Boolean>{
+            override fun onSuccess(value: Boolean) {
                 completion.invoke(VoiceServiceProtocol.ERR_OK, value)
             }
 
             override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
             }
         })
     }
