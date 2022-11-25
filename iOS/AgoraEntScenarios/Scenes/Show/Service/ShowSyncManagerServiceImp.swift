@@ -223,7 +223,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func createMicSeatApply(completion: @escaping (Error?) -> Void) {
         let apply = ShowMicSeatApply()
-        apply.userId = VLUserCenter.user.rtc_uid
+        apply.userId = VLUserCenter.user.id
         apply.userName = VLUserCenter.user.name
         apply.userAvatar = VLUserCenter.user.headUrl
         apply.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -231,7 +231,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func cancelMicSeatApply(completion: @escaping (Error?) -> Void) {
-        guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.userNo }).first else {
+        guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.id }).first else {
             agoraAssert("cancel apply not found")
             return
         }
@@ -241,6 +241,14 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func acceptMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
         apply.status = .accepted
         _updateMicSeatApply(apply: apply, completion: completion)
+        
+        let interaction = ShowInteractionInfo()
+        interaction.userId = apply.userId
+        interaction.roomId = getRoomId()
+        interaction.interactStatus = .onSeat
+        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        _addInteraction(interaction: interaction) { error in
+        }
     }
     
     func rejectMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
@@ -263,7 +271,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         invitation.userName = user.userName
         invitation.userAvatar = user.avatar
         invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        invitation.fromUserId = VLUserCenter.user.rtc_uid
+        invitation.fromUserId = VLUserCenter.user.id
+        
         _addMicSeatInvitation(invitation: invitation, completion: completion)
     }
     
@@ -283,6 +292,14 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         invitation.status = .accepted
         _updateMicSeatInvitation(invitation: invitation, completion: completion)
+        
+        let interaction = ShowInteractionInfo()
+        interaction.userId = invitation.userId
+        interaction.roomId = getRoomId()
+        interaction.interactStatus = .onSeat
+        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        _addInteraction(interaction: interaction) { error in
+        }
     }
     
     func rejectMicSeatInvitation(completion: @escaping (Error?) -> Void) {
@@ -295,44 +312,95 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void) {
-        _getAllPKInvitationList(completion: completion)
+        _getAllPKInvitationList(roomId: roomId, completion: completion)
     }
     
     func subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
-        _subscribePKInvitationChanged(subscribeClosure: subscribeClosure)
+        _subscribePKInvitationChanged(roomId: roomId, subscribeClosure: subscribeClosure)
     }
     
     func createPKInvitation(room: ShowRoomListModel,
                             completion: @escaping (Error?) -> Void) {
-        let invitation = ShowPKInvitation()
-        invitation.userId = room.ownerId
-        invitation.roomId = room.roomId
-        invitation.fromUserId = VLUserCenter.user.rtc_uid
-        var fromName: String?                            //发起Pk用户名
-        var fromRoomId: String?                          //发起Pk房间id
-        var status: ShowRoomRequestStatus = .waitting    //邀请状态
-        var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
-        _addPKInvitation(invitation: invitation, completion: completion)
+        _getAllPKInvitationList(roomId: room.roomId) {[weak self] error, invitationList in
+            guard let self = self, error == nil, let invitationList = invitationList else { return }
+            
+            defer {
+                self._unsubscribePKInvitationChanged(roomId: room.roomId)
+                self._subscribePKInvitationChanged(roomId: room.roomId) { status, invitation in
+                    guard invitation.fromRoomId == self.roomId else {
+                        return
+                    }
+                    if status == .deleted {
+                        self._recvPKRejected(invitation: invitation)
+                    } else {
+                        switch invitation.status {
+                        case .rejected:
+                            self._recvPKRejected(invitation: invitation)
+                        case .accepted:
+                            self._recvPKAccepted(invitation: invitation)
+                        case .ended:
+                            self._recvPKFinish(invitation: invitation)
+                        default:
+                            break
+                        }
+                    }
+                }
+            }
+            
+            guard let invitation = invitationList.filter({ $0.fromRoomId == self.roomId }).first else {
+                //not found, add invitation
+                let _invitation = ShowPKInvitation()
+                _invitation.userId = room.ownerId
+                _invitation.roomId = room.roomId
+                _invitation.fromUserId = VLUserCenter.user.rtc_uid
+                _invitation.fromName = VLUserCenter.user.name
+                _invitation.fromRoomId = self.roomId
+                _invitation.status = .waitting
+                _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+                self._addPKInvitation(invitation: _invitation, completion: completion)
+                return
+            }
+            
+            if invitation.status == .waitting {
+                agoraPrint("pk invitaion already send ")
+                return
+            }
+            
+            invitation.status = .waitting
+            invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+            //found, update invitation
+            self._updatePKInvitation(invitation: invitation, completion: completion)
+        }
     }
     
     func acceptPKInvitation(completion: @escaping (Error?) -> Void) {
-        agoraAssert("not implemented")
+        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
+            agoraAssert("accept invitation not found")
+            return
+        }
+        invitation.status = .accepted
+        _updatePKInvitation(invitation: invitation, completion: completion)
     }
     
     func rejectPKInvitation(completion: @escaping (Error?) -> Void) {
-        agoraAssert("not implemented")
+        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
+            agoraAssert("accept invitation not found")
+            return
+        }
+        invitation.status = .rejected
+        _updatePKInvitation(invitation: invitation, completion: completion)
     }
     
     func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
-        agoraAssert("not implemented")
+        _getAllInteractionList(completion: completion)
     }
     
     func subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void) {
-        agoraAssert("not implemented")
+        _subscribeInteractionChanged(subscribeClosure: subscribeClosure)
     }
     
     func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
-        agoraAssert("not implemented")
+        _removeInteraction(interaction: interaction, completion: completion)
     }
 }
 
@@ -411,7 +479,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         let model = ShowUser()
-        model.userId = VLUserCenter.user.rtc_uid
+        model.userId = VLUserCenter.user.id
         model.avatar = VLUserCenter.user.headUrl
         model.userName = VLUserCenter.user.name
 
@@ -479,7 +547,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         
-        guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.rtc_uid }).first?.objectId else {
+        guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.id }).first?.objectId else {
             agoraAssert("_removeUser objectId = nil")
             return
         }
@@ -831,7 +899,8 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: PK Invitation
 extension ShowSyncManagerServiceImp {
-    func _getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void) {
+    func _getAllPKInvitationList(roomId:String?,
+                                 completion: @escaping (Error?, [ShowPKInvitation]?) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -843,7 +912,9 @@ extension ShowSyncManagerServiceImp {
             .get(success: { [weak self] list in
                 agoraPrint("imp pk invitation success...")
                 let pkInvitationList = list.compactMap({ ShowPKInvitation.yy_model(withJSON: $0.toJson()!)! })
-                self?.pkInvitationList = pkInvitationList
+                if roomId == self?.roomId {
+                    self?.pkInvitationList = pkInvitationList
+                }
                 completion(nil, pkInvitationList)
             }, fail: { error in
                 agoraPrint("imp pk invitation fail :\(error.message)...")
@@ -851,7 +922,19 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
+    func _unsubscribePKInvitationChanged(roomId:String?) {
+        guard let channelName = roomId else {
+            agoraAssert("channelName = nil")
+            return
+        }
+        agoraPrint("imp pk invitation unsubscribe ...")
+        SyncUtil
+            .scene(id: channelName)?
+            .unsubscribeScene()
+    }
+    
+    func _subscribePKInvitationChanged(roomId:String?,
+                                       subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -891,7 +974,7 @@ extension ShowSyncManagerServiceImp {
     }
     
     func _addPKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
+        guard let channelName = invitation.roomId else {
 //            assert(false, "channelName = nil")
             agoraPrint("_addPKInvitation channelName = nil")
             return
@@ -952,6 +1035,40 @@ extension ShowSyncManagerServiceImp {
                 completion(NSError(domain: error.message, code: error.code))
             })
     }
+    
+    func _recvPKRejected(invitation: ShowPKInvitation) {
+        guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
+        _unsubscribePKInvitationChanged(roomId: pkRoomId)
+//        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else { return }
+//        _removeInteraction(interaction: interaction) { error in
+//        }
+    }
+    
+    func _recvPKAccepted(invitation: ShowPKInvitation) {
+        guard roomId == invitation.fromRoomId else { return }
+        if let _ = self.interactionList.filter({ $0.userId == invitation.userId }).first {
+            return
+        }
+        
+        let interaction = ShowInteractionInfo()
+        interaction.userId = invitation.userId
+        interaction.roomId = invitation.roomId
+        interaction.interactStatus = .pking
+        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        _addInteraction(interaction: interaction) { error in
+        }
+    }
+    
+    func _recvPKFinish(invitation: ShowPKInvitation) {
+        guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
+        _unsubscribePKInvitationChanged(roomId: pkRoomId)
+        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else {
+            return
+        }
+        
+        _removeInteraction(interaction: interaction) { error in
+        }
+    }
 }
 
 
@@ -978,7 +1095,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void) {
+    func _subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
