@@ -14,6 +14,7 @@ class VoiceBuddyImp : IVoiceBuddy {
     private var chatUid: String = ""
     private var chatToken: String = ""
     private var rtcToken: String = ""
+    private var chatUuid: String = ""
 
     override fun application(): Application {
         return AgoraApplication.the()
@@ -68,12 +69,20 @@ class VoiceBuddyImp : IVoiceBuddy {
         return chatToken
     }
 
+    override fun chatUserUuid(): String {
+        return chatUuid
+    }
+
     override fun setupRtcToken(rtcToken: String) {
         this.rtcToken = rtcToken
     }
 
-    override fun setupChatConfig(chatUid: String, chatToken: String) {
-        this.chatUid = chatUid
+    override fun setupChatConfig(chatUid: String, chatToken: String, chatUuid: String) {
+        // 传uuid 时候没有返回chatUid
+        if (this.chatUid.isEmpty()) {
+            this.chatUid = chatUid
+        }
         this.chatToken = chatToken
+        this.chatUuid = chatUuid
     }
 }
