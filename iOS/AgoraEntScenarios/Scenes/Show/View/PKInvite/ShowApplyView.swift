@@ -60,19 +60,35 @@ class ShowApplyView: UIView {
         view.delegate = self
         view.register(ShowApplyViewCell.self,
                       forCellWithReuseIdentifier: ShowApplyViewCell.description())
-        view.dataArray = (0...10).map({ $0 })
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
     
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        getAllMicSeatList()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getAllMicSeatList() {
+        AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
+            guard let list = list else { return }
+            let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
+            self.revokeutton.isHidden = seatUserModel == nil
+            if seatUserModel == nil { // 发出上麦申请
+                AppContext.showServiceImp.createMicSeatApply { _ in }
+            }
+            let text = " 正在等待"
+            let attrs = NSMutableAttributedString(string: text)
+            let attr = NSAttributedString(string: "\(list.count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+            attrs.insert(attr, at: 0)
+            self.tipsLabel.attributedText = attrs
+            self.tableView.dataArray = list
+        }
     }
     
     private func setupUI() {
@@ -133,14 +149,19 @@ class ShowApplyView: UIView {
         UIView.animate(withDuration: 0.25) {
             self.layoutIfNeeded()
         }
+        AppContext.showServiceImp.cancelMicSeatApply { _ in
+            self.getAllMicSeatList()
+        }
     }
 }
 
 extension ShowApplyView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowApplyViewCell.description(),
-                                                 for: indexPath)
-        
+                                                 for: indexPath) as! ShowApplyViewCell
+        if let model = self.tableView.dataArray?[indexPath.row] as? ShowMicSeatApply {
+            cell.setupApplyData(model: model, index: indexPath.row)
+        }
         return cell
     }
     
@@ -192,6 +213,18 @@ class ShowApplyViewCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupApplyData(model: ShowMicSeatApply, index: Int) {
+        sortLabel.text = "\(index + 1)"
+        avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+                                    placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
+        nameLabel.text = model.userName
+        if model.userId == VLUserCenter.user.id {
+            nameLabel.textColor = .show_zi01
+        } else {
+            nameLabel.textColor = .black
+        }
     }
     
     private func setupUI() {

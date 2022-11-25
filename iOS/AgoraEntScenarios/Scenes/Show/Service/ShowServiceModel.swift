@@ -16,6 +16,7 @@ enum ShowRoomStatus: Int {
 }
 
 enum ShowRoomRequestStatus: Int {
+    case idle = 0
     /// 等待中
     case waitting = 1
     /// 已接受
@@ -71,6 +72,7 @@ class ShowUser: ShowBaseInfo {
     var userId: String?              //用户id (rtc uid)
     var avatar: String?              //用户头像
     var userName: String?            //用户名
+    var status: ShowRoomRequestStatus = .idle //申请状态
 }
 
 /// 聊天消息
@@ -85,9 +87,9 @@ class ShowMessage: ShowBaseInfo {
 /// 连麦申请
 class ShowMicSeatApply: ShowBaseInfo {
     var userId: String?                              //用户id (rtc uid)
-    var userAvatar: String?                          //用户头像
+    var avatar: String?                          //用户头像
     var userName: String?                            //用户名
-    var status: ShowRoomRequestStatus = .waitting    //申请状态
+    var status: ShowRoomRequestStatus = .idle       //申请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
@@ -95,10 +97,9 @@ class ShowMicSeatApply: ShowBaseInfo {
 /// 连麦邀请
 class ShowMicSeatInvitation: ShowBaseInfo {
     var userId: String?                              //用户id (rtc uid)
-    var userAvatar: String?                          //用户头像
+    var avatar: String?                          //用户头像
     var userName: String?                            //用户名
-    var fromUserId: String?                          //发起邀请用户id
-    var status: ShowRoomRequestStatus = .waitting    //邀请状态
+    var status: ShowRoomRequestStatus = .idle      //邀请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
