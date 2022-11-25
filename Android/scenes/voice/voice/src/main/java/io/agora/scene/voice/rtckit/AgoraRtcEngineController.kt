@@ -12,6 +12,7 @@ import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.config.ConfigConstants
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 
 /**
@@ -69,6 +70,7 @@ class AgoraRtcEngineController {
 
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
+                    "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD()
                     // 默认开启降噪
                     deNoise(VoiceBuddyFactory.get().rtcChannelTemp.anisMode)
                     joinCallback?.onSuccess(true)
@@ -110,7 +112,7 @@ class AgoraRtcEngineController {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
             } catch (e: Exception) {
                 e.printStackTrace()
-                "rtc engine init error:${e.message}".logE()
+                "voice rtc engine init error:${e.message}".logE()
                 return false
             }
             return true

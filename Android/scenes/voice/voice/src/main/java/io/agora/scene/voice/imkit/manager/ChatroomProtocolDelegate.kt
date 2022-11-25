@@ -11,12 +11,10 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceMemberModel
-import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.service.VoiceRoomApply
+import io.agora.scene.voice.service.*
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.GsonTools
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 
 class ChatroomProtocolDelegate constructor(
@@ -67,35 +65,87 @@ class ChatroomProtocolDelegate constructor(
     }
 
     /**
-     * 从服务端获取所有麦位信息
+     * 获取详情，kv 组装
      */
-    fun getMicInfoFromServer(): MutableMap<String, VoiceMicInfoModel> {
-        var micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
-        val keyList: MutableList<String> = java.util.ArrayList()
+    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel,callback: ValueCallBack<VoiceRoomInfo>){
+        val keyList: MutableList<String> =
+            mutableListOf("ranking_list", "member_list", "gift_amount", "robot_volume", "use_robot")
         for (i in 0..7) {
-            keyList[i] = "mic_$i"
+            keyList.add("mic_$i")
         }
-        roomManager.asyncFetchChatroomAttributesFromServer(roomId,keyList,object :
-            ValueCallBack<MutableMap<String, String>> {
-            override fun onSuccess(value: MutableMap<String, String>?) {
-                value?.let {
-                    ChatroomCacheManager.cacheManager.clearMicInfo()
-                    ChatroomCacheManager.cacheManager.setMicInfo(it)
-                    for (entry in value.entries) {
-                        var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
-                        if (bean != null) {
-                            micInfoMap[entry.key] = bean
+        // TODO: 2022/11/25 拼接详情
+        val voiceRoomInfo = VoiceRoomInfo()
+        voiceRoomInfo.roomInfo = voiceRoomModel
+        roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
+            object : ValueCallBack<Map<String, String>> {
+                override fun onSuccess(result: Map<String, String>) {
+                    val micInfoList = mutableListOf<VoiceMicInfoModel>()
+                    val micMap = mutableMapOf<String,String>()
+                    result.entries.forEach {
+                        val key = it.key
+                        val value = it.value
+                        if (key.startsWith("mic_")){
+                            micMap[key] = value
+                        }else if (key=="ranking_list"){
+                            // TODO: 排行榜
+                        }else if (key=="member_list"){
+                            // TODO: 用户列表
+                        }else if (key=="gift_amount"){
+
+                        }else if (key=="robot_volume"){
+
+                        }else if (key=="use_robot"){
+
                         }
                     }
+                    ChatroomCacheManager.cacheManager.clearMicInfo()
+                    ChatroomCacheManager.cacheManager.setMicInfo(micMap)
+                    for (entry in micMap.entries) {
+                        GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)?.let {
+                            micInfoList.add(it)
+                        }
+                    }
+                    micInfoList.sortedBy { it.micIndex }
+                    voiceRoomInfo.micInfo = micInfoList
+                    "getMicInfoFromServer onSuccess: $micInfoList".logD(TAG)
+                    callback.onSuccess(voiceRoomInfo)
                 }
-            }
 
-            override fun onError(error: Int, desc: String?) {
-                "onError: $error $desc".logE("asyncFetchChatRoomAllAttributesFromServer")
-            }
+                override fun onError(error: Int, desc: String?) {
+                    "onError: $error $desc".logE(TAG)
+                    callback.onError(error,desc)
+                }
+            })
+    }
 
-        })
-        return micInfoMap
+    /**
+     * 从服务端获取所有麦位信息
+     */
+    fun getMicInfoFromServer(callback: ValueCallBack<List<VoiceMicInfoModel>>) {
+        val keyList: MutableList<String> = mutableListOf()
+        for (i in 0..7) {
+            keyList.add("mic_$i")
+        }
+        roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
+            object : ValueCallBack<Map<String, String>> {
+                override fun onSuccess(value: Map<String, String>) {
+                    val micInfoList = mutableListOf<VoiceMicInfoModel>()
+                    ChatroomCacheManager.cacheManager.clearMicInfo()
+                    ChatroomCacheManager.cacheManager.setMicInfo(value)
+                    for (entry in value.entries) {
+                       GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)?.let {
+                           micInfoList.add(it)
+                       }
+                    }
+                    "getMicInfoFromServer onSuccess: $micInfoList".logD(TAG)
+                    callback.onSuccess(micInfoList.sortedBy { it.micIndex })
+                }
+
+                override fun onError(error: Int, desc: String?) {
+                    "onError: $error $desc".logE(TAG)
+                    callback.onError(error,desc)
+                }
+            })
     }
 
     /**
@@ -125,24 +175,27 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 从服务端获取指定麦位信息
      */
-    fun getMicInfoByIndexFromServer(micIndex: Int): VoiceMicInfoModel {
-        val keyList: MutableList<String> = java.util.ArrayList()
-        var micBean = VoiceMicInfoModel(-99, null, -99)
+    fun getMicInfoByIndexFromServer(micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
+        val keyList: MutableList<String> = mutableListOf()
         keyList.add(getMicIndex(micIndex))
         roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList, object :
-            ValueCallBack<MutableMap<String, String>> {
-            override fun onSuccess(value: MutableMap<String, String>?) {
-                for (entry in value?.entries!!) {
-                    micBean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)!!
-                    "getMicInfoByIndex onSuccess: ".logE(TAG)
+            ValueCallBack<Map<String, String>> {
+            override fun onSuccess(value: Map<String, String>) {
+
+                value.entries.forEach {
+                    val micBean = GsonTools.toBean(it.value, VoiceMicInfoModel::class.java)
+                    "getMicInfoByIndex onSuccess: $micBean".logD(TAG)
+                    callback.onSuccess(micBean)
+                    // TODO: 单个
+                    return
                 }
             }
 
             override fun onError(error: Int, desc: String?) {
                 "getMicInfoByIndex onError: $error $desc".logE(TAG)
+                callback.onError(error, desc)
             }
         })
-        return micBean
     }
 
     /**
