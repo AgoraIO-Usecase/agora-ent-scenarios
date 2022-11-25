@@ -6,8 +6,10 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
+import io.agora.scene.voice.service.VoiceGiftModel
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.voice.buddy.tool.GsonTools
 import java.io.*
 
@@ -22,8 +24,8 @@ class ChatroomCacheManager {
     private val roomMemberList = mutableListOf<VoiceMemberModel>()
     private val roomMemberMap = mutableMapOf<String, VoiceMemberModel>()
 
-    private val giftContributeList = mutableListOf<VoiceMemberModel>()
-    private val giftContributeMap = mutableMapOf<String, VoiceMemberModel>()
+    private var rankingList = mutableListOf<VoiceRankUserModel>()
+    private val rankingMap = mutableMapOf<String, VoiceRankUserModel>()
 
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
@@ -155,6 +157,34 @@ class ChatroomCacheManager {
     fun clearMemberList(){
         roomMemberList.clear()
         roomMemberMap.clear()
+    }
+
+    /**
+     * 设置榜单列表
+     */
+    fun setRankList(rankBean:VoiceRankUserModel){
+        val name = rankBean.name
+        if (name != null){
+            rankingMap[name] = rankBean
+            rankingList.clear()
+            for (entry in rankingMap.entries) {
+                rankingList.add(entry.value)
+
+            }
+        }
+        rankingList.sortBy { it.amount }
+    }
+
+    fun getRankList():MutableList<VoiceRankUserModel>{
+        return rankingList
+    }
+
+    /**
+     * 清除榜单
+     */
+    fun clearRankList(){
+        rankingList.clear()
+        rankingMap.clear()
     }
 
     /**
