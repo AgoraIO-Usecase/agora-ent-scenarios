@@ -14,24 +14,24 @@ enum class ShowRoomRequestStatus(val value: Int){
 
 // 房间详情信息
 data class ShowRoomDetailModel(
-    val roomNo: String,
+    val roomId: String,
     val roomName: String,
     val roomUserCount: Int,
     val thumbnailId: String,
     val ownerId: String,
     val roomStatus: Int = ShowRoomStatus.activity.value,
-    val crateAt: Double,
+    val createAt: Double,
     val updateAt: Double,
 ): java.io.Serializable {
-    fun toMap(): Map<String, Any>{
-        return mapOf(
-            Pair("roomNo", roomNo),
+    fun toMap(): HashMap<String, Any>{
+        return hashMapOf(
+            Pair("roomId", roomId),
             Pair("roomName", roomName),
-            Pair("roomUserCount", 0),
+            Pair("roomUserCount", roomUserCount),
             Pair("thumbnailId", ""),
             Pair("ownerId", ownerId),
             Pair("roomStatus", roomStatus),
-            Pair("crateAt", crateAt),
+            Pair("crateAt", createAt),
             Pair("updateAt", updateAt),
         )
     }

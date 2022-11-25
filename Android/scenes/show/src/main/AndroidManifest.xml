@@ -16,7 +16,8 @@
         <activity
             android:name=".LiveDetailActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustNothing"/>
 
     </application>
 </manifest>
