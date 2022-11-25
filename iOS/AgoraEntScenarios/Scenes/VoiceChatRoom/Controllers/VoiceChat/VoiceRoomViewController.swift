@@ -800,9 +800,9 @@ extension VoiceRoomViewController: VMManagerDelegate {
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
         guard let micinfo = roomInfo?.mic_info else { return }
         for speaker in speakers {
-            for mic in micinfo {
-                guard let user = mic.member else { return }
-                guard let rtcUid = Int(user.rtc_uid ?? "0") else { return }
+            for mic in micinfo where mic.member != nil{
+                let user = mic.member
+                guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
                     rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
                 }
