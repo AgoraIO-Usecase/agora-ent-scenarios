@@ -178,7 +178,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             } else {
                 roomInfo.room?.ranking_list = [VRUser]()
             }
-            if let member_list = map?["ranking_list"]?.toArray() {
+            if let member_list = map?["member_list"]?.toArray() {
                 print("member_list: \(member_list)")
                 roomInfo.room?.member_list = member_list.kj.modelArray(VRUser.self)
             } else {
@@ -276,6 +276,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
+    func cleanUserMicIndex(mic: VRRoomMic) {
+        let user = self.userList?.first(where: {
+            $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
+        })
+        user?.mic_index = -1
+    }
+    
     func lockMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         guard let mic = self.mics[safe: mic_index] else {
             return
@@ -285,6 +292,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             mic.status = 3
         }
+        self.cleanUserMicIndex(mic: mic)
         mic.member = nil
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
@@ -318,6 +326,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let mic = VRRoomMic()
         mic.mic_index = mic_index
         mic.status = -1
+        self.cleanUserMicIndex(mic: mic)
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[mic_index] = mic
@@ -330,6 +339,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let mic = VRRoomMic()
         mic.mic_index = mic_index
         mic.status = -1
+        self.cleanUserMicIndex(mic: mic)
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[mic_index] = mic
