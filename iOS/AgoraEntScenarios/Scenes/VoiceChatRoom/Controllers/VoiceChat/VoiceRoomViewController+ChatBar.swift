@@ -308,19 +308,6 @@ extension VoiceRoomViewController {
                 
             }
         }
-//        guard let roomId = roomInfo?.room?.room_id else { return }
-//        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .submitApply(roomId: roomId), params: index != nil ? ["mic_index": index ?? 2] : [:]) { dic, error in
-//            if error == nil, dic != nil, let result = dic?["result"] as? Bool {
-//                if result {
-//                    self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
-//                    self.view.makeToast("Apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-//                } else {
-//                    self.view.makeToast("Apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-//                }
-//            } else {
-////                self.view.makeToast("\(error?.localizedDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
-//            }
-//        }
     }
 
     func cancelRequestSpeak(index: Int?) {

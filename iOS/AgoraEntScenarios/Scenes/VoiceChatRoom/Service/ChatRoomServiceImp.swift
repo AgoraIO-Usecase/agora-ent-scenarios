@@ -13,7 +13,7 @@ import AgoraChat.AgoraChatError
 private let cSceneId = "scene_chatRoom"
 
 public class ChatRoomServiceImp: NSObject {
-    private static var _sharedInstance: ChatRoomServiceImp?
+    static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
@@ -257,10 +257,16 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = mic.member == nil ? -1:0
+        if mic.status == 4 {
+            mic.status = 3
+        } else {
+            if mic.status == 2 {
+                mic.status = (mic.member == nil ? -1 : 0)
+            }
+        }
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 0
+                self.mics[safe: mic_index]?.status = mic.status
             }
             completion(self.convertError(error: error),mic)
         })
@@ -287,10 +293,17 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         guard let mic = self.mics[safe: mic_index] else {
             return
         }
-        mic.status = mic.member == nil ? -1:0
+        if mic.status == 4 {
+            mic.status = 2
+        } else {
+            if mic.status == 3 {
+                mic.status = (mic.member == nil ? -1 : 0)
+            }
+        }
+
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
-                self.mics[safe: mic_index]?.status = 0
+                self.mics[safe: mic_index]?.status = mic.status
             }
             completion(self.convertError(error: error),mic)
         })
