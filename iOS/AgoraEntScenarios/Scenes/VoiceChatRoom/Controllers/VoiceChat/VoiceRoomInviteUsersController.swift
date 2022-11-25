@@ -81,7 +81,9 @@ extension VoiceRoomInviteUsersController {
             if users != nil , error == nil {
                 if self.apply == nil {
                     let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()
-                    model.members = users
+                    model.members = users?.filter({
+                        $0.mic_index == -1
+                    })
                     self.apply = model
                 } else {
                     self.apply?.members?.append(contentsOf: users ?? [])
