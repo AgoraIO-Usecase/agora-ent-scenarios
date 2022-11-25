@@ -121,7 +121,7 @@ extension VoiceRoomViewController {
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
         guard let roomId = roomInfo?.room?.chatroom_id else { return }
-        guard let rtcUid = VoiceRoomUserInfo.shared.user?.rtc_uid else { return }
+        let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
 
