@@ -17,6 +17,7 @@ class ChatroomCacheManager {
     private var mEditor: SharedPreferences.Editor? = null
     private var mSharedPreferences: SharedPreferences? = null
     private val mMicInfoMap = mutableMapOf<String, String>()
+    private val allInfoMap = mutableMapOf<String, String>()
 
     private val submitMicList = mutableListOf<VoiceMemberModel>()
     private val submitMicMap = mutableMapOf<String, VoiceMemberModel>()
@@ -37,6 +38,33 @@ class ChatroomCacheManager {
                 mEditor = it?.edit()
             }
         }
+    }
+
+    /**
+     * 缓存所有kv属性
+     */
+    fun setKvInfo(kvMap: Map<String,String>){
+        for (entry in kvMap.entries) {
+            allInfoMap[entry.key] = entry.value
+        }
+    }
+
+    /**
+     * 根据key从缓存获取属性
+     */
+    fun getKvInfo(key: String?):String?{
+        return allInfoMap[key]
+    }
+
+    /**
+     * 清除所有缓存
+     */
+    fun clearAllCache(){
+        allInfoMap.clear()
+        clearMemberList()
+        clearMicInfo()
+        clearSubmitList()
+        clearRankList()
     }
 
     /**
@@ -131,6 +159,13 @@ class ChatroomCacheManager {
                 roomMemberList.add(entry.value)
             }
         }
+    }
+
+    /**
+     * 根据chatUid 获取对应实体类
+     */
+    fun getMember(chatUid: String):VoiceMemberModel?{
+        return roomMemberMap[chatUid]
     }
 
     /**
