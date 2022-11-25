@@ -109,7 +109,7 @@ class VoiceRoomViewController: VRBaseViewController {
     }
 
     deinit {
-        leaveRoom()
+        print("\(String(describing: self.swiftClassName)) is destroyed!")
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
@@ -353,6 +353,7 @@ extension VoiceRoomViewController {
             } else {
                 notifySeverLeave()
                 rtckit.leaveChannel()
+                self.leaveRoom()
                 backAction()
             }
         } else if action == .notice {
@@ -736,6 +737,7 @@ extension VoiceRoomViewController {
     }
 
     private func ownerBack() {
+        self.leaveRoom()
         if let vc = navigationController?.viewControllers.filter({ $0 is VRRoomsViewController
         }).first {
             navigationController?.popToViewController(vc, animated: true)

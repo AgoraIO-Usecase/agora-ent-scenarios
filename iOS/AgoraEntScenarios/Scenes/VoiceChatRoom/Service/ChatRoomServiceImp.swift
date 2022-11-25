@@ -13,7 +13,7 @@ import AgoraChat.AgoraChatError
 private let cSceneId = "scene_chatRoom"
 
 public class ChatRoomServiceImp: NSObject {
-    private static var _sharedInstance: ChatRoomServiceImp?
+    static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
     var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
