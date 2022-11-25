@@ -356,6 +356,7 @@ public let kMPK_RTC_UID: UInt = 1
      */
     public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
+        rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
@@ -372,7 +373,7 @@ public let kMPK_RTC_UID: UInt = 1
             rtcKit.setParameters("{\"che.audio.input_channels\":2}")
         }
         setAINS(with: .mid)
-        loadKit(with: channelName, rtcUid: rtcUid)
+        rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
         let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
     }
@@ -792,6 +793,10 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
         }
 
         delegate?.didRtcLocalUserJoinedOfUid?(uid: uid)
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
+        
     }
 
     // dataStream received
