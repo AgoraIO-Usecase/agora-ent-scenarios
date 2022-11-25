@@ -545,7 +545,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         room_entity.name = room.name
         room_entity.created_at = UInt(millisecond)
         room_entity.roomPassword = room.roomPassword
-        room_entity.click_count = 1
+        room_entity.click_count = 3
+        room_entity.member_count = 3
         
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
@@ -554,7 +555,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
-        initIM(with: room_entity.name ?? "", pwd: "12345678") {[weak self] im_token, uid, room_id in
+        initIM(with: room_entity.name ?? "", channelId: room_entity.channel_id ?? "", pwd: "12345678") {[weak self] im_token, uid, room_id in
             owner.chat_uid = uid
             room_entity.chatroom_id = room_id
             room_entity.owner = owner
@@ -594,10 +595,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 if room.room_id == roomId {
                     let updateRoom: VRRoomEntity = room
                     updateRoom.member_count = updateRoom.member_count ?? 0 + 1
+                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
-                    self.initIM(with: room.name ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
+                    self.initIM(with: room.name ?? "", channelId: updateRoom.channel_id ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
                         VLUserCenter.user.im_token = im_token
                         VLUserCenter.user.chat_uid = chat_uid
                         completion(nil, updateRoom)
@@ -645,6 +647,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     } else {
                         let updateRoom: VRRoomEntity = room
                         updateRoom.member_count = updateRoom.member_count ?? 0 - 1
+                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
@@ -700,7 +703,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return micsMap
     }
     
-    func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
+    func initIM(with roomName: String,channelId: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
         var im_token = ""
         var im_uid = ""
@@ -710,7 +713,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             im_uid = uid ?? ""
             chatroom_id = room_id ?? ""
             im_token = token ?? ""
-            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+            NetworkManager.shared.generateToken(channelName: channelId, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 completion(im_token, im_uid, chatroom_id )
             }
