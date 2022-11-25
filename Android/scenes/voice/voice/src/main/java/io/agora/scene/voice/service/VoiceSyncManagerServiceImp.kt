@@ -237,9 +237,21 @@ class VoiceSyncManagerServiceImp(
      */
     override fun fetchRoomDetail(
         voiceRoomModel: VoiceRoomModel,
-        completion: (error: Int, result: VoiceRoomInfo) -> Unit
+        completion: (error: Int, result: VoiceRoomInfo?) -> Unit
     ) {
+        ChatroomIMManager.getInstance().fetchRoomDetail(voiceRoomModel, object : ValueCallBack<VoiceRoomInfo> {
+            override fun onSuccess(value: VoiceRoomInfo?) {
+                if (value != null) {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, value)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                }
+            }
 
+            override fun onError(error: Int, errorMsg: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+            }
+        })
     }
 
     /**

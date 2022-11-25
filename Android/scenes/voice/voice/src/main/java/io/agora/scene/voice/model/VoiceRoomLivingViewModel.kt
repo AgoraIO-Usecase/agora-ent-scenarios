@@ -124,6 +124,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     /**获取礼物列表*/
     fun giftContributeObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _giftContributeObservable
 
+    /**获取详情*/
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
         _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }

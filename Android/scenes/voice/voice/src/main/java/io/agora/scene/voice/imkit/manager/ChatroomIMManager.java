@@ -28,6 +28,8 @@ import io.agora.scene.voice.service.VoiceGiftModel;
 import io.agora.scene.voice.service.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceMicInfoModel;
 import io.agora.scene.voice.service.VoiceRankUserModel;
+import io.agora.scene.voice.service.VoiceRoomInfo;
+import io.agora.scene.voice.service.VoiceRoomModel;
 import io.agora.util.EMLog;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
@@ -199,10 +201,8 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                     data.add(parseChatMessage(allMessage));
                 }
             }
-            return data;
-        }else {
-            return null;
         }
+        return data;
     }
 
     public ChatMessageData parseChatMessage(ChatMessage chatMessage){
@@ -462,6 +462,31 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
                 0);
         delegate.initMicInfo(roomType,voiceMemberModel,callBack);
+    }
+
+    /**
+     * 获取详情
+     * @param voiceRoomModel
+     * @param callBack
+     */
+    public void fetchRoomDetail(VoiceRoomModel voiceRoomModel, ValueCallBack<VoiceRoomInfo> callBack) {
+        // 麦位信息
+        VoiceMemberModel owner = voiceRoomModel.getOwner();
+        if (owner != null && TextUtils.equals(owner.getUserId(), VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+            initMicInfo(voiceRoomModel.getRoomType(), new CallBack() {
+                @Override
+                public void onSuccess() {
+                    delegate.fetchRoomDetail(voiceRoomModel, callBack);
+                }
+
+                @Override
+                public void onError(int code, String error) {
+                    callBack.onError(code, error);
+                }
+            });
+        } else {
+            delegate.fetchRoomDetail(voiceRoomModel, callBack);
+        }
     }
 
     /**
