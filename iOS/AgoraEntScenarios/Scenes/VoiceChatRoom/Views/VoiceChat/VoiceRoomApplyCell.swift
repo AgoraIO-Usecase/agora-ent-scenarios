@@ -54,7 +54,7 @@ public class VoiceRoomApplyCell: UITableViewCell {
     }
 
     @objc func apply() {
-        if agreeClosure != nil, user?.member?.mic_index ?? 0 < 1, user?.member?.invited ?? false == false {
+        if agreeClosure != nil, user?.member?.invited ?? false == false {
             agreeClosure!(user)
         }
     }
