@@ -645,7 +645,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param enable true 启动机器人，false 关闭机器人
      * @param callBack
      */
-    public void enableRobot(Boolean enable,ValueCallBack<Map<Integer,VoiceMicInfoModel>> callBack){
+    public void enableRobot(Boolean enable,ValueCallBack<Boolean> callBack){
         delegate.enableRobot(enable,callBack);
     }
 
