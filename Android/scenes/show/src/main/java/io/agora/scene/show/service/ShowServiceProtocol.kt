@@ -7,7 +7,6 @@ import io.agora.scene.base.utils.ToastUtils
 interface ShowServiceProtocol {
 
     enum class ShowSubscribeStatus {
-        created,
         deleted,
         updated
     }
@@ -49,11 +48,11 @@ interface ShowServiceProtocol {
     fun getAllUserList(success: (List<ShowUser>) -> Unit, error: ((Exception) -> Unit)? = null)
 
     // 监听用户变化
-    fun subscribeUser(onUserChange: (ShowSubscribeStatus, ShowUser) -> Unit)
+    fun subscribeUser(onUserChange: (ShowSubscribeStatus, ShowUser?) -> Unit)
 
     // 发送聊天消息
     fun sendChatMessage(
-        message: ShowMessage,
+        message: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )

@@ -62,7 +62,7 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun updateRoomItem(binding: ShowRoomItemBinding, roomInfo: ShowRoomDetailModel) {
         binding.tvRoomName.text = roomInfo.roomName
-        binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomNo)
+        binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
         binding.root.setOnClickListener {
             goLiveDetailActivity(roomInfo)
@@ -76,7 +76,7 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel){
-        mService.joinRoom(roomInfo.roomNo, {
+        mService.joinRoom(roomInfo.roomId, {
             LiveDetailActivity.launch(this, it)
         })
     }

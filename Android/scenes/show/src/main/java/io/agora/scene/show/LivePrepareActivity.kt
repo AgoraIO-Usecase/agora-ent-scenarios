@@ -20,7 +20,7 @@ class LivePrepareActivity : AppCompatActivity(){
         mBinding.btnCreateRoom.setOnClickListener {
             mBinding.btnCreateRoom.isEnabled = false
             mService.createRoom("Testing", {
-                mService.joinRoom(it.roomNo, { roomDetailInfo ->
+                mService.joinRoom(it.roomId, { roomDetailInfo ->
                     runOnUiThread {
                         LiveDetailActivity.launch(this@LivePrepareActivity, roomDetailInfo)
                         finish()

@@ -2,20 +2,31 @@ package io.agora.scene.show
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
+import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
+import io.agora.scene.show.service.ShowMessage
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.utils.PermissionHelp
+import io.agora.scene.show.widget.TextInputDialog
+import io.agora.scene.widget.basic.BindingSingleAdapter
+import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,7 +34,7 @@ import java.util.*
 class LiveDetailActivity : ComponentActivity() {
 
     companion object {
-        private val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
+        private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun launch(context: Context, roomDetail: ShowRoomDetailModel) {
             context.startActivity(Intent(context, LiveDetailActivity::class.java).apply {
@@ -37,6 +48,9 @@ class LiveDetailActivity : ComponentActivity() {
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
+    private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
+        null
+
     private lateinit var mPermissionHelp: PermissionHelp
     private lateinit var mRtcEngine: RtcEngineEx
 
@@ -44,6 +58,7 @@ class LiveDetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.setDarkStatusIcon(window, false)
         setContentView(mBinding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         mPermissionHelp = PermissionHelp(this)
         initView()
         initService()
@@ -61,13 +76,14 @@ class LiveDetailActivity : ComponentActivity() {
     private fun initView() {
         initTopLayout()
         initBottomLayout()
+        initMessageLayout()
     }
 
     private fun initTopLayout() {
         val topLayout = mBinding.topLayout
         topLayout.ivOwnerAvatar.setImageResource(R.mipmap.portrait03)
         topLayout.tvRoomName.text = mRoomInfo.roomName
-        topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomNo)
+        topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
         topLayout.tvUserCount.text = mRoomInfo.roomUserCount.toString()
         topLayout.ivClose.setOnClickListener { onBackPressed() }
 
@@ -77,7 +93,7 @@ class LiveDetailActivity : ComponentActivity() {
         topLayout.tvTimer.post(object : Runnable {
             override fun run() {
                 topLayout.tvTimer.text =
-                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.crateAt)
+                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.createAt)
                 topLayout.tvTimer.postDelayed(this, 1000)
             }
         })
@@ -86,10 +102,58 @@ class LiveDetailActivity : ComponentActivity() {
 
     private fun initBottomLayout() {
         val bottomLayout = mBinding.bottomLayout
+        bottomLayout.tvChat.setOnClickListener {
+            showMessageInputDialog()
+        }
         bottomLayout.ivSetting.setOnClickListener {
 
         }
     }
+
+    private fun initMessageLayout() {
+        val messageLayout = mBinding.messageLayout
+        mMessageAdapter =
+            object : BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>() {
+                override fun onBindViewHolder(
+                    holder: BindingViewHolder<ShowLiveDetailMessageItemBinding>,
+                    position: Int
+                ) {
+                    val item = getItem(position)
+                    holder.binding.text.text = SpannableStringBuilder()
+                        .append(
+                            "${item.userName}: ",
+                            ForegroundColorSpan(Color.parseColor("#A6C4FF")),
+                            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+                        )
+                        .append(
+                            item.message,
+                            ForegroundColorSpan(Color.WHITE),
+                            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+                        )
+                }
+            }
+        (messageLayout.rvMessage.layoutManager as LinearLayoutManager).let {
+            it.stackFromEnd = true
+        }
+        messageLayout.rvMessage.adapter = mMessageAdapter
+    }
+
+    private fun showMessageInputDialog() {
+        TextInputDialog(this)
+            .setOnInsertHeightChangeListener {
+                mBinding.messageLayout.root.layoutParams =
+                    (mBinding.messageLayout.root.layoutParams as MarginLayoutParams).apply {
+                        bottomMargin = it
+                    }
+            }
+            .setOnSentClickListener { dialog, msg ->
+                mService.sendChatMessage(msg)
+            }
+            .show()
+    }
+
+    private fun updateTopUserCount(count: Int) =
+        runOnUiThread { mBinding.topLayout.tvUserCount.text = count.toString() }
 
     private fun showPermissionLeakDialog(yes: () -> Unit) {
         AlertDialog.Builder(this).apply {
@@ -107,11 +171,25 @@ class LiveDetailActivity : ComponentActivity() {
         }
     }
 
+    private fun insertMessageItem(msg: ShowMessage) = runOnUiThread {
+        mMessageAdapter?.let {
+            it.insertLast(msg)
+            mBinding.messageLayout.rvMessage.scrollToPosition(it.itemCount - 1)
+        }
+    }
+
 
     //================== Service Operation ===============
 
     private fun initService() {
-
+        mService.subscribeUser { _, _ ->
+            mService.getAllUserList({
+                updateTopUserCount(it.size)
+            })
+        }
+        mService.subscribeMessage { _, showMessage ->
+            insertMessageItem(showMessage)
+        }
     }
 
     private fun destroyService() {
@@ -148,7 +226,7 @@ class LiveDetailActivity : ComponentActivity() {
 
     private fun joinChannel() {
         val uid = UserManager.getInstance().user.id
-        val channelName = mRoomInfo.roomNo
+        val channelName = mRoomInfo.roomId
         TokenGenerator.generateTokens(
             channelName,
             uid.toString(),

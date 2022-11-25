@@ -4,10 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     tools:background="@color/grey_5B">
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvChat"
         android:layout_width="85dp"
         android:layout_height="38dp"
         android:textColor="@color/white_80_percent"
