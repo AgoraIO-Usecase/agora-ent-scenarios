@@ -449,6 +449,11 @@ VLPopScoreViewDelegate
 }
 
 #pragma mark - rtc callbacks
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
+{
+    VLLog(@"uid joined %ld", uid);
+}
+
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
@@ -633,39 +638,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - action utils / business
-- (void)muteLocalAudio:(BOOL)mute {
-    if (mute) {
-        self.isNowMicMuted = YES;
-    } else{
-        self.isNowMicMuted = NO;
-    }
-    [self.RTCkit adjustRecordingSignalVolume:mute ? 0 : 100];
-    
-    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
-                                                        completion:^(NSError * error) {
-    }];
-}
-
-- (void)muteLocalVideo:(BOOL)mute {
-    if (!mute) {
-        self.isNowCameraMuted = NO;
-    } else {
-        self.isNowCameraMuted = YES;
-    }
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
-    [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:mute
-                                                        completion:^(NSError * error) {
-    }];
-}
-
-- (void)toggleLocalAudio {
-    [self muteLocalAudio:!self.isNowMicMuted];
-}
-
-- (void)toggleLocalVideo {
-    [self muteLocalVideo:!self.isNowCameraMuted];
-}
-
 - (void)leaveRoom {
     VL(weakSelf);
     [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
@@ -1054,10 +1026,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self popUpChooseSongView:NO];
             break;
         case VLKTVBottomBtnClickTypeAudio:
-            [self toggleLocalAudio];
+            self.isNowMicMuted = !self.isNowMicMuted;
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         case VLKTVBottomBtnClickTypeVideo:
-            [self toggleLocalVideo];
+            self.isNowCameraMuted = !self.isNowCameraMuted;
+            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         default:
             break;
@@ -1664,6 +1642,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self resetPlayer];
     }
     [self.RTCkit enableLocalAudio:isOnMicSeat];
+    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
@@ -1679,6 +1658,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isNowMicMuted = isNowMicMuted;
     
     if(oldValue != isNowMicMuted) {
+        [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
         [self.bottomView updateAudioBtn:isNowMicMuted];
     }
 }
@@ -1689,6 +1669,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     if(oldValue != isNowCameraMuted) {
         [self.RTCkit enableLocalVideo:!isNowCameraMuted];
+        if(!isNowCameraMuted) {
+            [self.RTCkit startPreview];
+        } else {
+            [self.RTCkit stopPreview];
+        }
+        [self.RTCkit muteLocalVideoStream:isNowCameraMuted];
         [self.bottomView updateVideoBtn:isNowCameraMuted];
     }
 }

@@ -126,7 +126,7 @@
     cell.videoView.hidden = !(seatModel.rtcUid != nil && !seatModel.isVideoMuted);
     //avatar or camera will only be displayed 1 at atime
     cell.avatarImgView.hidden = !cell.videoView.isHidden;
-    if (!seatModel.isVideoMuted) { //开启了视频
+    if (!seatModel.isVideoMuted && seatModel.objectId != nil) { //开启了视频
         [self.delegate onVLRoomPersonView:self onRenderVideo:seatModel inView:cell.videoView atIndex:indexPath.row];
     }
     
