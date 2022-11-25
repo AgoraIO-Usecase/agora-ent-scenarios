@@ -144,6 +144,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = voiceRoomModel.roomName,
+            chatOwner = voiceRoomModel.owner?.chatUid?:"",
             completion = { error, chatroomId ->
                 if (error == VoiceServiceProtocol.ERR_OK) {
                     ThreadManager.getInstance().runOnMainThread {

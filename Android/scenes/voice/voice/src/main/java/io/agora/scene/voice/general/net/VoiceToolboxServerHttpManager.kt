@@ -118,17 +118,7 @@ class VoiceToolboxServerHttpManager {
      * - 中文；
      * - 特殊字符。
      */
-    fun createImRoom(
-        chatroomName: String,
-        chatroomNameDesc: String = "Welcome!",
-        chatroomOwner: String,
-        src: String = "Android",
-        traceId: String,
-        username: String,
-        password: String = "12345678",
-        nickname: String,
-        callBack: VRValueCallBack<VRCreateRoomResponse>
-    ) {
+    fun createImRoom(roomName: String, roomOwner: String, callBack: VRValueCallBack<VRCreateRoomResponse>) {
         val headers = mutableMapOf<String, String>()
         headers["Content-Type"] = "application/json"
         val requestBody = JSONObject()
@@ -137,17 +127,24 @@ class VoiceToolboxServerHttpManager {
             requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
             requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
             val requestChat = JSONObject()
-            requestChat.putOpt("name", chatroomName)
-            requestChat.putOpt("description", chatroomNameDesc)
-            requestChat.putOpt("owner", chatroomOwner)
+            requestChat.putOpt("name", roomName)
+            requestChat.putOpt("description", "Welcome!")
+            requestChat.putOpt("owner", roomOwner)
             requestBody.putOpt("chat", requestChat)
-            requestBody.putOpt("src", src)
-            requestBody.putOpt("traceId", traceId)
+            requestBody.putOpt("src", "Android")
+            requestBody.putOpt("traceId", UUID.randomUUID().toString())
             val requestUser = JSONObject()
-            requestUser.putOpt("nickname", nickname)
-            requestUser.putOpt("username", username)
-            requestUser.putOpt("password", password)
+
+            val chatUserUuid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserUuid()
+            if (chatUserUuid.isEmpty()) {
+                requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
+                requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().userId())
+                requestUser.putOpt("password", "12345678")
+            } else {
+                requestUser.putOpt("id", chatUserUuid)
+            }
             requestBody.putOpt("user", requestUser)
+
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -183,7 +180,10 @@ class VoiceToolboxServerHttpManager {
      * @param chatroomName im 房间名
      */
     fun requestToolboxService(
-        channelId: String, chatroomName: String, completion: (error: Int, chatroomId: String) -> Unit,
+        channelId: String,
+        chatroomName: String,
+        chatOwner: String,
+        completion: (error: Int, chatroomId: String) -> Unit,
     ) {
         val generateToken = AtomicBoolean(false)
         val createImRoom = AtomicBoolean(false)
@@ -208,16 +208,14 @@ class VoiceToolboxServerHttpManager {
                 }
             })
         createImRoom(
-            chatroomName = chatroomName,
-            chatroomOwner = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-            traceId = UUID.randomUUID().toString(),
-            username = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-            nickname = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+            roomName = chatroomName,
+            roomOwner = chatOwner,
             callBack = object : VRValueCallBack<VRCreateRoomResponse> {
                 override fun onSuccess(response: VRCreateRoomResponse?) {
                     response?.let {
                         createImRoom.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatConfig(response.userName, response.token)
+                        VoiceBuddyFactory.get().getVoiceBuddy()
+                            .setupChatConfig(response.userName, response.token, response.uid)
                         chatRoomId = response.chatId
                         if (generateToken.get() && createImRoom.get()) {
                             completion.invoke(VoiceServiceProtocol.ERR_OK, chatRoomId)
