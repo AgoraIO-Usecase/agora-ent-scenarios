@@ -91,26 +91,25 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     //MARK: ShowServiceProtocol
     
     func getRoomList(page: Int, completion: @escaping (Error?, [ShowRoomListModel]?) -> Void) {
-        initScene { [weak self] in
-            SyncUtil.fetchAll { results in
-                print("result == \(results.compactMap { $0.toJson() })")
-                guard let self = self else {
-                    return
-                }
-
-                let dataArray = results.map({ info in
-                    return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
-                })
-                self.roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
-                completion(nil, self.roomList)
-            } fail: { error in
-                completion(error, nil)
-            }
+        _getRoomList(page: page) { [weak self] error, list in
+            guard let self = self else { return }
+            self.roomList = list
+            completion(nil, list)
         }
     }
     
-    func createRoom(room: ShowRoomListModel,
+    func createRoom(roomName: String,
+                    roomId: String,
+                    thumbnailId: String,
                     completion: @escaping (Error?, ShowRoomDetailModel?) -> Void) {
+        let room = ShowRoomListModel()
+        room.roomName = roomName
+        room.roomId = roomId
+        room.thumbnailId = thumbnailId
+        room.ownerId = VLUserCenter.user.id
+        room.ownerName = VLUserCenter.user.name
+        room.ownerAvater = VLUserCenter.user.headUrl
+        room.createdAt = Date().millionsecondSince1970()
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
         initScene { [weak self] in
@@ -313,6 +312,14 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _updateMicSeatInvitation(invitation: invitation, completion: completion)
     }
     
+    
+    func getAllPKUserList(completion: @escaping (Error?, [ShowPKUserInfo]?) -> Void) {
+        _getRoomList(page: 0) { error, list in
+            let filterList = list?.filter({ $0.ownerId != VLUserCenter.user.id })
+            completion(error, filterList)
+        }
+    }
+    
     func getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void) {
         _getAllPKInvitationList(roomId: roomId, completion: completion)
     }
@@ -428,6 +435,21 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 
 //MARK: room operation
 extension ShowSyncManagerServiceImp {
+    func _getRoomList(page: Int, completion: @escaping (Error?, [ShowRoomListModel]?) -> Void) {
+        initScene { [weak self] in
+            SyncUtil.fetchAll { results in
+                agoraPrint("result == \(results.compactMap { $0.toJson() })")
+                let dataArray = results.map({ info in
+                    return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
+                })
+                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
+                completion(nil, roomList)
+            } fail: { error in
+                completion(error, nil)
+            }
+        }
+    }
+    
     private func _leaveRoom(completion: @escaping (Error?) -> Void) {
         defer {
             _unsubscribe()
@@ -693,8 +715,7 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: Seat Apply
 extension ShowSyncManagerServiceImp {
-    
-    func _getAllMicSeatApplyList(completion: @escaping (Error?, [ShowMicSeatApply]?) -> Void) {
+    private func _getAllMicSeatApplyList(completion: @escaping (Error?, [ShowMicSeatApply]?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply get...")
         SyncUtil
@@ -711,7 +732,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _subscribeMicSeatApplyChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatApply) -> Void) {
+    private func _subscribeMicSeatApplyChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatApply) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply subscribe ...")
         SyncUtil
@@ -743,7 +764,7 @@ extension ShowSyncManagerServiceImp {
                        })
     }
     
-    func _addMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
+    private func _addMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply add ...")
 
@@ -760,7 +781,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _removeMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
+    private func _removeMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply remove...")
 
@@ -777,7 +798,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _updateMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
+    private func _updateMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply update...")
 
@@ -800,7 +821,7 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: Seat Invitation
 extension ShowSyncManagerServiceImp {
-    func _getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
+    private func _getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -820,7 +841,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _subscribeMicSeatInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatInvitation) -> Void) {
+    private func _subscribeMicSeatInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatInvitation) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -853,7 +874,7 @@ extension ShowSyncManagerServiceImp {
                        })
     }
     
-    func _addMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+    private func _addMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
 //            assert(false, "channelName = nil")
             agoraPrint("_addMicSeatInvitation channelName = nil")
@@ -874,7 +895,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _removeMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+    private func _removeMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
             agoraPrint("_removeMicSeatInvitation channelName = nil")
             return
@@ -894,7 +915,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _updateMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+    private func _updateMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
             agoraPrint("_removeMicSeatApply channelName = nil")
             return
@@ -920,7 +941,7 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: PK Invitation
 extension ShowSyncManagerServiceImp {
-    func _getAllPKInvitationList(roomId:String?,
+    private func _getAllPKInvitationList(roomId:String?,
                                  completion: @escaping (Error?, [ShowPKInvitation]?) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
@@ -943,7 +964,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _unsubscribePKInvitationChanged(roomId:String?) {
+    private func _unsubscribePKInvitationChanged(roomId:String?) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -954,7 +975,7 @@ extension ShowSyncManagerServiceImp {
             .unsubscribeScene()
     }
     
-    func _subscribePKInvitationChanged(roomId:String?,
+    private func _subscribePKInvitationChanged(roomId:String?,
                                        subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
@@ -1007,7 +1028,7 @@ extension ShowSyncManagerServiceImp {
                        })
     }
     
-    func _addPKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
+    private func _addPKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = invitation.roomId else {
 //            assert(false, "channelName = nil")
             agoraPrint("_addPKInvitation channelName = nil")
@@ -1028,7 +1049,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _removePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
+    private func _removePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = invitation.roomId else {
             agoraPrint("_removePKInvitation channelName = nil")
             return
@@ -1048,7 +1069,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _updatePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
+    private func _updatePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
         guard let channelName = invitation.roomId else {
             agoraPrint("_updatePKInvitation channelName = nil")
             return
@@ -1070,7 +1091,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _recvPKRejected(invitation: ShowPKInvitation) {
+    private func _recvPKRejected(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
 //        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else { return }
@@ -1079,7 +1100,7 @@ extension ShowSyncManagerServiceImp {
         self.pkCreatedInvitation = nil
     }
     
-    func _recvPKAccepted(invitation: ShowPKInvitation) {
+    private func _recvPKAccepted(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId else { return }
         if let _ = self.interactionList.filter({ $0.userId == invitation.userId }).first {
             return
@@ -1094,7 +1115,7 @@ extension ShowSyncManagerServiceImp {
         }
     }
     
-    func _recvPKFinish(invitation: ShowPKInvitation) {
+    private func _recvPKFinish(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
         guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else {
@@ -1107,11 +1128,9 @@ extension ShowSyncManagerServiceImp {
     }
 }
 
-
-
 //MARK: Interaction
 extension ShowSyncManagerServiceImp {
-    func _getAllInteractionList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
+    private func _getAllInteractionList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -1131,7 +1150,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void) {
+    private func _subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void) {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -1170,7 +1189,7 @@ extension ShowSyncManagerServiceImp {
                        })
     }
     
-    func _addInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
+    private func _addInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
 //            assert(false, "channelName = nil")
             agoraPrint("_addInteraction channelName = nil")
@@ -1191,7 +1210,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _removeInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
+    private func _removeInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
             agoraPrint("_removeInteraction channelName = nil")
             return
@@ -1211,7 +1230,7 @@ extension ShowSyncManagerServiceImp {
             })
     }
     
-    func _updateInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
+    private func _updateInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
         guard let channelName = roomId else {
             agoraPrint("_updateInteraction channelName = nil")
             return

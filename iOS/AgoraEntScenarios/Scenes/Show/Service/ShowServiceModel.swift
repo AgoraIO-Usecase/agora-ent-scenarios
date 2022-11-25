@@ -56,6 +56,9 @@ class ShowRoomListModel: ShowBaseInfo {
     var updatedAt: Int64 = 0                           //更新时间
 }
 
+//PK邀请对象
+typealias ShowPKUserInfo = ShowRoomListModel
+
 
 /// 房间详情信息
 @objcMembers
@@ -107,6 +110,7 @@ class ShowPKInvitation: ShowBaseInfo {
     var fromName: String?                            //发起Pk用户名
     var fromRoomId: String?                          //发起Pk房间id
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
+    var muteAudio: Bool = false                      //静音状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 

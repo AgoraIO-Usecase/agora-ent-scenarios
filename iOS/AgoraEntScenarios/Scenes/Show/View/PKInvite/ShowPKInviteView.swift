@@ -9,6 +9,11 @@ import UIKit
 import Agora_Scene_Utils
 
 class ShowPKInviteView: UIView {
+    var pkUserInvitationList: [ShowPKUserInfo]? {
+        didSet {
+            tableView.dataArray = pkUserInvitationList ?? []
+        }
+    }
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "PK邀请".show_localized
@@ -56,7 +61,7 @@ class ShowPKInviteView: UIView {
         view.delegate = self
         view.register(ShowPKInviteViewCell.self,
                       forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
-        view.dataArray = (0...10).map({ $0 })
+//        view.dataArray = (0...10).map({ $0 })
         return view
     }()
     private var pkTipsViewHeightCons: NSLayoutConstraint?
@@ -134,8 +139,8 @@ class ShowPKInviteView: UIView {
 extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
-                                                 for: indexPath)
-        
+                                                 for: indexPath) as! ShowPKInviteViewCell
+        cell.pkUserInvitation = self.pkUserInvitationList?[indexPath.row]
         return cell
     }
 }
@@ -168,15 +173,24 @@ enum ShowPKInviteStatus: CaseIterable {
 }
 
 class ShowPKInviteViewCell: UITableViewCell {
+    var pkUserInvitation: ShowPKUserInfo? {
+        didSet {
+            guard let info = pkUserInvitation else { return }
+            avatarImageView.sd_setImage(with: URL(string: info.ownerAvater ?? ""),
+                                        placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
+            nameLabel.text = info.ownerName
+            statusButton.isEnabled = info.interactStatus == .pking ? false : true
+        }
+    }
     private lazy var avatarImageView: AGEImageView = {
         let imageView = AGEImageView(type: .avatar)
-        imageView.image = UIImage.show_sceneImage(name: "show_default_avatar")
+//        imageView.image = UIImage.show_sceneImage(name: "show_default_avatar")
         imageView.cornerRadius = 22
         return imageView
     }()
     private lazy var nameLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .middle)
-        label.text = "Antonovich A"
+//        label.text = "Antonovich A"
         return label
     }()
     private lazy var statusButton: UIButton = {

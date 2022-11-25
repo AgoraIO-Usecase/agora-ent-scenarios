@@ -25,8 +25,18 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: ShowRoomListModel,
-                    completion: @escaping (Error?, ShowRoomDetailModel?) -> Void)
+    
+    
+    /// 创建房间
+    /// - Parameters:
+    ///   - roomName: 房间名
+    ///   - roomId: 房间Id
+    ///   - thumbnailId: 列表缩略图
+    ///   - completion: <#completion description#>
+    func createRoom(roomName: String,
+                    roomId: String,
+                    thumbnailId: String,
+                    completion: @escaping (Error?, ShowRoomDetailModel?) -> Void) 
     
     /// 加入房间
     /// - Parameters:
@@ -143,6 +153,11 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     func rejectMicSeatInvitation(completion: @escaping (Error?) -> Void)
     
     
+    
+    
+    /// 获取可PK对象列表(目前等价getRoomList)
+    /// - Parameter completion: <#completion description#>
+    func getAllPKUserList(completion: @escaping (Error?, [ShowPKUserInfo]?) -> Void)
     
     /// 获取PK邀请列表
     /// - Parameter completion: <#completion description#>
