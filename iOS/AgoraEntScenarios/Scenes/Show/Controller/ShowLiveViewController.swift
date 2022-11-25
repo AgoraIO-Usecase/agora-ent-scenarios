@@ -225,6 +225,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickPKButton(_ button: ShowRedDotButton) {
         let pkInviteView = ShowPKInviteView()
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
+        AppContext.showServiceImp.getAllPKUserList { [weak pkInviteView] (error, pkUserList) in
+            pkInviteView?.pkUserInvitationList = pkUserList
+        }
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {

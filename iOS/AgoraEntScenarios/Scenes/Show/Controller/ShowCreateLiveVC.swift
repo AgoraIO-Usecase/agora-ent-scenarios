@@ -131,14 +131,10 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             ToastView.show(text: "create_room_name_can_not_empty".show_localized)
             return
         }
-        let room = ShowRoomListModel()
-        room.roomName = createView.roomName
-        room.roomId = createView.roomNo
-        room.thumbnailId = createView.roomBg
-        room.ownerId = VLUserCenter.user.id
-        room.ownerAvater = VLUserCenter.user.headUrl
-        room.createdAt = Date().millionsecondSince1970()
-        AppContext.showServiceImp.createRoom(room: room) { [weak self] err, detailModel in
+        
+        AppContext.showServiceImp.createRoom(roomName: roomName,
+                                             roomId: createView.roomNo,
+                                             thumbnailId: createView.roomBg) { [weak self] err, detailModel in
             let liveVC = ShowLiveViewController()
             liveVC.room = detailModel
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
@@ -147,5 +143,4 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             wSelf.navigationController?.pushViewController(liveVC, animated: false)
         }
     }
-
 }
