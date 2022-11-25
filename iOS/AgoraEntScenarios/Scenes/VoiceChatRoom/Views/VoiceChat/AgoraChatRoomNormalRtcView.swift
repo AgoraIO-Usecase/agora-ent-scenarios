@@ -137,7 +137,7 @@ extension AgoraChatRoomNormalRtcView: UICollectionViewDelegate, UICollectionView
             return cell
         } else {
             let cell: AgoraChatRoomBaseAlienCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: aIdentifier, for: indexPath) as! AgoraChatRoomBaseAlienCollectionViewCell
-            if let mic_info = micInfos?[indexPath.item] {
+            if let mic_info = micInfos?[indexPath.row] {
                 cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeActived : .AgoraChatRoomBaseUserCellTypeNonActived
             }
 
