@@ -58,10 +58,10 @@ class ChatroomProtocolDelegate constructor(
         ) { code, result_map ->
             if (code == 0 && result_map.isEmpty()) {
                 callBack.onSuccess()
-                "update result onSuccess: ".logE(TAG)
+                "initMicInfo update result onSuccess roomId:$roomId,".logE(TAG)
             } else {
                 callBack.onError(code, result_map.toString())
-                "update result onError: $code $result_map ".logE(TAG)
+                "initMicInfo update result onError roomId:$roomId, $code $result_map ".logE(TAG)
             }
         }
     }
@@ -108,12 +108,12 @@ class ChatroomProtocolDelegate constructor(
                     }
                     micInfoList.sortedBy { it.micIndex }
                     voiceRoomInfo.micInfo = micInfoList
-                    "getMicInfoFromServer onSuccess: $micInfoList".logD(TAG)
+                    "fetchRoomDetail onSuccess roomId:$roomId, $micInfoList".logD(TAG)
                     callback.onSuccess(voiceRoomInfo)
                 }
 
                 override fun onError(error: Int, desc: String?) {
-                    "onError: $error $desc".logE(TAG)
+                    "fetchRoomDetail onError roomId:$roomId, $error $desc".logE(TAG)
                     callback.onError(error,desc)
                 }
             })

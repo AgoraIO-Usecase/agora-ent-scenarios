@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
+import io.agora.scene.voice.bean.SoundSelectionBean
 import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
@@ -72,7 +73,10 @@ class VoiceSyncManagerServiceImp(
 
                     }
                     //按照创建时间顺序排序
-                    ret.sortBy { it.createdAt }
+                    val comparator: Comparator<VoiceRoomModel> = Comparator { o1, o2 ->
+                        o2.createdAt.compareTo(o1.createdAt)
+                    }
+                    ret.sortWith(comparator)
                     ThreadManager.getInstance().runOnMainThread {
                         completion.invoke(VoiceServiceProtocol.ERR_OK, ret)
                     }
@@ -117,6 +121,7 @@ class VoiceSyncManagerServiceImp(
         VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomName = inputModel.roomName,
+            chatOwner = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
             completion = { error, chatroomId ->
                 if (error != VoiceServiceProtocol.ERR_OK) {
                     completion.invoke(error, voiceRoomModel)
