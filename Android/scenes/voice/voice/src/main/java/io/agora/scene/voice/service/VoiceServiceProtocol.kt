@@ -71,7 +71,7 @@ interface VoiceServiceProtocol {
     /**
      * 获取排行榜列表
      */
-    fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>) -> Unit)
+    fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit)
 
     /**
      * 获取用户列表

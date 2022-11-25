@@ -16,7 +16,9 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.service.VoiceGiftModel;
 import io.agora.scene.voice.service.VoiceMemberModel;
+import io.agora.util.EMLog;
 import io.agora.voice.buddy.tool.GsonTools;
 
 /**
@@ -162,6 +164,25 @@ public class CustomMsgHelper implements MessageListener {
             switch (msgType) {
                 case CHATROOM_GIFT:
                     AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    Map<String, String> giftMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
+                    voiceGiftModel.setGift_id(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+                    voiceGiftModel.setGift_count(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
+                    voiceGiftModel.setGift_name(giftMap.get(MsgConstant.CUSTOM_GIFT_NAME));
+                    voiceGiftModel.setGift_price(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE));
+                    voiceGiftModel.setUserName(giftMap.get(MsgConstant.CUSTOM_GIFT_USERNAME));
+                    voiceGiftModel.setPortrait(giftMap.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
+                    ChatroomIMManager.getInstance().updateRankList(voiceGiftModel, new CallBack() {
+                        @Override
+                        public void onSuccess() {
+                            EMLog.e("CustomMsgHelper","VoiceGiftModel update success");
+                        }
+
+                        @Override
+                        public void onError(int code, String error) {
+                            EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
+                        }
+                    });
                     if(listener != null) {
                         listener.onReceiveGiftMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }

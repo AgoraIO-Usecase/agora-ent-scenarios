@@ -14,8 +14,9 @@ import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.service.*
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.voice.buddy.tool.LogTools.logD
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -26,6 +27,7 @@ class ChatroomProtocolDelegate constructor(
 
     private var roomManager: ChatRoomManager = ChatClient.getInstance().chatroomManager()
     lateinit var ownerBean: VoiceMemberModel
+    var ranking:List<VoiceRankUserModel>? = null
 
     /////////////////////// mic ///////////////////////////
 
@@ -54,7 +56,7 @@ class ChatroomProtocolDelegate constructor(
         roomManager.asyncSetChatroomAttributesForced(
             roomId, attributeMap, true
         ) { code, result_map ->
-            if (code == 200) {
+            if (code == 0 && result_map.isEmpty()) {
                 callBack.onSuccess()
                 "update result onSuccess: ".logE(TAG)
             } else {
@@ -87,9 +89,9 @@ class ChatroomProtocolDelegate constructor(
                         if (key.startsWith("mic_")){
                             micMap[key] = value
                         }else if (key=="ranking_list"){
-                            // TODO: 排行榜
+                            voiceRoomInfo.roomInfo?.rankingList = ranking
                         }else if (key=="member_list"){
-                            // TODO: 用户列表
+                            voiceRoomInfo.roomInfo?.memberList = ChatroomCacheManager.cacheManager.getMemberList()
                         }else if (key=="gift_amount"){
 
                         }else if (key=="robot_volume"){
@@ -226,7 +228,7 @@ class ChatroomProtocolDelegate constructor(
             roomManager.asyncSetChatroomAttributes(
                 roomId, attributeMap, true
             ) { code, result_map ->
-                if (code == 200) {
+                if (code == 0 && result_map.isEmpty()) {
                     var map = mutableMapOf<Int, VoiceMicInfoModel>()
                     map[fromMicIndex] = toMicBean
                     map[toMicIndex] = fromBean
@@ -430,7 +432,7 @@ class ChatroomProtocolDelegate constructor(
             roomManager.asyncSetChatroomAttributes(
                 roomId, attributeMap, true
             ) { code, result ->
-                if (code == 200 && result.isEmpty()) {
+                if (code == 0 && result.isEmpty()) {
                     var map = mutableMapOf<Int, VoiceMicInfoModel>()
                     map[6] = robot6
                     map[7] = robot7
@@ -581,6 +583,66 @@ class ChatroomProtocolDelegate constructor(
             MicClickAction.Invite -> {
                 // nothing
             }
+        }
+    }
+
+    fun updateRankList(giftBean: VoiceGiftModel,callback: CallBack){
+        val rankList = ChatroomCacheManager.cacheManager.getRankList()
+        val name = giftBean.userName
+        val portrait = giftBean.portrait
+        val count = giftBean.gift_count
+        val price = giftBean.gift_price
+        val amount ="$count * $price".toInt()
+        val voiceRankModel =  VoiceRankUserModel()
+        voiceRankModel.name = name
+        voiceRankModel.portrait = portrait
+        voiceRankModel.amount = amount
+        rankList.add(voiceRankModel)
+        roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankList),
+            true,object : CallBack{
+            override fun onSuccess() {
+                callback.onSuccess()
+                ranking = rankList
+                ChatroomCacheManager.cacheManager.setRankList(voiceRankModel)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                callback.onError(code,error)
+            }
+        })
+    }
+
+    fun fetchGiftContribute(callback: ValueCallBack<MutableList<VoiceRankUserModel>>){
+        val rankingList = ChatroomCacheManager.cacheManager.getRankList()
+        if (rankingList.isEmpty()){
+            val keyList: MutableList<String> = java.util.ArrayList()
+            keyList.add("ranking_list")
+            roomManager.asyncFetchChatroomAttributesFromServer(roomId,keyList,object :
+                ValueCallBack<MutableMap<String, String>>{
+                override fun onSuccess(value: MutableMap<String, String>) {
+                    ThreadManager.getInstance().runOnMainThread{
+                        value["ranking_list"]?.let {
+                            val rankList = GsonTools.toList<VoiceRankUserModel>(it)
+                            ranking = rankList
+                            rankList?.forEach { bean ->
+                                ChatroomCacheManager.cacheManager.setRankList(bean)
+                            }
+                            callback.onSuccess(rankList as MutableList<VoiceRankUserModel>?)
+                        }
+                        "getRankList onSuccess: $value".logE(TAG)
+                    }
+                }
+
+                override fun onError(code: Int, errorMsg: String?) {
+                    ThreadManager.getInstance().runOnMainThread{
+                        callback.onError(code,errorMsg)
+                        "getRankList onError: $code $errorMsg".logE(TAG)
+                    }
+                }
+            })
+        }else{
+            ranking = rankingList
+            callback.onSuccess(rankingList)
         }
     }
 

@@ -257,7 +257,21 @@ class VoiceSyncManagerServiceImp(
     /**
      * 获取排行榜列表
      */
-    override fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>) -> Unit) {
+    override fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit) {
+        ChatroomIMManager.getInstance().fetchGiftContribute(object :
+            ValueCallBack<MutableList<VoiceRankUserModel>>{
+            override fun onSuccess(value: MutableList<VoiceRankUserModel>) {
+                ThreadManager.getInstance().runOnMainThread{
+                    completion.invoke(VoiceServiceProtocol.ERR_OK,value)
+                }
+            }
+
+            override fun onError(error: Int, errorMsg: String?) {
+                ThreadManager.getInstance().runOnMainThread{
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
+                }
+            }
+        })
     }
 
     /**

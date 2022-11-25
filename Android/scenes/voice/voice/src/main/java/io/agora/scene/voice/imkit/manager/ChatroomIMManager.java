@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import io.agora.CallBack;
 import io.agora.ChatRoomChangeListener;
@@ -25,8 +24,10 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.service.VoiceBuddyFactory;
+import io.agora.scene.voice.service.VoiceGiftModel;
 import io.agora.scene.voice.service.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceMicInfoModel;
+import io.agora.scene.voice.service.VoiceRankUserModel;
 import io.agora.scene.voice.service.VoiceRoomInfo;
 import io.agora.scene.voice.service.VoiceRoomModel;
 import io.agora.util.EMLog;
@@ -664,5 +665,20 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         return delegate.fetchRoomMembers();
     }
 
+    /**
+     * 获取排行榜列表
+     */
+    public void fetchGiftContribute(ValueCallBack<List<VoiceRankUserModel>> callBack){
+        delegate.fetchGiftContribute(callBack);
+    }
+
+    /**
+     * 更新排行榜
+     * @param giftModel
+     * @param callBack
+     */
+    public void updateRankList(VoiceGiftModel giftModel, CallBack callBack){
+        delegate.updateRankList(giftModel,callBack);
+    }
 
 }
