@@ -251,13 +251,19 @@ class VoiceSyncManagerServiceImp(
      * 获取用户列表
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
+        val  memberList = ChatroomIMManager.getInstance().fetchRoomMembers()
+        if (memberList != null && memberList.size > 0){
+            completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
+        }else{
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED,memberList)
+        }
     }
 
     /**
      * 申请列表
      */
-    override fun fetchApplicantsList(completion: (error: Int, result: MutableSet<VoiceMemberModel>) -> Unit) {
-       var raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
+    override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
+       val raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
         if (raisedList != null && raisedList.size > 0){
             completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
         }else{
