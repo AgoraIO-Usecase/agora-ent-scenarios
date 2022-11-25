@@ -42,6 +42,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private var pkInvitationList: [ShowPKInvitation] = [ShowPKInvitation]()
     private var interactionList: [ShowInteractionInfo] = [ShowInteractionInfo]()
     
+    private var pkCreatedInvitation: ShowPKInvitation?
+    
     private var syncUtilsInited: Bool = false
     private var roomId: String? {
         didSet {
@@ -356,9 +358,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 _invitation.status = .waitting
                 _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
                 self._addPKInvitation(invitation: _invitation, completion: completion)
+                self.pkCreatedInvitation = _invitation
                 return
             }
             
+            self.pkCreatedInvitation = invitation
             if invitation.status == .waitting {
                 agoraPrint("pk invitaion already send ")
                 return
@@ -399,6 +403,23 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
         _removeInteraction(interaction: interaction, completion: completion)
+        guard interaction.interactStatus == .pking else {
+            return
+        }
+        
+        // pk invitation sender
+        if let invitation = self.pkCreatedInvitation {
+            invitation.status = .ended
+            _updatePKInvitation(invitation: invitation, completion: completion)
+            return
+        }
+        
+        // pk invitation recviver
+        guard let invitation = self.pkInvitationList.filter({$0.fromUserId == interaction.userId }).first else {
+            agoraAssert("not found invitation: \(interaction.userId ?? "") \(interaction.roomId ?? "")")
+            return
+        }
+        _updatePKInvitation(invitation: invitation, completion: completion)
     }
 }
 
@@ -949,6 +970,10 @@ extension ShowSyncManagerServiceImp {
                                  let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
                                return
                            }
+                           guard channelName == self.getRoomId() else {
+                               subscribeClosure(.updated, model)
+                               return
+                           }
                            if self.pkInvitationList.contains(where: { $0.userId == model.userId }) {
                                return
                            }
@@ -957,6 +982,15 @@ extension ShowSyncManagerServiceImp {
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp pk invitation subscribe onDeleted...")
                            guard let self = self else {return}
+                           
+                           guard channelName == self.getRoomId() else {
+                               if let jsonStr = object.toJson(),
+                                  let model = ShowPKInvitation.yy_model(withJSON: jsonStr) {
+                                   subscribeClosure(.deleted, model)
+                               }
+                               return
+                           }
+                           
                            var model: ShowPKInvitation? = nil
                            if let index = self.pkInvitationList.firstIndex(where: { object.getId() == $0.objectId }) {
                                model = self.pkInvitationList[index]
@@ -993,7 +1027,7 @@ extension ShowSyncManagerServiceImp {
     }
     
     func _removePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
+        guard let channelName = invitation.roomId else {
             agoraPrint("_removePKInvitation channelName = nil")
             return
         }
@@ -1013,7 +1047,7 @@ extension ShowSyncManagerServiceImp {
     }
     
     func _updatePKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
+        guard let channelName = invitation.roomId else {
             agoraPrint("_updatePKInvitation channelName = nil")
             return
         }
@@ -1040,6 +1074,7 @@ extension ShowSyncManagerServiceImp {
 //        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else { return }
 //        _removeInteraction(interaction: interaction) { error in
 //        }
+        self.pkCreatedInvitation = nil
     }
     
     func _recvPKAccepted(invitation: ShowPKInvitation) {
@@ -1066,6 +1101,7 @@ extension ShowSyncManagerServiceImp {
         
         _removeInteraction(interaction: interaction) { error in
         }
+        self.pkCreatedInvitation = nil
     }
     
     func _getCurrentApplyUser(roomId: String?, completion: @escaping (ShowRoomListModel?) -> Void) {
