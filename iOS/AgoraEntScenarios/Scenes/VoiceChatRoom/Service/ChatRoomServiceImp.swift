@@ -571,8 +571,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         owner.uid = VLUserCenter.user.userNo
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
-        
-        initIM(with: room_entity.name ?? "", channelId: room_entity.channel_id ?? "", pwd: "12345678") {[weak self] im_token, uid, room_id in
+        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+        initIM(with: room_entity.name ?? "", chatId: nil, channelId: room_entity.channel_id ?? "",  imUid: imId, pwd: "12345678") {[weak self] im_token, uid, room_id in
             owner.chat_uid = uid
             room_entity.chatroom_id = room_id
             room_entity.owner = owner
@@ -616,7 +616,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
-                    self.initIM(with: room.name ?? "", channelId: updateRoom.channel_id ?? "", pwd: "12345678") { im_token, chat_uid, chatroom_id in
+                    let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+                    self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
                         VLUserCenter.user.im_token = im_token
                         VLUserCenter.user.chat_uid = chat_uid
                         completion(nil, updateRoom)
@@ -720,13 +721,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return micsMap
     }
     
-    func initIM(with roomName: String,channelId: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
+    func initIM(with roomName: String, chatId: String?, channelId: String, imUid: String?, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
         var im_token = ""
         var im_uid = ""
         var chatroom_id = ""
         
-        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
             im_uid = uid ?? ""
             chatroom_id = room_id ?? ""
             im_token = token ?? ""
