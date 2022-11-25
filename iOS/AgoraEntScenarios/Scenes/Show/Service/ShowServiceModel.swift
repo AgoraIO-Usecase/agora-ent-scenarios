@@ -22,6 +22,8 @@ enum ShowRoomRequestStatus: Int {
     case accepted = 2
     /// 已拒绝
     case rejected = 3
+    /// 已结束
+    case ended = 4
 }
 
 enum ShowInteractionStatus: Int {
@@ -112,7 +114,6 @@ class ShowPKInvitation: ShowBaseInfo {
 class ShowInteractionInfo: ShowBaseInfo {
     var userId: String?                                 //用户id (rtc uid)
     var roomId: String?                                 //用户所在房间id
-    var status: ShowRoomRequestStatus = .waitting       //状态
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数
 }
