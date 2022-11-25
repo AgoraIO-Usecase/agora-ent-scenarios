@@ -138,6 +138,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             let status = mic.status
             let mic_index = mic.mic_index
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
+            let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
+                $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
+            })
+            if micUser != nil {
+                micUser?.mic_index = mic_index
+            }
             if !isOwner {
                 refreshHandsUp(status: status)
                 if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
