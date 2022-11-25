@@ -125,6 +125,8 @@ class NetworkManager {
     ///   - success: success description {roomid, uid}
     func generateIMConfig(channelName: String,
                           nickName: String,
+                          chatId: String?,
+                          imUid: String?,
                           password: String,
                           uid: String,
                           success: @escaping (String?, String?, String?) -> Void) {
@@ -132,16 +134,26 @@ class NetworkManager {
             success(nil, nil, nil)
             return
         }
-        let chatParams = [
+        var chatParams = [
             "name": channelName,
             "description": "test",
             "owner": uid,
         ]
-        let userParams = [
+        
+        if let chatId = chatId {
+            chatParams.updateValue(chatId, forKey: "id")
+        }
+        
+        var userParams = [
             "username": uid,
             "password": password,
             "nickname": nickName,
         ]
+        
+        if let imUid = imUid {
+            userParams.updateValue(imUid, forKey: "id")
+        }
+        
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "AppCertificate": KeyCenter.Certificate as Any,
