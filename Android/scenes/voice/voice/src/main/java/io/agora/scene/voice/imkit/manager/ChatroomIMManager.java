@@ -610,7 +610,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * 举手列表
      * @return
      */
-    public Set<VoiceMemberModel> fetchRaisedList(){
+    public List<VoiceMemberModel> fetchRaisedList(){
         return delegate.fetchRaisedList();
     }
 
@@ -630,6 +630,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public void updateRobotVolume(int volume,CallBack callBack){
         delegate.updateRobotVolume(volume,callBack);
+    }
+
+    /**
+     * 获取用户列表
+     */
+    public List<VoiceMemberModel> fetchRoomMembers(){
+        return delegate.fetchRoomMembers();
     }
 
 

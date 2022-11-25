@@ -72,6 +72,16 @@ data class VoiceMicInfoModel constructor(
 ) : BaseRoomBean
 
 /**
+ * 申请数据
+ */
+data class VoiceRoomApply constructor(
+    var index: Int? = 0,
+    var member: VoiceMemberModel? = null,
+    var created_at:Long? = 0
+
+) :BaseRoomBean
+
+/**
  * 房间详情
  */
 data class VoiceRoomInfo constructor(
