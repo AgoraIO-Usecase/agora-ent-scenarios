@@ -40,7 +40,7 @@ class ChatroomCacheManager {
     /**
      * 设置Mic信息
      */
-    fun setMicInfo(kvMap: MutableMap<String,String>){
+    fun setMicInfo(kvMap: Map<String,String>){
         if (mMicInfoMap.isEmpty()){
             mMicInfoMap.putAll(kvMap)
         }else{
