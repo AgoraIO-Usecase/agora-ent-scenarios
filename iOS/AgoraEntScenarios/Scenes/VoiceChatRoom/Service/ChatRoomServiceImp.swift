@@ -692,7 +692,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.member?.mic_index = 0
         mic.member?.name = VLUserCenter.user.name
         mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
-        mic.member?.rtc_uid = AppContext.shared.appId()
+        mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
         mic.member?.im_token = ""
         mics.append(mic)
