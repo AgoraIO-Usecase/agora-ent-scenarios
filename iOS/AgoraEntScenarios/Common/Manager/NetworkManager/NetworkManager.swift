@@ -135,7 +135,7 @@ class NetworkManager {
             return
         }
         var chatParams = [
-            "name": channelName,
+            "name": nickName,
             "description": "test",
             "owner": uid,
         ]
@@ -165,7 +165,7 @@ class NetworkManager {
                                           params: params,
                                           success: { response in
             let data = response["data"] as? [String: String]
-            let uid = data?["uid"]
+            let uid = data?["userName"]
             let chatId = data?["chatId"]
             let token = data?["token"]
             print(response)

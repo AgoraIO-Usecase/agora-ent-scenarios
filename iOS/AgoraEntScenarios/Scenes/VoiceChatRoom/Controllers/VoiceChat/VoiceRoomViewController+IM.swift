@@ -145,6 +145,10 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
 
             let status = mic.status
             let mic_index = mic.mic_index
+            let liveMic = ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index]
+            if liveMic.mic_index == mic_index {
+                refreshHandsUp(status: status)
+            }
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                 $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
@@ -153,7 +157,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 micUser?.mic_index = mic_index
             }
             if !isOwner {
-                refreshHandsUp(status: status)
                 if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
                     local_index = nil
                 }
@@ -202,12 +205,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
 
     func refreshHandsUp(status: Int) {
-        switch status {
-        case <#pattern#>:
-            <#code#>
-        default:
-            <#code#>
-        }
         if status == -1 {
             chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
         } else {
