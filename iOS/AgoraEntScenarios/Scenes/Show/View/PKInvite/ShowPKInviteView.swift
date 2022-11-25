@@ -56,7 +56,6 @@ class ShowPKInviteView: UIView {
         view.delegate = self
         view.register(ShowPKInviteViewCell.self,
                       forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
-        view.dataArray = (0...10).map({ $0 })
         return view
     }()
     private var pkTipsViewHeightCons: NSLayoutConstraint?
@@ -168,6 +167,7 @@ enum ShowPKInviteStatus: CaseIterable {
 }
 
 class ShowPKInviteViewCell: UITableViewCell {
+    var refreshDataClosure: (() -> Void)?
     private lazy var avatarImageView: AGEImageView = {
         let imageView = AGEImageView(type: .avatar)
         imageView.image = UIImage.show_sceneImage(name: "show_default_avatar")
@@ -194,6 +194,9 @@ class ShowPKInviteViewCell: UITableViewCell {
         return view
     }()
     
+    private var seatApplyModel: ShowMicSeatApply?
+    private var seatInvitationModel: ShowUser?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -201,6 +204,51 @@ class ShowPKInviteViewCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupApplyAndInviteData(model: Any?) {
+        if let model = model as? ShowMicSeatApply {
+            seatApplyModel = model
+            nameLabel.text = model.userName
+            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+                                        placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
+            switch model.status {
+            case .accepted:
+                statusButton.isUserInteractionEnabled = false
+                statusButton.setTitle("已上麦", for: .normal)
+                statusButton.setTitleColor(.black, for: .normal)
+                statusButton.setBackgroundImage(nil, for: .normal)
+                
+            case .waitting:
+                statusButton.isUserInteractionEnabled = true
+                statusButton.setTitle("同意", for: .normal)
+                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
+                statusButton.setTitleColor(.white, for: .normal)
+                
+            default: break
+            }
+            
+        } else if let model = model as? ShowUser {
+            seatInvitationModel = model
+            nameLabel.text = model.userName
+            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+                                        placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
+
+            switch model.status {
+            case .waitting:
+                statusButton.isUserInteractionEnabled = false
+                statusButton.setTitle("等待中", for: .normal)
+                statusButton.setBackgroundImage(nil, for: .normal)
+                statusButton.setTitleColor(.black, for: .normal)
+                
+            default:
+                statusButton.setTitle("邀请", for: .normal)
+                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
+                statusButton.setTitleColor(.white, for: .normal)
+                statusButton.isUserInteractionEnabled = true
+            }
+        }
+        
     }
     
     private func setupUI() {
@@ -233,6 +281,15 @@ class ShowPKInviteViewCell: UITableViewCell {
     
     @objc
     private func onTapStatusButton(sender: UIButton) {
-        print("sender == \(sender.titleLabel?.text ?? "")")
+        if let model = seatApplyModel {
+            AppContext.showServiceImp.acceptMicSeatApply(apply: model) { _ in
+                self.refreshDataClosure?()
+            }
+        } else if let model = seatInvitationModel {
+            model.status = .waitting
+            AppContext.showServiceImp.createMicSeatInvitation(user: model) { _ in
+                self.refreshDataClosure?()
+            }
+        }
     }
 }
