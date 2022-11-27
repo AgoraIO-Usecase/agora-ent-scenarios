@@ -1,5 +1,7 @@
 package io.agora.scene.voice.general.net
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * @author create by zhangwei03
  */
@@ -21,7 +23,6 @@ data class VRGenerateTokenResponse(
 data class VRCreateRoomResponse(
     val appId: String,
     val chatId: String, // 聊天室ID, 这里返回环信的聊天室ID
-    val token: String, // 环信登录Token, 频道名使用聊天室I
+    @SerializedName("token") val chatToken: String, // 环信登录Token, 频道名使用聊天室I
     val userName: String, // 环信登录userId
-    val uid: String, // 这里返回环信的用户uuid
 ) : VoiceToolboxBaseResponse<VRCreateRoomResponse>()

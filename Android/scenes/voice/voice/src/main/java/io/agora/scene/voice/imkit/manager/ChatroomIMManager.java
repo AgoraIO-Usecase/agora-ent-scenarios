@@ -456,7 +456,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     public void initMicInfo(int roomType,CallBack callBack){
         VoiceMemberModel voiceMemberModel = new VoiceMemberModel(
                 VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-                VoiceBuddyFactory.get().getVoiceBuddy().chatUid(),
+                VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
                 VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
