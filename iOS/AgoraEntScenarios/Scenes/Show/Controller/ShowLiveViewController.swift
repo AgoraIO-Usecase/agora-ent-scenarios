@@ -126,49 +126,104 @@ class ShowLiveViewController: UIViewController {
 }
 
 //MARK: service subscribe
-extension ShowLiveViewController {
+extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _subscribeServiceEvent() {
         let service = AppContext.showServiceImp
-        //user did changed
-        service.subscribeUserChanged { status, user in
-            
-        }
         
-        AppContext.showServiceImp.subscribeMessageChanged(subscribeClosure: { [weak self] status, msg in
-            if let text = msg.message {
-                let model = ShowChatModel(userName: msg.userName ?? "", text: text)
-                self?.liveView.addChatModel(model)
-            }
-        })
+        service.subscribeEvent(delegate: self)
         
         //TODO: migration
         applyAndInviteView.applyStatusClosure = { [weak self] status in
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
+    }
+    
+    
+    func onUserJoinedRoom(user: ShowUser) {
         
-        service.subscribePKInvitationChanged { [weak self] (status, invitation) in
-            if invitation.status == .waitting {
-                let vc = ShowReceivePKAlertVC()
-                vc.name = invitation.fromName ?? ""
-                vc.dismissWithResult { result in
-                    let imp = AppContext.showServiceImp
-                    switch result {
-                    case .accept:
-                        AppContext.showServiceImp.acceptPKInvitation { error in
-                            
-                        }
-                        break
-                    default:
-                        imp.rejectPKInvitation { error in
-                            
-                        }
-                        break
-                    }
-                }
-                
-                self?.present(vc, animated: true)
-            }
+    }
+    
+    func onUserLeftRoom(user: ShowUser) {
+        
+    }
+    
+    func onMessageDidAdded(message: ShowMessage) {
+        if let text = message.message {
+            let model = ShowChatModel(userName: message.userName ?? "", text: text)
+            self.liveView.addChatModel(model)
         }
+    }
+    
+    func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.status == .waitting {
+            let vc = ShowReceivePKAlertVC()
+            vc.name = invitation.fromName ?? ""
+            vc.dismissWithResult { result in
+                let imp = AppContext.showServiceImp
+                switch result {
+                case .accept:
+                    AppContext.showServiceImp.acceptPKInvitation { error in
+                        
+                    }
+                    break
+                default:
+                    imp.rejectPKInvitation { error in
+                        
+                    }
+                    break
+                }
+            }
+            
+            self.present(vc, animated: true)
+        }
+    }
+    
+    func onPKInvitationAccepted(invitation: ShowPKInvitation) {
+        
+    }
+    
+    func onPKInvitationRejected(invitation: ShowPKInvitation) {
+        
+    }
+    
+    func onInteractionBegan(interation: ShowInteractionInfo) {
+        
+    }
+    
+    func onInterationEnded(interaction: ShowInteractionInfo) {
+        
     }
 }
 
