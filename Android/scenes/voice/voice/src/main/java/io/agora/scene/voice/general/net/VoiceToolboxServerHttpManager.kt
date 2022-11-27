@@ -117,8 +117,9 @@ class VoiceToolboxServerHttpManager {
      * - 10 个数字 0-9；
      * - 中文；
      * - 特殊字符。
+     * @param chatroomId 环信聊天室roomId
      */
-    fun createImRoom(roomName: String, roomOwner: String, callBack: VRValueCallBack<VRCreateRoomResponse>) {
+    fun createImRoom(roomName: String, roomOwner: String,chatroomId:String, callBack: VRValueCallBack<VRCreateRoomResponse>) {
         val headers = mutableMapOf<String, String>()
         headers["Content-Type"] = "application/json"
         val requestBody = JSONObject()
@@ -135,14 +136,14 @@ class VoiceToolboxServerHttpManager {
             requestBody.putOpt("traceId", UUID.randomUUID().toString())
             val requestUser = JSONObject()
 
-            val chatUserUuid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserUuid()
-            if (chatUserUuid.isEmpty()) {
+            // TODO: chatroomId
+//            if (chatroomId.isEmpty()) {
                 requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
                 requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().userId())
                 requestUser.putOpt("password", "12345678")
-            } else {
-                requestUser.putOpt("id", chatUserUuid)
-            }
+//            } else {
+//                requestUser.putOpt("id", chatroomId)
+//            }
             requestBody.putOpt("user", requestUser)
 
         } catch (e: JSONException) {
@@ -177,17 +178,20 @@ class VoiceToolboxServerHttpManager {
     /**
      * toolbox service api 置换token, 获取im 配置
      * @param channelId rtc 频道号
+     * @param chatroomId im roomId
      * @param chatroomName im 房间名
+     * @param chatOwner im 房间房主
      */
     fun requestToolboxService(
         channelId: String,
+        chatroomId: String,
         chatroomName: String,
         chatOwner: String,
         completion: (error: Int, chatroomId: String) -> Unit,
     ) {
         val generateToken = AtomicBoolean(false)
         val createImRoom = AtomicBoolean(false)
-        var chatRoomId = ""
+        var roomId = chatroomId
         generateToken(
             channelId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
@@ -197,35 +201,36 @@ class VoiceToolboxServerHttpManager {
                         generateToken.set(true)
                         VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
                         if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, chatRoomId)
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, roomId)
                         }
                     }
                 }
 
                 override fun onError(var1: Int, var2: String?) {
                     "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, chatRoomId)
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
                 }
             })
         createImRoom(
             roomName = chatroomName,
             roomOwner = chatOwner,
+            chatroomId = chatroomId,
             callBack = object : VRValueCallBack<VRCreateRoomResponse> {
                 override fun onSuccess(response: VRCreateRoomResponse?) {
                     response?.let {
                         createImRoom.set(true)
                         VoiceBuddyFactory.get().getVoiceBuddy()
-                            .setupChatConfig(response.userName, response.token, response.uid)
-                        chatRoomId = response.chatId
+                            .setupChatConfig(response.userName, response.chatToken)
+                        if (roomId.isEmpty()) roomId = response.chatId
                         if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, chatRoomId)
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, roomId)
                         }
                     }
                 }
 
                 override fun onError(var1: Int, var2: String?) {
                     "SyncToolboxService create room error code:$var1,msg:$var2".logE()
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, chatRoomId)
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
                 }
             })
     }
