@@ -319,7 +319,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         var voiceRoomApply = VoiceRoomApply()
         var memberBean = VoiceMemberModel()
-        memberBean.chatUid = get().getVoiceBuddy().chatUid()
+        memberBean.chatUid = get().getVoiceBuddy().chatUserName()
         memberBean.rtcUid = get().getVoiceBuddy().rtcUid()
         memberBean.nickName = get().getVoiceBuddy().nickName()
         memberBean.portrait = get().getVoiceBuddy().headUrl()
@@ -414,7 +414,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun enableRobot(enable: Boolean, callback: ValueCallBack<Boolean>) {
         val attributeMap = mutableMapOf<String, String>()
-        val currentUser = get().getVoiceBuddy().chatUid()
+        val currentUser = get().getVoiceBuddy().chatUserName()
         var robot6 = VoiceMicInfoModel()
         var robot7 = VoiceMicInfoModel()
         var isEnable: String
@@ -694,12 +694,12 @@ class ChatroomProtocolDelegate constructor(
      */
     private fun getMySelfModel():VoiceMemberModel{
         var micIndex : Int = -1
-        if (TextUtils.equals(ownerBean.chatUid,get().getVoiceBuddy().chatUid())){
+        if (TextUtils.equals(ownerBean.chatUid,get().getVoiceBuddy().chatUserName())){
             micIndex = 0
         }
         return VoiceMemberModel(
             get().getVoiceBuddy().userId(),
-            get().getVoiceBuddy().chatUid(),
+            get().getVoiceBuddy().chatUserName(),
             get().getVoiceBuddy().nickName(),
             get().getVoiceBuddy().headUrl(),
             get().getVoiceBuddy().rtcUid(),
