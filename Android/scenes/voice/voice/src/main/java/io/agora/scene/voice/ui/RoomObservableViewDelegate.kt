@@ -843,7 +843,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUid())
+                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
                     } else {
                         roomLivingViewModel.startMicSeatApply(micIndex)
                     }

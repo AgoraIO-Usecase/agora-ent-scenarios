@@ -11,10 +11,13 @@ import io.agora.voice.buddy.IVoiceBuddy
  */
 class VoiceBuddyImp : IVoiceBuddy {
 
-    private var chatUid: String = ""
+    private var chatUserName: String = ""
     private var chatToken: String = ""
     private var rtcToken: String = ""
-    private var chatUuid: String = ""
+
+    override fun isBuildTest(): Boolean {
+        return BuildConfig.voice_env_is_test
+    }
 
     override fun application(): Application {
         return AgoraApplication.the()
@@ -57,8 +60,9 @@ class VoiceBuddyImp : IVoiceBuddy {
         return rtcToken
     }
 
-    override fun chatUid(): String {
-        return chatUid
+    override fun chatUserName(): String {
+        // 环信 chatUserName 由用户userId 生成
+        return chatUserName.ifEmpty { userId() }
     }
 
     override fun chatAppKey(): String {
@@ -69,20 +73,14 @@ class VoiceBuddyImp : IVoiceBuddy {
         return chatToken
     }
 
-    override fun chatUserUuid(): String {
-        return chatUuid
-    }
-
     override fun setupRtcToken(rtcToken: String) {
         this.rtcToken = rtcToken
     }
 
-    override fun setupChatConfig(chatUid: String, chatToken: String, chatUuid: String) {
-        // 传uuid 时候没有返回chatUid
-        if (this.chatUid.isEmpty()) {
-            this.chatUid = chatUid
+    override fun setupChatConfig(chatUserName: String, chatToken: String) {
+        if (chatUserName.isNotEmpty()) {
+            this.chatUserName = chatUserName
         }
         this.chatToken = chatToken
-        this.chatUuid = chatUuid
     }
 }
