@@ -153,7 +153,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(result: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice create room chat_username:$chatUsername".logD()
                     "Voice create room im_token:$chatToken".logD()

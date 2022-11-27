@@ -7,6 +7,8 @@ import android.app.Application
  */
 interface IVoiceBuddy {
 
+    fun isBuildTest(): Boolean
+
     /** app */
     fun application(): Application
 
@@ -44,11 +46,9 @@ interface IVoiceBuddy {
     fun chatToken(): String
 
     /** im user id */
-    fun chatUid(): String
-
-    fun chatUserUuid(): String
+    fun chatUserName(): String
 
     fun setupRtcToken(rtcToken: String)
 
-    fun setupChatConfig(chatUid: String, chatToken: String, chatUuid: String)
+    fun setupChatConfig(chatUserName: String, chatToken: String)
 }
