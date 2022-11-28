@@ -1419,7 +1419,9 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _removeInteraction(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
-        guard let interaction = self.interactionList.filter({ $0.userId == invitation.fromUserId }).first else {
+        //TODO: 
+        let userIds = [invitation.fromUserId, invitation.userId]
+        guard let interaction = self.interactionList.filter({ userIds.contains($0.userId) }).first else {
             return
         }
         
