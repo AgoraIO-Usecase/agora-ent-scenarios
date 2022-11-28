@@ -245,6 +245,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         
         let interaction = ShowInteractionInfo()
         interaction.userId = apply.userId
+        interaction.userName = apply.userName
         interaction.roomId = getRoomId()
         interaction.interactStatus = .onSeat
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -281,29 +282,50 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func acceptMicSeatInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.seatInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("accept invitation not found")
-            return
+//        guard let invitation = self.seatInvitationList.filter({ $0.userId == VLUserCenter.user.userNo }).first else {
+//            agoraAssert("accept invitation not found")
+//            return
+//        }
+//        invitation.status = .accepted
+//        _updateMicSeatInvitation(invitation: invitation, completion: completion)
+        _getUserList { [weak self] (error, userList) in
+            guard let self = self else { return }
+            guard let user = self.userList.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraAssert("accept invitation not found")
+                return
+            }
+            user.status = .accepted
+            self._updateUserInfo(user: user, completion: completion)
+
+            let interaction = ShowInteractionInfo()
+            interaction.userId = user.userId
+            interaction.userName = user.userName
+            interaction.roomId = self.getRoomId()
+            interaction.interactStatus = .onSeat
+            interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+            self._addInteraction(interaction: interaction) { error in
+            }
         }
-        invitation.status = .accepted
-        _updateMicSeatInvitation(invitation: invitation, completion: completion)
         
-        let interaction = ShowInteractionInfo()
-        interaction.userId = invitation.userId
-        interaction.roomId = getRoomId()
-        interaction.interactStatus = .onSeat
-        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        _addInteraction(interaction: interaction) { error in
-        }
+        
     }
     
     func rejectMicSeatInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.seatInvitationList.filter({ $0.userId == VLUserCenter.user.userNo }).first else {
-            agoraAssert("reject invitation not found")
-            return
+//        guard let invitation = self.seatInvitationList.filter({ $0.userId == VLUserCenter.user.userNo }).first else {
+//            agoraAssert("reject invitation not found")
+//            return
+//        }
+//        invitation.status = .rejected
+//        _updateMicSeatInvitation(invitation: invitation, completion: completion)
+        _getUserList { [weak self] (error, userList) in
+            guard let self = self else { return }
+            guard let user = self.userList.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraAssert("reject invitation not found")
+                return
+            }
+            user.status = .rejected
+            self._updateUserInfo(user: user, completion: completion)
         }
-        invitation.status = .rejected
-        _updateMicSeatInvitation(invitation: invitation, completion: completion)
     }
     
     
@@ -342,7 +364,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     if status == .deleted {
                         self._recvPKRejected(invitation: model)
                     } else {
-                        switch invitation.status {
+                        model.status = invitation.status
+                        switch model.status {
                         case .rejected:
                             self._recvPKRejected(invitation: model)
                         case .accepted:
@@ -360,6 +383,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 //not found, add invitation
                 let _invitation = ShowPKInvitation()
                 _invitation.userId = room.ownerId
+                _invitation.userName = room.ownerName
                 _invitation.roomId = room.roomId
                 _invitation.fromUserId = VLUserCenter.user.id
                 _invitation.fromName = VLUserCenter.user.name
@@ -391,6 +415,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         invitation.status = .accepted
         _updatePKInvitation(invitation: invitation, completion: completion)
+        
+        let interaction = ShowInteractionInfo()
+        interaction.userId = invitation.fromUserId
+        interaction.userName = invitation.fromName
+        interaction.roomId = invitation.fromRoomId
+        interaction.interactStatus = .pking
+        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        _addInteraction(interaction: interaction) { error in
+        }
     }
     
     func rejectPKInvitation(completion: @escaping (Error?) -> Void) {
@@ -595,6 +628,26 @@ extension ShowSyncManagerServiceImp {
             }, fail: { error in
                 agoraPrint("imp user add fail :\(error.message)...")
                 finished()
+            })
+    }
+    
+    
+    private func _updateUserInfo(user: ShowUser, completion: @escaping (Error?) -> Void) {
+        let channelName = getRoomId()
+        agoraPrint("imp user update...")
+
+        let params = user.yy_modelToJSONObject() as! [String: Any]
+        SyncUtil
+            .scene(id: channelName)?
+            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .update(id: user.objectId!,
+                    data:params,
+                    success: {
+                agoraPrint("imp user update success...")
+                completion(nil)
+            }, fail: { error in
+                agoraPrint("imp user update fail :\(error.message)...")
+                completion(NSError(domain: error.message, code: error.code))
             })
     }
 
@@ -1100,26 +1153,26 @@ extension ShowSyncManagerServiceImp {
     
     private func _subscribePKInvitationChanged(channelName:String,
                                                subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
-        agoraPrint("imp pk invitation subscribe ...")
+        agoraPrint("imp pk invitation \(channelName) subscribe ...")
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION,
                        onCreated: { object in
-                agoraPrint("imp pk invitation subscribe onUpdated...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onUpdated...")
                 guard let jsonStr = object.toJson(),
                       let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
                     return
                 }
                 subscribeClosure(.created, model)
             }, onUpdated: { object in
-                agoraPrint("imp pk invitation subscribe onUpdated...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onUpdated...")
                 guard let jsonStr = object.toJson(),
                       let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
                     return
                 }
                 subscribeClosure(.updated, model)
             }, onDeleted: {[weak self] object in
-                agoraPrint("imp pk invitation subscribe onDeleted...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onDeleted...")
                 guard let self = self else {return}
                 guard channelName == self.getRoomId() else {
                     if let model = ShowPKInvitation.yy_model(withJSON: object.toJson() ?? "") {
@@ -1222,6 +1275,7 @@ extension ShowSyncManagerServiceImp {
         
         let interaction = ShowInteractionInfo()
         interaction.userId = invitation.userId
+        interaction.userName = invitation.userName
         interaction.roomId = invitation.roomId
         interaction.interactStatus = .pking
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
