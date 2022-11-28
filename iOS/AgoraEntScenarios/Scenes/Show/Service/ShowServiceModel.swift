@@ -87,9 +87,9 @@ class ShowMessage: ShowBaseInfo {
 /// 连麦申请
 class ShowMicSeatApply: ShowBaseInfo {
     var userId: String?                              //用户id (rtc uid)
-    var avatar: String?                          //用户头像
+    var avatar: String?                              //用户头像
     var userName: String?                            //用户名
-    var status: ShowRoomRequestStatus = .idle       //申请状态
+    var status: ShowRoomRequestStatus = .idle        //申请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
@@ -113,6 +113,10 @@ class ShowPKInvitation: ShowBaseInfo {
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
     var muteAudio: Bool = false                      //静音状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
+    
+    override var description: String {
+        return "userId: \(userId ?? "") roomId: \(roomId ?? "") fromUserId: \(fromUserId ?? "") fromRoomId: \(fromRoomId ?? "") status: \(status) objectId: \(objectId ?? "")"
+    }
 }
 
 //连麦/Pk模型

@@ -159,7 +159,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
-        
+        guard  apply.userId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
@@ -167,7 +168,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
-        
+        guard  apply.userId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
@@ -175,7 +177,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
-        
+        guard  invitation.userId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
     
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
@@ -183,7 +186,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
-        
+        guard  invitation.userId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
@@ -211,11 +215,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationAccepted(invitation: ShowPKInvitation) {
-        
+        //nothing todo, see onInteractionBegan
+        guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat invitation \(invitation.roomId ?? "") did accept")
     }
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
-        
+        guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        ToastView.show(text: "seat invitation \(invitation.roomId ?? "") did reject")
     }
     
     func onInteractionBegan(interation: ShowInteractionInfo) {
