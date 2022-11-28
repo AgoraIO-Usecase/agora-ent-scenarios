@@ -454,6 +454,15 @@ VLPopScoreViewDelegate
     VLLog(@"uid joined %ld", uid);
 }
 
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine localVideoStateChangedOfState:(AgoraVideoLocalState)state error:(AgoraLocalVideoStreamError)error sourceType:(AgoraVideoSourceType)source
+{
+    VLLog(@"local video state changed %lu", (unsigned long)state);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine remoteVideoStateChangedOfUid:(NSUInteger)uid state:(AgoraVideoRemoteState)state reason:(AgoraVideoRemoteReason)reason elapsed:(NSInteger)elapsed {
+    VLLog(@"remote video state changed %lu", (unsigned long)state);
+}
+
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
@@ -1658,8 +1667,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     
+    [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if(oldValue != isNowMicMuted) {
-        [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
         [self.bottomView updateAudioBtn:isNowMicMuted];
     }
 }
@@ -1668,14 +1677,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL oldValue = _isNowCameraMuted;
     _isNowCameraMuted = isNowCameraMuted;
     
+    [self.RTCkit enableLocalVideo:!isNowCameraMuted];
+    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
     if(oldValue != isNowCameraMuted) {
-        [self.RTCkit enableLocalVideo:!isNowCameraMuted];
-        if(!isNowCameraMuted) {
-            [self.RTCkit startPreview];
-        } else {
-            [self.RTCkit stopPreview];
-        }
-        [self.RTCkit muteLocalVideoStream:isNowCameraMuted];
         [self.bottomView updateVideoBtn:isNowCameraMuted];
     }
 }
