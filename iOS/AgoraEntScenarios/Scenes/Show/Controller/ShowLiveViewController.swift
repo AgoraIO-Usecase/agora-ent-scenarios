@@ -342,7 +342,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         _refreshInteractionList()
         switch interaction.interactStatus {
         case .pking:
-            break
+            agoraKitManager.leaveChannelEx()
+            liveView.canvasView.canvasType = .none
+            liveView.canvasView.setRemoteUserInfo(name: "")
             
         case .onSeat:
             applyView.getAllMicSeatList(autoApply: false)
