@@ -193,7 +193,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             
         } else if apply.status == .rejected {
-            applyView.getAllMicSeatList()
+            applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
             
@@ -345,7 +345,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             break
             
         case .onSeat:
-            applyView.getAllMicSeatList()
+            applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
             
@@ -448,7 +448,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
             
         } else {
-            applyView.getAllMicSeatList()
+            applyView.getAllMicSeatList(autoApply: role == .audience)
             AlertManager.show(view: applyView, alertPostion: .bottom)
         }
     }
