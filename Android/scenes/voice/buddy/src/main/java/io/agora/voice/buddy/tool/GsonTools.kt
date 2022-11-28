@@ -1,15 +1,30 @@
 package io.agora.voice.buddy.tool
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonElement
-import com.google.gson.ToNumberPolicy
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import org.json.JSONObject
+import java.io.IOException
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+
 
 object GsonTools {
     private val gson =
         GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+            .registerTypeAdapter(TypeToken.get(JSONObject::class.java).type, object : TypeAdapter<JSONObject>() {
+                @Throws(IOException::class)
+                override fun write(jsonWriter: JsonWriter, value: JSONObject) {
+                    jsonWriter.jsonValue(value.toString())
+                }
+
+                @Throws(IOException::class)
+                override fun read(jsonReader: JsonReader): JSONObject? {
+                    return null
+                }
+            })
+            .enableComplexMapKeySerialization()
             .create()
 
     @JvmStatic
@@ -62,9 +77,9 @@ object GsonTools {
     }
 
     @JvmStatic
-    fun <T> toMaps(jsonString: String?): Map<String, T>? {
+    fun <T> toMap(jsonString: String?, clazz: Class<T>): Map<String, T>? {
         return try {
-            gson.fromJson(jsonString, object : TypeToken<Map<String, T>>() {}.type)
+            gson.fromJson(jsonString, ParameterizedTypeMapImpl(clazz))
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -72,9 +87,9 @@ object GsonTools {
     }
 
     @JvmStatic
-    fun <T> toList(gsonString: String?): List<T>? {
+    fun <T> toList(gsonString: String?, clazz:Class<T>): List<T>? {
         return try {
-            gson.fromJson(gsonString, object : TypeToken<List<T>>() {}.type)
+            gson.fromJson(gsonString, ParameterizedTypeListImpl(clazz))
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -127,5 +142,35 @@ object GsonTools {
             e.printStackTrace()
         }
         return value
+    }
+
+
+}
+
+internal class ParameterizedTypeListImpl(var clazz: Class<*>) : ParameterizedType {
+    override fun getActualTypeArguments(): Array<Type> {
+        return arrayOf(clazz)
+    }
+
+    override fun getRawType(): Type {
+        return List::class.java
+    }
+
+    override fun getOwnerType(): Type? {
+        return null
+    }
+}
+
+internal class ParameterizedTypeMapImpl(var clazz: Class<*>) : ParameterizedType {
+    override fun getActualTypeArguments(): Array<Type> {
+        return arrayOf(clazz)
+    }
+
+    override fun getRawType(): Type {
+        return Map::class.java
+    }
+
+    override fun getOwnerType(): Type? {
+        return null
     }
 }

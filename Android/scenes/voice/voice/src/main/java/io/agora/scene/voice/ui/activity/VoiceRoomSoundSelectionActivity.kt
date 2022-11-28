@@ -1,5 +1,6 @@
 package io.agora.scene.voice.ui.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -15,7 +16,6 @@ import io.agora.scene.voice.VoiceConfigManager.getLifecycleCallbacks
 import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterParams
 import io.agora.scene.voice.bean.SoundSelectionBean
 import io.agora.scene.voice.service.VoiceRoomModel
 import io.agora.CallBack
@@ -34,6 +34,26 @@ import io.agora.voice.buddy.tool.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
+
+    companion object{
+        const val KEY_CHATROOM_CREATE_NAME = "chatroom_create_name"
+        const val KEY_CHATROOM_CREATE_IS_PUBLIC = "chatroom_create_is_public"
+        const val KEY_CHATROOM_CREATE_ENCRYPTION = "chatroom_create_encryption"
+        const val KEY_CHATROOM_CREATE_ROOM_TYPE = "chatroom_create_room_type"
+
+        fun startActivity(activity: Activity, roomName: String, isPublic: Boolean, encryption: String, roomType: Int) {
+            val intent = Intent(activity, VoiceRoomSoundSelectionActivity::class.java).apply {
+                putExtra(KEY_CHATROOM_CREATE_NAME, roomName)
+                putExtra(KEY_CHATROOM_CREATE_IS_PUBLIC, isPublic)
+                if (!isPublic) {
+                    putExtra(KEY_CHATROOM_CREATE_ENCRYPTION, encryption)
+                }
+                putExtra(KEY_CHATROOM_CREATE_ROOM_TYPE, roomType)
+            }
+            activity.startActivity(intent)
+        }
+    }
+
     private var soundSelectAdapter: VoiceRoomSoundSelectionAdapter? = null
     private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var isPublic = true
@@ -59,10 +79,10 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
 
     private fun initIntent() {
         intent?.let {
-            roomName = it.getStringExtra(RouterParams.KEY_CHATROOM_CREATE_NAME) ?: ""
-            isPublic = it.getBooleanExtra(RouterParams.KEY_CHATROOM_CREATE_IS_PUBLIC, true)
-            encryption = it.getStringExtra(RouterParams.KEY_CHATROOM_CREATE_ENCRYPTION) ?: ""
-            roomType = it.getIntExtra(RouterParams.KEY_CHATROOM_CREATE_ROOM_TYPE, 0)
+            roomName = it.getStringExtra(KEY_CHATROOM_CREATE_NAME) ?: ""
+            isPublic = it.getBooleanExtra(KEY_CHATROOM_CREATE_IS_PUBLIC, true)
+            encryption = it.getStringExtra(KEY_CHATROOM_CREATE_ENCRYPTION) ?: ""
+            roomType = it.getIntExtra(KEY_CHATROOM_CREATE_ROOM_TYPE, 0)
         }
     }
 
@@ -170,10 +190,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     private fun goVoiceRoom() {
         curVoiceRoomModel?.let {
             dismissLoading()
-            val intent = Intent(this, ChatroomLiveActivity::class.java).apply {
-                putExtra(RouterParams.KEY_VOICE_ROOM_MODEL, it)
-            }
-            startActivity(intent)
+            ChatroomLiveActivity.startActivity(this, it)
             // todo 优化
             finishCreateActivity()
             finish()
