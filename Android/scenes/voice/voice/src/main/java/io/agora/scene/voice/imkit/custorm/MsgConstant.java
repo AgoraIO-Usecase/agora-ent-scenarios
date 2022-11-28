@@ -9,4 +9,5 @@ public interface MsgConstant {
     String CUSTOM_GIFT_PORTRAIT = "portrait";
     String CUSTOM_GIFT_USERNAME = "userName";
     String CUSTOM_PRAISE_KEY_NUM = "num";
+    String CUSTOM_SYSTEM_NAME= "name";
 }

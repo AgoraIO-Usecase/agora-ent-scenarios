@@ -3,6 +3,9 @@ package io.agora.scene.voice.imkit.custorm;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -299,9 +302,15 @@ public class CustomMsgHelper implements MessageListener {
      */
     public void sendSystemMsg(String username,String portrait, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
-        params.put(MsgConstant.CUSTOM_GIFT_USERNAME,username);
-        params.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
-        sendSystemMsg(params, callBack);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(MsgConstant.CUSTOM_SYSTEM_NAME,username);
+            jsonObject.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
+            params.put("user",jsonObject.toString());
+            sendSystemMsg(params, callBack);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -183,18 +183,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
                     override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                         callBack.onSuccess(MutableLiveData(true))
-                        CustomMsgHelper.getInstance().sendSystemMsg(
-                            VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                            VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack(){
-                                override fun onSuccess(message: ChatMessageData?) {
-                                    "sendSystemMsg onSuccess $message".logE()
-                                }
-
-                                override fun onError(messageId: String?, code: Int, error: String?) {
-                                    "sendSystemMsg onFail $code $error".logE()
-                                }
-                            }
-                        )
                     }
                 }.asLiveData())
             }, 200)

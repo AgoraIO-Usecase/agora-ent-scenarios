@@ -93,12 +93,8 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     Log.d("focus", "focused");
-                    if (null != clickListener)
-                        clickListener.onInputViewFocusChange(true);
                 } else {
                     Log.d("focus", "focus lost");
-                    if (null != clickListener)
-                        clickListener.onInputViewFocusChange(false);
                     inputView.setVisibility(View.GONE);
                 }
             }
@@ -125,8 +121,6 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                 isShowEmoji = !isShowEmoji;
                 SoftShowing(isShowEmoji);
                 checkShowExpression(isShowEmoji);
-                if (null != clickListener)
-                    clickListener.onEmojiClick(isShowEmoji);
             }
         });
         mSend.setOnClickListener(new OnClickListener() {
