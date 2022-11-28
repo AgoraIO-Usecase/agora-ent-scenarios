@@ -331,5 +331,6 @@ class ShowPKInviteViewCell: UITableViewCell {
                 self.refreshDataClosure?()
             }
         }
+        AlertManager.hiddenView()
     }
 }

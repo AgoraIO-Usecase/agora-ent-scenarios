@@ -7,6 +7,7 @@
 
 import Foundation
 import AgoraRtcKit
+import UIKit
 
 class ShowAgoraKitManager: NSObject {
     
@@ -29,6 +30,7 @@ class ShowAgoraKitManager: NSObject {
     private lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
         config.cameraDirection = .front
+        config.dimensions = CGSize(width: 1280, height: 720)
         return config
     }()
     
@@ -51,15 +53,12 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.setClientRole(.broadcaster)
         agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
         agoraKit?.setVideoFrameDelegate(self)
+        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        
         let canvas = AgoraRtcVideoCanvas()
         canvas.renderMode = .hidden
         canvas.mirrorMode = .disabled
         canvas.view = canvasView
-        let config = AgoraCameraCapturerConfiguration()
-//        config.cameraDirection = .front
-        config.dimensions = CGSize(width: 1280, height: 720)
-        agoraKit.setCameraCapturerConfiguration(config)
-        
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
         agoraKit.startPreview()
@@ -70,9 +69,31 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
+    /// 切换连麦角色
+    func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView) {
+        let options = AgoraRtcChannelMediaOptions()
+        options.clientRoleType = role
+        options.publishMicrophoneTrack = role == .broadcaster
+        options.publishCameraTrack = role == .broadcaster
+        agoraKit.updateChannel(with: options)
+        agoraKit.setClientRole(role)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = UInt(uid ?? "0") ?? 0
+        videoCanvas.renderMode = .hidden
+        videoCanvas.view = canvasView
+        if uid == VLUserCenter.user.id {
+            agoraKit.setupLocalVideo(videoCanvas)
+        } else {
+            agoraKit.setupRemoteVideo(videoCanvas)
+        }
+    }
+    
+    /// 设置分辨率
     /// 设置采集分辨率
     /// - Parameter size: 分辨率
     func setCaptureVideoDimensions(_ size: CGSize){
+        agoraKit.disableVideo()
+        agoraKit.enableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
         agoraKit?.setCameraCapturerConfiguration(captureConfig)
     }

@@ -47,7 +47,7 @@ class ShowRoomLiveView: UIView {
         return button
     }()
     
-    private lazy var bottomBar: ShowRoomBottomBar = {
+    lazy var bottomBar: ShowRoomBottomBar = {
         let view = ShowRoomBottomBar(isBroadcastor: isBroadcastor)
         return view
     }()

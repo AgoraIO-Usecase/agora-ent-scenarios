@@ -16,7 +16,11 @@ enum ShowLiveCanvasType {
 
 class ShowCanvasView: UIView {
     lazy var localView = UIView()
-    lazy var remoteView = UIView()
+    lazy var remoteView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        return view
+    }()
     
     private lazy var localUser: AGEButton = {
         let button = AGEButton()

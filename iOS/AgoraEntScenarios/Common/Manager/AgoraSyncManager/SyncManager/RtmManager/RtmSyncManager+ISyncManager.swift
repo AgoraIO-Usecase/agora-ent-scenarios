@@ -217,7 +217,7 @@ extension RtmSyncManager: ISyncManager {
     /// id 是Collection item 的obj id
     public func delete(reference: CollectionReference,
                        id: String,
-                       success: SuccessBlockVoid?,
+                       success: SuccessBlockObjOptional?,
                        fail: FailBlock?)
     {
         let option = AgoraRtmChannelAttributeOptions()
@@ -232,7 +232,7 @@ extension RtmSyncManager: ISyncManager {
                                       fail?(error)
                                       return
                                   }
-                                  success?()
+                                  success?(nil)
                               })
     }
 
@@ -261,7 +261,7 @@ extension RtmSyncManager: ISyncManager {
     }
 
     public func deleteScenes(sceneIds: [String],
-                             success: SuccessBlockVoid?,
+                             success: SuccessBlockObjOptional?,
                              fail: FailBlock?)
     {
         let option = AgoraRtmChannelAttributeOptions()
@@ -277,7 +277,7 @@ extension RtmSyncManager: ISyncManager {
                                       return
                                   }
 
-                                  success?()
+                                  success?(nil)
                               })
     }
 

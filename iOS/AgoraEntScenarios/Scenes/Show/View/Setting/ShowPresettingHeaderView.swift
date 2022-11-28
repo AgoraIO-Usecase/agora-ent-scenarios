@@ -30,6 +30,11 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
         return imgView
     }()
     
+    private lazy var bgImgView: UIImageView = {
+        let imgView = UIImageView()
+        imgView.backgroundColor = .show_preset_bg
+        return imgView
+    }()
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -40,7 +45,21 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+//        bgImgView.setRoundingCorners([.topLeft,.topRight], radius: 16)
+    }
+    
+    
     private func createSubviews(){
+        
+        contentView.addSubview(bgImgView)
+        bgImgView.snp.makeConstraints { make in
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+            make.top.equalTo(15)
+            make.bottom.equalTo(0)
+        }
         
         contentView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
@@ -51,7 +70,7 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
         contentView.addSubview(iconImgView)
         iconImgView.snp.makeConstraints { make in
             make.centerY.equalTo(titleLabel)
-            make.right.equalTo(-20)
+            make.right.equalTo(-40)
         }
         
         contentView.addSubview(descLabel)

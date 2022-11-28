@@ -36,7 +36,7 @@ class ShowApplyView: UIView {
         let label = AGELabel(colorStyle: .black, fontStyle: .middle)
         let text = " 正在等待"
         let attrs = NSMutableAttributedString(string: text)
-        let attr = NSAttributedString(string: "3人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+        let attr = NSAttributedString(string: "0人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         label.attributedText = attrs
         return label
@@ -49,12 +49,13 @@ class ShowApplyView: UIView {
                                                                        renderingMode: .alwaysOriginal)
         button.setImage(image, for: .normal, postion: .right, spacing: 5)
         button.addTarget(self, action: #selector(onTapRevokeButton(sender:)), for: .touchUpInside)
+        button.isHidden = true
         return button
     }()
     private lazy var tableView: AGETableView = {
         let view = AGETableView(frame: .zero, style: .plain)
         view.rowHeight = 67
-        view.emptyTitle = "暂无主播在线".show_localized
+        view.emptyTitle = "暂无用户排麦".show_localized
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
@@ -67,28 +68,35 @@ class ShowApplyView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        getAllMicSeatList()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func getAllMicSeatList() {
+    func getAllMicSeatList() {
         AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
             guard let list = list else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
-            self.revokeutton.isHidden = seatUserModel == nil
-            if seatUserModel == nil { // 发出上麦申请
-                AppContext.showServiceImp.createMicSeatApply { _ in }
+            if seatUserModel == nil {
+                AppContext.showServiceImp.createMicSeatApply { _ in
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                        self.getAllMicSeatList()
+                    }
+                }
             }
-            let text = " 正在等待"
-            let attrs = NSMutableAttributedString(string: text)
-            let attr = NSAttributedString(string: "\(list.count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
-            attrs.insert(attr, at: 0)
-            self.tipsLabel.attributedText = attrs
+            self.revokeutton.isHidden = seatUserModel == nil
+            self.setupTipsInfo(count: list.count)
             self.tableView.dataArray = list
         }
+    }
+    
+    private func setupTipsInfo(count: Int) {
+        let text = " 正在等待"
+        let attrs = NSMutableAttributedString(string: text)
+        let attr = NSAttributedString(string: "\(count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+        attrs.insert(attr, at: 0)
+        self.tipsLabel.attributedText = attrs
     }
     
     private func setupUI() {
@@ -144,14 +152,12 @@ class ShowApplyView: UIView {
     
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
-        tipsViewHeightCons?.constant = 0
-        tipsViewHeightCons?.isActive = true
-        UIView.animate(withDuration: 0.25) {
-            self.layoutIfNeeded()
-        }
-        AppContext.showServiceImp.cancelMicSeatApply { _ in
-            self.getAllMicSeatList()
-        }
+        revokeutton.isHidden = true
+        AppContext.showServiceImp.cancelMicSeatApply { _ in }
+        let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
+        tableView.dataArray?.remove(at: index)
+        let count = tableView.dataArray?.count ?? 0
+        setupTipsInfo(count: count)
     }
 }
 
@@ -177,7 +183,7 @@ extension ShowApplyView: AGETableViewDelegate {
         return view
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        30
+        (self.tableView.dataArray?.isEmpty ?? true) ? 0 : 30
     }
 }
 

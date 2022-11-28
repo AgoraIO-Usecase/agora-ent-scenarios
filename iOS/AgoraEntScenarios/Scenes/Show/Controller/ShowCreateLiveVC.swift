@@ -13,7 +13,7 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var selectedResolution = 0
+    private var selectedResolution = 1
     
     private let agoraKitManager = ShowAgoraKitManager()
         

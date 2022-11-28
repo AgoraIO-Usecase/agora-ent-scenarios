@@ -649,7 +649,7 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .delete(id: objectId,
-                    success: {
+                    success: { _ in 
                         completion(nil)
                     },
                     fail: { error in
@@ -845,7 +845,7 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .delete(id: objectId,
-                    success: {
+                    success: { _ in
                         finished(nil)
                     }, fail: { error in
                         finished(NSError(domain: error.message, code: error.code))
@@ -1029,7 +1029,7 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
             .delete(id: objectId,
-                    success: {
+                    success: { _ in
                         // TODO(wsushengtao) callback foreach loop
 //                completion(nil)
                         print("removeChooseSong success")
