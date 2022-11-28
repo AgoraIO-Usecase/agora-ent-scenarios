@@ -22,9 +22,8 @@ class ShowPresettingVC: UIViewController {
     
     private var dataArray: [ShowPresettingModel] = {
         
-        let model1 = ShowPresettingModel(title: "秀场模式", desc: "倒垃圾来得及啊了解到拉进来的房间法律监督福利卡冷冻机房垃圾袋发来得及垃圾房间来得及发动机法拉三等奖爱讲道理",icon: "show_live_chat_bar_emoji_sel",optionsArray: [.show_low,.show_medium,.show_high])
-        let model2 = ShowPresettingModel(title: "舞蹈/运动模式", desc: "倒垃圾来得及啊理解多拉点了法兰蝶阀拉杜拉拉的发放的拉链都发了法拉第发令肌肤垃圾袋拉进来的房间爱劳动快乐",icon: "show_live_chat_bar_emoji_sel",optionsArray: [.show_low,.show_medium,.show_high])
-        return [model1, model2]
+        let model1 = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
+        return [model1]
     }()
     
     private lazy var headerView: ShowNavigationBar = {
@@ -38,6 +37,7 @@ class ShowPresettingVC: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = TableRowHeight
+        tableView.separatorStyle = .none
         tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.register(ShowPresettingCell.self, forCellReuseIdentifier: ShowPresettingCellID)
         tableView.register(ShowPresettingHeaderView.self, forHeaderFooterViewReuseIdentifier: ShowPresettingHeaderViewID)
@@ -65,7 +65,7 @@ class ShowPresettingVC: UIViewController {
         
         headerView.title = "show_advance_setting_presetting_title".show_localized
         view.addSubview(headerView)
-        headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_live_close"))
+        headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_preset_close"))
         let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
         headerView.rightItems = [saveButtonItem]
         
@@ -116,7 +116,7 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: ShowPresettingHeaderViewID) as! ShowPresettingHeaderView
         let model = dataArray[section]
-        headerView.setTitle(model.title, desc: model.desc, icon: model.icon)
+        headerView.setTitle(model.title, desc: model.desc, type: model.standard)
         return headerView
     }
     

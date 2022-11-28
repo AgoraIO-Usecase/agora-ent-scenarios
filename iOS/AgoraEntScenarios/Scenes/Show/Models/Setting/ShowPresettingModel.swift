@@ -7,6 +7,20 @@
 
 import Foundation
 
+enum ShowPresetStandardType {
+    case douyin
+    case kuaishou
+    
+    var image: UIImage? {
+        switch self {
+        case .douyin:
+            return UIImage.show_sceneImage(name: "show_preset_douyin")
+        case .kuaishou:
+            return UIImage.show_sceneImage(name: "show_preset_kuaishou")
+        }
+    }
+}
+
 enum ShowMode {
     case signle // 单主播模式
     case pk // pk模式
@@ -20,22 +34,22 @@ enum ShowPresetType {
     var title: String {
         switch self {
         case .show_low:
-            return "低端机"
+            return "show_presetting_device_level_low_title".show_localized
         case .show_medium:
-            return "中端机"
+            return "show_presetting_device_level_medium_title".show_localized
         case .show_high:
-            return "高端机"
+            return "show_presetting_device_level_high_title".show_localized
         }
     }
     
     var iosInfo: String {
         switch self {
         case .show_low:
-            return "iPhone6 及以下"
+            return "show_presetting_device_level_low_desc".show_localized
         case .show_medium:
-            return "iPhone6~iPhoneX"
+            return "show_presetting_device_level_medium_desc".show_localized
         case .show_high:
-            return "iPhoneX 及以上"
+            return "show_presetting_device_level_high_desc".show_localized
         }
     }
 }
@@ -43,13 +57,13 @@ enum ShowPresetType {
 class ShowPresettingModel {
     var title: String
     var desc: String
-    var icon: String
+    var standard: ShowPresetStandardType
     var optionsArray: [ShowPresetType]
     
-    init(title: String, desc: String, icon: String, optionsArray: [ShowPresetType]) {
+    init(title: String, desc: String, standard: ShowPresetStandardType, optionsArray: [ShowPresetType]) {
         self.title = title
         self.desc = desc
-        self.icon = icon
+        self.standard = standard
         self.optionsArray = optionsArray
     }
 }

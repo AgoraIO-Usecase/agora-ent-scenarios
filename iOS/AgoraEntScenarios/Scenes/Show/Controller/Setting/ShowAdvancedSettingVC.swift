@@ -70,6 +70,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        // 自动弹出预设
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.didClickPreSetBarButton()
+        }
     }
     
     private func setUpUI() {
@@ -101,14 +105,14 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
         // 主播端设置
         let broadcasterVideoSettings: [ShowSettingKey] = [
-            .lowlightEnhance,
+            .H265,
             .colorEnhance,
+            .lowlightEnhance,
             .videoDenoiser,
-            .videoCaptureSize,
-            .FPS,
-            .videoBitRate,
             .PVC,
-            .SR
+            .videoEncodeSize,
+            .FPS,
+            .videoBitRate
         ]
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
@@ -119,25 +123,29 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .earmonitoring,
             .recordingSignalVolume,
             .musincVolume,
-            .audioBitRate
         ]
         let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings,[]]
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
         vc.dataArray = settings[index]
-        vc.willChangeSettingParams = {[weak self] in
+        vc.willChangeSettingParams = {[weak self] key, value in
             guard let wSelf = self else { return false }
-            return wSelf.showModifyAlertIfNeeded()
+            return wSelf.showModifyAlertIfNeeded(key,value: value)
         }
         return vc
     }
     
     // 判断是否需要显示修改预设值的弹窗
-    private func showModifyAlertIfNeeded() -> Bool {
+    private func showModifyAlertIfNeeded(_ key: ShowSettingKey, value: Any) -> Bool {
         if presetModeName != nil {
-            showAlert(message: "当前处于\"\(presetModeName!)\"最佳效果配置修改参数后视频体验将改变") {
-                self.presetModeName = nil
+            let msg1 = "show_presetting_alert_will_change_value_message1".show_localized
+            let msg2 = "show_presetting_alert_will_change_value_message2".show_localized
+            showAlert(title:"show_presetting_alert_will_change_value_title".show_localized, message: "\(msg1)\"\(presetModeName!)\"\(msg2)") { [weak self] in
+                self?.presetModeName = nil
+                key.writeValue(value)
+                self?.videoSettingVC.reloadData()
+                self?.audioSettingVC.reloadData()
             }
         }
         return presetModeName == nil
@@ -154,7 +162,9 @@ extension ShowAdvancedSettingVC {
             self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .signle)
             self?.videoSettingVC.reloadData()
             self?.audioSettingVC.reloadData()
-            ToastView.show(text: "音频设置已更新至\"\(modeName)\"最佳配置")
+            let text1 = "show_presetting_update_toast1".show_localized
+            let text2 = "show_presetting_update_toast2".show_localized
+            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
             self?.presetModeName = modeName
         }
         present(vc, animated: true)

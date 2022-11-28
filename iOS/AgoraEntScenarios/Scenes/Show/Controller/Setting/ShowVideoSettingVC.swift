@@ -16,7 +16,7 @@ class ShowVideoSettingVC: UIViewController {
     
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowSettingManager!
-    var willChangeSettingParams: (()->Bool)?
+    var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -62,8 +62,8 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
             cell.setTitle(data.title, isOn: data.boolValue) {[weak self] isOn in
                 self?.changeValue(isOn, forSettingKey: data)
-            } detailButtonAction: {
-                
+            } detailButtonAction: {[weak self] in
+                self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
             return cell
         }else if data.type == .segment {
@@ -108,7 +108,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
 
 extension ShowVideoSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
-        if let willChange = willChangeSettingParams, willChange() == true {
+        if let willChange = willChangeSettingParams, willChange(key,value) == true {
             key.writeValue(value)
             settingManager.updateSettingForkey(key)
         }
