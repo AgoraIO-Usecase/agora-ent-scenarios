@@ -49,6 +49,14 @@ class ShowLiveViewController: UIViewController {
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
+    private lazy var pkInviteView = ShowPKInviteView()
+    
+    private var pkUserInvitationList: [ShowPKUserInfo]? {
+        didSet {
+            self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
+        }
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -136,8 +144,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         applyAndInviteView.applyStatusClosure = { [weak self] status in
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
+        
+        _refreshInvitationList()
     }
     
+    private func _refreshInvitationList() {
+        AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
+            self?.pkUserInvitationList = pkUserList
+        }
+    }
     
     func onUserJoinedRoom(user: ShowUser) {
         
@@ -173,6 +188,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
+        guard invitation.userId == VLUserCenter.user.id else { return }
         if invitation.status == .waitting {
             let vc = ShowReceivePKAlertVC()
             vc.name = invitation.userName ?? ""
@@ -240,11 +256,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         //nothing todo, see onInteractionBegan
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
+        _refreshInvitationList()
     }
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+        _refreshInvitationList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
@@ -354,11 +372,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickPKButton(_ button: ShowRedDotButton) {
-        let pkInviteView = ShowPKInviteView()
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
-        AppContext.showServiceImp.getAllPKUserList { [weak pkInviteView] (error, pkUserList) in
-            pkInviteView?.pkUserInvitationList = pkUserList
-        }
+        _refreshInvitationList()
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
