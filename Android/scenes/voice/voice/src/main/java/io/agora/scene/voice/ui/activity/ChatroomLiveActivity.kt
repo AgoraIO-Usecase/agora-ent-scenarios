@@ -136,6 +136,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: Boolean?) {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
+                    CustomMsgHelper.getInstance().sendSystemMsg(
+                        VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+                        VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack(){
+                            override fun onSuccess(message: ChatMessageData?) {
+                                "sendSystemMsg onSuccess $message".logE()
+                                binding.messageView.refreshSelectLast()
+                            }
+
+                            override fun onError(messageId: String?, code: Int, error: String?) {
+                                "sendSystemMsg onFail $code $error".logE()
+                            }
+                        }
+                    )
                 }
 
                 override fun onHideLoading() {
@@ -338,16 +351,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             }
 
-            override fun onInputViewFocusChange(focus: Boolean) {
-
-            }
-
             override fun onInputLayoutClick() {
                 checkFocus(false)
-            }
-
-            override fun onEmojiClick(isShow: Boolean) {
-
             }
 
             override fun onSendMessage(content: String?) {

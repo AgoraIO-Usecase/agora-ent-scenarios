@@ -21,6 +21,7 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.service.VoiceBuddyFactory;
@@ -197,7 +198,9 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         if (conversation != null){
             EMLog.e("getMessageData",conversation.getAllMessages().size() + "");
             for (ChatMessage allMessage : conversation.getAllMessages()) {
-                if (allMessage.getBody() instanceof TextMessageBody ){
+                if (allMessage.getBody() instanceof TextMessageBody
+                || allMessage.getBody() instanceof CustomMessageBody &&
+                (((CustomMessageBody) allMessage.getBody()).event()).equals(CustomMsgType.CHATROOM_SYSTEM.getName())){
                     data.add(parseChatMessage(allMessage));
                 }
             }
@@ -247,8 +250,8 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         String jsonString = "";
         String userName = "";
         Map<String,String> params = msg.getCustomParams();
-        if (params.containsKey("room_user")){
-            jsonString = params.get("room_user");
+        if (params.containsKey("user")){
+            jsonString = params.get("user");
             Log.e("getSystemUserName","jsonString: " + jsonString);
             if (!TextUtils.isEmpty(jsonString)){
                 try {
