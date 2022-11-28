@@ -117,7 +117,7 @@ class ShowApplyAndInviteView: UIView {
     }
     private func getInviteList() {
         AppContext.showServiceImp.getAllUserList { _, list in
-            guard let list = list else { return }
+            guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
             self.tableView.dataArray = list
         }
     }
