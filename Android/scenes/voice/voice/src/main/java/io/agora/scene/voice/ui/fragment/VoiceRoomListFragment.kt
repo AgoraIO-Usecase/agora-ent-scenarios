@@ -112,7 +112,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         voiceRoomViewModel.joinRoomObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean?>() {
                 override fun onSuccess(reslut: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice room list chat_username:$chatUsername".logD()
                     "Voice room list im_token:$chatToken".logD()
@@ -143,9 +143,10 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     private fun gotoJoinRoom(voiceRoomModel: VoiceRoomModel) {
         VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
+            chatroomId = voiceRoomModel.chatroomId,
             chatroomName = voiceRoomModel.roomName,
             chatOwner = voiceRoomModel.owner?.chatUid?:"",
-            completion = { error, chatroomId ->
+            completion = { error, _ ->
                 if (error == VoiceServiceProtocol.ERR_OK) {
                     ThreadManager.getInstance().runOnMainThread {
                         voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
