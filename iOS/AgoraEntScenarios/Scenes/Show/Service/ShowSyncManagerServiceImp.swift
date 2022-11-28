@@ -996,9 +996,6 @@ extension ShowSyncManagerServiceImp {
         }
         agoraPrint("imp pk invitation get...")
         
-        
-        
-        
         if roomId != channelName {
             guard let params = room?.yy_modelToJSONObject() as? [String: Any], let ownerId = room?.ownerId else {
                 agoraAssert("room convert to param fail")
@@ -1294,7 +1291,7 @@ extension ShowSyncManagerServiceImp {
                            }
                            
                            defer {
-                               self.subscribeDelegate?.onInteractionBegan(interation: model)
+                               self.subscribeDelegate?.onInteractionBegan(interaction: model)
                            }
                            
                            if self.interactionList.contains(where: { $0.userId == model.userId }) {

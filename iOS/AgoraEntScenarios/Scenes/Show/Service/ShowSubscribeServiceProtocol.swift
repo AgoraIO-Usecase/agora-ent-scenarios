@@ -76,7 +76,7 @@ protocol ShowSubscribeServiceProtocol: NSObject {
     
     /// 收到一个pk/连麦互动/更新
     /// - Parameter interation: <#interation description#>
-    func onInteractionBegan(interation: ShowInteractionInfo)
+    func onInteractionBegan(interaction: ShowInteractionInfo)
     
     /// pk/连麦被停止
     /// - Parameter interaction: <#interaction description#>
