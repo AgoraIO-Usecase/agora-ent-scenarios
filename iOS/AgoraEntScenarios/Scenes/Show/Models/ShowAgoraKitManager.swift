@@ -26,6 +26,12 @@ class ShowAgoraKitManager: NSObject {
         return config
     }()
     
+    private lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+        let config = AgoraCameraCapturerConfiguration()
+        config.cameraDirection = .front
+        return config
+    }()
+    
     private (set) var agoraKit: AgoraRtcEngineKit!
     
     weak var delegate: AgoraRtcEngineDelegate? {
@@ -64,7 +70,14 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
-    /// 设置分辨率
+    /// 设置采集分辨率
+    /// - Parameter size: 分辨率
+    func setCaptureVideoDimensions(_ size: CGSize){
+        captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        agoraKit?.setCameraCapturerConfiguration(captureConfig)
+    }
+    
+    /// 设置编码分辨率
     /// - Parameter size: 分辨率
     func setVideoDimensions(_ size: CGSize){
         videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)

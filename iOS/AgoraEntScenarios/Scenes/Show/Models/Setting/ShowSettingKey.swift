@@ -48,7 +48,7 @@ enum ShowSettingKey: String, CaseIterable {
     case PVC                    // pvc
     case SR                     // 超分
     case BFrame                 // b帧
-    case videoCaptureSize       // 视频采集分辨率
+    case videoEncodeSize       // 视频编码分辨率
     case FPS                    // 帧率
     case H265                   // h265
     case videoBitRate           // 视频码率
@@ -73,7 +73,7 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_SR_title".show_localized
         case .BFrame:
             return "show_advance_setting_BFrame_title".show_localized
-        case .videoCaptureSize:
+        case .videoEncodeSize:
             return "show_advance_setting_videoCaptureSize_title".show_localized
         case .FPS:
             return "show_advance_setting_FPS_title".show_localized
@@ -92,6 +92,7 @@ enum ShowSettingKey: String, CaseIterable {
         }
     }
     
+    // 类型
     var type: KeyType {
         switch self {
         case .lowlightEnhance:
@@ -108,7 +109,7 @@ enum ShowSettingKey: String, CaseIterable {
             return .aSwitch
         case .BFrame:
             return .aSwitch
-        case .videoCaptureSize:
+        case .videoEncodeSize:
             return .label
         case .FPS:
             return .label
@@ -127,6 +128,27 @@ enum ShowSettingKey: String, CaseIterable {
         }
     }
     
+    // 弹窗提示文案
+    var tips: String {
+        switch self {
+        case .lowlightEnhance:
+            return "show_advance_setting_lowlightEnhance_tips".show_localized
+        case .colorEnhance:
+            return "show_advance_setting_colorEnhance_tips".show_localized
+        case .videoDenoiser:
+            return "show_advance_setting_videoDenoiser_tips".show_localized
+        case .PVC:
+            return "show_advance_setting_PVC_tips".show_localized
+        case .SR:
+            return "show_advance_setting_SR_tips".show_localized
+        case .H265:
+            return "show_advance_setting_H265_tips".show_localized
+        default:
+            return ""
+        }
+    }
+    
+    // slider的取值区间
     var sliderValueScope: (Float, Float) {
         switch self {
         case .videoBitRate:
@@ -140,16 +162,10 @@ enum ShowSettingKey: String, CaseIterable {
         }
     }
     
+    // 选项
     var items: [String] {
         switch self {
-        case .videoCaptureSize:
-//            return [ShowAgoraVideoDimensions._320x240.rawValue,
-//                    ShowAgoraVideoDimensions._480x360.rawValue,
-//                    ShowAgoraVideoDimensions._360x640.rawValue,
-//                    ShowAgoraVideoDimensions._960x540.rawValue,
-//                    ShowAgoraVideoDimensions._960x720.rawValue,
-//                    ShowAgoraVideoDimensions._1280x720.rawValue
-//            ]
+        case .videoEncodeSize:
             return ShowAgoraVideoDimensions.allCases.map({ $0.rawValue })
         case .FPS:
             return [AgoraVideoFrameRate.fps1.stringValue(),

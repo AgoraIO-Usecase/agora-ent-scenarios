@@ -347,7 +347,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         let settingVC = ShowAdvancedSettingVC()
         settingVC.mode = .signle // 根据当前模式设置
         settingVC.isBroadcaster = role == .broadcaster
-        settingVC.isBroadcaster = false
         settingVC.settingManager = settingManager
         navigationController?.pushViewController(settingVC, animated: true)
     }

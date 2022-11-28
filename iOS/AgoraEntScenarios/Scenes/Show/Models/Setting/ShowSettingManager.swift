@@ -38,7 +38,7 @@ class ShowSettingManager {
         updatePresetForType(presetType ?? .show_low, mode: .signle)
         updateSettingForkey(.lowlightEnhance)
         updateSettingForkey(.colorEnhance)
-        updateSettingForkey(.videoCaptureSize)
+        updateSettingForkey(.videoEncodeSize)
         updateSettingForkey(.beauty)
         updateSettingForkey(.PVC)
         updateSettingForkey(.SR)
@@ -78,12 +78,12 @@ class ShowSettingManager {
     
     // 预设模式
     private func _presetValuesWith(dimensions: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captrueSize: ShowAgoraVideoDimensions) {
-        ShowSettingKey.videoCaptureSize.writeValue(dimensionsItems.firstIndex(of: dimensions.sizeValue))
+        ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: dimensions.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
         ShowSettingKey.H265.writeValue(h265On)
         
-        updateSettingForkey(.videoCaptureSize)
+        updateSettingForkey(.videoEncodeSize)
         updateSettingForkey(.videoBitRate)
         updateSettingForkey(.FPS)
         updateSettingForkey(.H265)
@@ -143,7 +143,7 @@ extension ShowSettingManager {
         case .BFrame:
             
            break
-        case .videoCaptureSize:
+        case .videoEncodeSize:
             videoEncoderConfig.dimensions = dimensionsItems[index]
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
         case .videoBitRate:
