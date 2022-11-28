@@ -10,7 +10,7 @@ import Foundation
 extension AppContext {
     static private var _showServiceImp: ShowSyncManagerServiceImp?
     
-    static private (set) var showServiceImp: ShowSyncManagerServiceImp = {
+    static private (set) var showServiceImp: ShowServiceProtocol = {
         if _showServiceImp == nil {
             _showServiceImp = ShowSyncManagerServiceImp()
         }

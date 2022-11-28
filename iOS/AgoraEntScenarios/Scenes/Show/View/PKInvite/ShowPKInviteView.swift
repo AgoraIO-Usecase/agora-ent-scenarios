@@ -14,6 +14,16 @@ class ShowPKInviteView: UIView {
             tableView.dataArray = pkUserInvitationList ?? []
         }
     }
+    var interactionList: [ShowInteractionInfo]? {
+        didSet {
+            let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
+            let pkTipsVisible = pkInfo == nil ? false : true
+            pkTipsViewHeightCons?.constant = pkTipsVisible ? 40 : 0
+            pkTipsViewHeightCons?.isActive = true
+            self.layoutIfNeeded()
+            pkTipsLabel.text = "与主播\(pkInfo?.userName ?? "")PK中"
+        }
+    }
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "PK邀请".show_localized
@@ -108,7 +118,7 @@ class ShowPKInviteView: UIView {
                                            constant: -Screen.safeAreaBottomHeight()).isActive = true
         statckView.heightAnchor.constraint(equalToConstant: 340).isActive = true
         
-        pkTipsViewHeightCons = pkTipsContainerView.heightAnchor.constraint(equalToConstant: 40)
+        pkTipsViewHeightCons = pkTipsContainerView.heightAnchor.constraint(equalToConstant: 0)
         pkTipsViewHeightCons?.isActive = true
         pkTipsView.leadingAnchor.constraint(equalTo: pkTipsContainerView.leadingAnchor,
                                             constant: 20).isActive = true
@@ -134,6 +144,7 @@ class ShowPKInviteView: UIView {
             self.layoutIfNeeded()
         }
     }
+    
 }
 extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
