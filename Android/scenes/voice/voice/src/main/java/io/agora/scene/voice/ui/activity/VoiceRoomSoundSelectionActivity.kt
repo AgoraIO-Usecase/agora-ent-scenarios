@@ -35,7 +35,7 @@ import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
 
-    companion object{
+    companion object {
         const val KEY_CHATROOM_CREATE_NAME = "chatroom_create_name"
         const val KEY_CHATROOM_CREATE_IS_PUBLIC = "chatroom_create_is_public"
         const val KEY_CHATROOM_CREATE_ENCRYPTION = "chatroom_create_encryption"
@@ -126,6 +126,11 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                     voiceRoomModel?.let {
                         voiceRoomViewModel.joinRoom(it.roomId)
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    dismissLoading()
+                    ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_create_error))
                 }
             })
         }

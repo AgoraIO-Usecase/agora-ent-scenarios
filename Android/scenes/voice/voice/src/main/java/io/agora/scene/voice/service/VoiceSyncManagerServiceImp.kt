@@ -111,24 +111,24 @@ class VoiceSyncManagerServiceImp(
         }
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
+            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
             userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
             micIndex = 0
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
+        voiceRoomModel.owner = owner
         // 2、置换token,获取im 配置，创建房间需要这里的数据
         VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
             chatroomId = "",
             chatroomName = inputModel.roomName,
-            chatOwner = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
+            chatOwner = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
             completion = { error, chatroomId ->
                 if (error != VoiceServiceProtocol.ERR_OK) {
                     completion.invoke(error, voiceRoomModel)
                     return@requestToolboxService
                 }
-                owner.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                voiceRoomModel.owner = owner
                 voiceRoomModel.chatroomId = chatroomId
                 // 3、创建房间
                 initScene {
