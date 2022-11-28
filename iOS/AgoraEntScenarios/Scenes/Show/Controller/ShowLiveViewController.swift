@@ -67,7 +67,6 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
@@ -169,6 +168,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
             //TODO: leave query dialog
+            leaveRoom()
         }
     }
     
@@ -299,17 +299,27 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
+        _refreshInteractionList()
         switch interaction.interactStatus {
         case .pking:
+//            let ret = agoraKitManager.joinChannel(channelName: interaction.roomId ?? "",
+//                                                  uid: UInt(room?.ownerId ?? "0")!,
+//                                                  ownerId: interaction.userId ?? "",
+//                                                canvasView: liveView.canvasView.remoteView)
+//            
+//            liveView.canvasView.canvasType = .pk
+//            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             break
             
         case .onSeat:
@@ -328,7 +338,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
-        
+        _refreshInteractionList()
         switch interaction.interactStatus {
         case .pking:
             break
