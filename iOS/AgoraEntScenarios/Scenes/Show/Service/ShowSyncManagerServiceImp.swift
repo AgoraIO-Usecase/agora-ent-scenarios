@@ -244,6 +244,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         
         let interaction = ShowInteractionInfo()
         interaction.userId = apply.userId
+        interaction.userName = apply.userName
         interaction.roomId = getRoomId()
         interaction.interactStatus = .onSeat
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -293,6 +294,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 
             let interaction = ShowInteractionInfo()
             interaction.userId = user.userId
+            interaction.userName = user.userName
             interaction.roomId = self.getRoomId()
             interaction.interactStatus = .onSeat
             interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -376,6 +378,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 //not found, add invitation
                 let _invitation = ShowPKInvitation()
                 _invitation.userId = room.ownerId
+                _invitation.userName = room.ownerName
                 _invitation.roomId = room.roomId
                 _invitation.fromUserId = VLUserCenter.user.id
                 _invitation.fromName = VLUserCenter.user.name
@@ -409,8 +412,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _updatePKInvitation(invitation: invitation, completion: completion)
         
         let interaction = ShowInteractionInfo()
-        interaction.userId = invitation.userId
-        interaction.roomId = invitation.roomId
+        interaction.userId = invitation.fromUserId
+        interaction.userName = invitation.fromName
+        interaction.roomId = invitation.fromRoomId
         interaction.interactStatus = .pking
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
@@ -1266,6 +1270,7 @@ extension ShowSyncManagerServiceImp {
         
         let interaction = ShowInteractionInfo()
         interaction.userId = invitation.userId
+        interaction.userName = invitation.userName
         interaction.roomId = invitation.roomId
         interaction.interactStatus = .pking
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
