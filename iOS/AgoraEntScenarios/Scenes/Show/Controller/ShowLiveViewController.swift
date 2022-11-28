@@ -313,13 +313,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         _refreshInteractionList()
         switch interaction.interactStatus {
         case .pking:
-//            let ret = agoraKitManager.joinChannel(channelName: interaction.roomId ?? "",
-//                                                  uid: UInt(room?.ownerId ?? "0")!,
-//                                                  ownerId: interaction.userId ?? "",
-//                                                canvasView: liveView.canvasView.remoteView)
-//            
-//            liveView.canvasView.canvasType = .pk
-//            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
+            if room?.roomId != interaction.roomId {
+                agoraKitManager.joinChannelEx(channelName: interaction.roomId,
+                                            ownerId: interaction.userId,
+                                            view: liveView.canvasView.remoteView)
+                liveView.canvasView.canvasType = .pk
+                liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
+            }
+            
             break
             
         case .onSeat:
@@ -372,16 +373,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = uid
-        videoCanvas.renderMode = .hidden
-        if uid == roomOwnerId {
-            videoCanvas.view = liveView.canvasView.localView
-            agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
-        } else {
-            videoCanvas.view = liveView.canvasView.remoteView
-            agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-        }
+    
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
