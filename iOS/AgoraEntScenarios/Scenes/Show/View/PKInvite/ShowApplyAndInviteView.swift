@@ -8,14 +8,28 @@
 import UIKit
 import Agora_Scene_Utils
 
+enum ShowApplyAndInviteType: String, CaseIterable {
+    case apply
+    case invite
+    
+    var title: String {
+        switch self {
+        case .apply: return "申请消息"
+        case .invite: return "连麦邀请"
+        }
+    }
+}
+
 class ShowApplyAndInviteView: UIView {
+    var applyStatusClosure: ((ShowInteractionStatus) -> Void)?
+    
     private lazy var segmentView: ShowSegmentView = {
         let segmentView = ShowSegmentView(frame: CGRect(x: 10,
                                                         y: 23,
                                                         width: Screen.width,
                                                         height: 44),
                                           segmentStyle: .init(),
-                                          titles: ["申请消息", "连麦邀请"])
+                                          titles: ShowApplyAndInviteType.allCases.map({ $0.title }))
         segmentView.style.indicatorStyle = .line
         segmentView.style.indicatorHeight = 2
         segmentView.style.indicatorColor = UIColor(hex: "#7A59FB")
@@ -24,7 +38,13 @@ class ShowApplyAndInviteView: UIView {
         segmentView.titlePendingHorizontal = 50
         segmentView.normalTitleColor = UIColor(hex: "#6D7291")
         segmentView.valueChange = { [weak self] index in
-            print("index === \(index)")
+            if index == 0 {
+                self?.tableView.emptyTitle = "暂无上麦申请".show_localized
+                self?.getApplyList()
+            } else {
+                self?.tableView.emptyTitle = "暂无用户".show_localized
+                self?.getInviteList()
+            }
         }
         return segmentView
     }()
@@ -38,6 +58,7 @@ class ShowApplyAndInviteView: UIView {
     }()
     private lazy var tipsContainerView: AGEView = {
         let view = AGEView()
+        view.isHidden = true
         return view
     }()
     private lazy var tipsView: AGEView = {
@@ -64,24 +85,47 @@ class ShowApplyAndInviteView: UIView {
     private lazy var tableView: AGETableView = {
         let view = AGETableView()
         view.rowHeight = 67
-        view.emptyTitle = "暂无主播在线".show_localized
+        view.emptyTitle = "暂无上麦申请".show_localized
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
         view.register(ShowPKInviteViewCell.self,
                       forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
-        view.dataArray = (0...10).map({ $0 })
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
+    private var roomId: String?
+    private var type: ShowApplyAndInviteType = .apply
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(roomId: String?) {
+        super.init(frame: .zero)
+        self.roomId = roomId
         setupUI()
+        getApplyInfo()
+        getApplyList()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func getApplyList() {
+        AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
+            guard let list = list else { return }
+            self.tableView.dataArray = list
+        }
+    }
+    private func getInviteList() {
+        AppContext.showServiceImp.getAllUserList { _, list in
+            guard let list = list else { return }
+            self.tableView.dataArray = list
+        }
+    }
+    private func getApplyInfo() {
+        AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) { roomModel in
+            self.tipsContainerView.isHidden = roomModel == nil
+            self.tipsLabel.text = "与主播\(roomModel?.ownerName ?? "")PK中"
+        }
     }
     
     private func setupUI() {
@@ -138,13 +182,25 @@ class ShowApplyAndInviteView: UIView {
         UIView.animate(withDuration: 0.25) {
             self.layoutIfNeeded()
         }
+        applyStatusClosure?(.idle)
     }
 }
 extension ShowApplyAndInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
-                                                 for: indexPath)
+                                                 for: indexPath) as! ShowPKInviteViewCell
+        let model = self.tableView.dataArray?[indexPath.row]
         
+        cell.setupApplyAndInviteData(model: model)
+        cell.refreshDataClosure = { [weak self] in
+            guard let self = self else { return }
+            if self.type == .apply {
+                self.getInviteList()
+                self.applyStatusClosure?(.onSeat)
+            } else {
+                self.getInviteList()
+            }
+        }
         return cell
     }
 }

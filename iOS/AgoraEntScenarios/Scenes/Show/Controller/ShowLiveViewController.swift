@@ -49,7 +49,7 @@ class ShowLiveViewController: UIViewController {
     private lazy var beautyVC = ShowBeautySettingVC()
     //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
-    private lazy var applyAndInviteView = ShowApplyAndInviteView()
+    private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
     
     override func viewDidLoad() {
@@ -57,7 +57,7 @@ class ShowLiveViewController: UIViewController {
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
         joinChannel()
-        subscribeChatMsg()
+        _subscribeServiceEvent()
         UIApplication.shared.isIdleTimerDisabled = true
     }
     
@@ -115,16 +115,6 @@ class ShowLiveViewController: UIViewController {
         sendMessageWithText("join_live_room".show_localized)
     }
     
-    private func subscribeChatMsg(){
-        
-        AppContext.showServiceImp.subscribeMessageChanged(subscribeClosure: { [weak self] status, msg in
-            if let text = msg.message {
-                let model = ShowChatModel(userName: msg.userName ?? "", text: text)
-                self?.liveView.addChatModel(model)
-            }
-        })
-    }
-    
     private func sendMessageWithText(_ text: String) {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
@@ -136,7 +126,108 @@ class ShowLiveViewController: UIViewController {
             print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }
+}
+
+//MARK: service subscribe
+extension ShowLiveViewController: ShowSubscribeServiceProtocol {
+    private func _subscribeServiceEvent() {
+        let service = AppContext.showServiceImp
+        
+        service.subscribeEvent(delegate: self)
+        
+        //TODO: migration
+        applyAndInviteView.applyStatusClosure = { [weak self] status in
+            self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
+        }
+    }
     
+    
+    func onUserJoinedRoom(user: ShowUser) {
+        
+    }
+    
+    func onUserLeftRoom(user: ShowUser) {
+        
+    }
+    
+    func onMessageDidAdded(message: ShowMessage) {
+        if let text = message.message {
+            let model = ShowChatModel(userName: message.userName ?? "", text: text)
+            self.liveView.addChatModel(model)
+        }
+    }
+    
+    func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
+        
+    }
+    
+    func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
+        
+    }
+    
+    func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.status == .waitting {
+            let vc = ShowReceivePKAlertVC()
+            vc.name = invitation.fromName ?? ""
+            vc.dismissWithResult { result in
+                let imp = AppContext.showServiceImp
+                switch result {
+                case .accept:
+                    AppContext.showServiceImp.acceptPKInvitation { error in
+                        
+                    }
+                    break
+                default:
+                    imp.rejectPKInvitation { error in
+                        
+                    }
+                    break
+                }
+            }
+            
+            self.present(vc, animated: true)
+        }
+    }
+    
+    func onPKInvitationAccepted(invitation: ShowPKInvitation) {
+        
+    }
+    
+    func onPKInvitationRejected(invitation: ShowPKInvitation) {
+        
+    }
+    
+    func onInteractionBegan(interation: ShowInteractionInfo) {
+        
+    }
+    
+    func onInterationEnded(interaction: ShowInteractionInfo) {
+        
+    }
 }
 
 
@@ -228,6 +319,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickPKButton(_ button: ShowRedDotButton) {
         let pkInviteView = ShowPKInviteView()
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
+        AppContext.showServiceImp.getAllPKUserList { [weak pkInviteView] (error, pkUserList) in
+            pkInviteView?.pkUserInvitationList = pkUserList
+        }
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
