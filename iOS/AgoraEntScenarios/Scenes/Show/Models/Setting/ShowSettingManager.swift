@@ -34,6 +34,9 @@ class ShowSettingManager {
     
     // 默认设置
     func defaultSetting() {
+        // 默认音量设置
+        ShowSettingKey.recordingSignalVolume.writeValue(80)
+        ShowSettingKey.musincVolume.writeValue(30)
         
         updatePresetForType(presetType ?? .show_low, mode: .signle)
         updateSettingForkey(.lowlightEnhance)
@@ -46,34 +49,6 @@ class ShowSettingManager {
         updateSettingForkey(.recordingSignalVolume)
         updateSettingForkey(.musincVolume)
         updateSettingForkey(.audioBitRate)
-        /*
-        agoraKit.setLowlightEnhanceOptions(ShowSettingKey.lowlightEnhance.boolValue(), options: AgoraLowlightEnhanceOptions())
-        agoraKit.setColorEnhanceOptions(ShowSettingKey.colorEnhance.boolValue(), options: AgoraColorEnhanceOptions())
-        agoraKit.setVideoDenoiserOptions(ShowSettingKey.videoDenoiser.boolValue(), options: AgoraVideoDenoiserOptions())
-        agoraKit.setBeautyEffectOptions(ShowSettingKey.beauty.boolValue(), options: AgoraBeautyOptions())
-        agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(ShowSettingKey.PVC.boolValue())}")
-        agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(ShowSettingKey.SR.boolValue()), \"mode\": 2}}")
-
-        // videoCaptureSize
-
-        let index = ShowSettingKey.videoCaptureSize.intValue()
-        videoEncoderConfig.dimensions = dimensionsItems[index]
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-
-        //  bitRate
-        videoEncoderConfig.bitrate = Int(ShowSettingKey.videoBitRate.floatValue())
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-
-        // fps
-        let fpsIndex = ShowSettingKey.FPS.intValue()
-        videoEncoderConfig.frameRate = fpsItems[fpsIndex]
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-
-        // H265:
-        let h265On = ShowSettingKey.H265.boolValue()
-        agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(h265On)}")
-        agoraKit.setParameters("{\"engine.video.codec_type\":\"\(h265On ? 3 : 2)\"}")
-         */
     }
     
     // 预设模式
@@ -82,14 +57,19 @@ class ShowSettingManager {
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
         ShowSettingKey.H265.writeValue(h265On)
+        ShowSettingKey.lowlightEnhance.writeValue(false)
+        ShowSettingKey.colorEnhance.writeValue(false)
+        ShowSettingKey.videoDenoiser.writeValue(false)
+        ShowSettingKey.PVC.writeValue(false)
         
         updateSettingForkey(.videoEncodeSize)
         updateSettingForkey(.videoBitRate)
         updateSettingForkey(.FPS)
         updateSettingForkey(.H265)
-//        let config = AgoraCameraCapturerConfiguration()
-//        config.dimensions = dimensions.sizeValue
-//        agoraKit.setCameraCapturerConfiguration(config)
+        updateSettingForkey(.lowlightEnhance)
+        updateSettingForkey(.colorEnhance)
+        updateSettingForkey(.videoDenoiser)
+        updateSettingForkey(.PVC)
     }
     
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode) {
