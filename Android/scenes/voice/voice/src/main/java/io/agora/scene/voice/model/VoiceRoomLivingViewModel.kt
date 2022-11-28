@@ -203,7 +203,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     // 开启/关闭机器人
     fun enableRobot(active: Boolean) {
-        _openBotObservable.setSource(mRepository.enableRobot(active))
+        if (active){
+            _openBotObservable.setSource(mRepository.enableRobot(true))
+        }else{
+            _closeBotObservable.setSource(mRepository.enableRobot(false))
+        }
     }
 
     // 更新机器人音量
