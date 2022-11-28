@@ -949,7 +949,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
     [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
     [option setPublishCameraTrack:!self.isNowCameraMuted];
-    [option setPublishMicrophoneTrack:!self.isNowMicMuted];
+    // use audio volume to control mic on/off, so that mic is always on when broadcaster
+    [option setPublishMicrophoneTrack:[self isBroadcaster]];
     [option setPublishCustomAudioTrack:NO];
     [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
