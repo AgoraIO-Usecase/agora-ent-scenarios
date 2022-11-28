@@ -200,17 +200,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         } else {
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isSelected = false
-            if apply.userId != "\(roomOwnerId)" {
-                agoraKitManager.switchRole(role: .audience,
-                                           uid: apply.userId,
-                                           canvasView: liveView.canvasView.remoteView)
-                let videoCanvas = AgoraRtcVideoCanvas()
-                videoCanvas.uid = roomOwnerId
-                videoCanvas.renderMode = .hidden
-                videoCanvas.view = liveView.canvasView.localView
-                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-                agoraKitManager.agoraKit.setupLocalVideo(AgoraRtcVideoCanvas())
-            }
         }
     }
     
@@ -248,7 +237,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     break
                 default:
                     imp.rejectMicSeatInvitation { error in
-                        
                     }
                     break
                 }
@@ -323,7 +311,18 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         switch interaction.interactStatus {
         case .pking:
             break
+            
+        case .onSeat:
+            liveView.canvasView.canvasType = .joint_broadcasting
+            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
+            agoraKitManager.switchRole(role: .broadcaster,
+                                            uid: interaction.userId,
+                                            canvasView: self.liveView.canvasView.remoteView)
+            liveView.bottomBar.linkButton.isSelected = true
+            liveView.bottomBar.linkButton.isShowRedDot = false
+            
         default:
+            
             break
         }
     }
@@ -333,6 +332,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         switch interaction.interactStatus {
         case .pking:
             break
+            
+        case .onSeat:
+            applyView.getAllMicSeatList()
+            liveView.bottomBar.linkButton.isShowRedDot = false
+            liveView.bottomBar.linkButton.isSelected = false
+            
         default:
             break
         }

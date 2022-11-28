@@ -258,9 +258,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _updateMicSeatApply(apply: apply, completion: completion)
     }
     
-    func stopMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
+    func stopMicSeatApply(apply: ShowUser, completion: @escaping (Error?) -> Void) {
         apply.status = .ended
-        _updateMicSeatApply(apply: apply, completion: completion)
+        let json = apply.yy_modelToJSONString() ?? ""
+        guard let model = ShowMicSeatApply.yy_model(withJSON: json) else { return }
+        _updateMicSeatApply(apply: model, completion: completion)
     }
     
     func getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
