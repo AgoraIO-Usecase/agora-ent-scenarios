@@ -394,7 +394,9 @@ extension VoiceRoomViewController {
                     }
                 } else {
                     if local_index != nil {
-                        changeMic(from: local_index!, to: tag - 200)
+                        Throttler.throttle(delay: .seconds(1)) {[weak self] in
+                            self?.changeMic(from: (self?.local_index)!, to: tag - 200)
+                        }
                     } else {
                         userApplyAlert(tag - 200)
                     }
