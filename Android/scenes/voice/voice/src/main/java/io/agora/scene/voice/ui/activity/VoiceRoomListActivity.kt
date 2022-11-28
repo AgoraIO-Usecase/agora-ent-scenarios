@@ -15,6 +15,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.PagePathConstant
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceConfigManager
@@ -22,12 +23,11 @@ import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.FastClickTools
 import io.agora.voice.buddy.tool.ResourcesTools
 
-@Route(path = RouterPath.ChatroomListPath)
+@Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
 
     private var title: TextView? = null
