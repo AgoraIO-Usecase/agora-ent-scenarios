@@ -288,27 +288,6 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         }
-        // 邀请上麦
-        roomLivingViewModel.invitationMicObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    "invitation mic：$data".logD()
-                    if (data != true) return
-                    ToastTools.show(activity, activity.getString(R.string.voice_room_invited))
-                }
-            })
-        }
-        // 同意上麦申请
-        roomLivingViewModel.acceptMicSeatApplyObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
-            parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
-                override fun onSuccess(data: VoiceMicInfoModel?) {
-                    "accept mic seat apply：${data?.micIndex}".logD()
-                    data?.let {
-                        iRoomMicView.onSeatUpdated(it)
-                    }
-                }
-            })
-        }
         // 用户拒绝申请上麦
         roomLivingViewModel.rejectMicInvitationObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
@@ -317,6 +296,17 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         }
+        // 接受邀请
+        roomLivingViewModel.acceptMicSeatInvitationObservable()
+            .observe(activity) { response: Resource<VoiceMicInfoModel> ->
+                parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
+                    override fun onSuccess(data: VoiceMicInfoModel?) {
+                        data?.let {
+                            iRoomMicView.onSeatUpdated(it)
+                        }
+                    }
+                })
+            }
         // 换麦
         roomLivingViewModel.changeMicObservable().observe(activity) { response: Resource<Map<Int, VoiceMicInfoModel>> ->
             parseResource(response, object : OnResourceParseCallback<Map<Int, VoiceMicInfoModel>>() {
@@ -338,9 +328,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: List<VoiceRankUserModel>?) {
                     data?.let {
                         if (activity.isFinishing) return
-                        ThreadManager.getInstance().runOnMainThread {
-                            iRoomTopView.onRankMember(it)
-                        }
+                        iRoomTopView.onRankMember(it)
                     }
                 }
             })
@@ -772,7 +760,6 @@ class RoomObservableViewDelegate constructor(
         val longDelay = Random.nextInt(1000, 10000)
         "receiveGift longDelay：$longDelay".logD(TAG)
         updateRankRunnable = Runnable {
-            // TODO: 收到礼物消息拉取最新排行榜
             roomLivingViewModel.fetchGiftContribute()
         }
         ThreadManager.getInstance().runOnMainThreadDelay(updateRankRunnable, longDelay)
@@ -831,6 +818,11 @@ class RoomObservableViewDelegate constructor(
         if (handsDialog == null) {
             handsDialog = ChatroomHandsDialog.newInstance
         }
+        handsDialog?.setFragmentListener(object : ChatroomHandsDialog.OnFragmentListener{
+            override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
+                iRoomMicView.onSeatUpdated(voiceMicInfoModel)
+            }
+        })
         handsDialog?.show(activity.supportFragmentManager, "room_hands")
         chatPrimaryMenuView.setShowHandStatus(true, false)
     }
