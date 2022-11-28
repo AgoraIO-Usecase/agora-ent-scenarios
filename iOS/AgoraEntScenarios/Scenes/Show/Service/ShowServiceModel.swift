@@ -101,19 +101,20 @@ class ShowMicSeatApply: ShowBaseInfo {
 
 
 /// 连麦邀请
-class ShowMicSeatInvitation: ShowBaseInfo {
-    var userId: String?                              //用户id (rtc uid)
-    var avatar: String?                          //用户头像
-    var userName: String?                            //用户名
-    var status: ShowRoomRequestStatus = .idle      //邀请状态
-    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
-    
-    #if DEBUG
-    override var description: String {
-        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
-    }
-    #endif
-}
+typealias ShowMicSeatInvitation = ShowUser
+//class ShowMicSeatInvitation: ShowBaseInfo {
+//    var userId: String?                              //用户id (rtc uid)
+//    var avatar: String?                          //用户头像
+//    var userName: String?                            //用户名
+//    var status: ShowRoomRequestStatus = .idle      //邀请状态
+//    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
+//    
+//    #if DEBUG
+//    override var description: String {
+//        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
+//    }
+//    #endif
+//}
 
 /// PK邀请
 class ShowPKInvitation: ShowBaseInfo {
