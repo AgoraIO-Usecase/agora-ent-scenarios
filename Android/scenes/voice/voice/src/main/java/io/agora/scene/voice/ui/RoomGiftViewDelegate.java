@@ -68,9 +68,7 @@ public class RoomGiftViewDelegate {
                 public void SendGift(View view, Object bean) {
                     dialog.setSendEnable(false);
                     GiftBean giftBean = (GiftBean) bean;
-                    // TODO: 2022/11/23  发送礼物消息
-
-                    // onSuccess onSendGiftSuccess()
+                    onSendGiftSuccess(view,giftBean,msgCallBack);
                 }
             });
         }
