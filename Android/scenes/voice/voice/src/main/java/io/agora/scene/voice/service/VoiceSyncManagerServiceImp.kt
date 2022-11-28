@@ -574,7 +574,7 @@ class VoiceSyncManagerServiceImp(
      * 是否启用机器人
      * @param enable true 启动机器人，false 关闭机器人
      */
-    override fun enableRobot(enable: Boolean, completion: (error: Int, enable:Boolean) -> Unit) {
+    override fun enableRobot(enable: Boolean, completion: (error: Int, result:Boolean) -> Unit) {
         ChatroomIMManager.getInstance().enableRobot(enable,object :
             ValueCallBack<Boolean>{
             override fun onSuccess(value: Boolean) {

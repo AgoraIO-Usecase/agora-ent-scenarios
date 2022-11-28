@@ -43,6 +43,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
             // nothing
         }else{
             // library 初始化
+            ResourcesTools.isZh(this)
             VoiceConfigManager.initMain()
         }
     }
@@ -53,12 +54,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // todo zhangwei
-//        ImageTools.loadImage(binding.imageAvatar, VoiceBuddyFactory.get().getVoiceBuddy().headUrl())
     }
 
     private fun initListener() {
