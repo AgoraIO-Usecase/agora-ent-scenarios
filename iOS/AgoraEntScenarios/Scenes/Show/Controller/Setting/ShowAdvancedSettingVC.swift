@@ -10,16 +10,17 @@ import UIKit
 import AgoraRtcKit
 
 class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
+    
+    var mode: ShowMode?
+    var isBroadcaster = true
 
-    var agoraKit: AgoraRtcEngineKit! {
-        didSet {
-            settingManager = ShowSettingManager(agoraKit: agoraKit)
-        }
-    }
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    private var settingManager: ShowSettingManager!
+    var settingManager: ShowSettingManager!
+    
+    // 当前设置的预设值
+    var presetModeName: String?
     
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized]
@@ -69,6 +70,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        // 自动弹出预设
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.didClickPreSetBarButton()
+        }
     }
     
     private func setUpUI() {
@@ -98,29 +103,52 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     }
     
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
-        let videoSettings: [ShowSettingKey] = [
-            .lowlightEnhance,
+        // 主播端设置
+        let broadcasterVideoSettings: [ShowSettingKey] = [
+            .H265,
             .colorEnhance,
+            .lowlightEnhance,
             .videoDenoiser,
-            .beauty,
-            .videoCaptureSize,
-            .FPS,
-            .videoBitRate,
             .PVC,
+            .videoEncodeSize,
+            .FPS,
+            .videoBitRate
+        ]
+        // 观众端设置
+        let audienceVideoSettings: [ShowSettingKey] = [
             .SR
         ]
+        
         let audioSettings: [ShowSettingKey]  = [
             .earmonitoring,
             .recordingSignalVolume,
             .musincVolume,
-            .audioBitRate
         ]
-        let settings = [videoSettings, audioSettings]
+        let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings,[]]
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
         vc.dataArray = settings[index]
+        vc.willChangeSettingParams = {[weak self] key, value in
+            guard let wSelf = self else { return false }
+            return wSelf.showModifyAlertIfNeeded(key,value: value)
+        }
         return vc
+    }
+    
+    // 判断是否需要显示修改预设值的弹窗
+    private func showModifyAlertIfNeeded(_ key: ShowSettingKey, value: Any) -> Bool {
+        if presetModeName != nil {
+            let msg1 = "show_presetting_alert_will_change_value_message1".show_localized
+            let msg2 = "show_presetting_alert_will_change_value_message2".show_localized
+            showAlert(title:"show_presetting_alert_will_change_value_title".show_localized, message: "\(msg1)\"\(presetModeName!)\"\(msg2)") { [weak self] in
+                self?.presetModeName = nil
+                key.writeValue(value)
+                self?.videoSettingVC.reloadData()
+                self?.audioSettingVC.reloadData()
+            }
+        }
+        return presetModeName == nil
     }
   
 }
@@ -130,10 +158,14 @@ extension ShowAdvancedSettingVC {
     // 点击预设按钮
     @objc private func didClickPreSetBarButton() {
         let vc = ShowPresettingVC()
-        vc.didSelectedIndex = {[weak self] index in
-            self?.settingManager.presetForSingleBroadcast()
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .signle)
             self?.videoSettingVC.reloadData()
             self?.audioSettingVC.reloadData()
+            let text1 = "show_presetting_update_toast1".show_localized
+            let text2 = "show_presetting_update_toast2".show_localized
+            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
+            self?.presetModeName = modeName
         }
         present(vc, animated: true)
     }

@@ -21,7 +21,7 @@ class ShowSelectQualityVC: UIViewController {
     
     var selectedItem: ((_ item: Resolution, _ index: Int)->())?
     var dismissed: (()->())?
-    var defalutSelectIndex = 0
+    var defalutSelectIndex = 1
     private let dataArray  = [
         Resolution(width: 1080, height: 1920, valueStr: "1080P", name: "极清"),
         Resolution(width: 720, height: 1280, valueStr: "720P", name: "超清"),

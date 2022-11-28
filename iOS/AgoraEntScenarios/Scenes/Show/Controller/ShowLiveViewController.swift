@@ -16,6 +16,8 @@ class ShowLiveViewController: UIViewController {
         return ShowAgoraKitManager()
     }()
     
+    private var settingManager: ShowSettingManager?
+    
     private var roomOwnerId: UInt {
         get{
             UInt(room?.ownerId ?? "0") ?? 0
@@ -99,23 +101,24 @@ class ShowLiveViewController: UIViewController {
         let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView)
         if ret == 0 {
             print("进入房间")
+            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
         }else{
             print("进入房间失败=====\(ret.debugDescription)")
             showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
         }
         
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = liveView.canvasView.localView
-        canvas.renderMode = .hidden
-        canvas.uid = uid
+//        let canvas = AgoraRtcVideoCanvas()
+//        canvas.view = liveView.canvasView.localView
+//        canvas.renderMode = .hidden
+//        canvas.uid = uid
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
-        if role == .broadcaster {
-            canvas.mirrorMode = .disabled
-            agoraKitManager.agoraKit?.setupLocalVideo(canvas)
-        } else {
-            agoraKitManager.agoraKit?.setupRemoteVideo(canvas)
-        }
-        agoraKitManager.agoraKit?.startPreview()
+//        if role == .broadcaster {
+//            canvas.mirrorMode = .disabled
+//            agoraKitManager.agoraKit?.setupLocalVideo(canvas)
+//        } else {
+//            agoraKitManager.agoraKit?.setupRemoteVideo(canvas)
+//        }
+//        agoraKitManager.agoraKit?.startPreview()
         
         sendMessageWithText("join_live_room".show_localized)
     }
@@ -397,7 +400,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickSettingButton() {
         let settingVC = ShowAdvancedSettingVC()
-        settingVC.agoraKit = agoraKitManager.agoraKit
+        settingVC.mode = .signle // 根据当前模式设置
+        settingVC.isBroadcaster = role == .broadcaster
+        settingVC.settingManager = settingManager
         navigationController?.pushViewController(settingVC, animated: true)
     }
     
