@@ -7,6 +7,7 @@
 
 import Foundation
 import AgoraRtcKit
+import UIKit
 
 class ShowAgoraKitManager: NSObject {
     
@@ -69,13 +70,22 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 切换连麦角色
-    func switchRole(role: AgoraClientRole) {
+    func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView) {
         let options = AgoraRtcChannelMediaOptions()
         options.clientRoleType = role
         options.publishMicrophoneTrack = role == .broadcaster
         options.publishCameraTrack = role == .broadcaster
         agoraKit.updateChannel(with: options)
         agoraKit.setClientRole(role)
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = UInt(uid ?? "0") ?? 0
+        videoCanvas.renderMode = .hidden
+        videoCanvas.view = canvasView
+        if uid == VLUserCenter.user.id {
+            agoraKit.setupLocalVideo(videoCanvas)
+        } else {
+            agoraKit.setupRemoteVideo(videoCanvas)
+        }
     }
     
     /// 设置分辨率

@@ -186,7 +186,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         } else if apply.status == .accepted {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
-            agoraKitManager.switchRole(role: .broadcaster)
+            agoraKitManager.switchRole(role: .broadcaster,
+                                       uid: apply.userId,
+                                       canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             
@@ -199,7 +201,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isSelected = false
             if apply.userId != "\(roomOwnerId)" {
-                agoraKitManager.switchRole(role: .audience)
+                agoraKitManager.switchRole(role: .audience,
+                                           uid: apply.userId,
+                                           canvasView: liveView.canvasView.remoteView)
                 let videoCanvas = AgoraRtcVideoCanvas()
                 videoCanvas.uid = roomOwnerId
                 videoCanvas.renderMode = .hidden
@@ -264,7 +268,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
         ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
         guard invitation.userId == VLUserCenter.user.id else { return }
-        agoraKitManager.switchRole(role: .broadcaster)
+        agoraKitManager.switchRole(role: .broadcaster,
+                                   uid: invitation.userId,
+                                   canvasView: liveView.canvasView.remoteView)
     }
     
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
@@ -354,24 +360,12 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = uid
         videoCanvas.renderMode = .hidden
-        if roomOwnerId == uid {
-            if currentUserId == "\(uid)" {
-                videoCanvas.view = liveView.canvasView.localView
-                agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
-            } else {
-                videoCanvas.view = liveView.canvasView.localView
-                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-            }
-        } else  {
-            if currentUserId == "\(uid)" {
-                videoCanvas.view = liveView.canvasView.remoteView
-                agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
-                agoraKitManager.agoraKit.startPreview()
-                
-            } else {
-                videoCanvas.view = liveView.canvasView.remoteView
-                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-            }
+        if uid == roomOwnerId {
+            videoCanvas.view = liveView.canvasView.localView
+            agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
+        } else {
+            videoCanvas.view = liveView.canvasView.remoteView
+            agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
         }
     }
 
