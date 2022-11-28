@@ -16,12 +16,15 @@ enum ShowRoomStatus: Int {
 }
 
 enum ShowRoomRequestStatus: Int {
+    case idle = 0
     /// 等待中
     case waitting = 1
     /// 已接受
     case accepted = 2
     /// 已拒绝
     case rejected = 3
+    /// 已结束
+    case ended = 4
 }
 
 enum ShowInteractionStatus: Int {
@@ -54,6 +57,9 @@ class ShowRoomListModel: ShowBaseInfo {
     var updatedAt: Int64 = 0                           //更新时间
 }
 
+//PK邀请对象
+typealias ShowPKUserInfo = ShowRoomListModel
+
 
 /// 房间详情信息
 @objcMembers
@@ -66,6 +72,7 @@ class ShowUser: ShowBaseInfo {
     var userId: String?              //用户id (rtc uid)
     var avatar: String?              //用户头像
     var userName: String?            //用户名
+    var status: ShowRoomRequestStatus = .idle //申请状态
 }
 
 /// 聊天消息
@@ -80,9 +87,9 @@ class ShowMessage: ShowBaseInfo {
 /// 连麦申请
 class ShowMicSeatApply: ShowBaseInfo {
     var userId: String?                              //用户id (rtc uid)
-    var userAvatar: String?                          //用户头像
+    var avatar: String?                          //用户头像
     var userName: String?                            //用户名
-    var status: ShowRoomRequestStatus = .waitting    //申请状态
+    var status: ShowRoomRequestStatus = .idle       //申请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
@@ -90,10 +97,9 @@ class ShowMicSeatApply: ShowBaseInfo {
 /// 连麦邀请
 class ShowMicSeatInvitation: ShowBaseInfo {
     var userId: String?                              //用户id (rtc uid)
-    var userAvatar: String?                          //用户头像
+    var avatar: String?                          //用户头像
     var userName: String?                            //用户名
-    var fromUserId: String?                          //发起邀请用户id
-    var status: ShowRoomRequestStatus = .waitting    //邀请状态
+    var status: ShowRoomRequestStatus = .idle      //邀请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
@@ -105,14 +111,14 @@ class ShowPKInvitation: ShowBaseInfo {
     var fromName: String?                            //发起Pk用户名
     var fromRoomId: String?                          //发起Pk房间id
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
+    var muteAudio: Bool = false                      //静音状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
 }
 
 //连麦/Pk模型
 class ShowInteractionInfo: ShowBaseInfo {
-    var userId: String?                                 //用户id (rtc uid)
+    var userId: String?                                 //用户id (rtc uid) pk是另一个房间的房主uid，连麦是连麦观众uid
     var roomId: String?                                 //用户所在房间id
-    var status: ShowRoomRequestStatus = .waitting       //状态
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数
 }

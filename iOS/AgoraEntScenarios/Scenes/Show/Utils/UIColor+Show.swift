@@ -29,6 +29,10 @@ extension UIColor {
         return UIColor.HexColor(hex: 0xFFFFFF, alpha: 0.7)
     }
     
+    @objc static var show_zi01: UIColor {
+        return UIColor.HexColor(hex: 0xCE27FB, alpha: 1)
+    }
+    
     @objc static var show_zi02: UIColor {
         return UIColor.HexColor(hex: 0x684BF2, alpha: 1)
     }

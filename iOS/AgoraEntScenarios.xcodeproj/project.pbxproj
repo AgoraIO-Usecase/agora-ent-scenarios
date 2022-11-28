@@ -455,6 +455,7 @@
 		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
 		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
 		DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */; };
+		DDB23A682933052F00C1BD15 /* ShowSubscribeServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB23A672933052F00C1BD15 /* ShowSubscribeServiceProtocol.swift */; };
 		DDBF788C2918D5920001855B /* ShowServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF78892918D5920001855B /* ShowServiceModel.swift */; };
 		DDBF788D2918D5920001855B /* ShowSyncManagerServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */; };
 		DDBF788E2918D5920001855B /* ShowServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */; };
@@ -1090,6 +1091,7 @@
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
 		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
+		DDB23A672933052F00C1BD15 /* ShowSubscribeServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSubscribeServiceProtocol.swift; sourceTree = "<group>"; };
 		DDBF78892918D5920001855B /* ShowServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowServiceModel.swift; sourceTree = "<group>"; };
 		DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSyncManagerServiceImp.swift; sourceTree = "<group>"; };
 		DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowServiceProtocol.swift; sourceTree = "<group>"; };
@@ -2866,6 +2868,7 @@
 			children = (
 				DDBF78892918D5920001855B /* ShowServiceModel.swift */,
 				DDBF788A2918D5920001855B /* ShowSyncManagerServiceImp.swift */,
+				DDB23A672933052F00C1BD15 /* ShowSubscribeServiceProtocol.swift */,
 				DDBF788B2918D5920001855B /* ShowServiceProtocol.swift */,
 				A845AD252918FAB300A41D8D /* AppContext+Show.swift */,
 			);
@@ -3572,6 +3575,7 @@
 				E73147C72926214B0032198F /* BERender.mm in Sources */,
 				0510B82A290B730E0063E57A /* VoiceRoomGiftEntity.swift in Sources */,
 				A8F372422923A0BD00CEA88D /* ShowSettingHeaderView.swift in Sources */,
+				DDB23A682933052F00C1BD15 /* ShowSubscribeServiceProtocol.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
 				A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */,
 				DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */,
