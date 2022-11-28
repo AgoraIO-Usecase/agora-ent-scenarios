@@ -101,6 +101,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     "robot open：$data".logD()
                     if (data != true) return
+                    iRoomMicView.activeBot(true)
                     VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = true
                     roomAudioSettingDialog?.updateBoxCheckBoxView(true)
                     // 创建房间，第⼀次启动机器⼈后播放音效：
@@ -121,6 +122,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     "robot close：$data".logD()
                     if (data != true) return
+                    iRoomMicView.activeBot(false)
                     // 关闭机器人，暂停所有音效播放
                     VoiceBuddyFactory.get().rtcChannelTemp.isUseBot = false
                     AgoraRtcEngineController.get().resetMediaPlayer()
