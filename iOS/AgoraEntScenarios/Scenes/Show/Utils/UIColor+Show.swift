@@ -132,4 +132,8 @@ extension UIColor {
         return UIColor.HexColor(hex: 0x1BA1FC, alpha: 1)
     }
     
+    @objc static var show_preset_bg: UIColor {
+        return UIColor.HexColor(hex: 0xF0F9FF, alpha: 1)
+    }
+    
 }

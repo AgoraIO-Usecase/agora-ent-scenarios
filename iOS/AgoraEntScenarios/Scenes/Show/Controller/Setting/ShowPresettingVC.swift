@@ -39,9 +39,9 @@ class ShowPresettingVC: UIViewController {
         tableView.rowHeight = TableRowHeight
         tableView.separatorStyle = .none
         tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.sectionFooterHeight = 15
         tableView.register(ShowPresettingCell.self, forCellReuseIdentifier: ShowPresettingCellID)
         tableView.register(ShowPresettingHeaderView.self, forHeaderFooterViewReuseIdentifier: ShowPresettingHeaderViewID)
-        tableView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         return tableView
     }()
     
@@ -118,6 +118,10 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
         let model = dataArray[section]
         headerView.setTitle(model.title, desc: model.desc, type: model.standard)
         return headerView
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return ShowPresettingFooterView()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
