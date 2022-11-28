@@ -120,13 +120,9 @@ class AgoraRtcEngineController {
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
-        "joinChannel channelId:$channelId,rtcToken:${
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()
-        },rtcUid:$rtcUid".logE()
+        "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid".logE()
         if (channelId.isEmpty() || rtcUid < 0) {
-            val msg = "join channel error roomId or rtcUid illegal!(roomId:${channelId},rtcUid:${rtcUid})"
-            msg.logE()
-            joinCallback?.onError(Constants.ERR_FAILED, msg)
+            joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
             return false
         }
 
@@ -162,9 +158,7 @@ class AgoraRtcEngineController {
         // 启用用户音量提示。
         rtcEngine?.enableAudioVolumeIndication(1000, 3, false)
         if (status != IRtcEngineEventHandler.ErrorCode.ERR_OK) {
-            val msg = "join channel error status not ERR_OK $status!"
-            msg.logE()
-            joinCallback?.onError(Constants.ERR_FAILED, msg)
+            joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
         return true
