@@ -18,21 +18,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
 import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.buddy.tool.LogTools.logD
 import java.util.HashMap
 
 class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener {
-    private lateinit var handsViewModel: VoiceUserListViewModel
+    private lateinit var userListViewModel: VoiceUserListViewModel
     private var adapter: ChatroomRaisedAdapter? = null
-    private var listener: ItemCountListener? = null
+    private var onFragmentListener: ChatroomHandsDialog.OnFragmentListener? = null
     private var roomId: String? = null
     private val map: MutableMap<String, Boolean> = HashMap()
     private var isRefreshing = false
     private var isLoadingNextPage = false
     private var emptyView: View? = null
-
-    private lateinit var userListViewModel: VoiceUserListViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_no_data_layout, container, false)
@@ -51,7 +51,6 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
         roomId = arguments?.getString("roomId")
         initView()
         initListener()
@@ -73,37 +72,47 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     private fun initViewModel() {
-        handsViewModel = ViewModelProvider(this).get(VoiceUserListViewModel::class.java)
-        handsViewModel.getRaisedObservable().observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
-                override fun onSuccess(data: List<VoiceMemberModel>?) {
-                    if (data == null) return
-                    val total = data.size
-                    adapter?.addData(data)
-                    listener?.getItemCount(total)
-                    finishRefresh()
-                    isRefreshing = false
-                    adapter?.data?.let {
-                        for (applyListBean in it) {
-                            if (map.containsKey(applyListBean.userId)) {
-                                adapter?.setAccepted(
-                                    applyListBean.userId,
-                                    true == map[applyListBean.userId]
-                                )
+        userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
+        userListViewModel.applicantsListObservable()
+            .observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
+                    override fun onSuccess(data: List<VoiceMemberModel>?) {
+                        if (data == null) return
+                        val total = data.size
+                        adapter?.addData(data)
+                        onFragmentListener?.getItemCount(total)
+                        finishRefresh()
+                        isRefreshing = false
+                        adapter?.data?.let {
+                            for (applyListBean in it) {
+                                if (map.containsKey(applyListBean.userId)) {
+                                    adapter?.setAccepted(
+                                        applyListBean.userId,
+                                        true == map[applyListBean.userId]
+                                    )
+                                }
                             }
                         }
+
                     }
 
-                }
-
-                override fun onError(code: Int, message: String) {
-                    super.onError(code, message)
-                }
-            })
-        }
-        userListViewModel.acceptMicSeatApplyObservable().observe(requireActivity()) {
-            // TODO:
-        }
+                    override fun onError(code: Int, message: String) {
+                        super.onError(code, message)
+                    }
+                })
+            }
+        // 同意上麦申请
+        userListViewModel.acceptMicSeatApplyObservable()
+            .observe(requireActivity()) { response: Resource<VoiceMicInfoModel> ->
+                parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
+                    override fun onSuccess(data: VoiceMicInfoModel?) {
+                        "accept mic seat apply：${data?.micIndex}".logD()
+                        data?.let {
+                        onFragmentListener?.onAcceptMicSeatApply(it)
+                        }
+                    }
+                })
+            }
     }
 
     private fun initListener() {
@@ -133,17 +142,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
         })
     }
 
-    private fun pullData() {
-        ThreadManager.getInstance().runOnMainThread {
-            activity?.let {
-                handsViewModel.getRaisedList()
-                isLoadingNextPage = false
-            }
-
-        }
-    }
-
-    protected fun finishRefresh() {
+    private fun finishRefresh() {
         if (binding?.swipeLayout != null && binding?.swipeLayout?.isRefreshing == true) {
             binding?.swipeLayout?.isRefreshing = false
         }
@@ -152,7 +151,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     fun reset() {
         isRefreshing = true
         activity?.let {
-            handsViewModel.getRaisedList()
+            userListViewModel.fetchApplicantsList()
         }
     }
 
@@ -160,12 +159,8 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
         userListViewModel.acceptMicSeatApply(uid)
     }
 
-    interface ItemCountListener {
-        fun getItemCount(count: Int)
-    }
-
-    fun setItemCountChangeListener(listener: ItemCountListener?) {
-        this.listener = listener
+    fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {
+        this.onFragmentListener = listener
     }
 
     override fun onDestroy() {
