@@ -244,6 +244,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         apply.userName = VLUserCenter.user.name
         apply.avatar = VLUserCenter.user.headUrl
         apply.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        apply.status = .waitting
         _addMicSeatApply(apply: apply, completion: completion)
     }
     
@@ -274,6 +275,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _updateMicSeatApply(apply: apply, completion: completion)
     }
     
+    func stopMicSeatApply(apply: ShowMicSeatApply, completion: @escaping (Error?) -> Void) {
+        apply.status = .ended
+        _updateMicSeatApply(apply: apply, completion: completion)
+    }
     
     func getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
         _getAllMicSeatInvitationList(completion: completion)
@@ -717,7 +722,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .delete(id: objectId,
-                    success: {
+                    success: { _ in
                 agoraPrint("imp user delete success...")
             }, fail: { error in
                 agoraPrint("imp user delete fail \(error.message)...")
@@ -909,7 +914,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .delete(id: apply.objectId!,
-                    success: {
+                    success: { _ in
                 agoraPrint("imp seat apply remove success...")
                 completion(nil)
             }, fail: { error in
@@ -1031,7 +1036,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
             .delete(id: invitation.objectId!,
-                    success: {
+                    success: { _ in
                 agoraPrint("imp seat invitation remove success...")
                 completion(nil)
             }, fail: { error in
@@ -1239,7 +1244,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
             .delete(id: invitation.objectId!,
-                    success: {
+                    success: { _ in
                 agoraPrint("imp pk invitation remove success...")
                 completion(nil)
             }, fail: { error in
@@ -1431,7 +1436,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .delete(id: interaction.objectId!,
-                    success: {
+                    success: { _ in
                 agoraPrint("imp interaction remove success...")
                 completion(nil)
             }, fail: { error in

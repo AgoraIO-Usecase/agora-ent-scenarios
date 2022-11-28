@@ -67,9 +67,9 @@ class ShowRoomBottomBar: UIView {
     }()
     
     // 连麦
-    private lazy var linkButton: ShowRedDotButton = {
+    lazy var linkButton: ShowRedDotButton = {
         let button = ShowRedDotButton(type: .custom)
-        button.setImage(UIImage.show_sceneImage(name: "show_live_link"), for: .normal)
+        button.setImage(UIImage.show_sceneImage(name: "show_live_link"), for: .selected)
         button.setImage(UIImage.show_sceneImage(name: "show_live_link_disable"), for: .normal)
         button.addTarget(self, action: #selector(didClickLinkButton), for: .touchUpInside)
         return button
