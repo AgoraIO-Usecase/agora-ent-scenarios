@@ -94,7 +94,7 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - apply: 停止连麦
     ///   - completion: <#completion description#>
-    func stopMicSeatApply(apply: ShowMicSeatApply,
+    func stopMicSeatApply(apply: ShowUser,
                           completion: @escaping (Error?) -> Void)
     
     
