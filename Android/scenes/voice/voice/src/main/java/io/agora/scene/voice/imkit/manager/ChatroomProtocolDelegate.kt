@@ -127,8 +127,7 @@ class ChatroomProtocolDelegate constructor(
                             micInfoList.add(it)
                         }
                     }
-                    micInfoList.sortedBy { it.micIndex }
-                    voiceRoomInfo.micInfo = micInfoList
+                    voiceRoomInfo.micInfo = micInfoList.sortedBy { it.micIndex }
                     "fetchRoomDetail onSuccess roomId:$roomId, $micInfoList".logD(TAG)
                     callback.onSuccess(voiceRoomInfo)
                 }
