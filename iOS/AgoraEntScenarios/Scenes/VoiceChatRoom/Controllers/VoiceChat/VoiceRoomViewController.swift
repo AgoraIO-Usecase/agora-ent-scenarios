@@ -701,8 +701,12 @@ extension VoiceRoomViewController {
     }
 
     @objc private func leaveRoom() {
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "") { _, _ in
-            
+        if self.isOwner {
+            VoiceRoomIMManager.shared?.userDestroyedChatroom()
+        } else {
+            ChatRoomServiceImp.getSharedInstance().leaveRoom(self.roomInfo?.room?.chatroom_id ?? "") { _, _ in
+                
+            }
         }
     }
 
