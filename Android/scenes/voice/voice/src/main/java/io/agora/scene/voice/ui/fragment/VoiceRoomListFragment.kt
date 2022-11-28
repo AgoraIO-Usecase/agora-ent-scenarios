@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.alibaba.android.arouter.launcher.ARouter
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
@@ -24,12 +23,11 @@ import io.agora.voice.baseui.BaseUiFragment
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.config.RouterParams
-import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
@@ -167,12 +165,11 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     }
 
     private fun goChatroomPage() {
+        val parentActivity = activity
         curVoiceRoomModel?.let {
-            ARouter.getInstance()
-                .build(RouterPath.ChatroomPath)
-                .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
-                .navigation()
+            if (parentActivity != null) ChatroomLiveActivity.startActivity(parentActivity, it)
         }
+
         dismissLoading()
     }
 
