@@ -206,9 +206,23 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         
         //current user is room owner, remove room
         if roomInfo.ownerId == VLUserCenter.user.id {
+            //remove pk if owner
+            interactionList.forEach { interaction in
+                guard interaction.interactStatus == .pking else {return}
+                self.stopInteraction(interaction: interaction) { err in
+                }
+            }
             _removeRoom(completion: completion)
             return
         }
+        
+        //remove single interaction if audience
+        interactionList.forEach { interaction in
+            guard interaction.userId == VLUserCenter.user.id else {return}
+            self.stopInteraction(interaction: interaction) { err in
+            }
+        }
+        
         _leaveRoom(completion: completion)
     }
     
@@ -1419,7 +1433,7 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _removeInteraction(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
-        //TODO: 
+        //TODO:
         let userIds = [invitation.fromUserId, invitation.userId]
         guard let interaction = self.interactionList.filter({ userIds.contains($0.userId) }).first else {
             return

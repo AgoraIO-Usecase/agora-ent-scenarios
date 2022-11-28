@@ -10,7 +10,7 @@ import AgoraRtcKit
 import UIKit
 
 class ShowAgoraKitManager: NSObject {
-    
+    private var exConnection: AgoraRtcConnection?
     private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
         return AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
                                        frameRate: .fps30,
@@ -115,6 +115,11 @@ class ShowAgoraKitManager: NSObject {
         AgoraRtcEngineKit.destroy()
     }
     
+    func leaveChannelEx() {
+        guard let connection = exConnection else { return }
+        agoraKit?.leaveChannelEx(connection)
+    }
+    
     func joinChannelEx(channelName: String?, ownerId: String?, view: UIView) {
         let roleOptions = AgoraClientRoleOptions()
         roleOptions.audienceLatencyLevel = .ultraLowLatency
@@ -139,6 +144,8 @@ class ShowAgoraKitManager: NSObject {
         videoCanvas.view = view
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
+        
+        exConnection = connection
     }
     
     func joinChannel(channelName: String, uid: UInt, ownerId: String, canvasView: UIView) -> Int32? {
