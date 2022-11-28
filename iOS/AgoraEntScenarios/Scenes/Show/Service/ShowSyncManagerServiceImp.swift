@@ -325,19 +325,25 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             defer {
                 self._unsubscribePKInvitationChanged(roomId: room.roomId)
                 self._subscribePKInvitationChanged(channelName: room.roomId!) { status, invitation in
-                    guard invitation.fromRoomId == self.roomId else {
+                    if status == .created {
+                        guard self.pkCreatedInvitation?.fromRoomId == invitation.fromRoomId else { return }
+                        self.pkCreatedInvitation = invitation
+                    }
+                    guard let model = self.pkCreatedInvitation,
+                          invitation.objectId == model.objectId else {
                         return
                     }
+                    
                     if status == .deleted {
-                        self._recvPKRejected(invitation: invitation)
+                        self._recvPKRejected(invitation: model)
                     } else {
                         switch invitation.status {
                         case .rejected:
-                            self._recvPKRejected(invitation: invitation)
+                            self._recvPKRejected(invitation: model)
                         case .accepted:
-                            self._recvPKAccepted(invitation: invitation)
+                            self._recvPKAccepted(invitation: model)
                         case .ended:
-                            self._recvPKFinish(invitation: invitation)
+                            self._recvPKFinish(invitation: model)
                         default:
                             break
                         }
@@ -350,13 +356,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 let _invitation = ShowPKInvitation()
                 _invitation.userId = room.ownerId
                 _invitation.roomId = room.roomId
-                _invitation.fromUserId = VLUserCenter.user.rtc_uid
+                _invitation.fromUserId = VLUserCenter.user.id
                 _invitation.fromName = VLUserCenter.user.name
                 _invitation.fromRoomId = self.roomId
                 _invitation.status = .waitting
                 _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-                self._addPKInvitation(invitation: _invitation, completion: completion)
                 self.pkCreatedInvitation = _invitation
+                self._addPKInvitation(invitation: _invitation, completion: completion)
                 return
             }
             
@@ -387,8 +393,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             agoraAssert("accept invitation not found")
             return
         }
-        invitation.status = .rejected
-        _updatePKInvitation(invitation: invitation, completion: completion)
+//        invitation.status = .rejected
+//        _updatePKInvitation(invitation: invitation, completion: completion)
+        _removePKInvitation(invitation: invitation, completion: completion)
     }
     
     func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
@@ -649,7 +656,7 @@ extension ShowSyncManagerServiceImp {
     private func _updateUserCount(with count: Int) {
         guard let channelName = roomId,
               let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first,
-              roomInfo.ownerId == VLUserCenter.user.rtc_uid
+              roomInfo.ownerId == VLUserCenter.user.id
         else {
 //            agoraPrint("updateUserCount channelName = nil")
 //            userListCountDidChanged?(UInt(count))
@@ -1093,38 +1100,38 @@ extension ShowSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION,
-                       onCreated: { _ in
-                       }, onUpdated: { object in
-                           agoraPrint("imp pk invitation subscribe onUpdated...")
-                           guard let jsonStr = object.toJson(),
-                                 let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
-                               return
-                           }
-                           subscribeClosure(.updated, model)
-                       }, onDeleted: {[weak self] object in
-                           agoraPrint("imp pk invitation subscribe onDeleted...")
-                           guard let self = self else {return}
-                           
-                           guard channelName == self.getRoomId() else {
-                               if let jsonStr = object.toJson(),
-                                  let model = ShowPKInvitation.yy_model(withJSON: jsonStr) {
-                                   subscribeClosure(.deleted, model)
-                               }
-                               return
-                           }
-                           
-                           var model: ShowPKInvitation? = nil
-                           if let index = self.pkInvitationList.firstIndex(where: { object.getId() == $0.objectId }) {
-                               model = self.pkInvitationList[index]
-                               self.pkInvitationList.remove(at: index)
-                           }
-                           guard let model = model else {return}
-                           subscribeClosure(.deleted, model)
-                       }, onSubscribed: {
-                       }, fail: { error in
-                           agoraPrint("imp pk invitation subscribe fail \(error.message)...")
-                           ToastView.show(text: error.message)
-                       })
+                       onCreated: { object in
+                agoraPrint("imp pk invitation subscribe onUpdated...")
+                guard let jsonStr = object.toJson(),
+                      let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                subscribeClosure(.created, model)
+            }, onUpdated: { object in
+                agoraPrint("imp pk invitation subscribe onUpdated...")
+                guard let jsonStr = object.toJson(),
+                      let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                subscribeClosure(.updated, model)
+            }, onDeleted: {[weak self] object in
+                agoraPrint("imp pk invitation subscribe onDeleted...")
+                guard let self = self else {return}
+                guard channelName == self.getRoomId() else {
+                    if let model = ShowPKInvitation.yy_model(withJSON: object.toJson() ?? "") {
+                        subscribeClosure(.deleted, model)
+                    } else {
+                        agoraAssert("imp pk invitation subscribe fail")
+                    }
+                    return
+                }
+                guard let model = ShowPKInvitation.yy_model(withJSON: object.toJson() ?? "") else { return }
+                subscribeClosure(.deleted, model)
+            }, onSubscribed: {
+            }, fail: { error in
+                agoraPrint("imp pk invitation subscribe fail \(error.message)...")
+                ToastView.show(text: error.message)
+            })
     }
     
     private func _addPKInvitation(invitation: ShowPKInvitation, completion: @escaping (Error?) -> Void) {
@@ -1199,6 +1206,8 @@ extension ShowSyncManagerServiceImp {
 //        _removeInteraction(interaction: interaction) { error in
 //        }
         self.pkCreatedInvitation = nil
+        
+        self.subscribeDelegate?.onPKInvitationRejected(invitation: invitation)
     }
     
     private func _recvPKAccepted(invitation: ShowPKInvitation) {
@@ -1214,6 +1223,8 @@ extension ShowSyncManagerServiceImp {
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
         }
+        
+        self.subscribeDelegate?.onPKInvitationAccepted(invitation: invitation)
     }
     
     private func _recvPKFinish(invitation: ShowPKInvitation) {
