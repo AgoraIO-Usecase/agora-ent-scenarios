@@ -444,11 +444,11 @@ class ChatroomProtocolDelegate constructor(
                     map[6] = robot6
                     map[7] = robot7
                     ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
-                    callback.onSuccess( isEnable != "0")
-                    "update result onSuccess: ".logE(TAG)
+                    callback.onSuccess(true)
+                    "enableRobot($enable) update result onSuccess: ".logE(TAG)
                 } else {
                     callback.onError(code, result.toString())
-                    "update result onError: $code $result ".logE(TAG)
+                    "enableRobot($enable) update result onError: $code $result ".logE(TAG)
                 }
             }
         }
