@@ -19,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.voice.databinding.VoiceRoomHandLayoutBinding
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.ResourcesTools
 
@@ -33,6 +34,8 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
     private var raisedHandsFragment: ChatroomRaisedHandsFragment? = null
     private var inviteHandsFragment: ChatroomInviteHandsFragment? = null
     private val TAG = ChatroomHandsDialog::class.java.simpleName
+
+    private var onFragmentListener: OnFragmentListener? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceRoomHandLayoutBinding {
         return VoiceRoomHandLayoutBinding.inflate(inflater, container, false)
@@ -119,7 +122,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
             override fun createFragment(position: Int): Fragment {
                 if (fragments[position] is ChatroomRaisedHandsFragment) {
                     raisedHandsFragment = fragments[position] as ChatroomRaisedHandsFragment?
-                    raisedHandsFragment?.setItemCountChangeListener(object :ChatroomRaisedHandsFragment.ItemCountListener{
+                    raisedHandsFragment?.setFragmentListener(object : OnFragmentListener {
                         override fun getItemCount(count: Int) {
                             mCount = count
                             activity?.let {
@@ -132,11 +135,14 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                             }
                         }
 
+                        override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
+                            onFragmentListener?.onAcceptMicSeatApply(voiceMicInfoModel)
+                        }
+
                     })
                 } else if (fragments[position] is ChatroomInviteHandsFragment) {
                     inviteHandsFragment = fragments[position] as ChatroomInviteHandsFragment?
-                    inviteHandsFragment?.setItemCountChangeListener(object :
-                        ChatroomInviteHandsFragment.itemCountListener {
+                    inviteHandsFragment?.setFragmentListener(object : OnFragmentListener {
                         override fun getItemCount(count: Int) {
                             mCount = count
                             if (activity != null) {
@@ -183,6 +189,17 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
 
     fun check(map: Map<String, String>) {
         inviteHandsFragment?.micChanged(map)
+    }
+
+    fun setFragmentListener(listener: OnFragmentListener?) {
+        this.onFragmentListener = listener
+    }
+
+    interface OnFragmentListener {
+        fun getItemCount(count: Int) {}
+
+        // 同意上麦
+        fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {}
     }
 
     companion object {

@@ -418,36 +418,4 @@ class VoiceRoomLivingRepository : BaseRepository() {
         }
         return resource.asLiveData()
     }
-
-    // 获取用户列表
-    fun fetchRoomMembers(): LiveData<Resource<List<VoiceMemberModel>>> {
-        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                voiceServiceProtocol.fetchRoomMembers(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
-    // 获取申请列表
-    fun fetchApplicantsList(): LiveData<Resource<List<VoiceMemberModel>>> {
-        val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                voiceServiceProtocol.fetchApplicantsList(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result.toList()))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
 }
