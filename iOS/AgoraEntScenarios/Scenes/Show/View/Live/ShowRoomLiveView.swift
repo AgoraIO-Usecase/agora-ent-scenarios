@@ -143,7 +143,7 @@ class ShowRoomLiveView: UIView {
         chatInputView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.height.equalTo(56)
-            make.top.equalTo(tableView.snp.bottom).offset(15)
+            make.centerY.equalTo(bottomBar)
         }
     }
     

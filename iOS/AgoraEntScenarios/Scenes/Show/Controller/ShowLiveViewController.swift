@@ -16,6 +16,8 @@ class ShowLiveViewController: UIViewController {
         return ShowAgoraKitManager()
     }()
     
+    private var settingManager: ShowSettingManager?
+    
     private var roomOwnerId: UInt {
         get{
             UInt(room?.ownerId ?? "0") ?? 0
@@ -49,6 +51,22 @@ class ShowLiveViewController: UIViewController {
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
+    
+    //PK popup list view
+    private lazy var pkInviteView = ShowPKInviteView()
+    
+    private var pkUserInvitationList: [ShowPKUserInfo]? {
+        didSet {
+            self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
+        }
+    }
+    
+    private var interactionList: [ShowInteractionInfo]? {
+        didSet {
+            self.pkInviteView.interactionList = interactionList ?? []
+        }
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,21 +109,12 @@ class ShowLiveViewController: UIViewController {
         let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
         if ret == 0 {
             print("进入房间")
+            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
         }else{
             print("进入房间失败=====\(ret.debugDescription)")
             showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
         }
-        
-//        let canvas = AgoraRtcVideoCanvas()
-//        canvas.view = liveView.canvasView.localView
-//        canvas.renderMode = .hidden
-//        canvas.uid = uid
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
-//        if role == .broadcaster {
-//            canvas.mirrorMode = .disabled
-//        }
-//        agoraKitManager.agoraKit?.setupLocalVideo(canvas)
-//        agoraKitManager.agoraKit?.startPreview()
         
         sendMessageWithText("join_live_room".show_localized)
     }
@@ -134,15 +143,33 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         applyAndInviteView.applyStatusClosure = { [weak self] status in
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
+        
+        _refreshInvitationList()
+        _refreshInteractionList()
+    }
+    
+    private func _refreshInvitationList() {
+        AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
+            self?.pkUserInvitationList = pkUserList
+        }
+    }
+    
+    private func _refreshInteractionList() {
+        AppContext.showServiceImp.getAllInterationList { [weak self] (error, interactionList) in
+            self?.interactionList = interactionList
+        }
     }
     
     
+    //MARK: ShowSubscribeServiceProtocol
     func onUserJoinedRoom(user: ShowUser) {
         
     }
     
     func onUserLeftRoom(user: ShowUser) {
-        
+        if user.userId == room?.ownerId {
+            //TODO: leave query dialog
+        }
     }
     
     func onMessageDidAdded(message: ShowMessage) {
@@ -203,6 +230,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
+        guard invitation.userId == VLUserCenter.user.id else { return }
         if invitation.status == .waitting {
             let vc = ShowReceivePKAlertVC()
             vc.name = invitation.userName ?? ""
@@ -276,11 +304,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         //nothing todo, see onInteractionBegan
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
+        _refreshInvitationList()
     }
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+        _refreshInvitationList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
@@ -406,11 +436,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickPKButton(_ button: ShowRedDotButton) {
-        let pkInviteView = ShowPKInviteView()
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
-        AppContext.showServiceImp.getAllPKUserList { [weak pkInviteView] (error, pkUserList) in
-            pkInviteView?.pkUserInvitationList = pkUserList
-        }
+        _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
@@ -436,7 +464,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickSettingButton() {
         let settingVC = ShowAdvancedSettingVC()
-        settingVC.agoraKit = agoraKitManager.agoraKit
+        settingVC.mode = .signle // 根据当前模式设置
+        settingVC.isBroadcaster = role == .broadcaster
+        settingVC.settingManager = settingManager
         navigationController?.pushViewController(settingVC, animated: true)
     }
     

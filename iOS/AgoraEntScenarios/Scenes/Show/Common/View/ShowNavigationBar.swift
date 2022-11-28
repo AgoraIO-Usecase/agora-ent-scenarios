@@ -61,7 +61,7 @@ class ShowNavigationBar: UIView {
         
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(56)
+            make.top.equalTo(16 + Screen.safeAreaTopHeight())
             make.centerX.equalToSuperview()
         }
         
