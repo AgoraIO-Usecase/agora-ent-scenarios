@@ -403,6 +403,7 @@
 		E333F65029150ECB0031B35F /* VoiceServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */; };
 		E333F65129150ECB0031B35F /* ChatRoomServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */; };
 		E358F7D7292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E358F7D6292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift */; };
+		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -555,7 +556,6 @@
 		DD2A43D128FFCEE7004CEDCF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DD2A43D328FFCEE7004CEDCF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DD2A43D628FFCEE7004CEDCF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		DD2A43D828FFCEE7004CEDCF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DD2A43DD28FFCEE7004CEDCF /* AgoraEntScenariosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosTests.swift; sourceTree = "<group>"; };
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -954,6 +954,11 @@
 		E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceServiceProtocol.swift; sourceTree = "<group>"; };
 		E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceProtocol.swift; sourceTree = "<group>"; };
 		E358F7D6292CC68A00A7EBD1 /* VoiceRoomRTCManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRTCManager.swift; sourceTree = "<group>"; };
+		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1301,10 +1306,11 @@
 				DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */,
 				DD2A43D028FFCEE7004CEDCF /* Main.storyboard */,
 				DD2A43D328FFCEE7004CEDCF /* Assets.xcassets */,
+				E358F7FC293493AD00A7EBD1 /* Info.plist */,
 				DD84168629090C520026B624 /* Resource */,
 				DD2A43D528FFCEE7004CEDCF /* LaunchScreen.storyboard */,
-				DD2A43D828FFCEE7004CEDCF /* Info.plist */,
 				DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */,
+				E358F802293494BC00A7EBD1 /* InfoPlist.strings */,
 			);
 			path = AgoraEntScenarios;
 			sourceTree = "<group>";
@@ -2568,6 +2574,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = DD2A43BE28FFCEE7004CEDCF;
 			productRefGroup = DD2A43C828FFCEE7004CEDCF /* Products */;
@@ -2615,6 +2622,7 @@
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				DD84177829090C520026B624 /* entertainment.js in Resources */,
 				DDA19A1C28FFE579009D3E61 /* SyncManager.swift~HEAD in Resources */,
+				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
 				DDA19A1F28FFE579009D3E61 /* SyncManager.swift~zyq in Resources */,
 				DD84176729090C520026B624 /* tab_profile.png in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
@@ -3084,6 +3092,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DD2A43D128FFCEE7004CEDCF /* Base */,
+				E358F7F72934925F00A7EBD1 /* zh-Hans */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -3092,8 +3101,18 @@
 			isa = PBXVariantGroup;
 			children = (
 				DD2A43D628FFCEE7004CEDCF /* Base */,
+				E358F7F82934925F00A7EBD1 /* zh-Hans */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		E358F802293494BC00A7EBD1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E358F801293494BC00A7EBD1 /* en */,
+				E358F803293494C100A7EBD1 /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -3103,6 +3122,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -3163,6 +3183,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -3222,7 +3243,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";
@@ -3259,7 +3280,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 499WYUV8Q2;
+				DEVELOPMENT_TEAM = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "声动互娱";

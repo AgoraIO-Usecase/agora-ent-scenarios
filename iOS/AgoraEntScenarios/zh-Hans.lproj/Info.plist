@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<key>&quot;Agora Entertainment&quot; needs to access your microphone
+
+When you are chatting/singing/live broadcasting, Agora Entertainment needs to apply for microphone access</key>
+	<string>“声动互娱”想访问你的麦克风
+
+当你进行语聊/K歌/直播时，声动互娱想要申请麦克风访问</string>
+</dict>
+</plist>
