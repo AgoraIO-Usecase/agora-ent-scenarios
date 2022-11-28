@@ -50,5 +50,5 @@ interface IVoiceBuddy {
 
     fun setupRtcToken(rtcToken: String)
 
-    fun setupChatConfig(chatUserName: String, chatToken: String)
+    fun setupChatToken(chatToken: String)
 }

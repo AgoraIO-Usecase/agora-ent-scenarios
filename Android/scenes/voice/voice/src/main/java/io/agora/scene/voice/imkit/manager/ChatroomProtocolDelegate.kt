@@ -12,7 +12,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.service.*
-import io.agora.scene.voice.service.VoiceBuddyFactory.Companion.get
+import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logE
@@ -127,8 +127,7 @@ class ChatroomProtocolDelegate constructor(
                             micInfoList.add(it)
                         }
                     }
-                    micInfoList.sortedBy { it.micIndex }
-                    voiceRoomInfo.micInfo = micInfoList
+                    voiceRoomInfo.micInfo = micInfoList.sortedBy { it.micIndex }
                     "fetchRoomDetail onSuccess roomId:$roomId, $micInfoList".logD(TAG)
                     callback.onSuccess(voiceRoomInfo)
                 }
@@ -318,11 +317,13 @@ class ChatroomProtocolDelegate constructor(
     fun startMicSeatApply(micIndex: Int? = null, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
         var voiceRoomApply = VoiceRoomApply()
-        var memberBean = VoiceMemberModel()
-        memberBean.chatUid = get().getVoiceBuddy().chatUserName()
-        memberBean.rtcUid = get().getVoiceBuddy().rtcUid()
-        memberBean.nickName = get().getVoiceBuddy().nickName()
-        memberBean.portrait = get().getVoiceBuddy().headUrl()
+        var memberBean = VoiceMemberModel().apply {
+            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
+            rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
+            nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
+            portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+        }
         voiceRoomApply.member = memberBean
         voiceRoomApply.created_at = System.currentTimeMillis()
         if (micIndex != null) {
@@ -351,7 +352,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun cancelSubmitMic(chatUid: String, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid)
+        var userBeam = VoiceMemberModel(chatUid = chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
@@ -368,7 +369,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun invitationMic(chatUid: String, micIndex: Int? = null, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid)
+        var userBeam = VoiceMemberModel(chatUid = chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_INVITE_SITE, attributeMap, callback)
     }
@@ -379,7 +380,7 @@ class ChatroomProtocolDelegate constructor(
     fun refuseInviteToMic(chatUid: String, callback: CallBack) {
         // TODO:  ios 没实现 需要确认是否需要实现
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid)
+        var userBeam = VoiceMemberModel(chatUid = chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
     }
@@ -414,7 +415,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun enableRobot(enable: Boolean, callback: ValueCallBack<Boolean>) {
         val attributeMap = mutableMapOf<String, String>()
-        val currentUser = get().getVoiceBuddy().chatUserName()
+        val currentUser = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
         var robot6 = VoiceMicInfoModel()
         var robot7 = VoiceMicInfoModel()
         var isEnable: String
@@ -694,16 +695,16 @@ class ChatroomProtocolDelegate constructor(
      */
     private fun getMySelfModel():VoiceMemberModel{
         var micIndex : Int = -1
-        if (TextUtils.equals(ownerBean.chatUid,get().getVoiceBuddy().chatUserName())){
+        if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
             micIndex = 0
         }
         return VoiceMemberModel(
-            get().getVoiceBuddy().userId(),
-            get().getVoiceBuddy().chatUserName(),
-            get().getVoiceBuddy().nickName(),
-            get().getVoiceBuddy().headUrl(),
-            get().getVoiceBuddy().rtcUid(),
-            micIndex)
+            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
+            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+            nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+            portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
+            rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            micIndex = micIndex)
     }
 
     /**

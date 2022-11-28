@@ -17,12 +17,17 @@ data class VoiceCreateRoomModel constructor(
 
 /**
  * 用户数据
+ * @see io.agora.scene.base.api.model.User
  */
 data class VoiceMemberModel constructor(
+
+    // 这里用的是user.userNo
     @SerializedName("uid") var userId: String? = null,
+    // 这里用的是user.id
     @SerializedName("chat_uid") var chatUid: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,
+    // 这里用的是user.id
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = 0,
 ) : BaseRoomBean

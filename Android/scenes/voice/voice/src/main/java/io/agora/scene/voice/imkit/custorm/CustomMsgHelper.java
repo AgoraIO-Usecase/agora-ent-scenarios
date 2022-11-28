@@ -293,13 +293,13 @@ public class CustomMsgHelper implements MessageListener {
 
     /**
      * 发送系统消息（成员加入）
-     * @param nickName
+     * @param username
      * @param portrait
      * @param callBack
      */
-    public void sendSystemMsg(String nickName,String portrait, OnMsgCallBack callBack) {
+    public void sendSystemMsg(String username,String portrait, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
-        params.put(MsgConstant.CUSTOM_GIFT_USERNAME,nickName);
+        params.put(MsgConstant.CUSTOM_GIFT_USERNAME,username);
         params.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
         sendSystemMsg(params, callBack);
     }
