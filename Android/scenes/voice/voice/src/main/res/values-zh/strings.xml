@@ -31,6 +31,7 @@
     <string name="voice_room_create_ktv_room">KTV</string>
     <string name="voice_room_create_tips">请输入4位数密码</string>
     <string name="voice_room_check_password">密码错误，请重试</string>
+    <string name="voice_room_create_error">创建房间失败</string>
 
     <string name="voice_room_empty_data">暂无房间</string>
     <string name="voice_room_list_title_private">私密</string>

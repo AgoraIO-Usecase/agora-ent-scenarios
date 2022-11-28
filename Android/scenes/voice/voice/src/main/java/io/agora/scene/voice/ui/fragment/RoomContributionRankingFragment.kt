@@ -68,7 +68,7 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
             slContributionRanking.setOnRefreshListener(this@RoomContributionRankingFragment)
         }
         roomRankViewModel.fetchGiftContribute()
-        roomRankViewModel.giftsObservable().observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
+        roomRankViewModel.contributeListObservable().observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
                 override fun onSuccess(data: List<VoiceRankUserModel>?) {
                     binding?.slContributionRanking?.isRefreshing = false
