@@ -59,12 +59,20 @@ extension UIFont {
         show_regularFontSize(12)
     }
     
+    @objc static var show_R_13: UIFont? {
+        show_regularFontSize(13)
+    }
+    
     @objc static var show_R_14: UIFont? {
         show_regularFontSize(14)
     }
     
     @objc static var show_R_16: UIFont? {
         show_regularFontSize(16)
+    }
+    
+    @objc static var show_S_18: UIFont? {
+        show_SemiboldFontSize(18)
     }
     
     // 导航栏标题
