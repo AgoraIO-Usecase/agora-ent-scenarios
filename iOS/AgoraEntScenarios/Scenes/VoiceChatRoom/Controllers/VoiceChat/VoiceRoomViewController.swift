@@ -371,7 +371,7 @@ extension VoiceRoomViewController {
 
     func didRtcAction(with type: AgoraChatRoomBaseUserCellType, tag: Int) {
         let index: Int = tag - 200
-        guard let mic: VRRoomMic = roomInfo?.mic_info?[index] else { return }
+        let mic: VRRoomMic = ChatRoomServiceImp.getSharedInstance().mics[safe:index]!
         if index == 6 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
