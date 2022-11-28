@@ -59,6 +59,16 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
+    /// 切换连麦角色
+    func switchRole(role: AgoraClientRole) {
+        let options = AgoraRtcChannelMediaOptions()
+        options.clientRoleType = role
+        options.publishMicrophoneTrack = role == .broadcaster
+        options.publishCameraTrack = role == .broadcaster
+        agoraKit.updateChannel(with: options)
+        agoraKit.setClientRole(role)
+    }
+    
     /// 设置分辨率
     /// - Parameter size: 分辨率
     func setVideoDimensions(_ size: CGSize){

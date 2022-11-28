@@ -54,7 +54,7 @@ public class CollectionReference {
 
     /// delete an item
     public func delete(id: String,
-                       success: SuccessBlockVoid?,
+                       success: SuccessBlockObjOptional?,
                        fail: FailBlock?)
     {
         manager.delete(reference: self,

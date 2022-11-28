@@ -21,10 +21,10 @@ class ShowReceivePKAlertVC: UIViewController {
     }()
     
     private var countDown = 15 // 倒计时
-    private var timer: Timer!
+    private var timer: Timer?
     
     deinit {
-        timer.invalidate()
+        timer?.invalidate()
         timer = nil
     }
     
@@ -64,8 +64,8 @@ class ShowReceivePKAlertVC: UIViewController {
             wSelf.pkAlertView.countDown = wSelf.countDown
             wSelf.countDown -= 1
         })
-        RunLoop.current.add(timer, forMode: .default)
-        timer.fire()
+        RunLoop.current.add(timer!, forMode: .default)
+        timer?.fire()
     }
     
     func dismissWithResult(_ dismissWithResult: @escaping ((_ result: ShowReceivePKAlertVC.Result)->())) {

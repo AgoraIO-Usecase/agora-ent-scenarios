@@ -39,6 +39,7 @@ public class RethinkSyncManager: NSObject {
     var connectBlock: SuccessBlockInt?
     var onSuccessBlock = [String: SuccessBlock]()
     var onSuccessBlockVoid = [String: SuccessBlockVoid]()
+    var onDeleteBlockObjOptional = [String: SuccessBlockObjOptional?]()
     var onSuccessBlockObjOptional = [String: SuccessBlockObjOptional]()
     var onSuccessBlockObj = [String: SuccessBlockObj]()
     var onFailBlock = [String: FailBlock]()
@@ -96,6 +97,7 @@ public class RethinkSyncManager: NSObject {
         guard isRemove else { return }
         onSuccessBlock.removeAll()
         onSuccessBlockVoid.removeAll()
+        onDeleteBlockObjOptional.removeAll()
         onSuccessBlockObjOptional.removeAll()
         onSuccessBlockObj.removeAll()
         onFailBlock.removeAll()
@@ -273,8 +275,8 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             if let successBlockObjVoid = onSuccessBlockObjOptional[channelName], action == .query {
                 successBlockObjVoid(attrs?.first)
             }
-            if let successBlock = onSuccessBlock[channelName], action == .deleteProp {
-                successBlock(attrs ?? [])
+            if let deleteBlock = onDeleteBlockObjOptional[channelName], action == .deleteProp {
+                deleteBlock?(attrs?.first)
             }
         }
         Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "收到消息")
