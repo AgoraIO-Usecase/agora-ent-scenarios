@@ -91,6 +91,12 @@ class ShowMicSeatApply: ShowBaseInfo {
     var userName: String?                            //用户名
     var status: ShowRoomRequestStatus = .idle        //申请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
+    
+    #if DEBUG
+    override var description: String {
+        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
+    }
+    #endif
 }
 
 
@@ -101,6 +107,12 @@ class ShowMicSeatInvitation: ShowBaseInfo {
     var userName: String?                            //用户名
     var status: ShowRoomRequestStatus = .idle      //邀请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
+    
+    #if DEBUG
+    override var description: String {
+        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
+    }
+    #endif
 }
 
 /// PK邀请
@@ -114,9 +126,11 @@ class ShowPKInvitation: ShowBaseInfo {
     var muteAudio: Bool = false                      //静音状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
     
+    #if DEBUG
     override var description: String {
         return "userId: \(userId ?? "") roomId: \(roomId ?? "") fromUserId: \(fromUserId ?? "") fromRoomId: \(fromRoomId ?? "") status: \(status) objectId: \(objectId ?? "")"
     }
+    #endif
 }
 
 //连麦/Pk模型
@@ -125,4 +139,10 @@ class ShowInteractionInfo: ShowBaseInfo {
     var roomId: String?                                 //用户所在房间id
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数
+    
+    #if DEBUG
+    override var description: String {
+        return "userId: \(userId ?? "") roomId: \(roomId ?? "") status: \(interactStatus) objectId: \(objectId ?? "")"
+    }
+    #endif
 }
