@@ -1,6 +1,5 @@
 package io.agora.scene.voice.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.TypedValue
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
@@ -31,8 +29,6 @@ import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterParams
-import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.DeviceTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
@@ -236,10 +232,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             binding.bottomNext.isEnabled = true
             dismissLoading()
             "voice room create joinChatRoom onSuccess".logD()
-            ARouter.getInstance()
-                .build(RouterPath.ChatroomPath)
-                .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
-                .navigation()
+            ChatroomLiveActivity.startActivity(this, it)
             finish()
         }
     }
@@ -277,14 +270,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         }
         binding.inputTip.visibility = View.GONE
         if (roomType == 0) {
-            val intent = Intent(this, VoiceRoomSoundSelectionActivity::class.java)
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_NAME, roomName)
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_IS_PUBLIC, isPublic)
-            if (!isPublic) {
-                intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_ENCRYPTION, encryption)
-            }
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_ROOM_TYPE, roomType)
-            startActivity(intent)
+            VoiceRoomSoundSelectionActivity.startActivity(this, roomName, isPublic, encryption, roomType)
         } else if (roomType == 1) {
             createSpatialRoom()
         }
