@@ -9,6 +9,12 @@ import UIKit
 
 class ShowPresettingCell: UITableViewCell {
 
+    private lazy var bgImgView: UIImageView = {
+        let imgView = UIImageView()
+        imgView.backgroundColor = .show_preset_bg
+        return imgView
+    }()
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .show_zi02
@@ -67,6 +73,13 @@ class ShowPresettingCell: UITableViewCell {
     }
     
     func createSubviews(){
+        
+        contentView.addSubview(bgImgView)
+        bgImgView.snp.makeConstraints { make in
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+            make.top.bottom.equalToSuperview()
+        }
         
         contentView.addSubview(whiteBgView)
         whiteBgView.snp.makeConstraints { make in
