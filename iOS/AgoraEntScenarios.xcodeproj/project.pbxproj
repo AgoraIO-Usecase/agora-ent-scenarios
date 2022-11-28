@@ -164,6 +164,7 @@
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
 		A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */; };
 		A8B016702934512B00E24CBF /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B0166F2934512A00E24CBF /* KeyCenter.swift */; };
+		A8B016722934A78600E24CBF /* ShowPresettingFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B016712934A78600E24CBF /* ShowPresettingFooterView.swift */; };
 		A8B561842910FDB8004F34D1 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */; };
 		A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */; };
 		A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5618929111052004F34D1 /* ShowBaseViewController.swift */; };
@@ -667,6 +668,7 @@
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
 		A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceCell.swift; sourceTree = "<group>"; };
 		A8B0166F2934512A00E24CBF /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
+		A8B016712934A78600E24CBF /* ShowPresettingFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPresettingFooterView.swift; sourceTree = "<group>"; };
 		A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
 		A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListCell.swift; sourceTree = "<group>"; };
 		A8B5618929111052004F34D1 /* ShowBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBaseViewController.swift; sourceTree = "<group>"; };
@@ -1475,6 +1477,7 @@
 				A8F372412923A0BD00CEA88D /* ShowSettingHeaderView.swift */,
 				A8F372452924832400CEA88D /* ShowPresettingCell.swift */,
 				A8088D05293065C1005AA4B7 /* ShowPresettingHeaderView.swift */,
+				A8B016712934A78600E24CBF /* ShowPresettingFooterView.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -3190,6 +3193,7 @@
 				DD8417B429090C520026B624 /* VLSearchEmptyView.m in Sources */,
 				DD8417B929090C520026B624 /* VLRoomPersonView.m in Sources */,
 				05FFE713290F73230024D22F /* SwiftyFitSize.swift in Sources */,
+				A8B016722934A78600E24CBF /* ShowPresettingFooterView.swift in Sources */,
 				05FFE701290F706C0024D22F /* VMUpstageView.swift in Sources */,
 				A8F3723E292399D700CEA88D /* ShowSettingActionSheetCell.swift in Sources */,
 				057DD9F5290B9495001329E6 /* UIViewToastExtension.swift in Sources */,
