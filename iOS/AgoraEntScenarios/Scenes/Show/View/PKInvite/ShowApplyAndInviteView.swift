@@ -38,6 +38,7 @@ class ShowApplyAndInviteView: UIView {
         segmentView.titlePendingHorizontal = 50
         segmentView.normalTitleColor = UIColor(hex: "#6D7291")
         segmentView.valueChange = { [weak self] index in
+            self?.tableView.dataArray = []
             if index == 0 {
                 self?.tableView.emptyTitle = "暂无上麦申请".show_localized
                 self?.getApplyList()
@@ -96,12 +97,13 @@ class ShowApplyAndInviteView: UIView {
     private var tipsViewHeightCons: NSLayoutConstraint?
     private var roomId: String?
     private var type: ShowApplyAndInviteType = .apply
+    private var seatMicModel: ShowMicSeatApply?
     
     init(roomId: String?) {
         super.init(frame: .zero)
         self.roomId = roomId
         setupUI()
-        getApplyInfo()
+        getApplyPKInfo()
         getApplyList()
     }
     
@@ -109,23 +111,34 @@ class ShowApplyAndInviteView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func reloadData() {
+        getApplyList()
+    }
+    
     private func getApplyList() {
         AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
-            guard let list = list else { return }
-            self.tableView.dataArray = list
+            guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+            let model = list.filter({ $0.status == .accepted }).first
+            self.tipsContainerView.isHidden = model == nil
+            self.tipsLabel.text = "与\(model?.userName ?? "")连麦中"
+            self.seatMicModel = model
+            self.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
     private func getInviteList() {
         AppContext.showServiceImp.getAllUserList { _, list in
             guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
-            self.tableView.dataArray = list
+            self.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
-    private func getApplyInfo() {
+    private func getApplyPKInfo() {
         AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) { roomModel in
             self.tipsContainerView.isHidden = roomModel == nil
             self.tipsLabel.text = "与主播\(roomModel?.ownerName ?? "")PK中"
         }
+    }
+    private func getApplyLinkInfo() {
+        
     }
     
     private func setupUI() {
@@ -182,6 +195,9 @@ class ShowApplyAndInviteView: UIView {
         UIView.animate(withDuration: 0.25) {
             self.layoutIfNeeded()
         }
+        if let model = seatMicModel {
+            AppContext.showServiceImp.stopMicSeatApply(apply: model) { _ in }
+        }
         applyStatusClosure?(.idle)
     }
 }
@@ -192,15 +208,6 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
         let model = self.tableView.dataArray?[indexPath.row]
         
         cell.setupApplyAndInviteData(model: model)
-        cell.refreshDataClosure = { [weak self] in
-            guard let self = self else { return }
-            if self.type == .apply {
-                self.getInviteList()
-                self.applyStatusClosure?(.onSeat)
-            } else {
-                self.getInviteList()
-            }
-        }
         return cell
     }
 }

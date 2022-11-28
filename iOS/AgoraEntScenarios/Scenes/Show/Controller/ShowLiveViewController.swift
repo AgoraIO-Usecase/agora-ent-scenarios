@@ -88,7 +88,7 @@ class ShowLiveViewController: UIViewController {
         guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
             return
         }
-        let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView)
+        let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
         if ret == 0 {
             print("进入房间")
         }else{
@@ -96,18 +96,16 @@ class ShowLiveViewController: UIViewController {
             showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
         }
         
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.view = liveView.canvasView.localView
-        canvas.renderMode = .hidden
-        canvas.uid = uid
+//        let canvas = AgoraRtcVideoCanvas()
+//        canvas.view = liveView.canvasView.localView
+//        canvas.renderMode = .hidden
+//        canvas.uid = uid
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
-        if role == .broadcaster {
-            canvas.mirrorMode = .disabled
-            agoraKitManager.agoraKit?.setupLocalVideo(canvas)
-        } else {
-            agoraKitManager.agoraKit?.setupRemoteVideo(canvas)
-        }
-        agoraKitManager.agoraKit?.startPreview()
+//        if role == .broadcaster {
+//            canvas.mirrorMode = .disabled
+//        }
+//        agoraKitManager.agoraKit?.setupLocalVideo(canvas)
+//        agoraKitManager.agoraKit?.startPreview()
         
         sendMessageWithText("join_live_room".show_localized)
     }
@@ -155,16 +153,48 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
-        
+        if apply.status == .waitting && role == .broadcaster {
+            liveView.bottomBar.linkButton.isShowRedDot = true
+
+        } else if apply.status == .accepted {
+            liveView.canvasView.canvasType = .joint_broadcasting
+            liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
+            agoraKitManager.switchRole(role: .broadcaster)
+            liveView.bottomBar.linkButton.isSelected = true
+            liveView.bottomBar.linkButton.isShowRedDot = false
+            
+        } else if apply.status == .rejected {
+            applyView.getAllMicSeatList()
+            liveView.bottomBar.linkButton.isShowRedDot = false
+            liveView.bottomBar.linkButton.isSelected = false
+            
+        } else {
+            liveView.canvasView.canvasType = .none
+            liveView.bottomBar.linkButton.isSelected = false
+            if apply.userId != "\(roomOwnerId)" {
+                agoraKitManager.switchRole(role: .audience)
+                let videoCanvas = AgoraRtcVideoCanvas()
+                videoCanvas.uid = roomOwnerId
+                videoCanvas.renderMode = .hidden
+                videoCanvas.view = liveView.canvasView.localView
+                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+                agoraKitManager.agoraKit.setupLocalVideo(AgoraRtcVideoCanvas())
+            }
+        }
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
         ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+        if role == .broadcaster {
+            applyAndInviteView.reloadData()
+        }
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
-        
+        applyAndInviteView.reloadData()
+        liveView.canvasView.canvasType = .joint_broadcasting
+        liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
@@ -197,19 +227,25 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
-        guard  invitation.userId == VLUserCenter.user.id else { return }
+        guard "\(roomOwnerId)" == invitation.userId else { return }
         ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
-    
+
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
-        //nothing todo, see onInteractionBegan
-        guard  invitation.userId == VLUserCenter.user.id else { return }
+        liveView.canvasView.canvasType = .joint_broadcasting
+        liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
         ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
+        guard invitation.userId == VLUserCenter.user.id else { return }
+        agoraKitManager.switchRole(role: .broadcaster)
     }
     
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
-        guard  invitation.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
+        guard role == .broadcaster else { return }
+        AlertManager.hiddenView()
+        let alertVC = UIAlertController(title: "\(invitation.userName ?? "")拒绝了您的连麦邀请", message: nil, preferredStyle: .alert)
+        let agree = UIAlertAction(title: "确定", style: .default, handler: nil)
+        alertVC.addAction(agree)
+        present(alertVC, animated: true, completion: nil)
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
@@ -275,7 +311,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
-        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
+//        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
 
     }
     
@@ -287,10 +323,26 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = uid
-        videoCanvas.view = liveView.canvasView.remoteView
         videoCanvas.renderMode = .hidden
-        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-        liveView.canvasView.setRemoteUserInfo(name: "\(uid)")
+        if roomOwnerId == uid {
+            if currentUserId == "\(uid)" {
+                videoCanvas.view = liveView.canvasView.localView
+                agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
+            } else {
+                videoCanvas.view = liveView.canvasView.localView
+                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+            }
+        } else  {
+            if currentUserId == "\(uid)" {
+                videoCanvas.view = liveView.canvasView.remoteView
+                agoraKitManager.agoraKit?.setupLocalVideo(videoCanvas)
+                agoraKitManager.agoraKit.startPreview()
+                
+            } else {
+                videoCanvas.view = liveView.canvasView.remoteView
+                agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+            }
+        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
@@ -363,9 +415,11 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
         if role == .broadcaster {
+            applyAndInviteView.reloadData()
             AlertManager.show(view: applyAndInviteView, alertPostion: .bottom)
             
         } else {
+            applyView.getAllMicSeatList()
             AlertManager.show(view: applyView, alertPostion: .bottom)
         }
     }
