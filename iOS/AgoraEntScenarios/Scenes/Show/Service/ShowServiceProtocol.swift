@@ -25,8 +25,18 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: ShowRoomListModel,
-                    completion: @escaping (Error?, ShowRoomDetailModel?) -> Void)
+    
+    
+    /// 创建房间
+    /// - Parameters:
+    ///   - roomName: 房间名
+    ///   - roomId: 房间Id
+    ///   - thumbnailId: 列表缩略图
+    ///   - completion: <#completion description#>
+    func createRoom(roomName: String,
+                    roomId: String,
+                    thumbnailId: String,
+                    completion: @escaping (Error?, ShowRoomDetailModel?) -> Void) 
     
     /// 加入房间
     /// - Parameters:
@@ -40,15 +50,6 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     
     
     
-    
-    
-    
-    
-    /// 监听用户变化
-    /// - Parameters:
-    ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeUserChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowUser) -> Void)
-    
     /// 获取当前房间所有用户
     /// - Parameter completion: 完成回调   (错误信息， 用户列表)
     func getAllUserList(completion: @escaping (Error?, [ShowUser]?) -> Void)
@@ -60,24 +61,11 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     func sendChatMessage(message: ShowMessage,
                          completion: ((Error?) -> Void)?)
     
-    /// 订阅聊天消息变化
-    /// - Parameters:
-    ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeMessageChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMessage) -> Void)
-    
-    
-    
-    
     
     /// 获取上麦申请列表
     /// - Parameter completion: <#completion description#>
     func getAllMicSeatApplyList(completion: @escaping (Error?, [ShowMicSeatApply]?) -> Void)
-    
-    /// 主播订阅连麦申请变化
-    /// - Parameters:
-    ///   - subscribeClosure: <#subscribeClosure description#>
-    func subscribeMicSeatApplyChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatApply) -> Void)
-    
+
     /// 观众申请连麦
     /// - Parameters:
     ///   - completion: <#completion description#>
@@ -114,10 +102,6 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: <#completion description#>
     func getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void)
     
-    /// 观众订阅连麦邀请
-    /// - Parameter subscribeClosure: <#subscribeClosure description#>
-    func subscribeMicSeatInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowMicSeatInvitation) -> Void)
-    
     /// 主播创建连麦邀请
     /// - Parameters:
     ///   - user: 邀请用户
@@ -144,14 +128,15 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     
     
     
+    
+    /// 获取可PK对象列表(目前等价getRoomList)
+    /// - Parameter completion: <#completion description#>
+    func getAllPKUserList(completion: @escaping (Error?, [ShowPKUserInfo]?) -> Void)
+    
     /// 获取PK邀请列表
     /// - Parameter completion: <#completion description#>
     func getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void)
-    
-    /// 观众订阅连麦邀请
-    /// - Parameter subscribeClosure: <#subscribeClosure description#>
-    func subscribePKInvitationChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void)
-    
+
     /// 创建PK邀请
     /// - Parameters:
     ///   - user: 邀请用户
@@ -175,12 +160,13 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: <#completion description#>
     func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void)
     
-    /// 订阅互动邀请
-    /// - Parameter subscribeClosure: <#subscribeClosure description#>
-    func subscribeInteractionChanged(subscribeClosure: @escaping (ShowSubscribeStatus, ShowInteractionInfo) -> Void)
-    
-    
     /// 停止互动
     /// - Parameter completion: <#completion description#>
     func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void)
+    
+
+    
+    func unsubscribeEvent(delegate: ShowSubscribeServiceProtocol)
+    
+    func subscribeEvent(delegate: ShowSubscribeServiceProtocol)
 }
