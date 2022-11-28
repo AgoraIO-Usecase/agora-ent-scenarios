@@ -108,7 +108,7 @@ typealias ShowMicSeatInvitation = ShowUser
 //    var userName: String?                            //用户名
 //    var status: ShowRoomRequestStatus = .idle      //邀请状态
 //    var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
-//    
+//
 //    #if DEBUG
 //    override var description: String {
 //        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
@@ -119,6 +119,7 @@ typealias ShowMicSeatInvitation = ShowUser
 /// PK邀请
 class ShowPKInvitation: ShowBaseInfo {
     var userId: String?                              //被pk用户id (rtc uid)
+    var userName: String?                            //用户名
     var roomId: String?                              //被pk房间id
     var fromUserId: String?                          //发起Pk用户id (rtc uid)
     var fromName: String?                            //发起Pk用户名
@@ -137,6 +138,7 @@ class ShowPKInvitation: ShowBaseInfo {
 //连麦/Pk模型
 class ShowInteractionInfo: ShowBaseInfo {
     var userId: String?                                 //用户id (rtc uid) pk是另一个房间的房主uid，连麦是连麦观众uid
+    var userName: String?                               //用户名
     var roomId: String?                                 //用户所在房间id
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数

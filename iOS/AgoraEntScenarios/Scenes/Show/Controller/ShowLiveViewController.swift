@@ -51,11 +51,19 @@ class ShowLiveViewController: UIViewController {
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
+    
+    //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
     
     private var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
             self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
+        }
+    }
+    
+    private var interactionList: [ShowInteractionInfo]? {
+        didSet {
+            self.pkInviteView.interactionList = interactionList ?? []
         }
     }
     
@@ -149,6 +157,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     private func _refreshInvitationList() {
@@ -157,12 +166,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
+    private func _refreshInteractionList() {
+        AppContext.showServiceImp.getAllInterationList { [weak self] (error, interactionList) in
+            self?.interactionList = interactionList
+        }
+    }
+    
+    
+    //MARK: ShowSubscribeServiceProtocol
     func onUserJoinedRoom(user: ShowUser) {
         
     }
     
     func onUserLeftRoom(user: ShowUser) {
-        
+        if user.userId == room?.ownerId {
+            //TODO: leave query dialog
+        }
     }
     
     func onMessageDidAdded(message: ShowMessage) {
@@ -377,6 +396,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
         _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
