@@ -49,8 +49,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _rejectMicInvitationObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _lockMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _cancelLockMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
-    private val _invitationMicObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
-    private val _acceptMicSeatApplyObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _startMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _cancelMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _changeMicObservable: SingleSourceLiveData<Resource<Map<Int,VoiceMicInfoModel>>> = SingleSourceLiveData()
@@ -102,12 +100,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**取消锁麦*/
     fun cancelLockMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _cancelLockMicObservable
-
-    /**邀请上麦*/
-    fun invitationMicObservable(): LiveData<Resource<Boolean>> = _invitationMicObservable
-
-    /**同意上麦申请*/
-    fun acceptMicSeatApplyObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatApplyObservable
 
     /**申请上麦*/
     fun startMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _startMicSeatApplyObservable
@@ -238,11 +230,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _kickMicObservable.setSource(mRepository.kickOff(micIndex))
     }
 
-    //  邀请上麦
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?) {
-        _invitationMicObservable.setSource(mRepository.startMicSeatInvitation(chatUid, micIndex))
-    }
-
     // 接受邀请
     fun acceptMicSeatInvitation() {
         _acceptMicSeatInvitationObservable.setSource(mRepository.acceptMicSeatInvitation())
@@ -271,11 +258,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     //取消上麦
     fun cancelMicSeatApply(chatUid: String) {
         _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatUid))
-    }
-
-    // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String) {
-        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(chatUid))
     }
 
     // 换麦

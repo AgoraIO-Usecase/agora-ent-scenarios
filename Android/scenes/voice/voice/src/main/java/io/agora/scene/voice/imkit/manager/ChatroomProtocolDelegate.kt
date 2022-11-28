@@ -90,29 +90,32 @@ class ChatroomProtocolDelegate constructor(
                         if (key.startsWith("mic_")){
                             micMap[key] = value
                         }else if (key=="ranking_list"){
-                            val rankList = GsonTools.toList<VoiceRankUserModel>(value)
-                            if (rankList != null){
-                                voiceRoomInfo.roomInfo?.rankingList = rankList
-                                rankList.forEach { rank ->
+                            val rankList = GsonTools.toList(value, VoiceRankUserModel::class.java)
+                            rankList?.let { rankUsers ->
+                                voiceRoomInfo.roomInfo?.rankingList = rankUsers
+                                rankUsers.forEach { rank ->
                                     ChatroomCacheManager.cacheManager.setRankList(rank)
                                 }
                             }
-                        }else if (key=="member_list"){
-                            val memberList = GsonTools.toList<VoiceMemberModel>(value) as MutableList<VoiceMemberModel>
-                            addMemberListBySelf(memberList,object : ValueCallBack<MutableList<VoiceMemberModel>>{
-                                override fun onSuccess(value: MutableList<VoiceMemberModel>) {
-                                    voiceRoomInfo.roomInfo?.memberList = value
-                                    value.forEach { member ->
-                                        ChatroomCacheManager.cacheManager.setMemberList(member)
+                        } else if (key == "member_list") {
+                            val memberList = GsonTools.toList(value, VoiceMemberModel::class.java)
+                            memberList?.let { members ->
+                                addMemberListBySelf(members, object : ValueCallBack<List<VoiceMemberModel>> {
+                                        override fun onSuccess(value: List<VoiceMemberModel>) {
+                                            voiceRoomInfo.roomInfo?.memberList = value
+                                            value.forEach { member ->
+                                                ChatroomCacheManager.cacheManager.setMemberList(member)
+                                            }
+                                        }
+
+                                    override fun onError(code: Int, error: String?) {
+                                        voiceRoomInfo.roomInfo?.memberList = memberList
+                                        memberList.forEach { member ->
+                                            ChatroomCacheManager.cacheManager.setMemberList(member)
+                                        }
                                     }
-                                }
-                                override fun onError(code: Int, error: String?) {
-                                    voiceRoomInfo.roomInfo?.memberList = memberList
-                                    memberList.forEach { member ->
-                                        ChatroomCacheManager.cacheManager.setMemberList(member)
-                                    }
-                                }
-                            })
+                                })
+                            }
                         }else if (key=="gift_amount"){
                             voiceRoomInfo.roomInfo?.giftAmount = value.toInt()
                         }else if (key=="robot_volume"){
@@ -178,10 +181,9 @@ class ChatroomProtocolDelegate constructor(
         var localMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
         if (localMap != null) {
             for (entry in localMap.entries) {
-                var bean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
-                if (bean != null) {
-                    micInfoMap[entry.key] = bean
-                }
+               GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)?.let {
+                   micInfoMap[entry.key] = it
+               }
             }
         }
         return micInfoMap
@@ -638,7 +640,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 从服务端获取榜单
      */
-    fun fetchGiftContribute(callback: ValueCallBack<MutableList<VoiceRankUserModel>>){
+    fun fetchGiftContribute(callback: ValueCallBack<List<VoiceRankUserModel>>){
         val rankingList = ChatroomCacheManager.cacheManager.getRankList()
         if (rankingList.isEmpty()){
             val keyList: MutableList<String> = java.util.ArrayList()
@@ -648,11 +650,11 @@ class ChatroomProtocolDelegate constructor(
                 override fun onSuccess(value: MutableMap<String, String>) {
                     ThreadManager.getInstance().runOnMainThread{
                         value["ranking_list"]?.let {
-                            val rankList = GsonTools.toList<VoiceRankUserModel>(it)
+                            val rankList = GsonTools.toList(it, VoiceRankUserModel::class.java)
                             rankList?.forEach { bean ->
                                 ChatroomCacheManager.cacheManager.setRankList(bean)
                             }
-                            callback.onSuccess(rankList as MutableList<VoiceRankUserModel>?)
+                            callback.onSuccess(rankList)
                         }
                         "getRankList onSuccess: $value".logE(TAG)
                     }
@@ -673,15 +675,14 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 从服务端获取成员列表
      */
-    fun getMemberFromServer(callback: ValueCallBack<MutableList<VoiceMemberModel>>){
+    fun getMemberFromServer(callback: ValueCallBack<List<VoiceMemberModel>>){
         ChatroomCacheManager.cacheManager.getMemberList()
         val keyList: MutableList<String> = mutableListOf("member_list")
         roomManager.asyncFetchChatroomAttributesFromServer(roomId,keyList,object :
             ValueCallBack<MutableMap<String, String>>{
             override fun onSuccess(value: MutableMap<String, String>) {
-                val memberList = GsonTools.toList<VoiceMemberModel>(value["member_list"])
-                if (memberList != null){
-                    callback.onSuccess(memberList as MutableList<VoiceMemberModel>?)
+                GsonTools.toList(value["member_list"], VoiceMemberModel::class.java)?.let { memberList ->
+                    callback.onSuccess(memberList)
                 }
             }
 
@@ -711,13 +712,14 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 向成员列表中添加自己(每个新加入房间的人需要调用一次)
      */
-    fun addMemberListBySelf(memberList:MutableList<VoiceMemberModel>,callback: ValueCallBack<MutableList<VoiceMemberModel>>){
-        memberList.add(getMySelfModel())
+    fun addMemberListBySelf(memberList:List<VoiceMemberModel>,callback: ValueCallBack<List<VoiceMemberModel>>){
+        val newMemberList = memberList.toMutableList()
+        newMemberList.add(getMySelfModel())
         val member = GsonTools.beanToString(memberList)
         roomManager.asyncSetChatroomAttributeForced(roomId,
             "member_list",member,true,object : CallBack{
             override fun onSuccess() {
-                callback.onSuccess(memberList)
+                callback.onSuccess(newMemberList)
                 "addMemberListBySelf onSuccess: ".logE(TAG)
             }
 

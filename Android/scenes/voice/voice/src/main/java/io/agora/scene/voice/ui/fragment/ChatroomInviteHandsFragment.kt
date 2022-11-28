@@ -11,14 +11,13 @@ import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import android.widget.LinearLayout
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.buddy.tool.ThreadManager
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.buddy.tool.LogTools.logD
+import io.agora.voice.buddy.tool.ToastTools
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -27,12 +26,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     private lateinit var userListViewModel: VoiceUserListViewModel
     private val dataList: MutableList<VoiceMemberModel> = ArrayList()
     private var adapter: ChatroomInviteAdapter? = null
-    private val pageSize = 10
-    private var listener: itemCountListener? = null
+    private var onFragmentListener: ChatroomHandsDialog.OnFragmentListener? = null
     private var roomId: String? = null
     private val map: MutableMap<String, Boolean> = HashMap()
     private var isRefreshing = false
-    private var isLoadingNextPage = false
     private var emptyView: View? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_no_data_layout, container, false)
@@ -73,8 +70,8 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     private fun initViewModel() {
-        userListViewModel = ViewModelProvider(this).get(VoiceUserListViewModel::class.java)
-        userListViewModel.getInviteObservable().observe(requireActivity()){ response: Resource<List<VoiceMemberModel>> ->
+        userListViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
+        userListViewModel.inviteListObservable().observe(requireActivity()){ response: Resource<List<VoiceMemberModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
                     var total = 0
@@ -86,7 +83,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     } else {
                         adapter?.addData(dataList)
                     }
-                    listener?.getItemCount(total)
+                    onFragmentListener?.getItemCount(total)
                     finishRefresh()
                     isRefreshing = false
                     adapter?.data?.let {
@@ -99,47 +96,24 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                 }
             })
         }
-
-        userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()){
-            // TODO:
+        // 邀请上麦
+        userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    "invitation mic：$data".logD()
+                    if (data != true) return
+                    activity?.let {
+                        ToastTools.show(it, getString(R.string.voice_room_invited))
+                    }
+                }
+            })
         }
+
     }
 
     private fun initListener() {
         adapter?.setOnActionListener(this)
         binding?.swipeLayout?.setOnRefreshListener { reset() }
-        binding?.list?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val lm = recyclerView.layoutManager as LinearLayoutManager?
-                val lastVisibleItemPosition = lm?.findLastVisibleItemPosition()
-                val totalCount = lm?.itemCount?:0
-                if (lastVisibleItemPosition == totalCount - 1 && !isLoadingNextPage && !isRefreshing) {
-                    // 在前面addLoadItem后，itemCount已经变化
-                    // 增加一层判断，确保用户是滑到了正在加载的地方，才加载更多
-                    val findLastVisibleItemPosition = lm.findLastVisibleItemPosition()
-                    if (findLastVisibleItemPosition == lm.itemCount - 1) {
-                        ThreadManager.getInstance().runOnMainThread {
-                            isLoadingNextPage = true
-//                            if (!TextUtils.isEmpty(cursor)) {
-//                                pullData()
-//                            }
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    private fun pullData() {
-        ThreadManager.getInstance().runOnMainThread {
-            userListViewModel.getInviteList()
-            isLoadingNextPage = false
-        }
     }
 
     private fun finishRefresh() {
@@ -150,20 +124,15 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
 
     fun reset() {
         isRefreshing = true
-        userListViewModel.getInviteList()
+        userListViewModel.fetchInviteList()
     }
 
     override fun onItemActionClick(view: View, position: Int, uid: String) {
-        // TODO:
         userListViewModel.startMicSeatInvitation(uid,-1)
     }
 
-    interface itemCountListener {
-        fun getItemCount(count: Int)
-    }
-
-    fun setItemCountChangeListener(listener: itemCountListener?) {
-        this.listener = listener
+    fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {
+        this.onFragmentListener = listener
     }
 
     override fun onDestroy() {
@@ -185,9 +154,5 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                 }
             }
         }
-    }
-
-    companion object {
-        private const val TAG = "ChatroomInviteHandsFragment"
     }
 }
