@@ -11,7 +11,6 @@ import io.agora.voice.buddy.IVoiceBuddy
  */
 class VoiceBuddyImp : IVoiceBuddy {
 
-    private var chatUserName: String = ""
     private var chatToken: String = ""
     private var rtcToken: String = ""
 
@@ -36,7 +35,7 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun userId(): String {
-        return UserManager.getInstance().user?.userNo ?: ""
+        return (UserManager.getInstance().user?.userNo ?: "").toString()
     }
 
     override fun userToken(): String {
@@ -61,8 +60,8 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun chatUserName(): String {
-        // 环信 chatUserName 由用户userId 生成
-        return chatUserName.ifEmpty { userId() }
+        // 环信 chatUserName 由user.id 生成 与iOS 保持统一
+        return (UserManager.getInstance().user?.id ?: "").toString()
     }
 
     override fun chatAppKey(): String {
@@ -77,10 +76,7 @@ class VoiceBuddyImp : IVoiceBuddy {
         this.rtcToken = rtcToken
     }
 
-    override fun setupChatConfig(chatUserName: String, chatToken: String) {
-        if (chatUserName.isNotEmpty()) {
-            this.chatUserName = chatUserName
-        }
+    override fun setupChatToken(chatToken: String) {
         this.chatToken = chatToken
     }
 }
