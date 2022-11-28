@@ -225,12 +225,23 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         ToastView.show(text: "seat invitation \(invitation.roomId ?? "") did reject")
     }
     
-    func onInteractionBegan(interation: ShowInteractionInfo) {
-        
+    func onInteractionBegan(interaction: ShowInteractionInfo) {
+        switch interaction.interactStatus {
+        case .pking:
+            break
+        default:
+            break
+        }
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         
+        switch interaction.interactStatus {
+        case .pking:
+            break
+        default:
+            break
+        }
     }
 }
 
