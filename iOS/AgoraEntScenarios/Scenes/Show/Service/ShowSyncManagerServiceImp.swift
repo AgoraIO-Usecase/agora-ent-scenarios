@@ -876,7 +876,9 @@ extension ShowSyncManagerServiceImp {
             .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp seat invitation success...")
-                let seatInvitationList = list.compactMap({ ShowMicSeatInvitation.yy_model(withJSON: $0.toJson()!)! })
+                let seatInvitationList = list
+                    .compactMap({ ShowMicSeatInvitation.yy_model(withJSON: $0.toJson()!)! })
+                    .filter ({ $0.userId != VLUserCenter.user.id })
                 self?.seatInvitationList = seatInvitationList
                 completion(nil, seatInvitationList)
             }, fail: { error in
