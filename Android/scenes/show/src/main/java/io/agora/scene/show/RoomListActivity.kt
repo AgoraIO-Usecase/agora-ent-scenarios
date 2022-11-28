@@ -33,7 +33,7 @@ class RoomListActivity : AppCompatActivity() {
                 holder: BindingViewHolder<ShowRoomItemBinding>,
                 position: Int
             ) {
-                updateRoomItem(holder.binding, getItem(position))
+                updateRoomItem(holder.binding, getItem(position) ?: return)
             }
         }
         mBinding.rvRooms.adapter = mRoomAdapter
