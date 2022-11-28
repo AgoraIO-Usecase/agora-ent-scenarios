@@ -8,55 +8,46 @@
 import UIKit
 
 private let TableHeaderHeight: CGFloat = 58
-private let TableRowHeight: CGFloat = 130
+private let TableRowHeight: CGFloat = 60
 private let ShowPresettingCellID = "ShowPresettingCellID"
+private let ShowPresettingHeaderViewID = "ShowPresettingHeaderViewID"
 
 class ShowPresettingVC: UIViewController {
     
-    var didSelectedIndex: ((_ index: Int)->())?
+    // 选中预设
+    var didSelectedPresetType: ((_ type: ShowPresetType, _ modeName: String)->())?
     
-    private var selectedModel: ShowPresettingModel? {
-        didSet {
-            oldValue?.isSelected = false
-            selectedModel?.isSelected = true
-        }
-    }
+    private var selectedType: ShowPresetType?
+    private var modeName: String?
     
     private var dataArray: [ShowPresettingModel] = {
-        let model1 = ShowPresettingModel(title: "预设1", desc: "倒垃圾来得及啊了解到拉进来的房间法律监督福利卡冷冻机房垃圾袋发来得及垃圾房间来得及发动机法拉三等奖爱讲道理")
-        let model2 = ShowPresettingModel(title: "预设2", desc: "倒垃圾来得及啊理解多拉点了法兰蝶阀拉杜拉拉的发放的拉链都发了法拉第发令肌肤垃圾袋拉进来的房间爱劳动快乐")
-        return [model1, model2]
+        
+        let model1 = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
+        return [model1]
     }()
     
-    private lazy var headerView: ShowSettingHeaderView = {
-        let headerView = ShowSettingHeaderView()
+    private lazy var headerView: ShowNavigationBar = {
+        let headerView = ShowNavigationBar()
         return headerView
     }()
-    
-    /*
-    private lazy var segmentControl: UISegmentedControl = {
-        let segmentCtrl = UISegmentedControl(items: ["show_advance_setting_presetting_mode_0".show_localized,"show_advance_setting_presetting_mode_1".show_localized])
-        segmentCtrl.selectedSegmentIndex = 0
-        return segmentCtrl
-    }()
-     */
 
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.backgroundColor = .white
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = TableRowHeight
-        tableView.isScrollEnabled = false
+        tableView.separatorStyle = .none
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.register(ShowPresettingCell.self, forCellReuseIdentifier: ShowPresettingCellID)
+        tableView.register(ShowPresettingHeaderView.self, forHeaderFooterViewReuseIdentifier: ShowPresettingHeaderViewID)
         tableView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
         return tableView
     }()
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        modalPresentationStyle = .overFullScreen
-        modalTransitionStyle = .crossDissolve
+        modalPresentationStyle = .fullScreen
     }
     
     required init?(coder: NSCoder) {
@@ -70,41 +61,13 @@ class ShowPresettingVC: UIViewController {
     }
     
     private func setUpUI(){
-
-        let bgView = UIView()
-        bgView.backgroundColor = .show_cover
-        view.addSubview(bgView)
-        bgView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapBlank)))
-        bgView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        view.backgroundColor = .white
         
         headerView.title = "show_advance_setting_presetting_title".show_localized
         view.addSubview(headerView)
-        headerView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalTo(320)
-            make.height.equalTo(TableHeaderHeight)
-        }
-        
-        let whiteBgView = UIView()
-        whiteBgView.backgroundColor = .white
-        view.addSubview(whiteBgView)
-        whiteBgView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalTo(headerView.snp.bottom)
-            make.height.equalTo(42)
-        }
-        
-        /*
-        view.addSubview(segmentControl)
-        segmentControl.snp.makeConstraints { make in
-            make.left.equalTo(15)
-            make.top.equalTo(headerView.snp.bottom)
-            make.right.equalTo(-15)
-            make.height.equalTo(42)
-        }
-         */
+        headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_preset_close"))
+        let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
+        headerView.rightItems = [saveButtonItem]
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -113,36 +76,53 @@ class ShowPresettingVC: UIViewController {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        headerView.setRoundingCorners([.topLeft, .topRight], radius: 20)
+    @objc private func didClickCloseButton() {
+        dismiss(animated: true)
     }
     
-    @objc private func didTapBlank() {
-        dismiss(animated: true)
+    @objc private func didClickSaveButton() {
+        guard let selectedType = selectedType,let modeName = modeName else {
+            ToastView.show(text: "请选择预设模式")
+            return
+        }
+        dismiss(animated: true) {[weak self] in
+            self?.didSelectedPresetType?(selectedType,modeName)
+        }
     }
 }
 
 
 extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return dataArray.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let model =  dataArray[section]
+        return model.optionsArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let model = dataArray[indexPath.row]
+        let model = dataArray[indexPath.section]
+        let type = model.optionsArray[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPresettingCellID, for: indexPath) as! ShowPresettingCell
         cell.selectionStyle = .none
-        cell.setTitle(model.title, desc: model.desc, selected: model.isSelected)
+        cell.setTitle(type.title, desc: type.iosInfo)
         return cell
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: ShowPresettingHeaderViewID) as! ShowPresettingHeaderView
+        let model = dataArray[section]
+        headerView.setTitle(model.title, desc: model.desc, type: model.standard)
+        return headerView
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedModel = dataArray[indexPath.row]
-        tableView.reloadData()
-        didSelectedIndex?(indexPath.row)
-//        dismiss(animated: true)
+        let model = dataArray[indexPath.section]
+        selectedType = model.optionsArray[indexPath.row]
+        modeName = model.title
     }
 }

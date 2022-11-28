@@ -26,7 +26,7 @@ class ShowMusicManager: NSObject {
             .presetSingingBeautifier,
             .presetChatBeautifierVitality,
             .presetChatBeautifierFresh,
-            .presetChatBeautifierMagnetic
+            .presetChatBeautifierMagnetic,
             ]
     }()
     
@@ -133,7 +133,19 @@ extension ShowMusicManager {
     
     // 选择音乐美声
     func setBeautyIndex(_ index: Int?) {
-        agoraKit.setVoiceBeautifierPreset(beautyPresets[index ?? 0])
+        switch index {
+        case 1: // 甜美
+            agoraKit.setVoiceConversionPreset(.sweet)
+        case 2: // 中性
+            agoraKit.setVoiceConversionPreset(.neutral)
+        case 3: // 稳重
+            agoraKit.setVoiceConversionPreset(.changerSolid)
+        case 4: //
+            agoraKit.setAudioEffectPreset(.voiceChangerEffectHulk)
+        default:
+            agoraKit.setAudioEffectPreset(.off)
+            agoraKit.setVoiceConversionPreset(.off)
+        }
     }
     
     // 选择混响
