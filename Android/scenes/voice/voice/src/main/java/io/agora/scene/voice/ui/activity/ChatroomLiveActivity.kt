@@ -50,7 +50,6 @@ import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.imkit.manager.ChatroomListener
 import io.agora.scene.voice.service.VoiceMicInfoModel
-import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
@@ -387,7 +386,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         super.finish()
     }
 
-    @AfterPermissionGranted(RC_PERMISSIONS)
     private fun requestAudioPermission() {
         val perms = arrayOf(Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(this, *perms)) {
@@ -411,7 +409,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
         "onPermissionsGranted requestCode$requestCode $perms".logE()
-        onPermissionGrant()
+        if (requestCode == RC_PERMISSIONS) {
+            onPermissionGrant()
+        }
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
