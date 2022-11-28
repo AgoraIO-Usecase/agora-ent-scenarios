@@ -119,33 +119,34 @@ class VoiceToolboxServerHttpManager {
      * - 特殊字符。
      * @param chatroomId 环信聊天室roomId
      */
-    fun createImRoom(roomName: String, roomOwner: String,chatroomId:String, callBack: VRValueCallBack<VRCreateRoomResponse>) {
+    fun createImRoom(
+        roomName: String,
+        roomOwner: String,
+        chatroomId: String,
+        callBack: VRValueCallBack<VRCreateRoomResponse>
+    ) {
         val headers = mutableMapOf<String, String>()
         headers["Content-Type"] = "application/json"
         val requestBody = JSONObject()
-
         try {
             requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
             requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
             val requestChat = JSONObject()
-            requestChat.putOpt("name", roomName)
-            requestChat.putOpt("description", "Welcome!")
-            requestChat.putOpt("owner", roomOwner)
+            if (chatroomId.isNotEmpty()) {
+                requestChat.putOpt("id", chatroomId)
+            } else {
+                requestChat.putOpt("name", roomName)
+                requestChat.putOpt("description", "Welcome!")
+                requestChat.putOpt("owner", roomOwner)
+            }
             requestBody.putOpt("chat", requestChat)
             requestBody.putOpt("src", "Android")
             requestBody.putOpt("traceId", UUID.randomUUID().toString())
             val requestUser = JSONObject()
-
-            // TODO: chatroomId
-//            if (chatroomId.isEmpty()) {
-                requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
-                requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().userId())
-                requestUser.putOpt("password", "12345678")
-//            } else {
-//                requestUser.putOpt("id", chatroomId)
-//            }
+            requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
+            requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
+            requestUser.putOpt("password", "12345678")
             requestBody.putOpt("user", requestUser)
-
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -219,8 +220,7 @@ class VoiceToolboxServerHttpManager {
                 override fun onSuccess(response: VRCreateRoomResponse?) {
                     response?.let {
                         createImRoom.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy()
-                            .setupChatConfig(response.userName, response.chatToken)
+                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(response.chatToken)
                         if (roomId.isEmpty()) roomId = response.chatId
                         if (generateToken.get() && createImRoom.get()) {
                             completion.invoke(VoiceServiceProtocol.ERR_OK, roomId)
