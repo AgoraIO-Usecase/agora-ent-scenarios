@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
-import io.agora.scene.voice.bean.SoundSelectionBean
 import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
@@ -120,6 +119,7 @@ class VoiceSyncManagerServiceImp(
         // 2、置换token,获取im 配置，创建房间需要这里的数据
         VoiceToolboxServerHttpManager.get().requestToolboxService(
             channelId = voiceRoomModel.channelId,
+            chatroomId = "",
             chatroomName = inputModel.roomName,
             chatOwner = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
             completion = { error, chatroomId ->
@@ -127,7 +127,7 @@ class VoiceSyncManagerServiceImp(
                     completion.invoke(error, voiceRoomModel)
                     return@requestToolboxService
                 }
-                owner.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
+                owner.chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
                 voiceRoomModel.owner = owner
                 voiceRoomModel.chatroomId = chatroomId
                 // 3、创建房间
