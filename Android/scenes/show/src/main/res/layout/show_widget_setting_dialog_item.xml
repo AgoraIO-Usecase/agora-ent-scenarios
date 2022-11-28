@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:drawableTop="@mipmap/show_setting_ic_camera"
+        android:drawablePadding="4dp"
+        android:gravity="center"
+        tools:text="@string/show_setting_switch_camera"
+        android:textColor="#C6C4DD"
+        android:textSize="12sp" />
+
+</FrameLayout>

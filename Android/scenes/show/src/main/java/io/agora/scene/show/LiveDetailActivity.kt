@@ -24,7 +24,7 @@ import io.agora.scene.show.service.ShowMessage
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.utils.PermissionHelp
-import io.agora.scene.show.widget.TextInputDialog
+import io.agora.scene.show.widget.*
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -56,7 +56,7 @@ class LiveDetailActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StatusBarUtil.setDarkStatusIcon(window, false)
+        StatusBarUtil.hideStatusBar(window, false)
         setContentView(mBinding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         mPermissionHelp = PermissionHelp(this)
@@ -106,7 +106,13 @@ class LiveDetailActivity : ComponentActivity() {
             showMessageInputDialog()
         }
         bottomLayout.ivSetting.setOnClickListener {
-
+            showSettingDialog()
+        }
+        bottomLayout.ivBeauty.setOnClickListener{
+            showBeautyDialog()
+        }
+        bottomLayout.ivMusic.setOnClickListener {
+            showMusicEffectDialog()
         }
     }
 
@@ -115,21 +121,18 @@ class LiveDetailActivity : ComponentActivity() {
         mMessageAdapter =
             object : BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>() {
                 override fun onBindViewHolder(
-                    holder: BindingViewHolder<ShowLiveDetailMessageItemBinding>,
-                    position: Int
+                    holder: BindingViewHolder<ShowLiveDetailMessageItemBinding>, position: Int
                 ) {
-                    val item = getItem(position)
-                    holder.binding.text.text = SpannableStringBuilder()
-                        .append(
-                            "${item.userName}: ",
-                            ForegroundColorSpan(Color.parseColor("#A6C4FF")),
-                            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-                        )
-                        .append(
-                            item.message,
-                            ForegroundColorSpan(Color.WHITE),
-                            SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
-                        )
+                    val item = getItem(position) ?: return
+                    holder.binding.text.text = SpannableStringBuilder().append(
+                        "${item.userName}: ",
+                        ForegroundColorSpan(Color.parseColor("#A6C4FF")),
+                        SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+                    ).append(
+                        item.message,
+                        ForegroundColorSpan(Color.WHITE),
+                        SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE
+                    )
                 }
             }
         (messageLayout.rvMessage.layoutManager as LinearLayoutManager).let {
@@ -139,17 +142,14 @@ class LiveDetailActivity : ComponentActivity() {
     }
 
     private fun showMessageInputDialog() {
-        TextInputDialog(this)
-            .setOnInsertHeightChangeListener {
-                mBinding.messageLayout.root.layoutParams =
-                    (mBinding.messageLayout.root.layoutParams as MarginLayoutParams).apply {
-                        bottomMargin = it
-                    }
-            }
-            .setOnSentClickListener { dialog, msg ->
-                mService.sendChatMessage(msg)
-            }
-            .show()
+        TextInputDialog(this).setOnInsertHeightChangeListener {
+            mBinding.messageLayout.root.layoutParams =
+                (mBinding.messageLayout.root.layoutParams as MarginLayoutParams).apply {
+                    bottomMargin = it
+                }
+        }.setOnSentClickListener { dialog, msg ->
+            mService.sendChatMessage(msg)
+        }.show()
     }
 
     private fun updateTopUserCount(count: Int) =
@@ -175,6 +175,52 @@ class LiveDetailActivity : ComponentActivity() {
         mMessageAdapter?.let {
             it.insertLast(msg)
             mBinding.messageLayout.rvMessage.scrollToPosition(it.itemCount - 1)
+        }
+    }
+
+    private fun showSettingDialog() {
+        SettingDialog(this).apply {
+            setHostView(isRoomOwner)
+            setItemActivated(SettingDialog.ITEM_ID_VIDEO, true)
+            setItemActivated(SettingDialog.ITEM_ID_MIC, true)
+            setOnItemActivateChangedListener{dialog, itemId, activated ->
+                when(itemId){
+                    SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
+                    SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
+                    SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.enableLocalVideo(activated)
+                    SettingDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
+                }
+            }
+            show()
+        }
+    }
+
+    private fun showPictureQualityDialog(parentDialog: SettingDialog) {
+        PictureQualityDialog(this).apply {
+            setOnQualitySelectListener { dialog, qualityIndex ->
+                when(qualityIndex){
+                    PictureQualityDialog.QUALITY_INDEX_1080P -> {}
+                    PictureQualityDialog.QUALITY_INDEX_720P -> {}
+                    PictureQualityDialog.QUALITY_INDEX_540P -> {}
+                    PictureQualityDialog.QUALITY_INDEX_360P -> {}
+                }
+            }
+
+            setOnShowListener { parentDialog.dismiss() }
+            setOnDismissListener { parentDialog.show() }
+            show()
+        }
+    }
+
+    private fun showBeautyDialog(){
+        BeautyDialog(this).apply {
+            show()
+        }
+    }
+
+    private fun showMusicEffectDialog(){
+        MusicEffectDialog(this).apply {
+            show()
         }
     }
 
