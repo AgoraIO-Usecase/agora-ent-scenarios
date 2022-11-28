@@ -16,6 +16,7 @@ class ShowVideoSettingVC: UIViewController {
     
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowSettingManager!
+    var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -59,28 +60,25 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         var cell: UITableViewCell!
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            cell.setTitle(data.title, isOn: data.boolValue) { isOn in
-                data.writeValue(isOn)
-                self.settingManager.updateSettingForkey(data)
-            } detailButtonAction: {
-                
+            cell.setTitle(data.title, isOn: data.boolValue) {[weak self] isOn in
+                self?.changeValue(isOn, forSettingKey: data)
+            } detailButtonAction: {[weak self] in
+                self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
             return cell
         }else if data.type == .segment {
             let cell = tableView.dequeueReusableCell(withIdentifier: SegmentCellID, for: indexPath) as! ShowSettingSegmentCell
             
-            cell.setTitle(data.title, items: data.items, defaultSelectIndex: data.intValue) { index in
-                data.writeValue(index)
-                self.settingManager.updateSettingForkey(data)
+            cell.setTitle(data.title, items: data.items, defaultSelectIndex: data.intValue) {[weak self] index in
+                self?.changeValue(index, forSettingKey: data)
             }
             return cell
         }else if data.type == .slider {
             let cell = tableView.dequeueReusableCell(withIdentifier: SliderCellID, for: indexPath) as! ShowSettingSliderCell
-            cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) { value in
+            cell.setTitle(data.title, value: data.floatValue, minValue: data.sliderValueScope.0, maxValue: data.sliderValueScope.1) {value in
                 
-            } sliderValueChangedAction: { value in
-                data.writeValue(value)
-                self.settingManager.updateSettingForkey(data)
+            } sliderValueChangedAction: {[weak self] value in
+                self?.changeValue(value, forSettingKey: data)
             }
 
             return cell
@@ -105,5 +103,15 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             cell = UITableViewCell()
         }
         return cell
+    }
+}
+
+extension ShowVideoSettingVC {
+    func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
+        if let willChange = willChangeSettingParams, willChange(key,value) == true {
+            key.writeValue(value)
+            settingManager.updateSettingForkey(key)
+        }
+        tableView.reloadData()
     }
 }
