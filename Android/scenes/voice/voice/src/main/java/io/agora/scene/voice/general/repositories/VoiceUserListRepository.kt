@@ -2,6 +2,7 @@ package io.agora.scene.voice.general.repositories
 
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.service.VoiceMicInfoModel
 import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.baseui.general.callback.ResultCallBack
@@ -15,12 +16,12 @@ class VoiceUserListRepository : BaseRepository() {
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
     // 踢用户下麦
-    fun kickOff(micIndex: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+    fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(Pair(micIndex, result)))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -47,12 +48,12 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
+        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-//                        callBack.onSuccess(createLiveData(result))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -65,10 +66,16 @@ class VoiceUserListRepository : BaseRepository() {
     /**
      * 举手列表
      */
-    fun getRaisedList(): LiveData<Resource<List<VoiceMemberModel>>> {
+    fun fetchApplicantsList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                // TODO:
+                voiceServiceProtocol.fetchApplicantsList(completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
             }
         }
         return resource.asLiveData()
@@ -77,10 +84,16 @@ class VoiceUserListRepository : BaseRepository() {
     /**
      * 邀请列表
      */
-    fun getInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
+    fun fetchInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                // TODO:
+                voiceServiceProtocol.fetchRoomMembers(completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
             }
         }
         return resource.asLiveData()
@@ -117,5 +130,4 @@ class VoiceUserListRepository : BaseRepository() {
         }
         return resource.asLiveData()
     }
-
 }

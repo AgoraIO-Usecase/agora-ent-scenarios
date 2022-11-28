@@ -1,6 +1,8 @@
 package io.agora.scene.voice.ui.activity
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -31,8 +33,6 @@ import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
 import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.config.RouterParams
-import io.agora.voice.buddy.config.RouterPath
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
@@ -53,12 +53,19 @@ import io.agora.scene.voice.service.VoiceMicInfoModel
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
-@Route(path = RouterPath.ChatroomPath)
 class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
     EasyPermissions.RationaleCallbacks, ChatroomListener{
 
     companion object {
         const val RC_PERMISSIONS = 101
+        const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
+
+        fun startActivity(activity: Activity,voiceRoomModel: VoiceRoomModel){
+            val intent = Intent(activity, ChatroomLiveActivity::class.java).apply {
+                putExtra(KEY_VOICE_ROOM_MODEL, voiceRoomModel)
+            }
+            activity.startActivity(intent)
+        }
     }
 
     /**room viewModel*/
@@ -72,7 +79,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     /** voice room info */
     private val voiceRoomModel: VoiceRoomModel by lazy {
-        intent.getSerializableExtra(RouterParams.KEY_VOICE_ROOM_MODEL) as VoiceRoomModel
+        intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as VoiceRoomModel
     }
 
     /**房间基础*/
@@ -149,11 +156,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             }
                         }
                     )
-                }
-
-                override fun onHideLoading() {
-                    super.onHideLoading()
-                    dismissLoading()
                 }
 
                 override fun onError(code: Int, message: String?) {
