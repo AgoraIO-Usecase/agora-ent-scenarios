@@ -143,6 +143,13 @@ class ShowPKInviteView: UIView {
         UIView.animate(withDuration: 0.25) {
             self.layoutIfNeeded()
         }
+        
+        guard let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first else {
+            return
+        }
+        
+        AppContext.showServiceImp.stopInteraction(interaction: pkInfo) { error in
+        }
     }
     
 }
