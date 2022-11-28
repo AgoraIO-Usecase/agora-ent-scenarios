@@ -76,6 +76,7 @@ class ChatroomProtocolDelegate constructor(
         for (i in 0..7) {
             keyList.add("mic_$i")
         }
+        this.ownerBean = voiceRoomModel.owner ?: VoiceMemberModel()
         val voiceRoomInfo = VoiceRoomInfo()
         voiceRoomInfo.roomInfo = voiceRoomModel
         roomManager.asyncFetchChatroomAttributesFromServer(roomId, keyList,
