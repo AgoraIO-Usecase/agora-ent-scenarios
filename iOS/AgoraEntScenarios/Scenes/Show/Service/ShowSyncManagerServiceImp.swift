@@ -357,7 +357,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     if status == .deleted {
                         self._recvPKRejected(invitation: model)
                     } else {
-                        switch invitation.status {
+                        model.status = invitation.status
+                        switch model.status {
                         case .rejected:
                             self._recvPKRejected(invitation: model)
                         case .accepted:
@@ -406,6 +407,14 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         invitation.status = .accepted
         _updatePKInvitation(invitation: invitation, completion: completion)
+        
+        let interaction = ShowInteractionInfo()
+        interaction.userId = invitation.userId
+        interaction.roomId = invitation.roomId
+        interaction.interactStatus = .pking
+        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+        _addInteraction(interaction: interaction) { error in
+        }
     }
     
     func rejectPKInvitation(completion: @escaping (Error?) -> Void) {
@@ -1135,26 +1144,26 @@ extension ShowSyncManagerServiceImp {
     
     private func _subscribePKInvitationChanged(channelName:String,
                                                subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
-        agoraPrint("imp pk invitation subscribe ...")
+        agoraPrint("imp pk invitation \(channelName) subscribe ...")
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION,
                        onCreated: { object in
-                agoraPrint("imp pk invitation subscribe onUpdated...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onUpdated...")
                 guard let jsonStr = object.toJson(),
                       let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
                     return
                 }
                 subscribeClosure(.created, model)
             }, onUpdated: { object in
-                agoraPrint("imp pk invitation subscribe onUpdated...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onUpdated...")
                 guard let jsonStr = object.toJson(),
                       let model = ShowPKInvitation.yy_model(withJSON: jsonStr) else {
                     return
                 }
                 subscribeClosure(.updated, model)
             }, onDeleted: {[weak self] object in
-                agoraPrint("imp pk invitation subscribe onDeleted...")
+                agoraPrint("imp pk invitation \(channelName) subscribe onDeleted...")
                 guard let self = self else {return}
                 guard channelName == self.getRoomId() else {
                     if let model = ShowPKInvitation.yy_model(withJSON: object.toJson() ?? "") {
