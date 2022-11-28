@@ -367,10 +367,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             }
             
             self.pkCreatedInvitation = invitation
-            if invitation.status == .waitting {
-                agoraPrint("pk invitaion already send ")
-                return
-            }
+//            if invitation.status == .waitting {
+//                agoraPrint("pk invitaion already send ")
+//                return
+//            }
             
             invitation.status = .waitting
             invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)

@@ -8,14 +8,14 @@
 import Foundation
 
 
-enum ShowRoomStatus: Int {
+@objc enum ShowRoomStatus: Int {
     /// 直播中
     case activity = 0
     /// 直播结束
     case end = 1
 }
 
-enum ShowRoomRequestStatus: Int {
+@objc enum ShowRoomRequestStatus: Int {
     case idle = 0
     /// 等待中
     case waitting = 1
@@ -27,7 +27,7 @@ enum ShowRoomRequestStatus: Int {
     case ended = 4
 }
 
-enum ShowInteractionStatus: Int {
+@objc enum ShowInteractionStatus: Int {
     /// 空闲
     case idle = 0
     /// 连麦中
