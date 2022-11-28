@@ -74,14 +74,14 @@ class ShowApplyView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func getAllMicSeatList() {
+    func getAllMicSeatList(autoApply:Bool) {
         AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
             guard let list = list else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
-            if seatUserModel == nil {
+            if seatUserModel == nil, autoApply {
                 AppContext.showServiceImp.createMicSeatApply { _ in
                     DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                        self.getAllMicSeatList()
+                        self.getAllMicSeatList(autoApply: autoApply)
                     }
                 }
             }
