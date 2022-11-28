@@ -325,6 +325,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         _refreshInteractionList()
         switch interaction.interactStatus {
         case .pking:
+//            let ret = agoraKitManager.joinChannel(channelName: interaction.roomId ?? "",
+//                                                  uid: UInt(room?.ownerId ?? "0")!,
+//                                                  ownerId: interaction.userId ?? "",
+//                                                canvasView: liveView.canvasView.remoteView)
+//            
+//            liveView.canvasView.canvasType = .pk
+//            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             break
         default:
             break
