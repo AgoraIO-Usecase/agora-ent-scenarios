@@ -150,9 +150,9 @@ class NetworkManager {
             "nickname": nickName,
         ]
         
-        if let imUid = imUid {
-            userParams.updateValue(imUid, forKey: "id")
-        }
+//        if let imUid = imUid {
+//            userParams.updateValue(imUid, forKey: "id")
+//        }
         
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
@@ -168,6 +168,7 @@ class NetworkManager {
             let uid = data?["userName"]
             let chatId = data?["chatId"]
             let token = data?["token"]
+            //let token = data?["chatToken"]
             print(response)
             success(uid, chatId, token)
             ToastView.hidden()
