@@ -266,8 +266,6 @@ class AgoraRtcEngineController {
      * 本地mute/unmute
      */
     fun enableLocalAudio(mute: Boolean) {
-        if (VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute == mute) return
-        VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute = mute
         rtcEngine?.enableLocalAudio(mute)
     }
 
