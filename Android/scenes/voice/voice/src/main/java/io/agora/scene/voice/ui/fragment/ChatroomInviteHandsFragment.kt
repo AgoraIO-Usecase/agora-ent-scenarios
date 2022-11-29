@@ -82,11 +82,11 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
         userListViewModel.inviteListObservable().observe(requireActivity()){ response: Resource<List<VoiceMemberModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
-                    var total = 0
+                    finishRefresh()
                     if (data == null) return
+                    val total = data.size
                     adapter?.data = data
                     onFragmentListener?.getItemCount(total)
-                    finishRefresh()
                     isRefreshing = false
                     adapter?.data?.let {
                         for (datum in it) {
@@ -131,7 +131,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
 
     override fun onItemActionClick(view: View, position: Int, uid: String) {
         map[uid] = true
-        adapter!!.setInvited(map)
+        adapter?.setInvited(map)
         userListViewModel.startMicSeatInvitation(uid,-1)
     }
 

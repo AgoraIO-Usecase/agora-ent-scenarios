@@ -696,4 +696,12 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.updateRankList(giftModel,callBack);
     }
 
+    /**
+     * 更新本地kv缓存
+     * @param kvMap
+     */
+    public void updateMicInfoCache(Map<String,String> kvMap){
+        delegate.updateMicInfoCache(kvMap);
+    }
+
 }
