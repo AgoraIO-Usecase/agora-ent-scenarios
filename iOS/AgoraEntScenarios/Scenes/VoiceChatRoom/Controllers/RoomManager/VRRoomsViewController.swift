@@ -156,9 +156,9 @@ extension VRRoomsViewController {
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
         ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
+            SVProgressHUD.dismiss()
             if error == nil, room_entity != nil {
                 VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
-                    SVProgressHUD.dismiss()
                     if error == nil {
                         self.mapUser(user: VLUserCenter.user)
                         let info: VRRoomInfo = VRRoomInfo()
@@ -174,18 +174,6 @@ extension VRRoomsViewController {
                 self.view.makeToast("Loading failed,please retry or install again!")
             }
         }
-        
-//        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
-//            SVProgressHUD.dismiss()
-//            if error == nil {
-//                let info = VRRoomInfo()
-//                info.room = room
-//                let vc = VoiceRoomViewController(info: info)
-//                self.navigationController?.pushViewController(vc, animated: true)
-//            } else {
-//                self.view.makeToast("Loading failed,please retry or install again!")
-//            }
-//        })
     }
 
     private func childViewControllersEvent() {
