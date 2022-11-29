@@ -226,7 +226,17 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void) {
         if self.userList?.count ?? 0 > 0 {
-            completion(nil,self.userList)
+            var mics_id = ""
+            for mic in self.mics {
+                if mic.member != nil {
+                    mics_id += mic.member?.channel_id ?? ""
+                }
+            }
+            let list = self.userList?.filter({
+                !mics_id.z.isMatchRegular(expression: $0.chat_uid ?? "")
+            })
+            completion(nil,list)
+
         } else {
             VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["member_list"], completion: { error, map in
                 if let member_list = map?["member_list"]?.toArray() {
