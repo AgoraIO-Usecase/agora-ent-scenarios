@@ -105,7 +105,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if attributeMap!.keys.contains(where: { text in
             text.hasPrefix("mic_")
         }) {
-            updateMic(attributeMap, fromId: fromId)
+            Throttler.throttle(delay: .seconds(1)) {
+                self.updateMic(attributeMap, fromId: fromId)
+            }
         }
         
         if attributeMap!.keys.contains(where: { text in
