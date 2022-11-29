@@ -1,32 +1,34 @@
 package io.agora.scene.voice.ui.fragment
 
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.scene.voice.ui.adapter.ChatroomRaisedAdapter
-import io.agora.scene.voice.model.VoiceUserListViewModel
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import io.agora.scene.voice.R
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import android.widget.LinearLayout
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.buddy.tool.ThreadManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
+import io.agora.scene.voice.model.VoiceUserListViewModel
 import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.ui.adapter.ChatroomRaisedAdapter
+import io.agora.voice.baseui.BaseUiFragment
+import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter
+import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.LogTools.logD
-import java.util.HashMap
+import io.agora.voice.buddy.tool.ThreadManager
 
 class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener {
     private lateinit var userListViewModel: VoiceUserListViewModel
-    private var adapter: ChatroomRaisedAdapter? = null
+    private var baseAdapter: RoomBaseRecyclerViewAdapter<VoiceMemberModel>? = null
+    private var adapter:ChatroomRaisedAdapter? = null
     private var onFragmentListener: ChatroomHandsDialog.OnFragmentListener? = null
     private var roomId: String? = null
     private val map: MutableMap<String, Boolean> = HashMap()
@@ -58,7 +60,14 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     private fun initView() {
-        adapter = ChatroomRaisedAdapter()
+        baseAdapter = ChatroomRaisedAdapter()
+        adapter = baseAdapter as ChatroomRaisedAdapter
+        binding.let {
+            it?.list?.layoutManager = LinearLayoutManager(
+                activity
+            )
+            it?.list?.adapter = adapter
+        }
         if (emptyView == null) {
             adapter?.setEmptyView(R.layout.voice_no_data_layout)
         } else {
@@ -79,7 +88,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     override fun onSuccess(data: List<VoiceMemberModel>?) {
                         if (data == null) return
                         val total = data.size
-                        adapter?.addData(data)
+                        adapter?.data = data
                         onFragmentListener?.getItemCount(total)
                         finishRefresh()
                         isRefreshing = false
@@ -108,7 +117,12 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                     override fun onSuccess(data: VoiceMicInfoModel?) {
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
-                        onFragmentListener?.onAcceptMicSeatApply(it)
+                            it.member?.chatUid?.let { chatUid ->
+                                ChatroomCacheManager.cacheManager.removeSubmitMember(
+                                    chatUid
+                                )
+                            }
+                            onFragmentListener?.onAcceptMicSeatApply(it)
                         }
                     }
                 })
@@ -156,6 +170,8 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     override fun onItemActionClick(view: View, index: Int, uid: String) {
+        adapter!!.setAccepted(uid, true)
+        map[uid] = true
         userListViewModel.acceptMicSeatApply(uid)
     }
 

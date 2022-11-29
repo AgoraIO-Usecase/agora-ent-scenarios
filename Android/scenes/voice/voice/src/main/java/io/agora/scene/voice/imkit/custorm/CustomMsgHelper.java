@@ -21,6 +21,7 @@ import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.service.VoiceGiftModel;
 import io.agora.scene.voice.service.VoiceMemberModel;
+import io.agora.scene.voice.service.VoiceRoomApply;
 import io.agora.util.EMLog;
 import io.agora.voice.buddy.tool.GsonTools;
 
@@ -121,9 +122,9 @@ public class CustomMsgHelper implements MessageListener {
                 case CHATROOM_APPLY_SITE:
                     Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if (map.containsKey("user")){
-                        VoiceMemberModel memberModel = GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
-                        if (memberModel != null){
-                            ChatroomCacheManager.Companion.getCacheManager().setSubmitMicList(memberModel);
+                        VoiceRoomApply voiceRoomApply = GsonTools.toBean(map.get("user"), VoiceRoomApply.class);
+                        if (voiceRoomApply != null && voiceRoomApply.getMember() != null){
+                            ChatroomCacheManager.Companion.getCacheManager().setSubmitMicList(voiceRoomApply.getMember());
                         }
                     }
                     if(listener != null) {
