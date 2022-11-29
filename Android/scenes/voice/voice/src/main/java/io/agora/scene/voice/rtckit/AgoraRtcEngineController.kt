@@ -265,8 +265,8 @@ class AgoraRtcEngineController {
     /**
      * 本地mute/unmute
      */
-    fun enableLocalAudio(mute: Boolean) {
-        rtcEngine?.enableLocalAudio(mute)
+    fun enableLocalAudio(enable: Boolean) {
+        rtcEngine?.enableLocalAudio(enable)
     }
 
     fun destroy() {
