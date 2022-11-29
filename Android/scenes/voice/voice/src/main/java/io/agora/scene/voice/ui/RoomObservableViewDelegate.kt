@@ -71,9 +71,11 @@ class RoomObservableViewDelegate constructor(
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
 
+    private var isLocalAudioMute: Boolean = true
+
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
 
-    fun isOnMic(): Boolean {
+    private fun isOnMic(): Boolean {
         return mySelfIndex() >= 0
     }
 
@@ -81,7 +83,7 @@ class RoomObservableViewDelegate constructor(
         return myselfMicInfo?.micIndex ?: -1
     }
 
-    fun mySelfMicStatus(): Int {
+    private fun mySelfMicStatus(): Int {
         return myselfMicInfo?.micStatus ?: MicStatus.Unknown
     }
 
@@ -159,11 +161,10 @@ class RoomObservableViewDelegate constructor(
             }
 
             override fun onUserVolume(rtcUid: Int, volume: Int) {
-//                "onAudioVolumeIndication uid:${rtcUid},volume:${volume}".logD("onUserVolume")
                 if (rtcUid == 0) {
                     // 自己,没有关麦
                     val myselfIndex = mySelfIndex()
-                    if (myselfIndex >= 0 && !VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute) {
+                    if (myselfIndex >= 0 && !isLocalAudioMute) {
                         iRoomMicView.updateVolume(myselfIndex, volume)
                     }
                 } else {
@@ -203,7 +204,9 @@ class RoomObservableViewDelegate constructor(
                     "mute mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -215,7 +218,9 @@ class RoomObservableViewDelegate constructor(
                     "cancel mute mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_unmuted))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -227,7 +232,9 @@ class RoomObservableViewDelegate constructor(
                     "leave mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_off_stage))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -239,7 +246,9 @@ class RoomObservableViewDelegate constructor(
                     "kick mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_kicked_off))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -251,7 +260,9 @@ class RoomObservableViewDelegate constructor(
                     "force mute mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -263,7 +274,9 @@ class RoomObservableViewDelegate constructor(
                     "cancel force mute mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_unmuted))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -275,7 +288,9 @@ class RoomObservableViewDelegate constructor(
                     "lock mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_blocked))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -287,7 +302,9 @@ class RoomObservableViewDelegate constructor(
                     "cancel lock mic：${data?.micIndex}".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_unblocked))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        val newMicMap = mutableMapOf(it.micIndex to it)
+                        dealMicDataMap(newMicMap)
+                        updateViewByMicMap(newMicMap)
                     }
                 }
             })
@@ -306,7 +323,10 @@ class RoomObservableViewDelegate constructor(
                 parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                     override fun onSuccess(data: VoiceMicInfoModel?) {
                         data?.let {
-                            iRoomMicView.onSeatUpdated(it)
+                            // 更新麦位
+                            val newMicMap = mutableMapOf(it.micIndex to it)
+                            dealMicDataMap(newMicMap)
+                            updateViewByMicMap(newMicMap)
                         }
                     }
                 })
@@ -317,7 +337,9 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Map<Int, VoiceMicInfoModel>?) {
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_exchange_mic_success))
                     data?.let {
-                        iRoomMicView.onSeatUpdated(it)
+                        // 更新麦位
+                        dealMicDataMap(it)
+                        updateViewByMicMap(it)
                     }
                 }
 
@@ -336,46 +358,6 @@ class RoomObservableViewDelegate constructor(
                     }
                 }
             })
-        }
-    }
-
-    /**
-     * 麦位index,rtcUid
-     */
-    fun onUpdateMicMap(updateMap: Map<Int, VoiceMicInfoModel>) {
-        //临时变量，防止交换麦位时候被移除
-        var kvLocalUser: VoiceMicInfoModel? = null
-        updateMap.forEach { (index, micInfo) ->
-            val rtcUid = micInfo.member?.rtcUid ?: -1
-            if (rtcUid > 0) {
-                micMap[index] = rtcUid
-                // 当前用户在麦位上
-                if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                    kvLocalUser = micInfo
-                }
-            } else {
-                val removeRtcUid = micMap.remove(index)
-                // 当前用户从麦位移除
-                if (removeRtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                    myselfMicInfo = null
-                }
-            }
-        }
-        kvLocalUser?.let {
-            myselfMicInfo = it
-        }
-        AgoraRtcEngineController.get().switchRole(mySelfIndex() >= 0)
-
-        if (mySelfMicStatus() == MicStatus.Normal) {
-            // 状态正常
-            AgoraRtcEngineController.get().enableLocalAudio(false)
-        } else {
-            // 其他状态
-            AgoraRtcEngineController.get().enableLocalAudio(true)
-        }
-        // 机器人麦位
-        updateMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
-            voiceRoomModel.useRobot = it.micStatus == MicStatus.BotActivated
         }
     }
 
@@ -415,8 +397,7 @@ class RoomObservableViewDelegate constructor(
                         // 自己
                         if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                             myselfMicInfo = micInfo
-                            VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute =
-                                micInfo.micStatus != MicStatus.Normal
+                            isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
                         }
                         micMap[micIndex] = rtcUid
                     }
@@ -424,7 +405,7 @@ class RoomObservableViewDelegate constructor(
             }
             iRoomMicView.onInitMic(micInfoList, voiceRoomModel.useRobot)
         }
-        chatPrimaryMenuView.showMicVisible(VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute, isOnMic())
+        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, isOnMic())
     }
 
     /**
@@ -827,7 +808,10 @@ class RoomObservableViewDelegate constructor(
         }
         handsDialog?.setFragmentListener(object : ChatroomHandsDialog.OnFragmentListener {
             override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
-                iRoomMicView.onSeatUpdated(voiceMicInfoModel)
+                // 更新麦位
+                val newMicMap = mutableMapOf(voiceMicInfoModel.micIndex to voiceMicInfoModel)
+                dealMicDataMap(newMicMap)
+                updateViewByMicMap(newMicMap)
             }
         })
         handsDialog?.show(activity.supportFragmentManager, "room_hands")
@@ -854,6 +838,31 @@ class RoomObservableViewDelegate constructor(
 
     fun handsUpdate(index: Int) {
         handsDialog?.update(index)
+    }
+
+    // 点击下方麦克风icon
+    fun onClickBottomMic() {
+        if (mySelfMicStatus() == MicStatus.ForceMute) {
+            // 被禁言
+            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
+            return
+        }
+        if (isLocalAudioMute) {
+            chatPrimaryMenuView.setEnableMic(true)
+            muteLocalAudio(false)
+        } else {
+            chatPrimaryMenuView.setEnableMic(false)
+            muteLocalAudio(true)
+        }
+    }
+
+    // 点击下方举手icon
+    fun onClickBottomHandUp() {
+        if (roomKitBean.isOwner) {
+            showOwnerHandsDialog()
+        } else {
+            showMemberHandsDialog(-1)
+        }
     }
 
     // 更新公告
@@ -886,23 +895,66 @@ class RoomObservableViewDelegate constructor(
         } else if (attributeMap.containsKey("use_robot")) {
             // TODO:
         }
-
+        dealMicDataMap(newMicMap)
         ThreadManager.getInstance().runOnMainThread {
-            onUpdateMicMap(newMicMap)
-            iRoomMicView.onSeatUpdated(newMicMap)
-            chatPrimaryMenuView.showMicVisible(
-                VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute, isOnMic()
-            )
-            if (roomKitBean.isOwner) {
-                val handsCheckMap = mutableMapOf<String, String>()
-                micInfoMap.forEach { (t, u) ->
-                    handsCheckMap[t] = u.member?.userId ?: ""
+            updateViewByMicMap(newMicMap)
+        }
+    }
+
+    /**
+     * 处理麦位数据
+     */
+    private fun dealMicDataMap(updateMap: Map<Int, VoiceMicInfoModel>) {
+        //临时变量，防止交换麦位时候被移除
+        var kvLocalUser: VoiceMicInfoModel? = null
+        updateMap.forEach { (index, micInfo) ->
+            val rtcUid = micInfo.member?.rtcUid ?: -1
+            if (rtcUid > 0) {
+                micMap[index] = rtcUid
+                // 当前用户在麦位上
+                if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                    kvLocalUser = micInfo
                 }
-                handsDialog?.check(handsCheckMap)
             } else {
-                chatPrimaryMenuView.setEnableHand(isOnMic())
-                isRequesting = false
+                val removeRtcUid = micMap.remove(index)
+                // 当前用户从麦位移除
+                if (removeRtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                    myselfMicInfo = null
+                }
             }
+        }
+        kvLocalUser?.let {
+            myselfMicInfo = it
+        }
+        AgoraRtcEngineController.get().switchRole(mySelfIndex() >= 0)
+        if (mySelfMicStatus() == MicStatus.Normal) {   // 状态正常
+            if (!isLocalAudioMute) return
+            AgoraRtcEngineController.get().enableLocalAudio(false)
+        } else {  // 其他状态
+            if (isLocalAudioMute) return
+            AgoraRtcEngineController.get().enableLocalAudio(true)
+        }
+        // 机器人麦位
+        updateMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
+            voiceRoomModel.useRobot = it.micStatus == MicStatus.BotActivated
+        }
+    }
+
+    /**
+     * 根据麦位数据更新ui
+     */
+    private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
+        iRoomMicView.onSeatUpdated(newMicMap)
+        chatPrimaryMenuView.showMicVisible(isLocalAudioMute, isOnMic())
+        if (roomKitBean.isOwner) {
+            val handsCheckMap = mutableMapOf<Int, String>()
+            newMicMap.forEach { (t, u) ->
+                handsCheckMap[t] = u.member?.userId ?: ""
+            }
+            handsDialog?.check(handsCheckMap)
+        } else {
+            chatPrimaryMenuView.setEnableHand(isOnMic())
+            isRequesting = false
         }
     }
 }
