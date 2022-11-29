@@ -55,19 +55,27 @@ class ShowLiveViewController: UIViewController {
     //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
     
+    //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
             self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
         }
     }
     
+    //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
             self.pkInviteView.interactionList = interactionList ?? []
         }
     }
     
+    //pk invitation request map
     private var createPKInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
+    
+    //get current interaction status
+    private var interactionStatus: ShowInteractionStatus {
+        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -367,7 +375,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             
         default:
-            
             break
         }
     }
