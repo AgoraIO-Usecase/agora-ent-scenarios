@@ -160,7 +160,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             let old_mic = ChatRoomServiceImp.getSharedInstance().mics.first {
                 $0.member?.chat_uid ?? "" == fromId
             }
-            old_mic?.member = nil
+            if old_mic?.member != nil {
+                old_mic?.member = nil
+            }
             let status = mic.status
             let mic_index = mic.mic_index
             if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
