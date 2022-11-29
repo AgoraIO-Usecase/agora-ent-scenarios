@@ -187,7 +187,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     "cancel mic seat apply:$data".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_success))
-                    chatPrimaryMenuView.setShowHandStatus(false, true)
+                    chatPrimaryMenuView.setShowHandStatus(false, false)
                     isRequesting = true
                 }
             })
@@ -205,7 +205,7 @@ class RoomObservableViewDelegate constructor(
             })
         }
         // 取消本地禁麦
-        roomLivingViewModel.cancelMuteMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
+        roomLivingViewModel.unMuteMicObservable().observe(activity) { response: Resource<VoiceMicInfoModel> ->
             parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
                 override fun onSuccess(data: VoiceMicInfoModel?) {
                     "cancel mute mic：${data?.micIndex}".logD()

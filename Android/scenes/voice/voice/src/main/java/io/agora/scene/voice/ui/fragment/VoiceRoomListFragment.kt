@@ -90,20 +90,16 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         voiceRoomViewModel.checkPasswordObservable().observe(requireActivity()) { response ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(value: Boolean?) {
-                    if (value == true) {
-                        curVoiceRoomModel?.let {
-                            // 房间列表进入需要置换 token 与获取 im 配置
-                            gotoJoinRoom(it)
-                        }
-                    } else {
-                        dismissLoading()
-                        ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
+                    curVoiceRoomModel?.let {
+                        // 房间列表进入需要置换 token 与获取 im 配置
+                        gotoJoinRoom(it)
                     }
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
                     binding?.swipeLayout?.isRefreshing = false
+                    dismissLoading()
+                    ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
                 }
             })
         }
@@ -180,7 +176,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
-                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomId, password)
+                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
                     showLoading(false)
                 }
             })
