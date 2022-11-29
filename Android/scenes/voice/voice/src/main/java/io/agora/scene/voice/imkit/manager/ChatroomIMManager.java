@@ -32,6 +32,7 @@ import io.agora.scene.voice.service.VoiceRankUserModel;
 import io.agora.scene.voice.service.VoiceRoomInfo;
 import io.agora.scene.voice.service.VoiceRoomModel;
 import io.agora.util.EMLog;
+import io.agora.voice.buddy.tool.LogTools;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;
@@ -476,6 +477,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
                 0);
+        LogTools.logE("initMicInfo:" + voiceMemberModel, TAG);
         delegate.initMicInfo(roomType,voiceMemberModel,callBack);
     }
 
