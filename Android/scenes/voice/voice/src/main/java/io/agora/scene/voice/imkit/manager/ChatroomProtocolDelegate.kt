@@ -327,6 +327,7 @@ class ChatroomProtocolDelegate constructor(
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
+        "startMicSeatApply:$memberBean".logE(TAG)
         voiceRoomApply.member = memberBean
         voiceRoomApply.created_at = System.currentTimeMillis()
         if (micIndex != null) {
@@ -549,7 +550,7 @@ class ChatroomProtocolDelegate constructor(
             MicClickAction.Mute -> {
                 micInfo.micStatus = MicStatus.Mute
             }
-            // 关闭座位（房主操作）
+            // 开麦（麦位用户操作包括房主操作自己）
             MicClickAction.UnMute -> {
                 if (micInfo.member == null) {
                     micInfo.micStatus = MicStatus.Idle
@@ -564,6 +565,7 @@ class ChatroomProtocolDelegate constructor(
                 } else {
                     micInfo.micStatus = MicStatus.Lock
                 }
+                micInfo.member = null
             }
             // 打开座位（房主操作）
             MicClickAction.UnLock -> {
@@ -584,6 +586,7 @@ class ChatroomProtocolDelegate constructor(
                 } else {
                     micInfo.micStatus = MicStatus.Idle
                 }
+                micInfo.member = null
             }
             // 下麦（嘉宾操作）
             MicClickAction.OffStage -> {
@@ -592,6 +595,7 @@ class ChatroomProtocolDelegate constructor(
                 } else {
                     micInfo.micStatus = MicStatus.Idle
                 }
+                micInfo.member = null
             }
             // 接受邀请/接受申请
             MicClickAction.Accept -> {
@@ -708,7 +712,9 @@ class ChatroomProtocolDelegate constructor(
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
-            micIndex = micIndex)
+            micIndex = micIndex).also {
+                "getMySelfModel:$it".logE(TAG)
+        }
     }
 
     /**
