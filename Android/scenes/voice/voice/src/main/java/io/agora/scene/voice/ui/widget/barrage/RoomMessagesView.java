@@ -54,7 +54,7 @@ public class RoomMessagesView extends RelativeLayout{
     private static final int ITEM_DEFAULT_TYPE = 0;
     private static final int ITEM_SYSTEM_TYPE = 1;
     private String chatroomId;
-    private boolean isOwner;
+    private String ownerUid;
     private Context mContext;
     private boolean isScrollBottom;
 
@@ -78,9 +78,9 @@ public class RoomMessagesView extends RelativeLayout{
         listview = (RecyclerView) findViewById(R.id.listview);
     }
 
-    public void init(String chatroomId,boolean isOwner){
+    public void init(String chatroomId,String ownerUid){
         this.chatroomId = chatroomId;
-        this.isOwner = isOwner;
+        this.ownerUid = ownerUid;
         adapter = new ListAdapter(getContext(), ChatroomIMManager.getInstance().getMessageData(chatroomId));
         ScrollSpeedLinearLayoutManger scrollSpeedLinearLayoutManger = new ScrollSpeedLinearLayoutManger(getContext());
         //设置item滑动速度
@@ -206,12 +206,10 @@ public class RoomMessagesView extends RelativeLayout{
             from = ChatroomIMManager.getInstance().getUserName(message);
             String s = message.getContent();
             if (holder instanceof MyViewHolder){
-                if (isOwner){
-                }
                 if (TextUtils.isEmpty(from)){
                     from = message.getFrom();
                 }
-                showText(((MyViewHolder) holder).content, from, s);
+                showText(message.getFrom().equals(ownerUid),((MyViewHolder) holder).content, from, s);
             }else if (holder instanceof SystemViewHolder){
                 from = ChatroomIMManager.getInstance().getSystemUserName(message);
                 showSystemMsg(((SystemViewHolder) holder).name ,from,"");
@@ -236,7 +234,7 @@ public class RoomMessagesView extends RelativeLayout{
             name.setText(span);
         }
 
-        private void showText(TextView con, String nickName,String content) {
+        private void showText(boolean isOwner,TextView con, String nickName,String content) {
             StringBuilder builder = new StringBuilder();
             if (isOwner){
                 builder.append("O").append(nickName).append(" : ").append(content);
@@ -282,7 +280,11 @@ public class RoomMessagesView extends RelativeLayout{
 
         @Override
         public int getItemCount() {
-            return messages.size();
+            if (messages != null && messages.size()>0){
+                return messages.size();
+            }else {
+                return 0;
+            }
         }
 
         public void refresh(){

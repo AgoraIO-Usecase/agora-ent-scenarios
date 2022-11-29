@@ -5,6 +5,7 @@
     android:maxWidth="400dp"
     android:minWidth="200dp"
     android:layout_marginTop="5dp"
+    android:layout_marginStart="15dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/voice_bg_widget_gift">
 
