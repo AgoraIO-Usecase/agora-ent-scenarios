@@ -90,7 +90,6 @@ public class CustomMsgHelper implements MessageListener {
      */
     public void removeListener() {
         ChatClient.getInstance().chatManager().removeMessageListener(this);
-
     }
 
     @Override
@@ -400,7 +399,11 @@ public class CustomMsgHelper implements MessageListener {
             @Override
             public void onSuccess() {
                 if(callBack != null) {
-                    AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
+                    if (event.equals(CustomMsgType.CHATROOM_SYSTEM.getName())){
+                        AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
+                    }else {
+                        AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
+                    }
                     callBack.onSuccess(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
                 }
             }

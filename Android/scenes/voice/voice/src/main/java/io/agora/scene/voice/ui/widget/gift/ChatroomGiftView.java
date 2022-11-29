@@ -204,8 +204,12 @@ public class ChatroomGiftView extends LinearLayout {
 
         @Override
         public int getItemCount() {
-            Log.e("gift_view", "messages.size()" + messages.size());
-            return messages.size();
+            if (messages != null && messages.size()>0){
+                Log.e("gift_view", "messages.size()" + messages.size());
+                return messages.size();
+            }else {
+                return 0;
+            }
         }
 
 
