@@ -11,9 +11,6 @@ import io.agora.scene.voice.general.livedatas.SingleSourceLiveData
 import io.agora.scene.voice.general.net.VRValueCallBack
 import io.agora.scene.voice.general.repositories.NetworkOnlyResource
 import io.agora.scene.voice.general.repositories.VoiceRoomLivingRepository
-import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
-import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.*
 import io.agora.voice.baseui.general.callback.ResultCallBack
@@ -41,7 +38,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _closeBotObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _robotVolumeObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> = SingleSourceLiveData()
     private val _muteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
-    private val _cancelMuteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
+    private val _unMuteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _leaveMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _forbidMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _cancelForbidMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
@@ -78,7 +75,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun muteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _muteMicObservable
 
     /**取消本地禁麦*/
-    fun cancelMuteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _cancelMuteMicObservable
+    fun unMuteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _unMuteMicObservable
 
     /**下麦*/
     fun leaveMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _leaveMicObservable
@@ -207,7 +204,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     // 本地取消禁麦
     fun unMuteLocal(micIndex: Int) {
-        _cancelMuteMicObservable.setSource(mRepository.unMuteLocal(micIndex))
+        _unMuteMicObservable.setSource(mRepository.unMuteLocal(micIndex))
     }
 
     // 下麦
