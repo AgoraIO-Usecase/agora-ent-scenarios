@@ -107,7 +107,7 @@ class VoiceSyncManagerServiceImp(
             roomName = inputModel.roomName
             createdAt = currentMilliseconds
             roomPassword = inputModel.password
-            memberCount = 0
+            memberCount = 2
         }
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
