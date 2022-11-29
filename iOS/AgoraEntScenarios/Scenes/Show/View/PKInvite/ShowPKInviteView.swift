@@ -18,9 +18,7 @@ class ShowPKInviteView: UIView {
         didSet {
             let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
             let pkTipsVisible = pkInfo == nil ? false : true
-            pkTipsViewHeightCons?.constant = pkTipsVisible ? 40 : 0
-            pkTipsViewHeightCons?.isActive = true
-            self.layoutIfNeeded()
+            _showTipsView(show: pkTipsVisible)
             pkTipsLabel.text = "与主播\(pkInfo?.userName ?? "")PK中"
         }
     }
@@ -49,7 +47,7 @@ class ShowPKInviteView: UIView {
     }()
     private lazy var pkTipsLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .middle)
-        label.text = "与主播gdsklgjlgPK中"
+        label.text = ""
         return label
     }()
     private lazy var endButton: AGEButton = {
@@ -138,11 +136,7 @@ class ShowPKInviteView: UIView {
     
     @objc
     private func onTapEndButton(sender: AGEButton) {
-        pkTipsViewHeightCons?.constant = 0
-        pkTipsViewHeightCons?.isActive = true
-        UIView.animate(withDuration: 0.25) {
-            self.layoutIfNeeded()
-        }
+        _showTipsView(show: false)
         
         guard let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first else {
             return
@@ -152,6 +146,13 @@ class ShowPKInviteView: UIView {
         }
     }
     
+    private func _showTipsView(show: Bool) {
+        pkTipsViewHeightCons?.constant = show ? 40 : 0
+        pkTipsViewHeightCons?.isActive = true
+        UIView.animate(withDuration: 0.25) {
+            self.layoutIfNeeded()
+        }
+    }
 }
 extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
