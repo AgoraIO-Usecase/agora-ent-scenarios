@@ -118,7 +118,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }
 
-    fun initSdkJoin(roomKitBean: RoomKitBean, password: String?) {
+    fun initSdkJoin(roomKitBean: RoomKitBean) {
         joinRtcChannel.set(false)
         joinImRoom.set(false)
         AgoraRtcEngineController.get().joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().application(),
