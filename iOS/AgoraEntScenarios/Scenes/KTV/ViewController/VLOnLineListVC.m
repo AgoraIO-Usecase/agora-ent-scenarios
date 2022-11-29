@@ -16,7 +16,6 @@
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
@@ -158,6 +157,10 @@
 }
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
+    if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
+        return;
+    }
+    
     KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.userNo;
@@ -165,7 +168,7 @@
 
     VL(weakSelf);
     [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                        completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;
