@@ -707,6 +707,7 @@ extension ShowSyncManagerServiceImp {
                            self.userList.append(model)
                            self._updateUserCount { error in
                            }
+                           self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onDeleted: { object in
                            agoraPrint("imp user subscribe onDeleted...")
                            if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
@@ -714,6 +715,7 @@ extension ShowSyncManagerServiceImp {
                                self._updateUserCount { error in
                                }
                            }
+                           self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                        }, fail: { error in

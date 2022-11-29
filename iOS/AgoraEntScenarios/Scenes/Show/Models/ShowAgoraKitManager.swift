@@ -168,11 +168,13 @@ class ShowAgoraKitManager: NSObject {
             agoraKit.setupLocalVideo(canvas)
             agoraKit.startPreview()
         } else {
-            let connection = AgoraRtcConnection()
-            connection.localUid = uid
-            connection.channelId = channelName
+//            let connection = AgoraRtcConnection()
+//            connection.localUid = uid
+//            connection.channelId = channelName
+//            canvas.uid = UInt(ownerId) ?? 0
+//            agoraKit.setupRemoteVideoEx(canvas, connection: connection)
             canvas.uid = UInt(ownerId) ?? 0
-            agoraKit.setupRemoteVideoEx(canvas, connection: connection)
+            agoraKit.setupRemoteVideo(canvas)
         }
         
         let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRtcToken(), channelId: channelName, info: nil, uid: uid)

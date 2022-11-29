@@ -8,6 +8,11 @@
 import Foundation
 
 protocol ShowSubscribeServiceProtocol: NSObject {
+
+    
+    /// 房间内用户数变化
+    /// - Parameter userCount: <#userCount description#>
+    func onUserCountChanged(userCount: Int)
     
     /// 用户加入房间
     /// - Parameter user: <#user description#>
