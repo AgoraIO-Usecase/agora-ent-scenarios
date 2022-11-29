@@ -157,7 +157,10 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             let value: String = mic_info[key] ?? ""
             let mic_dic: [String: Any] = value.z.jsonToDictionary()
             let mic: VRRoomMic = model(from: mic_dic, type: VRRoomMic.self) as! VRRoomMic
-
+            let old_mic = ChatRoomServiceImp.getSharedInstance().mics.first {
+                $0.member?.chat_uid ?? "" == fromId
+            }
+            old_mic?.member = nil
             let status = mic.status
             let mic_index = mic.mic_index
             if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
