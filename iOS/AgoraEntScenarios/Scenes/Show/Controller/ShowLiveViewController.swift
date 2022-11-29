@@ -161,6 +161,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     
     //MARK: ShowSubscribeServiceProtocol
+    func onUserCountChanged(userCount: Int) {
+        self.liveView.roomUserCount = userCount
+    }
+    
     func onUserJoinedRoom(user: ShowUser) {
         
     }
