@@ -190,6 +190,7 @@ extension VoiceRoomViewController {
             DispatchQueue.main.async {
                 let joinSuccess = rtcJoinSuccess && IMJoinSuccess
                 if !joinSuccess {
+                    self?.view.makeToast("Join failed!")
                     self?.didHeaderAction(with: .back, destroyed: true)
                 } else {
                     
@@ -371,7 +372,7 @@ extension VoiceRoomViewController {
 
     func didRtcAction(with type: AgoraChatRoomBaseUserCellType, tag: Int) {
         let index: Int = tag - 200
-        let mic: VRRoomMic = ChatRoomServiceImp.getSharedInstance().mics[safe:index]!
+        guard let mic: VRRoomMic = ChatRoomServiceImp.getSharedInstance().mics[safe:index] else { return }
         if index == 6 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
@@ -724,6 +725,7 @@ extension VoiceRoomViewController {
                 self.rtcView.updateUser(mic)
                 self.local_index = mic.mic_index
                 self.rtckit.setClientRole(role: .owner)
+                self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
             }
         })
     }
