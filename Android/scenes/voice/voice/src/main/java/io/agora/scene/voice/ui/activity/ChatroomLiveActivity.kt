@@ -146,8 +146,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                     CustomMsgHelper.getInstance().sendSystemMsg(
-                        VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                        VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack() {
+                        roomKitBean.ownerChatUid, object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 "sendSystemMsg onSuccess $message".logE()
                                 binding.messageView.refreshSelectLast()
@@ -463,6 +462,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logE()
         if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
         attributeMap?.let {
+            ChatroomIMManager.getInstance().updateMicInfoCache(it)
             roomObservableDelegate.onSeatUpdated(it)
         }
     }

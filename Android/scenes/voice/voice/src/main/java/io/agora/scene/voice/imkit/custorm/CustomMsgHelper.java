@@ -20,6 +20,7 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.scene.voice.service.VoiceGiftModel;
 import io.agora.scene.voice.service.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceRoomApply;
@@ -200,17 +201,9 @@ public class CustomMsgHelper implements MessageListener {
                     AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
                     Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if (map.containsKey("user")){
-                        try {
-                            JSONObject object = new JSONObject(Objects.requireNonNull(map.get("user")));
-                            if (object.has(MsgConstant.CUSTOM_SYSTEM_NAME) && object.has(MsgConstant.CUSTOM_GIFT_PORTRAIT)){
-                                VoiceMemberModel memberModel = new VoiceMemberModel();
-                                memberModel.setNickName(object.getString(MsgConstant.CUSTOM_SYSTEM_NAME));
-                                memberModel.setChatUid(message.getFrom());
-                                memberModel.setPortrait(object.getString(MsgConstant.CUSTOM_GIFT_PORTRAIT));
-                                ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        VoiceMemberModel memberModel =  GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
+                        if (memberModel != null){
+                            ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
                         }
                     }
                     if (listener != null){
@@ -304,16 +297,19 @@ public class CustomMsgHelper implements MessageListener {
 
     /**
      * 发送系统消息（成员加入）
-     * @param username
-     * @param portrait
+     * @param ownerId
      * @param callBack
      */
-    public void sendSystemMsg(String username,String portrait, OnMsgCallBack callBack) {
+    public void sendSystemMsg(String ownerId,OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(MsgConstant.CUSTOM_SYSTEM_NAME,username);
-            jsonObject.put(MsgConstant.CUSTOM_GIFT_PORTRAIT,portrait);
+            jsonObject.put("uid", VoiceBuddyFactory.get().getVoiceBuddy().userId());
+            jsonObject.put("chat_uid",VoiceBuddyFactory.get().getVoiceBuddy().chatUserName());
+            jsonObject.put("name",VoiceBuddyFactory.get().getVoiceBuddy().nickName());
+            jsonObject.put("portrait",VoiceBuddyFactory.get().getVoiceBuddy().headUrl());
+            jsonObject.put("rtc_uid",VoiceBuddyFactory.get().getVoiceBuddy().rtcUid());
+            jsonObject.put("mic_index",TextUtils.equals(ownerId,VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())? "0" : "-1");
             params.put("user",jsonObject.toString());
             sendSystemMsg(params, callBack);
         } catch (JSONException e) {
