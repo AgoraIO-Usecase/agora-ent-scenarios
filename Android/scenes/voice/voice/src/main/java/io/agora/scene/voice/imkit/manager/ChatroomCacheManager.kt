@@ -189,7 +189,7 @@ class ChatroomCacheManager {
     /**
      * 清除成员列表
      */
-    fun clearMemberList(){
+    private fun clearMemberList(){
         roomMemberList.clear()
         roomMemberMap.clear()
     }
