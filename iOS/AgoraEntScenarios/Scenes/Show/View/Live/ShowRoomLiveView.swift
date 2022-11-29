@@ -13,11 +13,16 @@ protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate {
 }
 
 class ShowRoomLiveView: UIView {
+    var roomUserCount: Int = 1 {
+        didSet {
+            countView.count = roomUserCount
+        }
+    }
     
     var room: ShowRoomListModel? {
         didSet{
             roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
-            countView.count = room?.roomUserCount ?? 1
+            self.roomUserCount = room?.roomUserCount ?? 1
         }
     }
     

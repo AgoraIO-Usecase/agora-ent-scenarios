@@ -55,16 +55,26 @@ class ShowLiveViewController: UIViewController {
     //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
     
+    //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
             self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
         }
     }
     
+    //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
             self.pkInviteView.interactionList = interactionList ?? []
         }
+    }
+    
+    //pk invitation request map
+    private var createPKInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
+    
+    //get current interaction status
+    private var interactionStatus: ShowInteractionStatus {
+        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
     override func viewDidLoad() {
@@ -161,6 +171,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     
     //MARK: ShowSubscribeServiceProtocol
+    func onUserCountChanged(userCount: Int) {
+        self.liveView.roomUserCount = userCount
+    }
+    
     func onUserJoinedRoom(user: ShowUser) {
         
     }
@@ -271,6 +285,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         if invitation.status == .waitting {
             let vc = ShowReceivePKAlertVC()
             vc.name = invitation.fromName ?? ""
@@ -297,6 +320,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onPKInvitationAccepted(invitation: ShowPKInvitation) {
         //nothing todo, see onInteractionBegan
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshInvitationList()
         _refreshInteractionList()
@@ -304,6 +337,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = nil
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         _refreshInvitationList()
         _refreshInteractionList()
@@ -334,7 +376,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             
         default:
-            
             break
         }
     }
