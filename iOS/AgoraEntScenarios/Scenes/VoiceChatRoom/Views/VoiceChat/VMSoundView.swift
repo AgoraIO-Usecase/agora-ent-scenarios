@@ -117,7 +117,7 @@ class VMSoundView: UIView {
             if view.isKind(of: UIImageView.self) {
                 if view.tag >= 110 && view.tag <= 150 {
                     let index = view.tag % 10
-                    view.frame = CGRect(x: 30~ + 30~ * CGFloat(index), y: bounds.size.height - 65~, width: 20~, height: 20~)
+                    view.frame = CGRect(x: 30~ + 30~ * CGFloat(index), y: bounds.size.height - 65, width: 20~, height: 20)
                 }
             }
         }

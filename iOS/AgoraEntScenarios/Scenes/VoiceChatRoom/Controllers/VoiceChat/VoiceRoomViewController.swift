@@ -456,8 +456,8 @@ extension VoiceRoomViewController {
     }
 
     func showSoundView() {
-        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 240~), soundEffect: roomInfo?.room?.sound_effect ?? 0)
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 240~)), custom: soundView)
+        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 240), soundEffect: roomInfo?.room?.sound_effect ?? 0)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 240)), custom: soundView)
         presentViewController(vc)
     }
 
@@ -496,7 +496,7 @@ extension VoiceRoomViewController {
                 mic_info.status = flag == true ? 5 : -2
                 self.roomInfo?.room?.use_robot = flag
                 self.roomInfo?.mic_info![6] = mic_info
-                self.rtcView.micInfos = self.roomInfo?.mic_info
+                self.rtcView.updateAlien(mic_info.status)
             } else {
                 print("激活机器人失败")
             }
