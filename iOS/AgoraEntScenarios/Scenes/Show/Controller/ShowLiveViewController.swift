@@ -165,7 +165,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     private func _refreshInteractionList() {
         AppContext.showServiceImp.getAllInterationList { [weak self] (error, interactionList) in
-            self?.interactionList = interactionList
+            guard let self = self, error == nil else { return }
+            if self.interactionList == nil, let interaction = interactionList?.first {
+                // first load
+                self.onInteractionBegan(interaction: interaction)
+            }
+            
+            self.interactionList = interactionList
         }
     }
     
@@ -389,10 +395,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.setRemoteUserInfo(name: "")
             
         case .onSeat:
-            applyView.getAllMicSeatList(autoApply: false)
-            liveView.bottomBar.linkButton.isShowRedDot = false
-            liveView.bottomBar.linkButton.isSelected = false
+//            applyView.getAllMicSeatList(autoApply: false)
+//            liveView.bottomBar.linkButton.isShowRedDot = false
+//            liveView.bottomBar.linkButton.isSelected = false
+            print("onInterationEnded on seat")
             
+            //TODO:
+            let videoCanvas = AgoraRtcVideoCanvas()
+            videoCanvas.uid = UInt(interaction.userId ?? "") ?? 0
+            videoCanvas.view = nil
+            videoCanvas.renderMode = .hidden
+            agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+            liveView.canvasView.setRemoteUserInfo(name: "")
+            liveView.canvasView.canvasType = .none
         default:
             break
         }
