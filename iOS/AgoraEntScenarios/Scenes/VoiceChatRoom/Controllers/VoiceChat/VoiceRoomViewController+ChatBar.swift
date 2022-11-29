@@ -195,8 +195,9 @@ extension VoiceRoomViewController {
         player.tag(199)
         view.addSubview(player)
         let parser = SVGAParser()
-        parser.parse(withNamed: "rocket", in: .main) { entitiy in
-            player.videoItem = entitiy
+        guard let path = Bundle.voiceRoomBundle.path(forResource: "rocket", ofType: "svga") else { return }
+        parser.parse(with: URL(fileURLWithPath: path)) { entity in
+            player.videoItem = entity
             player.startAnimation()
         } failureBlock: { error in
             player.removeFromSuperview()
