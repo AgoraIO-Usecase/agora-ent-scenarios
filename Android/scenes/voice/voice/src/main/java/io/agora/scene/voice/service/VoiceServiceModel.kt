@@ -60,8 +60,9 @@ data class VoiceRoomModel constructor(
     @Transient var memberList: List<VoiceMemberModel>? = null,
     @Transient var giftAmount: Int = 0,
     @Transient var clickCount: Int = 0,
-    @Transient var userRobot: Boolean = false,
+    @Transient var useRobot: Boolean = false,
     @Transient var robotVolume: Int = 50,
+    @Transient var announcement: String = "",
 ) : BaseRoomBean
 
 /**

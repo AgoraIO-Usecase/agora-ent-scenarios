@@ -56,7 +56,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
         binding = VoiceViewRoom2dMicLayoutBinding.bind(root)
     }
 
-    fun setUpAdapter(isUseBot: Boolean) {
+    fun setUpInitAdapter() {
         room2DMicAdapter =
             Room2DMicAdapter(
                 RoomMicConstructor.builderDefault2dMicList(),
@@ -65,7 +65,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
             )
         room2DMicBotAdapter =
             Room2DBotMicAdapter(
-                RoomMicConstructor.builderDefault2dBotMicList(context, isUseBot),
+                RoomMicConstructor.builderDefault2dBotMicList(context, false),
                 null,
                 object : OnItemChildClickListener<BotMicInfoBean> {
 

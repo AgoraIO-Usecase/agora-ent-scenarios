@@ -13,6 +13,7 @@ data class RoomKitBean constructor(
     var channelId: String = "",
     var chatroomId: String = "",
     var ownerId: String = "",
+    var ownerChatUid: String = "",
     var roomType: Int = ConfigConstants.RoomType.Common_Chatroom,
     var isOwner: Boolean = false,
     var soundEffect: Int = ConfigConstants.SoundSelection.Social_Chat

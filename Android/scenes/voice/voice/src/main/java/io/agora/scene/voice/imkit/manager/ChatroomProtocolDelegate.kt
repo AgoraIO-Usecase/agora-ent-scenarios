@@ -120,7 +120,7 @@ class ChatroomProtocolDelegate constructor(
                         }else if (key=="robot_volume"){
                             voiceRoomInfo.roomInfo?.robotVolume = value.toInt()
                         }else if (key=="use_robot"){
-                            voiceRoomInfo.roomInfo?.userRobot = value != "0"
+                            voiceRoomInfo.roomInfo?.useRobot = value != "0"
                         }
                     }
                     ChatroomCacheManager.cacheManager.clearMicInfo()
