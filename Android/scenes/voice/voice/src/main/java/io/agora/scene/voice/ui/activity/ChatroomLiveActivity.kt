@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import io.agora.CallBack
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
@@ -132,6 +133,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
+                        cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                     }
                 }
             })
@@ -155,7 +157,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             }
                         }
                     )
-                    cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -359,11 +360,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     override fun finish() {
-        ChatClient.getInstance().chatroomManager().leaveChatRoom(roomKitBean.chatroomId)
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         ChatroomConfigManager.getInstance().removeChatRoomListener(this)
         ChatroomIMManager.getInstance().logout(false)
+        if (roomKitBean.isOwner){
+            ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(roomKitBean.chatroomId,object :
+                CallBack{
+                override fun onSuccess() {}
+
+                override fun onError(code: Int, error: String?) {}
+            })
+        }
+        ChatClient.getInstance().chatroomManager().leaveChatRoom(roomKitBean.chatroomId)
         super.finish()
     }
 
