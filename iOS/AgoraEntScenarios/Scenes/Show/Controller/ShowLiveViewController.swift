@@ -67,6 +67,8 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
+    private var createPKInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
@@ -275,6 +277,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         if invitation.status == .waitting {
             let vc = ShowReceivePKAlertVC()
             vc.name = invitation.fromName ?? ""
@@ -301,6 +312,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onPKInvitationAccepted(invitation: ShowPKInvitation) {
         //nothing todo, see onInteractionBegan
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshInvitationList()
         _refreshInteractionList()
@@ -308,6 +329,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = nil
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         _refreshInvitationList()
         _refreshInteractionList()
