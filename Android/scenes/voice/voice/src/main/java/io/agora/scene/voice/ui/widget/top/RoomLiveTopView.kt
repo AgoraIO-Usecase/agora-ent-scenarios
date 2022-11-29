@@ -55,8 +55,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.llTitle.layoutParams = layoutParams
     }
 
-    override fun onChatroomInfo(voiceRoomInfo: VoiceRoomModel) {
-        this.roomDetailInfo = voiceRoomInfo
+    override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
+        this.roomDetailInfo = voiceRoomModel
         binding.apply {
             mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
             mtChatroomName.text = roomDetailInfo.roomName

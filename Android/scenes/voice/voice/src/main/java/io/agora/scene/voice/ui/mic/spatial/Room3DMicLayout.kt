@@ -131,8 +131,8 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex6] = binding.micV3Red
     }
 
-    fun setUpMicInfoMap(isUseBot: Boolean) {
-        micInfoMap.putAll(RoomMicConstructor.builderDefault3dMicMap(context, isUseBot))
+    fun setUpInitMicInfoMap() {
+        micInfoMap.putAll(RoomMicConstructor.builderDefault3dMicMap(context, false))
         micInfoMap.entries.forEach { entry ->
             micViewMap[entry.key]?.apply {
                 binding(entry.value)

@@ -20,6 +20,7 @@ object RoomInfoConstructor {
         chatroomId = voiceRoomModel.chatroomId
         channelId = voiceRoomModel.channelId
         ownerId = voiceRoomModel.owner?.userId ?: ""
+        ownerChatUid = voiceRoomModel.owner?.chatUid?:""
         roomType = voiceRoomModel.roomType
         isOwner = curUserIsHost(voiceRoomModel.owner?.userId)
         soundEffect = voiceRoomModel.soundEffect
@@ -52,21 +53,6 @@ object RoomInfoConstructor {
             micInfoList.add(micInfo)
         }
         return micInfoList
-    }
-
-    /**
-     * im kv 属性转 micInfo
-     * key mic0 value micInfo
-     */
-    fun convertAttr2MicInfoMap(attributeMap: Map<String, String>): Map<String, VoiceMicInfoModel> {
-        val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
-        attributeMap.entries.forEach { entry ->
-            GsonTools.toBean<VoiceMicInfoModel>(entry.value, object : TypeToken<VoiceMicInfoModel>() {}.type)
-                ?.let { attrBean ->
-                    micInfoMap[entry.key] = attrBean
-                }
-        }
-        return micInfoMap
     }
 
     /**
