@@ -120,41 +120,53 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.leaveChannelEx(connection)
     }
     
-    func joinChannelEx(channelName: String?, ownerId: String?, view: UIView) {
-        let roleOptions = AgoraClientRoleOptions()
-        roleOptions.audienceLatencyLevel = .ultraLowLatency
-        agoraKit?.setClientRole(.audience, options: roleOptions)
-        let uid = UInt(ownerId ?? "0") ?? 0
+    func joinChannelEx(channelName: String?,
+                       ownerId: String?,
+                       view: UIView,
+                       role: AgoraClientRole) {
+        
         let mediaOptions = AgoraRtcChannelMediaOptions()
         mediaOptions.autoSubscribeAudio = true
         mediaOptions.autoSubscribeVideo = true
         mediaOptions.publishCameraTrack = false
-        mediaOptions.publishMicrophoneTrack = false
+        mediaOptions.publishMicrophoneTrack = role == .broadcaster
+        mediaOptions.clientRoleType = role
+    
         let connection = AgoraRtcConnection()
         connection.channelId = channelName ?? ""
         connection.localUid = UInt(VLUserCenter.user.id) ?? 0
-        agoraKit.joinChannelEx(byToken: AppContext.shared.appRtcToken(),
-                                         connection: connection,
-                                         delegate: delegate,
-                                         mediaOptions: mediaOptions,
-                                         joinSuccess: nil)
         
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = uid
-        videoCanvas.view = view
-        videoCanvas.renderMode = .hidden
-        agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
-        
+        NetworkManager.shared.generateToken(channelName: channelName ?? "", 
+                                            uid: VLUserCenter.user.id,
+                                            tokenType: .token007,
+                                            type: .rtc) { token in
+            self.agoraKit.joinChannelEx(byToken: token,
+                                        connection: connection,
+                                        delegate: self.delegate,
+                                        mediaOptions: mediaOptions,
+                                        joinSuccess: nil)
+            
+            let uid = UInt(ownerId ?? "0") ?? 0
+            let videoCanvas = AgoraRtcVideoCanvas()
+            videoCanvas.uid = uid
+            videoCanvas.view = view
+            videoCanvas.renderMode = .hidden
+            self.agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
+        }
         exConnection = connection
     }
     
     func joinChannel(channelName: String, uid: UInt, ownerId: String, canvasView: UIView) -> Int32? {
-        
         let role: AgoraClientRole = ownerId == VLUserCenter.user.id ? .broadcaster : .audience
         let roleOptions = AgoraClientRoleOptions()
         roleOptions.audienceLatencyLevel = role == .audience ? .ultraLowLatency : .lowLatency
         agoraKit?.setClientRole(role, options: roleOptions)
         agoraKit?.enableVideo()
+        
+        let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRtcToken(),
+                                        channelId: channelName,
+                                        info: nil,
+                                        uid: uid)
         
         let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
@@ -168,14 +180,9 @@ class ShowAgoraKitManager: NSObject {
             agoraKit.setupLocalVideo(canvas)
             agoraKit.startPreview()
         } else {
-            let connection = AgoraRtcConnection()
-            connection.localUid = uid
-            connection.channelId = channelName
             canvas.uid = UInt(ownerId) ?? 0
-            agoraKit.setupRemoteVideoEx(canvas, connection: connection)
+            agoraKit.setupRemoteVideo(canvas)
         }
-        
-        let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRtcToken(), channelId: channelName, info: nil, uid: uid)
         return ret
     }
 }

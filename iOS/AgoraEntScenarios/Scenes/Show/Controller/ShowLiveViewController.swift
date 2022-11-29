@@ -315,8 +315,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .pking:
             if room?.roomId != interaction.roomId {
                 agoraKitManager.joinChannelEx(channelName: interaction.roomId,
-                                            ownerId: interaction.userId,
-                                            view: liveView.canvasView.remoteView)
+                                              ownerId: interaction.userId,
+                                              view: liveView.canvasView.remoteView,
+                                              role: role)
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
@@ -366,7 +367,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
 //        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
-
+        print("errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
@@ -375,7 +376,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-    
+        print("join Uid === \(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
