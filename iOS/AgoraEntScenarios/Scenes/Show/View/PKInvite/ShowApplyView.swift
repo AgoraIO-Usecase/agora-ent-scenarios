@@ -64,6 +64,7 @@ class ShowApplyView: UIView {
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
+    private var interactionModel: ShowInteractionInfo?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -74,11 +75,19 @@ class ShowApplyView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func getAllMicSeatList(autoApply:Bool) {
+    func getAllMicSeatList(autoApply: Bool) {
+        AppContext.showServiceImp.getAllInterationList { _, list in
+            guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+            self.interactionModel = list.filter({ $0.interactStatus == .onSeat }).first
+            self.getMicSeatList(autoApply: autoApply)
+        }
+    }
+    
+    private func getMicSeatList(autoApply: Bool) {
         AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
-            guard let list = list else { return }
+            guard let list = list?.filter({ $0.userId != self.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
-            if seatUserModel == nil, autoApply {
+            if seatUserModel == nil, autoApply, self.interactionModel?.userId != VLUserCenter.user.id {
                 AppContext.showServiceImp.createMicSeatApply { _ in
                     DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
                         self.getAllMicSeatList(autoApply: autoApply)
@@ -97,6 +106,7 @@ class ShowApplyView: UIView {
         let attr = NSAttributedString(string: "\(count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         self.tipsLabel.attributedText = attrs
+        self.revokeutton.isHidden = count == 0
     }
     
     private func setupUI() {

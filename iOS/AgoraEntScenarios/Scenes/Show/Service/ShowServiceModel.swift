@@ -71,7 +71,7 @@ class ShowRoomDetailModel: ShowRoomListModel {
 class ShowUser: ShowBaseInfo {
     var userId: String?              //用户id (rtc uid)
     var avatar: String?              //用户头像
-    var userName: String?            //用户名
+    var userName: String?                     //用户名
     var status: ShowRoomRequestStatus = .idle //申请状态
 }
 
@@ -80,16 +80,16 @@ class ShowUser: ShowBaseInfo {
 class ShowMessage: ShowBaseInfo {
     var userId: String?        //用户id (rtc uid)
     var userName: String?      //用户名
-    var message: String?       //用户名
+    var message: String?       //消息文本内容
     var createAt: Int64 = 0    //创建时间，与19700101时间比较的毫秒数
 }
 
 /// 连麦申请
-class ShowMicSeatApply: ShowBaseInfo {
-    var userId: String?                              //用户id (rtc uid)
-    var avatar: String?                              //用户头像
-    var userName: String?                            //用户名
-    var status: ShowRoomRequestStatus = .idle        //申请状态
+class ShowMicSeatApply: ShowUser {
+//    var userId: String?                              //用户id (rtc uid)
+//    var avatar: String?                              //用户头像
+//    var userName: String?                            //用户名
+//    var status: ShowRoomRequestStatus = .idle        //申请状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
     
     #if DEBUG

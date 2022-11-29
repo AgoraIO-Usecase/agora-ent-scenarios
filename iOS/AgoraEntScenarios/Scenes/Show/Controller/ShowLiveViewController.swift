@@ -69,16 +69,26 @@ class ShowLiveViewController: UIViewController {
     // 是否正在PK
     private var isOnPK = false  //TODO:
     
+    //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
             self.pkInviteView.pkUserInvitationList = pkUserInvitationList ?? []
         }
     }
     
+    //interaction list
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
             self.pkInviteView.interactionList = interactionList ?? []
         }
+    }
+    
+    //pk invitation request map
+    private var createPKInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
+    
+    //get current interaction status
+    private var interactionStatus: ShowInteractionStatus {
+        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
     override func viewDidLoad() {
@@ -289,6 +299,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         if invitation.status == .waitting {
             let vc = ShowReceivePKAlertVC()
             vc.name = invitation.fromName ?? ""
@@ -315,6 +334,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onPKInvitationAccepted(invitation: ShowPKInvitation) {
         //nothing todo, see onInteractionBegan
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshInvitationList()
         _refreshInteractionList()
@@ -322,6 +351,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
         guard  invitation.fromUserId == VLUserCenter.user.id else { return }
+        
+        if invitation.fromRoomId == room?.roomId {
+            //send invitation
+            createPKInvitationMap[invitation.roomId ?? ""] = nil
+            pkInviteView.createPKInvitationMap = createPKInvitationMap
+            return
+        }
+        
+        //recv invitation
         ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         _refreshInvitationList()
         _refreshInteractionList()
@@ -333,8 +371,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .pking:
             if room?.roomId != interaction.roomId {
                 agoraKitManager.joinChannelEx(channelName: interaction.roomId,
-                                            ownerId: interaction.userId,
-                                            view: liveView.canvasView.remoteView)
+                                              ownerId: interaction.userId,
+                                              view: liveView.canvasView.remoteView,
+                                              role: role)
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
@@ -351,7 +390,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isShowRedDot = false
             
         default:
-            
             break
         }
     }
@@ -384,7 +422,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
 //        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
-
+        print("errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
@@ -393,7 +431,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-    
+        print("join Uid === \(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
