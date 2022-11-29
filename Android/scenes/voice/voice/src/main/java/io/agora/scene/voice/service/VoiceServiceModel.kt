@@ -107,10 +107,3 @@ data class VoiceGiftModel constructor(
     var portrait: String? = "",
     var isChecked: Boolean? = false
 )
-
-/**
- * 上麦申请消息
- */
-data class VoiceRoomApplyModel constructor(
-    var id: String = "",
-)

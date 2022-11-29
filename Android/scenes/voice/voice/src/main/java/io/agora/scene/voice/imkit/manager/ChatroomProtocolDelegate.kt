@@ -99,6 +99,7 @@ class ChatroomProtocolDelegate constructor(
                         } else if (key == "member_list") {
                             val memberList = GsonTools.toList(value, VoiceMemberModel::class.java)
                             memberList?.let { members ->
+                                "member_list($members) fetchRoomDetail onSuccess: ".logE(TAG)
                                 addMemberListBySelf(members, object : ValueCallBack<List<VoiceMemberModel>> {
                                         override fun onSuccess(value: List<VoiceMemberModel>) {
                                             voiceRoomInfo.roomInfo?.memberList = value
@@ -354,7 +355,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun cancelSubmitMic(chatUid: String, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid = chatUid)
+        val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
@@ -371,7 +372,7 @@ class ChatroomProtocolDelegate constructor(
      */
     fun invitationMic(chatUid: String, micIndex: Int? = null, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid = chatUid)
+        val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_INVITE_SITE, attributeMap, callback)
     }
@@ -382,7 +383,7 @@ class ChatroomProtocolDelegate constructor(
     fun refuseInviteToMic(chatUid: String, callback: CallBack) {
         // TODO:  ios 没实现 需要确认是否需要实现
         val attributeMap = mutableMapOf<String, String>()
-        var userBeam = VoiceMemberModel(chatUid = chatUid)
+        val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
     }
@@ -477,11 +478,11 @@ class ChatroomProtocolDelegate constructor(
      * 更新指定麦位信息并返回更新成功的麦位信息
      * 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲 5:机器人专属激活状态 -2:机器人专属关闭状态
      */
-    private fun updateMicByResult(chatUid: VoiceMemberModel? = null,
+    private fun updateMicByResult(member: VoiceMemberModel? = null,
         micIndex: Int, @MicClickAction clickAction: Int, isForced: Boolean, callback: ValueCallBack<VoiceMicInfoModel>
     ) {
         val voiceMicInfo = getMicInfo(micIndex) ?: return
-        updateMicStatusByAction(voiceMicInfo, clickAction, chatUid)
+        updateMicStatusByAction(voiceMicInfo, clickAction, member)
         voiceMicInfo.micIndex = micIndex
         val value = GsonTools.beanToString(voiceMicInfo) ?: return
         if (isForced) {
@@ -522,7 +523,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 根据麦位原状态与action 更新麦位状态
      */
-    private fun updateMicStatusByAction(micInfo: VoiceMicInfoModel, @MicClickAction action: Int,userBean:VoiceMemberModel? = null) {
+    private fun updateMicStatusByAction(micInfo: VoiceMicInfoModel, @MicClickAction action: Int,memberBean:VoiceMemberModel? = null) {
         when (action) {
             MicClickAction.ForbidMic -> {
                 // 禁言（房主操作）
@@ -595,14 +596,14 @@ class ChatroomProtocolDelegate constructor(
             // 接受邀请/接受申请
             MicClickAction.Accept -> {
                 micInfo.micStatus = MicStatus.Normal
-                if (userBean != null){
-                    micInfo.member = userBean
+                if (memberBean != null){
+                    micInfo.member = memberBean
                 }
             }
             MicClickAction.Invite -> {
                 micInfo.micStatus = MicStatus.Normal
-                if (userBean != null){
-                    micInfo.member = userBean
+                if (memberBean != null){
+                    micInfo.member = memberBean
                 }
             }
         }
@@ -785,5 +786,9 @@ class ChatroomProtocolDelegate constructor(
 
     private fun getMicIndex(index: Int): String {
         return "mic_$index"
+    }
+
+    fun clearCache(){
+        ChatroomCacheManager.cacheManager.clearAllCache()
     }
 }
