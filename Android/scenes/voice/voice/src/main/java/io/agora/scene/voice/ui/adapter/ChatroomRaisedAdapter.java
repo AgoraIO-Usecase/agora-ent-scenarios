@@ -44,8 +44,6 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
 
         @Override
         public void setData(VoiceMemberModel item, int position) {
-            int resId = 0;
-
             ImageTools.loadImage(avatar, item.getPortrait());
             name.setText(item.getNickName());
             action.setText(mContext.getString(R.string.voice_room_accept));

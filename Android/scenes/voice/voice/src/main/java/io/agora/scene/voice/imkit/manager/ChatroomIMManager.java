@@ -452,19 +452,19 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
+     * 获取当前用户实体类
+     */
+    public VoiceMemberModel getMySelfModel(){
+       return delegate.getMySelfModel();
+    }
+
+    /**
      * 初始化麦位信息
      * @param roomType
      * @param callBack
      */
     public void initMicInfo(int roomType,CallBack callBack){
-        VoiceMemberModel voiceMemberModel = new VoiceMemberModel(
-                VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-                VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
-                0);
-        delegate.initMicInfo(roomType,voiceMemberModel,callBack);
+        delegate.initMicInfo(roomType,getMySelfModel(),callBack);
     }
 
     /**
