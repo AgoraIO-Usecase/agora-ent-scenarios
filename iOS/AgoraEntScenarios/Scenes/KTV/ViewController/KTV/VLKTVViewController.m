@@ -203,7 +203,6 @@ VLPopScoreViewDelegate
     
     [AgoraRtcEngineKit destroy];
     VLLog(@"Agora - destroy RTCEngine");
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [self.lyricCallbacks removeAllObjects];
     [self.musicCallbacks removeAllObjects];
@@ -229,7 +228,6 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
-        //观众看到打分
         if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
             //audience use sync to update pitch value, main singer don't
             weakSelf.currentVoicePitch = score;
@@ -255,13 +253,10 @@ VLPopScoreViewDelegate
             // 下麦消息
             
             // 被下麦用户刷新UI
-            //TODO 需要重新review
             if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
                 [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
-                
-                [weakSelf setSelfAudience];
                 [weakSelf resetChorusStatus:model.userNo];
             }
             
@@ -454,6 +449,20 @@ VLPopScoreViewDelegate
 }
 
 #pragma mark - rtc callbacks
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
+{
+    VLLog(@"uid joined %ld", uid);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine localVideoStateChangedOfState:(AgoraVideoLocalState)state error:(AgoraLocalVideoStreamError)error sourceType:(AgoraVideoSourceType)source
+{
+    VLLog(@"local video state changed %lu", (unsigned long)state);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine remoteVideoStateChangedOfUid:(NSUInteger)uid state:(AgoraVideoRemoteState)state reason:(AgoraVideoRemoteReason)reason elapsed:(NSInteger)elapsed {
+    VLLog(@"remote video state changed %lu", (unsigned long)state);
+}
+
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
@@ -489,7 +498,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 
 - (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
        didChangedToPosition:(NSInteger)position {
-    //只有主唱才能发送消息
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //只有主唱才能发送消息
         VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
         if ([songModel.userNo isEqualToString:VLUserCenter.user.userNo]) { //主唱
 //            VLLog(@"didChangedToPosition-----%@,%ld",playerKit,position);
@@ -498,13 +508,9 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 @"duration":@([self getTotalTime]),
                 @"time":@(position),
             };
-            [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
-                if (ifSuccess) {
-//                    VLLog(@"发送成功");
-                }else{
-//                    VLLog(@"发送失败");
-                }
+            [self sendStremMessageWithDict:dict success:^(BOOL success) {
             }];
+            
             //check invalid
             if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
                 KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
@@ -512,6 +518,7 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 [self loadAndPlaySong];
             }
         }
+    });
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -522,7 +529,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (![dict[@"cmd"] isEqualToString:@"setLrcTime"] && ![dict[@"cmd"] isEqualToString:@"testDelay"]) {
         VLLog(@"receiveStreamMessageFromUid::%ld---message::%@",uid, dict);
     }
-    VLLog(@"返回数据:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+    VLLog(@"recv message: %@, streamID: %d, uid: %d",dict,(int)streamId,(int)uid);
     if ([dict[@"cmd"] isEqualToString:@"setLrcTime"]) {  //同步歌词
         long type = [dict[@"time"] longValue];
         if(type == 0) {
@@ -538,7 +545,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             float postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
-            
+//            KTVLogInfo(@"setLrcTime: %.2f/%.2f, songNo: %@", self.currentTime, self.currentDuration, self.currentPlayingSongNo);
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
                 [_MVView start];
@@ -626,10 +633,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 status:(AgoraMusicContentCenterPreloadStatus)status
                    msg:(nonnull NSString *)msg
               lyricUrl:(nonnull NSString *)lyricUrl {
-    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
         return;
     }
+    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
     NSString* sSongCode = [NSString stringWithFormat:@"%ld", songCode];
     LoadMusicCallback block = [self.musicCallbacks objectForKey:sSongCode];
     if(!block) {
@@ -640,39 +647,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - action utils / business
-- (void)muteLocalAudio:(BOOL)mute {
-    if (mute) {
-        self.isNowMicMuted = YES;
-    } else{
-        self.isNowMicMuted = NO;
-    }
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
-    
-    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:mute
-                                                        completion:^(NSError * error) {
-    }];
-}
-
-- (void)muteLocalVideo:(BOOL)mute {
-    if (!mute) {
-        self.isNowCameraMuted = NO;
-    } else {
-        self.isNowCameraMuted = YES;
-    }
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
-    [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:mute
-                                                        completion:^(NSError * error) {
-    }];
-}
-
-- (void)toggleLocalAudio {
-    [self muteLocalAudio:!self.isNowMicMuted];
-}
-
-- (void)toggleLocalVideo {
-    [self muteLocalVideo:!self.isNowCameraMuted];
-}
-
 - (void)leaveRoom {
     VL(weakSelf);
     [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
@@ -693,6 +667,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     if (model == nil || [model waittingForChorus]) {
         VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
+        //刷新MV里的视图
+        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
     if (model.status != 2 && [model readyToPlay]) {
@@ -717,20 +693,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self stopCurrentSong];
     KTVLogInfo(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
 
+    //刷新MV里的视图
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    
     VL(weakSelf);
     if(role == KTVSingRoleMainSinger) {
         [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-            VLLog(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@", model.songNo, model.songName);
+            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@, lyricUrl: %@", model.songNo, model.songName, lyricUrl);
             if (lyricUrl == nil) {
                 return;
             }
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
             [weakSelf loadMusic:model.songNo withCallback:^(AgoraMusicContentCenterPreloadStatus status){
+                KTVLogInfo(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@, status: %ld", model.songNo, model.songName, status);
                 if (status != AgoraMusicContentCenterPreloadStatusOK) {
                     return;
                 }
-                VLLog(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@", model.songNo, model.songName);
                 [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
                 weakSelf.isPlayerPublish = YES;
                 [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
@@ -738,8 +717,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [weakSelf.MVView start];
                 [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
                 //TODO why always NO?
-                [weakSelf.MVView updateUIWithUserOnSeat:NO
-                                                   song:model];
+                [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
             }];
         }];
     } else if(role == KTVSingRoleAudience) {
@@ -747,7 +725,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if (lyricUrl == nil) {
                 return;
             }
-            VLLog(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
+            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
 //            model.lyric = lyricUrl;
 //            [weakSelf.MVView loadLrcURL:lyricUrl];
             weakSelf.currentPlayingSongNo = model.songNo;
@@ -758,8 +736,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [weakSelf.MVView start];
             [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             //TODO why always NO?
-            [weakSelf.MVView updateUIWithUserOnSeat:NO
-                                           song:model];
+            [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
         }];
     }
 }
@@ -833,7 +810,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLLog(@"RTC media player stop");
 }
 
-- (void)requestOnSeatWithIndex:(NSInteger)index {
+- (void)enterSeatWithIndex:(NSInteger)index {
     
     KTVOnSeatInputModel* inputModel = [KTVOnSeatInputModel new];
     inputModel.seatIndex = index;
@@ -914,6 +891,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [AgoraRtcEngineKit destroy];
     
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    //use game streaming in solo mode, chrous profile in chrous mode
+    [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
+    
+    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
+    [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
+    [self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
+    [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
@@ -941,6 +925,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     
     VLLog(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    
+    KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
@@ -962,13 +948,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.AgoraMcc = [AgoraMusicContentCenter sharedContentCenterWithConfig:contentCenterConfiguration];
 }
 
-- (void)setSelfAudience {
-    [self.RTCkit muteLocalVideoStream:YES];
-    [self.RTCkit muteLocalAudioStream:YES];
-    [self.RTCkit setClientRole:AgoraClientRoleAudience];
-    [self resetPlayer];
-}
-
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
         VLLog(@"Agora - Leave RTC channel");
@@ -979,12 +958,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
     [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
     [option setPublishCameraTrack:!self.isNowCameraMuted];
-    [option setPublishMicrophoneTrack:!self.isNowMicMuted];
+    // use audio volume to control mic on/off, so that mic is always on when broadcaster
+    [option setPublishMicrophoneTrack:[self isBroadcaster]];
     [option setPublishCustomAudioTrack:NO];
+    [option setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
     [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
     [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
+    [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
 
@@ -1054,10 +1036,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self popUpChooseSongView:NO];
             break;
         case VLKTVBottomBtnClickTypeAudio:
-            [self toggleLocalAudio];
+            self.isNowMicMuted = !self.isNowMicMuted;
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:self.isNowMicMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         case VLKTVBottomBtnClickTypeVideo:
-            [self toggleLocalVideo];
+            self.isNowCameraMuted = !self.isNowCameraMuted;
+            [[AppContext ktvServiceImp] updateSeatVideoMuteStatusWithMuted:self.isNowCameraMuted
+                                                                completion:^(NSError * error) {
+            }];
             break;
         default:
             break;
@@ -1088,7 +1076,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             BOOL isOnSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
             if (!isOnSeat) {
                 //not yet seated
-                [self requestOnSeatWithIndex:seatIndex];
+                [self enterSeatWithIndex:seatIndex];
             }
         }
     }
@@ -1143,8 +1131,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                     itemTapped:(VLBelcantoModel *)model
                      withIndex:(NSInteger)index {
     self.selBelcantoModel = model;
-    [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality
-                        scenario:AgoraAudioScenarioGameStreaming];
     if (index == 0) {
         [self.RTCkit setVoiceBeautifierPreset:AgoraVoiceBeautifierPresetOff];
     }else if (index == 1){
@@ -1392,16 +1378,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //音效设置
 - (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType {
     if (effectType == VLKTVSoundEffectTypeHeFeng) {
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:3 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeXiaoDiao){
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:2 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeDaDiao){
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:1 param2:4];
     } else if (effectType == VLKTVSoundEffectTypeNone) {
-        [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
     }
     VLLog(@"Agora - Setting effect type to %lu", effectType);
@@ -1662,6 +1644,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
     _isOnMicSeat = isOnMicSeat;
     
+    //start mic once enter seat
+    if(isOnMicSeat) {
+        [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
+    } else {
+        [self.RTCkit setClientRole:AgoraClientRoleAudience];
+        [self resetPlayer];
+    }
+    [self.RTCkit enableLocalAudio:isOnMicSeat];
+    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
+    
+    
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
     self.isNowCameraMuted = info.isVideoMuted;
@@ -1674,8 +1667,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     
+    [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     if(oldValue != isNowMicMuted) {
-        [self.RTCkit enableLocalAudio:!isNowMicMuted];
         [self.bottomView updateAudioBtn:isNowMicMuted];
     }
 }
@@ -1684,8 +1677,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     BOOL oldValue = _isNowCameraMuted;
     _isNowCameraMuted = isNowCameraMuted;
     
+    [self.RTCkit enableLocalVideo:!isNowCameraMuted];
+    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
     if(oldValue != isNowCameraMuted) {
-        [self.RTCkit enableLocalVideo:!isNowCameraMuted];
         [self.bottomView updateVideoBtn:isNowCameraMuted];
     }
 }
@@ -1710,9 +1704,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (self.chooseSongView) {
         self.chooseSongView.selSongsArray = selSongsArray; //刷新已点歌曲UI
     }
-    //刷新MV里的视图
-    [self.MVView updateUIWithSong:self.selSongsArray.firstObject
-                               onSeat:self.isOnMicSeat];
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
 }
