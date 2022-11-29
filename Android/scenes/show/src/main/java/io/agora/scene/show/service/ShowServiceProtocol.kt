@@ -29,7 +29,9 @@ interface ShowServiceProtocol {
 
     // 创建房间
     fun createRoom(
+        roomId: String,
         roomName: String,
+        thumbnailId: String,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)? = null
     )

@@ -7,7 +7,6 @@ import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.EventListener
-import kotlin.random.Random
 
 class ShowSyncManagerServiceImpl(
     private val context: Context,
@@ -16,7 +15,7 @@ class ShowSyncManagerServiceImpl(
 
     private val kSceneId = "scene_show"
     private val kCollectionIdUser = "userCollection"
-    private val kCollectionIdMessage = "messageInfo"
+    private val kCollectionIdMessage = "show_message_collection"
 
     @Volatile
     private var syncInitialized = false
@@ -57,17 +56,20 @@ class ShowSyncManagerServiceImpl(
     }
 
     override fun createRoom(
+        roomId: String,
         roomName: String,
+        thumbnailId: String,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
         initSync {
             val roomDetail = ShowRoomDetailModel(
-                (Random(System.currentTimeMillis()).nextInt(10000) + 100000).toString(),
+                roomId,
                 roomName,
                 0,
-                "",
+                thumbnailId,
                 UserManager.getInstance().user.id.toString(),
+                UserManager.getInstance().user.headUrl,
                 ShowRoomStatus.activity.value,
                 System.currentTimeMillis().toDouble(),
                 System.currentTimeMillis().toDouble()
@@ -338,6 +340,7 @@ class ShowSyncManagerServiceImpl(
             userCount,
             roomInfo.thumbnailId,
             roomInfo.ownerId,
+            roomInfo.ownerAvater,
             roomInfo.roomStatus,
             roomInfo.createAt,
             roomInfo.updateAt

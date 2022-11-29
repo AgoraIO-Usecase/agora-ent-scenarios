@@ -6,6 +6,11 @@
         <item name="cornerSize">6%</item>
     </style>
 
+    <style name="show_roundStyle_12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12%</item>
+    </style>
+
     <style name="show_roundStyle_50">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

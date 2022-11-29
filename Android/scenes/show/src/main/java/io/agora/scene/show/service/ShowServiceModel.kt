@@ -1,5 +1,9 @@
 package io.agora.scene.show.service
 
+import androidx.annotation.DrawableRes
+import io.agora.scene.show.R
+import kotlin.random.Random
+
 enum class ShowRoomStatus(val value: Int) {
     activity(0),//直播中
     end(1)//直播结束
@@ -17,8 +21,9 @@ data class ShowRoomDetailModel(
     val roomId: String,
     val roomName: String,
     val roomUserCount: Int,
-    val thumbnailId: String,
+    val thumbnailId: String, // 0, 1, 2, 3
     val ownerId: String,
+    val ownerAvater: String,// http url
     val roomStatus: Int = ShowRoomStatus.activity.value,
     val createAt: Double,
     val updateAt: Double,
@@ -30,11 +35,38 @@ data class ShowRoomDetailModel(
             Pair("roomUserCount", roomUserCount),
             Pair("thumbnailId", ""),
             Pair("ownerId", ownerId),
+            Pair("ownerAvater", ownerAvater),
             Pair("roomStatus", roomStatus),
             Pair("crateAt", createAt),
             Pair("updateAt", updateAt),
         )
     }
+
+    fun getThumbnailIcon() = when (thumbnailId) {
+        "0" -> R.mipmap.show_room_cover_0
+        "1" -> R.mipmap.show_room_cover_1
+        "2" -> R.mipmap.show_room_cover_2
+        "3" -> R.mipmap.show_room_cover_3
+        else -> R.mipmap.show_room_cover_0
+    }
+
+    companion object{
+
+        fun getRandomRoomId() = (Random(System.currentTimeMillis()).nextInt(10000) + 100000).toString()
+
+        fun getRandomThumbnailId() = Random(System.currentTimeMillis()).nextInt(0, 3).toString()
+
+        @DrawableRes
+        fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
+            "0" -> R.mipmap.show_room_cover_0
+            "1" -> R.mipmap.show_room_cover_1
+            "2" -> R.mipmap.show_room_cover_2
+            "3" -> R.mipmap.show_room_cover_3
+            else -> R.mipmap.show_room_cover_0
+        }
+
+    }
+
 }
 
 //用户信息
