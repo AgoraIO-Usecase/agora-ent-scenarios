@@ -86,42 +86,7 @@ class PermissionHelp(val activity: ComponentActivity) {
         unGranted: () -> Unit,
         force: Boolean = false
     ) {
-        when {
-            ContextCompat.checkSelfPermission(
-                activity,
-                Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
-                granted.invoke()
-            }
-            activity.shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected, and what
-                // features are disabled if it's declined. In this UI, include a
-                // "cancel" or "no thanks" button that lets the user continue
-                // using your app without granting the permission.
-                // showInContextUI(...)
-                if (force) {
-                    launchAppSetting(
-                        Manifest.permission.RECORD_AUDIO,
-                        granted,
-                        unGranted
-                    )
-                } else {
-                    unGranted.invoke()
-                }
-
-            }
-            else -> {
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
-                launchPermissionRequest(
-                    Manifest.permission.RECORD_AUDIO,
-                    granted,
-                    unGranted
-                )
-            }
-        }
+        checkPermission(Manifest.permission.RECORD_AUDIO, granted, force, unGranted)
     }
 
     /**
@@ -134,15 +99,39 @@ class PermissionHelp(val activity: ComponentActivity) {
         unGranted: () -> Unit,
         force: Boolean = false
     ) {
+        checkPermission(Manifest.permission.CAMERA, granted, force, unGranted)
+    }
+
+    /**
+     * 检查外置存储权限
+     *
+     * @param force 是：如果权限被禁用则会跳转到系统应用权限设置页面
+     */
+    fun checkStoragePerm(
+        granted: () -> Unit,
+        unGranted: () -> Unit,
+        force: Boolean = false
+    ) {
+        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, {
+            checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, granted, force, unGranted)
+        }, force, unGranted)
+    }
+
+    private fun checkPermission(
+        perm: String,
+        granted: () -> Unit,
+        force: Boolean,
+        unGranted: () -> Unit
+    ) {
         when {
             ContextCompat.checkSelfPermission(
                 activity,
-                Manifest.permission.CAMERA
+                perm
             ) == PackageManager.PERMISSION_GRANTED -> {
                 // You can use the API that requires the permission.
                 granted.invoke()
             }
-            activity.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
+            activity.shouldShowRequestPermissionRationale(perm) -> {
                 // In an educational UI, explain to the user why your app requires this
                 // permission for a specific feature to behave as expected, and what
                 // features are disabled if it's declined. In this UI, include a
@@ -151,7 +140,7 @@ class PermissionHelp(val activity: ComponentActivity) {
                 // showInContextUI(...)
                 if (force) {
                     launchAppSetting(
-                        Manifest.permission.CAMERA,
+                        perm,
                         granted,
                         unGranted
                     )
@@ -163,7 +152,7 @@ class PermissionHelp(val activity: ComponentActivity) {
                 // You can directly ask for the permission.
                 // The registered ActivityResultCallback gets the result of this request.
                 launchPermissionRequest(
-                    Manifest.permission.CAMERA,
+                    perm,
                     granted,
                     unGranted
                 )

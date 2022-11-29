@@ -19,6 +19,7 @@ import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.beauty.bytedance.BeautyByteDanceImpl
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.service.ShowMessage
@@ -52,6 +53,7 @@ class LiveDetailActivity : ComponentActivity() {
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
         null
 
+    private val mBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
     private lateinit var mPermissionHelp: PermissionHelp
     private lateinit var mRtcEngine: RtcEngineEx
 
@@ -217,6 +219,7 @@ class LiveDetailActivity : ComponentActivity() {
 
     private fun showBeautyDialog(){
         BeautyDialog(this).apply {
+            setBeautyProcessor(mBeautyProcessor)
             show()
         }
     }
@@ -262,6 +265,7 @@ class LiveDetailActivity : ComponentActivity() {
         }
         mRtcEngine = RtcEngine.create(config) as RtcEngineEx
         mRtcEngine.enableVideo()
+        mRtcEngine.registerVideoFrameObserver(mBeautyProcessor)
 
         checkRequirePerms {
             joinChannel()
@@ -269,7 +273,9 @@ class LiveDetailActivity : ComponentActivity() {
     }
 
     private fun destroyRtcEngine() {
+        mRtcEngine.stopPreview()
         mRtcEngine.leaveChannel()
+        mBeautyProcessor.release()
         RtcEngine.destroy()
     }
 

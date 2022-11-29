@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
@@ -16,6 +17,8 @@ import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.beauty.IBeautyProcessor
+import io.agora.scene.show.beauty.bytedance.BeautyByteDanceImpl
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
@@ -32,6 +35,7 @@ class LivePrepareActivity : ComponentActivity() {
 
     private val mThumbnailId by lazy { ShowRoomDetailModel.getRandomThumbnailId() }
     private val mRoomId by lazy { ShowRoomDetailModel.getRandomRoomId() }
+    private val mBeautyProcessor : IBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
 
     private val mPermissionHelp = PermissionHelp(this)
     private var mRtcEngine: RtcEngineEx? = null
@@ -40,6 +44,7 @@ class LivePrepareActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
         setContentView(mBinding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         mBinding.ivRoomCover.setImageResource(ShowRoomDetailModel.getThumbnailIcon(mThumbnailId))
         mBinding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
@@ -49,6 +54,9 @@ class LivePrepareActivity : ComponentActivity() {
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
+        }
+        mBinding.ivClose.setOnClickListener {
+            finish()
         }
 
         mBinding.ivCopy.setOnClickListener {
@@ -75,7 +83,13 @@ class LivePrepareActivity : ComponentActivity() {
 
     private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
         mPermissionHelp.checkCameraPerm(
-            { granted.invoke() },
+            {
+                mPermissionHelp.checkStoragePerm(
+                    granted,
+                    { showPermissionLeakDialog(granted) },
+                    force
+                )
+            },
             { showPermissionLeakDialog(granted) },
             force
         )
@@ -110,11 +124,7 @@ class LivePrepareActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mRtcEngine?.let {
-            it.stopPreview()
-            mRtcEngine = null
-            RtcEngine.destroy()
-        }
+        releaseRtcEngine()
     }
 
     private fun initRtcEngine() {
@@ -130,7 +140,7 @@ class LivePrepareActivity : ComponentActivity() {
             }
         }
         mRtcEngine = RtcEngine.create(config) as RtcEngineEx?
-
+        mRtcEngine?.registerVideoFrameObserver(mBeautyProcessor)
         mRtcEngine?.enableVideo()
         mRtcEngine?.setupLocalVideo(
             VideoCanvas(SurfaceView(this).apply {
@@ -156,6 +166,7 @@ class LivePrepareActivity : ComponentActivity() {
 
     private fun showBeautyDialog() {
         BeautyDialog(this).apply {
+            setBeautyProcessor(mBeautyProcessor)
             show()
         }
     }
@@ -179,11 +190,7 @@ class LivePrepareActivity : ComponentActivity() {
         mService.createRoom(mRoomId, roomName, mThumbnailId, {
             mService.joinRoom(it.roomId, { roomDetailInfo ->
                 runOnUiThread {
-                    mRtcEngine?.apply {
-                        stopPreview()
-                        mRtcEngine = null
-                        RtcEngine.destroy()
-                    }
+                    releaseRtcEngine()
                     LiveDetailActivity.launch(this@LivePrepareActivity, roomDetailInfo)
                     finish()
                 }
@@ -199,5 +206,14 @@ class LivePrepareActivity : ComponentActivity() {
                 mBinding.btnStartLive.isEnabled = true
             }
         })
+    }
+
+    private fun releaseRtcEngine() {
+        mRtcEngine?.apply {
+            mBeautyProcessor.release()
+            stopPreview()
+            mRtcEngine = null
+            RtcEngine.destroy()
+        }
     }
 }

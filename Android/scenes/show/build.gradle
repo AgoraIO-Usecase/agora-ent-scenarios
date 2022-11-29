@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 
