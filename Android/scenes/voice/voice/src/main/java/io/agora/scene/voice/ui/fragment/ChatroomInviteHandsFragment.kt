@@ -1,30 +1,31 @@
 package io.agora.scene.voice.ui.fragment
 
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
-import io.agora.scene.voice.model.VoiceUserListViewModel
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.os.Bundle
-import io.agora.scene.voice.R
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import android.widget.LinearLayout
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
+import io.agora.scene.voice.model.VoiceUserListViewModel
 import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
+import io.agora.voice.baseui.BaseUiFragment
+import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter
+import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ToastTools
-import java.util.ArrayList
-import java.util.HashMap
 
 class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomInviteAdapter.onActionListener {
     private lateinit var userListViewModel: VoiceUserListViewModel
     private val dataList: MutableList<VoiceMemberModel> = ArrayList()
+    private var baseAdapter: RoomBaseRecyclerViewAdapter<VoiceMemberModel>? = null
     private var adapter: ChatroomInviteAdapter? = null
     private var onFragmentListener: ChatroomHandsDialog.OnFragmentListener? = null
     private var roomId: String? = null
@@ -56,7 +57,14 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     private fun initView() {
-        adapter = ChatroomInviteAdapter()
+        baseAdapter = ChatroomInviteAdapter()
+        adapter = baseAdapter as ChatroomInviteAdapter
+        binding.let {
+            it?.list?.layoutManager = LinearLayoutManager(
+                activity
+            )
+            it?.list?.adapter = adapter
+        }
         if (emptyView == null) {
             adapter?.setEmptyView(R.layout.voice_no_data_layout)
         } else {
@@ -76,13 +84,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
                     var total = 0
                     if (data == null) return
-                    dataList.clear()
-                    dataList.addAll(data)
-                    if (isRefreshing) {
-                        adapter?.data = dataList
-                    } else {
-                        adapter?.addData(dataList)
-                    }
+                    adapter?.data = data
                     onFragmentListener?.getItemCount(total)
                     finishRefresh()
                     isRefreshing = false
@@ -128,6 +130,8 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     }
 
     override fun onItemActionClick(view: View, position: Int, uid: String) {
+        map[uid] = true
+        adapter!!.setInvited(map)
         userListViewModel.startMicSeatInvitation(uid,-1)
     }
 
