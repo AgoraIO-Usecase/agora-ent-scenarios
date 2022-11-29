@@ -87,11 +87,11 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
             .observe(requireActivity()) { response: Resource<List<VoiceMemberModel>> ->
                 parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                     override fun onSuccess(data: List<VoiceMemberModel>?) {
+                        finishRefresh()
                         if (data == null) return
                         val total = data.size
                         adapter?.data = data
                         onFragmentListener?.getItemCount(total)
-                        finishRefresh()
                         isRefreshing = false
                         adapter?.data?.let {
                             for (applyListBean in it) {
