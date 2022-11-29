@@ -15,18 +15,24 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
+import io.agora.voice.baseui.BaseUiActivity
+import io.agora.voice.baseui.adapter.OnItemClickListener
+import io.agora.voice.baseui.general.callback.OnResourceParseCallback
+import io.agora.voice.baseui.general.net.Resource
+import io.agora.voice.baseui.utils.StatusBarCompat
+import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.voice.buddy.tool.ToastTools
 import io.agora.chat.ChatClient
 import io.agora.chat.adapter.EMAChatRoomManagerListener
 import io.agora.scene.voice.R
 import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.bean.RoomKitBean
+import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
-import io.agora.scene.voice.general.constructor.RoomInfoConstructor
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
-import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
-import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager.Companion.cacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
@@ -41,27 +47,19 @@ import io.agora.scene.voice.ui.RoomObservableViewDelegate
 import io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.baseui.utils.StatusBarCompat
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
 class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
-    EasyPermissions.RationaleCallbacks, ChatroomListener{
+    EasyPermissions.RationaleCallbacks, ChatroomListener {
 
     companion object {
         const val RC_PERMISSIONS = 101
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
 
-        fun startActivity(activity: Activity,voiceRoomModel: VoiceRoomModel){
+        fun startActivity(activity: Activity, voiceRoomModel: VoiceRoomModel) {
             val intent = Intent(activity, ChatroomLiveActivity::class.java).apply {
                 putExtra(KEY_VOICE_ROOM_MODEL, voiceRoomModel)
             }
@@ -146,7 +144,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                     CustomMsgHelper.getInstance().sendSystemMsg(
                         VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                        VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack(){
+                        VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 "sendSystemMsg onSuccess $message".logE()
                                 binding.messageView.refreshSelectLast()
@@ -161,7 +159,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    ToastTools.show(this@ChatroomLiveActivity, message ?: getString(R.string.voice_chatroom_join_room_failed))
+                    ToastTools.show(
+                        this@ChatroomLiveActivity,
+                        message ?: getString(R.string.voice_chatroom_join_room_failed)
+                    )
                     ThreadManager.getInstance().runOnMainThreadDelay({
                         finish()
                     }, 1000)
@@ -195,7 +196,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
             binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
             binding.chatroomGiftView.init(roomKitBean.chatroomId)
-            binding.messageView.init(roomKitBean.chatroomId, voiceRoomModel.owner?.chatUid)
+            binding.messageView.init(roomKitBean.chatroomId, roomKitBean.ownerChatUid)
             binding.rvChatroom2dMicLayout.isVisible = true
             binding.rvChatroom3dMicLayout.isVisible = false
             roomObservableDelegate =
@@ -216,22 +217,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 },
                 object : OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        if (roomKitBean.isOwner) {
-                            roomObservableDelegate.onBotMicClick(
-                                VoiceBuddyFactory.get().rtcChannelTemp.isUseBot,
-                                getString(R.string.voice_chatroom_open_bot_prompt)
-                            )
-                        } else {
-                            if (!VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
-                                ToastTools.showTips(
-                                    this@ChatroomLiveActivity,
-                                    getString(R.string.voice_chatroom_only_host_can_change_robot)
-                                )
-                            }
-                        }
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
                     }
                 }
-            ).setUpAdapter(VoiceBuddyFactory.get().rtcChannelTemp.isUseBot)
+            ).setUpInitAdapter()
         } else { // 空间音效房间
             binding.likeView.isVisible = false
             binding.rvChatroom2dMicLayout.isVisible = false
@@ -254,22 +243,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 },
                 object : OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        if (roomKitBean.isOwner) {
-                            roomObservableDelegate.onBotMicClick(
-                                VoiceBuddyFactory.get().rtcChannelTemp.isUseBot,
-                                getString(R.string.voice_chatroom_open_bot_prompt)
-                            )
-                        } else {
-                            if (!VoiceBuddyFactory.get().rtcChannelTemp.isUseBot) {
-                                ToastTools.showTips(
-                                    this@ChatroomLiveActivity,
-                                    getString(R.string.voice_chatroom_only_host_can_change_robot)
-                                )
-                            }
-                        }
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
                     }
                 },
-            ).setUpMicInfoMap(VoiceBuddyFactory.get().rtcChannelTemp.isUseBot)
+            ).setUpInitMicInfoMap()
         }
         binding.cTopView.setTitleMaxWidth()
         roomObservableDelegate.onRoomModel(voiceRoomModel)
@@ -292,14 +269,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             }
 
             override fun onClickNotice(view: View) {
-                // todo announcement
-                roomObservableDelegate.onClickNotice(
-                    getString(R.string.voice_voice_voice_chatroom_first_enter_room_notice_tips)
-                )
+                roomObservableDelegate.onClickNotice()
             }
 
             override fun onClickSoundSocial(view: View) {
-                roomObservableDelegate.onClickSoundSocial(voiceRoomModel.soundEffect, finishBack = {
+                roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
                     finish()
                 })
             }
@@ -339,9 +313,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
-                                if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
-                                    roomObservableDelegate.receiveGift(roomKitBean.roomId)
-                                }
+                                roomObservableDelegate.receiveGift(roomKitBean.roomId)
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
@@ -413,29 +385,29 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     private fun onPermissionGrant() {
         "onPermissionGrant initSdkJoin".logE()
-        roomLivingViewModel.initSdkJoin(roomKitBean, voiceRoomModel.roomPassword)
+        roomLivingViewModel.initSdkJoin(roomKitBean)
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsGranted requestCode$requestCode $perms".logE()
+        "onPermissionsGranted requestCode$requestCode $perms".logD()
         if (requestCode == RC_PERMISSIONS) {
             onPermissionGrant()
         }
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsDenied $perms ".logE()
+        "onPermissionsDenied $perms ".logD()
     }
 
     override fun onRationaleAccepted(requestCode: Int) {
-        "onRationaleAccepted requestCode$requestCode ".logE()
+        "onRationaleAccepted requestCode$requestCode ".logD()
         if (requestCode == RC_PERMISSIONS) {
             onPermissionGrant()
         }
     }
 
     override fun onRationaleDenied(requestCode: Int) {
-        "onRationaleDenied requestCode$requestCode ".logE()
+        "onRationaleDenied requestCode$requestCode ".logD()
     }
 
 
@@ -460,9 +432,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
             giftViewDelegate.showGiftAction()
         }
-        if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
-            roomObservableDelegate.receiveGift(roomKitBean.roomId)
-        }
+        roomObservableDelegate.receiveGift(roomKitBean.roomId)
     }
 
     override fun receiveApplySite(roomId: String?, message: ChatMessageData?) {
@@ -472,45 +442,17 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     override fun announcementChanged(roomId: String?, announcement: String?) {
         super.announcementChanged(roomId, announcement)
-        "announcementChanged roomId:$roomId  announcement:$announcement".logE("announcementChanged")
+        "announcementChanged roomId:$roomId  announcement:$announcement".logD()
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        // todo 公告
-        //roomInfoBean?.room?.announcement = announcement
+        roomObservableDelegate.updateAnnouncement(announcement)
     }
 
-    override fun roomAttributesDidUpdated(roomId: String?, attributeMap: MutableMap<String, String>?, fromId: String?) {
+    override fun roomAttributesDidUpdated(roomId: String?, attributeMap: Map<String, String>?, fromId: String?) {
         super.roomAttributesDidUpdated(roomId, attributeMap, fromId)
-        "roomAttributesDidUpdated currentThread:${Thread.currentThread()} roomId:$roomId  fromId:$fromId attributeMap:$attributeMap".logE(
-            "roomAttributesDid"
-        )
-        if (isFinishing) return
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+        "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logE()
+        if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
         attributeMap?.let {
-            val micInfoMap = RoomInfoConstructor.convertAttr2MicInfoMap(it)
-            val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, roomKitBean.ownerId)
-            val handsCheckMap = mutableMapOf<String, String>()
-            micInfoMap.forEach { (t, u) ->
-                handsCheckMap[t] = u.member?.userId ?: ""
-            }
-            ThreadManager.getInstance().runOnMainThread {
-                if (roomKitBean.isOwner) {
-                    roomObservableDelegate.handsCheck(handsCheckMap)
-                }
-                roomObservableDelegate.onUpdateMicMap(newMicMap)
-                if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
-                    binding.rvChatroom2dMicLayout.onSeatUpdated(newMicMap)
-                } else {
-                    binding.rvChatroom3dMicLayout.onSeatUpdated(newMicMap)
-                }
-                binding.chatBottom.showMicVisible(
-                    VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute, roomObservableDelegate.isOnMic()
-                )
-                if (!roomKitBean.isOwner) {
-                    Log.e("liveActivity", "roomAttributesDidUpdated:  ${roomObservableDelegate.isOnMic()}")
-                    binding.chatBottom.setEnableHand(roomObservableDelegate.isOnMic())
-                    roomObservableDelegate.resetRequest()
-                }
-            }
+            roomObservableDelegate.onSeatUpdated(it)
         }
     }
 
@@ -570,18 +512,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     override fun voiceRoomUpdateRobotVolume(roomId: String?, volume: String?) {
         super.voiceRoomUpdateRobotVolume(roomId, volume)
         "voiceRoomUpdateRobotVolume roomId:$roomId,volume:$volume".logE()
-        if (TextUtils.equals(roomId, roomKitBean.chatroomId)) {
-            VoiceBuddyFactory.get().rtcChannelTemp.botVolume = volume?.toInt() ?: ConfigConstants.RotDefaultVolume
-        }
+        if (!TextUtils.equals(roomId, roomKitBean.chatroomId)) return
+        roomObservableDelegate.updateRobotVolume(volume)
     }
 
     override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
         super.onMemberExited(roomId, chatUid, s2)
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
         chatUid?.let { cacheManager.removeMember(it) }
-        if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
-            roomObservableDelegate.subMemberCount()
-        }
+        roomObservableDelegate.subMemberCount()
     }
 
     override fun userBeKicked(roomId: String?, reason: Int) {
