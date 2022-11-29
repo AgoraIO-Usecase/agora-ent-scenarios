@@ -14,6 +14,11 @@ class ShowPKInviteView: UIView {
             tableView.dataArray = pkUserInvitationList ?? []
         }
     }
+    var createPKInvitationMap: [String: ShowPKInvitation]? {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     var interactionList: [ShowInteractionInfo]? {
         didSet {
             let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
@@ -158,46 +163,57 @@ extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
                                                  for: indexPath) as! ShowPKInviteViewCell
-        cell.pkUserInvitation = self.pkUserInvitationList?[indexPath.row]
+        cell.pkUser = self.pkUserInvitationList?[indexPath.row]
+        cell.pkInvitation = self.createPKInvitationMap?[cell.pkUser?.roomId ?? ""]
         return cell
     }
 }
 
 enum ShowPKInviteStatus: CaseIterable {
     case invite
+    case waitting
     case pking
     case refused
     
     var title: String {
         switch self {
         case .invite: return "邀请".show_localized
+        case .waitting: return "邀请中".show_localized
         case .pking: return "PK中".show_localized
         case .refused: return "已拒绝".show_localized
         }
     }
     var titleColor: UIColor? {
         switch self {
-        case .invite: return .white
+        case .invite, .waitting: return .white
         default: return .black
         }
     }
 
     var bgImage: UIImage? {
         switch self {
-        case .invite: return UIImage.show_sceneImage(name: "show_invite_btn_bg")
+        case .invite, .waitting: return UIImage.show_sceneImage(name: "show_invite_btn_bg")
         default: return nil
         }
     }
 }
 
 class ShowPKInviteViewCell: UITableViewCell {
-    var pkUserInvitation: ShowPKUserInfo? {
+    var pkUser: ShowPKUserInfo? {
         didSet {
-            guard let info = pkUserInvitation else { return }
+            defer {
+                _refreshPKStatus()
+            }
+            
+            guard let info = pkUser else { return }
             avatarImageView.sd_setImage(with: URL(string: info.ownerAvater ?? ""),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             nameLabel.text = info.ownerName
-            pkStatus = info.interactStatus == .pking  ? .pking : .invite
+        }
+    }
+    var pkInvitation: ShowPKInvitation? {
+        didSet {
+            _refreshPKStatus()
         }
     }
     var pkStatus: ShowPKInviteStatus = .invite {
@@ -285,7 +301,6 @@ class ShowPKInviteViewCell: UITableViewCell {
                 statusButton.isUserInteractionEnabled = true
             }
         }
-        
     }
     
     private func setupUI() {
@@ -316,9 +331,17 @@ class ShowPKInviteViewCell: UITableViewCell {
         lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
     }
     
+    private func _refreshPKStatus() {
+        var stauts: ShowPKInviteStatus = pkUser?.interactStatus == .pking ? .pking : .invite
+        if stauts == .invite {
+            stauts = pkInvitation?.status == .waitting ? .waitting : .invite
+        }
+        pkStatus = stauts
+    }
+    
     @objc
     private func onTapStatusButton(sender: UIButton) {
-        if let invitation = pkUserInvitation {
+        if let invitation = pkUser {
             AppContext.showServiceImp.createPKInvitation(room: invitation) { error in
                 self.refreshDataClosure?()
             }

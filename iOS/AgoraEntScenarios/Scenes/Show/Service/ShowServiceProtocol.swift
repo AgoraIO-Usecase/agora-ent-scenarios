@@ -140,9 +140,10 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: <#completion description#>
     func getAllPKUserList(completion: @escaping (Error?, [ShowPKUserInfo]?) -> Void)
     
-    /// 获取PK邀请列表
+    /// 获取PK邀请列表（包括发起邀请和接受的邀请，根据fromUerId区分）
     /// - Parameter completion: <#completion description#>
     func getAllPKInvitationList(completion: @escaping (Error?, [ShowPKInvitation]?) -> Void)
+    
 
     /// 创建PK邀请
     /// - Parameters:
