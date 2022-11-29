@@ -35,6 +35,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.voice.buddy.tool.ImageTools;
 
 
 public class ChatroomGiftView extends LinearLayout {
@@ -189,6 +190,8 @@ public class ChatroomGiftView extends LinearLayout {
             }
             if (resId != 0) {
                 avatar.setImageResource(resId);
+            }else {
+                ImageTools.loadImage(avatar, userPortrait);
             }
             StringBuilder builder = new StringBuilder();
             if (null != giftBean) {
@@ -201,8 +204,12 @@ public class ChatroomGiftView extends LinearLayout {
 
         @Override
         public int getItemCount() {
-            Log.e("gift_view", "messages.size()" + messages.size());
-            return messages.size();
+            if (messages != null && messages.size()>0){
+                Log.e("gift_view", "messages.size()" + messages.size());
+                return messages.size();
+            }else {
+                return 0;
+            }
         }
 
 
