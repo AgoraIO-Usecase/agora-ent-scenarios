@@ -64,6 +64,7 @@ class RoomListActivity : AppCompatActivity() {
         binding.tvRoomName.text = roomInfo.roomName
         binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
+        binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
         binding.root.setOnClickListener {
             goLiveDetailActivity(roomInfo)
         }

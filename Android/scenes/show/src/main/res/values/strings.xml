@@ -43,4 +43,13 @@
     <string name="show_music_effect_beauty_voice_sweet">甜美</string>
     <string name="show_music_effect_mixing_ktv">KTV</string>
     <string name="show_music_effect_mixing_concert">演唱会</string>
+    <string name="show_live_prepare_title">秀场直播</string>
+    <string name="show_live_prepare_rotate">翻转</string>
+    <string name="show_live_prepare_beauty">美化</string>
+    <string name="show_live_prepare_hd">画质</string>
+    <string name="show_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="show_live_prepare_start_live">开始直播</string>
+    <string name="show_live_prepare_room_empty">房间名不能为空！</string>
+    <string name="show_live_prepare_room_clipboard_copyed">房间ID已复制到剪切板！</string>
+    <string name="show_live_prepare_room_name_hint">请输入房间名称</string>
 </resources>

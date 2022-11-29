@@ -13,6 +13,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
@@ -81,7 +82,9 @@ class LiveDetailActivity : ComponentActivity() {
 
     private fun initTopLayout() {
         val topLayout = mBinding.topLayout
-        topLayout.ivOwnerAvatar.setImageResource(R.mipmap.portrait03)
+        Glide.with(this)
+            .load(mRoomInfo.ownerAvater)
+            .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
         topLayout.tvUserCount.text = mRoomInfo.roomUserCount.toString()
