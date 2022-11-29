@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SVProgressHUD
 
 @objcMembers public class VRBaseViewController: UIViewController {
     lazy var navigation: BaseNavigationView = .init(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ZNavgationHeight))
@@ -34,6 +35,11 @@ import ZSwiftBaseLib
         navigation.title.textColor = titleColor
         navigation.back.setImage(UIImage(backImageName), for: .normal)
         navigation.backgroundColor = navBackgroundColor
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        SVProgressHUD.dismiss()
     }
 }
 
