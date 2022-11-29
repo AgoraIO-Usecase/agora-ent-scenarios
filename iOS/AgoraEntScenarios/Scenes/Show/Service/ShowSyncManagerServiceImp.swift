@@ -147,12 +147,12 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
+                    self.roomList?.append(room)
                     completion(nil, output)
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
                     }
-                    self.roomList?.append(room)
                 }
             } fail: { error in
                 completion(error, nil)
