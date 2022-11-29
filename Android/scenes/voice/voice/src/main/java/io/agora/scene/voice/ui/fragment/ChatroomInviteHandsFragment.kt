@@ -144,7 +144,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
         map.clear()
     }
 
-    fun micChanged(data: Map<String, String>) {
+    fun micChanged(data: Map<Int, String>) {
         if (!adapter?.data.isNullOrEmpty()){
             adapter?.data?.let {
                 dataList.addAll(it)

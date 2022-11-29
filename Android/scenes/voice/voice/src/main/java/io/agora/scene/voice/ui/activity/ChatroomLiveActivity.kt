@@ -288,28 +288,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         })
                     }
                     R.id.voice_extend_item_mic -> {
-                        if (roomObservableDelegate.mySelfMicStatus() == MicStatus.ForceMute) {
-                            // 被禁言
-                            ToastTools.show(
-                                this@ChatroomLiveActivity, getString(R.string.voice_chatroom_mic_muted_by_host)
-                            )
-                            return
-                        }
-                        if (VoiceBuddyFactory.get().rtcChannelTemp.isLocalAudioMute) {
-                            binding.chatBottom.setEnableMic(true)
-                            roomObservableDelegate.muteLocalAudio(false)
-                        } else {
-                            binding.chatBottom.setEnableMic(false)
-                            roomObservableDelegate.muteLocalAudio(true)
-                        }
+                        roomObservableDelegate.onClickBottomMic()
                     }
                     R.id.voice_extend_item_hand_up -> {
-                        "extend_item_hand_up isOwner:${roomKitBean.isOwner}".logD()
-                        if (roomKitBean.isOwner) {
-                            roomObservableDelegate.showOwnerHandsDialog()
-                        } else {
-                            roomObservableDelegate.showMemberHandsDialog(-1)
-                        }
+                       roomObservableDelegate.onClickBottomHandUp()
                     }
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
@@ -419,7 +401,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     override fun onRationaleDenied(requestCode: Int) {
         "onRationaleDenied requestCode$requestCode ".logD()
     }
-
 
     private fun reset() {
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) {
