@@ -35,6 +35,9 @@ private func agoraPrint(_ message: String) {
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private var roomList: [ShowRoomListModel]?
+    private var room: ShowRoomListModel? {
+        return self.roomList?.filter({ $0.roomId == roomId}).first
+    }
     private var userList: [ShowUser] = [ShowUser]()
     private var messageList: [ShowMessage] = [ShowMessage]()
     private var seatApplyList: [ShowMicSeatApply] = [ShowMicSeatApply]()
@@ -276,7 +279,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func cancelMicSeatApply(completion: @escaping (Error?) -> Void) {
         guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("cancel apply not found")
+//            agoraAssert("cancel apply not found")
             return
         }
         _removeMicSeatApply(apply: apply, completion: completion)
@@ -599,10 +602,11 @@ extension ShowSyncManagerServiceImp {
     private func _subscribeAll() {
         _subscribeOnlineUsersChanged()
         _subscribeMessageChanged()
-        _subscribeMicSeatInvitationChanged()
         _subscribeMicSeatApplyChanged()
-        _subscribePKInvitationChanged()
         _subscribeInteractionChanged()
+        _subscribeMicSeatInvitationChanged()
+        guard room?.ownerId == VLUserCenter.user.id else { return }
+        _subscribePKInvitationChanged()
     }
     
     private func _unsubscribeAll() {
@@ -1214,6 +1218,13 @@ extension ShowSyncManagerServiceImp {
                 self._removeInteraction(invitation: model) { error in
                 }
             case .updated:
+                //only support 1 interaction
+                if self.interactionList.count > 0 {
+                    self._removePKInvitation(invitation: invitation) { err in
+                    }
+                    return
+                }
+                
                 defer {
                     if invitation.status == .accepted {
                         self.subscribeDelegate?.onPKInvitationAccepted(invitation: invitation)
