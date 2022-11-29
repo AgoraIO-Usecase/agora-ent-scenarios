@@ -51,7 +51,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                         listener.onItemActionClick(view,position,item.getChatUid());
                 }
             });
-            if (checkMap.containsKey(item.getUserId())){
+            if (checkMap.containsKey(item.getChatUid())){
                 action.setText(mContext.getString(R.string.voice_room_invited));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                 action.setEnabled(false);

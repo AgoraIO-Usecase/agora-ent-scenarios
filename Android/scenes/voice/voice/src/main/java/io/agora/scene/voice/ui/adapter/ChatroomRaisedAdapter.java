@@ -55,7 +55,7 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 }
             });
             action.setText(mContext.getString(R.string.voice_room_accept));
-            if (item.getUserId().equals(selectUid)) {
+            if (item.getChatUid().equals(selectUid)) {
                 if (isAccepted) {
                     action.setText(mContext.getString(R.string.voice_room_accepted));
                     action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);

@@ -26,6 +26,9 @@ class ChatroomCacheManager {
     private val roomMemberList = mutableListOf<VoiceMemberModel>()
     private val roomMemberMap = mutableMapOf<String, VoiceMemberModel>()
 
+    private val invitationList = mutableListOf<VoiceMemberModel>()
+    private val invitationMap = mutableMapOf<String, VoiceMemberModel>()
+
     private var rankingList = mutableListOf<VoiceRankUserModel>()
     private val rankingMap = mutableMapOf<String, VoiceRankUserModel>()
 
@@ -175,6 +178,27 @@ class ChatroomCacheManager {
      */
     fun getMemberList():MutableList<VoiceMemberModel>{
         return roomMemberList
+    }
+
+    /**
+     * 获取邀请列表（过滤已在麦位的成员）
+     */
+    fun getInvitationList():MutableList<VoiceMemberModel>{
+        invitationMap.clear()
+        invitationList.clear()
+        invitationMap.putAll(roomMemberMap)
+        "invitationMap(${invitationMap}) invitationMap".logE("ChatroomCacheManager")
+        for (entry in getMicInfoMap()?.entries!!) {
+            val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+            micInfo?.member?.chatUid.let {
+                "invitationMap remove(${it})".logE("ChatroomCacheManager")
+                invitationMap.remove(it)
+            }
+        }
+        for (entry in invitationMap.entries) {
+            invitationList.add(entry.value)
+        }
+        return invitationList
     }
 
     /**

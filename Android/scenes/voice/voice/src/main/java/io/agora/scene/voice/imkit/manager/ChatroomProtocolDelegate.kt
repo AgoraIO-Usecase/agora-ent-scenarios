@@ -219,7 +219,7 @@ class ChatroomProtocolDelegate constructor(
      * 下麦
      */
     fun leaveMic(micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(null,micIndex, MicClickAction.OffStage, false, callback)
+        updateMicByResult(null,micIndex, MicClickAction.OffStage, true, callback)
     }
 
     /**
@@ -327,12 +327,13 @@ class ChatroomProtocolDelegate constructor(
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
-        "startMicSeatApply:$memberBean".logE(TAG)
-        voiceRoomApply.member = memberBean
-        voiceRoomApply.created_at = System.currentTimeMillis()
         if (micIndex != null) {
             voiceRoomApply.index = micIndex
+            memberBean.micIndex = micIndex
         }
+        voiceRoomApply.member = memberBean
+        "startMicSeatApply:$memberBean".logE(TAG)
+        voiceRoomApply.created_at = System.currentTimeMillis()
         attributeMap["user"] = GsonTools.beanToString(voiceRoomApply).toString()
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
@@ -341,7 +342,11 @@ class ChatroomProtocolDelegate constructor(
      * 同意上麦申请
      */
     fun acceptMicSeatApply(chatUid:String,micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(ChatroomCacheManager.cacheManager.getMember(chatUid),micIndex?:getFirstFreeMic(), MicClickAction.Accept, false, callback)
+        val memberBean = ChatroomCacheManager.cacheManager.getMember(chatUid)
+        if (memberBean != null) {
+            memberBean.micIndex = micIndex?:getFirstFreeMic()
+        }
+        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, false, callback)
     }
 
     /**
@@ -365,7 +370,7 @@ class ChatroomProtocolDelegate constructor(
      * 邀请上麦列表
      */
     fun fetchRoomMembers():MutableList<VoiceMemberModel> {
-        return ChatroomCacheManager.cacheManager.getMemberList()
+        return ChatroomCacheManager.cacheManager.getInvitationList()
     }
 
     /**
@@ -393,7 +398,11 @@ class ChatroomProtocolDelegate constructor(
      * 用户同意上麦邀请
      */
     fun acceptMicSeatInvitation(chatUid: String,micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(ChatroomCacheManager.cacheManager.getMember(chatUid),micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+        val memberBean = ChatroomCacheManager.cacheManager.getMember(chatUid)
+        if (memberBean != null) {
+            memberBean.micIndex = micIndex?:getFirstFreeMic()
+        }
+        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
     }
 
     /////////////////////////// room ///////////////////////////////
@@ -440,7 +449,7 @@ class ChatroomProtocolDelegate constructor(
             attributeMap["mic_6"] = GsonTools.beanToString(robot6).toString()
             attributeMap["mic_7"] = GsonTools.beanToString(robot7).toString()
             attributeMap["use_robot"] = isEnable
-            roomManager.asyncSetChatroomAttributes(
+            roomManager.asyncSetChatroomAttributesForced(
                 roomId, attributeMap, true
             ) { code, result ->
                 if (code == 0 && result.isEmpty()) {
@@ -787,7 +796,7 @@ class ChatroomProtocolDelegate constructor(
             }
         }
         indexList.sortBy { it }
-        return indexList[indexList.lastIndex]
+        return indexList[0]
     }
 
     private fun getMicIndex(index: Int): String {
@@ -796,5 +805,9 @@ class ChatroomProtocolDelegate constructor(
 
     fun clearCache(){
         ChatroomCacheManager.cacheManager.clearAllCache()
+    }
+
+    fun updateMicInfoCache(kvMap: Map<String,String>){
+        ChatroomCacheManager.cacheManager.setMicInfo(kvMap)
     }
 }
