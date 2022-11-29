@@ -225,6 +225,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             return
         }
         
+        cancelMicSeatApply { error in
+        }
+        
         //remove single interaction if audience
         interactionList.forEach { interaction in
             guard interaction.userId == VLUserCenter.user.id else {return}
