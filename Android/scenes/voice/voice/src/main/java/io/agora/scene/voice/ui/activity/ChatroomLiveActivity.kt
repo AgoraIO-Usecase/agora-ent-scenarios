@@ -143,6 +143,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: Boolean?) {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
+                    CustomMsgHelper.getInstance().sendSystemMsg(
+                        VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
+                        VoiceBuddyFactory.get().getVoiceBuddy().headUrl(), object : OnMsgCallBack(){
+                            override fun onSuccess(message: ChatMessageData?) {
+                                "sendSystemMsg onSuccess $message".logE()
+                                binding.messageView.refreshSelectLast()
+                            }
+
+                            override fun onError(messageId: String?, code: Int, error: String?) {
+                                "sendSystemMsg onFail $code $error".logE()
+                            }
+                        }
+                    )
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -180,7 +193,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
             binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
             binding.chatroomGiftView.init(roomKitBean.chatroomId)
-            binding.messageView.init(roomKitBean.chatroomId, roomKitBean.isOwner)
+            binding.messageView.init(roomKitBean.chatroomId, voiceRoomModel.owner?.chatUid)
             binding.rvChatroom2dMicLayout.isVisible = true
             binding.rvChatroom3dMicLayout.isVisible = false
             roomObservableDelegate =
@@ -340,16 +353,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             }
 
-            override fun onInputViewFocusChange(focus: Boolean) {
-
-            }
-
             override fun onInputLayoutClick() {
                 checkFocus(false)
-            }
-
-            override fun onEmojiClick(isShow: Boolean) {
-
             }
 
             override fun onSendMessage(content: String?) {
