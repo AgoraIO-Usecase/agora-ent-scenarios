@@ -696,7 +696,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 获取当前用户实体信息
      */
-    private fun getMySelfModel():VoiceMemberModel{
+     fun getMySelfModel():VoiceMemberModel{
         var micIndex : Int = -1
         if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
             micIndex = 0

@@ -15,41 +15,42 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import io.agora.chat.ChatClient
+import io.agora.chat.adapter.EMAChatRoomManagerListener
+import io.agora.scene.voice.R
+import io.agora.scene.voice.annotation.MicStatus
+import io.agora.scene.voice.bean.RoomKitBean
+import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
+import io.agora.scene.voice.general.constructor.RoomInfoConstructor
+import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.imkit.bean.ChatMessageData
-import com.alibaba.android.arouter.facade.annotation.Route
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager.Companion.cacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.imkit.manager.ChatroomListener
+import io.agora.scene.voice.model.VoiceRoomLivingViewModel
+import io.agora.scene.voice.service.VoiceBuddyFactory
+import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.service.VoiceRoomInfo
+import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.scene.voice.ui.RoomGiftViewDelegate
+import io.agora.scene.voice.ui.RoomObservableViewDelegate
+import io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
+import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
+import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.voice.baseui.BaseUiActivity
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
 import io.agora.voice.baseui.utils.StatusBarCompat
+import io.agora.voice.buddy.config.ConfigConstants
+import io.agora.voice.buddy.tool.LogTools.logD
+import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
-import io.agora.chat.ChatClient
-import io.agora.chat.adapter.EMAChatRoomManagerListener
-import io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.general.constructor.RoomInfoConstructor
-import io.agora.scene.voice.ui.RoomObservableViewDelegate
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.scene.voice.R
-import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
-import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
-import io.agora.scene.voice.model.VoiceRoomLivingViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceRoomInfo
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.scene.voice.ui.RoomGiftViewDelegate
-import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
-import io.agora.scene.voice.annotation.MicStatus
-import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.imkit.manager.ChatroomListener
-import io.agora.scene.voice.service.VoiceMicInfoModel
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
@@ -156,6 +157,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             }
                         }
                     )
+                    cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -573,9 +575,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
     }
 
-    override fun onMemberExited(roomId: String?, s1: String?, s2: String?) {
-        super.onMemberExited(roomId, s1, s2)
+    override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
+        super.onMemberExited(roomId, chatUid, s2)
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+        chatUid?.let { cacheManager.removeMember(it) }
         if (this@ChatroomLiveActivity::roomObservableDelegate.isInitialized) {
             roomObservableDelegate.subMemberCount()
         }
