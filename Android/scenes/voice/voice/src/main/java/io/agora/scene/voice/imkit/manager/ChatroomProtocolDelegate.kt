@@ -240,7 +240,7 @@ class ChatroomProtocolDelegate constructor(
             if (fromBeanValue != null) {
                 attributeMap?.put(toKey, fromBeanValue)
             }
-            roomManager.asyncSetChatroomAttributes(
+            roomManager.asyncSetChatroomAttributesForced(
                 roomId, attributeMap, true
             ) { code, result_map ->
                 if (code == 0 && result_map.isEmpty()) {
@@ -262,14 +262,14 @@ class ChatroomProtocolDelegate constructor(
      * 关麦
      */
     fun muteLocal(micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(null,micIndex, MicClickAction.Mute, false, callback)
+        updateMicByResult(null,micIndex, MicClickAction.Mute, true, callback)
     }
 
     /**
      * 取消关麦
      */
     fun unMuteLocal(micIndex: Int, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(null,micIndex, MicClickAction.UnMute, false, callback)
+        updateMicByResult(null,micIndex, MicClickAction.UnMute, true, callback)
     }
 
     /**
@@ -346,7 +346,7 @@ class ChatroomProtocolDelegate constructor(
         if (memberBean != null) {
             memberBean.micIndex = micIndex?:getFirstFreeMic()
         }
-        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, false, callback)
+        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
     }
 
     /**

@@ -729,7 +729,7 @@ class RoomObservableViewDelegate constructor(
      * 自己关麦
      */
     fun muteLocalAudio(mute: Boolean, index: Int = -1) {
-        AgoraRtcEngineController.get().enableLocalAudio(mute)
+        AgoraRtcEngineController.get().enableLocalAudio(!mute)
         val micIndex = if (index < 0) mySelfIndex() else index
         if (mute) {
             roomLivingViewModel.muteLocal(micIndex)
@@ -848,9 +848,11 @@ class RoomObservableViewDelegate constructor(
             return
         }
         if (isLocalAudioMute) {
+            isLocalAudioMute = false
             chatPrimaryMenuView.setEnableMic(true)
             muteLocalAudio(false)
         } else {
+            isLocalAudioMute = true
             chatPrimaryMenuView.setEnableMic(false)
             muteLocalAudio(true)
         }
@@ -929,10 +931,12 @@ class RoomObservableViewDelegate constructor(
         AgoraRtcEngineController.get().switchRole(mySelfIndex() >= 0)
         if (mySelfMicStatus() == MicStatus.Normal) {   // 状态正常
             if (!isLocalAudioMute) return
-            AgoraRtcEngineController.get().enableLocalAudio(false)
+            isLocalAudioMute = false
+            AgoraRtcEngineController.get().enableLocalAudio(true)
         } else {  // 其他状态
             if (isLocalAudioMute) return
-            AgoraRtcEngineController.get().enableLocalAudio(true)
+            isLocalAudioMute = true
+            AgoraRtcEngineController.get().enableLocalAudio(false)
         }
         // 机器人麦位
         updateMap[ConfigConstants.MicConstant.KeyIndex6]?.let {
