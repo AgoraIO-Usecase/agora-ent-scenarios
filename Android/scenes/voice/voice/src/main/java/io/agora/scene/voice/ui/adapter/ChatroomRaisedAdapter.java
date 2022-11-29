@@ -51,7 +51,7 @@ public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 @Override
                 public void onClick(View view) {
                     if (listener != null)
-                        listener.onItemActionClick(view, item.getMicIndex(), item.getUserId());
+                        listener.onItemActionClick(view, item.getMicIndex(), item.getChatUid());
                 }
             });
             action.setText(mContext.getString(R.string.voice_room_accept));
