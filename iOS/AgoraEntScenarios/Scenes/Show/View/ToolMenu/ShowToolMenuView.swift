@@ -71,8 +71,10 @@ class ShowToolMenuModel {
 enum ShowMenuType {
     /// 未pk
     case none
-    /// PK中
-    case pking
+    /// PK中主播
+    case pking_broadcaster
+    /// PK中观众
+    case pking_audience
 }
 
 class ShowToolMenuView: UIView {
@@ -97,9 +99,13 @@ class ShowToolMenuView: UIView {
     
     var type: ShowMenuType = .none {
         didSet {
-            if type == .none {
+            
+            switch type {
+            case .none:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 != .mute_mic && $0 != .end_pk }))
-            } else {
+            case .pking_broadcaster:
+                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .switch_camera || $0 == .camera || $0 == .mute_mic || $0 == .end_pk }))
+            case .pking_audience:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .mute_mic || $0 == .end_pk }))
             }
         }
