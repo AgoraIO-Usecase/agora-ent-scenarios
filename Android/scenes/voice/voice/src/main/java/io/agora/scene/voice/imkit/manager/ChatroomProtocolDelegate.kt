@@ -12,12 +12,11 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.service.*
-import io.agora.scene.voice.service.VoiceBuddyFactory
 import io.agora.voice.buddy.config.ConfigConstants
 import io.agora.voice.buddy.tool.GsonTools
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.LogTools.logD
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -616,13 +615,15 @@ class ChatroomProtocolDelegate constructor(
         val rankList = ChatroomCacheManager.cacheManager.getRankList()
         val name = giftBean.userName
         val portrait = giftBean.portrait
-        val count = giftBean.gift_count
-        val price = giftBean.gift_price
-        val amount ="$count * $price".toInt()
+        val count = giftBean.gift_count?.toInt()
+        val price = giftBean.gift_price?.toInt()
         val voiceRankModel =  VoiceRankUserModel()
+        if (count != null && price !=null){
+            voiceRankModel.amount = count * price
+        }
         voiceRankModel.name = name
         voiceRankModel.portrait = portrait
-        voiceRankModel.amount = amount
+
         rankList.add(voiceRankModel)
         roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankList),
             true,object : CallBack{
