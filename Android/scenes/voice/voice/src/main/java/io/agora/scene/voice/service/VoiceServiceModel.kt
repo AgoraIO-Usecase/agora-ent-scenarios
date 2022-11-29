@@ -29,7 +29,7 @@ data class VoiceMemberModel constructor(
     @SerializedName("portrait") var portrait: String? = null,
     // 这里用的是user.id
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
-    @SerializedName("mic_index") var micIndex: Int = 0,
+    @SerializedName("mic_index") var micIndex: Int = -1,
 ) : BaseRoomBean
 
 /**
