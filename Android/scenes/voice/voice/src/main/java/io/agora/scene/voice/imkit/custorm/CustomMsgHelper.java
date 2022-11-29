@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.agora.CallBack;
 import io.agora.MessageListener;
@@ -197,16 +198,23 @@ public class CustomMsgHelper implements MessageListener {
                     break;
                 case CHATROOM_SYSTEM:
                     AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    if (map.containsKey("user")){
+                        try {
+                            JSONObject object = new JSONObject(Objects.requireNonNull(map.get("user")));
+                            if (object.has(MsgConstant.CUSTOM_SYSTEM_NAME) && object.has(MsgConstant.CUSTOM_GIFT_PORTRAIT)){
+                                VoiceMemberModel memberModel = new VoiceMemberModel();
+                                memberModel.setNickName(object.getString(MsgConstant.CUSTOM_SYSTEM_NAME));
+                                memberModel.setChatUid(message.getFrom());
+                                memberModel.setPortrait(object.getString(MsgConstant.CUSTOM_GIFT_PORTRAIT));
+                                ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if (listener != null){
                         listener.onReceiveSystem(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    }
-                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    if (map.containsKey(MsgConstant.CUSTOM_GIFT_USERNAME) && map.containsKey(MsgConstant.CUSTOM_GIFT_PORTRAIT)){
-                        VoiceMemberModel memberModel = new VoiceMemberModel();
-                        memberModel.setNickName(map.get(MsgConstant.CUSTOM_GIFT_USERNAME));
-                        memberModel.setChatUid(message.getFrom());
-                        memberModel.setPortrait(MsgConstant.CUSTOM_GIFT_PORTRAIT);
-                        ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
                     }
                     break;
                 case CHATROOM_UPDATE_ROBOT_VOLUME:

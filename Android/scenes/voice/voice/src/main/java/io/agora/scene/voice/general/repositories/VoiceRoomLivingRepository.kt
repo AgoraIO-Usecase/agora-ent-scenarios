@@ -323,46 +323,6 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 邀请上麦
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.startMicSeatInvitation(chatUid, micIndex, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
-                    } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
-    // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
-        val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
-                    } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
     // 换麦
     fun changeMic(oldIndex: Int, newIndex: Int): LiveData<Resource<Map<Int,VoiceMicInfoModel>>> {
         val resource = object : NetworkOnlyResource<Map<Int,VoiceMicInfoModel>>() {

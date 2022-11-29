@@ -35,6 +35,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     private var isRefreshing = false
     private var isLoadingNextPage = false
     private var emptyView: View? = null
+    private var currentIndex:Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_no_data_layout, container, false)
@@ -121,6 +122,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                                 ChatroomCacheManager.cacheManager.removeSubmitMember(
                                     chatUid
                                 )
+                                adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)
                         }
@@ -172,6 +174,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     override fun onItemActionClick(view: View, index: Int, uid: String) {
         adapter!!.setAccepted(uid, true)
         map[uid] = true
+        currentIndex = index
         userListViewModel.acceptMicSeatApply(uid)
     }
 

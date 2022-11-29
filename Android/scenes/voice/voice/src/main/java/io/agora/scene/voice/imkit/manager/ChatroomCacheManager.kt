@@ -11,6 +11,7 @@ import io.agora.scene.voice.service.VoiceMemberModel
 import io.agora.scene.voice.service.VoiceMicInfoModel
 import io.agora.scene.voice.service.VoiceRankUserModel
 import io.agora.voice.buddy.tool.GsonTools
+import io.agora.voice.buddy.tool.LogTools.logE
 import java.io.*
 
 class ChatroomCacheManager {
@@ -165,6 +166,7 @@ class ChatroomCacheManager {
      * 根据chatUid 获取对应实体类
      */
     fun getMember(chatUid: String):VoiceMemberModel?{
+        "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logE("ChatroomCacheManager")
         return roomMemberMap[chatUid]
     }
 

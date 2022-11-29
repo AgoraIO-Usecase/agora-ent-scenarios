@@ -134,6 +134,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
                         cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
+//                        ChatroomIMManager.getInstance().initMicInfo()
                     }
                 }
             })
@@ -364,6 +365,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomObservableDelegate.destroy()
         ChatroomConfigManager.getInstance().removeChatRoomListener(this)
         ChatroomIMManager.getInstance().logout(false)
+        ChatroomIMManager.getInstance().clearCache()
         if (roomKitBean.isOwner){
             ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(roomKitBean.chatroomId,object :
                 CallBack{
