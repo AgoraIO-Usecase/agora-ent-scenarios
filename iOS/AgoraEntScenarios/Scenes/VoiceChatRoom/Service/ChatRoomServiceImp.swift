@@ -747,13 +747,31 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         var im_token = ""
         var im_uid = ""
         var chatroom_id = ""
+
+        let impGroup = DispatchGroup()
+        let impQueue = DispatchQueue(label: "com.agora.imp.www")
+
+        impGroup.enter()
+        impQueue.async {
+            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
+                im_uid = uid ?? ""
+                chatroom_id = room_id ?? ""
+                im_token = token ?? ""
+                impGroup.leave()
+            }
+            
+        }
         
-        NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
-            im_uid = uid ?? ""
-            chatroom_id = room_id ?? ""
-            im_token = token ?? ""
+        impGroup.enter()
+        impQueue.async {
             NetworkManager.shared.generateToken(channelName: channelId, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
                 VLUserCenter.user.agoraRTCToken = token ?? ""
+                impGroup.leave()
+            }
+        }
+        
+        impGroup.notify(queue: impQueue) {
+            DispatchQueue.main.async {
                 completion(im_token, im_uid, chatroom_id )
             }
         }
