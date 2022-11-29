@@ -391,8 +391,8 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 用户同意上麦邀请
      */
-    fun acceptMicSeatInvitation(micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
-        updateMicByResult(null,micIndex?:getFirstFreeMic(), MicClickAction.Accept, false, callback)
+    fun acceptMicSeatInvitation(chatUid: String,micIndex: Int? = null, callback: ValueCallBack<VoiceMicInfoModel>) {
+        updateMicByResult(ChatroomCacheManager.cacheManager.getMember(chatUid),micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
     }
 
     /////////////////////////// room ///////////////////////////////

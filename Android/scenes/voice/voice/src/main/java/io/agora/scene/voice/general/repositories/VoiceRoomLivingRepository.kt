@@ -59,13 +59,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.updateAnnouncement(content, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -81,13 +77,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.updateRobotVolume(value, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(Pair(value, result)))
-                        }
+                        callBack.onSuccess(createLiveData(Pair(value, result)))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -103,13 +95,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.startMicSeatApply(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -125,13 +113,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.cancelMicSeatApply(chatUid, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -147,13 +131,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.muteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -169,13 +149,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unMuteLocal(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread{
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread{
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -189,13 +165,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.leaveMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -209,13 +181,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.forbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -229,13 +197,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unForbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData( result))
-                        }
+                        callBack.onSuccess(createLiveData( result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -249,13 +213,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.kickOff(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread{
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -269,13 +229,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.refuseInvite(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -289,13 +245,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.lockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -309,13 +261,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unLockMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -329,13 +277,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<Map<Int,VoiceMicInfoModel>>>) {
                 voiceServiceProtocol.changeMic(oldIndex, newIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread {
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }
@@ -349,13 +293,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.acceptMicSeatInvitation(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        runOnMainThread {
-                            callBack.onSuccess(createLiveData(result))
-                        }
+                        callBack.onSuccess(createLiveData(result))
                     } else {
-                        runOnMainThread{
-                            callBack.onError(error)
-                        }
+                        callBack.onError(error)
                     }
                 })
             }

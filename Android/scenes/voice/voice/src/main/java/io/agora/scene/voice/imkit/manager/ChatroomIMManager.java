@@ -602,7 +602,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param callBack
      */
     public void acceptMicSeatInvitation(ValueCallBack<VoiceMicInfoModel> callBack){
-        delegate.acceptMicSeatInvitation(null,callBack);
+        delegate.acceptMicSeatInvitation(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),null,callBack);
     }
 
     /**
