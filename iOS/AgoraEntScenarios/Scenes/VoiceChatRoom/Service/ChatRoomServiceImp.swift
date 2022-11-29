@@ -227,13 +227,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void) {
         if self.userList?.count ?? 0 > 0 {
             var mics_id = ""
-            for mic in self.mics {
-                if mic.member != nil {
-                    mics_id += mic.member?.channel_id ?? ""
+            for i in 1...6 {
+                let mic = self.mics[safe: i]
+                if mic?.member != nil {
+                    mics_id += mic?.member?.chat_uid ?? ""
                 }
             }
             let list = self.userList?.filter({
-                !mics_id.z.isMatchRegular(expression: $0.chat_uid ?? "")
+                mics_id.z.rangeOfString($0.chat_uid ?? "").length <= 0
             })
             completion(nil,list)
 
