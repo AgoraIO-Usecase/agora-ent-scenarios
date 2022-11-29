@@ -78,6 +78,8 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         entity.is_private = !code.isEmpty
         entity.name = name
         entity.roomPassword = code
+        self.toLive.isUserInteractionEnabled = false
+        self.navigation.back.isUserInteractionEnabled = false
         ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
             SVProgressHUD.dismiss()
             if let room = room {
@@ -89,11 +91,16 @@ public class VRSoundEffectsViewController: VRBaseViewController {
                         info.mic_info = nil
                         let vc = VoiceRoomViewController(info: info)
                         self.navigationController?.pushViewController(vc, animated: true)
+                        self.toLive.isUserInteractionEnabled = true
+                        self.navigation.back.isUserInteractionEnabled = true
                     } else {
-                        
+                        self.toLive.isUserInteractionEnabled = true
+                        self.navigation.back.isUserInteractionEnabled = true
                     }
                 })
             } else {
+                self.toLive.isUserInteractionEnabled = true
+                self.navigation.back.isUserInteractionEnabled = true
                 self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
             }
         }
