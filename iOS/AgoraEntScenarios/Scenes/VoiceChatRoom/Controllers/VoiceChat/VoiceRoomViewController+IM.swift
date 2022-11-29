@@ -101,10 +101,23 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
+        
         if attributeMap!.keys.contains(where: { text in
             text.hasPrefix("mic_")
         }) {
             updateMic(attributeMap, fromId: fromId)
+        }
+        
+        if attributeMap!.keys.contains(where: { text in
+            text.hasPrefix("use_robot")
+        }) {
+            guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
+            let use_robot: String = (attributeMap?["use_robot"])! as String
+            let mic_info = mic
+            mic_info.status = use_robot == "1" ? 5 : -2
+            self.roomInfo?.room?.use_robot = use_robot == "1"
+            self.roomInfo?.mic_info![6] = mic_info
+            self.rtcView.updateAlien(mic_info.status)
         }
     }
     
