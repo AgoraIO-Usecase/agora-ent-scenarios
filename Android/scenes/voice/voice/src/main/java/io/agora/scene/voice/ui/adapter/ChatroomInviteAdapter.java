@@ -48,7 +48,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
                 @Override
                 public void onClick(View view) {
                     if (listener != null)
-                        listener.onItemActionClick(view,position,item.getUserId());
+                        listener.onItemActionClick(view,position,item.getChatUid());
                 }
             });
             if (checkMap.containsKey(item.getUserId())){

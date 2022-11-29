@@ -70,6 +70,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         CustomMsgHelper.getInstance().setChatRoomInfo(chatroomId);
         //设置语聊房协议代理
         delegate = new ChatroomProtocolDelegate(chatroomId);
+        clearCache();
     }
 
 
@@ -456,6 +457,10 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public VoiceMemberModel getMySelfModel(){
        return delegate.getMySelfModel();
+    }
+
+    public void clearCache(){
+        delegate.clearCache();
     }
 
     /**
