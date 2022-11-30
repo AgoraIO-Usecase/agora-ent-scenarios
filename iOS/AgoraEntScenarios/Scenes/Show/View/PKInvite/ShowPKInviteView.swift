@@ -24,7 +24,7 @@ class ShowPKInviteView: UIView {
             let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
             let pkTipsVisible = pkInfo == nil ? false : true
             _showTipsView(show: pkTipsVisible)
-            pkTipsLabel.text = "与主播\(pkInfo?.userName ?? "")PK中"
+            pkTipsLabel.text = String(format: "与主播%@PK中".show_localized, pkInfo?.userName ?? "")
         }
     }
     private lazy var titleLabel: AGELabel = {

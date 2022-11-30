@@ -114,9 +114,10 @@ class ShowApplyView: UIView {
     }
     
     private func setupTipsInfo(count: Int) {
-        let text = " 正在等待"
+        let text = " "+"正在等待".show_localized
         let attrs = NSMutableAttributedString(string: text)
-        let attr = NSAttributedString(string: "\(count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+        let attr = NSAttributedString(string: "\(count)"+"人".show_localized,
+                                      attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         self.tipsLabel.attributedText = attrs
     }
