@@ -395,12 +395,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.setRemoteUserInfo(name: "")
             
         case .onSeat:
-//            applyView.getAllMicSeatList(autoApply: false)
-//            liveView.bottomBar.linkButton.isShowRedDot = false
-//            liveView.bottomBar.linkButton.isSelected = false
-            print("onInterationEnded on seat")
-            
-            //TODO:
             let videoCanvas = AgoraRtcVideoCanvas()
             videoCanvas.uid = UInt(interaction.userId ?? "") ?? 0
             videoCanvas.view = nil
@@ -408,6 +402,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
+            applyView.getAllMicSeatList(autoApply: false)
+            liveView.bottomBar.linkButton.isShowRedDot = false
+            liveView.bottomBar.linkButton.isSelected = false
+            
         default:
             break
         }
