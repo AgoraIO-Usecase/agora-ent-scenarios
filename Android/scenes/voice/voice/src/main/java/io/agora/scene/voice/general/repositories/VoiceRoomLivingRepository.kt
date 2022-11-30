@@ -197,7 +197,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
                 voiceServiceProtocol.unForbidMic(micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData( result))
+                        callBack.onSuccess(createLiveData(result))
                     } else {
                         callBack.onError(error)
                     }
@@ -272,9 +272,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     // 换麦
-    fun changeMic(oldIndex: Int, newIndex: Int): LiveData<Resource<Map<Int,VoiceMicInfoModel>>> {
-        val resource = object : NetworkOnlyResource<Map<Int,VoiceMicInfoModel>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Map<Int,VoiceMicInfoModel>>>) {
+    fun changeMic(oldIndex: Int, newIndex: Int): LiveData<Resource<Map<Int, VoiceMicInfoModel>>> {
+        val resource = object : NetworkOnlyResource<Map<Int, VoiceMicInfoModel>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Map<Int, VoiceMicInfoModel>>>) {
                 voiceServiceProtocol.changeMic(oldIndex, newIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
@@ -308,6 +308,24 @@ class VoiceRoomLivingRepository : BaseRepository() {
         val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
                 voiceServiceProtocol.fetchGiftContribute(completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    /**
+     * 离开syncManager 房间
+     */
+    fun leaveSyncManagerRoom(roomId: String): LiveData<Resource<Boolean>> {
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.leaveRoom(roomId, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
