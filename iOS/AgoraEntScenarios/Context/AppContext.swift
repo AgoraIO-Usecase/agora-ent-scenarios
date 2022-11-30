@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Bugly
 
 @objc class AppContext: NSObject {
     @objc static let shared: AppContext = .init()
