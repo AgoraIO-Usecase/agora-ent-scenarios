@@ -668,7 +668,7 @@ class RoomObservableViewDelegate constructor(
                         }
                         MicClickAction.OffStage -> {
                             //用户主动下台
-                            roomLivingViewModel.leaveMicMic(micInfo.micIndex)
+                            roomLivingViewModel.leaveMic(micInfo.micIndex)
                         }
                     }
                 }
