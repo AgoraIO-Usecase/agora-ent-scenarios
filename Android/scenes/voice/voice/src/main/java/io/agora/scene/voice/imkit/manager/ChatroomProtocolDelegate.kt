@@ -226,33 +226,36 @@ class ChatroomProtocolDelegate constructor(
      * 交换麦位
      */
     fun changeMic(fromMicIndex: Int, toMicIndex: Int, callback: ValueCallBack<Map<Int, VoiceMicInfoModel>>) {
-        val attributeMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
+        val attributeMap = mutableMapOf<String, String>()
         val fromKey = getMicIndex(fromMicIndex)
         val toKey = getMicIndex(toMicIndex)
         val fromBean = getMicInfo(fromMicIndex)
         val toMicBean = getMicInfo(toMicIndex)
-        val fromBeanValue = GsonTools.beanToString(fromBean)
-        val toBeanValue = GsonTools.beanToString(toMicBean)
         if (toMicBean != null && fromBean != null && toMicBean.micStatus == -1) {
+            fromBean.member?.micIndex  = toMicIndex
+            fromBean.micIndex = toMicIndex
+            toMicBean.micIndex = fromMicIndex
+            val fromBeanValue = GsonTools.beanToString(fromBean)
+            val toBeanValue = GsonTools.beanToString(toMicBean)
             if (toBeanValue != null) {
-                attributeMap?.put(fromKey, toBeanValue)
+                attributeMap[fromKey] = toBeanValue
             }
             if (fromBeanValue != null) {
-                attributeMap?.put(toKey, fromBeanValue)
+                attributeMap[toKey] = fromBeanValue
             }
             roomManager.asyncSetChatroomAttributesForced(
-                roomId, attributeMap, true
+                roomId, attributeMap, false
             ) { code, result_map ->
                 if (code == 0 && result_map.isEmpty()) {
                     val map = mutableMapOf<Int, VoiceMicInfoModel>()
                     map[fromMicIndex] = toMicBean
                     map[toMicIndex] = fromBean
-                    attributeMap?.let { ChatroomCacheManager.cacheManager.setMicInfo(it) }
+                    attributeMap.let { ChatroomCacheManager.cacheManager.setMicInfo(it) }
                     callback.onSuccess(map)
-                    "update result onSuccess: ".logE(TAG)
+                    "changeMic update result onSuccess: ".logE(TAG)
                 } else {
                     callback.onError(code, result_map.toString())
-                    "update result onError: $code $result_map ".logE(TAG)
+                    "changeMic update result onError: $code $result_map ".logE(TAG)
                 }
             }
         }
@@ -497,7 +500,7 @@ class ChatroomProtocolDelegate constructor(
         val value = GsonTools.beanToString(voiceMicInfo) ?: return
         if (isForced) {
             roomManager.asyncSetChatroomAttributeForced(roomId, getMicIndex(micIndex),
-                value, true, object : CallBack {
+                value, false, object : CallBack {
                     override fun onSuccess() {
                         val attributeMap = mutableMapOf<String, String>()
                         attributeMap[getMicIndex(micIndex)] = value
@@ -513,7 +516,7 @@ class ChatroomProtocolDelegate constructor(
                 })
         } else {
             roomManager.asyncSetChatroomAttribute(roomId, getMicIndex(micIndex),
-                value, true, object : CallBack {
+                value, false, object : CallBack {
                     override fun onSuccess() {
                         val attributeMap = mutableMapOf<String, String>()
                         attributeMap[getMicIndex(micIndex)] = value
@@ -640,7 +643,7 @@ class ChatroomProtocolDelegate constructor(
 
         rankList.add(voiceRankModel)
         roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankList),
-            true,object : CallBack{
+            false,object : CallBack{
             override fun onSuccess() {
                 callback.onSuccess()
                 ChatroomCacheManager.cacheManager.setRankList(voiceRankModel)
@@ -734,7 +737,7 @@ class ChatroomProtocolDelegate constructor(
         newMemberList.add(getMySelfModel())
         val member = GsonTools.beanToString(memberList)
         roomManager.asyncSetChatroomAttributeForced(roomId,
-            "member_list",member,true,object : CallBack{
+            "member_list",member,false,object : CallBack{
             override fun onSuccess() {
                 callback.onSuccess(newMemberList)
                 "addMemberListBySelf onSuccess: ".logE(TAG)
