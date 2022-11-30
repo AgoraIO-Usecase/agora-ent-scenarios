@@ -27,7 +27,7 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:textColor="@color/show_music_effect_item_text_bg"
             android:textSize="12sp"
             android:padding="3dp"
             tools:text="欢乐"/>

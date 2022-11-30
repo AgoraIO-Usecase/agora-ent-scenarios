@@ -12,10 +12,13 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.*
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -52,6 +55,7 @@ class LiveDetailActivity : ComponentActivity() {
 
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
         null
+    private val mMusicEffectDialog by lazy { MusicEffectDialog(this) }
 
     private val mBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
     private lateinit var mPermissionHelp: PermissionHelp
@@ -157,8 +161,36 @@ class LiveDetailActivity : ComponentActivity() {
         }.show()
     }
 
-    private fun updateTopUserCount(count: Int) =
+    private fun refreshTopUserCount(count: Int) =
         runOnUiThread { mBinding.topLayout.tvUserCount.text = count.toString() }
+
+    private fun changeStatisticVisible(){
+        val topBinding = mBinding.topLayout
+        val visible = !topBinding.tlStatistic.isVisible
+        topBinding.tlStatistic.isVisible = visible
+        topBinding.ivStatisticClose.isVisible = visible
+        refreshStatisticInfo(0, 0, 0, 0, 0, 0)
+        topBinding.ivStatisticClose.setOnClickListener {
+            topBinding.tlStatistic.isVisible = false
+            topBinding.ivStatisticClose.isVisible = false
+        }
+    }
+
+    private fun refreshStatisticInfo(bitrate: Int? = null, fps: Int? = null, delay: Int? = null,
+                                     lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null){
+        val topBinding = mBinding.topLayout
+        val statisticBinding = topBinding.tlStatistic
+        val visible = statisticBinding.isVisible
+        if(!visible){
+            return
+        }
+        bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
+        delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
+        lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
+        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
+        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
+    }
 
     private fun showPermissionLeakDialog(yes: () -> Unit) {
         AlertDialog.Builder(this).apply {
@@ -190,10 +222,17 @@ class LiveDetailActivity : ComponentActivity() {
             setItemActivated(SettingDialog.ITEM_ID_MIC, true)
             setOnItemActivateChangedListener{dialog, itemId, activated ->
                 when(itemId){
-                    SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
+                    SettingDialog.ITEM_ID_CAMERA -> {
+                        VideoSetting.cameraIsFront = !VideoSetting.cameraIsFront
+                        mRtcEngine.switchCamera()
+                    }
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.enableLocalVideo(activated)
                     SettingDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
+                    SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
+                    SettingDialog.ITEM_ID_SETTING -> {
+
+                    }
                 }
             }
             show()
@@ -202,13 +241,10 @@ class LiveDetailActivity : ComponentActivity() {
 
     private fun showPictureQualityDialog(parentDialog: SettingDialog) {
         PictureQualityDialog(this).apply {
-            setOnQualitySelectListener { dialog, qualityIndex ->
-                when(qualityIndex){
-                    PictureQualityDialog.QUALITY_INDEX_1080P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_720P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_540P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_360P -> {}
-                }
+            setSelectQuality(VideoSetting.cameraResolution.width, VideoSetting.cameraResolution.height)
+            setOnQualitySelectListener { dialog, qualityIndex, size ->
+                VideoSetting.cameraResolution = size
+                updateRtcVideoConfig()
             }
 
             setOnShowListener { parentDialog.dismiss() }
@@ -225,9 +261,55 @@ class LiveDetailActivity : ComponentActivity() {
     }
 
     private fun showMusicEffectDialog(){
-        MusicEffectDialog(this).apply {
-            show()
+        mMusicEffectDialog.setOnItemSelectedListener { musicEffectDialog, itemId ->
+            when(itemId){
+                MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE ->{
+                    mRtcEngine.stopAudioMixing()
+                }
+                MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY ->{
+                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                }
+                MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC ->{
+                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                }
+                MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 ->{
+                    mRtcEngine.startAudioMixing("/assets/romantic.wav", false, -1)
+                }
+
+                MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL ->{
+                    mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CONVERSION_OFF)
+                }
+                MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_SWEET ->{
+                    mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SWEET)
+                }
+                MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ZHONGXIN ->{
+                    mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_NEUTRAL)
+                }
+                MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_WENZHONG ->{
+                    mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_SOLID)
+                }
+                MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_MOHUAN ->{
+                    mRtcEngine.setVoiceConversionPreset(Constants.VOICE_CHANGER_BASS)
+                }
+
+                MusicEffectDialog.ITEM_ID_MIXING_NONE -> {
+                    mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF)
+                }
+                MusicEffectDialog.ITEM_ID_MIXING_KTV -> {
+                    mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_KTV)
+                }
+                MusicEffectDialog.ITEM_ID_MIXING_CONCERT -> {
+                    mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_VOCAL_CONCERT)
+                }
+                MusicEffectDialog.ITEM_ID_MIXING_LUYINPEN -> {
+                    mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_STUDIO)
+                }
+                MusicEffectDialog.ITEM_ID_MIXING_KONGKUANG -> {
+                    mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_SPACIAL)
+                }
+            }
         }
+        mMusicEffectDialog.show()
     }
 
 
@@ -236,7 +318,7 @@ class LiveDetailActivity : ComponentActivity() {
     private fun initService() {
         mService.subscribeUser { _, _ ->
             mService.getAllUserList({
-                updateTopUserCount(it.size)
+                refreshTopUserCount(it.size)
             })
         }
         mService.subscribeMessage { _, showMessage ->
@@ -262,10 +344,38 @@ class LiveDetailActivity : ComponentActivity() {
                 ToastUtils.showToast(RtcEngine.getErrorDescription(err))
             }
 
+            override fun onLocalVideoStats(
+                source: Constants.VideoSourceType?,
+                stats: LocalVideoStats?
+            ) {
+                super.onLocalVideoStats(source, stats)
+                refreshStatisticInfo(
+                    bitrate = stats?.encodedBitrate,
+                    fps = stats?.encoderOutputFrameRate,
+                    lossPackage = stats?.txPacketLossRate
+                )
+            }
+
+            override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
+                super.onUplinkNetworkInfoUpdated(info)
+                refreshStatisticInfo(
+                    upLinkBps = info?.video_encoder_target_bitrate_bps
+                )
+            }
+
+            override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
+                super.onDownlinkNetworkInfoUpdated(info)
+                refreshStatisticInfo(
+                    downLinkBps = info?.bandwidth_estimation_bps,
+                    delay = info?.lastmile_buffer_delay_time_ms
+                )
+            }
+
         }
         mRtcEngine = RtcEngine.create(config) as RtcEngineEx
         mRtcEngine.enableVideo()
         mRtcEngine.registerVideoFrameObserver(mBeautyProcessor)
+        updateRtcVideoConfig()
 
         checkRequirePerms {
             joinChannel()
@@ -328,6 +438,30 @@ class LiveDetailActivity : ComponentActivity() {
                 showPermissionLeakDialog(granted)
             },
             force
+        )
+    }
+
+    private fun updateRtcVideoConfig(){
+        val resolution = VideoSetting.cameraResolution
+        val isFrontCamera = VideoSetting.cameraIsFront
+
+        mRtcEngine.setCameraCapturerConfiguration(
+            CameraCapturerConfiguration(
+                if (isFrontCamera) CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT else CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_REAR,
+                CameraCapturerConfiguration.CaptureFormat(
+                    resolution.width,
+                    resolution.height,
+                    15
+                )
+            )
+        )
+        mRtcEngine.setVideoEncoderConfiguration(
+            VideoEncoderConfiguration(
+                VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height),
+                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15,
+                0,
+                VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
+            )
         )
     }
 
