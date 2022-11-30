@@ -632,21 +632,38 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 更新榜单
      */
-    fun updateRankList(giftBean: VoiceGiftModel,callback: CallBack){
-        val rankList = ChatroomCacheManager.cacheManager.getRankList()
+    fun updateRankList(chatUid:String,giftBean: VoiceGiftModel,callback: CallBack){
+        //首先拿到所有的数据
+        val rankMap = ChatroomCacheManager.cacheManager.getRankMap()
+        //创建一个新列表
+        val rankingList = mutableListOf<VoiceRankUserModel>()
+        //获取指定id的对象
+        var voiceRankModel = rankMap[chatUid]
+        if (voiceRankModel == null){
+            voiceRankModel = VoiceRankUserModel()
+        }
+        var newAmount = 0
         val name = giftBean.userName
         val portrait = giftBean.portrait
         val count = giftBean.gift_count?.toInt()
         val price = giftBean.gift_price?.toInt()
-        val voiceRankModel =  VoiceRankUserModel()
         if (count != null && price !=null){
-            voiceRankModel.amount = count * price
+            newAmount = count * price
         }
+        val oldAmount = voiceRankModel.amount
+        if (oldAmount != null){
+            voiceRankModel.amount = oldAmount + newAmount
+        }else{
+            voiceRankModel.amount = newAmount
+        }
+        voiceRankModel.chatUid = chatUid
         voiceRankModel.name = name
         voiceRankModel.portrait = portrait
-
-        rankList.add(voiceRankModel)
-        roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankList),
+        rankMap[chatUid] = voiceRankModel
+        for (entry in rankMap.entries) {
+            rankingList.add(entry.value)
+        }
+        roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankingList),
             false,object : CallBack{
             override fun onSuccess() {
                 callback.onSuccess()

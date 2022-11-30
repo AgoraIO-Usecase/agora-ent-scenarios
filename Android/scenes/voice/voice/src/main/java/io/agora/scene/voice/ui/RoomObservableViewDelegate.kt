@@ -32,6 +32,7 @@ import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
 import io.agora.scene.voice.annotation.MicClickAction
 import io.agora.scene.voice.annotation.MicStatus
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
@@ -892,6 +893,13 @@ class RoomObservableViewDelegate constructor(
             voiceRoomModel.useRobot = attributeMap["use_robot"] == "1"
             ThreadManager.getInstance().runOnMainThread {
                 iRoomMicView.activeBot(voiceRoomModel.useRobot)
+            }
+        } else if(attributeMap.containsKey("ranking_list")){
+            val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
+            rankList?.let { rankUsers ->
+                rankUsers.forEach { rank ->
+                    ChatroomCacheManager.cacheManager.setRankList(rank)
+                }
             }
         }
         dealMicDataMap(newMicMap)
