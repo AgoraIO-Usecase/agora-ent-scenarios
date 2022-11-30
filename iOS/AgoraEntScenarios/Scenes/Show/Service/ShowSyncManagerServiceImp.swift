@@ -441,6 +441,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     guard let interaction = self.interactionList.filter({ $0.userId == model.userId}).first else {return}
                     if interaction.muteAudio == model.userMuteAudio { return }
                     interaction.muteAudio = model.userMuteAudio
+                    interaction.ownerMuteAudio = model.fromUserMuteAudio
                     self._updateInteraction(interaction: interaction) { err in
                     }
                 }
@@ -545,7 +546,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func muteAudio(mute:Bool, userId: String, completion: @escaping (Error?) -> Void) {
         if let interaction = self.interactionList.filter({ $0.userId == userId}).first, interaction.interactStatus == .onSeat {
             //is on seat
-            interaction.muteAudio = mute
+            if userId == room?.ownerId {
+                interaction.ownerMuteAudio = mute
+            } else {
+                interaction.muteAudio = mute
+            }
             _updateInteraction(interaction: interaction) { err in
             }
         }
@@ -1284,6 +1289,7 @@ extension ShowSyncManagerServiceImp {
                     pkInvitation.fromUserMuteAudio = invitation.fromUserMuteAudio
                     guard let interaction = self.interactionList.filter({ $0.userId == pkInvitation.fromUserId}).first else {return}
                     interaction.muteAudio = pkInvitation.fromUserMuteAudio
+                    interaction.ownerMuteAudio = pkInvitation.userMuteAudio
                     self._updateInteraction(interaction: interaction) { err in
                     }
                     return
