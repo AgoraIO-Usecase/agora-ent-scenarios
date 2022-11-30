@@ -53,10 +53,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
     public var roomInfo: VRRoomInfo? {
         didSet {
-            if let entity = roomInfo?.room {
-                if headerView == nil { return }
-                headerView.entity = entity
-            }
             VoiceRoomUserInfo.shared.currentRoomOwner = self.roomInfo?.room?.owner
             if let mics = roomInfo?.mic_info {
                 if let type = roomInfo?.room?.type {
@@ -155,6 +151,7 @@ extension VoiceRoomViewController {
                                 if let info = self.roomInfo {
                                     info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                                     self.roomInfo = info
+                                    self.headerView.updateHeader(with: info.room)
                                     ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
                                 }
                                 
@@ -218,7 +215,7 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
-                self?.roomInfo = info
+                self?.headerView.updateHeader(with: info.room)
                 guard let mics = self?.roomInfo?.mic_info else { return }
                 if self?.roomInfo?.room?.member_list == nil {
                     self?.roomInfo?.room?.member_list = [VRUser]()
@@ -245,7 +242,7 @@ extension VoiceRoomViewController {
             if error == nil, users != nil {
                 let info = self.roomInfo
                 info?.room?.ranking_list = users
-                self.roomInfo = info
+                self.headerView.updateHeader(with: info?.room)
             }
         }
     }
@@ -276,7 +273,7 @@ extension VoiceRoomViewController {
         if let entity = roomInfo?.room {
             sRtcView.isHidden = entity.type == 0
             rtcView.isHidden = entity.type == 1
-            headerView.entity = entity
+            headerView.updateHeader(with: entity)
         }
 
         bgImgView.snp.makeConstraints { make in
