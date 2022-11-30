@@ -141,6 +141,7 @@ class ShowInteractionInfo: ShowBaseInfo {
     var userName: String?                               //用户名
     var roomId: String?                                 //用户所在房间id
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
+    var muteAudio: Bool = false                         //静音状态
     var createdAt: Int64 = 0                            //创建时间，与19700101时间比较的毫秒数
     
     #if DEBUG

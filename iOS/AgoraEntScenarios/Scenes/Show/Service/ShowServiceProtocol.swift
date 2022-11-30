@@ -165,7 +165,15 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// - Parameter completion: <#completion description#>
     func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void)
     
+    
+    
+    /// 静音设置
+    /// - Parameters:
+    ///   - mute: <#mute description#>
+    ///   - completion: <#completion description#>
+    func muteAudio(mute:Bool, completion: @escaping (Error?) -> Void)
 
+    
     
     func unsubscribeEvent(delegate: ShowSubscribeServiceProtocol)
     
