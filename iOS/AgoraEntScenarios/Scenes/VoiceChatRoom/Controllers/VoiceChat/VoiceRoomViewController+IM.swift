@@ -34,15 +34,15 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.room?.gift_amount = gift_amount
         }
         //刷新礼物贡献总数，头部
-        self.fetchGiftContribution()
+//        self.fetchGiftContribution()
     }
     
     func fetchGiftContribution() {
-        let seconds: [Double] = [0,1,2,3]
-        guard let refreshSeconds = seconds.randomElement() else { return }
-        Throttler.throttle(delay: .seconds(refreshSeconds)) {
-            self.requestRankList()
-        }
+//        let seconds: [Double] = [0,1,2,3]
+//        guard let refreshSeconds = seconds.randomElement() else { return }
+//        Throttler.throttle(delay: .seconds(refreshSeconds)) {
+//            self.requestRankList()
+//        }
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
@@ -50,8 +50,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
+        self.refreshApplicants(chat_uid: chat_uid)
+    }
+    
+    func refreshApplicants(chat_uid: String) {
         ChatRoomServiceImp.getSharedInstance().applicants = ChatRoomServiceImp.getSharedInstance().applicants.filter({
-            $0.member?.chat_uid != chat_uid
+            ($0.member?.chat_uid ?? "") != chat_uid
         })
     }
     
@@ -63,8 +67,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         // 更新用户人数
         let info = roomInfo
         info?.room?.member_count! += 1
-        info?.room?.click_count! += 1
-        headerView.updateHeader(with: info?.room)
+        roomInfo = info
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
@@ -102,14 +105,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-        
-        if attributeMap!.keys.contains(where: { text in
+        guard let properties = attributeMap else { return }
+        if properties.keys.contains(where: { text in
             text.hasPrefix("mic_")
         }) {
             self.updateMic(attributeMap, fromId: fromId)
         }
         
-        if attributeMap!.keys.contains(where: { text in
+        if properties.keys.contains(where: { text in
             text.hasPrefix("use_robot")
         }) {
             guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
@@ -120,30 +123,22 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.mic_info![6] = mic_info
             self.rtcView.updateAlien(mic_info.status)
         }
+        if properties.keys.contains(where: {
+            $0 == "ranking_list"
+        }) {
+            self.roomInfo?.room?.ranking_list = properties["ranking_list"]?.toArray()?.kj.modelArray(VRUser.self)
+        }
     }
     
     func onUserLeftRoom(roomId: String, userName: String) {
         let info = roomInfo
         let count: Int = info?.room?.member_count ?? 0
         info?.room?.member_count = count - 1
-        headerView.updateHeader(with: info?.room)
-        if let micInfos = info?.mic_info {
-            for mic in micInfos {
-                if let user: VRUser = mic.member {
-                    if user.rtc_uid == userName {
-                        let memeber = mic
-                        memeber.member = nil
-                        memeber.status = -1
-                        rtcView.updateUser(memeber)
-                        break
-                    }
-                }
-            }
-        }
-       
+        roomInfo = info
         self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
             $0.chat_uid != userName
         })
+        self.refreshApplicants(chat_uid: userName)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
     }
     
@@ -154,29 +149,30 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         }
     }
 
+//    func refuseInvite(roomId: String, meta: [String: String]?) {
+//        let user = model(from: meta ?? [:], VRUser.self)
+//        if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "" {
+//            return
+//        }
+//        self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
+//        self.view.makeToast("User \(user.name ?? "")" + "rejected Invitation".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
+//    }
+
     private func updateMic(_ map: [String: String]?, fromId: String) {
+        //如果换麦的话fromId也就是操作人是同一个，只需要取首位两个key对应模型的index将本地缓存互换即可，如果是上麦的话，单次操作人只会操作一个麦位直接取第一个更新即可，机器人收到开关本地更新即可，这里不做任何机器人逻辑，浪费io
+        
         guard let mic_info = map else { return }
         let keys = mic_info.keys.map { $0 }
+        var mics = [VRRoomMic]()
         for key in keys {
             let value: String = mic_info[key] ?? ""
             let mic_dic: [String: Any] = value.z.jsonToDictionary()
             let mic: VRRoomMic = model(from: mic_dic, type: VRRoomMic.self) as! VRRoomMic
-            let old_mic = ChatRoomServiceImp.getSharedInstance().mics.first {
-                $0.member?.chat_uid ?? "" == fromId
-            }
-            if old_mic?.member != nil {
-                old_mic?.member = nil
-            }
             let status = mic.status
             let mic_index = mic.mic_index
             if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
                 refreshHandsUp(status: status)
             }
-            let same = ChatRoomServiceImp.getSharedInstance().mics.filter {
-                $0.member?.chat_uid ?? "" == fromId
-            }
-            let old = same.first { $0.member?.mic_index ?? 1 != mic_index}
-            ChatRoomServiceImp.getSharedInstance().mics[safe: old?.mic_index ?? 1]?.member = nil
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                 $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
@@ -208,9 +204,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 if mic.member != nil {
                     mic.member?.mic_index = mic_index
                 }
-                roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
-                roomInfo?.mic_info?[mic_index] = mic
-                rtcView.updateUser(mic)
+                mics.append(mic)
                 if let user = mic.member {
                     if let uid = user.uid {
                         let local_uid = VoiceRoomUserInfo.shared.user?.uid
@@ -229,6 +223,19 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         rtckit.muteLocalAudioStream(mute: true)
                     }
                 }
+            }
+        }
+        if mics.count == 2,let first = mics.first,let last = mics.last {
+            ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
+            ChatRoomServiceImp.getSharedInstance().mics[last.mic_index] = last
+            roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
+            rtcView.updateUser(first)
+            rtcView.updateUser(last)
+        } else {
+            if let first = mics.first {
+                ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
+                roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
+                rtcView.updateUser(first)
             }
         }
     }
@@ -259,8 +266,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": UIDevice.current.deviceUUID, "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? userAvatar, "name": VoiceRoomUserInfo.shared.user?.name ?? ""], classType: VRUser.self) { [weak self] user, error in
             if error == nil {
                 VoiceRoomUserInfo.shared.user = user
-                VoiceRoomBusinessRequest.shared.userToken = user?.authorization ?? ""
-                AgoraChatClient.shared().renewToken(user?.im_token ?? "")
+                AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
             } else {
                 self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
