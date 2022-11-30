@@ -187,8 +187,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            //TODO: leave query dialog
-            leaveRoom()
+            let vc = ShowReceiveLiveFinishAlertVC()
+            vc.dismissAlert { [weak self] in
+                self?.leaveRoom()
+            }
+            
+            self.present(vc, animated: true)
         }
     }
     
@@ -252,7 +256,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 switch result {
                 case .accept:
                     AppContext.showServiceImp.acceptMicSeatInvitation { error in
-                        
                     }
                     break
                 default:
