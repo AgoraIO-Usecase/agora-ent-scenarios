@@ -27,9 +27,8 @@ class ShowReceivePKView: UIView {
     
     var name: String? {
         didSet {
-            guard let name = name else { return }
             let attributedText = NSMutableAttributedString(string: "show_alert_pk_title_1".show_localized, attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_Ellipse6])
-            let attributedName = NSAttributedString(string: name, attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_blue03])
+            let attributedName = NSAttributedString(string: name ?? "", attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_blue03])
             let tailText = NSAttributedString(string: "show_alert_pk_title_2".show_localized, attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_Ellipse6])
             attributedText.append(attributedName)
             attributedText.append(tailText)
