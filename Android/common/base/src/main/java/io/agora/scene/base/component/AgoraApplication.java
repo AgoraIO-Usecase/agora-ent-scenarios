@@ -7,6 +7,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.elvishew.xlog.XLog;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.utils.LogUtils;
@@ -26,10 +27,15 @@ public class AgoraApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        initBugly();
         initARouter();
         initAutoSize();
         RxJavaPlugins.setErrorHandler(throwable -> LogUtils.INSTANCE.e("AgoraApplication", throwable.toString()));
         XLog.init();
+    }
+
+    private void initBugly(){
+        CrashReport.initCrashReport(getApplicationContext(), "0e701c6bd0", BuildConfig.DEBUG);
     }
 
     private void initARouter() {

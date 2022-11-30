@@ -71,6 +71,7 @@ class RoomObservableViewDelegate constructor(
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
 
+    /**本地mute标志*/
     private var isLocalAudioMute: Boolean = true
 
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
@@ -745,7 +746,7 @@ class RoomObservableViewDelegate constructor(
         if (updateRankRunnable != null) {
             ThreadManager.getInstance().removeCallbacks(updateRankRunnable)
         }
-        val longDelay = Random.nextInt(1000, 10000)
+        val longDelay = Random.nextInt(1000, 5000)
         "receiveGift longDelay：$longDelay".logD(TAG)
         updateRankRunnable = Runnable {
             roomLivingViewModel.fetchGiftContribute()
@@ -779,18 +780,18 @@ class RoomObservableViewDelegate constructor(
     fun receiveSystem(ext: MutableMap<String, String>) {
         ThreadManager.getInstance().runOnMainThread {
             if (ext.containsKey("click_count")) {
-                ext["click_count"]?.let {
-                    iRoomTopView.onUpdateWatchCount(it.toIntOrNull() ?: -1)
+                ext["click_count"]?.toIntOrNull()?.let {
+                    iRoomTopView.onUpdateWatchCount(it)
                 }
             }
             if (ext.containsKey("member_count")) {
-                ext["member_count"]?.let {
-                    iRoomTopView.onUpdateMemberCount(it.toIntOrNull() ?: -1)
+                ext["member_count"]?.toIntOrNull()?.let {
+                    iRoomTopView.onUpdateMemberCount(it)
                 }
             }
             if (ext.containsKey("gift_amount")) {
-                ext["gift_amount"]?.let {
-                    iRoomTopView.onUpdateGiftCount(it.toIntOrNull() ?: -1)
+                ext["gift_amount"]?.toIntOrNull()?.let {
+                    iRoomTopView.onUpdateGiftCount(it)
                 }
             }
         }
@@ -877,7 +878,6 @@ class RoomObservableViewDelegate constructor(
         voiceRoomModel.robotVolume = volume?.toInt() ?: ConfigConstants.RotDefaultVolume
     }
 
-    // TODO: 区分key
     fun onSeatUpdated(attributeMap: Map<String, String>) {
         // mic
         val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
@@ -891,18 +891,25 @@ class RoomObservableViewDelegate constructor(
         val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, roomKitBean.ownerId)
 
         if (attributeMap.containsKey("gift_amount")) {
-            // TODO:
+            attributeMap["gift_amount"]?.toIntOrNull()?.let {
+                voiceRoomModel.giftAmount = it
+                ThreadManager.getInstance().runOnMainThread {
+                    iRoomTopView.onUpdateGiftCount(it)
+                }
+            }
         } else if (attributeMap.containsKey("robot_volume")) {
-            // TODO:
+            attributeMap["robot_volume"]?.toIntOrNull()?.let {
+                voiceRoomModel.robotVolume = it
+            }
         } else if (attributeMap.containsKey("use_robot")) {
-            // TODO:
+            // TODO: 魔法值
+            voiceRoomModel.useRobot = attributeMap["use_robot"] == "1"
         }
         dealMicDataMap(newMicMap)
         ThreadManager.getInstance().runOnMainThread {
             updateViewByMicMap(newMicMap)
         }
     }
-
     /**
      * 处理麦位数据
      */
@@ -959,6 +966,12 @@ class RoomObservableViewDelegate constructor(
         } else {
             chatPrimaryMenuView.setEnableHand(isOnMic())
             isRequesting = false
+        }
+    }
+
+    fun checkUserLeaveMic() {
+        if (mySelfIndex()>0){
+            roomLivingViewModel.leaveMic(mySelfIndex())
         }
     }
 }
