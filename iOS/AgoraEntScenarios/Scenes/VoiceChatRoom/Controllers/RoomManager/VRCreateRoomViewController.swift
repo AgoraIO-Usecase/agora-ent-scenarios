@@ -64,7 +64,7 @@ extension VRCreateRoomViewController {
 
     private func entryRoom() {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
+        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VLUserCenter.user.im_token, completion: { userName, error in
             SVProgressHUD.dismiss()
             if error == nil {
                 Throttler.throttle {
