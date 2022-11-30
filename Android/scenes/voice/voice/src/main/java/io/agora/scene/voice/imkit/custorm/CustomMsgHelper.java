@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import io.agora.CallBack;
 import io.agora.MessageListener;
@@ -169,25 +168,6 @@ public class CustomMsgHelper implements MessageListener {
             switch (msgType) {
                 case CHATROOM_GIFT:
                     AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    Map<String, String> giftMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
-                    voiceGiftModel.setGift_id(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
-                    voiceGiftModel.setGift_count(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
-                    voiceGiftModel.setGift_name(giftMap.get(MsgConstant.CUSTOM_GIFT_NAME));
-                    voiceGiftModel.setGift_price(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE));
-                    voiceGiftModel.setUserName(giftMap.get(MsgConstant.CUSTOM_GIFT_USERNAME));
-                    voiceGiftModel.setPortrait(giftMap.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
-                    ChatroomIMManager.getInstance().updateRankList(voiceGiftModel, new CallBack() {
-                        @Override
-                        public void onSuccess() {
-                            EMLog.e("CustomMsgHelper","VoiceGiftModel update success");
-                        }
-
-                        @Override
-                        public void onError(int code, String error) {
-                            EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
-                        }
-                    });
                     if(listener != null) {
                         listener.onReceiveGiftMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
@@ -363,8 +343,6 @@ public class CustomMsgHelper implements MessageListener {
         sendCustomMsg(CustomMsgType.CHATROOM_PRAISE.getName(), params, callBack);
     }
 
-
-
     /**
      * 发送自定义消息
      * @param event
@@ -406,8 +384,26 @@ public class CustomMsgHelper implements MessageListener {
                 if(callBack != null) {
                     if (event.equals(CustomMsgType.CHATROOM_SYSTEM.getName())){
                         AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
-                    }else {
+                    }else if (event.equals(CustomMsgType.CHATROOM_GIFT.getName())){
                         AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
+                        VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
+                        voiceGiftModel.setGift_id(params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+                        voiceGiftModel.setGift_count(params.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
+                        voiceGiftModel.setGift_name(params.get(MsgConstant.CUSTOM_GIFT_NAME));
+                        voiceGiftModel.setGift_price(params.get(MsgConstant.CUSTOM_GIFT_PRICE));
+                        voiceGiftModel.setUserName(params.get(MsgConstant.CUSTOM_GIFT_USERNAME));
+                        voiceGiftModel.setPortrait(params.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
+                        ChatroomIMManager.getInstance().updateRankList(sendMessage.getFrom(),voiceGiftModel, new CallBack() {
+                            @Override
+                            public void onSuccess() {
+                                EMLog.e("CustomMsgHelper","VoiceGiftModel update success");
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+                                EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
+                            }
+                        });
                     }
                     callBack.onSuccess(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
                 }
