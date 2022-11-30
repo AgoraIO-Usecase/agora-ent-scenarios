@@ -1,26 +1,26 @@
 package io.agora.scene.voice.ui.fragment
 
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.baseui.dialog.BaseSheetDialog
-import io.agora.scene.voice.R
-import com.google.android.material.textview.MaterialTextView
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.imageview.ShapeableImageView
-import android.util.TypedValue
 import android.graphics.Typeface
+import android.os.Bundle
+import android.util.TypedValue
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.textview.MaterialTextView
+import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceRoomHandLayoutBinding
 import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.voice.baseui.dialog.BaseSheetDialog
 import io.agora.voice.buddy.tool.DeviceTools
+import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ResourcesTools
 
 class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
@@ -104,11 +104,13 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
             override fun onTabReselected(tab: TabLayout.Tab) {
                 "onTabReselected：".logD(TAG)
                 title = tab.customView?.findViewById(R.id.mtTabText)
+                val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
                     setText(titles[tab.position])
                     setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
                     setTypeface(null, Typeface.BOLD)
                 }
+                tagLine?.setBackgroundColor(ResourcesTools.getColor(resources,R.color.voice_color_156ef3))
             }
         })
         binding?.vpFragment?.currentItem = 0
