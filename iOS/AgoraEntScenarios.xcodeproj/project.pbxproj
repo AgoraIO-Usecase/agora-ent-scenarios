@@ -165,6 +165,7 @@
 		A88D14322914C17B00F5DF6A /* ShowBeautyFaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */; };
 		A8B016702934512B00E24CBF /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B0166F2934512A00E24CBF /* KeyCenter.swift */; };
 		A8B016722934A78600E24CBF /* ShowPresettingFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B016712934A78600E24CBF /* ShowPresettingFooterView.swift */; };
+		A8B016742935F9CB00E24CBF /* ShowToolMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B016732935F9CB00E24CBF /* ShowToolMenuViewController.swift */; };
 		A8B561842910FDB8004F34D1 /* ShowRoomListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */; };
 		A8B561862910FE91004F34D1 /* ShowRoomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */; };
 		A8B5618A29111052004F34D1 /* ShowBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5618929111052004F34D1 /* ShowBaseViewController.swift */; };
@@ -670,6 +671,7 @@
 		A88D14312914C17B00F5DF6A /* ShowBeautyFaceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceCell.swift; sourceTree = "<group>"; };
 		A8B0166F2934512A00E24CBF /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		A8B016712934A78600E24CBF /* ShowPresettingFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPresettingFooterView.swift; sourceTree = "<group>"; };
+		A8B016732935F9CB00E24CBF /* ShowToolMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowToolMenuViewController.swift; sourceTree = "<group>"; };
 		A8B561832910FDB8004F34D1 /* ShowRoomListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListVC.swift; sourceTree = "<group>"; };
 		A8B561852910FE91004F34D1 /* ShowRoomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRoomListCell.swift; sourceTree = "<group>"; };
 		A8B5618929111052004F34D1 /* ShowBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBaseViewController.swift; sourceTree = "<group>"; };
@@ -1596,6 +1598,7 @@
 				A8B5619C2912675C004F34D1 /* ShowCreateLiveVC.swift */,
 				A845AD272919263200A41D8D /* ShowLiveViewController.swift */,
 				A845AD3B291BA74300A41D8D /* ShowMusicEffectVC.swift */,
+				A8B016732935F9CB00E24CBF /* ShowToolMenuViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -3322,6 +3325,7 @@
 				E74A3131291B929E00412D42 /* ShowStatisticsInfo.swift in Sources */,
 				05FFE6F2290F706C0024D22F /* VMManagerView.swift in Sources */,
 				05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */,
+				A8B016742935F9CB00E24CBF /* ShowToolMenuViewController.swift in Sources */,
 				DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */,
 				05FFE708290F706C0024D22F /* VMANISSetTableViewCell.swift in Sources */,
 				0510B863290B7A6E0063E57A /* VRBaseViewController.swift in Sources */,
