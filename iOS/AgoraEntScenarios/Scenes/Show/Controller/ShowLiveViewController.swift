@@ -502,8 +502,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
+        guard let info = interactionList?.first else { return }
         let menuVC = ShowToolMenuViewController()
-        settingMenuVC.menuTitle = "对观众"
+        settingMenuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.type = ShowMenuType.managerMic
         menuVC.delegate = self
         present(menuVC, animated: true)
@@ -609,7 +610,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 结束连麦
     func onClickEndPkButtonSelected(_ selected: Bool) {
-        //TODO:
+        guard let info = interactionList?.first else { return }
+        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+            
+        }
     }
     
     // 麦克风开关
