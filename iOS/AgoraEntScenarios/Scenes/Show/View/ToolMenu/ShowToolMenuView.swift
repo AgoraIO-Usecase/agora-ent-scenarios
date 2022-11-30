@@ -40,21 +40,21 @@ enum ShowToolMenuType: CaseIterable {
     
     var title: String {
         switch self {
-        case .switch_camera: return "翻转镜头"
-        case .camera: return "摄像头开"
-        case .mic: return "麦克风开"
-        case .real_time_data: return "实时数据"
-        case .HD: return "画质"
-        case .setting: return "高级设置"
-        case .mute_mic: return "静音"
-        case .end_pk: return "结束连麦"
+        case .switch_camera: return "翻转镜头".show_localized
+        case .camera: return "摄像头开".show_localized
+        case .mic: return "麦克风开".show_localized
+        case .real_time_data: return "实时数据".show_localized
+        case .HD: return "画质".show_localized
+        case .setting: return "高级设置".show_localized
+        case .mute_mic: return "静音".show_localized
+        case .end_pk: return "结束连麦".show_localized
         }
     }
     var selectedTitle: String? {
         switch self {
-        case .camera: return "摄像头关"
-        case .mic: return "麦克风关"
-        case .mute_mic: return "取消静音"
+        case .camera: return "摄像头关".show_localized
+        case .mic: return "麦克风关".show_localized
+        case .mute_mic: return "取消静音".show_localized
         default: return title
         }
     }

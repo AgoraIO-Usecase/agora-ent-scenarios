@@ -169,13 +169,13 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             switch model.status {
             case .accepted:
                 statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("已上麦", for: .normal)
+                statusButton.setTitle("已上麦".show_localized, for: .normal)
                 statusButton.setTitleColor(.black, for: .normal)
                 statusButton.setBackgroundImage(nil, for: .normal)
                 
             case .waitting:
                 statusButton.isUserInteractionEnabled = true
-                statusButton.setTitle("同意", for: .normal)
+                statusButton.setTitle("同意".show_localized, for: .normal)
                 statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
                 statusButton.setTitleColor(.white, for: .normal)
                 
@@ -191,12 +191,12 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
             switch model.status {
             case .waitting:
                 statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("等待中", for: .normal)
+                statusButton.setTitle("等待中".show_localized, for: .normal)
                 statusButton.setBackgroundImage(nil, for: .normal)
                 statusButton.setTitleColor(.black, for: .normal)
                 
             default:
-                statusButton.setTitle("邀请", for: .normal)
+                statusButton.setTitle("邀请".show_localized, for: .normal)
                 statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
                 statusButton.setTitleColor(.white, for: .normal)
                 statusButton.isUserInteractionEnabled = true
