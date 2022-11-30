@@ -208,8 +208,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             agoraAssert("leaveRoom channelName = nil")
             return
         }
-        
-        
+        _removeUser { err in
+        }
         //current user is room owner, remove room
         if roomInfo.ownerId == VLUserCenter.user.id {
             //cancel pk invitation
@@ -509,11 +509,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         // pk invitation recviver
-        guard let room = self.roomList?.filter({ $0.roomId == interaction.roomId}).first else {
-//            agoraAssert("stopInteraction to get room(\(interaction.roomId ?? "") not found")
-            return
-        }
-        _getAllPKInvitationList(room: room) {[weak self] (error, list) in
+        _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
             guard let self = self,
                   let pkList = list,
                   let invitation = pkList.filter({$0.fromUserId == interaction.userId }).first else {
@@ -723,22 +719,29 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
                        onCreated: { _ in
-                       }, onUpdated: { object in
+                       }, onUpdated: { [weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
-                           guard let jsonStr = object.toJson(),
-                                    let model = ShowUser.yy_model(withJSON: jsonStr) else { return }
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = ShowUser.yy_model(withJSON: jsonStr) else { return }
                            if self.userList.contains(where: { $0.userId == model.userId }) { return }
                            self.userList.append(model)
                            self._updateUserCount { error in
                            }
+                           self.subscribeDelegate?.onUserJoinedRoom(user: model)
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
-                       }, onDeleted: { object in
+                       }, onDeleted: { [weak self] object in
                            agoraPrint("imp user subscribe onDeleted...")
+                           guard let self = self else { return }
+                           var model: ShowUser? = nil
                            if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
+                               model = self.userList[index]
                                self.userList.remove(at: index)
                                self._updateUserCount { error in
                                }
                            }
+                           guard let model = model else { return }
+                           self.subscribeDelegate?.onUserLeftRoom(user: model)
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)

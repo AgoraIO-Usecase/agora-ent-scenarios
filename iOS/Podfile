@@ -40,6 +40,7 @@ def all_pods
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.0.0.9'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
+#pod 'AgoraRtcEngine_iOS', :path => './libs'
 
   #ThirdParty
   pod 'HWWeakTimer'
@@ -76,5 +77,5 @@ target 'AgoraEntScenarios' do
   all_pods
 end
 
-
+system("./libs/setup_podspec.sh")
 

@@ -86,6 +86,10 @@ class ShowSettingActionSheetVC: UIViewController {
     @objc private func didClickCancelButton(){
         dismiss(animated: true)
     }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        dismiss(animated: true)
+    }
 }
 
 extension ShowSettingActionSheetVC: UITableViewDelegate, UITableViewDataSource {
