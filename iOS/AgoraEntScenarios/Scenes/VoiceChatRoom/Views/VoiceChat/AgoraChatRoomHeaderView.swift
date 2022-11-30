@@ -38,24 +38,23 @@ class AgoraChatRoomHeaderView: UIView {
     private var rankTBtn: UIButton = .init() // 榜三小弟
 
     var completeBlock: resBlock?
-
-    var entity: VRRoomEntity = .init() {
-        didSet {
-            guard let owner = entity.owner else { return }
-            self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
-            self.titleLabel.text = owner.name
-            self.roomLabel.text = entity.name
-            self.lookBtn.setTitle(" \(entity.click_count ?? 0)", for: .normal)
-            self.totalCountLabel.text = "\(entity.member_count ?? 0)"
-            let gift_count = entity.gift_amount ?? 0
-            let count = gift_count >= 1000 ? afterDecimals(value: gift_count) : "\(gift_count)"
-            self.giftBtn.setTitle(" \(count)", for: .normal)
-            self.giftBtn.snp.updateConstraints { make in
-                make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
-            }
-            self.soundSetLabel.text = getSoundType(with: entity.sound_effect)
-            updateGiftList()
+    
+    func updateHeader(with room_entity: VRRoomEntity?) {
+        guard let room = room_entity else {return}
+        guard let owner = room.owner else { return }
+        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+        self.titleLabel.text = owner.name
+        self.roomLabel.text = room.name
+        self.lookBtn.setTitle(" \(room.click_count ?? 0)", for: .normal)
+        self.totalCountLabel.text = "\(room.member_count ?? 0)"
+        let gift_count = room.gift_amount ?? 0
+        let count = gift_count >= 1000 ? afterDecimals(value: gift_count) : "\(gift_count)"
+        self.giftBtn.setTitle(" \(count)", for: .normal)
+        self.giftBtn.snp.updateConstraints { make in
+            make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
+        self.soundSetLabel.text = getSoundType(with: room.sound_effect)
+        updateGiftList(with: room)
     }
 
     override init(frame: CGRect) {
@@ -80,7 +79,7 @@ class AgoraChatRoomHeaderView: UIView {
         addSubview(iconImgView)
 
         roomLabel.textColor = .white
-        roomLabel.text = entity.name
+        roomLabel.text = ""
         roomLabel.font = UIFont.systemFont(ofSize: 14)
         addSubview(roomLabel)
 
@@ -91,7 +90,7 @@ class AgoraChatRoomHeaderView: UIView {
 
         totalCountLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)
         totalCountLabel.layer.cornerRadius = 13~
-        totalCountLabel.text = "\(entity.member_count ?? 0)"
+        totalCountLabel.text = "0"
         totalCountLabel.font = UIFont.systemFont(ofSize: 11)
         totalCountLabel.textColor = .white
         totalCountLabel.textAlignment = .center
@@ -124,7 +123,7 @@ class AgoraChatRoomHeaderView: UIView {
         let soundSetView = UIView()
         addSubview(soundSetView)
 
-        soundSetLabel.text = getSoundType(with: entity.sound_effect)
+        soundSetLabel.text = ""
         soundSetLabel.textColor = .white
         soundSetLabel.font = UIFont.systemFont(ofSize: 10)
         addSubview(soundSetLabel)
@@ -141,7 +140,7 @@ class AgoraChatRoomHeaderView: UIView {
         giftBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
         giftBtn.layer.cornerRadius = 11~
         giftBtn.setImage(UIImage("liwu"), for: .normal)
-        giftBtn.setTitle(" \(entity.gift_amount ?? 0)", for: .normal)
+        giftBtn.setTitle(" 0", for: .normal)
         giftBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)
         giftBtn.isUserInteractionEnabled = false
         addSubview(giftBtn)
@@ -149,7 +148,7 @@ class AgoraChatRoomHeaderView: UIView {
         lookBtn.layer.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
         lookBtn.layer.cornerRadius = 11~
         lookBtn.titleLabel?.font = UIFont.systemFont(ofSize: 10)~
-        lookBtn.setTitle(" \(entity.click_count ?? 0)", for: .normal)
+        lookBtn.setTitle(" 0", for: .normal)
         lookBtn.isUserInteractionEnabled = false
         lookBtn.setImage(UIImage(named: "guankan"), for: .normal)
         addSubview(lookBtn)
@@ -314,17 +313,15 @@ class AgoraChatRoomHeaderView: UIView {
         block(.rank)
     }
 
-    private func updateGiftList() {
+    private func updateGiftList(with room: VRRoomEntity) {
         // 土豪榜展示逻辑
-        if let rankList = entity.ranking_list {
+        if let rankList = room.ranking_list {
             if rankList.count == 0 { return }
 
             if let fImg: String = rankList[0].portrait {
                 rankFBtn.setImage(getImage(with: fImg), for: .normal)
                 rankFBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
                 }
             }
@@ -334,16 +331,6 @@ class AgoraChatRoomHeaderView: UIView {
                 rankSBtn.setImage(getImage(with: sImg), for: .normal)
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
-//                self.rankFBtn.snp.remakeConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
-//                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
-//                }
-//                self.rankSBtn.snp.remakeConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
-//                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
-//                }
                 rankFBtn.snp.updateConstraints { make in
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
                 }
@@ -359,18 +346,12 @@ class AgoraChatRoomHeaderView: UIView {
                 rankSBtn.isHidden = false
                 rankTBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-70)
                 }
                 rankSBtn.snp.updateConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-40)
                 }
                 rankTBtn.snp.updateConstraints { make in
-//                    make.centerY.equalTo(self.backBtn)
-//                    make.width.height.equalTo(26)
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
                 }
             }
