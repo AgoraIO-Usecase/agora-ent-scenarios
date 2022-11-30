@@ -405,11 +405,16 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         _refreshInteractionList()
+        let options = AgoraRtcChannelMediaOptions()
         switch interaction.interactStatus {
         case .pking:
             agoraKitManager.leaveChannelEx()
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
+            if interaction.userId == VLUserCenter.user.id {
+                options.publishCameraTrack = false
+                options.publishMicrophoneTrack = false
+            }
             
         case .onSeat:
             let videoCanvas = AgoraRtcVideoCanvas()
@@ -422,10 +427,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
+            if interaction.userId == VLUserCenter.user.id {
+                options.publishMicrophoneTrack = false
+            }
             
         default:
             break
         }
+        agoraKitManager.agoraKit.updateChannel(with: options)
     }
 }
 
