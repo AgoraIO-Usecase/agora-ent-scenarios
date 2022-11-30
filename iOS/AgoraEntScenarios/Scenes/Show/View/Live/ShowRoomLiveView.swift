@@ -37,7 +37,7 @@ class ShowRoomLiveView: UIView {
         view.onTapRemoteCanvasClosure = { [weak self] in
             self?.delegate?.onClickRemoteCanvas()
         }
-        return canvasView
+        return view
     }()
     
     private var chatArray = [ShowChatModel]()
@@ -155,12 +155,14 @@ class ShowRoomLiveView: UIView {
         chatInputView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.height.equalTo(56)
-            make.centerY.equalTo(bottomBar)
+            make.bottom.equalToSuperview()
         }
     }
     
     @objc private func didClickChatButton() {
         chatInputView.isHidden = false
+        bottomBar.isHidden = true
+        chatButton.isHidden = true
         chatInputView.textField.becomeFirstResponder()
     }
     
@@ -205,6 +207,8 @@ extension ShowRoomLiveView: ShowChatInputViewDelegate {
     
     func onEndEditing() {
         chatInputView.isHidden = true
+        bottomBar.isHidden = false
+        chatButton.isHidden = false
     }
 
     func onClickEmojiButton() {

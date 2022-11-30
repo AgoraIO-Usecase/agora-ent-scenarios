@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
+import IQKeyboardManager
 
 class ShowLiveViewController: UIViewController {
 
@@ -16,7 +17,7 @@ class ShowLiveViewController: UIViewController {
     
     private lazy var settingMenuVC: ShowToolMenuViewController = {
         let settingMenuVC = ShowToolMenuViewController()
-        settingMenuVC.type = ShowMenuType.none
+        settingMenuVC.type = ShowMenuType.idle_audience
         settingMenuVC.delegate = self
         return settingMenuVC
     }()
@@ -63,11 +64,6 @@ class ShowLiveViewController: UIViewController {
     
     //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
-    
-    // 是否正在连麦
-    private var isOnMic = false //TODO:
-    // 是否正在PK
-    private var isOnPK = false  //TODO:
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -515,6 +511,15 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
+    func onClickRemoteCanvas() {
+        guard let info = interactionList?.first else { return }
+        let menuVC = ShowToolMenuViewController()
+        settingMenuVC.menuTitle = "对观众\(info.userName ?? "")"
+        menuVC.type = ShowMenuType.managerMic
+        menuVC.delegate = self
+        present(menuVC, animated: true)
+    }
+    
     func onClickSendMsgButton(text: String) {
         sendMessageWithText(text)
     }
@@ -557,12 +562,20 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-        if isOnMic || isOnPK {
-            settingMenuVC.type = role == .broadcaster ? .pking_broadcaster : .pking_audience
+        if interactionStatus == .idle {
+            settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
-            settingMenuVC.type = ShowMenuType.none
+            settingMenuVC.type = .pking
+            settingMenuVC.menuTitle = "互动连麦"
         }
         present(settingMenuVC, animated: true)
+        
+        /*
+        settingMenuVC.type = .managerMic
+        let name = "xxx"
+        settingMenuVC.menuTitle = "对观众\(name)"
+        present(settingMenuVC, animated: true)
+         */
     }
     
 }
@@ -607,7 +620,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 结束连麦
     func onClickEndPkButtonSelected(_ selected: Bool) {
-        //TODO:
+        guard let info = interactionList?.first else { return }
+        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+            
+        }
     }
     
     // 麦克风开关
@@ -636,7 +652,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
-            vc.mode = .signle // 根据当前模式设置
+            vc.mode = wSelf.interactionStatus == .pking ? .pk : .signle // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
             vc.settingManager = wSelf.settingManager
             wSelf.navigationController?.pushViewController(vc, animated: true)
@@ -645,38 +661,3 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
 }
 
-
-extension ShowLiveViewController {
-    
-    private func addKeyboardObserver(){
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShow(note:)), name: UIResponder.keyboardWillShowNotification , object: nil)
-        NotificationCenter.default.addObserver(self,selector: #selector(keyboardHidden(note:)),
-                    name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    //键盘弹出监听
-    @objc private func keyboardShow(note: Notification)  {
-        guard let userInfo = note.userInfo else {return}
-        guard let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else{return}
-        //获取动画执行的时间
-        var duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-        if duration == nil { duration = 0.25 }
-        
-        //获取键盘弹起的高度
-        let keyboardTopYPosition = keyboardRect.height
-        
-        UIView.animate(withDuration: duration!, delay: 0, options: .allowAnimatedContent, animations: {
-//            self.chatInputView.center.y = (self._centerY - keyboardTopYPosition)
-//            //这一步是至关重要的，设置当前textField的y值为原始y值减去键盘高度，由于始终是用原始y值去减，所以不管通知几次都不会错
-            
-        }, completion: nil)
-        
-    }
-    
-    //键盘隐藏监听
-    @objc private func keyboardHidden(note: Notification){
-        UIView.animate(withDuration: 0.3, delay: 0, options: .allowAnimatedContent, animations: {
-            
-        }, completion: nil)
-    }
-}
