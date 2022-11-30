@@ -216,6 +216,7 @@ extension VoiceRoomViewController {
             if error == nil {
                 guard let info = room_info else { return }
                 self?.headerView.updateHeader(with: info.room)
+                self?.roomInfo = info
                 guard let mics = self?.roomInfo?.mic_info else { return }
                 if self?.roomInfo?.room?.member_list == nil {
                     self?.roomInfo?.room?.member_list = [VRUser]()
