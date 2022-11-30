@@ -10,6 +10,7 @@ import UIKit
 protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate {
     func onClickSendMsgButton(text: String)
     func onClickCloseButton()
+    func onClickRemoteCanvas()
 }
 
 class ShowRoomLiveView: UIView {
@@ -31,7 +32,13 @@ class ShowRoomLiveView: UIView {
             bottomBar.delegate = delegate
         }
     }
-    lazy var canvasView = ShowCanvasView()
+    lazy var canvasView: ShowCanvasView = {
+        let view = ShowCanvasView()
+        view.onTapRemoteCanvasClosure = { [weak self] in
+            self?.delegate?.onClickRemoteCanvas()
+        }
+        return canvasView
+    }()
     
     private var chatArray = [ShowChatModel]()
     
