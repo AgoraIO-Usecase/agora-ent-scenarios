@@ -632,9 +632,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         if let roomList = self.roomList {
             for room in roomList {
                 if room.room_id == roomId {
-                    let updateRoom: VRRoomEntity = room
-                    updateRoom.member_count = updateRoom.member_count ?? 0 + 1
-                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
+                    var updateRoom: VRRoomEntity = room
+                    updateRoom.member_count = (updateRoom.member_count ?? 0) + 1
+                    updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
@@ -686,8 +686,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         VoiceRoomIMManager.shared?.userDestroyedChatroom()
                     } else {
                         let updateRoom: VRRoomEntity = room
-                        updateRoom.member_count = updateRoom.member_count ?? 0 - 1
-                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
+                        updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
