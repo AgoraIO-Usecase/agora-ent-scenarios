@@ -261,6 +261,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             finish()
                         })
                 } else {
+                    roomObservableDelegate.checkUserLeaveMic()
                     finish()
                 }
             }
