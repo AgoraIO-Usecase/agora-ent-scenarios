@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
+import IQKeyboardManager
 
 class ShowLiveViewController: UIViewController {
 
@@ -606,38 +607,3 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
 }
 
-
-extension ShowLiveViewController {
-    
-    private func addKeyboardObserver(){
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShow(note:)), name: UIResponder.keyboardWillShowNotification , object: nil)
-        NotificationCenter.default.addObserver(self,selector: #selector(keyboardHidden(note:)),
-                    name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    //键盘弹出监听
-    @objc private func keyboardShow(note: Notification)  {
-        guard let userInfo = note.userInfo else {return}
-        guard let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else{return}
-        //获取动画执行的时间
-        var duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-        if duration == nil { duration = 0.25 }
-        
-        //获取键盘弹起的高度
-        let keyboardTopYPosition = keyboardRect.height
-        
-        UIView.animate(withDuration: duration!, delay: 0, options: .allowAnimatedContent, animations: {
-//            self.chatInputView.center.y = (self._centerY - keyboardTopYPosition)
-//            //这一步是至关重要的，设置当前textField的y值为原始y值减去键盘高度，由于始终是用原始y值去减，所以不管通知几次都不会错
-            
-        }, completion: nil)
-        
-    }
-    
-    //键盘隐藏监听
-    @objc private func keyboardHidden(note: Notification){
-        UIView.animate(withDuration: 0.3, delay: 0, options: .allowAnimatedContent, animations: {
-            
-        }, completion: nil)
-    }
-}
