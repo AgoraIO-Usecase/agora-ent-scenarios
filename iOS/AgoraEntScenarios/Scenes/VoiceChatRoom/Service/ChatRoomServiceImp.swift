@@ -566,6 +566,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
     }
     
+    func limitError() -> VoiceRoomError {
+        let error = VoiceRoomError()
+        error.code = "403"
+        error.message = "Members reach limit!"
+        return error
+    }
+
+    
     /// 创建房间
     /// - Parameters:
     ///   - room: 房间对象信息
@@ -633,6 +641,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             for room in roomList {
                 if room.room_id == roomId {
                     let updateRoom: VRRoomEntity = room
+                    if room.member_count ?? 0 >= 19 {
+                        completion(self.limitError(),nil)
+                        return
+                    }
+
                     updateRoom.member_count = updateRoom.member_count ?? 0 + 1
                     updateRoom.click_count = updateRoom.click_count ?? 0 + 1
                     let params = updateRoom.kj.JSONObject()
@@ -658,6 +671,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 completion(error, nil)
                             })
                     }
+                    break
                 }
             }
         }
