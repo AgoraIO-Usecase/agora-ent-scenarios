@@ -12,6 +12,15 @@ class ShowLiveViewController: UIViewController {
 
     var room: ShowRoomListModel?
     
+    var selectedResolution = 1
+    
+    private lazy var settingMenuVC: ShowToolMenuViewController = {
+        let settingMenuVC = ShowToolMenuViewController()
+        settingMenuVC.type = ShowMenuType.none
+        settingMenuVC.delegate = self
+        return settingMenuVC
+    }()
+    
     lazy var agoraKitManager: ShowAgoraKitManager = {
         return ShowAgoraKitManager()
     }()
@@ -54,6 +63,11 @@ class ShowLiveViewController: UIViewController {
     
     //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
+    
+    // 是否正在连麦
+    private var isOnMic = false //TODO:
+    // 是否正在PK
+    private var isOnPK = false  //TODO:
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -526,11 +540,12 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-        let settingVC = ShowAdvancedSettingVC()
-        settingVC.mode = .signle // 根据当前模式设置
-        settingVC.isBroadcaster = role == .broadcaster
-        settingVC.settingManager = settingManager
-        navigationController?.pushViewController(settingVC, animated: true)
+        if isOnMic || isOnPK {
+            settingMenuVC.type = role == .broadcaster ? .pking_broadcaster : .pking_audience
+        }else{
+            settingMenuVC.type = ShowMenuType.none
+        }
+        present(settingMenuVC, animated: true)
     }
     
 }
@@ -541,5 +556,106 @@ extension ShowLiveViewController {
         showAlert(title: title, message: errMsg) { [weak self] in
             self?.leaveRoom()
         }
+    }
+}
+
+extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
+    
+    // 开关摄像头
+    func onClickCameraButtonSelected(_ selected: Bool) {
+        if selected {
+            agoraKitManager.agoraKit.stopPreview()
+        }else{
+            agoraKitManager.agoraKit.startPreview()
+        }
+    }
+    
+    // 画质
+    func onClickHDButtonSelected(_ selected: Bool) {
+        settingMenuVC.dismiss(animated: false)
+        
+        let vc = ShowSelectQualityVC()
+        vc.defalutSelectIndex = selectedResolution
+        present(vc, animated: false)
+        vc.dismissed = { [weak self] in
+            guard let wSelf = self else { return }
+            wSelf.present(wSelf.settingMenuVC, animated: false)
+        }
+        vc.selectedItem = {[weak self] resolution,index in
+            guard let wSelf = self else { return }
+            wSelf.selectedResolution = index
+            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+        }
+    }
+    
+    // 结束连麦
+    func onClickEndPkButtonSelected(_ selected: Bool) {
+        //TODO:
+    }
+    
+    // 麦克风开关
+    func onClickMicButtonSelected(_ selected: Bool) {
+        agoraKitManager.agoraKit.muteRecordingSignal(selected)
+    }
+    
+    // 静音
+    func onClickMuteMicButtonSelected(_ selected: Bool) {
+        agoraKitManager.agoraKit.muteAllRemoteAudioStreams(selected)
+    }
+    
+    func onClickRealTimeDataButtonSelected(_ selected: Bool) {
+        AlertManager.show(view: realTimeView, alertPostion: .top)
+    }
+    
+    func onClickSwitchCameraButtonSelected(_ selected: Bool) {
+        agoraKitManager.switchCamera()
+    }
+    
+    func onClickSettingButtonSelected(_ selected: Bool) {
+        settingMenuVC.dismiss(animated: true) {[weak self] in
+            guard let wSelf = self else { return }
+            let vc = ShowAdvancedSettingVC()
+            vc.mode = .signle // 根据当前模式设置
+            vc.isBroadcaster = wSelf.role == .broadcaster
+            vc.settingManager = wSelf.settingManager
+            wSelf.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+}
+
+
+extension ShowLiveViewController {
+    
+    private func addKeyboardObserver(){
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShow(note:)), name: UIResponder.keyboardWillShowNotification , object: nil)
+        NotificationCenter.default.addObserver(self,selector: #selector(keyboardHidden(note:)),
+                    name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    //键盘弹出监听
+    @objc private func keyboardShow(note: Notification)  {
+        guard let userInfo = note.userInfo else {return}
+        guard let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else{return}
+        //获取动画执行的时间
+        var duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        if duration == nil { duration = 0.25 }
+        
+        //获取键盘弹起的高度
+        let keyboardTopYPosition = keyboardRect.height
+        
+        UIView.animate(withDuration: duration!, delay: 0, options: .allowAnimatedContent, animations: {
+//            self.chatInputView.center.y = (self._centerY - keyboardTopYPosition)
+//            //这一步是至关重要的，设置当前textField的y值为原始y值减去键盘高度，由于始终是用原始y值去减，所以不管通知几次都不会错
+            
+        }, completion: nil)
+        
+    }
+    
+    //键盘隐藏监听
+    @objc private func keyboardHidden(note: Notification){
+        UIView.animate(withDuration: 0.3, delay: 0, options: .allowAnimatedContent, animations: {
+            
+        }, completion: nil)
     }
 }
