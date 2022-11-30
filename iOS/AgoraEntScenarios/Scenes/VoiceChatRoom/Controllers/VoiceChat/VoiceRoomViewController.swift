@@ -215,6 +215,7 @@ extension VoiceRoomViewController {
         ChatRoomServiceImp.getSharedInstance().fetchRoomDetail(entity: self.roomInfo?.room ?? VRRoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
+                self?.roomInfo = info
                 self?.headerView.updateHeader(with: info.room)
                 guard let mics = self?.roomInfo?.mic_info else { return }
                 if self?.roomInfo?.room?.member_list == nil {
