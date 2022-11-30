@@ -17,7 +17,7 @@ class ShowLiveViewController: UIViewController {
     
     private lazy var settingMenuVC: ShowToolMenuViewController = {
         let settingMenuVC = ShowToolMenuViewController()
-        settingMenuVC.type = ShowMenuType.none
+        settingMenuVC.type = ShowMenuType.idle_audience
         settingMenuVC.delegate = self
         return settingMenuVC
     }()
@@ -64,11 +64,6 @@ class ShowLiveViewController: UIViewController {
     
     //PK popup list view
     private lazy var pkInviteView = ShowPKInviteView()
-    
-    // 是否正在连麦
-    private var isOnMic = false //TODO:
-    // 是否正在PK
-    private var isOnPK = false  //TODO:
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -180,7 +175,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     private func _refreshInteractionList() {
         AppContext.showServiceImp.getAllInterationList { [weak self] (error, interactionList) in
-            self?.interactionList = interactionList
+            guard let self = self, error == nil else { return }
+            if self.interactionList == nil, let interaction = interactionList?.first {
+                // first load
+                self.onInteractionBegan(interaction: interaction)
+            }
+            
+            self.interactionList = interactionList
         }
     }
     
@@ -196,8 +197,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            //TODO: leave query dialog
-            leaveRoom()
+            let vc = ShowReceiveLiveFinishAlertVC()
+            vc.dismissAlert { [weak self] in
+                self?.leaveRoom()
+            }
+            
+            self.present(vc, animated: true)
         }
     }
     
@@ -261,7 +266,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 switch result {
                 case .accept:
                     AppContext.showServiceImp.acceptMicSeatInvitation { error in
-                        
                     }
                     break
                 default:
@@ -397,20 +401,36 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         _refreshInteractionList()
+        let options = AgoraRtcChannelMediaOptions()
         switch interaction.interactStatus {
         case .pking:
             agoraKitManager.leaveChannelEx()
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
+            if interaction.userId == VLUserCenter.user.id {
+                options.publishCameraTrack = false
+                options.publishMicrophoneTrack = false
+            }
             
         case .onSeat:
+            let videoCanvas = AgoraRtcVideoCanvas()
+            videoCanvas.uid = UInt(interaction.userId ?? "") ?? 0
+            videoCanvas.view = nil
+            videoCanvas.renderMode = .hidden
+            agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+            liveView.canvasView.setRemoteUserInfo(name: "")
+            liveView.canvasView.canvasType = .none
             applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
+            if interaction.userId == VLUserCenter.user.id {
+                options.publishMicrophoneTrack = false
+            }
             
         default:
             break
         }
+        agoraKitManager.agoraKit.updateChannel(with: options)
     }
 }
 
@@ -481,6 +501,14 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
+    func onClickRemoteCanvas() {
+        let menuVC = ShowToolMenuViewController()
+        settingMenuVC.menuTitle = "对观众"
+        menuVC.type = ShowMenuType.managerMic
+        menuVC.delegate = self
+        present(menuVC, animated: true)
+    }
+    
     func onClickSendMsgButton(text: String) {
         sendMessageWithText(text)
     }
@@ -523,12 +551,20 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
-        if isOnMic || isOnPK {
-            settingMenuVC.type = role == .broadcaster ? .pking_broadcaster : .pking_audience
+        if interactionStatus == .idle {
+            settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
-            settingMenuVC.type = ShowMenuType.none
+            settingMenuVC.type = .pking
+            settingMenuVC.menuTitle = "互动连麦"
         }
         present(settingMenuVC, animated: true)
+        
+        /*
+        settingMenuVC.type = .managerMic
+        let name = "xxx"
+        settingMenuVC.menuTitle = "对观众\(name)"
+        present(settingMenuVC, animated: true)
+         */
     }
     
 }
@@ -598,7 +634,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
-            vc.mode = .signle // 根据当前模式设置
+            vc.mode = wSelf.interactionStatus == .pking ? .pk : .signle // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
             vc.settingManager = wSelf.settingManager
             wSelf.navigationController?.pushViewController(vc, animated: true)

@@ -35,10 +35,13 @@ private func agoraPrint(_ message: String) {
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private var roomList: [ShowRoomListModel]?
+    private var room: ShowRoomListModel? {
+        return self.roomList?.filter({ $0.roomId == roomId}).first
+    }
     private var userList: [ShowUser] = [ShowUser]()
     private var messageList: [ShowMessage] = [ShowMessage]()
     private var seatApplyList: [ShowMicSeatApply] = [ShowMicSeatApply]()
-    private var seatInvitationList: [ShowMicSeatInvitation] = [ShowMicSeatInvitation]()
+//    private var seatInvitationList: [ShowMicSeatInvitation] = [ShowMicSeatInvitation]()
     private var pkInvitationList: [ShowPKInvitation] = [ShowPKInvitation]()
     private var interactionList: [ShowInteractionInfo] = [ShowInteractionInfo]()
     
@@ -91,7 +94,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         userList = [ShowUser]()
         messageList = [ShowMessage]()
         seatApplyList = [ShowMicSeatApply]()
-        seatInvitationList = [ShowMicSeatInvitation]()
+//        seatInvitationList = [ShowMicSeatInvitation]()
         pkInvitationList = [ShowPKInvitation]()
         interactionList = [ShowInteractionInfo]()
         pkCreatedInvitationMap = [String: ShowPKInvitation]()
@@ -144,12 +147,12 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
+                    self.roomList?.append(room)
                     completion(nil, output)
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
                     }
-                    self.roomList?.append(room)
                 }
             } fail: { error in
                 completion(error, nil)
@@ -198,6 +201,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func leaveRoom(completion: @escaping (Error?) -> Void) {
         defer {
+            self.pkCreatedInvitationMap.values.forEach { invitation in
+                guard let pkRoomId = invitation.roomId else { return }
+                SyncUtil.leaveScene(id: pkRoomId)
+            }
+            
             cleanCache()
         }
         
@@ -205,8 +213,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             agoraAssert("leaveRoom channelName = nil")
             return
         }
-        
-        
+        _removeUser { err in
+        }
         //current user is room owner, remove room
         if roomInfo.ownerId == VLUserCenter.user.id {
             //cancel pk invitation
@@ -276,7 +284,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func cancelMicSeatApply(completion: @escaping (Error?) -> Void) {
         guard let apply = self.seatApplyList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("cancel apply not found")
+//            agoraAssert("cancel apply not found")
             return
         }
         _removeMicSeatApply(apply: apply, completion: completion)
@@ -301,29 +309,27 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _updateMicSeatApply(apply: apply, completion: completion)
     }
     
-    func stopMicSeatApply(apply: ShowUser, completion: @escaping (Error?) -> Void) {
-        apply.status = .ended
-        let json = apply.yy_modelToJSONString() ?? ""
-        guard let model = ShowMicSeatApply.yy_model(withJSON: json) else { return }
-        _updateMicSeatApply(apply: model, completion: completion)
-    }
-    
     func getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
-        _getAllMicSeatInvitationList(completion: completion)
+//        _getAllMicSeatInvitationList(completion: completion)
+        _getUserList(finished: completion)
     }
     
     func createMicSeatInvitation(user: ShowUser, completion: @escaping (Error?) -> Void) {
         user.status = .waitting
-        _addMicSeatInvitation(invitation: user, completion: completion)
+//        _addMicSeatInvitation(invitation: user, completion: completion)
+        _updateUserInfo(user: user, completion: completion)
     }
     
     func cancelMicSeatInvitation(userId: String, completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.seatInvitationList.filter({ $0.userId == userId }).first else {
-            agoraAssert("cancel invitation not found")
-            return
-        }
-        
-        _removeMicSeatInvitation(invitation: invitation, completion: completion)
+//        guard let invitation = self.seatInvitationList.filter({ $0.userId == userId }).first else {
+////            agoraAssert("cancel invitation not found")
+//            return
+//        }
+//
+//        _removeMicSeatInvitation(invitation: invitation, completion: completion)
+        guard let user = self.userList.filter({ $0.userId == userId }).first else { return }
+        user.status = .idle
+        _updateUserInfo(user: user, completion: completion)
     }
     
     func acceptMicSeatInvitation(completion: @escaping (Error?) -> Void) {
@@ -351,8 +357,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             self._addInteraction(interaction: interaction) { error in
             }
         }
-        
-        
     }
     
     func rejectMicSeatInvitation(completion: @escaping (Error?) -> Void) {
@@ -412,7 +416,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 }
                 
                 if status == .deleted {
-                    self._recvPKRejected(invitation: model)
+                    if model.status == .accepted {
+                        self._recvPKFinish(invitation: model)
+                    } else {
+                        self._recvPKRejected(invitation: model)
+                    }
                 } else {
                     model.status = invitation.status
                     switch model.status {
@@ -494,6 +502,12 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func stopInteraction(interaction: ShowInteractionInfo, completion: @escaping (Error?) -> Void) {
         _removeInteraction(interaction: interaction, completion: completion)
         guard interaction.interactStatus == .pking else {
+            // seat apply / interation
+            cancelMicSeatApply { error in
+            }
+            
+            cancelMicSeatInvitation(userId: interaction.userId ?? "") { err in
+            }
             return
         }
         
@@ -506,11 +520,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         // pk invitation recviver
-        guard let room = self.roomList?.filter({ $0.roomId == interaction.roomId}).first else {
-//            agoraAssert("stopInteraction to get room(\(interaction.roomId ?? "") not found")
-            return
-        }
-        _getAllPKInvitationList(room: room) {[weak self] (error, list) in
+        _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
             guard let self = self,
                   let pkList = list,
                   let invitation = pkList.filter({$0.fromUserId == interaction.userId }).first else {
@@ -599,10 +609,11 @@ extension ShowSyncManagerServiceImp {
     private func _subscribeAll() {
         _subscribeOnlineUsersChanged()
         _subscribeMessageChanged()
-        _subscribeMicSeatInvitationChanged()
         _subscribeMicSeatApplyChanged()
-        _subscribePKInvitationChanged()
         _subscribeInteractionChanged()
+//        _subscribeMicSeatInvitationChanged()
+        guard room?.ownerId == VLUserCenter.user.id else { return }
+        _subscribePKInvitationChanged()
     }
     
     private func _unsubscribeAll() {
@@ -719,22 +730,35 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
                        onCreated: { _ in
-                       }, onUpdated: { object in
+                       }, onUpdated: { [weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
-                           guard let jsonStr = object.toJson(),
-                                    let model = ShowUser.yy_model(withJSON: jsonStr) else { return }
-                           if self.userList.contains(where: { $0.userId == model.userId }) { return }
+                           guard let self = self,
+                                 let jsonStr = object.toJson(),
+                                 let model = ShowUser.yy_model(withJSON: jsonStr) else { return }
+                           if self.userList.contains(where: { $0.userId == model.userId }) {
+                               self.subscribeDelegate?.onMicSeatInvitationUpdated(invitation: model)
+                               return
+                           }
                            self.userList.append(model)
                            self._updateUserCount { error in
                            }
+                           self.subscribeDelegate?.onUserJoinedRoom(user: model)
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
-                       }, onDeleted: { object in
+                           
+                       }, onDeleted: { [weak self] object in
                            agoraPrint("imp user subscribe onDeleted...")
+                           guard let self = self else { return }
+                           var model: ShowUser? = nil
                            if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
+                               model = self.userList[index]
                                self.userList.remove(at: index)
                                self._updateUserCount { error in
                                }
+                               guard let model = model else { return }
+                               self.subscribeDelegate?.onMicSeatInvitationDeleted(invitation: model)
                            }
+                           guard let model = model else { return }
+                           self.subscribeDelegate?.onUserLeftRoom(user: model)
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                        }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
@@ -1008,126 +1032,126 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: Seat Invitation
 extension ShowSyncManagerServiceImp {
-    private func _getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
-        guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp seat invitation get...")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
-            .get(success: { [weak self] list in
-                agoraPrint("imp seat invitation success...")
-                let seatInvitationList = list
-                    .compactMap({ ShowMicSeatInvitation.yy_model(withJSON: $0.toJson()!)! })
-                    .filter ({ $0.userId != VLUserCenter.user.id })
-                self?.seatInvitationList = seatInvitationList
-                completion(nil, seatInvitationList)
-            }, fail: { error in
-                agoraPrint("imp seat invitation fail :\(error.message)...")
-                completion(error, nil)
-            })
-    }
-    
-    private func _subscribeMicSeatInvitationChanged() {
-        guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp seat invitation subscribe ...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: SYNC_MANAGER_SEAT_INVITATION_COLLECTION,
-                       onCreated: { _ in
-                       }, onUpdated: {[weak self] object in
-                           agoraPrint("imp seat invitation subscribe onUpdated...")
-                           guard let self = self,
-                                 let jsonStr = object.toJson(),
-                                 let model = ShowMicSeatInvitation.yy_model(withJSON: jsonStr) else { return }
-                           defer {
-                               self.subscribeDelegate?.onMicSeatInvitationUpdated(invitation: model)
-                           }
-                           if self.seatInvitationList.contains(where: { $0.userId == model.userId }) { return }
-                           self.seatInvitationList.append(model)
-                       }, onDeleted: { object in
-                           agoraPrint("imp seat invitation subscribe onDeleted...")
-                           var model: ShowMicSeatInvitation? = nil
-                           if let index = self.seatInvitationList.firstIndex(where: { object.getId() == $0.objectId }) {
-                               model = self.seatInvitationList[index]
-                               self.seatInvitationList.remove(at: index)
-                           }
-                           guard let model = model else {return}
-                           self.subscribeDelegate?.onMicSeatInvitationDeleted(invitation: model)
-                       }, onSubscribed: {
-                       }, fail: { error in
-                           agoraPrint("imp seat invitation subscribe fail \(error.message)...")
-                           ToastView.show(text: error.message)
-                       })
-    }
-    
-    private func _addMicSeatInvitation(invitation: ShowUser, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
-//            assert(false, "channelName = nil")
-            agoraPrint("_addMicSeatInvitation channelName = nil")
-            return
-        }
-        agoraPrint("imp seat invitation add ...")
-
-        let params = invitation.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
-            .add(data: params, success: { object in
-                agoraPrint("imp seat invitation add success...")
-                completion(nil)
-            }, fail: { error in
-                agoraPrint("imp seat invitation add fail :\(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
-    
-    private func _removeMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
-            agoraPrint("_removeMicSeatInvitation channelName = nil")
-            return
-        }
-        agoraPrint("imp seat invitation remove...")
-
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
-            .delete(id: invitation.objectId!,
-                    success: { _ in
-                agoraPrint("imp seat invitation remove success...")
-                completion(nil)
-            }, fail: { error in
-                agoraPrint("imp seat invitation remove fail :\(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
-    
-    private func _updateMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomId else {
-            agoraPrint("_removeMicSeatApply channelName = nil")
-            return
-        }
-        agoraPrint("imp seat invitation update...")
-
-        let params = invitation.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
-            .update(id: invitation.objectId!,
-                    data:params,
-                    success: {
-                agoraPrint("imp seat invitation update success...")
-                completion(nil)
-            }, fail: { error in
-                agoraPrint("imp seat invitation update fail :\(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
+//    private func _getAllMicSeatInvitationList(completion: @escaping (Error?, [ShowMicSeatInvitation]?) -> Void) {
+//        guard let channelName = roomId else {
+//            agoraAssert("channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp seat invitation get...")
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
+//            .get(success: { [weak self] list in
+//                agoraPrint("imp seat invitation success...")
+//                let seatInvitationList = list
+//                    .compactMap({ ShowMicSeatInvitation.yy_model(withJSON: $0.toJson()!)! })
+//                    .filter ({ $0.userId != VLUserCenter.user.id })
+//                self?.seatInvitationList = seatInvitationList
+//                completion(nil, seatInvitationList)
+//            }, fail: { error in
+//                agoraPrint("imp seat invitation fail :\(error.message)...")
+//                completion(error, nil)
+//            })
+//    }
+//
+//    private func _subscribeMicSeatInvitationChanged() {
+//        guard let channelName = roomId else {
+//            agoraAssert("channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp seat invitation subscribe ...")
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .subscribe(key: SYNC_MANAGER_SEAT_INVITATION_COLLECTION,
+//                       onCreated: { _ in
+//                       }, onUpdated: {[weak self] object in
+//                           agoraPrint("imp seat invitation subscribe onUpdated...")
+//                           guard let self = self,
+//                                 let jsonStr = object.toJson(),
+//                                 let model = ShowMicSeatInvitation.yy_model(withJSON: jsonStr) else { return }
+//                           defer {
+//                               self.subscribeDelegate?.onMicSeatInvitationUpdated(invitation: model)
+//                           }
+//                           if self.seatInvitationList.contains(where: { $0.userId == model.userId }) { return }
+//                           self.seatInvitationList.append(model)
+//                       }, onDeleted: { object in
+//                           agoraPrint("imp seat invitation subscribe onDeleted...")
+//                           var model: ShowMicSeatInvitation? = nil
+//                           if let index = self.seatInvitationList.firstIndex(where: { object.getId() == $0.objectId }) {
+//                               model = self.seatInvitationList[index]
+//                               self.seatInvitationList.remove(at: index)
+//                           }
+//                           guard let model = model else {return}
+//                           self.subscribeDelegate?.onMicSeatInvitationDeleted(invitation: model)
+//                       }, onSubscribed: {
+//                       }, fail: { error in
+//                           agoraPrint("imp seat invitation subscribe fail \(error.message)...")
+//                           ToastView.show(text: error.message)
+//                       })
+//    }
+//
+//    private func _addMicSeatInvitation(invitation: ShowUser, completion: @escaping (Error?) -> Void) {
+//        guard let channelName = roomId else {
+////            assert(false, "channelName = nil")
+//            agoraPrint("_addMicSeatInvitation channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp seat invitation add ...")
+//
+//        let params = invitation.yy_modelToJSONObject() as! [String: Any]
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
+//            .add(data: params, success: { object in
+//                agoraPrint("imp seat invitation add success...")
+//                completion(nil)
+//            }, fail: { error in
+//                agoraPrint("imp seat invitation add fail :\(error.message)...")
+//                completion(NSError(domain: error.message, code: error.code))
+//            })
+//    }
+//
+//    private func _removeMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+//        guard let channelName = roomId else {
+//            agoraPrint("_removeMicSeatInvitation channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp seat invitation remove...")
+//
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
+//            .delete(id: invitation.objectId!,
+//                    success: { _ in
+//                agoraPrint("imp seat invitation remove success...")
+//                completion(nil)
+//            }, fail: { error in
+//                agoraPrint("imp seat invitation remove fail :\(error.message)...")
+//                completion(NSError(domain: error.message, code: error.code))
+//            })
+//    }
+//
+//    private func _updateMicSeatInvitation(invitation: ShowMicSeatInvitation, completion: @escaping (Error?) -> Void) {
+//        guard let channelName = roomId else {
+//            agoraPrint("_removeMicSeatApply channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp seat invitation update...")
+//
+//        let params = invitation.yy_modelToJSONObject() as! [String: Any]
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .collection(className: SYNC_MANAGER_SEAT_INVITATION_COLLECTION)
+//            .update(id: invitation.objectId!,
+//                    data:params,
+//                    success: {
+//                agoraPrint("imp seat invitation update success...")
+//                completion(nil)
+//            }, fail: { error in
+//                agoraPrint("imp seat invitation update fail :\(error.message)...")
+//                completion(NSError(domain: error.message, code: error.code))
+//            })
+//    }
 }
 
 
@@ -1214,6 +1238,13 @@ extension ShowSyncManagerServiceImp {
                 self._removeInteraction(invitation: model) { error in
                 }
             case .updated:
+                //only support 1 interaction
+                if self.interactionList.count > 0 {
+                    self._removePKInvitation(invitation: invitation) { err in
+                    }
+                    return
+                }
+                
                 defer {
                     if invitation.status == .accepted {
                         self.subscribeDelegate?.onPKInvitationAccepted(invitation: invitation)
@@ -1319,7 +1350,7 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("_updatePKInvitation channelName = nil")
             return
         }
-        agoraPrint("imp pk invitation update...")
+        agoraPrint("imp pk invitation \(channelName) update...")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
@@ -1328,10 +1359,10 @@ extension ShowSyncManagerServiceImp {
             .update(id: invitation.objectId!,
                     data:params,
                     success: {
-                agoraPrint("imp pk invitation update success...")
+                agoraPrint("imp pk invitation \(channelName) update success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp pk invitation update fail :\(error.message)...")
+                agoraPrint("imp pk invitation update \(channelName) fail :\(error.message)...")
                 completion(NSError(domain: error.message, code: error.code))
             })
     }

@@ -90,13 +90,6 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     func rejectMicSeatApply(apply:ShowMicSeatApply,
                             completion: @escaping (Error?) -> Void)
     
-    ///  停止连麦
-    /// - Parameters:
-    ///   - apply: 停止连麦
-    ///   - completion: <#completion description#>
-    func stopMicSeatApply(apply: ShowUser,
-                          completion: @escaping (Error?) -> Void)
-    
     
     /// 获取当前连麦或PK的主播
     /// - Parameters:

@@ -14,8 +14,8 @@ enum ShowApplyAndInviteType: String, CaseIterable {
     
     var title: String {
         switch self {
-        case .apply: return "申请消息"
-        case .invite: return "连麦邀请"
+        case .apply: return "申请消息".show_localized
+        case .invite: return "连麦邀请".show_localized
         }
     }
 }
@@ -90,8 +90,8 @@ class ShowApplyAndInviteView: UIView {
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
-        view.register(ShowPKInviteViewCell.self,
-                      forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
+        view.register(ShowSeatApplyAndInviteViewCell.self,
+                      forCellWithReuseIdentifier: ShowSeatApplyAndInviteViewCell.description())
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
@@ -137,7 +137,7 @@ class ShowApplyAndInviteView: UIView {
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             let model = list.filter({ $0.interactStatus == .onSeat }).first
             self.tipsContainerView.isHidden = model == nil
-            self.tipsLabel.text = "与\(model?.userName ?? "")连麦中"
+            self.tipsLabel.text = String(format: "与%@连麦中".show_localized, model?.userName ?? "")
             self.updateLayout(isHidden: model == nil)
             self.seatMicModel = model
         }
@@ -146,7 +146,7 @@ class ShowApplyAndInviteView: UIView {
     private func getApplyPKInfo() {
         AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) { roomModel in
             self.tipsContainerView.isHidden = roomModel == nil
-            self.tipsLabel.text = "与主播\(roomModel?.ownerName ?? "")PK中"
+            self.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
         }
     }
     private func getApplyLinkInfo() {
@@ -219,8 +219,8 @@ class ShowApplyAndInviteView: UIView {
 }
 extension ShowApplyAndInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
-                                                 for: indexPath) as! ShowPKInviteViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ShowSeatApplyAndInviteViewCell.description(),
+                                                 for: indexPath) as! ShowSeatApplyAndInviteViewCell
         let model = self.tableView.dataArray?[indexPath.row]
         
         cell.setupApplyAndInviteData(model: model)

@@ -35,6 +35,13 @@ class ShowAgoraKitManager: NSObject {
         return config
     }()
     
+    private lazy var canvas: AgoraRtcVideoCanvas = {
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.renderMode = .hidden
+        canvas.mirrorMode = .disabled
+        return canvas
+    }()
+    
     private (set) var agoraKit: AgoraRtcEngineKit!
     
     weak var delegate: AgoraRtcEngineDelegate? {
@@ -56,9 +63,6 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.setVideoFrameDelegate(self)
         agoraKit.setCameraCapturerConfiguration(captureConfig)
         
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.renderMode = .hidden
-        canvas.mirrorMode = .disabled
         canvas.view = canvasView
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
@@ -169,12 +173,9 @@ class ShowAgoraKitManager: NSObject {
                                         info: nil,
                                         uid: uid)
         
-        let canvas = AgoraRtcVideoCanvas()
         canvas.view = canvasView
-        canvas.renderMode = .hidden
         if role == .broadcaster {
             canvas.uid = uid
-            canvas.mirrorMode = .disabled
             agoraKit?.setVideoFrameDelegate(self)
             agoraKit.setDefaultAudioRouteToSpeakerphone(true)
             agoraKit.enableAudio()
