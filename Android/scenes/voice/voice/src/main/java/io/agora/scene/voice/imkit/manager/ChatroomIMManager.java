@@ -694,8 +694,8 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param giftModel
      * @param callBack
      */
-    public void updateRankList(VoiceGiftModel giftModel, CallBack callBack){
-        delegate.updateRankList(giftModel,callBack);
+    public void updateRankList(String chatUid,VoiceGiftModel giftModel, CallBack callBack){
+        delegate.updateRankList(chatUid,giftModel,callBack);
     }
 
     /**
