@@ -81,7 +81,7 @@ data class VoiceMicInfoModel constructor(
  * 申请数据
  */
 data class VoiceRoomApply constructor(
-    var index: Int? = 0,
+    var index: Int? = -1,
     var member: VoiceMemberModel? = null,
     var created_at:Long? = 0
 
