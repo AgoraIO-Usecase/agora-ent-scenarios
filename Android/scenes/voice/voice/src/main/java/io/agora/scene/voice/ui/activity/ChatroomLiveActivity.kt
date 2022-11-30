@@ -29,7 +29,6 @@ import io.agora.voice.buddy.tool.ToastTools
 import io.agora.chat.ChatClient
 import io.agora.chat.adapter.EMAChatRoomManagerListener
 import io.agora.scene.voice.R
-import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
@@ -292,7 +291,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         roomObservableDelegate.onClickBottomMic()
                     }
                     R.id.voice_extend_item_hand_up -> {
-                       roomObservableDelegate.onClickBottomHandUp()
+                        roomObservableDelegate.onClickBottomHandUp()
                     }
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
@@ -348,15 +347,16 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         ChatroomConfigManager.getInstance().removeChatRoomListener(this)
         ChatroomIMManager.getInstance().logout(false)
         ChatroomIMManager.getInstance().clearCache()
-        if (roomKitBean.isOwner){
-            ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(roomKitBean.chatroomId,object :
-                CallBack{
+        if (roomKitBean.isOwner) {
+            ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
+                CallBack {
                 override fun onSuccess() {}
 
                 override fun onError(code: Int, error: String?) {}
             })
         }
         ChatClient.getInstance().chatroomManager().leaveChatRoom(roomKitBean.chatroomId)
+        roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
         super.finish()
     }
 
@@ -509,11 +509,25 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomObservableDelegate.updateRobotVolume(volume)
     }
 
+    override fun userJoinedRoom(roomId: String?, uid: String?) {
+        super.userJoinedRoom(roomId, uid)
+        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+        voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
+        voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
+        ThreadManager.getInstance().runOnMainThread {
+            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+            binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
+        }
+    }
+
     override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
         super.onMemberExited(roomId, chatUid, s2)
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
         chatUid?.let { cacheManager.removeMember(it) }
-        roomObservableDelegate.subMemberCount()
+        voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
+        ThreadManager.getInstance().runOnMainThread {
+            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+        }
     }
 
     override fun userBeKicked(roomId: String?, reason: Int) {
