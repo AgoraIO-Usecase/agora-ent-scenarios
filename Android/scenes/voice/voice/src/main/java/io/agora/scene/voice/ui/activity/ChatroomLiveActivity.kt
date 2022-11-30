@@ -509,11 +509,25 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomObservableDelegate.updateRobotVolume(volume)
     }
 
+    override fun userJoinedRoom(roomId: String?, uid: String?) {
+        super.userJoinedRoom(roomId, uid)
+        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+        voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
+        voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
+        ThreadManager.getInstance().runOnMainThread {
+            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+            binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
+        }
+    }
+
     override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
         super.onMemberExited(roomId, chatUid, s2)
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
         chatUid?.let { cacheManager.removeMember(it) }
-        roomObservableDelegate.subMemberCount()
+        voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
+        ThreadManager.getInstance().runOnMainThread {
+            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+        }
     }
 
     override fun userBeKicked(roomId: String?, reason: Int) {
