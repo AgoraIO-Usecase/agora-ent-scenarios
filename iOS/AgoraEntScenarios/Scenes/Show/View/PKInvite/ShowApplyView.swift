@@ -79,6 +79,14 @@ class ShowApplyView: UIView {
         AppContext.showServiceImp.getAllInterationList { _, list in
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             self.interactionModel = list.filter({ $0.interactStatus == .onSeat }).first
+            if self.interactionModel?.userId == VLUserCenter.user.id {
+                self.revokeutton.setTitle("结束".show_localized, for: .normal)
+                let image = UIImage(systemName: "xmark.circle")?.withTintColor(UIColor(hex: "#684BF2"),
+                                                                               renderingMode: .alwaysOriginal)
+                self.revokeutton.setImage(image, for: .normal, postion: .right, spacing: 5)
+                self.revokeutton.tag = 1
+                self.revokeutton.isHidden = false
+            }
             self.getMicSeatList(autoApply: autoApply)
         }
     }
@@ -89,24 +97,29 @@ class ShowApplyView: UIView {
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             if seatUserModel == nil, autoApply, self.interactionModel?.userId != VLUserCenter.user.id {
                 AppContext.showServiceImp.createMicSeatApply { _ in
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
                         self.getAllMicSeatList(autoApply: autoApply)
                     }
                 }
+                self.revokeutton.setTitle("撤回申请".show_localized, for: .normal)
+                let image = UIImage(systemName: "arrow.uturn.left")?.withTintColor(UIColor(hex: "#684BF2"),
+                                                                                   renderingMode: .alwaysOriginal)
+                self.revokeutton.setImage(image, for: .normal, postion: .right, spacing: 5)
+                self.revokeutton.tag = 0
+                self.revokeutton.isHidden = false
             }
-            self.revokeutton.isHidden = seatUserModel == nil
             self.setupTipsInfo(count: list.count)
             self.tableView.dataArray = list
         }
     }
     
     private func setupTipsInfo(count: Int) {
-        let text = " 正在等待"
+        let text = " "+"正在等待".show_localized
         let attrs = NSMutableAttributedString(string: text)
-        let attr = NSAttributedString(string: "\(count)人", attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
+        let attr = NSAttributedString(string: "\(count)"+"人".show_localized,
+                                      attributes: [.font: UIFont.systemFont(ofSize: 14, weight: .bold)])
         attrs.insert(attr, at: 0)
         self.tipsLabel.attributedText = attrs
-        self.revokeutton.isHidden = count == 0
     }
     
     private func setupUI() {
@@ -162,12 +175,17 @@ class ShowApplyView: UIView {
     
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
-        revokeutton.isHidden = true
-        AppContext.showServiceImp.cancelMicSeatApply { _ in }
-        let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
-        tableView.dataArray?.remove(at: index)
-        let count = tableView.dataArray?.count ?? 0
-        setupTipsInfo(count: count)
+        if sender.tag == 0 {
+            revokeutton.isHidden = true
+            AppContext.showServiceImp.cancelMicSeatApply { _ in }
+            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
+            tableView.dataArray?.remove(at: index)
+            let count = tableView.dataArray?.count ?? 0
+            setupTipsInfo(count: count)
+        } else if let interactionModel = interactionModel {
+            AppContext.showServiceImp.stopInteraction(interaction: interactionModel) { _ in }
+            AlertManager.hiddenView()
+        }
     }
 }
 
