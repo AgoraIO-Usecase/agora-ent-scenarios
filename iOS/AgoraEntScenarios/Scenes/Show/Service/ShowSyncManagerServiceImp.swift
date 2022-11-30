@@ -414,7 +414,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 guard let model = self.pkCreatedInvitationMap.values.filter({ $0.objectId == invitation.objectId }).first else {
                     return
                 }
-                
+                model.userMuteAudio = invitation.userMuteAudio
+                model.fromUserMuteAudio = invitation.fromUserMuteAudio
                 if status == .deleted {
                     if model.status == .accepted {
                         self._recvPKFinish(invitation: model)
@@ -437,9 +438,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     }
                     
                     //TODO: workaround
-                    guard let interaction = self.interactionList.filter({ $0.userId == model.fromUserId}).first else {return}
-                    if interaction.muteAudio == model.muteAudio { return }
-                    interaction.muteAudio = model.muteAudio
+                    guard let interaction = self.interactionList.filter({ $0.userId == model.userId}).first else {return}
+                    if interaction.muteAudio == model.userMuteAudio { return }
+                    interaction.muteAudio = model.userMuteAudio
                     self._updateInteraction(interaction: interaction) { err in
                     }
                 }
@@ -541,25 +542,32 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     
-    func muteAudio(mute:Bool, completion: @escaping (Error?) -> Void) {
-        if let interaction = self.interactionList.filter({ $0.userId == VLUserCenter.user.id}).first, interaction.interactStatus == .onSeat {
+    func muteAudio(mute:Bool, userId: String, completion: @escaping (Error?) -> Void) {
+        if let interaction = self.interactionList.filter({ $0.userId == userId}).first, interaction.interactStatus == .onSeat {
             //is on seat
             interaction.muteAudio = mute
             _updateInteraction(interaction: interaction) { err in
             }
         }
         
-        // pk recviver
-        _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
-            guard let invitation = list?.filter({ $0.status == .accepted }).first else { return }
-            invitation.muteAudio = mute
-            self?._updatePKInvitation(invitation: invitation) { err in
+        //only owner can update pk invitation
+        guard userId == room?.ownerId else {
+            return
+        }
+        
+        guard let pkInvitation = self.pkCreatedInvitationMap.values.filter({ $0.status == .accepted}).first else {
+            // pk recviver
+            _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
+                guard let invitation = list?.filter({ $0.status == .accepted }).first else { return }
+                invitation.userMuteAudio = mute
+                self?._updatePKInvitation(invitation: invitation) { err in
+                }
             }
+            return
         }
         
         //is pk, send mute status (pk sender)
-        guard let pkInvitation = self.pkCreatedInvitationMap.values.filter({ $0.status == .accepted}).first else { return }
-        pkInvitation.muteAudio = mute
+        pkInvitation.fromUserMuteAudio = mute
         _updatePKInvitation(invitation: pkInvitation) { err in
         }
     }
@@ -1273,9 +1281,9 @@ extension ShowSyncManagerServiceImp {
                 if let pkInvitation = self.pkInvitationList.first,
                     pkInvitation.objectId == invitation.objectId {
                     //update invitation (mute audio)
-                    pkInvitation.muteAudio = invitation.muteAudio
+                    pkInvitation.fromUserMuteAudio = invitation.fromUserMuteAudio
                     guard let interaction = self.interactionList.filter({ $0.userId == pkInvitation.fromUserId}).first else {return}
-                    interaction.muteAudio = pkInvitation.muteAudio
+                    interaction.muteAudio = pkInvitation.fromUserMuteAudio
                     self._updateInteraction(interaction: interaction) { err in
                     }
                     return
