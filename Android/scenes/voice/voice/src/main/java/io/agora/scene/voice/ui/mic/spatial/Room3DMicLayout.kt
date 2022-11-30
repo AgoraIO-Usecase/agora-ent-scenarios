@@ -457,19 +457,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         }
     }
 
-    override fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
-        // TODO:
-        val index = micInfoModel.micIndex
-        micInfoMap[index] = micInfoModel
-        micViewMap[index]?.apply {
-            binding(micInfoModel)
-        }
-        // 机器人
-        if (index == ConfigConstants.MicConstant.KeyIndex5 || index == ConfigConstants.MicConstant.KeyIndex6) {
-            activeBot(micInfoModel.micStatus == MicStatus.BotActivated)
-        }
-    }
-
     private var myRtcUid: Int = -1
 
     fun setMyRtcUid(rtcUid: Int) {

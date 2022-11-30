@@ -272,9 +272,9 @@ class AgoraRtcEngineController {
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
         rtcEngine?.leaveChannel()
-        mediaPlayer?.apply {
-            unRegisterPlayerObserver(firstMediaPlayerObserver)
-            destroy()
+        mediaPlayer?.let {
+            it.unRegisterPlayerObserver(firstMediaPlayerObserver)
+            it.destroy()
         }
         RtcEngineEx.destroy()
         rtcEngine = null
