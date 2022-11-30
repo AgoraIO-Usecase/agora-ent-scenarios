@@ -214,7 +214,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     // 禁言指定麦位
     fun forbidMic(micIndex: Int) {
-        _muteMicObservable.setSource(mRepository.forbidMic(micIndex))
+        _forbidMicObservable.setSource(mRepository.forbidMic(micIndex))
     }
 
     // 取消指定麦位禁言

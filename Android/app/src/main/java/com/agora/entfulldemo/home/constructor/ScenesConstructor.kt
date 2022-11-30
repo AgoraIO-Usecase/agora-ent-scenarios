@@ -17,8 +17,15 @@ object ScenesConstructor {
     }
 
     @JvmStatic
-    fun buildData(context: Context): MutableList<ScenesModel> {
+    fun buildData(context: Context): List<ScenesModel> {
         return mutableListOf(
+            ScenesModel(
+                SceneType.Voice_Chat,
+                context.getString(R.string.voice_chat),
+                R.mipmap.bg_btn_home3,
+                R.mipmap.bg_btn_home_chat,
+                true
+            ),
             ScenesModel(
                 SceneType.Ktv_Online,
                 context.getString(R.string.ktv_online),
@@ -26,34 +33,27 @@ object ScenesConstructor {
                 R.mipmap.bg_btn_home_ktv,
                 true
             ),
-            ScenesModel(
-                SceneType.Voice_Chat,
-                context.getString(R.string.voice_chat),
-                R.mipmap.bg_btn_home1,
-                R.mipmap.bg_btn_home_ktv,
-                true
-            ),
-            ScenesModel(
-                SceneType.Meta_Live,
-                context.getString(R.string.meta_live),
-                R.mipmap.bg_btn_home2,
-                R.mipmap.bg_btn_home_live,
-                false
-            ),
-            ScenesModel(
-                SceneType.Meta_Chat,
-                context.getString(R.string.meta_chatting),
-                R.mipmap.bg_btn_home3,
-                R.mipmap.bg_btn_home_chat,
-                false
-            ),
-            ScenesModel(
-                SceneType.Games,
-                context.getString(R.string.interactive_games),
-                R.mipmap.bg_btn_home4,
-                R.mipmap.bg_btn_home_youxi,
-                false
-            )
+//            ScenesModel(
+//                SceneType.Meta_Live,
+//                context.getString(R.string.meta_live),
+//                R.mipmap.bg_btn_home2,
+//                R.mipmap.bg_btn_home_live,
+//                false
+//            ),
+//            ScenesModel(
+//                SceneType.Meta_Chat,
+//                context.getString(R.string.meta_chatting),
+//                R.mipmap.bg_btn_home3,
+//                R.mipmap.bg_btn_home_chat,
+//                false
+//            ),
+//            ScenesModel(
+//                SceneType.Games,
+//                context.getString(R.string.interactive_games),
+//                R.mipmap.bg_btn_home4,
+//                R.mipmap.bg_btn_home_youxi,
+//                false
+//            )
         )
     }
 }
