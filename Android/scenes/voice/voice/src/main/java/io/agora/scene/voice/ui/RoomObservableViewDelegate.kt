@@ -762,12 +762,6 @@ class RoomObservableViewDelegate constructor(
             }).show(activity.supportFragmentManager, "CommonFragmentAlertDialog")
     }
 
-    fun subMemberCount() {
-        ThreadManager.getInstance().runOnMainThread {
-            iRoomTopView.subMemberCount()
-        }
-    }
-
     /**接受系统消息*/
     fun receiveSystem(ext: MutableMap<String, String>) {
         ThreadManager.getInstance().runOnMainThread {

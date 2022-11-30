@@ -107,7 +107,8 @@ class VoiceSyncManagerServiceImp(
             roomName = inputModel.roomName
             createdAt = currentMilliseconds
             roomPassword = inputModel.password
-            memberCount = 2
+            memberCount = 2 // 两个机器人
+            clickCount = 2 // 两个机器人
         }
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
@@ -161,6 +162,7 @@ class VoiceSyncManagerServiceImp(
                     mSceneReference = sceneReference
                     val curRoomInfo = roomMap[roomId] ?: return
                     curRoomInfo.memberCount = curRoomInfo.memberCount + 1
+                    curRoomInfo.clickCount = curRoomInfo.clickCount + 1
                     val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
                         putAll(GsonTools.beanToMap(curRoomInfo))
                     }
