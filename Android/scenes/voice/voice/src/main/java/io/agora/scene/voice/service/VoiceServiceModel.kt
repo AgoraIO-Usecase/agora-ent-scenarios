@@ -36,9 +36,10 @@ data class VoiceMemberModel constructor(
  * 贡献榜
  */
 data class VoiceRankUserModel constructor(
+    @SerializedName("chat_uid") var chatUid: String? = null,
     var name: String? = null,
     var portrait: String? = "",
-    var amount: Int? = 0
+    var amount: Int = 0
 ) : BaseRoomBean
 
 /**

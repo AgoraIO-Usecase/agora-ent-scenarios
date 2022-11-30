@@ -132,7 +132,9 @@ public class ChatroomGiftView extends LinearLayout {
 
     public void refresh() {
         adapter.refresh();
-        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        if (adapter.getItemCount() > 0){
+            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        }
         clearTiming();
     }
 
