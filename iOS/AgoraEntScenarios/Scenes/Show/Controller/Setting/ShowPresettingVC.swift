@@ -22,7 +22,7 @@ class ShowPresettingVC: UIViewController {
     
     private var dataArray: [ShowPresettingModel] = {
         
-        let model1 = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
+        let model1 = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium])
         return [model1]
     }()
     

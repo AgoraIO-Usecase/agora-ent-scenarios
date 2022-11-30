@@ -69,15 +69,18 @@ class ShowToolMenuModel {
 }
 
 enum ShowMenuType {
-    /// 未pk
-    case none
-    /// PK中主播
-    case pking_broadcaster
-    /// PK中观众
-    case pking_audience
+    /// 未pk观众
+    case idle_audience
+    /// 未pk主播
+    case idle_broadcaster
+    /// PK中
+    case pking
+    /// 管理麦位
+    case managerMic
 }
 
 class ShowToolMenuView: UIView {
+    var title: String?
     var onTapItemClosure: ((ShowToolMenuType, Bool) -> Void)?
     
     public lazy var collectionView: AGECollectionView = {
@@ -97,22 +100,25 @@ class ShowToolMenuView: UIView {
         return view
     }()
     
-    var type: ShowMenuType = .none {
+    var type: ShowMenuType = .idle_audience {
         didSet {
             
             switch type {
-            case .none:
+            case .idle_broadcaster:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 != .mute_mic && $0 != .end_pk }))
-            case .pking_broadcaster:
+            case .pking:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .switch_camera || $0 == .camera || $0 == .mute_mic || $0 == .end_pk }))
-            case .pking_audience:
+            case .managerMic:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .mute_mic || $0 == .end_pk }))
+            case .idle_audience:
+                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 != .mute_mic && $0 != .end_pk && $0 != .camera && $0 != .switch_camera && $0 != .mic && $0 != .HD }))
             }
         }
     }
     
-    init(type: ShowMenuType) {
+    init(type: ShowMenuType, title: String? = nil) {
         super.init(frame: .zero)
+        self.title = title
         setupUI()
         defer {
             self.type = type
@@ -182,21 +188,21 @@ extension ShowToolMenuView: AGECollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
                                                                          withReuseIdentifier: LiveToolHeaderView.description(),
-                                                                         for: indexPath)
-        
+                                                                         for: indexPath) as! LiveToolHeaderView
+        headerView.tipsLabel.text = title
         return headerView
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: Screen.width, height: type == .none ? 0 : 50)
+        CGSize(width: Screen.width, height: title == nil ? 0 : 50)
     }
 }
 
 
 class LiveToolHeaderView: UICollectionReusableView {
-    private lazy var tipsLabel: AGELabel = {
+    lazy var tipsLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .middle)
-        label.text = "对观众SLKGJAKLGJ"
+//        label.text = "对观众SLKGJAKLGJ"
         return label
     }()
     private lazy var lineView: AGEView = {

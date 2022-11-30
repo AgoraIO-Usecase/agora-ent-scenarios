@@ -21,10 +21,16 @@ protocol ShowToolMenuViewControllerDelegate: NSObjectProtocol {
 
 class ShowToolMenuViewController: UIViewController {
     
-    var type: ShowMenuType?
+    var menuTitle: String?
+    var type: ShowMenuType? {
+        didSet {
+            guard let type = type else { return }
+            updateLayoutForType(type)
+        }
+    }
     var delegate: ShowToolMenuViewControllerDelegate?
     
-    private var menuView: ShowToolMenuView!
+    private var menuView: ShowToolMenuView?
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -46,15 +52,11 @@ class ShowToolMenuViewController: UIViewController {
     }
     
     private func setUpUI(){
-        
-        menuView = ShowToolMenuView(type: type ?? .none)
-        view.addSubview(menuView)
-        menuView?.snp.makeConstraints({ make in
-            make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(210)
-        })
-        
-        menuView.onTapItemClosure = {[weak self] modelType, isSelected in
+        guard let type = self.type else { return  }
+        menuView = ShowToolMenuView(type: type, title: menuTitle)
+        view.addSubview(menuView!)
+        updateLayoutForType(type)
+        menuView!.onTapItemClosure = {[weak self] modelType, isSelected in
             switch modelType {
             case .camera:
                 self?.delegate?.onClickCameraButtonSelected(isSelected)
@@ -63,6 +65,7 @@ class ShowToolMenuViewController: UIViewController {
                 self?.delegate?.onClickHDButtonSelected(isSelected)
                 break
             case .end_pk:
+                self?.dismiss(animated: true)
                 self?.delegate?.onClickEndPkButtonSelected(isSelected)
                 break
             case .mic:
@@ -82,6 +85,18 @@ class ShowToolMenuViewController: UIViewController {
                 break
             }
         }
+    }
+    
+    private func updateLayoutForType(_ menuType: ShowMenuType) {
+        var height = 210
+        if type == .idle_audience {
+            height = 150
+        }
+        menuView?.type = type ?? .idle_audience
+        menuView?.snp.remakeConstraints({ make in
+            make.left.bottom.right.equalToSuperview()
+            make.height.equalTo(height)
+        })
     }
 
 }
