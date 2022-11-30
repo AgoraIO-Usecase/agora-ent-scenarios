@@ -117,11 +117,15 @@ class ChatroomProtocolDelegate constructor(
                                 })
                             }
                         }else if (key=="gift_amount"){
-                            voiceRoomInfo.roomInfo?.giftAmount = value.toInt()
+                            value.toIntOrNull()?.let {
+                                voiceRoomInfo.roomInfo?.giftAmount = it
+                            }
                         }else if (key=="robot_volume"){
-                            voiceRoomInfo.roomInfo?.robotVolume = value.toInt()
+                            value.toIntOrNull()?.let {
+                                voiceRoomInfo.roomInfo?.robotVolume = it
+                            }
                         }else if (key=="use_robot"){
-                            voiceRoomInfo.roomInfo?.useRobot = value != "0"
+                            voiceRoomInfo.roomInfo?.useRobot = value == "1"
                         }
                     }
                     ChatroomCacheManager.cacheManager.clearMicInfo()
