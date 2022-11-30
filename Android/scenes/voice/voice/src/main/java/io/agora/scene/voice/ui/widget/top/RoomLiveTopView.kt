@@ -138,14 +138,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
-    override fun subMemberCount() {
-        if (this::roomDetailInfo.isInitialized) {
-            roomDetailInfo.memberCount -= 1
-            val text = roomDetailInfo.memberCount.number2K()
-            binding.mtChatroomMembers.text = text
-        }
-    }
-
     override fun onUpdateMemberCount(count: Int) {
         super.onUpdateMemberCount(count)
         if (count < 0) return
