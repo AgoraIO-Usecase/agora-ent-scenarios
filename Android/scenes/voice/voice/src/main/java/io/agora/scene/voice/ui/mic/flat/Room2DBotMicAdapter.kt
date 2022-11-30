@@ -60,19 +60,4 @@ class Room2DBotMicAdapter constructor(
         }
         notifyItemChanged(0)
     }
-
-    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
-        if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex6)) {
-            val value = newMicMap[ConfigConstants.MicConstant.KeyIndex6]
-            activeBot(value?.micStatus == MicStatus.BotActivated)
-        }
-    }
-
-    fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
-        if (micInfoModel.micIndex == ConfigConstants.MicConstant.KeyIndex6
-            || micInfoModel.micIndex == ConfigConstants.MicConstant.KeyIndex7
-        ) {
-            activeBot(micInfoModel.micStatus == MicStatus.BotActivated)
-        }
-    }
 }

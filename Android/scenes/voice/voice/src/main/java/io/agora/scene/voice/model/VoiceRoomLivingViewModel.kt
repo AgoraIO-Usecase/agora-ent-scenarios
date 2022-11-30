@@ -48,10 +48,13 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _cancelLockMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
     private val _startMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
     private val _cancelMicSeatApplyObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
-    private val _changeMicObservable: SingleSourceLiveData<Resource<Map<Int,VoiceMicInfoModel>>> = SingleSourceLiveData()
-    private val _acceptMicSeatInvitationObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> = SingleSourceLiveData()
+    private val _changeMicObservable: SingleSourceLiveData<Resource<Map<Int, VoiceMicInfoModel>>> =
+        SingleSourceLiveData()
+    private val _acceptMicSeatInvitationObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
+        SingleSourceLiveData()
     private val _giftContributeObservable: SingleSourceLiveData<Resource<List<VoiceRankUserModel>>> =
         SingleSourceLiveData()
+    private val _leaveSyncRoomObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
 
     /**房间详情*/
     fun roomDetailsObservable(): LiveData<Resource<VoiceRoomInfo>> = _roomDetailsObservable
@@ -105,13 +108,16 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun cancelMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _cancelMicSeatApplyObservable
 
     /**换麦*/
-    fun changeMicObservable(): LiveData<Resource<Map<Int,VoiceMicInfoModel>>> = _changeMicObservable
+    fun changeMicObservable(): LiveData<Resource<Map<Int, VoiceMicInfoModel>>> = _changeMicObservable
 
     /**接受邀请*/
     fun acceptMicSeatInvitationObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatInvitationObservable
 
     /**获取礼物列表*/
     fun giftContributeObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _giftContributeObservable
+
+    /**离开syncManager 房间*/
+    fun leaveSyncRoomObservable(): LiveData<Resource<Boolean>> = _leaveSyncRoomObservable
 
     /**获取详情*/
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
@@ -180,9 +186,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     // 开启/关闭机器人
     fun enableRobot(active: Boolean) {
-        if (active){
+        if (active) {
             _openBotObservable.setSource(mRepository.enableRobot(true))
-        }else{
+        } else {
             _closeBotObservable.setSource(mRepository.enableRobot(false))
         }
     }
@@ -265,5 +271,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
     //  获取礼物列
     fun fetchGiftContribute() {
         _giftContributeObservable.setSource(mRepository.fetchGiftContribute())
+    }
+
+    fun leaveSyncManagerRoom(roomId: String) {
+        _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId))
     }
 }
