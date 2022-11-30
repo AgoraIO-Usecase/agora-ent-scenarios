@@ -62,8 +62,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onUserJoinedRoom(roomId: String, user: VRUser) {
         // 更新用户人数
         let info = roomInfo
-        info?.room?.member_count! += 1
-        info?.room?.click_count! += 1
+        info?.room?.member_count = (info?.room?.member_count ?? 0) + 1
+        info?.room?.click_count = (info?.room?.click_count ?? 0) + 1
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
@@ -120,6 +120,13 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.mic_info![6] = mic_info
             self.rtcView.updateAlien(mic_info.status)
         }
+        
+        if attributeMap!.keys.contains(where: { text in
+            text.hasPrefix("robot_volume")
+        }) {
+            let robot_volume: String = (attributeMap?["robot_volume"])! as String
+            roomInfo?.room?.robot_volume = UInt(robot_volume)
+        }
     }
     
     func onUserLeftRoom(roomId: String, userName: String) {
@@ -172,11 +179,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
                 refreshHandsUp(status: status)
             }
-            let same = ChatRoomServiceImp.getSharedInstance().mics.filter {
-                $0.member?.chat_uid ?? "" == fromId
-            }
-            let old = same.first { $0.member?.mic_index ?? 1 != mic_index}
-            ChatRoomServiceImp.getSharedInstance().mics[safe: old?.mic_index ?? 1]?.member = nil
+//            let same = ChatRoomServiceImp.getSharedInstance().mics.filter {
+//                $0.member?.chat_uid ?? "" == fromId
+//            }
+//            let old = same.first { $0.member?.mic_index ?? 1 != mic_index}
+//            ChatRoomServiceImp.getSharedInstance().mics[safe: old?.mic_index ?? 1]?.member = nil
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                 $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""

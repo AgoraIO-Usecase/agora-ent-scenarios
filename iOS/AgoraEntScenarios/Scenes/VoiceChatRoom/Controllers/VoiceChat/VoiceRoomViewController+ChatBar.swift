@@ -242,7 +242,7 @@ extension VoiceRoomViewController {
     func showApplyAlert(_ index: Int) {
         let isHairScreen = SwiftyFitsize.isFullScreen
         let manageView = VMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
-        guard let mic_info = roomInfo?.mic_info?[index] else { return }
+        let mic_info = ChatRoomServiceImp.getSharedInstance().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
             self?.dismiss(animated: true)
