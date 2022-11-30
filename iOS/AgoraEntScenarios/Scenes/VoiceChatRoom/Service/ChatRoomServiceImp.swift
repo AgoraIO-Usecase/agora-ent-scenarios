@@ -56,7 +56,12 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
             guard let map = meta?["user"]?.z.jsonToDictionary() else { return }
             let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
-            self.applicants.append(apply)
+            let user = self.applicants.first {
+                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+            }
+            if user == nil {
+                self.applicants.append(apply)
+            }
             self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
         }
     }
@@ -700,7 +705,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         VoiceRoomIMManager.shared?.userDestroyedChatroom()
                     } else {
                         let updateRoom: VRRoomEntity = room
-                        updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
+                        updateRoom.member_count = updateRoom.member_count ?? 0 - 1
+                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
@@ -734,7 +740,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
         mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
-        mic.member?.im_token = ""
         mics.append(mic)
         for i in 1...7 {
             let item = VRRoomMic()
