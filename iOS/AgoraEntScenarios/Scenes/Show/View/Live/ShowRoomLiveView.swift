@@ -37,7 +37,7 @@ class ShowRoomLiveView: UIView {
         view.onTapRemoteCanvasClosure = { [weak self] in
             self?.delegate?.onClickRemoteCanvas()
         }
-        return canvasView
+        return view
     }()
     
     private var chatArray = [ShowChatModel]()
