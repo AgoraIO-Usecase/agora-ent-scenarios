@@ -132,12 +132,6 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
 
     override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         room2DMicAdapter?.onSeatUpdated(newMicMap)
-        room2DMicBotAdapter?.onSeatUpdated(newMicMap)
-    }
-
-    override fun onSeatUpdated(micInfoModel: VoiceMicInfoModel) {
-        room2DMicAdapter?.onSeatUpdated(micInfoModel)
-        room2DMicBotAdapter?.onSeatUpdated(micInfoModel)
     }
 
     private var myRtcUid: Int = -1

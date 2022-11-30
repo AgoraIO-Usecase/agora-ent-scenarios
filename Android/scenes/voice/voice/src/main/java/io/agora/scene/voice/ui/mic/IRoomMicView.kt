@@ -22,9 +22,6 @@ interface IRoomMicView {
     /**多麦位更新*/
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
 
-    /**单麦位更新*/
-    fun onSeatUpdated(micInfoModel: VoiceMicInfoModel)
-
     /**是否在麦位上,-1 不在*/
     fun findMicByUid(uid: String): Int
 
