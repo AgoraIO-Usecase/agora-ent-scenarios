@@ -90,8 +90,8 @@ class ShowApplyAndInviteView: UIView {
         view.emptyTitleColor = UIColor(hex: "#989DBA")
         view.emptyImage = UIImage.show_sceneImage(name: "show_pkInviteViewEmpty")
         view.delegate = self
-        view.register(ShowPKInviteViewCell.self,
-                      forCellWithReuseIdentifier: ShowPKInviteViewCell.description())
+        view.register(ShowSeatApplyAndInviteViewCell.self,
+                      forCellWithReuseIdentifier: ShowSeatApplyAndInviteViewCell.description())
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
@@ -219,8 +219,8 @@ class ShowApplyAndInviteView: UIView {
 }
 extension ShowApplyAndInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
-                                                 for: indexPath) as! ShowPKInviteViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ShowSeatApplyAndInviteViewCell.description(),
+                                                 for: indexPath) as! ShowSeatApplyAndInviteViewCell
         let model = self.tableView.dataArray?[indexPath.row]
         
         cell.setupApplyAndInviteData(model: model)
