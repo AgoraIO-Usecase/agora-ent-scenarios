@@ -12,7 +12,7 @@ import UIKit
 class ShowAgoraKitManager: NSObject {
     private var exConnection: AgoraRtcConnection?
     private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
-        return AgoraVideoEncoderConfiguration(size: CGSize(width: 480, height: 840),
+        return AgoraVideoEncoderConfiguration(size: CGSize(width: 540, height: 960),
                                        frameRate: .fps30,
                                        bitrate: AgoraVideoBitrateStandard,
                                        orientationMode: .fixedPortrait,
@@ -31,6 +31,7 @@ class ShowAgoraKitManager: NSObject {
         let config = AgoraCameraCapturerConfiguration()
         config.cameraDirection = .front
         config.dimensions = CGSize(width: 1280, height: 720)
+        config.frameRate = 15
         return config
     }()
     
@@ -93,9 +94,9 @@ class ShowAgoraKitManager: NSObject {
     /// - Parameter size: 分辨率
     func setCaptureVideoDimensions(_ size: CGSize){
         agoraKit.disableVideo()
-        agoraKit.enableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
         agoraKit?.setCameraCapturerConfiguration(captureConfig)
+        agoraKit.enableVideo()
     }
     
     /// 设置编码分辨率

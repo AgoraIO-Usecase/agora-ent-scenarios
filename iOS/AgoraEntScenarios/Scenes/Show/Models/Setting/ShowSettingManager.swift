@@ -12,6 +12,14 @@ class ShowSettingManager {
     
     private var agoraKit: AgoraRtcEngineKit!
     
+    private lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+        let config = AgoraCameraCapturerConfiguration()
+        config.cameraDirection = .front
+        config.dimensions = CGSize(width: 1280, height: 720)
+        config.frameRate = 15
+        return config
+    }()
+    
     // 预设类型
     private var presetType: ShowPresetType?
     
@@ -52,7 +60,7 @@ class ShowSettingManager {
     }
     
     // 预设模式
-    private func _presetValuesWith(dimensions: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captrueSize: ShowAgoraVideoDimensions) {
+    private func _presetValuesWith(dimensions: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, videoSize: ShowAgoraVideoDimensions) {
         ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: dimensions.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
@@ -77,17 +85,19 @@ class ShowSettingManager {
         case .show_low:
             switch mode {
             case .signle:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: true, captrueSize: ._1280x720)
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: true, videoSize: ._1280x720)
+//                setCaptureVideoDimensions(CGSize(width: 720, height: 1280))
             case .pk:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 700, h265On: false, captrueSize: ._1280x720)
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
             }
             break
         case .show_medium:
             switch mode {
             case .signle:
-                _presetValuesWith(dimensions: ._1280x720, fps: .fps15, bitRate: 1800, h265On: true, captrueSize: ._1280x720)
+                _presetValuesWith(dimensions: ._1280x720, fps: .fps15, bitRate: 1800, h265On: true, videoSize: ._1280x720)
+//                setCaptureVideoDimensions(CGSize(width: 1080, height: 1920))
             case .pk:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captrueSize: ._1280x720)
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
             }
             
             break
@@ -95,6 +105,13 @@ class ShowSettingManager {
             
             break
         }
+    }
+    
+    func setCaptureVideoDimensions(_ size: CGSize){
+        agoraKit.disableVideo()
+        captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        agoraKit.enableVideo()
     }
 }
 
