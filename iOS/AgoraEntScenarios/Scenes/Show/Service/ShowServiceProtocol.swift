@@ -170,8 +170,9 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     /// 静音设置
     /// - Parameters:
     ///   - mute: <#mute description#>
+    ///   - userId: <#userId description#>
     ///   - completion: <#completion description#>
-    func muteAudio(mute:Bool, completion: @escaping (Error?) -> Void)
+    func muteAudio(mute:Bool, userId: String, completion: @escaping (Error?) -> Void)
 
     
     
