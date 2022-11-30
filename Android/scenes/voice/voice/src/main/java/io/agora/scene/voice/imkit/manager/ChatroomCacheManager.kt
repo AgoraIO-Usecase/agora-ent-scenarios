@@ -224,20 +224,28 @@ class ChatroomCacheManager {
      * 设置榜单列表
      */
     fun setRankList(rankBean:VoiceRankUserModel){
-        val name = rankBean.name
-        if (name != null){
-            rankingMap[name] = rankBean
+        val chatUid = rankBean.chatUid
+        if (chatUid != null){
+            rankingMap[chatUid] = rankBean
             rankingList.clear()
             for (entry in rankingMap.entries) {
                 rankingList.add(entry.value)
-
             }
         }
-        rankingList.sortBy { it.amount }
+        "setRankList (${rankingList})".logE("ChatroomCacheManager")
+        var comparator:Comparator<VoiceRankUserModel> = Comparator{o1,o2 ->
+            o2.amount.compareTo(o1.amount)
+        }
+//        rankingList.sortBy { it.amount }
+        rankingList.sortWith(comparator)
     }
 
     fun getRankList():MutableList<VoiceRankUserModel>{
         return rankingList
+    }
+
+    fun getRankMap():MutableMap<String, VoiceRankUserModel>{
+        return rankingMap
     }
 
     /**
