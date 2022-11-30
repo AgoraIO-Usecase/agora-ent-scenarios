@@ -503,7 +503,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                 }
-                let currentMic = self.mics[safe: user?.index ?? 1]
+                let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
                     completion(nil,mic)
@@ -565,6 +565,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             }
         }
     }
+    
+    func limitError() -> VoiceRoomError {
+        let error = VoiceRoomError()
+        error.code = "403"
+        error.message = "Members reach limit!"
+        return error
+    }
+
     
     /// 创建房间
     /// - Parameters:
@@ -632,9 +640,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         if let roomList = self.roomList {
             for room in roomList {
                 if room.room_id == roomId {
-                    var updateRoom: VRRoomEntity = room
-                    updateRoom.member_count = (updateRoom.member_count ?? 0) + 1
-                    updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
+                    let updateRoom: VRRoomEntity = room
+                    if room.member_count ?? 0 >= 19 {
+                        completion(self.limitError(),nil)
+                        return
+                    }
+
+                    updateRoom.member_count = updateRoom.member_count ?? 0 + 1
+                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
@@ -658,6 +671,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 completion(error, nil)
                             })
                     }
+                    break
                 }
             }
         }

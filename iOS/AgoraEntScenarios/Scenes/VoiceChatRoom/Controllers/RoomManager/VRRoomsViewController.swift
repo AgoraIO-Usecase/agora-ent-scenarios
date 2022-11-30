@@ -167,11 +167,11 @@ extension VRRoomsViewController {
                         let vc = VoiceRoomViewController(info: info)
                         self.navigationController?.pushViewController(vc, animated: true)
                     } else {
-                        
+                        self.view.makeToast("Loading failed,please retry or install again!")
                     }
                 })
             } else {
-                self.view.makeToast("Loading failed,please retry or install again!")
+                self.view.makeToast("Members reach limit!")
             }
         }
     }
