@@ -194,7 +194,7 @@ class RoomObservableViewDelegate constructor(
                     "cancel mic seat apply:$data".logD()
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_cancel_apply_success))
                     chatPrimaryMenuView.setShowHandStatus(false, false)
-                    isRequesting = true
+                    isRequesting = false
                 }
             })
         }

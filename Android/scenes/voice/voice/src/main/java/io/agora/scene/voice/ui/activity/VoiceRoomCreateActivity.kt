@@ -1,6 +1,9 @@
 package io.agora.scene.voice.ui.activity
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
@@ -36,6 +39,8 @@ import io.agora.voice.buddy.tool.ToastTools.show
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBinding>() {
@@ -66,6 +71,8 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         super.onCreate(savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         chickPrivate()
+        binding.edRoomName.filters = arrayOf<InputFilter>(EmojiInputFilter(32))
+        binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         initListener()
         voiceRoomObservable()
         setupWithViewPager()
@@ -302,6 +309,29 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             mLayout = itemView.findViewById(R.id.item_layout)
             mTitle = itemView.findViewById(R.id.item_title)
             mContent = itemView.findViewById(R.id.item_text)
+        }
+    }
+
+    class EmojiInputFilter(max: Int) : InputFilter.LengthFilter(max) {
+        private var emoji = Pattern.compile(
+            "[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
+            Pattern.UNICODE_CASE or Pattern.CASE_INSENSITIVE
+        )
+
+        override fun filter(
+            source: CharSequence,//即将要输入的字符串
+            start: Int,//source的start
+            end: Int,//source的end
+            dest: Spanned,//输入框中原来的内容
+            dstart: Int,//光标所在位置
+            dend: Int//光标终止位置
+        ): CharSequence {
+            var resultInput = source.toString()
+            val emojiMatcher: Matcher = emoji.matcher(source)
+            if (emojiMatcher.find()) {
+                return ""
+            }
+            return resultInput
         }
     }
 }
