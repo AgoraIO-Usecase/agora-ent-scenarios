@@ -63,7 +63,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         // 更新用户人数
         let info = roomInfo
         info?.room?.member_count! += 1
-        roomInfo = info
+        info?.room?.click_count! += 1
+        headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
@@ -125,7 +126,21 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         let info = roomInfo
         let count: Int = info?.room?.member_count ?? 0
         info?.room?.member_count = count - 1
-        roomInfo = info
+        headerView.updateHeader(with: info?.room)
+        if let micInfos = info?.mic_info {
+            for mic in micInfos {
+                if let user: VRUser = mic.member {
+                    if user.rtc_uid == userName {
+                        let memeber = mic
+                        memeber.member = nil
+                        memeber.status = -1
+                        rtcView.updateUser(memeber)
+                        break
+                    }
+                }
+            }
+        }
+       
         self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
             $0.chat_uid != userName
         })
@@ -138,15 +153,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.refreshChatView()
         }
     }
-
-//    func refuseInvite(roomId: String, meta: [String: String]?) {
-//        let user = model(from: meta ?? [:], VRUser.self)
-//        if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "" {
-//            return
-//        }
-//        self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: true)
-//        self.view.makeToast("User \(user.name ?? "")" + "rejected Invitation".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
-//    }
 
     private func updateMic(_ map: [String: String]?, fromId: String) {
         guard let mic_info = map else { return }
