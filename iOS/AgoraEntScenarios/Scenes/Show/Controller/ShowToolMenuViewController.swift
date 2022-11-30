@@ -65,6 +65,7 @@ class ShowToolMenuViewController: UIViewController {
                 self?.delegate?.onClickHDButtonSelected(isSelected)
                 break
             case .end_pk:
+                self?.dismiss(animated: true)
                 self?.delegate?.onClickEndPkButtonSelected(isSelected)
                 break
             case .mic:
