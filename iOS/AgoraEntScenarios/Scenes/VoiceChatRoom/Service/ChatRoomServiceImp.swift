@@ -222,12 +222,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void) {
-        VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
-            if let ranking_list = map?["ranking_list"]?.toArray() {
-                completion(self.convertError(error: error),ranking_list.kj.modelArray(VRUser.self))
-            }
-        })
-    }
+            VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
+                if let ranking_list = map?["ranking_list"]?.toArray() {
+                    completion(self.convertError(error: error),ranking_list.kj.modelArray(VRUser.self).sorted(by: { $0.amount ?? 0 > $1.amount ?? 0
+                    }))
+                }
+            })
+        }
     
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void) {
         if self.userList?.count ?? 0 > 0 {
@@ -650,9 +651,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         completion(self.limitError(),nil)
                         return
                     }
-
-                    updateRoom.member_count = updateRoom.member_count ?? 0 + 1
-                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
+                    updateRoom.member_count = (updateRoom.member_count ?? 0) + 1
+                    updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
@@ -705,8 +705,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         VoiceRoomIMManager.shared?.userDestroyedChatroom()
                     } else {
                         let updateRoom: VRRoomEntity = room
-                        updateRoom.member_count = updateRoom.member_count ?? 0 - 1
-                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
+                        updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
