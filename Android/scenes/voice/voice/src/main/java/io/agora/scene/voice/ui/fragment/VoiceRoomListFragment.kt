@@ -171,8 +171,9 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
         RoomEncryptionInputDialog()
-            .leftText(activity!!.getString(R.string.voice_room_cancel))
-            .rightText(activity!!.getString(R.string.voice_room_confirm))
+            .leftText(requireActivity().getString(R.string.voice_room_cancel))
+            .rightText(requireActivity().getString(R.string.voice_room_confirm))
+            .setDialogCancelable(true)
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
