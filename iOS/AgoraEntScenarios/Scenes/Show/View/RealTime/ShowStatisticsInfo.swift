@@ -124,13 +124,13 @@ struct ShowStatisticsInfo {
     
     private func localDescription(info: LocalInfo, audioOnly: Bool) -> (String, String) {
         
-        let videoSend = "码率: \(info.videoStats.sentBitrate) kbps"
-        let lastmile = "延迟: \(info.channelStats.lastmileDelay) ms"
-        let uplink = "上行网络: \(uplink) KB/s"
+        let videoSend = "码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
+        let lastmile = "延迟".show_localized+": \(info.channelStats.lastmileDelay) ms"
+        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
         
-        let fps = "帧率: \(fps) fps"
-        let vSendLoss = "丢包率: \(info.videoStats.txPacketLossRate) %"
-        let downlink = "下行网络: \(downlink) KB/s"
+        let fps = "帧率".show_localized+": \(fps) fps"
+        let vSendLoss = "丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"
+        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
         
         let audioSend = "ASend: \(info.audioStats.sentBitrate) kbps"
         let cpu = "CPU: \(info.channelStats.cpuAppUsage)%/\(info.channelStats.cpuTotalUsage) %"
@@ -146,13 +146,13 @@ struct ShowStatisticsInfo {
     }
     
     private func remoteDescription(info: RemoteInfo, audioOnly: Bool) -> (String, String) {
-        let videoSend = "码率: \(info.videoStats.receivedBitrate) kbps"
-        let lastmile = "延迟: \(info.videoStats.avSyncTimeMs) ms"
-        let uplink = "上行网络: \(uplink) KB/s"
+        let videoSend = "码率".show_localized+": \(info.videoStats.receivedBitrate) kbps"
+        let lastmile = "延迟".show_localized+": \(info.videoStats.avSyncTimeMs) ms"
+        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
         
-        let fps = "帧率: \(fps) fps"
-        let vSendLoss = "丢包率: \(info.videoStats.packetLossRate) %"
-        let downlink = "下行网络: \(downlink) KB/s"
+        let fps = "帧率".show_localized+": \(fps) fps"
+        let vSendLoss = "丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
+        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
         
         let audioRecv = "ARecv: \(info.audioStats.receivedBitrate) kbps"
         let audioLoss = "ALoss: \(info.audioStats.audioLossRate) %"
