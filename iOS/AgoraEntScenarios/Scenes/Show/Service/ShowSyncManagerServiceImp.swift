@@ -509,11 +509,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         // pk invitation recviver
-        guard let room = self.roomList?.filter({ $0.roomId == interaction.roomId}).first else {
-//            agoraAssert("stopInteraction to get room(\(interaction.roomId ?? "") not found")
-            return
-        }
-        _getAllPKInvitationList(room: room) {[weak self] (error, list) in
+        _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
             guard let self = self,
                   let pkList = list,
                   let invitation = pkList.filter({$0.fromUserId == interaction.userId }).first else {

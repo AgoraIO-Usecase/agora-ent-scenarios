@@ -201,6 +201,7 @@
 		DD2A43E228FFCEE7004CEDCF /* AgoraEntScenariosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */; };
 		DD2A43EC28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */; };
 		DD2A43EE28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */; };
+		DD64580B293708D30062A9E7 /* ShowInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD64580A293708D30062A9E7 /* ShowInviteCell.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -713,6 +714,7 @@
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITests.swift; sourceTree = "<group>"; };
 		DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		DD64580A293708D30062A9E7 /* ShowInviteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowInviteCell.swift; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -2942,6 +2944,7 @@
 				E74A311C2919FBD700412D42 /* ShowPKInviteView.swift */,
 				E74A311E291A457100412D42 /* ShowApplyAndInviteView.swift */,
 				E74A3122291A580100412D42 /* ShowApplyView.swift */,
+				DD64580A293708D30062A9E7 /* ShowInviteCell.swift */,
 			);
 			path = PKInvite;
 			sourceTree = "<group>";
@@ -3226,6 +3229,7 @@
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
 				DD8417A629090C520026B624 /* VLKTVTonesView.m in Sources */,
+				DD64580B293708D30062A9E7 /* ShowInviteCell.swift in Sources */,
 				05FFE738290F74560024D22F /* AgoraChatRoomNormalRtcView.swift in Sources */,
 				DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */,
 				05FFE722290F73670024D22F /* VoiceRoomAudiencesViewController.swift in Sources */,
