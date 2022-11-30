@@ -14,8 +14,8 @@ enum ShowApplyAndInviteType: String, CaseIterable {
     
     var title: String {
         switch self {
-        case .apply: return "申请消息"
-        case .invite: return "连麦邀请"
+        case .apply: return "申请消息".show_localized
+        case .invite: return "连麦邀请".show_localized
         }
     }
 }
@@ -137,7 +137,7 @@ class ShowApplyAndInviteView: UIView {
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             let model = list.filter({ $0.interactStatus == .onSeat }).first
             self.tipsContainerView.isHidden = model == nil
-            self.tipsLabel.text = "与\(model?.userName ?? "")连麦中"
+            self.tipsLabel.text = String(format: "与%@连麦中".show_localized, model?.userName ?? "")
             self.updateLayout(isHidden: model == nil)
             self.seatMicModel = model
         }
@@ -146,7 +146,7 @@ class ShowApplyAndInviteView: UIView {
     private func getApplyPKInfo() {
         AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) { roomModel in
             self.tipsContainerView.isHidden = roomModel == nil
-            self.tipsLabel.text = "与主播\(roomModel?.ownerName ?? "")PK中"
+            self.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
         }
     }
     private func getApplyLinkInfo() {
