@@ -700,8 +700,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         VoiceRoomIMManager.shared?.userDestroyedChatroom()
                     } else {
                         let updateRoom: VRRoomEntity = room
-                        updateRoom.member_count = updateRoom.member_count ?? 0 - 1
-                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
+                        updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
                         let params = updateRoom.kj.JSONObject()
                         SyncUtil
                             .scene(id: roomId)?
