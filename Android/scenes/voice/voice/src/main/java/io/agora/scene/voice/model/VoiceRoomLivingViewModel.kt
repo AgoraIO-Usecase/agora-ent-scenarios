@@ -208,7 +208,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     // 下麦
-    fun leaveMicMic(micIndex: Int) {
+    fun leaveMic(micIndex: Int) {
         _leaveMicObservable.setSource(mRepository.leaveMic(micIndex))
     }
 

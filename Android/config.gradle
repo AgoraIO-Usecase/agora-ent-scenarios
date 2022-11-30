@@ -35,6 +35,7 @@ ext {
             okhttp_logger     : 'com.squareup.okhttp3:logging-interceptor:4.10.0',
 
             lifecycle         : 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1',
+            lifecycle_runtime : 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0',
             fragment_ktx      : 'androidx.navigation:navigation-fragment-ktx:2.4.2',
             ui_ktx            : 'androidx.navigation:navigation-ui-ktx:2.4.2',
             palette_ktx       : 'androidx.palette:palette-ktx:1.0.0',
