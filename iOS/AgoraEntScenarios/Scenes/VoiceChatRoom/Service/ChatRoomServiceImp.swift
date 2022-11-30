@@ -503,7 +503,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                 }
-                let currentMic = self.mics[safe: user?.index ?? 1]
+                let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
                     completion(nil,mic)
