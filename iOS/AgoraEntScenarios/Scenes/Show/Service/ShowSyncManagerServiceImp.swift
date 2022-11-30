@@ -201,6 +201,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func leaveRoom(completion: @escaping (Error?) -> Void) {
         defer {
+            self.pkCreatedInvitationMap.values.forEach { invitation in
+                guard let pkRoomId = invitation.roomId else { return }
+                SyncUtil.leaveScene(id: pkRoomId)
+            }
+            
             cleanCache()
         }
         
@@ -415,7 +420,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 }
                 
                 if status == .deleted {
-                    self._recvPKRejected(invitation: model)
+                    if model.status == .accepted {
+                        self._recvPKFinish(invitation: model)
+                    } else {
+                        self._recvPKRejected(invitation: model)
+                    }
                 } else {
                     model.status = invitation.status
                     switch model.status {
@@ -1333,7 +1342,7 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("_updatePKInvitation channelName = nil")
             return
         }
-        agoraPrint("imp pk invitation update...")
+        agoraPrint("imp pk invitation \(channelName) update...")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
         SyncUtil
@@ -1342,10 +1351,10 @@ extension ShowSyncManagerServiceImp {
             .update(id: invitation.objectId!,
                     data:params,
                     success: {
-                agoraPrint("imp pk invitation update success...")
+                agoraPrint("imp pk invitation \(channelName) update success...")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp pk invitation update fail :\(error.message)...")
+                agoraPrint("imp pk invitation update \(channelName) fail :\(error.message)...")
                 completion(NSError(domain: error.message, code: error.code))
             })
     }
