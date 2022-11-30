@@ -435,6 +435,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         self.subscribeDelegate?.onPKInvitationUpdated(invitation: model)
                         break
                     }
+                    
+                    //TODO: workaround
+                    guard let interaction = self.interactionList.filter({ $0.userId == model.fromUserId}).first else {return}
+                    if interaction.muteAudio == model.muteAudio { return }
+                    interaction.muteAudio = model.muteAudio
+                    self._updateInteraction(interaction: interaction) { err in
+                    }
                 }
             }
             
@@ -524,12 +531,36 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             guard let self = self,
                   let pkList = list,
                   let invitation = pkList.filter({$0.fromUserId == interaction.userId }).first else {
-                agoraAssert("stopInteraction not found invitation: \(interaction.userId ?? "") \(interaction.roomId ?? "")")
+//                agoraAssert("stopInteraction not found invitation: \(interaction.userId ?? "") \(interaction.roomId ?? "")")
                 return
             }
     //        invitation.status = .ended
     //        _updatePKInvitation(invitation: invitation, completion: completion)
             self._removePKInvitation(invitation: invitation, completion: completion)
+        }
+    }
+    
+    
+    func muteAudio(mute:Bool, completion: @escaping (Error?) -> Void) {
+        if let interaction = self.interactionList.filter({ $0.userId == VLUserCenter.user.id}).first, interaction.interactStatus == .onSeat {
+            //is on seat
+            interaction.muteAudio = mute
+            _updateInteraction(interaction: interaction) { err in
+            }
+        }
+        
+        // pk recviver
+        _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
+            guard let invitation = list?.filter({ $0.status == .accepted }).first else { return }
+            invitation.muteAudio = mute
+            self?._updatePKInvitation(invitation: invitation) { err in
+            }
+        }
+        
+        //is pk, send mute status (pk sender)
+        guard let pkInvitation = self.pkCreatedInvitationMap.values.filter({ $0.status == .accepted}).first else { return }
+        pkInvitation.muteAudio = mute
+        _updatePKInvitation(invitation: pkInvitation) { err in
         }
     }
 }
@@ -1238,6 +1269,18 @@ extension ShowSyncManagerServiceImp {
                 self._removeInteraction(invitation: model) { error in
                 }
             case .updated:
+                
+                if let pkInvitation = self.pkInvitationList.first,
+                    pkInvitation.objectId == invitation.objectId {
+                    //update invitation (mute audio)
+                    pkInvitation.muteAudio = invitation.muteAudio
+                    guard let interaction = self.interactionList.filter({ $0.userId == pkInvitation.fromUserId}).first else {return}
+                    interaction.muteAudio = pkInvitation.muteAudio
+                    self._updateInteraction(interaction: interaction) { err in
+                    }
+                    return
+                }
+                
                 //only support 1 interaction
                 if self.interactionList.count > 0 {
                     self._removePKInvitation(invitation: invitation) { err in
@@ -1465,14 +1508,12 @@ extension ShowSyncManagerServiceImp {
                                return
                            }
                            
-                           defer {
-                               self.subscribeDelegate?.onInteractionBegan(interaction: model)
-                           }
-                           
                            if self.interactionList.contains(where: { $0.userId == model.userId }) {
+                               self.subscribeDelegate?.onInterationUpdated(interaction: model)
                                return
                            }
                            self.interactionList.append(model)
+                           self.subscribeDelegate?.onInteractionBegan(interaction: model)
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp pk invitation subscribe onDeleted...")
                            guard let self = self else {return}

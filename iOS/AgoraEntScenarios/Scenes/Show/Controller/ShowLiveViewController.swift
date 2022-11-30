@@ -157,6 +157,11 @@ class ShowLiveViewController: UIViewController {
 
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
+    func onInterationUpdated(interaction: ShowInteractionInfo) {
+        //TODO: mute
+        print("onInterationUpdated: \(interaction.muteAudio)")
+    }
+    
     private func _subscribeServiceEvent() {
         let service = AppContext.showServiceImp
         
@@ -603,11 +608,15 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     // 麦克风开关
     func onClickMicButtonSelected(_ selected: Bool) {
         agoraKitManager.agoraKit.muteRecordingSignal(selected)
+        AppContext.showServiceImp.muteAudio(mute: selected) { err in
+        }
     }
     
     // 静音
     func onClickMuteMicButtonSelected(_ selected: Bool) {
         agoraKitManager.agoraKit.muteAllRemoteAudioStreams(selected)
+//        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
+//        }
     }
     
     func onClickRealTimeDataButtonSelected(_ selected: Bool) {
