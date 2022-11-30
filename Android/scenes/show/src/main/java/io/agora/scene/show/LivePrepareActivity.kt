@@ -15,6 +15,8 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.CameraCapturerConfiguration.CAMERA_DIRECTION
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
@@ -35,7 +37,7 @@ class LivePrepareActivity : ComponentActivity() {
 
     private val mThumbnailId by lazy { ShowRoomDetailModel.getRandomThumbnailId() }
     private val mRoomId by lazy { ShowRoomDetailModel.getRandomRoomId() }
-    private val mBeautyProcessor : IBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
+    private val mBeautyProcessor: IBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
 
     private val mPermissionHelp = PermissionHelp(this)
     private var mRtcEngine: RtcEngineEx? = null
@@ -67,6 +69,7 @@ class LivePrepareActivity : ComponentActivity() {
             createAndStartLive(mBinding.etRoomName.text.toString())
         }
         mBinding.tvRotate.setOnClickListener {
+            VideoSetting.cameraIsFront = !VideoSetting.cameraIsFront
             mRtcEngine?.switchCamera()
         }
         mBinding.tvBeauty.setOnClickListener {
@@ -82,16 +85,11 @@ class LivePrepareActivity : ComponentActivity() {
     }
 
     private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
-        mPermissionHelp.checkCameraPerm(
-            {
-                mPermissionHelp.checkStoragePerm(
-                    granted,
-                    { showPermissionLeakDialog(granted) },
-                    force
-                )
-            },
-            { showPermissionLeakDialog(granted) },
-            force
+        mPermissionHelp.checkCameraPerm({
+            mPermissionHelp.checkStoragePerm(
+                granted, { showPermissionLeakDialog(granted) }, force
+            )
+        }, { showPermissionLeakDialog(granted) }, force
         )
     }
 
@@ -147,18 +145,32 @@ class LivePrepareActivity : ComponentActivity() {
                 mBinding.flVideoContainer.addView(this)
             })
         )
+        updateRtcVideoConfig()
         mRtcEngine?.startPreview()
+    }
+
+    private fun updateRtcVideoConfig() {
+        mRtcEngine?.setCameraCapturerConfiguration(
+            CameraCapturerConfiguration(
+                if (VideoSetting.cameraIsFront) CAMERA_DIRECTION.CAMERA_FRONT else CAMERA_DIRECTION.CAMERA_REAR,
+                CameraCapturerConfiguration.CaptureFormat(
+                    VideoSetting.cameraResolution.width,
+                    VideoSetting.cameraResolution.height,
+                    15
+                )
+            )
+        )
     }
 
     private fun showPictureQualityDialog() {
         PictureQualityDialog(this).apply {
-            setOnQualitySelectListener { dialog, qualityIndex ->
-                when (qualityIndex) {
-                    PictureQualityDialog.QUALITY_INDEX_1080P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_720P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_540P -> {}
-                    PictureQualityDialog.QUALITY_INDEX_360P -> {}
-                }
+            setSelectQuality(
+                VideoSetting.cameraResolution.width,
+                VideoSetting.cameraResolution.height
+            )
+            setOnQualitySelectListener { dialog, qualityIndex, size ->
+                VideoSetting.cameraResolution = size
+                updateRtcVideoConfig()
             }
             show()
         }

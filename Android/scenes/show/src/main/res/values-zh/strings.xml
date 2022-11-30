@@ -81,6 +81,17 @@
     <string name="show_beauty_item_effect_yuanqi">元气</string>
     <string name="show_beauty_item_sticker_biti">鼻涕</string>
     <string name="show_beauty_item_sticker_zhounian">周年狂欢</string>
+    <string name="show_statistic_bitrate">码率: %s kbps</string>
+    <string name="show_statistic_fps">帧率: %s fps</string>
+    <string name="show_statistic_delay">延迟: %s ms</string>
+    <string name="show_statistic_loss_package">丢包率: %s ％</string>
+    <string name="show_statistic_up_net_speech">上行网络: %s KB/s</string>
+    <string name="show_statistic_down_net_speech">下行网络: %s KB/s</string>
+    <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
+    <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
+    <string name="show_music_effect_beauty_voice_mohuan">魔幻</string>
+    <string name="show_music_effect_mixing_luyinpen">录音棚</string>
+    <string name="show_music_effect_mixing_kongkuang">空旷</string>
 
     <!-- 连麦  -->
     <string name="show_linking_request_message">申请消息</string>

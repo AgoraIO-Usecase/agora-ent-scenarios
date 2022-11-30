@@ -81,8 +81,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginVertical="4dp"
-        android:background="@drawable/show_live_detail_top_view_bg"
         android:layout_marginEnd="10dp"
+        android:background="@drawable/show_live_detail_top_view_bg"
         android:drawableTop="@mipmap/show_live_top_user_tag"
         android:gravity="center"
         android:maxLines="1"
@@ -101,14 +101,89 @@
         android:layout_height="0dp"
         android:layout_marginVertical="4dp"
         android:background="@drawable/show_live_detail_top_view_bg"
+        android:contentDescription="@string/show_live_top_close"
         android:padding="10dp"
         android:scaleType="fitXY"
         android:src="@mipmap/show_live_top_close"
         app:layout_constraintBottom_toBottomOf="@id/clRoomTitle"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/clRoomTitle"
-        android:contentDescription="@string/show_live_top_close" />
+        app:layout_constraintTop_toTopOf="@id/clRoomTitle" />
+
+    <TableLayout
+        android:id="@+id/tlStatistic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/show_live_detail_top_statistic_bg"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/clRoomTitle"
+        tools:visibility="visible">
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticBitrate"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_bitrate" />
+
+            <TextView
+                android:id="@+id/tvStatisticFPS"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_fps" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticDelay"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_delay" />
+
+            <TextView
+                android:id="@+id/tvStatisticLossPackage"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_loss_package" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticUpNet"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_up_net_speech" />
+
+            <TextView
+                android:id="@+id/tvStatisticDownNet"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_net_speech" />
+        </TableRow>
+    </TableLayout>
+
+    <ImageView
+        android:id="@+id/ivStatisticClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@mipmap/show_live_detail_top_statistic_close"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/tlStatistic"
+        app:layout_constraintTop_toTopOf="@id/tlStatistic"
+        tools:visibility="visible" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
