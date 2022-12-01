@@ -461,15 +461,6 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-//        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
-//        didOfflineOfUid(uid: uid)
-//        if roomOwnerId == uid {
-//            let vc = ShowReceiveLiveFinishAlertVC()
-//            vc.dismissAlert { [weak self] in
-//                self?.leaveRoom()
-//            }
-//            present(vc, animated: true)
-//        }
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = uid
         videoCanvas.view = nil
@@ -564,13 +555,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             settingMenuVC.menuTitle = "互动连麦"
         }
         present(settingMenuVC, animated: true)
-        
-        /*
-        settingMenuVC.type = .managerMic
-        let name = "xxx"
-        settingMenuVC.menuTitle = "对观众\(name)"
-        present(settingMenuVC, animated: true)
-         */
     }
     
 }
