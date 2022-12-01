@@ -77,7 +77,7 @@ typedef enum : NSUInteger {
 /// @param song 歌曲信息
 - (void)updateUIWithUserOnSeat:(BOOL)onSeat song:(VLRoomSelSongModel *)song;
 
-- (void)cleanMusicText;
+//- (void)cleanMusicText;
 - (int)getSongScore;
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
