@@ -82,8 +82,7 @@
     if (!_itemsArray) {
         _itemsArray = @[
             @{@"bgImgStr":@"home_talk_bg",@"iconImgStr":@"home_talk_icon",@"titleStr":@"语聊房",@"subTitleStr":@""},
-            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"在线K歌房",@"subTitleStr":@""},
-            @{@"bgImgStr":@"home_game_bg",@"iconImgStr":@"home_game_icon",@"titleStr":@"互动游戏",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)}
+            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"在线K歌房",@"subTitleStr":@""}
         ];
     }
     return _itemsArray;
