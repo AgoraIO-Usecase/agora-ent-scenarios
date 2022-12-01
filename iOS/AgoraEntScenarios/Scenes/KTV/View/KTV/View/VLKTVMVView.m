@@ -119,6 +119,17 @@
     [self setPlayerViewsHidden:YES nextButtonHidden:YES];
 }
 
+- (void)_refreshOriginButton {
+    if (self.originBtn.selected) {
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+    }
+    else {
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
+    }
+}
+
 #pragma mark - public
 
 - (void)updateMVPlayerState:(VLKTVMVViewActionType)state {
@@ -372,14 +383,7 @@
 - (void)originClick:(UIButton *)button {
     button.selected = !button.selected;
     VLKTVMVViewActionType origin = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
-    if (button.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
-    }
+    [self _refreshOriginButton];
     
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
         [self.delegate onKTVMVView:self btnTappedWithActionType:origin];
@@ -442,6 +446,9 @@
 
 - (void)reset {
     [_lrcView reset];
+    [self.originBtn setSelected:YES];
+    [self _refreshOriginButton];
+    [self cleanMusicText];
 }
 
 - (void)resetTime {
