@@ -126,12 +126,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         }
         
         if attributeMap!.keys.contains(where: { text in
-                    text.hasPrefix("robot_volume")
-         }) {
+            text.hasPrefix("robot_volume")
+        }) {
             let robot_volume: String = (attributeMap?["robot_volume"])! as String
             roomInfo?.room?.robot_volume = UInt(robot_volume)
         }
-        
+
         if properties.keys.contains(where: {
             $0 == "ranking_list"
         }) {
@@ -187,6 +187,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
                 refreshHandsUp(status: status)
             }
+
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
             let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                 $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
