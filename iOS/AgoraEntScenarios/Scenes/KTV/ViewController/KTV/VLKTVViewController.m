@@ -338,6 +338,14 @@ VLPopScoreViewDelegate
             [weakSelf refreshChoosedSongList:nil];
         }
     }];
+    
+    [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
+        if (status == KTVServiceNetworkStatusOpen) {
+            return;
+        }
+        
+        //TODO: 
+    }];
 }
 
 #pragma mark view helpers
