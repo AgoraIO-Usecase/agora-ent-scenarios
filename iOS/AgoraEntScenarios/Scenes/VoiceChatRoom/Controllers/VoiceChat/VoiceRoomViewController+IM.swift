@@ -34,7 +34,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.room?.gift_amount = gift_amount
         }
         //刷新礼物贡献总数，头部
-        self.requestRankList()
+//        self.requestRankList()
     }
     
     func fetchGiftContribution() {
@@ -128,6 +128,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             $0 == "ranking_list"
         }) {
             self.roomInfo?.room?.ranking_list = properties["ranking_list"]?.toArray()?.kj.modelArray(VRUser.self)
+            self.headerView.updateHeader(with: self.roomInfo?.room)
         }
     }
     
