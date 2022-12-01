@@ -745,7 +745,7 @@ class RoomObservableViewDelegate constructor(
             .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
-                        iRoomTopView.onUpdateGiftCount(amount)
+                        iRoomTopView.onUpdateGiftCount(ChatroomCacheManager.cacheManager.getGiftAmountCache())
                     }
                     EMLog.d(TAG, "updateAmount success")
                 }
