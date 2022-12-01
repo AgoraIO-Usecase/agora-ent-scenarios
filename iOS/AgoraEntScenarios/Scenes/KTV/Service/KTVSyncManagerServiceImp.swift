@@ -61,6 +61,7 @@ private func _hideLoadingIfNeed() {
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
     private var singingScoreDidChanged: ((Double) -> Void)?
+    private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
     
     private var publishScore: Double?
 
@@ -115,10 +116,15 @@ private func _hideLoadingIfNeed() {
 //            completion()
         }
         
-        SyncUtil.subscribeConnectState { [weak self] state in
-            guard let self = self,
-                    !self.syncUtilsInited,
-                    state == .open else {
+        SyncUtil.subscribeConnectState { [weak self] (state) in
+            guard let self = self else {
+                return
+            }
+            
+            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
+            guard state == .open else { return }
+            guard !self.syncUtilsInited else {
+                self._seatListReload()
                 return
             }
             self.syncUtilsInited = true
@@ -510,6 +516,10 @@ private func _hideLoadingIfNeed() {
         _subscribeSingScore()
     }
     
+    func subscribeNetworkStatusChanged(_ changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
+        networkDidChanged = changedBlock
+    }
+    
     func unsubscribeAll() {
         _unsubscribeAll()
     }
@@ -792,9 +802,13 @@ extension KTVSyncManagerServiceImp {
         userList.removeAll()
         songList.removeAll()
         seatMap.removeAll()
-        _getSeatInfo { [weak self] error, list in
-            guard let self = self else {
+        _getSeatInfo { [weak self] (error, list) in
+            guard let self = self, let list = list else {
                 return
+            }
+            
+            list.forEach { seat in
+                self.seatMap["\(seat.seatIndex)"] = seat
             }
 
             // update seat info (user avater/nick name did changed) if seat existed
@@ -820,6 +834,32 @@ extension KTVSyncManagerServiceImp {
             }
         }
     }
+    
+    private func _seatListReload() {
+        _getSeatInfo {[weak self] (error, seatList) in
+            guard let self = self,
+                    error == nil,
+                    let seatList = seatList else { return }
+            
+            var _seatMap: [String: VLRoomSeatModel] = .init()
+            seatList.forEach { seat in
+                _seatMap["\(seat.seatIndex)"] = seat
+            }
+            
+            self.seatMap.forEach { (key, origSeat) in
+                guard let seat = _seatMap[key] else {
+                    let seat = VLRoomSeatModel()
+                    seat.seatIndex = origSeat.seatIndex
+                    _seatMap[key] = seat
+                    self.seatListDidChanged?(KTVSubscribeDeleted.rawValue, origSeat)
+                    return
+                }
+                
+                self.seatListDidChanged?(KTVSubscribeUpdated.rawValue, seat)
+            }
+            self.seatMap = _seatMap
+        }
+    }
 
     private func _getSeatInfo(finished: @escaping (Error?, [VLRoomSeatModel]?) -> Void) {
         guard let channelName = roomNo else {
@@ -832,14 +872,8 @@ extension KTVSyncManagerServiceImp {
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .get(success: { [weak self] list in
                 agoraPrint("imp seat get success...")
-                guard let self = self else {
-                    return
-                }
                 let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
-                seats.forEach { seat in
-                    self.seatMap["\(seat.seatIndex)"] = seat
-                }
-
+                
                 finished(nil, seats)
             }, fail: { error in
                 agoraPrint("imp seat get fail...")
