@@ -264,7 +264,7 @@ public extension VoiceRoomIMManager {
     }
     
     func setChatroomAttributes(attributes: Dictionary<String,String>, completion: @escaping (AgoraChatError?) -> ()) {
-        AgoraChatClient.shared().roomManager?.setChatroomAttributesForced(self.currentRoomId, attributes: attributes, autoDelete: true, completionBlock: { error, errorAttributes in
+        AgoraChatClient.shared().roomManager?.setChatroomAttributesForced(self.currentRoomId, attributes: attributes, autoDelete: false, completionBlock: { error, errorAttributes in
             completion(error)
         })
     }

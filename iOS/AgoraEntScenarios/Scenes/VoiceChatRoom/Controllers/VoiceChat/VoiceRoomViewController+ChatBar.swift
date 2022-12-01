@@ -143,7 +143,10 @@ extension VoiceRoomViewController {
                     if self.roomInfo?.room?.ranking_list == nil {
                         self.roomInfo?.room?.ranking_list = [VRUser]()
                     }
-                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? ""
+                    if (VoiceRoomUserInfo.shared.user?.chat_uid ?? "").isEmpty {
+                        VoiceRoomUserInfo.shared.user?.chat_uid = VLUserCenter.user.chat_uid
+                    }
+                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
                     })
                     if ranker == nil {
                         self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
@@ -154,7 +157,7 @@ extension VoiceRoomViewController {
                         if error != nil {
                             self.view.makeToast("update ranking_list failed!\(error?.errorDescription ?? "")")
                         } else {
-                            self.fetchGiftContribution()
+                            self.requestRankList()
                         }
                     })
                     var giftList: VoiceRoomGiftView? = self.view.viewWithTag(1111) as? VoiceRoomGiftView
@@ -312,18 +315,12 @@ extension VoiceRoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        guard let local_index = self.local_index else {return}
-        guard let user: VRUser = self.roomInfo?.room?.member_list?[local_index] else {return}
-        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: user.chat_uid ?? "") { error, flag in
+        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: VLUserCenter.user.chat_uid) { error, flag in
             if error == nil {
-                if flag {
-                    self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-                    self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
-                } else {
-                    self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-                }
+                self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
+                self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
             } else {
-                
+                self.view.makeToast("Cancel apply failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
     }
