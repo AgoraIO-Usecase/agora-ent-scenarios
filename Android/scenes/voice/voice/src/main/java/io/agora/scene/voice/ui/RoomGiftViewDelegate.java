@@ -13,12 +13,20 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+import java.util.Objects;
+
+import io.agora.CallBack;
 import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.imkit.custorm.MsgConstant;
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel;
 import io.agora.scene.voice.service.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
+import io.agora.scene.voice.service.VoiceGiftModel;
+import io.agora.util.EMLog;
 import io.agora.voice.buddy.tool.ThreadManager;
 import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
@@ -104,7 +112,39 @@ public class RoomGiftViewDelegate {
                             }
                         });
                         if (msgCallBack != null) {
-                            msgCallBack.onSuccess(message);
+                            Map<String, String> giftMap = CustomMsgHelper.getInstance().getCustomMsgParams(message);
+                            VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
+                            voiceGiftModel.setGift_id(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+                            voiceGiftModel.setGift_count(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
+                            voiceGiftModel.setGift_name(giftMap.get(MsgConstant.CUSTOM_GIFT_NAME));
+                            voiceGiftModel.setGift_price(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE));
+                            voiceGiftModel.setUserName(giftMap.get(MsgConstant.CUSTOM_GIFT_USERNAME));
+                            voiceGiftModel.setPortrait(giftMap.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
+                            ChatroomIMManager.getInstance().updateRankList(message.getFrom(),voiceGiftModel, new CallBack() {
+                                @Override
+                                public void onSuccess() {
+                                    EMLog.e("CustomMsgHelper","VoiceGiftModel update success");
+                                    msgCallBack.onSuccess(message);
+                                }
+
+                                @Override
+                                public void onError(int code, String error) {
+                                    EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
+                                }
+                            });
+                            int amount = Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM)))
+                                    * Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE)));
+                            ChatroomIMManager.getInstance().updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, new CallBack() {
+                                @Override
+                                public void onSuccess() {
+                                    EMLog.e("CustomMsgHelper","updateAmount success");
+                                }
+
+                                @Override
+                                public void onError(int code, String error) {
+                                    EMLog.e("CustomMsgHelper","updateAmount error" + code + " "+ error);
+                                }
+                            });
                         }
                     }
 
