@@ -81,4 +81,19 @@
     <string name="show_beauty_item_effect_yuanqi">元气</string>
     <string name="show_beauty_item_sticker_biti">鼻涕</string>
     <string name="show_beauty_item_sticker_zhounian">周年狂欢</string>
+
+    <!-- 连麦  -->
+    <string name="show_linking_request_message">申请消息</string>
+    <string name="show_online_audience">在线观众</string>
+    <string name="show_agree_onseat">同意上麦</string>
+    <string name="show_application">邀请</string>
+    <string name="show_empty_onseat_apply">暂无上麦申请</string>
+    <string name="show_linking">正在连麦</string>
+    <string name="show_is_onseat">已上麦</string>
+
+    <!-- pk   -->
+    <string name="show_online_boardcaster">在线主播</string>
+    <string name="show_pking">正在pk</string>
+    <string name="show_empty_online_boardcaster">暂无在线主播</string>
+    <string name="show_empty_online_audience">暂无在线观众</string>
 </resources>

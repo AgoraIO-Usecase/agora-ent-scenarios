@@ -1,0 +1,72 @@
+package io.agora.scene.show.widget.link
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import io.agora.scene.base.component.BaseFragment
+import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
+import io.agora.scene.show.widget.UserItem
+
+class LiveLinkRequestFragment : BaseFragment() {
+    private val mBinding by lazy { ShowLiveLinkRequestMessageListBinding.inflate(LayoutInflater.from(context)) }
+    private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
+    private lateinit var mListener : Listener
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        linkRequestViewAdapter.setClickListener(object : LiveLinkRequestViewAdapter.OnClickListener {
+            override fun onClick(userItem: UserItem, position: Int) {
+                // 主播接受连麦
+                mListener.onAcceptMicSeatItemChosen(userItem, position)
+            }
+        })
+        mBinding.iBtnStopLink.setOnClickListener {
+            // 主播停止连麦
+            mListener.onStopLinkingChosen()
+        }
+    }
+
+    /**
+     * 设置当前麦上状态
+     */
+    fun setOnSeatStatus(userName: String) {
+        mBinding.textLinking.setText("与观众" + userName + "连麦中")
+    }
+
+    /**
+     * 设置连麦申请列表
+     */
+    fun setSeatApplyList(list: List<UserItem>) {
+        if (list == null || list.isEmpty()) {
+            mBinding.linkRequestListEmpty.setVisibility(View.VISIBLE)
+        } else {
+            mBinding.linkRequestListEmpty.setVisibility(View.GONE)
+        }
+        linkRequestViewAdapter.resetAll(list)
+    }
+
+    /**
+     * 接受连麦-更新item选中状态
+     */
+    fun setSeatApplyItemStatus(userItem: UserItem, isAccept: Boolean) {
+        val itemCount: Int = linkRequestViewAdapter.getItemCount()
+        for (i in 0 until itemCount) {
+            val item: UserItem = linkRequestViewAdapter.getItem(i)!!
+            if (item.userId == UserItem.userId) {
+                item.isAccepted = isAccept
+                linkRequestViewAdapter.notifyItemChanged(i)
+                break
+            }
+        }
+    }
+
+    fun setListener(listener : Listener) {
+        mListener = listener
+    }
+
+    interface Listener {
+        fun onAcceptMicSeatItemChosen(userItem: UserItem, position: Int)
+        fun onRequestRefreshing(tagIndex: Int)
+        fun onStopLinkingChosen()
+    }
+}
