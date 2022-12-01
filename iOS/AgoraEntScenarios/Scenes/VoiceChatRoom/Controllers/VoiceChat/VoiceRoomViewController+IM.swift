@@ -124,6 +124,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             self.roomInfo?.mic_info![6] = mic_info
             self.rtcView.updateAlien(mic_info.status)
         }
+        
+        if attributeMap!.keys.contains(where: { text in
+                    text.hasPrefix("robot_volume")
+         }) {
+            let robot_volume: String = (attributeMap?["robot_volume"])! as String
+            roomInfo?.room?.robot_volume = UInt(robot_volume)
+        }
+        
         if properties.keys.contains(where: {
             $0 == "ranking_list"
         }) {
