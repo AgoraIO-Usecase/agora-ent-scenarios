@@ -10,10 +10,17 @@ enum class ShowRoomStatus(val value: Int) {
 }
 
 enum class ShowRoomRequestStatus(val value: Int){
-    watitting(1),// 等待中
-    accept(2),//  已接受
-    refuse(3),// 已拒绝
-    end(4)// 已结束
+    idle(0),
+    waitting(1),// 等待中
+    accepted(2),//  已接受
+    rejected(3),// 已拒绝
+    ended(4)// 已结束
+}
+
+enum class ShowInteractionStatus(val value: Int) {
+    idle(0), /// 空闲
+    onSeat(1), /// 连麦中
+    pking(2) /// pk中
 }
 
 // 房间详情信息
@@ -73,7 +80,8 @@ data class ShowRoomDetailModel(
 data class ShowUser(
     val userId: String,
     val avatar: String,
-    val userName: String
+    val userName: String,
+    val status: ShowRoomRequestStatus = ShowRoomRequestStatus.idle
 )
 
 // 聊天消息
@@ -98,19 +106,46 @@ data class ShowMicSeatInvitation(
     val userId: String,
     val userAvatar: String,
     val userName: String,
-    val fromUserId: String,
     val status: ShowRoomRequestStatus,
-    val createAt: Double
 )
 
 // PK邀请
 data class ShowPKInvitation(
     val userId: String,
+    var userName: String,
     val roomId: String,
     val fromUserId: String,
     val fromName: String,
     val fromRoomId: String,
     val status: ShowRoomRequestStatus,
+    var userMuteAudio: Boolean = false,
+    var fromUserMuteAudio: Boolean = false,
     val createAt: Double
+)
+
+//房间列表信息
+data class ShowRoomListModel(
+    val roomId: String,                                //房间号
+    val roomName: String,                             //房间名
+    val roomUserCount: Int,                       //房间人数
+    val thumbnailId: String,                         //缩略图id
+    val ownerId: String,                             //房主user id (rtc uid)
+    val ownerAvater: String,                           //房主头像
+    val ownerName: String,                            //房主名
+    val roomStatus: ShowRoomStatus,         //直播状态
+    val interactStatus: ShowInteractionStatus,  //互动状态
+    val createdAt: Double,                          //创建时间，与19700101时间比较的毫秒数
+    val updatedAt: Double
+)
+
+//连麦/Pk模型
+data class ShowInteractionInfo(
+    val userId: String,
+    val userName: String,
+    val roomId: String,
+    val interactStatus: ShowInteractionStatus,
+    val muteAudio: Boolean = false,
+    val ownerMuteAudio: Boolean = false,
+    val createdAt: Double
 )
 
