@@ -169,21 +169,6 @@ public class CustomMsgHelper implements MessageListener {
             switch (msgType) {
                 case CHATROOM_GIFT:
                     AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    Map<String, String> giftMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    int amount = Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM)))
-                            * Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE)));
-                    ChatroomCacheManager.Companion.getCacheManager().updateGiftAmountCache(amount);
-                    ChatroomIMManager.getInstance().updateAmount(message.getFrom(), amount, new CallBack() {
-                        @Override
-                        public void onSuccess() {
-                            EMLog.e("CustomMsgHelper","updateAmount success");
-                        }
-
-                        @Override
-                        public void onError(int code, String error) {
-                            EMLog.e("CustomMsgHelper","updateAmount error" + code + " "+ error);
-                        }
-                    });
                     if(listener != null) {
                         listener.onReceiveGiftMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
@@ -402,37 +387,6 @@ public class CustomMsgHelper implements MessageListener {
                         AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
                     }else if (event.equals(CustomMsgType.CHATROOM_GIFT.getName())){
                         AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
-                        VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
-                        voiceGiftModel.setGift_id(params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
-                        voiceGiftModel.setGift_count(params.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
-                        voiceGiftModel.setGift_name(params.get(MsgConstant.CUSTOM_GIFT_NAME));
-                        voiceGiftModel.setGift_price(params.get(MsgConstant.CUSTOM_GIFT_PRICE));
-                        voiceGiftModel.setUserName(params.get(MsgConstant.CUSTOM_GIFT_USERNAME));
-                        voiceGiftModel.setPortrait(params.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
-                        ChatroomIMManager.getInstance().updateRankList(sendMessage.getFrom(),voiceGiftModel, new CallBack() {
-                            @Override
-                            public void onSuccess() {
-                                EMLog.e("CustomMsgHelper","VoiceGiftModel update success");
-                            }
-
-                            @Override
-                            public void onError(int code, String error) {
-                                EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
-                            }
-                        });
-                        int amount = Integer.parseInt(Objects.requireNonNull(params.get(MsgConstant.CUSTOM_GIFT_KEY_NUM)))
-                                * Integer.parseInt(Objects.requireNonNull(params.get(MsgConstant.CUSTOM_GIFT_PRICE)));
-                        ChatroomIMManager.getInstance().updateAmount(sendMessage.getFrom(), amount, new CallBack() {
-                            @Override
-                            public void onSuccess() {
-                                EMLog.e("CustomMsgHelper","updateAmount success");
-                            }
-
-                            @Override
-                            public void onError(int code, String error) {
-                                EMLog.e("CustomMsgHelper","updateAmount error" + code + " "+ error);
-                            }
-                        });
                     }
                     callBack.onSuccess(ChatroomIMManager.getInstance().parseChatMessage(sendMessage));
                 }
