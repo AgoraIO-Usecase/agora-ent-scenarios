@@ -160,7 +160,8 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     private var seatApplyModel: ShowMicSeatApply?
     private var seatInvitationModel: ShowUser?
 
-    func setupApplyAndInviteData(model: Any?) {
+    func setupApplyAndInviteData(model: Any?, isLink: Bool) {
+        statusButton.isHidden = isLink
         if let model = model as? ShowMicSeatApply {
             seatApplyModel = model
             nameLabel.text = model.userName
