@@ -56,7 +56,12 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
             guard let map = meta?["user"]?.z.jsonToDictionary() else { return }
             let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
-            self.applicants.append(apply)
+            let user = self.applicants.first {
+                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+            }
+            if user == nil {
+                self.applicants.append(apply)
+            }
             self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
         }
     }
@@ -217,12 +222,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void) {
-        VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
-            if let ranking_list = map?["ranking_list"]?.toArray() {
-                completion(self.convertError(error: error),ranking_list.kj.modelArray(VRUser.self))
-            }
-        })
-    }
+            VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["ranking_list"], completion: { error, map in
+                if let ranking_list = map?["ranking_list"]?.toArray() {
+                    completion(self.convertError(error: error),ranking_list.kj.modelArray(VRUser.self).sorted(by: { $0.amount ?? 0 > $1.amount ?? 0
+                    }))
+                }
+            })
+        }
     
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void) {
         if self.userList?.count ?? 0 > 0 {
@@ -566,6 +572,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
     }
     
+    func limitError() -> VoiceRoomError {
+        let error = VoiceRoomError()
+        error.code = "403"
+        error.message = "Members reach limit!"
+        return error
+    }
+
+    
     /// 创建房间
     /// - Parameters:
     ///   - room: 房间对象信息
@@ -632,7 +646,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         if let roomList = self.roomList {
             for room in roomList {
                 if room.room_id == roomId {
-                    var updateRoom: VRRoomEntity = room
+                    let updateRoom: VRRoomEntity = room
+                    if room.member_count ?? 0 >= 19 {
+                        completion(self.limitError(),nil)
+                        return
+                    }
                     updateRoom.member_count = (updateRoom.member_count ?? 0) + 1
                     updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
                     let params = updateRoom.kj.JSONObject()
@@ -658,6 +676,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                 completion(error, nil)
                             })
                     }
+                    break
                 }
             }
         }
@@ -720,7 +739,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
         mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
-        mic.member?.im_token = ""
         mics.append(mic)
         for i in 1...7 {
             let item = VRRoomMic()

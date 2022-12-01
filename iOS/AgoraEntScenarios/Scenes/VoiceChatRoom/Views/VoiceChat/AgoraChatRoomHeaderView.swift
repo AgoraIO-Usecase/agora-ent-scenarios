@@ -57,6 +57,25 @@ class AgoraChatRoomHeaderView: UIView {
         updateGiftList(with: room)
     }
 
+//    var entity: VRRoomEntity = .init() {
+//        didSet {
+//            guard let owner = entity.owner else { return }
+//            self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+//            self.titleLabel.text = owner.name
+//            self.roomLabel.text = entity.name
+//            self.lookBtn.setTitle(" \(entity.click_count ?? 0)", for: .normal)
+//            self.totalCountLabel.text = "\(entity.member_count ?? 0)"
+//            let gift_count = entity.gift_amount ?? 0
+//            let count = gift_count >= 1000 ? afterDecimals(value: gift_count) : "\(gift_count)"
+//            self.giftBtn.setTitle(" \(count)", for: .normal)
+//            self.giftBtn.snp.updateConstraints { make in
+//                make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
+//            }
+//            self.soundSetLabel.text = getSoundType(with: entity.sound_effect)
+//            updateGiftList(with: ro)
+//        }
+//    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
