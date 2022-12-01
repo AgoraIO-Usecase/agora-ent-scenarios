@@ -119,7 +119,7 @@ class ChatroomProtocolDelegate constructor(
                         }else if (key=="gift_amount"){
                             value.toIntOrNull()?.let {
                                 voiceRoomInfo.roomInfo?.giftAmount = it
-                                ChatroomCacheManager.cacheManager.updateGiftAmountCache(it)
+                                ChatroomCacheManager.cacheManager.setGiftAmountCache(it)
                             }
                         }else if (key=="robot_volume"){
                             value.toIntOrNull()?.let {

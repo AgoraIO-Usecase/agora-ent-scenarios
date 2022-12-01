@@ -47,6 +47,13 @@ class ChatroomCacheManager {
     }
 
     /**
+     * 从服务端获取数据 直接赋值giftAmount
+     */
+    fun setGiftAmountCache(amount:Int){
+        giftAmount = amount
+    }
+
+    /**
      * 更新房间礼物总金额
      */
     fun updateGiftAmountCache(amount:Int){
@@ -251,15 +258,17 @@ class ChatroomCacheManager {
                 rankingList.add(entry.value)
             }
         }
-        "setRankList (${rankingList})".logE("ChatroomCacheManager")
-        var comparator:Comparator<VoiceRankUserModel> = Comparator{o1,o2 ->
-            o2.amount.compareTo(o1.amount)
-        }
-//        rankingList.sortBy { it.amount }
-        rankingList.sortWith(comparator)
     }
 
+    /**
+     * 获取榜单列表
+     */
     fun getRankList():MutableList<VoiceRankUserModel>{
+        val comparator:Comparator<VoiceRankUserModel> = Comparator{ o1, o2 ->
+            o2.amount.compareTo(o1.amount)
+        }
+        rankingList.sortWith(comparator)
+        "getRankList (${rankingList})".logE("ChatroomCacheManager")
         return rankingList
     }
 
