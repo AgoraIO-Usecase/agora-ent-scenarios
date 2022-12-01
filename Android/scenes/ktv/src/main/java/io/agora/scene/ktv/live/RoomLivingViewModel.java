@@ -22,6 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import io.agora.lyrics_view.DownloadManager;
 import io.agora.lyrics_view.LrcLoadUtils;
@@ -65,6 +68,7 @@ import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.UpdateSingingScoreInputModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
+import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -908,6 +912,10 @@ public class RoomLivingViewModel extends ViewModel {
     // ======================= 分数相关 =======================
     private void initSingScore(){
         ktvServiceProtocol.subscribeSingingScoreChange((ktvSubscribe, aDouble) -> {
+            if (mPlayer == null || mPlayer.getState() != io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                return null;
+            }
+
             playerPitchLiveData.postValue(aDouble);
             return null;
         });
@@ -1087,6 +1095,9 @@ public class RoomLivingViewModel extends ViewModel {
         // ------------------ 初始化音乐播放器实例 ------------------
         mPlayer = iAgoraMusicContentCenter.createMusicPlayer();
         mPlayer.registerPlayerObserver(new IMediaPlayerObserver() {
+
+            private ScheduledExecutorService mExecutor = Executors.newSingleThreadScheduledExecutor();
+
             @Override
             public void onPlayerStateChanged(io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error) {
                 switch (state) {
@@ -1131,11 +1142,18 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onPositionChanged(long position_ms) {
-                // 本端获取播放位置， 用于歌词播放
-                if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                    mLastRecvPlayPosTime = System.currentTimeMillis();
-                    mRecvedPlayPosition = position_ms;
-                }
+                // 本端获取播放位置，用于歌词播放
+                // Workaround, delay emit for 350ms
+
+                mExecutor.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
+                            mLastRecvPlayPosTime = System.currentTimeMillis();
+                            mRecvedPlayPosition = position_ms;
+                        }
+                    }
+                }, 350, TimeUnit.MILLISECONDS);
             }
 
             @Override
@@ -1176,6 +1194,12 @@ public class RoomLivingViewModel extends ViewModel {
             @Override
             public void onAudioVolumeIndication(int volume) {
 
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+                mExecutor.shutdown();
             }
         });
 
