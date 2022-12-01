@@ -7,14 +7,24 @@ import android.widget.CompoundButton
 import android.widget.SeekBar
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
+import io.agora.CallBack
 import io.agora.scene.voice.R
+import io.agora.scene.voice.annotation.MicClickAction
+import io.agora.scene.voice.annotation.MicStatus
 import io.agora.scene.voice.bean.*
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor
 import io.agora.scene.voice.general.constructor.RoomSoundAudioConstructor
+import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
+import io.agora.scene.voice.imkit.custorm.MsgConstant
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager.Companion.cacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.service.*
+import io.agora.scene.voice.service.VoiceBuddyFactory.Companion.get
 import io.agora.scene.voice.ui.ainoise.RoomAINSSheetDialog
 import io.agora.scene.voice.ui.audiosettings.RoomAudioSettingsSheetDialog
 import io.agora.scene.voice.ui.common.CommonFragmentAlertDialog
@@ -30,9 +40,7 @@ import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionSheetDialog
 import io.agora.scene.voice.ui.spatialaudio.RoomSpatialAudioSheetDialog
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
-import io.agora.scene.voice.annotation.MicClickAction
-import io.agora.scene.voice.annotation.MicStatus
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
+import io.agora.util.EMLog
 import io.agora.voice.baseui.adapter.OnItemClickListener
 import io.agora.voice.baseui.general.callback.OnResourceParseCallback
 import io.agora.voice.baseui.general.net.Resource
@@ -42,6 +50,7 @@ import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
+import java.util.*
 import kotlin.random.Random
 
 /**
@@ -735,7 +744,7 @@ class RoomObservableViewDelegate constructor(
     private var updateRankRunnable: Runnable? = null
 
     // 收到礼物消息
-    fun receiveGift(roomId: String) {
+    fun receiveGift(roomId: String,message: ChatMessageData?) {
         if (updateRankRunnable != null) {
             ThreadManager.getInstance().removeCallbacks(updateRankRunnable)
         }
@@ -745,6 +754,23 @@ class RoomObservableViewDelegate constructor(
             roomLivingViewModel.fetchGiftContribute()
         }
         ThreadManager.getInstance().runOnMainThreadDelay(updateRankRunnable, longDelay)
+        val giftMap: Map<String, String> = CustomMsgHelper.getInstance().getCustomMsgParams(message)
+        if (giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM] == null || giftMap[MsgConstant.CUSTOM_GIFT_PRICE] == null) return
+        val count = giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM]!!.toInt()
+        val price = giftMap[MsgConstant.CUSTOM_GIFT_PRICE]!!.toInt()
+        val amount =  count * price
+        cacheManager.updateGiftAmountCache(amount)
+        ChatroomIMManager.getInstance()
+            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+                override fun onSuccess() {
+                    iRoomTopView.onUpdateGiftCount(amount)
+                    EMLog.d(TAG, "updateAmount success")
+                }
+
+                override fun onError(code: Int, error: String) {
+                    EMLog.d(TAG, "updateAmount error$code $error")
+                }
+            })
     }
 
     /**收到邀请上麦消息*/
@@ -898,7 +924,7 @@ class RoomObservableViewDelegate constructor(
             val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
             rankList?.let { rankUsers ->
                 rankUsers.forEach { rank ->
-                    ChatroomCacheManager.cacheManager.setRankList(rank)
+                    cacheManager.setRankList(rank)
                 }
             }
         }
