@@ -377,8 +377,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
-        roomLivingViewModel.playerPitchLiveData.observe(this, pitch ->
-            getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue()));
+        roomLivingViewModel.playerPitchLiveData.observe(this, pitch -> {
+                    getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue());
+                }
+        );
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
     }
