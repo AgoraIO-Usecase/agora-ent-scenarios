@@ -32,6 +32,8 @@ class ChatroomCacheManager {
     private var rankingList = mutableListOf<VoiceRankUserModel>()
     private val rankingMap = mutableMapOf<String, VoiceRankUserModel>()
 
+    private var giftAmount:Int=0
+
     companion object {
         val cacheManager = ChatroomCacheManager().apply {
             mSharedPreferences = ChatroomConfigManager.getInstance().context.getSharedPreferences(
@@ -42,6 +44,22 @@ class ChatroomCacheManager {
                 mEditor = it?.edit()
             }
         }
+    }
+
+    /**
+     * 更新房间礼物总金额
+     */
+    fun updateGiftAmountCache(amount:Int){
+        giftAmount += amount
+        "updateGiftAmountCache(${giftAmount}) ".logE("ChatroomCacheManager")
+    }
+
+    /**
+     * 获取房间礼物总金额
+     */
+    fun getGiftAmountCache():Int{
+        "getGiftAmountCache(${giftAmount}) ".logE("ChatroomCacheManager")
+        return giftAmount
     }
 
     /**
@@ -69,6 +87,7 @@ class ChatroomCacheManager {
         clearMicInfo()
         clearSubmitList()
         clearRankList()
+        giftAmount = 0
     }
 
     /**

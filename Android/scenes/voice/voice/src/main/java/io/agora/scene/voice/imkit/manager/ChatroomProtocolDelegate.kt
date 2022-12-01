@@ -119,6 +119,7 @@ class ChatroomProtocolDelegate constructor(
                         }else if (key=="gift_amount"){
                             value.toIntOrNull()?.let {
                                 voiceRoomInfo.roomInfo?.giftAmount = it
+                                ChatroomCacheManager.cacheManager.updateGiftAmountCache(it)
                             }
                         }else if (key=="robot_volume"){
                             value.toIntOrNull()?.let {
@@ -651,11 +652,7 @@ class ChatroomProtocolDelegate constructor(
             newAmount = count * price
         }
         val oldAmount = voiceRankModel.amount
-        if (oldAmount != null){
-            voiceRankModel.amount = oldAmount + newAmount
-        }else{
-            voiceRankModel.amount = newAmount
-        }
+        voiceRankModel.amount = oldAmount + newAmount
         voiceRankModel.chatUid = chatUid
         voiceRankModel.name = name
         voiceRankModel.portrait = portrait
@@ -666,14 +663,37 @@ class ChatroomProtocolDelegate constructor(
         roomManager.asyncSetChatroomAttributeForced(roomId,"ranking_list", GsonTools.beanToString(rankingList),
             false,object : CallBack{
             override fun onSuccess() {
-                callback.onSuccess()
                 ChatroomCacheManager.cacheManager.setRankList(voiceRankModel)
+                callback.onSuccess()
             }
 
             override fun onError(code: Int, error: String?) {
                 callback.onError(code,error)
             }
         })
+    }
+
+    /**
+     * 更新礼物总数
+     */
+    fun updateGiftAmount(chatUid: String,newAmount:Int,callback: CallBack){
+        if (TextUtils.equals(ownerBean.chatUid,chatUid)){
+            var giftAmount = ChatroomCacheManager.cacheManager.getGiftAmountCache()
+            giftAmount += newAmount
+            roomManager.asyncSetChatroomAttribute(roomId,"gift_amount",giftAmount.toString(),true,object :
+                CallBack{
+                override fun onSuccess() {
+                    "update giftAmount onSuccess: $giftAmount".logE(TAG)
+                    ChatroomCacheManager.cacheManager.updateGiftAmountCache(newAmount)
+                    callback.onSuccess()
+                }
+
+                override fun onError(code: Int, error: String?) {
+                    "update giftAmount onError: $code $error".logE(TAG)
+                    callback.onError(code,error)
+                }
+            })
+        }
     }
 
     /**
