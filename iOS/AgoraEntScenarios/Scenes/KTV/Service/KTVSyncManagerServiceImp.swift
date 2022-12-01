@@ -106,8 +106,19 @@ private func _hideLoadingIfNeed() {
             return
         }
 
-        SyncUtil.initSyncManager(sceneId: kSceneId) { [weak self] in
-            guard let self = self else {
+        SyncUtil.initSyncManager(sceneId: kSceneId) {
+//            guard let self = self else {
+//                return
+//            }
+//            self.syncUtilsInited = true
+//
+//            completion()
+        }
+        
+        SyncUtil.subscribeConnectState { [weak self] state in
+            guard let self = self,
+                    !self.syncUtilsInited,
+                    state == .open else {
                 return
             }
             self.syncUtilsInited = true
