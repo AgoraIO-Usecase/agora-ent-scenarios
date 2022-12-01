@@ -28,6 +28,13 @@ typedef enum : NSUInteger {
     VLSendMessageAuditFail = 20,
 } VLSendMessageType;
 
+typedef enum : NSUInteger {
+    KTVServiceNetworkStatusConnecting = 0,
+    KTVServiceNetworkStatusOpen,
+    KTVServiceNetworkStatusFail,
+    KTVServiceNetworkStatusClosed,
+} KTVServiceNetworkStatus;
+
 
 typedef enum : NSUInteger {
     KTVSubscribeCreated,      //创建
@@ -175,6 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
 
 
+- (void)subscribeNetworkStatusChangedWithBlock:(void(^)(KTVServiceNetworkStatus))changedBlock;
 
 /// 取消全部订阅
 - (void)unsubscribeAll;
