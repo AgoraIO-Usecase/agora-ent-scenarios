@@ -143,7 +143,10 @@ extension VoiceRoomViewController {
                     if self.roomInfo?.room?.ranking_list == nil {
                         self.roomInfo?.room?.ranking_list = [VRUser]()
                     }
-                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? ""
+                    if (VoiceRoomUserInfo.shared.user?.chat_uid ?? "").isEmpty {
+                        VoiceRoomUserInfo.shared.user?.chat_uid = VLUserCenter.user.chat_uid
+                    }
+                    let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
                     })
                     if ranker == nil {
                         self.roomInfo?.room?.ranking_list?.append(VoiceRoomUserInfo.shared.user!)
