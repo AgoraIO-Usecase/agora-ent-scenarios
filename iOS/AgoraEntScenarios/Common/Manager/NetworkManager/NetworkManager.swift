@@ -7,13 +7,14 @@
 
 import UIKit
 
-class NetworkManager {
-    public enum TokenGeneratorType: Int {
+@objc
+class NetworkManager:NSObject {
+    @objc public enum TokenGeneratorType: Int {
         case token006 = 0
         case token007 = 1
     }
     
-    public enum AgoraTokenType: Int {
+    @objc public enum AgoraTokenType: Int {
         case rtc = 1
         case rtm = 2
         case chat = 3
@@ -41,8 +42,8 @@ class NetworkManager {
         return config
     }()
 
-    static let shared = NetworkManager()
-    private init() {}
+    @objc static let shared = NetworkManager()
+
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     
     /// get tokens
@@ -78,6 +79,7 @@ class NetworkManager {
         }
     }
 
+    @objc
     func generateToken(channelName: String,
                        uid: String,
                        tokenType: TokenGeneratorType,
@@ -114,7 +116,6 @@ class NetworkManager {
 //            ToastView.hidden()
         })
     }
-    
     
     /// generator easemob im token & uid
     /// - Parameters:

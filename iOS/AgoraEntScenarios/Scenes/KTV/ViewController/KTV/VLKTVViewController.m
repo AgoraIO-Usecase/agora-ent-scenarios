@@ -595,6 +595,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
+    KTVLogInfo(@"tokenPrivilegeWillExpire: %@", token);
+    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                      uid:VLUserCenter.user.id
+                                                tokenType:TokenGeneratorTypeToken006
+                                                     type:AgoraTokenTypeRtc
+                                                  success:^(NSString * token) {
+        KTVLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
+        [self.RTCkit renewToken:token];
+    }];
+    
+    //TODO: mcc missing token expire callback
+    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                      uid:VLUserCenter.user.id
+                                                tokenType:TokenGeneratorTypeToken006
+                                                     type:AgoraTokenTypeRtm
+                                                  success:^(NSString * token) {
+        KTVLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
+        [self.AgoraMcc renewToken:token];
+    }];
+}
+
 #pragma mark AgoraMusicContentCenterEventDelegate
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
