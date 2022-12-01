@@ -72,7 +72,7 @@ interface ShowServiceProtocol {
     )
 
     // 主播订阅连麦申请变化
-    fun subscribeMicSeatApply(onMicSeatChange: (ShowSubscribeStatus, ShowMicSeatApply) -> Unit)
+    fun subscribeMicSeatApply(onMicSeatChange: (ShowSubscribeStatus, ShowMicSeatApply?) -> Unit)
 
     // 观众申请连麦
     fun createMicSeatApply(success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
@@ -101,7 +101,7 @@ interface ShowServiceProtocol {
     )
 
     // 观众订阅连麦邀请
-    fun subscribeMicSeatInvitation(onMicSeatInvitationChange: (ShowSubscribeStatus, ShowMicSeatInvitation) -> Unit)
+    fun subscribeMicSeatInvitation(onMicSeatInvitationChange: (ShowSubscribeStatus, ShowMicSeatInvitation?) -> Unit)
 
     // 主播创建连麦邀请
     fun createMicSeatInvitation(
@@ -112,21 +112,63 @@ interface ShowServiceProtocol {
 
     // 主播取消连麦邀请
     fun cancelMicSeatInvitation(
-        user: ShowUser,
+        userId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
     // 观众同意连麦
     fun acceptMicSeatInvitation(
-        invitation: ShowMicSeatInvitation,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
     // 观众拒绝连麦
     fun rejectMicSeatInvitation(
-        invitation: ShowMicSeatInvitation,
+        success: (() -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 获取PK邀请列表
+    fun getAllPKInvitationList(
+        success: ((List<ShowPKInvitation>) -> Unit),
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 观众订阅连麦邀请
+    fun subscribePKInvitationChanged(onPKInvitationChanged: (ShowSubscribeStatus, ShowPKInvitation?) -> Unit)
+
+    // 创建PK邀请
+    fun createPKInvitation(
+        room: ShowRoomListModel,
+        success: (() -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 同意PK
+    fun acceptPKInvitation(
+        success: (() -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 拒绝PK
+    fun rejectPKInvitation(
+        success: (() -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 获取互动列表
+    fun getAllInterationList(
+        success: ((List<ShowInteractionInfo>) -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
+
+    // 订阅互动邀请
+    fun subscribeInteractionChanged(onInteractionChanged: (ShowSubscribeStatus, ShowInteractionInfo?) -> Unit)
+
+    // 停止互动
+    fun stopInteraction(
+        interaction: ShowInteractionInfo,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
