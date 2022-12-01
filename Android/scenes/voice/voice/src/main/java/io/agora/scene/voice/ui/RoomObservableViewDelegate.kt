@@ -18,13 +18,11 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.MsgConstant
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager.Companion.cacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceRoomLivingViewModel
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.service.*
-import io.agora.scene.voice.service.VoiceBuddyFactory.Companion.get
 import io.agora.scene.voice.ui.ainoise.RoomAINSSheetDialog
 import io.agora.scene.voice.ui.audiosettings.RoomAudioSettingsSheetDialog
 import io.agora.scene.voice.ui.common.CommonFragmentAlertDialog
@@ -50,8 +48,6 @@ import io.agora.voice.buddy.tool.GsonTools
 import io.agora.voice.buddy.tool.LogTools.logD
 import io.agora.voice.buddy.tool.ThreadManager
 import io.agora.voice.buddy.tool.ToastTools
-import java.util.*
-import kotlin.random.Random
 
 /**
  * @author create by zhangwei03
@@ -348,17 +344,6 @@ class RoomObservableViewDelegate constructor(
 
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_exchange_mic_failed))
-                }
-            })
-        }
-        // 榜单
-        roomLivingViewModel.giftContributeObservable().observe(activity) { response ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
-                override fun onSuccess(data: List<VoiceRankUserModel>?) {
-                    data?.let {
-                        if (activity.isFinishing) return
-                        iRoomTopView.onRankMember(it)
-                    }
                 }
             })
         }
@@ -741,29 +726,27 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
-    private var updateRankRunnable: Runnable? = null
+    // 发礼物成功回调
+    fun onSendGiftSuccess() {
+        ThreadManager.getInstance().runOnMainThread {
+            iRoomTopView.onRankMember(ChatroomCacheManager.cacheManager.getRankList())
+        }
+    }
 
     // 收到礼物消息
-    fun receiveGift(roomId: String,message: ChatMessageData?) {
-        if (updateRankRunnable != null) {
-            ThreadManager.getInstance().removeCallbacks(updateRankRunnable)
-        }
-        val longDelay = Random.nextInt(1000, 5000)
-        "receiveGift longDelay：$longDelay".logD(TAG)
-        updateRankRunnable = Runnable {
-            roomLivingViewModel.fetchGiftContribute()
-        }
-        ThreadManager.getInstance().runOnMainThreadDelay(updateRankRunnable, longDelay)
+    fun receiveGift(roomId: String, message: ChatMessageData?) {
         val giftMap: Map<String, String> = CustomMsgHelper.getInstance().getCustomMsgParams(message)
         if (giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM] == null || giftMap[MsgConstant.CUSTOM_GIFT_PRICE] == null) return
-        val count = giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM]!!.toInt()
-        val price = giftMap[MsgConstant.CUSTOM_GIFT_PRICE]!!.toInt()
-        val amount =  count * price
-        cacheManager.updateGiftAmountCache(amount)
+        val count = giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM]?.toIntOrNull() ?: 0
+        val price = giftMap[MsgConstant.CUSTOM_GIFT_PRICE]?.toIntOrNull() ?: 0
+        val amount = count * price
+        ChatroomCacheManager.cacheManager.updateGiftAmountCache(amount)
         ChatroomIMManager.getInstance()
-            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
                 override fun onSuccess() {
-                    iRoomTopView.onUpdateGiftCount(amount)
+                    ThreadManager.getInstance().runOnMainThread {
+                        iRoomTopView.onUpdateGiftCount(amount)
+                    }
                     EMLog.d(TAG, "updateAmount success")
                 }
 
@@ -892,17 +875,6 @@ class RoomObservableViewDelegate constructor(
     }
 
     fun onSeatUpdated(attributeMap: Map<String, String>) {
-        // mic
-        val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
-        attributeMap
-            .filter { it.key.startsWith("mic_") }
-            .forEach { (key, value) ->
-                val micInfo =
-                    GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
-                micInfo?.let { micInfoMap[key] = it }
-            }
-        val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, roomKitBean.ownerId)
-
         if (attributeMap.containsKey("gift_amount")) {
             attributeMap["gift_amount"]?.toIntOrNull()?.let {
                 voiceRoomModel.giftAmount = it
@@ -920,17 +892,31 @@ class RoomObservableViewDelegate constructor(
             ThreadManager.getInstance().runOnMainThread {
                 iRoomMicView.activeBot(voiceRoomModel.useRobot)
             }
-        } else if(attributeMap.containsKey("ranking_list")){
+        } else if (attributeMap.containsKey("ranking_list")) {
             val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
             rankList?.let { rankUsers ->
                 rankUsers.forEach { rank ->
-                    cacheManager.setRankList(rank)
+                    ChatroomCacheManager.cacheManager.setRankList(rank)
+                }
+                ThreadManager.getInstance().runOnMainThread {
+                    iRoomTopView.onRankMember(rankUsers)
                 }
             }
-        }
-        dealMicDataMap(newMicMap)
-        ThreadManager.getInstance().runOnMainThread {
-            updateViewByMicMap(newMicMap)
+        } else {
+            // mic
+            val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()
+            attributeMap
+                .filter { it.key.startsWith("mic_") }
+                .forEach { (key, value) ->
+                    val micInfo =
+                        GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
+                    micInfo?.let { micInfoMap[key] = it }
+                }
+            val newMicMap = RoomInfoConstructor.extendMicInfoMap(micInfoMap, roomKitBean.ownerId)
+            dealMicDataMap(newMicMap)
+            ThreadManager.getInstance().runOnMainThread {
+                updateViewByMicMap(newMicMap)
+            }
         }
     }
 
