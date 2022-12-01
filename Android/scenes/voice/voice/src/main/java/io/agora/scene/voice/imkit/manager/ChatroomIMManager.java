@@ -706,4 +706,11 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.updateMicInfoCache(kvMap);
     }
 
+    /**
+     * 更新礼物总数
+     */
+    public void updateAmount(String chatUid,int amount,CallBack callBack){
+        delegate.updateGiftAmount(chatUid,amount,callBack);
+    }
+
 }
