@@ -820,7 +820,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.currentPlayingSongNo = nil;
     [self.MVView stop];
     [self.MVView reset];
-    [self.MVView cleanMusicText];
     [self.rtcMediaPlayer stop];
     [self resetPlayer];
     [self cancelLoadAndPlay];
