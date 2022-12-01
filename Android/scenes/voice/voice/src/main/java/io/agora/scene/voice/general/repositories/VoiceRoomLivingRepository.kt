@@ -303,22 +303,6 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 获取礼物榜单
-    fun fetchGiftContribute(): LiveData<Resource<List<VoiceRankUserModel>>> {
-        val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
-                voiceServiceProtocol.fetchGiftContribute(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
     /**
      * 离开syncManager 房间
      */

@@ -33,7 +33,7 @@ import io.agora.scene.voice.bean.RoomKitBean
 import io.agora.voice.buddy.tool.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager.Companion.cacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.imkit.manager.ChatroomListener
@@ -132,8 +132,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
-                        cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
-//                        ChatroomIMManager.getInstance().initMicInfo()
+                        ChatroomCacheManager.cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                     }
                 }
             })
@@ -296,6 +295,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
+                                roomObservableDelegate.onSendGiftSuccess()
                                 roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
                             }
 
@@ -523,7 +523,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
         super.onMemberExited(roomId, chatUid, s2)
         if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        chatUid?.let { cacheManager.removeMember(it) }
+        chatUid?.let { ChatroomCacheManager.cacheManager.removeMember(it) }
         voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
         ThreadManager.getInstance().runOnMainThread {
             binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)

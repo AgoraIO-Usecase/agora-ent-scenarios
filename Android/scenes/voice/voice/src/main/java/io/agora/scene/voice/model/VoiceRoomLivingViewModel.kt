@@ -52,8 +52,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _acceptMicSeatInvitationObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
         SingleSourceLiveData()
-    private val _giftContributeObservable: SingleSourceLiveData<Resource<List<VoiceRankUserModel>>> =
-        SingleSourceLiveData()
     private val _leaveSyncRoomObservable: SingleSourceLiveData<Resource<Boolean>> = SingleSourceLiveData()
 
     /**房间详情*/
@@ -112,9 +110,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**接受邀请*/
     fun acceptMicSeatInvitationObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatInvitationObservable
-
-    /**获取礼物列表*/
-    fun giftContributeObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _giftContributeObservable
 
     /**离开syncManager 房间*/
     fun leaveSyncRoomObservable(): LiveData<Resource<Boolean>> = _leaveSyncRoomObservable
@@ -266,11 +261,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     // 换麦
     fun changeMic(oldIndex: Int, newIndex: Int) {
         _changeMicObservable.setSource(mRepository.changeMic(oldIndex, newIndex))
-    }
-
-    //  获取礼物列
-    fun fetchGiftContribute() {
-        _giftContributeObservable.setSource(mRepository.fetchGiftContribute())
     }
 
     fun leaveSyncManagerRoom(roomId: String) {
