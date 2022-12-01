@@ -14,8 +14,6 @@ import KakaJSON
     public var channel_id: String?
     public var name: String?
     public var portrait: String?
-    public var authorization: String?
-    public var im_token: String?
     public var invited = false
     public var amount: Int? = 0
     public var mic_index: Int?

@@ -74,8 +74,6 @@ extension VRRoomsViewController {
         let current = VRUser()
         current.chat_uid = user?.chat_uid
         current.rtc_uid = user?.id
-        current.im_token = user?.im_token
-        current.authorization = user?.authorization
         current.channel_id = user?.channel_id
         current.uid = user?.userNo
         current.name = user?.name
@@ -83,24 +81,6 @@ extension VRRoomsViewController {
         VoiceRoomUserInfo.shared.user = current
     }
 
-    private func login() {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": currentUser?.userNo ?? "", "portrait": currentUser?.headUrl ?? "", "name": currentUser?.name ?? ""], classType: VRUser.self) { user, error in
-            if error == nil, user != nil {
-                self.currentUser?.hasVoiceRoomUserInfo = true
-                self.currentUser?.chat_uid = user?.chat_uid ?? ""
-                self.currentUser?.channel_id = user?.channel_id ?? ""
-                self.currentUser?.rtc_uid = user?.rtc_uid ?? ""
-                self.currentUser?.authorization = user?.authorization ?? ""
-                self.currentUser?.im_token = user?.im_token ?? ""
-                print("avatar url: \(self.currentUser?.headUrl ?? "")")
-                VoiceRoomUserInfo.shared.user = user
-                VoiceRoomBusinessRequest.shared.userToken = user?.authorization ?? ""
-                self.showContent()
-            } else {
-                self.view.makeToast("\(error?.localizedDescription ?? "")")
-            }
-        }
-    }
 
     private func viewsAction() {
         create.action = { [weak self] in
@@ -167,11 +147,11 @@ extension VRRoomsViewController {
                         let vc = VoiceRoomViewController(info: info)
                         self.navigationController?.pushViewController(vc, animated: true)
                     } else {
-                        
+                        self.view.makeToast("Loading failed,please retry or install again!")
                     }
                 })
             } else {
-                self.view.makeToast("Loading failed,please retry or install again!")
+                self.view.makeToast("Members reach limit!")
             }
         }
     }
@@ -186,8 +166,10 @@ extension VRRoomsViewController {
 //            self.menuBar.menuList.reloadData()
 //        }
 
-        normal.didSelected = { [weak self] in
-            self?.entryRoom(room: $0)
+        normal.didSelected = { [weak self] room in
+            Throttler.throttle(delay: .seconds(1)) {
+                self?.entryRoom(room: room)
+            }
         }
 //        self.normal.totalCountClosure = { [weak self] in
 //            guard let self = self else { return }
