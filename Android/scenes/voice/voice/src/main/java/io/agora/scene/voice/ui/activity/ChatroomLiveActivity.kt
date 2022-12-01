@@ -296,7 +296,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
-                                roomObservableDelegate.receiveGift(roomKitBean.roomId)
+                                roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
@@ -424,7 +424,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
             giftViewDelegate.showGiftAction()
         }
-        roomObservableDelegate.receiveGift(roomKitBean.roomId)
+        roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
     }
 
     override fun receiveApplySite(roomId: String?, message: ChatMessageData?) {
