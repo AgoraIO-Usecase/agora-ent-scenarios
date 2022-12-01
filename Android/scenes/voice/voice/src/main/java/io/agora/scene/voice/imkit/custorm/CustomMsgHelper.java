@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.agora.CallBack;
 import io.agora.MessageListener;
@@ -168,6 +169,21 @@ public class CustomMsgHelper implements MessageListener {
             switch (msgType) {
                 case CHATROOM_GIFT:
                     AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    Map<String, String> giftMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    int amount = Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM)))
+                            * Integer.parseInt(Objects.requireNonNull(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE)));
+                    ChatroomCacheManager.Companion.getCacheManager().updateGiftAmountCache(amount);
+                    ChatroomIMManager.getInstance().updateAmount(message.getFrom(), amount, new CallBack() {
+                        @Override
+                        public void onSuccess() {
+                            EMLog.e("CustomMsgHelper","updateAmount success");
+                        }
+
+                        @Override
+                        public void onError(int code, String error) {
+                            EMLog.e("CustomMsgHelper","updateAmount error" + code + " "+ error);
+                        }
+                    });
                     if(listener != null) {
                         listener.onReceiveGiftMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
@@ -402,6 +418,19 @@ public class CustomMsgHelper implements MessageListener {
                             @Override
                             public void onError(int code, String error) {
                                 EMLog.e("CustomMsgHelper","VoiceGiftModel update error" + code + " "+ error);
+                            }
+                        });
+                        int amount = Integer.parseInt(Objects.requireNonNull(params.get(MsgConstant.CUSTOM_GIFT_KEY_NUM)))
+                                * Integer.parseInt(Objects.requireNonNull(params.get(MsgConstant.CUSTOM_GIFT_PRICE)));
+                        ChatroomIMManager.getInstance().updateAmount(sendMessage.getFrom(), amount, new CallBack() {
+                            @Override
+                            public void onSuccess() {
+                                EMLog.e("CustomMsgHelper","updateAmount success");
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+                                EMLog.e("CustomMsgHelper","updateAmount error" + code + " "+ error);
                             }
                         });
                     }
