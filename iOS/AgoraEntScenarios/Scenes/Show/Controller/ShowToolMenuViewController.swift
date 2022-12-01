@@ -24,6 +24,7 @@ class ShowToolMenuViewController: UIViewController {
     var menuTitle: String?
     var type: ShowMenuType? {
         didSet {
+            if type == oldValue { return }
             guard let type = type else { return }
             updateLayoutForType(type)
         }
