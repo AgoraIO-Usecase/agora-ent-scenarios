@@ -146,7 +146,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
 
         getBinding().btnCreate.setOnClickListener(view -> {
             if (getBinding().cbUnOpen.isChecked() && !isAllInput()) {
-                ToastUtils.showToast(getString(R.string.please_input_4_pwd));
+                ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd));
             } else {
                 String code =
                         getBinding().etCode1.getText().toString()
@@ -154,9 +154,9 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
                                 + getBinding().etCode3.getText()
                                 + getBinding().etCode4.getText();
                 if (TextUtils.isEmpty(getBinding().etRoomName.getText())) {
-                    ToastUtils.showToast(getString(R.string.please_input_room_name));
+                    ToastUtils.showToast(getString(R.string.ktv_please_input_room_name));
                 } else if (code.length() > 4) {
-                    ToastUtils.showToast(getString(R.string.please_input_4_pwd));
+                    ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd));
                 } else {
                     createRoom(code);
                 }
@@ -181,7 +181,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         showLoadingView();
         String roomName = getBinding().etRoomName.getText().toString();
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.please_input_room_name);
+            ToastUtils.showToast(R.string.ktv_please_input_room_name);
             return;
         }
         String userNo = UserManager.getInstance().getUser().userNo;

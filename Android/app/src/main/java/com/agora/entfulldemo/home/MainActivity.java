@@ -14,7 +14,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.BottomNavigationViewKt;
 
 import com.agora.entfulldemo.R;
-import com.agora.entfulldemo.databinding.ActivityMainBinding;
+import com.agora.entfulldemo.databinding.AppActivityMainBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import io.agora.scene.base.manager.UserManager;
  * 主页容器
  */
 @Route(path = PagePathConstant.pageMainHome)
-public class MainActivity extends BaseViewBindingActivity<ActivityMainBinding> {
+public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
     private NavController navController;
     /**
      * 主页接收消息
@@ -37,8 +37,8 @@ public class MainActivity extends BaseViewBindingActivity<ActivityMainBinding> {
     private MainViewModel mainViewModel;
 
     @Override
-    protected ActivityMainBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityMainBinding.inflate(inflater);
+    protected AppActivityMainBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return AppActivityMainBinding.inflate(inflater);
     }
 
     @Override
