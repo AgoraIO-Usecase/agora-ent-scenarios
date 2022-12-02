@@ -345,6 +345,12 @@ class KTVSyncManagerServiceImp(
 
     // =================== 麦位相关 ===============================
 
+    override fun getSeatStatusList(
+        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
+    ) {
+        innerGetSeatInfo(completion)
+    }
+
     override fun onSeat(
         inputModel: OnSeatInputModel,
         completion: (error: Exception?) -> Unit

@@ -80,6 +80,13 @@ interface KTVServiceProtocol {
     // ===================== 麦位相关 =================================
 
     /**
+     * 获取麦位列表
+     */
+    fun getSeatStatusList(
+        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
+    )
+
+    /**
      * 上麦
      */
     fun onSeat(

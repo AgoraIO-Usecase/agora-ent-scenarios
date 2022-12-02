@@ -216,6 +216,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             roomLivingViewModel.toggleMic(b);
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
+        getBinding().iBtnChorus.setClickable(false);
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> {
@@ -513,7 +514,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
             int key = entry.getKey();
             String value = entry.getValue();
-            if (key == 0) {
+            if (key == 1) {
                 value = getString(R.string.ktv_song_rank_7);
                 ret.put(key, value);
             } else if (key == 3 || key == 4 || key == 6) {
