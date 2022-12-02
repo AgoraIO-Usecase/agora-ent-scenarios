@@ -1,6 +1,6 @@
 package io.agora.scene.voice.rtckit
 
-import io.agora.voice.buddy.config.ConfigConstants
+import io.agora.voice.common.constant.ConfigConstants
 
 /**当前频道数据*/
 data class RtcChannelTemp constructor(

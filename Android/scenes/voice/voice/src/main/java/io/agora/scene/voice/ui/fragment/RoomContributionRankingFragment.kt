@@ -10,21 +10,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.ui.adapter.RoomContributionRankingViewHolder
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.voice.buddy.tool.ResourcesTools
-import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.scene.voice.model.RoomKitBean
+import io.agora.scene.voice.ui.adapter.viewholder.RoomContributionRankingViewHolder
+import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.voice.common.utils.ResourcesTools
+import io.agora.voice.common.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
-import io.agora.scene.voice.model.VoiceUserListViewModel
-import io.agora.scene.voice.service.VoiceRankUserModel
+import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.voice.common.net.Resource
 
 class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContributionRankingBinding>(),
     OnRefreshListener {
@@ -102,7 +102,11 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
 
     private fun initAdapter(recyclerView: RecyclerView) {
         contributionAdapter =
-            BaseRecyclerViewAdapter(null, null, RoomContributionRankingViewHolder::class.java)
+            BaseRecyclerViewAdapter(
+                null,
+                null,
+                RoomContributionRankingViewHolder::class.java
+            )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         context?.let {

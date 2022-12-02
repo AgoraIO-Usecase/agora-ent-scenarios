@@ -23,20 +23,20 @@ import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.CallBack
 import io.agora.scene.voice.R
-import io.agora.scene.voice.bean.PageBean
+import io.agora.scene.voice.model.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
-import io.agora.scene.voice.model.VoiceCreateViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.tool.DeviceTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools.show
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools.show
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.voice.common.net.Resource
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
@@ -71,7 +71,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         super.onCreate(savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         chickPrivate()
-        binding.edRoomName.filters = arrayOf<InputFilter>(EmojiInputFilter(32))
+//        binding.edRoomName.filters = arrayOf<InputFilter>(EmojiInputFilter(32))
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         initListener()
         voiceRoomObservable()

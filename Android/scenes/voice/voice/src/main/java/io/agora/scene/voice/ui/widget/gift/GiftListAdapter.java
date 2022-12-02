@@ -10,8 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import io.agora.scene.voice.bean.GiftBean;
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.scene.voice.model.GiftBean;
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.scene.voice.R;
 
 public class GiftListAdapter extends RoomBaseRecyclerViewAdapter<GiftBean> {

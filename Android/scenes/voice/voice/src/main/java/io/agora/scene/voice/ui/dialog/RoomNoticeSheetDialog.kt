@@ -12,9 +12,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.voice.baseui.dialog.BaseSheetDialog
-import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.scene.voice.model.RoomKitBean
+import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.voice.common.utils.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceDialogRoomNoticeBinding
 import java.util.regex.Pattern
 

@@ -6,12 +6,11 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
-import io.agora.scene.voice.service.VoiceGiftModel
-import io.agora.scene.voice.service.VoiceMemberModel
-import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.service.VoiceRankUserModel
-import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.scene.voice.model.VoiceMemberModel
+import io.agora.scene.voice.model.VoiceMicInfoModel
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.voice.common.utils.GsonTools
+import io.agora.voice.common.utils.LogTools.logE
 import java.io.*
 
 class ChatroomCacheManager {
@@ -180,7 +179,7 @@ class ChatroomCacheManager {
     /**
      * 设置成员列表
      */
-    fun setMemberList(member:VoiceMemberModel){
+    fun setMemberList(member: VoiceMemberModel){
         val chatUid = member.chatUid
         if (chatUid != null){
             roomMemberMap[chatUid] = member
@@ -194,7 +193,7 @@ class ChatroomCacheManager {
     /**
      * 根据chatUid 获取对应实体类
      */
-    fun getMember(chatUid: String):VoiceMemberModel?{
+    fun getMember(chatUid: String): VoiceMemberModel?{
         "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logE("ChatroomCacheManager")
         return roomMemberMap[chatUid]
     }
@@ -249,7 +248,7 @@ class ChatroomCacheManager {
     /**
      * 设置榜单列表
      */
-    fun setRankList(rankBean:VoiceRankUserModel){
+    fun setRankList(rankBean: VoiceRankUserModel){
         val chatUid = rankBean.chatUid
         if (chatUid != null){
             rankingMap[chatUid] = rankBean

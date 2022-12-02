@@ -29,13 +29,13 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
-import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.model.GiftBean;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.buddy.tool.DeviceTools;
+import io.agora.voice.common.utils.DeviceTools;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
-import io.agora.voice.buddy.tool.ImageTools;
+import io.agora.voice.common.utils.ImageTools;
 
 
 public class ChatroomGiftView extends LinearLayout {
