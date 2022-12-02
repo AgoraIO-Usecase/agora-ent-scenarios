@@ -921,6 +921,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [_rtcMediaPlayer adjustPublishSignalVolume:200];
 }
 
+- (void)setupContentInspectConfig {
+    AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
+    NSDictionary* dic = @{
+        @"userNo": [VLUserCenter user].userNo ? : @"unknown"
+    };
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
+    NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    config.extraInfo = jsonStr;
+    [self.RTCkit enableContentInspect:YES config:config];
+}
+
 - (void)joinRTCChannel {
     [self.RTCkit leaveChannel:nil];
     [AgoraRtcEngineKit destroy];
@@ -941,6 +952,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         VLLog(@"评分回调开启失败：%d\n",code);
     }
+    
+    //鉴黄
+    [self setupContentInspectConfig];
     
     [self.RTCkit enableVideo];
     [self.RTCkit enableAudio];
