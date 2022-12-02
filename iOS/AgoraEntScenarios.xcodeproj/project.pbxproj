@@ -134,6 +134,8 @@
 		7F6BE3E02919ED4900F6714D /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */; };
 		7F6BE3E12919ED4900F6714D /* VLPopOnLineTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */; };
 		7F6BE3E4291A2B6600F6714D /* VLTouristOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */; };
+		7FA9045129362D49001BCF94 /* KTVSoloController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA9045029362D49001BCF94 /* KTVSoloController.m */; };
+		7FA9045429362D5A001BCF94 /* KTVChorusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA9045329362D5A001BCF94 /* KTVChorusController.m */; };
 		DD0260262926736700D88B68 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0260252926736700D88B68 /* KTVLog.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
@@ -555,6 +557,10 @@
 		7F6BE3DD2919ED4900F6714D /* VLPopOnLineTypeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopOnLineTypeView.m; sourceTree = "<group>"; };
 		7F6BE3E2291A2B6600F6714D /* VLTouristOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLTouristOnLineView.h; sourceTree = "<group>"; };
 		7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLTouristOnLineView.m; sourceTree = "<group>"; };
+		7FA9044F29362D49001BCF94 /* KTVSoloController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVSoloController.h; sourceTree = "<group>"; };
+		7FA9045029362D49001BCF94 /* KTVSoloController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVSoloController.m; sourceTree = "<group>"; };
+		7FA9045229362D5A001BCF94 /* KTVChorusController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVChorusController.h; sourceTree = "<group>"; };
+		7FA9045329362D5A001BCF94 /* KTVChorusController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVChorusController.m; sourceTree = "<group>"; };
 		DD0260252926736700D88B68 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1782,6 +1788,10 @@
 			children = (
 				DD84175429090C520026B624 /* VLKTVViewController.h */,
 				DD84175529090C520026B624 /* VLKTVViewController.m */,
+				7FA9044F29362D49001BCF94 /* KTVSoloController.h */,
+				7FA9045029362D49001BCF94 /* KTVSoloController.m */,
+				7FA9045229362D5A001BCF94 /* KTVChorusController.h */,
+				7FA9045329362D5A001BCF94 /* KTVChorusController.m */,
 			);
 			path = KTV;
 			sourceTree = "<group>";
@@ -2691,6 +2701,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD8417B429090C520026B624 /* VLSearchEmptyView.m in Sources */,
+				7FA9045129362D49001BCF94 /* KTVSoloController.m in Sources */,
 				DD8417B929090C520026B624 /* VLRoomPersonView.m in Sources */,
 				05FFE713290F73230024D22F /* SwiftyFitSize.swift in Sources */,
 				05FFE701290F706C0024D22F /* VMUpstageView.swift in Sources */,
@@ -2846,6 +2857,7 @@
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
+				7FA9045429362D5A001BCF94 /* KTVChorusController.m in Sources */,
 				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
 				057DDA09290B9496001329E6 /* VoiceRoomPageContainer.swift in Sources */,
 				DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */,
