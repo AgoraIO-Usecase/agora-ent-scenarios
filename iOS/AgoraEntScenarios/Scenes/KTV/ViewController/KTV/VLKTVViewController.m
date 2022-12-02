@@ -344,7 +344,7 @@ VLPopScoreViewDelegate
             return;
         }
         
-        //TODO: 
+        [weakSelf _fetchServiceAllData];
     }];
 }
 
@@ -1152,7 +1152,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     
-    [self refreshChoosedSongList:nil];
+    [self _fetchServiceAllData];
 }
 
 #pragma mark - VLChooseBelcantoViewDelegate
@@ -1419,6 +1419,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark --
+- (void)_fetchServiceAllData {
+    //请求已点歌曲
+    VL(weakSelf);
+    [self refreshChoosedSongList:^{
+        //请求歌词和歌曲
+        [weakSelf loadAndPlaySong];
+    }];
+    
+    //
+}
+
 - (void)refreshChoosedSongList:(void (^ _Nullable)(void))block{
     VL(weakSelf);
     [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
