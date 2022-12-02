@@ -132,7 +132,7 @@ VLPopScoreViewDelegate
     topView.listModel = self.roomModel;
     
     //MV视图(显示歌词...)
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)*0.67) withDelegate:self];
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)) withDelegate:self];
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
@@ -929,7 +929,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
+    int code = [self.RTCkit enableAudioVolumeIndication:200 smooth:3 reportVad:YES];
     if (code == 0) {
         VLLog(@"评分回调开启成功\n");
     } else {
