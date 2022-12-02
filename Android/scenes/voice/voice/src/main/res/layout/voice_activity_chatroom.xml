@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <io.agora.scene.voice.ui.mic.flat.Room2DMicLayout
+    <io.agora.scene.voice.ui.widget.mic.Room2DMicLayout
         android:id="@+id/rvChatroom2dMicLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         android:layout_width="70dp"
         android:layout_height="wrap_content"/>
 
-    <io.agora.scene.voice.ui.mic.spatial.Room3DMicLayout
+    <io.agora.scene.voice.ui.widget.mic.Room3DMicLayout
         android:id="@+id/rvChatroom3dMicLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"

@@ -9,10 +9,10 @@ import androidx.annotation.NonNull;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
-import io.agora.scene.voice.service.VoiceMemberModel;
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.scene.voice.model.VoiceMemberModel;
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.scene.voice.R;
-import io.agora.voice.buddy.tool.ImageTools;
+import io.agora.voice.common.utils.ImageTools;
 
 public class ChatroomRaisedAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;

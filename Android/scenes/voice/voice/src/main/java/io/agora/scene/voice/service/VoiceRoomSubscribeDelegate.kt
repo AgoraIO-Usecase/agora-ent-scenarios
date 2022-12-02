@@ -1,6 +1,8 @@
 package io.agora.scene.voice.service
 
 import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.model.VoiceGiftModel
+import io.agora.scene.voice.model.VoiceMemberModel
 
 /**
  * @author create by zhangwei03

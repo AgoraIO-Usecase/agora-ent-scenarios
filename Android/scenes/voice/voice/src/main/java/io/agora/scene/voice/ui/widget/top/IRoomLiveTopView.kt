@@ -1,7 +1,7 @@
 package io.agora.scene.voice.ui.widget.top
 
-import io.agora.scene.voice.service.VoiceRankUserModel
-import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.scene.voice.model.VoiceRoomModel
 
 interface IRoomLiveTopView {
     /**头部初始化*/

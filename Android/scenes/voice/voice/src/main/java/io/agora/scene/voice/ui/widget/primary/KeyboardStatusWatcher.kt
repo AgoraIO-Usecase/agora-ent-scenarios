@@ -9,7 +9,7 @@ import android.widget.PopupWindow
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import io.agora.voice.buddy.tool.*
+import io.agora.voice.common.utils.*
 
 class KeyboardStatusWatcher(
     private val activity: FragmentActivity,
@@ -95,7 +95,7 @@ class KeyboardStatusWatcher(
             isKeyboardShowed = true
             //非全屏时减去状态栏高度
             keyboardHeight =
-                if (activity.isFullScreen) heightDiff else heightDiff - activity.statusBarHeight
+                if (activity.isFullScreen) heightDiff else heightDiff - StatusBarCompat.getStatusBarHeight(activity)
             //导航栏显示时减去其高度，但横屏时导航栏在侧边，故不必扣除高度
 //            Log.d(TAG, "navBarHeight = ${activity.navBarHeight}   ")
 //            Log.d(TAG, "hasNavBar = ${activity.hasNavBar}   ")

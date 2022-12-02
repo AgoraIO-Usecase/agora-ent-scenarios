@@ -12,22 +12,22 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
-import io.agora.scene.voice.model.VoiceCreateViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
+import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
+import io.agora.voice.common.net.Resource
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
@@ -58,7 +58,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     private fun initAdapter(recyclerView: RecyclerView) {
         val offsetPx = resources.getDimension(R.dimen.voice_space_84dp)
         recyclerView.addItemDecoration(BottomOffsetDecoration(offsetPx.toInt()))
-        listAdapter = VoiceRoomListAdapter(null, object : OnItemClickListener<VoiceRoomModel> {
+        listAdapter = VoiceRoomListAdapter(null, object :
+            OnItemClickListener<VoiceRoomModel> {
             override fun onItemClick(voiceRoomModel: VoiceRoomModel, view: View, position: Int, viewType: Long) {
                 onItemClick(voiceRoomModel)
             }

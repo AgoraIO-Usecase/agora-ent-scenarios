@@ -30,7 +30,7 @@ import io.agora.scene.voice.R;
 import io.agora.scene.voice.ui.widget.expression.ExpressionIcon;
 import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
-import io.agora.voice.buddy.tool.DeviceTools;
+import io.agora.voice.common.utils.DeviceTools;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 

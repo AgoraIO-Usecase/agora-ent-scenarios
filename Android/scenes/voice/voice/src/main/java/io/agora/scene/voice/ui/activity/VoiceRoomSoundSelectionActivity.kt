@@ -11,27 +11,27 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionConstructor.builderSoundSelectionList
-import io.agora.scene.voice.VoiceConfigManager.getLifecycleCallbacks
+import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
+import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
 import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.scene.voice.bean.SoundSelectionBean
-import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.scene.voice.model.SoundSelectionBean
+import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
-import io.agora.scene.voice.model.VoiceCreateViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.FastClickTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.FastClickTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.voice.common.net.Resource
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
 
@@ -90,7 +90,8 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         val soundSelectionList: List<SoundSelectionBean> =
             builderSoundSelectionList(this, ConfigConstants.SoundSelection.Social_Chat)
         soundSelectAdapter =
-            VoiceRoomSoundSelectionAdapter(soundSelectionList, object : OnItemClickListener<SoundSelectionBean> {
+            VoiceRoomSoundSelectionAdapter(soundSelectionList, object :
+                OnItemClickListener<SoundSelectionBean> {
                 override fun onItemClick(data: SoundSelectionBean, view: View, position: Int, viewType: Long) {
                     soundSelectAdapter?.setSelectedPosition(position)
                     soundEffect = data.soundSelectionType
