@@ -126,6 +126,7 @@ private func _hideLoadingIfNeed() {
             guard !self.syncUtilsInited else {
                 self._seatListReloadIfNeed()
                 self._getUserInfo { err, list in
+                    self.userListCountDidChanged?(UInt(list?.count ?? 0))
                 }
                 return
             }
