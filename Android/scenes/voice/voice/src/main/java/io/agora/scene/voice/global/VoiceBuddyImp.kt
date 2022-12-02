@@ -42,16 +42,15 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun rtcUid(): Int {
-        // TODO: id 类型long？
         return UserManager.getInstance().user?.id?.toInt() ?: 0
     }
 
     override fun rtcAppId(): String {
-        return BuildConfig.agora_app_id
+        return io.agora.scene.base.BuildConfig.AGORA_APP_ID
     }
 
     override fun rtcAppCert(): String {
-        return BuildConfig.agora_app_cert
+        return io.agora.scene.base.BuildConfig.AGORA_APP_CERTIFICATE
     }
 
     override fun rtcToken(): String {
