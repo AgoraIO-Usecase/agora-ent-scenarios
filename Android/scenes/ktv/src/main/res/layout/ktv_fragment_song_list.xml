@@ -106,7 +106,7 @@
         android:layout_marginTop="60dp"
         android:drawablePadding="@dimen/ktv_space_normal"
         android:gravity="center"
-        android:text="@string/empty_search"
+        android:text="@string/ktv_empty_search"
         android:textColor="@color/def_text_grey_979"
         android:textSize="12sp"
         android:visibility="gone"
