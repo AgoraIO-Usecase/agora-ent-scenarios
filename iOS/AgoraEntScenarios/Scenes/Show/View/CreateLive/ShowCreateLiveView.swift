@@ -107,6 +107,7 @@ class ShowCreateLiveView: UIView {
         
         // 复制按钮
         let copyButton = UIButton(type: .custom)
+        copyButton.isHidden = true
         roomInfoCoverVeiw.addSubview(copyButton)
         copyButton.setImage(UIImage.show_sceneImage(name: "show_create_copy"), for: .normal)
         copyButton.addTarget(self, action: #selector(didClickCopyButton), for: .touchUpInside)
