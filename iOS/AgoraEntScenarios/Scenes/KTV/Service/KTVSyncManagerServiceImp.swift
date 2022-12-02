@@ -124,7 +124,9 @@ private func _hideLoadingIfNeed() {
             self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard state == .open else { return }
             guard !self.syncUtilsInited else {
-                self._seatListReload()
+                self._seatListReloadIfNeed()
+                self._getUserInfo { err, list in
+                }
                 return
             }
             self.syncUtilsInited = true
@@ -835,7 +837,8 @@ extension KTVSyncManagerServiceImp {
         }
     }
     
-    private func _seatListReload() {
+    private func _seatListReloadIfNeed() {
+        guard let _ = roomNo else {return}
         _getSeatInfo {[weak self] (error, seatList) in
             guard let self = self,
                     error == nil,
