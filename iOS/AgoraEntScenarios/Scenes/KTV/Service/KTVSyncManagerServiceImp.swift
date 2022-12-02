@@ -1189,7 +1189,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         if let publishScore = publishScore, abs(publishScore - score) < 0.01  {
-            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
+//            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
             return
         }
         
