@@ -584,7 +584,8 @@ extension KTVSyncManagerServiceImp {
 
     private func _getUserInfo(finished: @escaping (Error?, [VLLoginModel]?) -> Void) {
         guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
+//            agoraAssert("channelName = nil")
+            finished(nil, nil)
             return
         }
         agoraPrint("imp user get...")

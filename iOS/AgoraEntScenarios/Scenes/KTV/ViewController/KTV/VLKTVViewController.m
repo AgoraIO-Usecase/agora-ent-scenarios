@@ -340,7 +340,8 @@ VLPopScoreViewDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
-        if (status == KTVServiceNetworkStatusOpen) {
+        if (status != KTVServiceNetworkStatusOpen) {
+            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
         
