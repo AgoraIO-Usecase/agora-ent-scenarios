@@ -28,6 +28,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -97,7 +98,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Forehead"
-        model.value = 0
+        model.value = 0.1
         model.name = "额头".show_localized
         model.icon = "meiyan_icon_etou"
         dataArray.append(model)
@@ -126,6 +127,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -172,6 +174,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -252,6 +255,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
