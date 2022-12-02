@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.agora.entfulldemo.databinding.ActivityWelcomeBinding;
+import com.agora.entfulldemo.databinding.AppActivityWelcomeBinding;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.agora.scene.base.Constant;
@@ -22,13 +22,13 @@ import io.agora.scene.widget.dialog.UserAgreementDialog;
 import io.agora.scene.widget.dialog.UserAgreementDialog2;
 
 @Route(path = PagePathConstant.pageWelcome)
-public class WelcomeActivity extends BaseViewBindingActivity<ActivityWelcomeBinding> {
+public class WelcomeActivity extends BaseViewBindingActivity<AppActivityWelcomeBinding> {
     private UserAgreementDialog userAgreementDialog;
     private UserAgreementDialog2 userAgreementDialog2;
 
     @Override
-    protected ActivityWelcomeBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityWelcomeBinding.inflate(inflater);
+    protected AppActivityWelcomeBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return AppActivityWelcomeBinding.inflate(inflater);
     }
 
     @Override
