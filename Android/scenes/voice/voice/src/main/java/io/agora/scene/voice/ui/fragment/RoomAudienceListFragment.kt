@@ -11,21 +11,21 @@
 //import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 //import com.google.android.material.divider.MaterialDividerItemDecoration
 //import io.agora.scene.voice.bean.RoomKitBean
-//import io.agora.scene.voice.ui.adapter.RoomAudienceListViewHolder
-//import io.agora.voice.baseui.BaseUiFragment
+//import io.agora.scene.voice.ui.adapter.viewholder.RoomAudienceListViewHolder
+//import io.agora.voice.baseui.ui.BaseUiFragment
 //import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
 //import io.agora.voice.baseui.adapter.OnItemChildClickListener
-//import io.agora.voice.baseui.general.callback.OnResourceParseCallback
+//import io.agora.voice.baseui.ui.common.OnResourceParseCallback
 //import io.agora.voice.baseui.general.net.Resource
 //import io.agora.voice.buddy.tool.*
-//import io.agora.voice.buddy.tool.LogTools.logE
-//import io.agora.voice.buddy.tool.DeviceTools.dp
+//import io.agora.voice.baseui.utils.LogTools.logE
+//import io.agora.voice.baseui.utils.DeviceTools.dp
 //import io.agora.scene.voice.R
 //import io.agora.scene.voice.annotation.MicClickAction
 //import io.agora.scene.voice.databinding.VoiceFragmentAudienceListBinding
 //import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 //import io.agora.scene.voice.model.VoiceUserListViewModel
-//import io.agora.scene.voice.service.VoiceMemberModel
+//import io.agora.scene.voice.model.VoiceMemberModel
 //
 //class RoomAudienceListFragment : BaseUiFragment<VoiceFragmentAudienceListBinding>(),
 //    SwipeRefreshLayout.OnRefreshListener {

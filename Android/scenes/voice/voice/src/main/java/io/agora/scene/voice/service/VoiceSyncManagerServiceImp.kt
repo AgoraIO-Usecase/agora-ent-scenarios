@@ -4,14 +4,16 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
-import io.agora.scene.voice.general.net.VoiceToolboxServerHttpManager
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
-import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.voice.common.utils.GsonTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.model.*
 import kotlin.collections.HashMap
 
 /**

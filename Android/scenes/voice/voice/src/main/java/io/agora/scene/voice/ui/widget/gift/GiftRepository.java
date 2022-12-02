@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.model.GiftBean;
 
 /**
  * 用于获取本地礼物信息
