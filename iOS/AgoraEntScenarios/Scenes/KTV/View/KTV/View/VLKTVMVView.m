@@ -485,7 +485,7 @@
         // 评分组件配置
         AgoraScoreItemConfigModel *scoreConfig = [[AgoraScoreItemConfigModel alloc] init];
         scoreConfig.tailAnimateColor = [UIColor yellowColor];
-        scoreConfig.scoreViewHeight = 59; // 评分视图高度
+        scoreConfig.scoreViewHeight = 100; // 评分视图高度
         scoreConfig.emitterColors = @[[UIColor purpleColor]];
         scoreConfig.isHiddenSeparatorLine = NO;
         scoreConfig.separatorLineColor = [UIColor whiteColor];
