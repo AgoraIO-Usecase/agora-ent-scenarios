@@ -101,45 +101,45 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvUserAgreement"
-            style="@style/tv_mine_style"
+            style="@style/app_tv_mine_style"
             android:drawableStart="@mipmap/ic_user_center1"
-            android:text="@string/user_agreement"
+            android:text="@string/app_user_agreement"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvPrivacyAgreement"
-            style="@style/tv_mine_style"
+            style="@style/app_tv_mine_style"
             android:layout_marginTop="1dp"
             android:drawableStart="@mipmap/ic_user_center2"
-            android:text="@string/privacy_agreement"
+            android:text="@string/app_privacy_agreement"
             app:layout_constraintTop_toBottomOf="@id/tvUserAgreement"
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvAbout"
-            style="@style/tv_mine_style"
+            style="@style/app_tv_mine_style"
             android:layout_marginTop="1dp"
             android:drawableStart="@mipmap/ic_user_center3"
-            android:text="@string/about_us"
+            android:text="@string/app_about_us"
             app:layout_constraintTop_toBottomOf="@id/tvPrivacyAgreement"
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvLogout"
-            style="@style/tv_mine_style"
+            style="@style/app_tv_mine_style"
             android:layout_marginTop="1dp"
             android:drawableStart="@mipmap/ic_user_center4"
-            android:text="@string/logout"
+            android:text="@string/app_logout"
             app:layout_constraintTop_toBottomOf="@id/tvAbout"
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvLogoffAccount"
-            style="@style/tv_mine_style"
+            style="@style/app_tv_mine_style"
             android:layout_marginTop="1dp"
             android:drawableStart="@mipmap/ic_user_center5"
-            android:text="@string/logoff_account"
+            android:text="@string/app_logoff_account"
             app:layout_constraintTop_toBottomOf="@id/tvLogout"
             tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
