@@ -10,12 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.agora.entfulldemo.databinding.FragmentHomeIndexBinding;
-import com.agora.entfulldemo.databinding.ItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;
 import com.agora.entfulldemo.home.holder.HomeIndexHolder;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
@@ -26,12 +25,12 @@ import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.utils.UiUtil;
 
-public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndexBinding> {
+public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
 
     @NonNull
     @Override
-    protected FragmentHomeIndexBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentHomeIndexBinding.inflate(inflater);
+    protected AppFragmentHomeIndexBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return AppFragmentHomeIndexBinding.inflate(inflater);
     }
 
     @Override

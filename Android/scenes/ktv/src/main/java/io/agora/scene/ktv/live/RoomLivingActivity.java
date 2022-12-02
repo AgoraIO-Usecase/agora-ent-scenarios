@@ -261,7 +261,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
-                getBinding().tvRoomMCount.setText(getString(R.string.room_count, String.valueOf(count))));
+                getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
 
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
@@ -343,6 +343,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.playerMusicLrcDataLiveData.observe(this, lrcData -> {
+            if (lrcData == null) getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.ktv_no_lrc));
             getBinding().lrcControlView.getLrcView().setLrcData(lrcData);
             getBinding().lrcControlView.getPitchView().setLrcData(lrcData);
         });
@@ -387,21 +388,21 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR
                 || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_yellow);
-            getBinding().tvNetStatus.setText(R.string.net_status_m);
+            getBinding().tvNetStatus.setText(R.string.ktv_net_status_m);
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN
                 || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_VBAD) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
-            getBinding().tvNetStatus.setText(R.string.net_status_low);
+            getBinding().tvNetStatus.setText(R.string.ktv_net_status_low);
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD
                 || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
-            getBinding().tvNetStatus.setText(R.string.net_status_good);
+            getBinding().tvNetStatus.setText(R.string.ktv_net_status_good);
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
-            getBinding().tvNetStatus.setText(R.string.net_status_un_know);
+            getBinding().tvNetStatus.setText(R.string.ktv_net_status_un_know);
         } else {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
-            getBinding().tvNetStatus.setText(R.string.net_status_good);
+            getBinding().tvNetStatus.setText(R.string.ktv_net_status_good);
         }
     }
 
@@ -510,8 +511,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
             int key = entry.getKey();
             String value = entry.getValue();
-            if (key == 2) {
-                value = getString(R.string.song_rank_7);
+            if (key == 0) {
+                value = getString(R.string.ktv_song_rank_7);
+                ret.put(key, value);
+            } else if (key == 3 || key == 4 || key == 6) {
+                ret.put(key, value);
             }
             ret.put(key, value);
         }
