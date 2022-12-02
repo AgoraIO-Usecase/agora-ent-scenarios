@@ -1,8 +1,7 @@
 package io.agora.scene.ktv.service
 
+import android.util.Log
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
-
 
 interface KTVServiceProtocol {
 
@@ -16,7 +15,7 @@ interface KTVServiceProtocol {
         private val instance by lazy {
             // KTVServiceImp()
             KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { ToastUtils.showToast(it) }
+                error?.message?.let { Log.e("SyncManager", it) }
             }
         }
 
