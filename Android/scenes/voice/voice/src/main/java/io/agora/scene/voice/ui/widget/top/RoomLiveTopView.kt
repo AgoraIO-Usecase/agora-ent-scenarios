@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.voice.buddy.tool.*
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.voice.buddy.tool.DeviceTools.number2K
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.voice.common.utils.DeviceTools.number2K
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
-import io.agora.scene.voice.service.VoiceRankUserModel
-import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.ImageTools
 
 class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView {
 

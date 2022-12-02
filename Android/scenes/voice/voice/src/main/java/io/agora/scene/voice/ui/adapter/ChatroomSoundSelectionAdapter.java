@@ -17,11 +17,11 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
 
-import io.agora.scene.voice.bean.CustomerUsageBean;
-import io.agora.scene.voice.bean.SoundSelectionBean;
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.buddy.tool.DeviceTools;
-import io.agora.voice.buddy.tool.ResourcesTools;
+import io.agora.scene.voice.model.CustomerUsageBean;
+import io.agora.scene.voice.model.SoundSelectionBean;
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.ResourcesTools;
 import io.agora.scene.voice.R;
 
 public class ChatroomSoundSelectionAdapter extends RoomBaseRecyclerViewAdapter<SoundSelectionBean> {

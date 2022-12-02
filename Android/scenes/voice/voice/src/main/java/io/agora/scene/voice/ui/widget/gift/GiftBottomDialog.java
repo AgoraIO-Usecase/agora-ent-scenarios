@@ -17,12 +17,12 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.List;
 
 import io.agora.scene.voice.R;
-import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.model.GiftBean;
 import io.agora.scene.voice.databinding.VoiceDialogGiftLayoutBinding;
 import io.agora.scene.voice.databinding.VoicePopGiftLayoutBinding;
-import io.agora.voice.baseui.dialog.BaseSheetDialog;
-import io.agora.voice.baseui.popupwindow.CommonPopupWindow;
-import io.agora.voice.buddy.tool.DeviceTools;
+import io.agora.voice.common.ui.dialog.BaseSheetDialog;
+import io.agora.voice.common.ui.widget.CommonPopupWindow;
+import io.agora.voice.common.utils.DeviceTools;
 
 public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBinding> implements View.OnClickListener {
     private int currentIndex = 0;//当前页面,默认首页

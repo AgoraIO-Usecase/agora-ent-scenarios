@@ -1,6 +1,6 @@
 package io.agora.scene.voice.ui.widget.mic
 
-import io.agora.scene.voice.service.VoiceMicInfoModel
+import io.agora.scene.voice.model.VoiceMicInfoModel
 
 /**
  * @author create by zhangwei03

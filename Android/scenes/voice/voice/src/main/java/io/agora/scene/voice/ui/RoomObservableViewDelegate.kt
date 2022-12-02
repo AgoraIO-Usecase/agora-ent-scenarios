@@ -9,45 +9,45 @@ import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
-import io.agora.scene.voice.annotation.MicClickAction
-import io.agora.scene.voice.annotation.MicStatus
-import io.agora.scene.voice.bean.*
-import io.agora.scene.voice.general.constructor.RoomInfoConstructor
-import io.agora.scene.voice.general.constructor.RoomSoundAudioConstructor
+import io.agora.scene.voice.model.annotation.MicClickAction
+import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.scene.voice.model.*
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.model.constructor.RoomInfoConstructor
+import io.agora.scene.voice.model.constructor.RoomSoundAudioConstructor
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.MsgConstant
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceRoomLivingViewModel
+import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.service.*
-import io.agora.scene.voice.ui.ainoise.RoomAINSSheetDialog
-import io.agora.scene.voice.ui.audiosettings.RoomAudioSettingsSheetDialog
-import io.agora.scene.voice.ui.common.CommonFragmentAlertDialog
-import io.agora.scene.voice.ui.common.CommonSheetAlertDialog
+import io.agora.scene.voice.ui.dialog.RoomAINSSheetDialog
+import io.agora.scene.voice.ui.dialog.RoomAudioSettingsSheetDialog
+import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
+import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.ui.dialog.RoomContributionAndAudienceSheetDialog
 import io.agora.scene.voice.ui.dialog.RoomNoticeSheetDialog
-import io.agora.scene.voice.ui.fragment.ChatroomHandsDialog
-import io.agora.scene.voice.ui.mic.IRoomMicView
-import io.agora.scene.voice.ui.micmanger.RoomMicManagerSheetDialog
-import io.agora.scene.voice.ui.soundselection.RoomSocialChatSheetDialog
-import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionConstructor
-import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionSheetDialog
-import io.agora.scene.voice.ui.spatialaudio.RoomSpatialAudioSheetDialog
+import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
+import io.agora.scene.voice.ui.widget.mic.IRoomMicView
+import io.agora.scene.voice.ui.dialog.RoomMicManagerSheetDialog
+import io.agora.scene.voice.ui.dialog.RoomSocialChatSheetDialog
+import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
+import io.agora.voice.common.net.Resource
+import io.agora.scene.voice.ui.dialog.RoomSoundSelectionSheetDialog
+import io.agora.scene.voice.ui.dialog.RoomSpatialAudioSheetDialog
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
 import io.agora.util.EMLog
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.baseui.interfaces.IParserSource
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.ui.IParserSource
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.GsonTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 
 /**
  * @author create by zhangwei03
@@ -611,7 +611,8 @@ class RoomObservableViewDelegate constructor(
                     putSerializable(RoomMicManagerSheetDialog.KEY_IS_MYSELF, isMyself)
                 }
             }
-            roomMicMangerDialog.onItemClickListener = object : OnItemClickListener<MicManagerBean> {
+            roomMicMangerDialog.onItemClickListener = object :
+                OnItemClickListener<MicManagerBean> {
                 override fun onItemClick(data: MicManagerBean, view: View, position: Int, viewType: Long) {
                     when (data.micClickAction) {
                         MicClickAction.Invite -> {
