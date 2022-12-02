@@ -45,6 +45,8 @@
 @property (nonatomic, assign) int totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) double currentTime;
+
+@property (nonatomic, assign) BOOL isPlayAccompany;
 @end
 
 @implementation VLKTVMVView
@@ -57,6 +59,14 @@
     }
     return self;
 }
+
+#pragma setter
+- (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
+    [self.originBtn setSelected:!isPlayAccompany];
+    [self _refreshOriginButton];
+}
+
+#pragma mark private
 
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
@@ -446,8 +456,7 @@
 
 - (void)reset {
     [_lrcView reset];
-    [self.originBtn setSelected:YES];
-    [self _refreshOriginButton];
+    self.isPlayAccompany = NO;
     [self cleanMusicText];
 }
 
