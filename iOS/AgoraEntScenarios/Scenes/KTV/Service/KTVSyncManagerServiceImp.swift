@@ -118,8 +118,8 @@ private func _hideLoadingIfNeed() {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = 60 * 1000
-        agoraPrint("subscribeRoomWillExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
         guard currentTs - room.createdAt > expiredDuration else { return }
         
         guard let callback = self.roomExpiredDidChanged else {
