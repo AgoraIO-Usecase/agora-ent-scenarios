@@ -217,13 +217,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         if (songPlaying != null && songPlaying.isChorus()) {
             if (UserManager.getInstance().getUser().userNo.equals(songPlaying.getUserNo())) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
-                mBinding.scoreControlView.setText(getContext().getString(R.string.score_formatter, 0.00));
+                mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
             } else {
                 mBinding.scoreControlView.setVisibility(GONE);
             }
         } else if (songPlaying != null && !songPlaying.isChorus()) {
             mBinding.scoreControlView.setVisibility(VISIBLE);
-            mBinding.scoreControlView.setText(getContext().getString(R.string.score_formatter, 0.00));
+            mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
         } else {
             mBinding.scoreControlView.setVisibility(GONE);
         }
@@ -306,7 +306,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void updateScore(double score) {
-        mBinding.scoreControlView.setText(getContext().getString(R.string.score_formatter, score));
+        mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, score));
     }
 
     @Override
