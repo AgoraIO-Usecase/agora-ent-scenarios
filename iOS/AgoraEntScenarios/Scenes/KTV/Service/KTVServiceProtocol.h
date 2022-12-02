@@ -182,7 +182,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
 
 
+/// 订阅网络状态变化
+/// @param changedBlock <#changedBlock description#>
 - (void)subscribeNetworkStatusChangedWithBlock:(void(^)(KTVServiceNetworkStatus))changedBlock;
+
+
+
+/// 订阅房间过期
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeRoomWillExpire:(void(^)(void))changedBlock;
 
 /// 取消全部订阅
 - (void)unsubscribeAll;
