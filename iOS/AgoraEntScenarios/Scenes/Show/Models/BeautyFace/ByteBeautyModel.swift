@@ -28,6 +28,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -126,6 +127,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -172,6 +174,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -252,6 +255,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()

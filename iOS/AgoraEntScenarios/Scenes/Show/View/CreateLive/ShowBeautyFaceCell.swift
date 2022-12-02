@@ -15,14 +15,6 @@ class ShowBeautyFaceCell: UICollectionViewCell {
     // 选中标识
     private var indicatorImgView: UIImageView!
     
-    override var isSelected: Bool {
-        didSet{
-            indicatorImgView.isHidden = !isSelected
-            nameLabel.font = isSelected ? .show_M_12 : .show_R_11
-            nameLabel.textColor = isSelected ? .show_main_text : .show_beauty_deselect
-        }
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         createSubviews()
@@ -35,6 +27,9 @@ class ShowBeautyFaceCell: UICollectionViewCell {
     func setupModel(model: ByteBeautyModel) {
         nameLabel.text = model.name
         imageView.image = UIImage.show_byteBeautyImage(name: model.icon)
+        indicatorImgView.isHidden = !model.isSelected
+        nameLabel.font = model.isSelected ? .show_M_12 : .show_R_11
+        nameLabel.textColor = model.isSelected ? .show_main_text : .show_beauty_deselect
     }
     
     private func createSubviews(){
