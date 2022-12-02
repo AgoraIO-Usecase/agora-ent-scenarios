@@ -41,7 +41,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongRefreshing(@NonNull SongDialog dialog, int index) {
         // 点歌-列表刷新
-        mCurrPage = 0;
+        mCurrPage = 1;
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.getSongList(getSongType(index), mCurrPage),
                 list -> {

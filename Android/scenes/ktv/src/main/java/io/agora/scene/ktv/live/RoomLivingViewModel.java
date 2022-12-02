@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.live;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -46,6 +47,7 @@ import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
+import io.agora.rtc2.video.ContentInspectConfig;
 import io.agora.rtc2.video.VideoCanvas;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
@@ -68,7 +70,6 @@ import io.agora.scene.ktv.service.RoomSelSongModel;
 import io.agora.scene.ktv.service.UpdateSingingScoreInputModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
-import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -77,7 +78,7 @@ public class RoomLivingViewModel extends ViewModel {
     private final String TAG = "KTV Scene LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
 
-    // loading dilaog
+    // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
     final LiveData<Boolean> loadingDialogVisible = _loadingDialogVisible;
 
@@ -104,7 +105,7 @@ public class RoomLivingViewModel extends ViewModel {
     /**
      * Player/RTC信息
      */
-    int streamId;
+    int streamId = 0;
     boolean mpkNeedStopped = false;
     boolean mccNeedPreload = false;
     enum PlayerMusicStatus {
@@ -123,7 +124,6 @@ public class RoomLivingViewModel extends ViewModel {
     final MutableLiveData<String> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicPlayPositionChangeLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
-
     final MutableLiveData<Double> playerPitchLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
@@ -168,6 +168,8 @@ public class RoomLivingViewModel extends ViewModel {
 
     public void init() {
         if (isRoomOwner()) {
+            // 房主开启倒计时，默认为在麦上状态
+            startExitRoomTimer();
             isOnSeat = true;
         }
         initRTCPlayer();
@@ -196,6 +198,7 @@ public class RoomLivingViewModel extends ViewModel {
             RtcEngineEx.destroy();
             mRtcEngine = null;
         }
+        mCountDownLatch = null;
     }
 
     // ======================= 房间相关 =======================
@@ -257,6 +260,25 @@ public class RoomLivingViewModel extends ViewModel {
             }
             return null;
         });
+    }
+
+    /**
+     * 房主退出房间倒计时（20分钟）
+     */
+    private CountDownTimer mCountDownLatch;
+    public void startExitRoomTimer() {
+        if (mCountDownLatch != null) mCountDownLatch.cancel();
+        mCountDownLatch = new CountDownTimer(20 * 60 * 1000, 20 * 60 * 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                ToastUtils.showToast("体验时间已耗尽，自动离开房间");
+                exitRoom();
+            }
+        }.start();
     }
 
     /**
@@ -379,6 +401,35 @@ public class RoomLivingViewModel extends ViewModel {
             }
             return null;
         });
+    }
+
+    private Thread mReLinkThread;
+    public void getSeatStatus() {
+        mReLinkThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //TODO: workaround 网络重连后等待3s刷新麦位状态， SYNC中添加回调后修改
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "getSeatStatusList: call");
+                ktvServiceProtocol.getSeatStatusList((e, data) -> {
+                    if (e == null && data != null) {
+                        Log.d(TAG, "getSeatStatusList: return" + data);
+                        seatListLiveData.setValue(data);
+                        try {
+                            mReLinkThread.join();
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    return null;
+                });
+            }
+        });
+        mReLinkThread.start();
     }
 
     /**
@@ -926,16 +977,13 @@ public class RoomLivingViewModel extends ViewModel {
         if (TextUtils.isEmpty(BuildConfig.AGORA_APP_ID)) {
             throw new NullPointerException("please check \"strings_config.xml\"");
         }
-        if (mRtcEngine != null) {
-            return;
-        }
+        if (mRtcEngine != null) return;
 
         // ------------------ 初始化RTC ------------------
         RtcEngineConfig config = new RtcEngineConfig();
         config.mContext = AgoraApplication.the();
         config.mAppId = BuildConfig.AGORA_APP_ID;
         config.mEventHandler = new IRtcEngineEventHandler() {
-
             @Override
             public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
                 Log.d(TAG, "onJoinChannelSuccess() called, channel: " + channel + " uid: " + uid);
@@ -996,8 +1044,7 @@ public class RoomLivingViewModel extends ViewModel {
                 if (Objects.equals(songPlaying.getUserNo(), UserManager.getInstance().getUser().userNo)
                         || Objects.equals(songPlaying.getChorusNo(), UserManager.getInstance().getUser().userNo)) {
                     for (AudioVolumeInfo info : speakers) {
-                        if (info.uid == 0) {
-                            //Log.d(TAG, "onAudioVolumeIndication uid=0, voicePitch=" + info.voicePitch);
+                        if (info.uid == 0 && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
                             ktvServiceProtocol.updateSingingScore(new UpdateSingingScoreInputModel(info.voicePitch));
                         }
                     }
@@ -1006,10 +1053,21 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void onNetworkQuality(int uid, int txQuality, int rxQuality) {
-                // 网络状态回调
-                if (uid == 0) { //本地user uid = 0
+                // 网络状态回调, 本地user uid = 0
+                if (uid == 0) {
                     networkStatusLiveData.postValue(new NetWorkEvent(txQuality, rxQuality));
                 }
+            }
+
+            @Override
+            public void onRejoinChannelSuccess(String channel, int uid, int elapsed) {
+                // 断网重连操作，断网重连后刷新麦位状态
+                getSeatStatus();
+            }
+
+            @Override
+            public void onContentInspectResult(int result) {
+
             }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
@@ -1018,7 +1076,7 @@ public class RoomLivingViewModel extends ViewModel {
             mRtcEngine = (RtcEngineEx) RtcEngine.create(config);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "RtcEngine.create() called error: " + e.toString());
+            Log.e(TAG, "RtcEngine.create() called error: " + e);
         }
         mRtcEngine.loadExtensionProvider("agora_drm_loader");
 
@@ -1044,6 +1102,17 @@ public class RoomLivingViewModel extends ViewModel {
             Log.e(TAG, "joinRTC() called error: " + ret);
         }
 
+        // ------------------ 开启鉴黄服务 ------------------
+        ContentInspectConfig contentInspectConfig = new ContentInspectConfig();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
+            contentInspectConfig.extraInfo = jsonObject.toString();
+            mRtcEngine.enableContentInspect(true, contentInspectConfig);
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+        }
+
         // ------------------ 初始化内容中心 ------------------
         MusicContentCenterConfiguration contentCenterConfiguration
                 = new MusicContentCenterConfiguration();
@@ -1055,8 +1124,8 @@ public class RoomLivingViewModel extends ViewModel {
         iAgoraMusicContentCenter.registerEventHandler(new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
+                Log.d(TAG, "onPreLoadEvent percent = " + percent + " status = " + status);
                 if (percent == 100) {
-                    Log.d(TAG, "onPreLoadEvent percent = " + percent + " status = " + status);
                     if (mccNeedPreload && mPlayer != null) {
                         mccNeedPreload = false;
                         mPlayer.open(songCode, 0);
@@ -1144,7 +1213,6 @@ public class RoomLivingViewModel extends ViewModel {
             public void onPositionChanged(long position_ms) {
                 // 本端获取播放位置，用于歌词播放
                 // Workaround, delay emit for 350ms
-
                 mExecutor.schedule(new Runnable() {
                     @Override
                     public void run() {
@@ -1726,7 +1794,6 @@ public class RoomLivingViewModel extends ViewModel {
 
             @Override
             public void run() {
-                //mLogger.i("startSyncLrc: " + lrcId);
                 mStopSyncLrc = false;
                 while (!mStopSyncLrc /*&& playerMusicStatusLiveData.getValue() >= PlayerMusicStatus.ON_PLAYING*/) {
                     if (mPlayer == null) {
