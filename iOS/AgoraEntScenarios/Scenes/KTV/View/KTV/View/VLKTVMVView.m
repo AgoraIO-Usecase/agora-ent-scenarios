@@ -441,7 +441,10 @@
 }
 
 - (void)reset {
+    [_lrcView stop];
     [_lrcView reset];
+    [_lrcView resetTime];
+    [self cleanMusicText];
 }
 
 - (void)resetTime {

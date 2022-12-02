@@ -96,8 +96,6 @@ typedef enum : NSUInteger {
 - (void)stop;
 /// 重置歌词界面
 - (void)reset;
-/// 重置歌词时间
-- (void)resetTime;
 ///滚动到指定位置
 - (void)scrollToTime:(NSTimeInterval)time;
 
