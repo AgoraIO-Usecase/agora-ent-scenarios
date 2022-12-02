@@ -24,15 +24,15 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
-import io.agora.scene.voice.service.VoiceBuddyFactory;
-import io.agora.scene.voice.service.VoiceGiftModel;
-import io.agora.scene.voice.service.VoiceMemberModel;
-import io.agora.scene.voice.service.VoiceMicInfoModel;
-import io.agora.scene.voice.service.VoiceRankUserModel;
-import io.agora.scene.voice.service.VoiceRoomInfo;
-import io.agora.scene.voice.service.VoiceRoomModel;
+import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.model.VoiceGiftModel;
+import io.agora.scene.voice.model.VoiceMemberModel;
+import io.agora.scene.voice.model.VoiceMicInfoModel;
+import io.agora.scene.voice.model.VoiceRankUserModel;
+import io.agora.scene.voice.model.VoiceRoomInfo;
+import io.agora.scene.voice.model.VoiceRoomModel;
 import io.agora.util.EMLog;
-import io.agora.voice.buddy.tool.LogTools;
+import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;

@@ -40,8 +40,8 @@ import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
-import io.agora.voice.buddy.tool.DeviceTools;
-import io.agora.voice.buddy.tool.ThreadManager;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 

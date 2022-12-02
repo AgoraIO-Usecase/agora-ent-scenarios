@@ -10,8 +10,8 @@ import com.google.android.material.textview.MaterialTextView;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.agora.scene.voice.service.VoiceMemberModel;
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.scene.voice.model.VoiceMemberModel;
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
 import io.agora.scene.voice.R;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {

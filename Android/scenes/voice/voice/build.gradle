@@ -63,9 +63,8 @@ android {
 
 dependencies {
     implementation project(":common:base")
+    implementation project(':scenes:voice:common')
 
-    implementation project(":scenes:voice:baseui")
-    implementation project(":scenes:voice:buddy")
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
