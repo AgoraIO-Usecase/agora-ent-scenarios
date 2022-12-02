@@ -1,7 +1,7 @@
 package io.agora.scene.voice.ui.widget.gift
 
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.scene.voice.bean.GiftBean
+import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.scene.voice.model.GiftBean
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
@@ -11,10 +11,11 @@ import android.graphics.drawable.GradientDrawable
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import io.agora.scene.voice.databinding.VoiceFragmentGiftListLayoutBinding
-import io.agora.voice.baseui.interfaces.OnItemClickListener
-import io.agora.voice.buddy.tool.DeviceTools
+import io.agora.voice.common.ui.adapter.listener.OnAdapterItemClickListener
+import io.agora.voice.common.utils.DeviceTools
 
-class LiveGiftListFragment : BaseUiFragment<VoiceFragmentGiftListLayoutBinding>(), OnItemClickListener {
+class LiveGiftListFragment : BaseUiFragment<VoiceFragmentGiftListLayoutBinding>(),
+    OnAdapterItemClickListener {
     private var adapter: GiftListAdapter? = null
     private var giftBean: GiftBean? = null
     private var listener: OnConfirmClickListener? = null

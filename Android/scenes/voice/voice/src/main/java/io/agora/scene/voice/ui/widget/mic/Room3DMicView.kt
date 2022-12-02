@@ -7,11 +7,11 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.agora.scene.voice.databinding.VoiceViewRoom3dMicBinding
-import io.agora.voice.buddy.config.ConfigConstants
+import io.agora.voice.common.constant.ConfigConstants
 import io.agora.scene.voice.R
-import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.annotation.MicStatus
-import io.agora.voice.buddy.tool.ImageTools
+import io.agora.scene.voice.model.VoiceMicInfoModel
+import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.voice.common.utils.ImageTools
 
 /**
  * @author create by zhangwei03

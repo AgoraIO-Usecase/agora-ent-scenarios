@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import io.agora.CallBack;
 import io.agora.MessageListener;
@@ -20,12 +19,10 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
-import io.agora.scene.voice.service.VoiceBuddyFactory;
-import io.agora.scene.voice.service.VoiceGiftModel;
-import io.agora.scene.voice.service.VoiceMemberModel;
-import io.agora.scene.voice.service.VoiceRoomApply;
-import io.agora.util.EMLog;
-import io.agora.voice.buddy.tool.GsonTools;
+import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.model.VoiceMemberModel;
+import io.agora.scene.voice.model.VoiceRoomApply;
+import io.agora.voice.common.utils.GsonTools;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。

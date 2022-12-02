@@ -11,15 +11,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
-import io.agora.scene.voice.model.VoiceUserListViewModel
-import io.agora.scene.voice.service.VoiceMemberModel
+import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
+import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ToastTools
+import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
+import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.ToastTools
 
 class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomInviteAdapter.onActionListener {

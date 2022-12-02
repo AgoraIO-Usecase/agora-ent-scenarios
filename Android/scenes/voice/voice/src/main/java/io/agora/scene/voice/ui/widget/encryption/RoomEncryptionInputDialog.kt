@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import io.agora.voice.baseui.dialog.BaseFragmentDialog
+import io.agora.voice.common.ui.dialog.BaseFragmentDialog
 import io.agora.scene.voice.databinding.VoiceDialogEncryptionBinding
 
 /**

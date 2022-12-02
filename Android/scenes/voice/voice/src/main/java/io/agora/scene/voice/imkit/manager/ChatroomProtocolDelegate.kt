@@ -5,18 +5,19 @@ import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
-import io.agora.scene.voice.annotation.MicClickAction
-import io.agora.scene.voice.annotation.MicStatus
+import io.agora.scene.voice.model.annotation.MicClickAction
+import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
-import io.agora.scene.voice.service.*
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.GsonTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.LogTools.logE
-import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.scene.voice.model.*
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.GsonTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 
 class ChatroomProtocolDelegate constructor(
     private val roomId: String
@@ -69,7 +70,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 获取详情，kv 组装
      */
-    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel,callback: ValueCallBack<VoiceRoomInfo>){
+    fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, callback: ValueCallBack<VoiceRoomInfo>){
         val keyList: MutableList<String> =
             mutableListOf("ranking_list", "member_list", "gift_amount", "robot_volume", "use_robot")
         for (i in 0..7) {
@@ -497,7 +498,7 @@ class ChatroomProtocolDelegate constructor(
      * 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲 5:机器人专属激活状态 -2:机器人专属关闭状态
      */
     private fun updateMicByResult(member: VoiceMemberModel? = null,
-        micIndex: Int, @MicClickAction clickAction: Int, isForced: Boolean, callback: ValueCallBack<VoiceMicInfoModel>
+                                  micIndex: Int, @MicClickAction clickAction: Int, isForced: Boolean, callback: ValueCallBack<VoiceMicInfoModel>
     ) {
         val voiceMicInfo = getMicInfo(micIndex) ?: return
         updateMicStatusByAction(voiceMicInfo, clickAction, member)
@@ -541,7 +542,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 根据麦位原状态与action 更新麦位状态
      */
-    private fun updateMicStatusByAction(micInfo: VoiceMicInfoModel, @MicClickAction action: Int,memberBean:VoiceMemberModel? = null) {
+    private fun updateMicStatusByAction(micInfo: VoiceMicInfoModel, @MicClickAction action: Int, memberBean: VoiceMemberModel? = null) {
         when (action) {
             MicClickAction.ForbidMic -> {
                 // 禁言（房主操作）
@@ -633,7 +634,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 更新榜单
      */
-    fun updateRankList(chatUid:String,giftBean: VoiceGiftModel,callback: CallBack){
+    fun updateRankList(chatUid:String, giftBean: VoiceGiftModel, callback: CallBack){
         //首先拿到所有的数据
         val rankMap = ChatroomCacheManager.cacheManager.getRankMap()
         //创建一个新列表
@@ -754,7 +755,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 获取当前用户实体信息
      */
-     fun getMySelfModel():VoiceMemberModel{
+     fun getMySelfModel(): VoiceMemberModel {
         var micIndex : Int = -1
         if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
             micIndex = 0
@@ -773,7 +774,7 @@ class ChatroomProtocolDelegate constructor(
     /**
      * 向成员列表中添加自己(每个新加入房间的人需要调用一次)
      */
-    fun addMemberListBySelf(memberList:List<VoiceMemberModel>,callback: ValueCallBack<List<VoiceMemberModel>>){
+    fun addMemberListBySelf(memberList:List<VoiceMemberModel>, callback: ValueCallBack<List<VoiceMemberModel>>){
         val newMemberList = memberList.toMutableList()
         newMemberList.add(getMySelfModel())
         val member = GsonTools.beanToString(memberList)

@@ -19,36 +19,36 @@ import io.agora.CallBack
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 import io.agora.chat.ChatClient
 import io.agora.chat.adapter.EMAChatRoomManagerListener
 import io.agora.scene.voice.R
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.scene.voice.model.RoomKitBean
+import io.agora.voice.common.utils.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
-import io.agora.scene.voice.general.constructor.RoomInfoConstructor.convertByVoiceRoomModel
+import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.imkit.manager.ChatroomListener
-import io.agora.scene.voice.model.VoiceRoomLivingViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceMicInfoModel
-import io.agora.scene.voice.service.VoiceRoomInfo
-import io.agora.scene.voice.service.VoiceRoomModel
+import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.model.VoiceMicInfoModel
+import io.agora.scene.voice.model.VoiceRoomInfo
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.voice.common.net.Resource
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
 import io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.LogTools.logD
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.LogTools.logD
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
@@ -209,12 +209,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 )
             binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom2dMicLayout.onItemClickListener(
-                object : OnItemClickListener<VoiceMicInfoModel> {
+                object :
+                    OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
                         roomObservableDelegate.onUserMicClick(data)
                     }
                 },
-                object : OnItemClickListener<VoiceMicInfoModel> {
+                object :
+                    OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
                         roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
                     }
@@ -235,12 +237,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 )
             binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom3dMicLayout.onItemClickListener(
-                object : OnItemClickListener<VoiceMicInfoModel> {
+                object :
+                    OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
                         roomObservableDelegate.onUserMicClick(data)
                     }
                 },
-                object : OnItemClickListener<VoiceMicInfoModel> {
+                object :
+                    OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
                         roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
                     }

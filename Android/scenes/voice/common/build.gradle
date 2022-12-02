@@ -1,0 +1,19 @@
+apply from: '../voice.gradle'
+
+android {
+
+}
+
+dependencies {
+    api rootProject.ext.deps.core_ktx
+    api rootProject.ext.deps.lifecycle
+    api rootProject.ext.deps.appcompat
+    api rootProject.ext.deps.constraintlayout
+    api rootProject.ext.deps.recyclerview
+    api rootProject.ext.deps.material
+    api rootProject.ext.deps.databinding_runtime
+    api rootProject.ext.deps.gson
+    // glide
+    kapt rootProject.ext.deps.glide_compiler
+    api rootProject.ext.deps.glide
+}

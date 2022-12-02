@@ -5,15 +5,15 @@ import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
-import io.agora.scene.voice.bean.SoundAudioBean
-import io.agora.scene.voice.general.net.VRValueCallBack
+import io.agora.scene.voice.model.SoundAudioBean
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.LogTools.logE
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
 
 /**
  * @author create by zhangwei03
@@ -24,6 +24,8 @@ class AgoraRtcEngineController {
 
         @JvmStatic
         fun get() = InstanceHelper.sSingle
+
+        private const val TAG = "AgoraRtcEngineController"
     }
 
     object InstanceHelper {
@@ -65,12 +67,12 @@ class AgoraRtcEngineController {
 
                 override fun onError(err: Int) {
                     super.onError(err)
-                    "voice rtc onError code:$err".logE()
+                    "voice rtc onError code:$err".logE(TAG)
                 }
 
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD()
+                    "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
                     // 默认开启降噪
                     deNoise(VoiceBuddyFactory.get().rtcChannelTemp.anisMode)
                     joinCallback?.onSuccess(true)
@@ -112,7 +114,7 @@ class AgoraRtcEngineController {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
             } catch (e: Exception) {
                 e.printStackTrace()
-                "voice rtc engine init error:${e.message}".logE()
+                "voice rtc engine init error:${e.message}".logE(TAG)
                 return false
             }
             return true
@@ -120,7 +122,7 @@ class AgoraRtcEngineController {
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
-        "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid".logE()
+        "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid".logD(TAG)
         if (channelId.isEmpty() || rtcUid < 0) {
             joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
             return false
@@ -245,6 +247,7 @@ class AgoraRtcEngineController {
      * @param speakerType 模拟哪个机器人
      */
     fun playMusic(soundId: Int, audioUrl: String, speakerType: Int) {
+        "playMusic soundId:$soundId".logD(TAG)
         resetMediaPlayer()
         openMediaPlayer(audioUrl, speakerType)
     }

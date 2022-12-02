@@ -10,7 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.List;
 
-import io.agora.scene.voice.bean.GiftBean;
+import io.agora.scene.voice.model.GiftBean;
 
 public class GiftFragmentAdapter extends FragmentStateAdapter {
     private OnVpFragmentItemListener listener;
