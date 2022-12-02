@@ -71,6 +71,7 @@ public class RethinkSyncManager: NSObject {
         appId = config.appId
         reConnect(isRemove: true)
         completeBlock = complete
+        complete?(0)
         NotificationCenter.default.addObserver(self, selector: #selector(enterForegroundNotification),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
@@ -223,7 +224,6 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             connectStateBlock?(SocketConnectState(rawValue: webSocket.readyState.rawValue) ?? .closed)
         }
         state = webSocket.readyState
-        connectStateBlock?(.closed)
         if let complete = completeBlock {
             complete(state == .OPEN ? 0 : -1)
             completeBlock = nil

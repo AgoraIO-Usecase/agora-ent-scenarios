@@ -66,18 +66,7 @@ private func _hideLoadingIfNeed() {
     
     private var publishScore: Double?
 
-    private var roomNo: String? {
-        didSet {
-            if oldValue == roomNo {
-                return
-            }
-            guard let _ = roomNo else {
-                return
-            }
-
-            syncUtilsInited = false
-        }
-    }
+    private var roomNo: String?
     
     private var room: VLRoomListModel? {
         return self.roomList?.filter({ $0.roomNo == self.roomNo }).first
@@ -135,12 +124,6 @@ private func _hideLoadingIfNeed() {
         }
 
         SyncUtil.initSyncManager(sceneId: kSceneId) {
-//            guard let self = self else {
-//                return
-//            }
-//            self.syncUtilsInited = true
-//
-//            completion()
         }
         
         SyncUtil.subscribeConnectState { [weak self] (state) in
@@ -148,6 +131,7 @@ private func _hideLoadingIfNeed() {
                 return
             }
             
+            agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
             self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard state == .open else { return }
             guard !self.syncUtilsInited else {
@@ -157,8 +141,8 @@ private func _hideLoadingIfNeed() {
                 }
                 return
             }
+            
             self.syncUtilsInited = true
-
             completion()
         }
     }
@@ -883,7 +867,10 @@ extension KTVSyncManagerServiceImp {
     }
     
     private func _seatListReloadIfNeed() {
-        guard let _ = roomNo else {return}
+        guard let _ = roomNo else {
+            agoraPrint("_seatListReloadIfNeed break")
+            return
+        }
         _getSeatInfo {[weak self] (error, seatList) in
             guard let self = self,
                     error == nil,
