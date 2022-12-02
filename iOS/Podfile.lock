@@ -371,7 +371,7 @@ DEPENDENCIES:
   - AFNetworking (~> 4.0.1)
   - Agora-Scene-Utils (~> 1.0.8)
   - Agora_Chat_iOS
-  - AgoraLyricsScore (~> 1.0.8.5)
+  - AgoraLyricsScore (from `https://github.com/AgoraIO-Community/LrcView-iOS.git`, branch `feature/voicePitch`)
   - AgoraRtcEngine_Special_iOS (= 4.0.1.2)
   - AgoraRtm_iOS
   - Bugly
@@ -407,7 +407,6 @@ SPEC REPOS:
     - AFNetworking
     - Agora-Scene-Utils
     - Agora_Chat_iOS
-    - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - Bugly
@@ -441,6 +440,16 @@ SPEC REPOS:
     - YYText
     - Zip
     - ZSwiftBaseLib
+
+EXTERNAL SOURCES:
+  AgoraLyricsScore:
+    :branch: feature/voicePitch
+    :git: https://github.com/AgoraIO-Community/LrcView-iOS.git
+
+CHECKOUT OPTIONS:
+  AgoraLyricsScore:
+    :commit: 4b8a78ccfe356a4da1ea842197220d892fbf1c0c
+    :git: https://github.com/AgoraIO-Community/LrcView-iOS.git
 
 SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
@@ -481,6 +490,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: aae8d5bd25c2638c683b5594171faa8cc3637be2
+PODFILE CHECKSUM: 9ef23f3f594b969075d09fbd6d37fea0d28cdf13
 
 COCOAPODS: 1.11.3
