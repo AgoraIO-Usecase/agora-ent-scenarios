@@ -552,7 +552,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
             settingMenuVC.type = .pking
-            settingMenuVC.menuTitle = "互动连麦"
+            settingMenuVC.menuTitle = "show_setting_menu_on_pk_title".show_localized
         }
         present(settingMenuVC, animated: true)
     }

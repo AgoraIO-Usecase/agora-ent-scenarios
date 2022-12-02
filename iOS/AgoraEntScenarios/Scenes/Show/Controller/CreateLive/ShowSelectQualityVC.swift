@@ -68,7 +68,7 @@ class ShowSelectQualityVC: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
-        modalTransitionStyle = .crossDissolve
+//        modalTransitionStyle = .crossDissolve
     }
     
     required init?(coder: NSCoder) {

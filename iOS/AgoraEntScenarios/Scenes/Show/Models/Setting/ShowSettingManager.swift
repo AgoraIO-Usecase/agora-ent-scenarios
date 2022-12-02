@@ -86,7 +86,6 @@ class ShowSettingManager {
             switch mode {
             case .signle:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: true, videoSize: ._1280x720)
-//                setCaptureVideoDimensions(CGSize(width: 720, height: 1280))
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
             }
@@ -95,13 +94,19 @@ class ShowSettingManager {
             switch mode {
             case .signle:
                 _presetValuesWith(dimensions: ._1280x720, fps: .fps15, bitRate: 1800, h265On: true, videoSize: ._1280x720)
-//                setCaptureVideoDimensions(CGSize(width: 1080, height: 1920))
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
             }
             
             break
         case .show_high:
+            
+            switch mode {
+            case .signle:
+                _presetValuesWith(dimensions: ._1280x720, fps: .fps15, bitRate: 1800, h265On: true, videoSize: ._1280x720)
+            case .pk:
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
+            }
             
             break
         }

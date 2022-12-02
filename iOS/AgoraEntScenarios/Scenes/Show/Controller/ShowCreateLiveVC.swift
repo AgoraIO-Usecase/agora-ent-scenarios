@@ -15,6 +15,8 @@ class ShowCreateLiveVC: UIViewController {
     
     private var selectedResolution = 1
     
+//    let transDelegate = ShowPresentTransitioningDelegate()
+    
     private let agoraKitManager = ShowAgoraKitManager()
         
     private lazy var beautyVC = ShowBeautySettingVC()
@@ -66,6 +68,7 @@ class ShowCreateLiveVC: UIViewController {
             make.edges.equalToSuperview()
         }
         
+//        beautyVC.transitioningDelegate = transDelegate
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
@@ -127,6 +130,11 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickStartBtnAction() {
         guard let roomName = createView.roomName, roomName.count > 0 else {
             ToastView.show(text: "create_room_name_can_not_empty".show_localized)
+            return
+        }
+        
+        guard  let roomName = createView.roomName, roomName.count <= 16 else {
+            ToastView.show(text: "create_room_name_too_long".show_localized)
             return
         }
         
