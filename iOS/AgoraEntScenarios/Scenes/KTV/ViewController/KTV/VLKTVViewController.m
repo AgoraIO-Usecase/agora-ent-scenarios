@@ -347,6 +347,11 @@ VLPopScoreViewDelegate
         
         [weakSelf _fetchServiceAllData];
     }];
+    
+    [[AppContext ktvServiceImp] subscribeRoomWillExpire:^{
+        [VLToast toast:@"room expired"];
+        [weakSelf leaveRoom];
+    }];
 }
 
 #pragma mark view helpers

@@ -62,6 +62,7 @@ private func _hideLoadingIfNeed() {
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
     private var singingScoreDidChanged: ((Double) -> Void)?
     private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
+    private var roomExpiredDidChanged: (() -> Void)?
     
     private var publishScore: Double?
 
@@ -76,6 +77,10 @@ private func _hideLoadingIfNeed() {
 
             syncUtilsInited = false
         }
+    }
+    
+    private var room: VLRoomListModel? {
+        return self.roomList?.filter({ $0.roomNo == self.roomNo }).first
     }
 
     private var syncUtilsInited: Bool = false
@@ -99,6 +104,28 @@ private func _hideLoadingIfNeed() {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+        
+        userListCountDidChanged = nil
+        seatListDidChanged = nil
+        roomStatusDidChanged = nil
+        chooseSongDidChanged = nil
+        singingScoreDidChanged = nil
+        networkDidChanged = nil
+        roomExpiredDidChanged = nil
+    }
+    
+    private func _checkRoomExpire() {
+        guard let room = self.room else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 60 * 1000
+        agoraPrint("subscribeRoomWillExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        guard currentTs - room.createdAt > expiredDuration else { return }
+        
+        guard let callback = self.roomExpiredDidChanged else {
+            return
+        }
+        callback()
     }
 
     private func initScene(completion: @escaping () -> Void) {
@@ -523,6 +550,22 @@ private func _hideLoadingIfNeed() {
         networkDidChanged = changedBlock
     }
     
+    func subscribeRoomWillExpire(_ changedBlock: @escaping () -> Void) {
+        roomExpiredDidChanged = changedBlock
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomExpiredDidChanged == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
+    }
+    
     func unsubscribeAll() {
         _unsubscribeAll()
     }
@@ -678,7 +721,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
         guard let objectId = userList.filter({ $0.userNo == VLUserCenter.user.userNo }).first?.objectId else {
-            agoraAssert("_removeUser objectId = nil")
+//            agoraAssert("_removeUser objectId = nil")
             return
         }
         agoraPrint("imp user delete... [\(objectId)]")
