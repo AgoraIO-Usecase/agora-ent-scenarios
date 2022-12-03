@@ -16,7 +16,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 @interface KTVSoloController ()<
     AgoraRtcMediaPlayerDelegate,
-    AgoraLrcDownloadDelegate,
     AgoraMusicContentCenterEventDelegate
 >
 
@@ -54,6 +53,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 -(void)dealloc
 {
+    [self cancelAsyncTasks];
     [[AppContext shared] unregisterEventDelegate:self];
     [[AppContext shared] unregisterPlayerEventDelegate:self];
 }
@@ -67,6 +67,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         if(state == KTVLoadSongStateOK) {
             return block(songCode, [self cachedLyricUrl:songCode], role, state);
         } else if(state == KTVLoadSongStateInProgress) {
+            //overwrite callback
+            //TODO
             return;
         }
     }
@@ -80,7 +82,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                 [weakSelf.loadDict removeObjectForKey:[weakSelf songCodeString:songCode]];
                 return block(songCode, nil, role, KTVLoadSongStateNoLyricUrl);
             }
-
+            [weakSelf.lyricUrlDict setObject:lyricUrl forKey:[self songCodeString:songCode]];
             [weakSelf loadMusic:songCode withCallback:^(AgoraMusicContentCenterPreloadStatus status){
                 if (status != AgoraMusicContentCenterPreloadStatusOK) {
                     [weakSelf.loadDict removeObjectForKey:[weakSelf songCodeString:songCode]];
@@ -96,6 +98,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                 [weakSelf.loadDict removeObjectForKey:[weakSelf songCodeString:songCode]];
                 return block(songCode, nil, role, KTVLoadSongStateNoLyricUrl);
             }
+            [weakSelf.lyricUrlDict setObject:lyricUrl forKey:[self songCodeString:songCode]];
             [weakSelf.loadDict setObject:[NSNumber numberWithInt:KTVLoadSongStateOK] forKey:[weakSelf songCodeString:songCode]];
             return block(songCode, lyricUrl, role, KTVLoadSongStateOK);
         }];
@@ -122,12 +125,32 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     }
 }
 
+-(void)resumePlay
+{
+    [self.rtcMediaPlayer resume];
+}
+
+-(void)pausePlay
+{
+    [self.rtcMediaPlayer pause];
+}
+
+-(void)stopSong
+{
+    [self.rtcMediaPlayer stop];
+    self.openedSongCode = -1;
+    [self cancelAsyncTasks];
+}
+
 #pragma mark - AgoraRtcMediaPlayerDelegate
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
         [playerKit play];
-    } else if (state == AgoraMediaPlayerStatePlaying) {
+    } else if (state == AgoraMediaPlayerStatePlaying
+               || state == AgoraMediaPlayerStatePaused
+               || state == AgoraMediaPlayerStateStopped
+               || state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
         [self.delegate controller:self song:self.openedSongCode didChangedToState:state];
     }
 }
@@ -178,6 +201,12 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 }
 
 #pragma private apis
+- (void)cancelAsyncTasks
+{
+    [self.lyricCallbacks removeAllObjects];
+    [self.musicCallbacks removeAllObjects];
+}
+
 - (NSString*)cachedLyricUrl:(NSInteger)songCode
 {
     return [self.lyricUrlDict objectForKey:[self songCodeString:songCode]];

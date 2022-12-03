@@ -16,8 +16,7 @@ typedef enum : NSUInteger {
     VLKTVMVViewActionTypeMVPause,   // parse
     VLKTVMVViewActionTypeMVNext,     // 播放下一首
     VLKTVMVViewActionTypeSingOrigin, //原唱
-    VLKTVMVViewActionTypeSingAcc,   // 伴奏
-    VLKTVMVViewActionTypeExit
+    VLKTVMVViewActionTypeSingAcc   // 伴奏
     
 } VLKTVMVViewActionType;
 
