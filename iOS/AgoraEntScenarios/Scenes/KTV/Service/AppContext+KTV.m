@@ -154,4 +154,11 @@ NSString* kAgoraMpkWeakTableKey = @"AgoraMpkWeakTableKey";
         [obj AgoraRtcMediaPlayer:playerKit didChangedToState:state error:error];
     }];
 }
+
+-(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
+{
+    [[self mpkDelegateArray] enumerateObjectsUsingBlock:^(id<AgoraRtcMediaPlayerDelegate>  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj AgoraRtcMediaPlayer:playerKit didChangedToPosition:position];
+    }];
+}
 @end
