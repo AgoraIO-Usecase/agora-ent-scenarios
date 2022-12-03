@@ -35,6 +35,9 @@ typedef enum : NSUInteger {
 -(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer delegate:(id<KTVSoloControllerDelegate>)delegate;
 -(void)loadSong:(NSInteger)songCode asRole:(KTVSingRole)role withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
 -(void)playSong:(NSInteger)songCode asRole:(KTVSingRole)role;
+-(void)stopSong;
+-(void)resumePlay;
+-(void)pausePlay;
 @end
 
 NS_ASSUME_NONNULL_END

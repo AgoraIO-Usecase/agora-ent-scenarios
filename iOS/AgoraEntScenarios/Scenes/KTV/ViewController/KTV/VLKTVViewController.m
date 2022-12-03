@@ -62,7 +62,6 @@ VLBadNetWorkViewDelegate,
 AgoraLrcViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
-AgoraMusicContentCenterEventDelegate,
 VLPopScoreViewDelegate,
 KTVSoloControllerDelegate
 >
@@ -90,9 +89,7 @@ KTVSoloControllerDelegate
 
 @property (nonatomic, strong) AgoraRtcConnection *mediaPlayerConnection;
 @property (nonatomic, strong) NSString *mutedRemoteUserId;
-@property (nonatomic, strong) NSString *currentPlayingSongNo;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
-@property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
@@ -115,6 +112,7 @@ KTVSoloControllerDelegate
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.blackColor;
+    self.lyricCallbacks = [NSMutableDictionary dictionary];
 
     [self subscribeServiceEvent];
     
@@ -168,11 +166,7 @@ KTVSoloControllerDelegate
     
     
     //请求已点歌曲
-    VL(weakSelf);
-    [self refreshChoosedSongList:^{
-        //请求歌词和歌曲
-        [weakSelf loadAndPlaySong];
-    }];
+    [self refreshChoosedSongList:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -200,7 +194,6 @@ KTVSoloControllerDelegate
     self.soloControl = nil;
     
     [self.lyricCallbacks removeAllObjects];
-    [self.musicCallbacks removeAllObjects];
 }
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {
@@ -289,24 +282,7 @@ KTVSoloControllerDelegate
         [weakSelf _checkInEarMonitoring];
         
         if (KTVSubscribeDeleted == status) {
-            VLRoomSelSongModel *selSongModel = weakSelf.selSongsArray.firstObject;
-            if (![selSongModel.songNo isEqualToString:songInfo.songNo]) {
-                [weakSelf removeSelSongWithSongNo:songInfo.songNo];
-                return;
-            }
-            
-            //切换歌曲
-            /*
-             1. removed song is top song, play next
-             2. waitting for play, play next
-             */
-            BOOL removedSongIsPlaying = [selSongModel.songNo isEqualToString:weakSelf.currentPlayingSongNo];
-            BOOL isWaitingForPlay = [weakSelf.currentPlayingSongNo length] == 0;
-            if (removedSongIsPlaying || isWaitingForPlay) {
-                [weakSelf stopCurrentSong];
-            }
-            [weakSelf removeSelSongWithSongNo:songInfo.songNo];
-            [weakSelf loadAndPlaySong];
+            [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -318,19 +294,19 @@ KTVSoloControllerDelegate
             }
             
             [weakSelf replaceSelSongWithInfo:songInfo];
-            [weakSelf loadAndPlaySong];
             
             //有人加入合唱
-            if(songInfo.isChorus
-               && weakSelf.currentPlayingSongNo == nil
-               && songInfo.chorusNo != nil) {
-                [weakSelf.MVView setJoinInViewHidden];
-                [weakSelf setUserJoinChorus:songInfo.chorusNo];
-                return;
-            }
+            //TODO
+//            if(songInfo.isChorus
+//               && weakSelf.currentPlayingSongNo == nil
+//               && songInfo.chorusNo != nil) {
+//                [weakSelf.MVView setJoinInViewHidden];
+//                [weakSelf setUserJoinChorus:songInfo.chorusNo];
+//                return;
+//            }
             
             //pin
-            [weakSelf refreshChoosedSongList:nil];
+//            [weakSelf refreshChoosedSongList:nil];
         }
     }];
 }
@@ -457,27 +433,6 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 }
 
 - (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
-          didChangedToState:(AgoraMediaPlayerState)state
-                      error:(AgoraMediaPlayerError)error {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLLog(@"AgoraMediaPlayerState---%ld\n",state);
-        if (state == AgoraMediaPlayerStateOpenCompleted) {
-            [playerKit play];
-        } else if (state == AgoraMediaPlayerStatePlayBackCompleted) {
-            VLLog(@"Playback Completed");
-        } else if (state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            VLLog(@"Playback all loop completed");
-            VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-            if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
-                [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
-            }
-            [self playNextSong];
-        } else if (state == AgoraMediaPlayerStateStopped) {
-        }
-    });
-}
-
-- (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
        didChangedToPosition:(NSInteger)position {
     dispatch_async(dispatch_get_main_queue(), ^{
         //只有主唱才能发送消息
@@ -493,11 +448,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
             }];
             
             //check invalid
-            if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
-                KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
-                [self stopCurrentSong];
-                [self loadAndPlaySong];
-            }
+            //TODO
+//            if (![self.currentPlayingSongNo isEqualToString:self.selSongsArray.firstObject.songNo]) {
+//                KTVLogInfo(@"play fail, current playing songNo: %@, topSongNo: %@", self.currentPlayingSongNo, self.selSongsArray.firstObject.songNo);
+//                [self stopCurrentSong];
+//                [self loadAndPlaySong];
+//            }
         }
     });
 }
@@ -540,11 +496,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         int leftSecond = [dict[@"time"] intValue];
         VLRoomSelSongModel *song = self.selSongsArray.firstObject;
-        if(self.currentPlayingSongNo == nil) {
-            [self.MVView receiveCountDown:leftSecond
-                                   onSeat:self.isOnMicSeat
-                              currentSong:song];
-        }
+        //TODO
+//        if(self.currentPlayingSongNo == nil) {
+//            [self.MVView receiveCountDown:leftSecond
+//                                   onSeat:self.isOnMicSeat
+//                              currentSong:song];
+//        }
         VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
     }
 }
@@ -573,54 +530,29 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-#pragma mark AgoraMusicContentCenterEventDelegate
-- (void)onLyricResult:(nonnull NSString *)requestId
-             lyricUrl:(nonnull NSString *)lyricUrl {
-    
-    KTVLogInfo(@"onLyricResult %@", lyricUrl);
-    
-    LyricCallback callback = [self.lyricCallbacks objectForKey:requestId];
+#pragma mark - AgoraLrcDownloadDelegate
+- (void)downloadLrcFinishedWithUrl:(NSString *)url {
+    KTVLogInfo(@"download lrc finished %@",url);
+
+    LyricCallback callback = [self.lyricCallbacks objectForKey:url];
     if(!callback) {
         return;
     }
-    [self.lyricCallbacks removeObjectForKey:requestId];
-    
-    if ([lyricUrl length] == 0) {
-        callback(nil);
-        return;
-    }
-    
-    [self.MVView loadLrcURL:lyricUrl];
-    [self.lyricCallbacks setObject:callback forKey:lyricUrl];
+    [self.lyricCallbacks removeObjectForKey:url];
+
+    callback(url);
 }
 
-- (void)onMusicChartsResult:(nonnull NSString *)requestId
-                     status:(AgoraMusicContentCenterStatusCode)status
-                     result:(nonnull NSArray<AgoraMusicChartInfo *> *)result {
-    VLLog(@"Music charts - ");
-}
+- (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
+    KTVLogInfo(@"download lrc fail %@: %@",url,error);
 
-- (void)onMusicCollectionResult:(nonnull NSString *)requestId
-                         status:(AgoraMusicContentCenterStatusCode)status
-                         result:(nonnull AgoraMusicCollection *)result {
-}
-
-- (void)onPreLoadEvent:(NSInteger)songCode
-               percent:(NSInteger)percent
-                status:(AgoraMusicContentCenterPreloadStatus)status
-                   msg:(nonnull NSString *)msg
-              lyricUrl:(nonnull NSString *)lyricUrl {
-    if (status == AgoraMusicContentCenterPreloadStatusPreloading) {
+    LyricCallback callback = [self.lyricCallbacks objectForKey:url];
+    if(!callback) {
         return;
     }
-    KTVLogInfo(@"Agora - onPreLoadEvent: %ld", status);
-    NSString* sSongCode = [NSString stringWithFormat:@"%ld", songCode];
-    LoadMusicCallback block = [self.musicCallbacks objectForKey:sSongCode];
-    if(!block) {
-        return;
-    }
-    [self.musicCallbacks removeObjectForKey:sSongCode];
-    block(status);
+    [self.lyricCallbacks removeObjectForKey:url];
+
+    callback(nil);
 }
 
 #pragma mark - action utils / business
@@ -642,150 +574,30 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    if (model == nil || [model waittingForChorus]) {
-        VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
-        //刷新MV里的视图
-        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-        return;
-    }
+//    if (model == nil || [model waittingForChorus]) {
+//        VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
+//        //刷新MV里的视图
+//        return;
+//    }
     if (model.status != 2 && [model readyToPlay]) {
         [self markSongDidPlayWithModel:model];
         VLLog(@"skip load, song %@ need to mark to playing", model.songNo);
         return;
     }
     
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience;
-//    [self loadAndPlaySongWithModel:model withRole:role];
     VL(weakSelf);
     [self.soloControl loadSong:[[model songNo] integerValue] asRole:role withCallback:^(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
-            [weakSelf.soloControl playSong:[[model songNo] integerValue] asRole:role];
+            [weakSelf setLrcLyric:lyricUrl withCallback:^(NSString *lyricUrl) {
+                if(lyricUrl) {
+                    [weakSelf.soloControl playSong:[[model songNo] integerValue] asRole:role];
+                }
+            }];
         }
     }];
-}
-
-//- (void)loadAndPlaySongWithModel:(VLRoomSelSongModel*)model
-//                        withRole:(KTVSingRole)role {
-//    if([model.songNo isEqualToString:self.currentPlayingSongNo]
-//       || [self.lyricCallbacks count] > 0
-//       || [self.musicCallbacks count] > 0) {
-//        VLLog(@"skip load, song %@ already playing or loading", model.songNo);
-//        return;
-//    }
-//
-//    [self stopCurrentSong];
-//    KTVLogInfo(@"loadAndPlaySongWithModel: songNo: %@, songName: %@", model.songNo, model.songName);
-//
-//    //刷新MV里的视图
-//    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-//
-//    VL(weakSelf);
-//    if(role == KTVSingRoleMainSinger) {
-//        [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-//            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric1 success: songNo: %@, songName: %@, lyricUrl: %@", model.songNo, model.songName, lyricUrl);
-//            if (lyricUrl == nil) {
-//                return;
-//            }
-//
-//            [weakSelf loadMusic:model.songNo withCallback:^(AgoraMusicContentCenterPreloadStatus status){
-//                KTVLogInfo(@"loadAndPlaySongWithModel loadMusic success: songNo: %@, songName: %@, status: %ld", model.songNo, model.songName, status);
-//                if (status != AgoraMusicContentCenterPreloadStatusOK) {
-//                    return;
-//                }
-//                [weakSelf openMusicWithSongCode:[model.songNo integerValue]];
-//                weakSelf.isPlayerPublish = YES;
-//                [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
-//
-//                [weakSelf.MVView start];
-//                [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-//                //TODO why always NO?
-//                [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
-//            }];
-//        }];
-//    } else if(role == KTVSingRoleAudience) {
-//        [self loadLyric:[model.songNo integerValue] withCallback:^(NSString *lyricUrl) {
-//            if (lyricUrl == nil) {
-//                return;
-//            }
-//            KTVLogInfo(@"loadAndPlaySongWithModel loadLyric2 success: songNo: %@, songName: %@", model.songNo, model.songName);
-//            weakSelf.currentPlayingSongNo = model.songNo;
-//
-//            weakSelf.isPlayerPublish = NO;
-//            [weakSelf.RTCkit updateChannelWithMediaOptions:[weakSelf channelMediaOptions]];
-//
-//            [weakSelf.MVView start];
-//            [weakSelf.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-//            //TODO why always NO?
-//            [weakSelf.MVView updateUIWithUserOnSeat:NO song:model];
-//        }];
-//    }
-//}
-
-- (void)cancelLoadAndPlay {
-    [self.lyricCallbacks removeAllObjects];
-    [self.musicCallbacks removeAllObjects];
-}
-
-//- (void)loadLyric:(NSInteger)songNo withCallback:(void (^ _Nullable)(NSString* lyricUrl))block {
-//    KTVLogInfo(@"loadLyric: %ld", songNo);
-////    [KTVLog infoWithText:[NSString stringWithFormat:@"loadLyric: %ld", songNo] tag:nil];
-//    NSString* requestId = [self.AgoraMcc getLyricWithSongCode:songNo lyricType:0];
-//    if ([requestId length] == 0) {
-//        if (block) {
-//            block(nil);
-//        }
-//        return;
-//    }
-//    [self.lyricCallbacks setObject:block forKey:requestId];
-//}
-//
-//- (void)loadMusic:(NSString *)songCode withCallback:(LoadMusicCallback)block {
-//    KTVLogInfo(@"loadMusic: %@", songCode);
-//    NSInteger songCodeIntValue = [songCode integerValue];
-//    NSInteger error = [self.AgoraMcc isPreloadedWithSongCode:songCodeIntValue];
-//    if(error == 0) {
-//        if(block) {
-//            [self.musicCallbacks removeObjectForKey:songCode];
-//            block(AgoraMusicContentCenterPreloadStatusOK);
-//        }
-//
-//        return;
-//    }
-//
-//    error = [self.AgoraMcc preloadWithSongCode:songCodeIntValue jsonOption:nil];
-//    if (error != 0) {
-//        if(block) {
-//            [self.musicCallbacks removeObjectForKey:songCode];
-//            block(AgoraMusicContentCenterPreloadStatusError);
-//        }
-//        return;
-//    }
-//    [self.musicCallbacks setObject:block forKey:songCode];
-//
-//    VLLog(@"_rtcMediaPlayer--------是否静音:%d",[_rtcMediaPlayer getMute]);
-//}
-//
-//- (void)openMusicWithSongCode:(NSInteger )songCode {
-//    KTVLogInfo(@"Agora - MediaPlayer playing %ld", songCode);
-//    if(self.rtcMediaPlayer != nil) {
-//        self.currentPlayingSongNo = [NSString stringWithFormat:@"%ld", songCode];
-//        [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
-//    }
-//}
-
-- (void)stopCurrentSong {
-    self.currentTime = 0;
-    self.currentPlayingSongNo = nil;
-    [self.MVView reset];
-    [self.rtcMediaPlayer stop];
-    [self resetPlayer];
-    [self cancelLoadAndPlay];
-}
-
-- (void)playNextSong {
-    [self stopCurrentSong];
-    [self deleteSongEvent:self.selSongsArray.firstObject];
-    VLLog(@"RTC media player stop");
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index {
@@ -945,13 +757,27 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)controller:(KTVSoloController *)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        VLRoomSelSongModel* model = [[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+            return [[evaluatedObject songNo] integerValue] == songCode;
+        }]] firstObject];
         if(state == AgoraMediaPlayerStatePlaying) {
-            VLRoomSelSongModel* model = [[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-                return [[evaluatedObject songNo] integerValue] == songCode;
-            }]] firstObject];
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             [self.MVView updateUIWithUserOnSeat:NO song:model];
+        } else if(state == AgoraMediaPlayerStatePaused) {
+            [self.MVView stop];
+            [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
+            [self.MVView updateUIWithUserOnSeat:NO song:model];
+        } else if(state == AgoraMediaPlayerStateStopped) {
+            self.currentTime = 0;
+            [self.MVView reset];
+        } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            VLLog(@"Playback all loop completed");
+            VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
+            if([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+                [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
+            }
+            [self removeCurrentSongWithSync:YES];
         }
     });
 }
@@ -1174,32 +1000,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (type == VLKTVMVViewActionTypeSetParam) {
         [self showSettingView];
     } else if (type == VLKTVMVViewActionTypeMVPlay) { //播放
-        [self.rtcMediaPlayer resume];
-        //        [self.rtcMediaPlayer play];
-        [self.MVView start];
-        //发送继续播放的消息
-        [self sendPauseOrResumeMessage:0];
+        [self.soloControl resumePlay];
+//        [self.rtcMediaPlayer resume];
+//        //发送继续播放的消息
+//        [self sendPauseOrResumeMessage:0];
         
         //failed to load lyric/music, try again
-        [self loadAndPlaySong];
+//        [self loadAndPlaySong];
     } else if (type == VLKTVMVViewActionTypeMVPause) { //暂停
-        [self.rtcMediaPlayer pause];
-        [self.MVView stop];
-        //发送暂停的消息
-        [self sendPauseOrResumeMessage:-1];
+        [self.soloControl pausePlay];
+//        [self.rtcMediaPlayer pause];
+//        [self.MVView stop];
+//        //发送暂停的消息
+//        [self sendPauseOrResumeMessage:-1];
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
         VL(weakSelf);
         [LEEAlert popSwitchSongDialogWithCancelBlock:nil
                                        withDoneBlock:^{
             if (weakSelf.selSongsArray.count >= 1) {
-                if([weakSelf isRoomOwner]
-                   && [weakSelf isCurrentSongMainSinger:VLUserCenter.user.userNo] == NO) {
-                    [weakSelf playNextSong];
-                } else {
-                    [weakSelf playNextSong];
-                }
-                
-                VLLog(@"---Change song---");
+                [weakSelf.soloControl stopSong];
+                [weakSelf removeCurrentSongWithSync:YES];
             }
         }];
     } else if (type == VLKTVMVViewActionTypeSingOrigin) { // 原唱
@@ -1208,8 +1028,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVMVViewActionTypeSingAcc) { // 伴奏
         [self.rtcMediaPlayer selectAudioTrack:1];
         [self sendTrackModeMessage:1];
-    } else if (type == VLKTVMVViewActionTypeExit) {
-        [self playNextSong];
     }
 }
 
@@ -1378,22 +1196,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)deleteSongEvent:(VLRoomSelSongModel *)model {
-    if([model.songNo length] == 0 || [self.roomModel.roomNo length] == 0) {
-        return;
-    }
-    
-    KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
-    inputModel.songNo = model.songNo;
-    inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] removeSongWithInput:inputModel
-                                         completion:^(NSError * error) {
-        if (error) {
-            KTVLogInfo(@"deleteSongEvent fail: %@ %ld", model.songName, error.code);
-        }
-    }];
-}
-
 //发送独唱的消息
 - (void)enterSoloMode {
     [[AppContext ktvServiceImp] enterSoloMode];
@@ -1450,10 +1252,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark other
-- (void)setLyricUrl:(NSString*)url
+- (void)setLrcLyric:(NSString*)url withCallback:(void (^ _Nullable)(NSString* lyricUrl))block
 {
+    BOOL taskExits = [self.lyricCallbacks objectForKey:url] != nil;
+    if(!taskExits){
+        //overwrite existing callback and use new
+        [self.lyricCallbacks setObject:block forKey:url];
+    }
     [self.MVView.lrcView setLrcUrlWithUrl:url];
-    [self.lyricCallbacks setObject:<#(nonnull LyricCallback)#> forKey:url];
 }
 
 - (void)setSelfChorusUserNo:(NSString *)userNo {
@@ -1478,16 +1284,40 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.roomPersonView.roomSeatsArray = self.seatsArray;
 }
 
-- (void)removeSelSongWithSongNo:(NSString*)songNo {
-    NSMutableArray* selSongsArray = [NSMutableArray array];
-    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.songNo isEqualToString:songNo]) {
-            return;
+- (void)removeCurrentSongWithSync:(BOOL)sync
+{
+    VLRoomSelSongModel* top = [self.selSongsArray firstObject];
+    if(top && top.songNo.length != 0) {
+        [self removeSelSongWithSongNo:[top.songNo integerValue] sync:sync];
+    }
+}
+
+- (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+    __block VLRoomSelSongModel* removed;
+    NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        if([evaluatedObject.songNo integerValue] == songNo) {
+            removed = evaluatedObject;
+            return false;
         }
-        [selSongsArray addObject:obj];
-    }];
+        return true;
+    }]]];
     
-    self.selSongsArray = selSongsArray;
+    if(removed != nil) {
+        //did remove
+        self.selSongsArray = updatedList;
+        
+        if(sync) {
+            KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
+            inputModel.songNo = removed.songNo;
+            inputModel.objectId = removed.objectId;
+            [[AppContext ktvServiceImp] removeSongWithInput:inputModel
+                                                 completion:^(NSError * error) {
+                if (error) {
+                    KTVLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+                }
+            }];
+        }
+    }
 }
 
 - (VLRoomSelSongModel*)selSongWithSongNo:(NSString*)songNo {
@@ -1621,6 +1451,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setSelSongsArray:(NSArray<VLRoomSelSongModel *> *)selSongsArray {
+    NSArray<VLRoomSelSongModel*> *oldSongsArray = self.selSongsArray;
     _selSongsArray = selSongsArray;
     
     if (self.chooseSongView) {
@@ -1628,6 +1459,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
+    
+    if([[selSongsArray firstObject] songNo] != [[oldSongsArray firstObject] songNo]) {
+        //if top songno changes, try to load and play new song
+        [self loadAndPlaySong];
+    }
 }
 
 - (void)setCurrentVoicePitch:(double)currentVoicePitch {
