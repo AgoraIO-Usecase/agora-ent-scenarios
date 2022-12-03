@@ -10,6 +10,7 @@
 #import "KTVMacro.h"
 #import <AgoraLyricsScore-Swift.h>
 #import "AppContext+KTV.h"
+#import "VLGlobalHelper.h"
 
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
@@ -27,12 +28,13 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSNumber*>* loadDict;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSString*>* lyricUrlDict;
+@property(nonatomic, assign)NSInteger dataStreamId;
 
 @end
 
 @implementation KTVSoloController
 
--(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer delegate:(nonnull id<KTVSoloControllerDelegate>)delegate
+-(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(nonnull id<KTVSoloControllerDelegate>)delegate
 {
     if (self = [super init]) {
         self.delegate = delegate;
@@ -42,6 +44,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         self.lyricUrlDict = [NSMutableDictionary dictionary];
         
         self.engine = engine;
+        self.dataStreamId = streamId;
         self.musicCenter = musicCenter;
         self.rtcMediaPlayer = rtcMediaPlayer;
         
@@ -142,6 +145,26 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [self cancelAsyncTasks];
 }
 
+-(void)selectTrackMode:(KTVPlayerTrackMode)mode
+{
+    [self.rtcMediaPlayer selectAudioTrack:mode == KTVPlayerTrackOrigin ? 0 : 1];
+}
+
+//发送流消息
+- (void)sendStreamMessageWithDict:(NSDictionary *)dict
+                         success:(_Nullable sendStreamSuccess)success {
+//    VLLog(@"sendStremMessageWithDict:::%@",dict);
+    NSData *messageData = [VLGlobalHelper compactDictionaryToData:dict];
+    
+    int code = [self.engine sendStreamMessage:self.dataStreamId
+                                         data:messageData];
+    if (code == 0 && success) {
+        success(YES);
+    } else{
+//        VLLog(@"发送失败-streamId:%ld\n",streamId);
+    };
+}
+
 #pragma mark - AgoraRtcMediaPlayerDelegate
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
@@ -153,6 +176,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                || state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
         [self.delegate controller:self song:self.openedSongCode didChangedToState:state];
     }
+}
+
+-(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
+{
+    [self.delegate controller:self song:self.openedSongCode didChangedToPosition:position];
 }
 
 
