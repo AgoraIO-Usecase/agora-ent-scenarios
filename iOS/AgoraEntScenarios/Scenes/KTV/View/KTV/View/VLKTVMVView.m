@@ -368,11 +368,10 @@
 //    }
 }
 
-
-- (void)originClick:(UIButton *)button {
-    button.selected = !button.selected;
-    VLKTVMVViewActionType origin = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
-    if (button.selected) {
+- (void)setOriginBtnState:(VLKTVMVViewActionType)type
+{
+    _originBtn.selected = type == VLKTVMVViewActionTypeSingOrigin ? YES : NO;
+    if (_originBtn.selected) {
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
     }
@@ -380,9 +379,15 @@
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
+}
+
+- (void)originClick:(UIButton *)button {
+    BOOL targetState = !button.selected;
+    VLKTVMVViewActionType targetOrigin = targetState ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+    [self setOriginBtnState:targetOrigin];
     
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
-        [self.delegate onKTVMVView:self btnTappedWithActionType:origin];
+        [self.delegate onKTVMVView:self btnTappedWithActionType:targetOrigin];
     }
 }
 

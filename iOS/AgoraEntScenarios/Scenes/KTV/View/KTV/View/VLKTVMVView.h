@@ -82,6 +82,7 @@ typedef enum : NSUInteger {
 - (int)getAvgSongScore;
 
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
+- (void)setOriginBtnState:(VLKTVMVViewActionType)type;
 
 #pragma mark - 歌词相关
 

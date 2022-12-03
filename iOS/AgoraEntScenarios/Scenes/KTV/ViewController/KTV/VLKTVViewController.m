@@ -627,7 +627,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     self.isNowMicMuted = myseat.isAudioMuted;
     self.isNowCameraMuted = myseat.isVideoMuted;
-    self.trackMode = KTVPlayerTrackOrigin;
+    self.trackMode = KTVPlayerTrackAcc;
     
     AgoraVideoEncoderConfiguration *encoderConfiguration =
     [[AgoraVideoEncoderConfiguration alloc] initWithSize:CGSizeMake(100, 100)
@@ -718,6 +718,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return [[evaluatedObject songNo] integerValue] == songCode;
         }]] firstObject];
         if(state == AgoraMediaPlayerStatePlaying) {
+            //track has to be selected after loaded
+            [self.soloControl selectTrackMode:self.trackMode];
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             [self.MVView updateUIWithUserOnSeat:NO song:model];
@@ -1416,6 +1418,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     _trackMode = trackMode;
     [self.soloControl selectTrackMode:trackMode];
+    
+    [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
 }
 
 - (void)setCurrentVoicePitch:(double)currentVoicePitch {
