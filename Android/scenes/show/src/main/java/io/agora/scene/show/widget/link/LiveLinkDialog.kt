@@ -10,10 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.show.databinding.ShowLiveDetailVideoLinkBinding
+import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
+import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.widget.UserItem
 
 class LiveLinkDialog : AppCompatDialogFragment() {
-    private val mBinding by lazy { ShowLiveDetailVideoLinkBinding.inflate(LayoutInflater.from(context)) }
+    private val mBinding by lazy { ShowLiveLinkDialogBinding.inflate(LayoutInflater.from(context)) }
 
     private lateinit var linkDialogListener: OnLinkDialogActionListener;
     private val linkFragment: LiveLinkRequestFragment = LiveLinkRequestFragment()
@@ -34,7 +36,7 @@ class LiveLinkDialog : AppCompatDialogFragment() {
         mBinding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         linkFragment.setListener(object: LiveLinkRequestFragment.Listener {
-            override fun onAcceptMicSeatItemChosen(userItem: UserItem, position: Int) {
+            override fun onAcceptMicSeatItemChosen(userItem: ShowMicSeatApply, position: Int) {
                 if (linkDialogListener != null) {
                     linkDialogListener.onAcceptMicSeatApplyChosen(this@LiveLinkDialog, userItem)
                 }
@@ -119,14 +121,14 @@ class LiveLinkDialog : AppCompatDialogFragment() {
     /**
      * 连麦申请列表-设置连麦申请列表
      */
-    fun setSeatApplyList(list : List<UserItem>) {
+    fun setSeatApplyList(list : List<ShowMicSeatApply>) {
         linkFragment.setSeatApplyList(list)
     }
 
     /**
      * 连麦申请列表-更新item选中状态
      */
-    fun setSeatApplyItemStatus(applyItem: UserItem, isAccept: Boolean) {
+    fun setSeatApplyItemStatus(applyItem: ShowMicSeatApply, isAccept: Boolean) {
         linkFragment.setSeatApplyItemStatus(applyItem, isAccept)
     }
 

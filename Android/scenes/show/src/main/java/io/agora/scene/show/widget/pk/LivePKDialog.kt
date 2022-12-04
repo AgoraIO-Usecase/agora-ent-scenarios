@@ -10,12 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.show.databinding.ShowLiveDetailVideoPkBinding
+import io.agora.scene.show.databinding.ShowLivePkDialogBinding
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.UserItem
 
 class LivePKDialog : AppCompatDialogFragment() {
-    private val mBinding by lazy { ShowLiveDetailVideoPkBinding.inflate(LayoutInflater.from(context)) }
+    private val mBinding by lazy { ShowLivePkDialogBinding.inflate(LayoutInflater.from(context)) }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
 
     private lateinit var pkDialogListener : OnPKDialogActionListener;

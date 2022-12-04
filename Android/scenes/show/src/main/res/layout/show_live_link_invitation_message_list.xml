@@ -13,7 +13,6 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/show_pk_or_link_status_bg"
-        android:drawableStart=""
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
         android:hint="@string/show_linking"
