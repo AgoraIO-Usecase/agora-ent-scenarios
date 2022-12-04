@@ -87,6 +87,21 @@ class ShowLiveViewController: UIViewController {
         return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
+    private var currentInteraction: ShowInteractionInfo? {
+        didSet {
+            if oldValue == currentInteraction {
+                return
+            }
+            
+            if let info = oldValue {
+                _stopInteraction(interaction: info)
+            }
+            if let info = currentInteraction {
+                _startInteraction(interaction: info)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
@@ -153,6 +168,16 @@ class ShowLiveViewController: UIViewController {
 
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
+    func onConnectStateChanged(state: ShowServiceConnectState) {
+        guard state == .open else {
+            ToastView.show(text: "net work error: \(state)")
+            return
+        }
+        
+        _refreshInvitationList()
+        _refreshInteractionList()
+    }
+    
     func onInterationUpdated(interaction: ShowInteractionInfo) {
         liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
         liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
@@ -377,6 +402,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         _refreshInteractionList()
+        self.currentInteraction = interaction
+    }
+    
+    func onInterationEnded(interaction: ShowInteractionInfo) {
+        _refreshInteractionList()
+        self.currentInteraction = nil
+    }
+    
+    private func _startInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
             if room?.roomId != interaction.roomId {
@@ -404,8 +438,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
-    func onInterationEnded(interaction: ShowInteractionInfo) {
-        _refreshInteractionList()
+    private func _stopInteraction(interaction: ShowInteractionInfo) {
         let options = AgoraRtcChannelMediaOptions()
         switch interaction.interactStatus {
         case .pking:
@@ -436,6 +469,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             break
         }
         agoraKitManager.agoraKit.updateChannel(with: options)
+        
     }
 }
 
@@ -470,13 +504,13 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //            }
 //            present(vc, animated: true)
 //        }
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = uid
-        videoCanvas.view = nil
-        videoCanvas.renderMode = .hidden
-        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-        liveView.canvasView.setRemoteUserInfo(name: "")
-        liveView.canvasView.canvasType = .none
+//        let videoCanvas = AgoraRtcVideoCanvas()
+//        videoCanvas.uid = uid
+//        videoCanvas.view = nil
+//        videoCanvas.renderMode = .hidden
+//        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+//        liveView.canvasView.setRemoteUserInfo(name: "")
+//        liveView.canvasView.canvasType = .none
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
