@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
+import io.agora.scene.show.service.ShowMicSeatApply
+import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.widget.UserItem
 
 class LiveLinkRequestFragment : BaseFragment() {
@@ -15,7 +17,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkRequestViewAdapter.setClickListener(object : LiveLinkRequestViewAdapter.OnClickListener {
-            override fun onClick(userItem: UserItem, position: Int) {
+            override fun onClick(userItem: ShowMicSeatApply, position: Int) {
                 // 主播接受连麦
                 mListener.onAcceptMicSeatItemChosen(userItem, position)
             }
@@ -36,7 +38,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setSeatApplyList(list: List<UserItem>) {
+    fun setSeatApplyList(list: List<ShowMicSeatApply>) {
         if (list == null || list.isEmpty()) {
             mBinding.linkRequestListEmpty.setVisibility(View.VISIBLE)
         } else {
@@ -48,12 +50,18 @@ class LiveLinkRequestFragment : BaseFragment() {
     /**
      * 接受连麦-更新item选中状态
      */
-    fun setSeatApplyItemStatus(userItem: UserItem, isAccept: Boolean) {
+    fun setSeatApplyItemStatus(seatApply: ShowMicSeatApply, isAccept: Boolean) {
         val itemCount: Int = linkRequestViewAdapter.getItemCount()
         for (i in 0 until itemCount) {
-            val item: UserItem = linkRequestViewAdapter.getItem(i)!!
-            if (item.userId == UserItem.userId) {
-                item.isAccepted = isAccept
+            var item: ShowMicSeatApply = linkRequestViewAdapter.getItem(i)!!
+            if (item.userId == seatApply.userId) {
+                item = ShowMicSeatApply(
+                    item.userId,
+                    item.userAvatar,
+                    item.userName,
+                    ShowRoomRequestStatus.accepted,
+                    item.createAt
+                )
                 linkRequestViewAdapter.notifyItemChanged(i)
                 break
             }
@@ -65,7 +73,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onAcceptMicSeatItemChosen(userItem: UserItem, position: Int)
+        fun onAcceptMicSeatItemChosen(userItem: ShowMicSeatApply, position: Int)
         fun onRequestRefreshing(tagIndex: Int)
         fun onStopLinkingChosen()
     }

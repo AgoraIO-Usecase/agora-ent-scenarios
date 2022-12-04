@@ -1,5 +1,6 @@
 package io.agora.scene.show.widget.link
 
+import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.widget.UserItem
 
 interface OnLinkDialogActionListener {
@@ -11,7 +12,7 @@ interface OnLinkDialogActionListener {
     /**
      * 连麦-item"同意上麦"按钮点击时回调
      */
-    fun onAcceptMicSeatApplyChosen(dialog: LiveLinkDialog, userItem: UserItem)
+    fun onAcceptMicSeatApplyChosen(dialog: LiveLinkDialog, seatApply: ShowMicSeatApply)
 
     /**
      * 连麦-当下拉刷新时回调
