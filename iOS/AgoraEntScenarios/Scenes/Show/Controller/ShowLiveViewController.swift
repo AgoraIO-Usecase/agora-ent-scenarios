@@ -401,13 +401,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
-        _refreshInteractionList()
         self.currentInteraction = interaction
+        _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
-        _refreshInteractionList()
         self.currentInteraction = nil
+        _refreshInvitationList()
+        _refreshInteractionList()
     }
     
     private func _startInteraction(interaction: ShowInteractionInfo) {
