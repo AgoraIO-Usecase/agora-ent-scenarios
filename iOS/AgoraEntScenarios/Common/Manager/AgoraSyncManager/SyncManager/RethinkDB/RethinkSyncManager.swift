@@ -47,6 +47,7 @@ public class RethinkSyncManager: NSObject {
     var onSuccessBlock = [String: SuccessBlock]()
     var onSuccessBlockVoid = [String: SuccessBlockVoid]()
     var onSuccessBlockObjOptional = [String: SuccessBlockObjOptional]()
+    var onDeleteBlockObjOptional = [String: SuccessBlockObjOptional?]()
     var onSuccessBlockObj = [String: SuccessBlockObj]()
     var onFailBlock = [String: FailBlock]()
     var onCreateBlocks = [String: OnSubscribeBlock]()

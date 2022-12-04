@@ -71,4 +71,8 @@ class SyncUtil: NSObject {
     class func leaveScene(id: String) {
         sceneRefs.removeValue(forKey: id)
     }
+    
+    class func subscribeConnectState(state: @escaping ConnectBlockState) {
+        manager?.subscribeConnectState(state: state)
+    }
 }
