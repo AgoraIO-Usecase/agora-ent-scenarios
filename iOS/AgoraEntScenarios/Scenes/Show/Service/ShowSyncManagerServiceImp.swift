@@ -1544,27 +1544,26 @@ extension ShowSyncManagerServiceImp {
                                  let model = ShowInteractionInfo.yy_model(withJSON: jsonStr) else {
                                return
                            }
-                           agoraPrint("imp interaction subscribe onUpdated1 \(self.interactionList.count) \(model.interactStatus)")
                            
                            if self.interactionList.contains(where: { $0.userId == model.userId }) {
                                self.subscribeDelegate?.onInterationUpdated(interaction: model)
                                return
                            }
                            self.interactionList.append(model)
-                           agoraPrint("imp interaction subscribe onUpdated2 \(self.interactionList.count) \(model.interactStatus)")
                            self.subscribeDelegate?.onInteractionBegan(interaction: model)
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp interaction subscribe onDeleted...")
                            guard let self = self else {return}
                            var model: ShowInteractionInfo? = nil
-                           agoraPrint("imp interaction subscribe onDeleted2 \(self.interactionList.count) \(model?.interactStatus)")
                            if let index = self.interactionList.firstIndex(where: { object.getId() == $0.objectId }) {
                                model = self.interactionList[index]
                                self.interactionList.remove(at: index)
                            }
-                           agoraPrint("imp interaction subscribe onDeleted2 \(self.interactionList.count) \(model?.interactStatus)")
-                           guard let model = model else {return}
-                           self.subscribeDelegate?.onInterationEnded(interaction: model)
+                           guard let _invitation = model ?? ShowInteractionInfo.yy_model(withJSON: object.toJson() ?? "") else {
+                               agoraAssert("fail to handle delete pk invitation")
+                               return
+                           }
+                           self.subscribeDelegate?.onInterationEnded(interaction: _invitation)
                        }, onSubscribed: {
                        }, fail: { error in
                            agoraPrint("imp interaction subscribe fail \(error.message)...")
