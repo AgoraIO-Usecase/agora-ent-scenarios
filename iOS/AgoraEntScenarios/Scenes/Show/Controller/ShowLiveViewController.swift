@@ -26,7 +26,7 @@ class ShowLiveViewController: UIViewController {
         return ShowAgoraKitManager()
     }()
     
-    private var settingManager: ShowSettingManager?
+//    private var settingManager: ShowSettingManager?
     
     private var roomOwnerId: UInt {
         get{
@@ -45,10 +45,10 @@ class ShowLiveViewController: UIViewController {
     }
     
     // 音乐
-    private lazy var musicManager: ShowMusicManager? = {
-        guard let agorakit = agoraKitManager.agoraKit else { return nil }
-        return ShowMusicManager(agoraKit: agorakit)
-    }()
+//    private lazy var musicManager: ShowMusicManager? = {
+//        guard let agorakit = agoraKitManager.agoraKit else { return nil }
+//        return ShowMusicManager(agoraKit: agorakit)
+//    }()
     
     private lazy var liveView: ShowRoomLiveView = {
         let view = ShowRoomLiveView(isBroadcastor: role == .broadcaster)
@@ -118,6 +118,9 @@ class ShowLiveViewController: UIViewController {
     private func setupUI(){
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
+        if role == .audience {
+            liveView.roomUserCount += 1
+        }
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -137,13 +140,14 @@ class ShowLiveViewController: UIViewController {
     
     private func joinChannel() {
         agoraKitManager.delegate = self
+        agoraKitManager.defaultSetting()
         guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
             return
         }
         let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
         if ret == 0 {
             print("进入房间")
-            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
+//            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
         }else{
             print("进入房间失败=====\(ret.debugDescription)")
             showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
@@ -241,12 +245,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            let vc = ShowReceiveLiveFinishAlertVC()
-            vc.dismissAlert { [weak self] in
+            ShowReceiveLiveFinishAlertVC.present { [weak self] in
+                if self?.presentedViewController != nil {
+                    self?.presentedViewController?.dismiss(animated: false)
+                }
                 self?.leaveRoom()
             }
-            
-            self.present(vc, animated: true)
         }
     }
     
@@ -630,7 +634,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickMusicButton() {
         let vc = ShowMusicEffectVC()
-        vc.musicManager = musicManager
+        vc.musicManager = agoraKitManager
         present(vc, animated: true)
     }
     
@@ -639,16 +643,9 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
             settingMenuVC.type = .pking
-            settingMenuVC.menuTitle = "互动连麦"
+            settingMenuVC.menuTitle = "show_setting_menu_on_pk_title".show_localized
         }
         present(settingMenuVC, animated: true)
-        
-        /*
-        settingMenuVC.type = .managerMic
-        let name = "xxx"
-        settingMenuVC.menuTitle = "对观众\(name)"
-        present(settingMenuVC, animated: true)
-         */
     }
     
 }
@@ -668,8 +665,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickCameraButtonSelected(_ selected: Bool) {
         if selected {
             agoraKitManager.agoraKit.stopPreview()
+            agoraKitManager.agoraKit.enableLocalVideo(false)
         }else{
             agoraKitManager.agoraKit.startPreview()
+            agoraKitManager.agoraKit.enableLocalVideo(true)
         }
     }
     
@@ -725,9 +724,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
+            vc.isOutsise = false
             vc.mode = wSelf.interactionStatus == .pking ? .pk : .signle // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
-            vc.settingManager = wSelf.settingManager
+            vc.settingManager = wSelf.agoraKitManager
             wSelf.navigationController?.pushViewController(vc, animated: true)
         }
     }
