@@ -456,6 +456,7 @@
 
 - (void)reset {
     [_lrcView reset];
+    [self setSongScore:0];
     self.isPlayAccompany = NO;
     [self cleanMusicText];
 }
