@@ -11,6 +11,8 @@ class ByteBaseModel: Codable {
     var icon: String?
     var name: String?
     var isSelected: Bool = false
+    /// 是否双向调节
+    var enableNegative: Bool = false
 }
 
 class ByteBeautyModel: ByteBaseModel {
@@ -53,6 +55,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.35
         model.name = "瘦脸".show_localized
         model.icon = "meiyan_icon_shoulian"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -61,6 +64,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.2
         model.name = "瘦颧骨".show_localized
         model.icon = "meiyan_icon_shouquangu"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -69,6 +73,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.4
         model.name = "大眼".show_localized
         model.icon = "meiyan_icon_dayan"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -77,6 +82,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.2
         model.name = "瘦鼻".show_localized
         model.icon = "meiyan_icon_shoubi"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -85,6 +91,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.6
         model.name = "下巴".show_localized
         model.icon = "meiyan_icon_xiaba"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -93,6 +100,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.2
         model.name = "下颌骨".show_localized
         model.icon = "meiyan_icon_xiahegu"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -101,6 +109,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.1
         model.name = "额头".show_localized
         model.icon = "meiyan_icon_etou"
+        model.enableNegative = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -109,6 +118,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.1
         model.name = "嘴型".show_localized
         model.icon = "meiyan_icon_zuixing"
+        model.enableNegative = true
         dataArray.append(model)
     
         model = ByteBeautyModel()
