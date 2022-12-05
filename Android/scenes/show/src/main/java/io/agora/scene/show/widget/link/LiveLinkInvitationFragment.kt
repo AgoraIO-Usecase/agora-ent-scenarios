@@ -3,12 +3,13 @@ package io.agora.scene.show.widget.link
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
 import io.agora.scene.show.widget.UserItem
 
 class LiveLinkInvitationFragment : BaseFragment() {
-    private val mBinding by lazy { ShowLiveLinkRequestMessageListBinding.inflate(LayoutInflater.from(context)) }
+    private lateinit var mBinding : ShowLiveLinkRequestMessageListBinding
     private val linkInvitationViewAdapter : LiveLinkInvitationViewAdapter = LiveLinkInvitationViewAdapter()
     private lateinit var mListener : LiveLinkInvitationFragment.Listener
 
@@ -20,6 +21,15 @@ class LiveLinkInvitationFragment : BaseFragment() {
                 mListener.onInviteMicSeatItemChosen(userItem, position)
             }
         })
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mBinding = ShowLiveLinkRequestMessageListBinding.inflate(layoutInflater)
+        return mBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         mBinding.iBtnStopLink.setOnClickListener {
             // 主播停止连麦
             mListener.onStopLinkingChosen()

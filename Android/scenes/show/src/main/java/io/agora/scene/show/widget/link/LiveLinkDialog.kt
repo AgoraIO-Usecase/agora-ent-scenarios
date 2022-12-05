@@ -1,29 +1,44 @@
 package io.agora.scene.show.widget.link
 
+import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatDialogFragment
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import io.agora.scene.show.databinding.ShowLiveDetailVideoLinkBinding
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.widget.UserItem
 
-class LiveLinkDialog : AppCompatDialogFragment() {
-    private val mBinding by lazy { ShowLiveLinkDialogBinding.inflate(LayoutInflater.from(context)) }
-
+class LiveLinkDialog : BottomSheetDialogFragment() {
+    private lateinit var mBinding: ShowLiveLinkDialogBinding
     private lateinit var linkDialogListener: OnLinkDialogActionListener;
     private val linkFragment: LiveLinkRequestFragment = LiveLinkRequestFragment()
     private val onlineUserFragment: LiveLinkInvitationFragment = LiveLinkInvitationFragment()
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mBinding = ShowLiveLinkDialogBinding.inflate(layoutInflater)
+        return mBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 设置背景透明
+        WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
+        requireDialog().setOnShowListener { dialog: DialogInterface? ->
+            (view.parent as ViewGroup).setBackgroundColor(
+                Color.TRANSPARENT
+            )
+        }
         ViewCompat.setOnApplyWindowInsetsListener(
             requireDialog().window!!.decorView
         ) { v: View?, insets: WindowInsetsCompat ->
@@ -32,6 +47,7 @@ class LiveLinkDialog : AppCompatDialogFragment() {
             mBinding.pager.setPadding(0, 0, 0, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
+
         mBinding.rBtnRequestMessage.setChecked(true)
         mBinding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
@@ -87,7 +103,7 @@ class LiveLinkDialog : AppCompatDialogFragment() {
                     return fragments[position]
                 }
             }
-        mBinding.pager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+        mBinding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 if (position == 0) {
@@ -97,11 +113,17 @@ class LiveLinkDialog : AppCompatDialogFragment() {
                 }
             }
         })
-        setChosenItemCount(0)
     }
 
     override fun onStart() {
         super.onStart()
+        mBinding.radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+            if (i === R.id.rBtnRequestMessage) {
+                mBinding.pager.currentItem = 0
+            } else if (i === R.id.rBtnOnlineUser) {
+                mBinding.pager.currentItem = 1
+            }
+        }
     }
 
     /**
@@ -144,21 +166,5 @@ class LiveLinkDialog : AppCompatDialogFragment() {
      */
     fun setSeatInvitationItemStatus(applyItem: UserItem, isAccept: Boolean) {
         onlineUserFragment.setSeatInvitationItemStatus(applyItem, isAccept)
-    }
-
-    private fun setChosenItemCount(count: Int) {
-        var count = count
-        if (mBinding == null) {
-            return
-        }
-        if (count > 0) {
-            mBinding.rBtnRequestMessage.setVisibility(View.VISIBLE)
-            if (count > 99) {
-                count = 99
-            }
-            mBinding.rBtnRequestMessage.setText(count.toString())
-        } else {
-            mBinding.rBtnRequestMessage.setVisibility(View.GONE)
-        }
     }
 }

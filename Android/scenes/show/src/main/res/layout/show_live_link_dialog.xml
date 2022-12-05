@@ -20,8 +20,8 @@
 
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rBtnRequestMessage"
-            android:layout_width="64dp"
-            android:layout_height="22dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:button="@null"
             android:gravity="center"
             android:text="@string/show_linking_request_message"
@@ -30,8 +30,8 @@
 
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/rBtnOnlineUser"
-            android:layout_width="64dp"
-            android:layout_height="22dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="130dp"
             android:button="@null"
             android:gravity="center"

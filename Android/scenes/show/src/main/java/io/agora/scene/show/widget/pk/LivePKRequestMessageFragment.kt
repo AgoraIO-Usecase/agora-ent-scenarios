@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.pk
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageBinding
@@ -11,7 +12,7 @@ import io.agora.scene.show.widget.UserItem
 import io.agora.scene.show.widget.link.LiveLinkRequestViewAdapter
 
 class LivePKRequestMessageFragment : BaseFragment() {
-    private val mBinding by lazy { ShowLivePkRequestMessageListBinding.inflate(LayoutInflater.from(context)) }
+    private lateinit var mBinding : ShowLivePkRequestMessageListBinding
     private lateinit var mListener : Listener
     private val linkPKViewAdapter : LivePKViewAdapter = LivePKViewAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,11 @@ class LivePKRequestMessageFragment : BaseFragment() {
                 mListener.onAcceptMicSeatItemChosen(userItem)
             }
         })
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mBinding = ShowLivePkRequestMessageListBinding.inflate(layoutInflater)
+        return mBinding.root
     }
 
     /**
