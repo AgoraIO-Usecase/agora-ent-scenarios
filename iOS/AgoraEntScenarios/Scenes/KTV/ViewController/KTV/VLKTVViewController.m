@@ -631,6 +631,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine contentInspectResult:(AgoraContentInspectResult)result {
+    KTVLogInfo(@"contentInspectResult: %ld", result);
+}
+
 #pragma mark AgoraMusicContentCenterEventDelegate
 - (void)onLyricResult:(nonnull NSString *)requestId
              lyricUrl:(nonnull NSString *)lyricUrl {
@@ -929,6 +933,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
     NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     config.extraInfo = jsonStr;
+    AgoraContentInspectModule* module = [AgoraContentInspectModule new];
+    module.interval = 30;
+    module.type = AgoraContentInspectTypeModeration;
+    config.modules = @[module];
     [self.RTCkit enableContentInspect:YES config:config];
 }
 
