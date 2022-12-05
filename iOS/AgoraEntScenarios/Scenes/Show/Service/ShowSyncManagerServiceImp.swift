@@ -110,6 +110,32 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         pkCreatedInvitationMap = [String: ShowPKInvitation]()
     }
     
+    private func _checkRoomExpire() {
+        guard let room = self.room else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        guard currentTs - room.createdAt > expiredDuration else { return }
+        
+        self.subscribeDelegate?.onRoomExpired()
+    }
+    
+    private func _startCheckExpire() {
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomId == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
+    }
+    
     //MARK: ShowServiceProtocol
     func getRoomList(page: Int, completion: @escaping (Error?, [ShowRoomListModel]?) -> Void) {
         _getRoomList(page: page) { [weak self] error, list in
@@ -158,6 +184,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     let output = ShowRoomDetailModel.yy_model(with: params!)
                     self.roomList?.append(room)
                     completion(nil, output)
+                    self._startCheckExpire()
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
@@ -197,6 +224,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
                     completion(nil, output)
+                    self._startCheckExpire()
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
@@ -496,31 +524,40 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func acceptPKInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("accept invitation not found")
-            return
-        }
-        invitation.status = .accepted
-        _updatePKInvitation(invitation: invitation, completion: completion)
-        
-        let interaction = ShowInteractionInfo()
-        interaction.userId = invitation.fromUserId
-        interaction.userName = invitation.fromName
-        interaction.roomId = invitation.fromRoomId
-        interaction.interactStatus = .pking
-        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        _addInteraction(interaction: interaction) { error in
+        guard let room = room else { return }
+        _getAllPKInvitationList(room: room) { [weak self] (error, list) in
+            guard let self = self,
+                  let list = list,
+                  let invitation = list.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraPrint("accept invitation not found")
+                return
+            }
+            
+            invitation.status = .accepted
+            self._updatePKInvitation(invitation: invitation, completion: completion)
+            
+            let interaction = ShowInteractionInfo()
+            interaction.userId = invitation.fromUserId
+            interaction.userName = invitation.fromName
+            interaction.roomId = invitation.fromRoomId
+            interaction.interactStatus = .pking
+            interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+            self._addInteraction(interaction: interaction) { error in
+            }
         }
     }
     
     func rejectPKInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("accept invitation not found")
-            return
+        guard let room = room else { return }
+        _getAllPKInvitationList(room: room) { [weak self] (error, list) in
+            guard let self = self,
+                  let list = list,
+                  let invitation = list.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraPrint("accept invitation not found")
+                return
+            }
+            self._removePKInvitation(invitation: invitation, completion: completion)
         }
-//        invitation.status = .rejected
-//        _updatePKInvitation(invitation: invitation, completion: completion)
-        _removePKInvitation(invitation: invitation, completion: completion)
     }
     
     func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
@@ -1469,6 +1506,13 @@ extension ShowSyncManagerServiceImp {
             return
         }
         
+        //reject if already has interation
+        if self.interactionList.count > 0 {
+            _removePKInvitation(invitation: invitation) { err in
+            }
+            return
+        }
+        
         let interaction = ShowInteractionInfo()
         interaction.userId = invitation.userId
         interaction.userName = invitation.userName
@@ -1479,6 +1523,14 @@ extension ShowSyncManagerServiceImp {
         }
         
         self.subscribeDelegate?.onPKInvitationAccepted(invitation: invitation)
+        
+        //cancel others pk invitation
+        self.pkCreatedInvitationMap.forEach { (key: String, value: ShowPKInvitation) in
+            if key == invitation.roomId { return }
+            self._removePKInvitation(invitation: value) { err in
+            }
+        }
+        
     }
     
     private func _recvPKFinish(invitation: ShowPKInvitation) {
