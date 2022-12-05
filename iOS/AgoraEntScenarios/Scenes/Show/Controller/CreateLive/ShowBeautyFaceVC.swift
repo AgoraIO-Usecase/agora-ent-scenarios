@@ -38,7 +38,7 @@ class ShowBeautyFaceVC: UIViewController {
         case .beauty: return ShowBeautyFaceVC.beautyData
         case .style: return ShowBeautyFaceVC.styleData
         case .filter: return ShowBeautyFaceVC.filterData
-        case .sticker: return ShowBeautyFaceVC.filterData
+        case .sticker: return ShowBeautyFaceVC.stickerData
         }
     }()
     
