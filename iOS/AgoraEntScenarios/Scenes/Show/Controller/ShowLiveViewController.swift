@@ -475,6 +475,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         default:
             break
         }
+        let text = interaction.interactStatus == .pking ? "PK已断开哦".show_localized : "连麦已断开哦".show_localized
+        ToastView.show(text: text)
         agoraKitManager.agoraKit.updateChannel(with: options)
         
     }
