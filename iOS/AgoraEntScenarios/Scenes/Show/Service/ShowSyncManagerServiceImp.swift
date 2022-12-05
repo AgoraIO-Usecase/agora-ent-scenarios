@@ -1497,6 +1497,13 @@ extension ShowSyncManagerServiceImp {
             return
         }
         
+        //reject if already has interation
+        if self.interactionList.count > 0 {
+            _removePKInvitation(invitation: invitation) { err in
+            }
+            return
+        }
+        
         let interaction = ShowInteractionInfo()
         interaction.userId = invitation.userId
         interaction.userName = invitation.userName
@@ -1507,6 +1514,14 @@ extension ShowSyncManagerServiceImp {
         }
         
         self.subscribeDelegate?.onPKInvitationAccepted(invitation: invitation)
+        
+        //cancel others pk invitation
+        self.pkCreatedInvitationMap.forEach { (key: String, value: ShowPKInvitation) in
+            if key == invitation.roomId { return }
+            self._removePKInvitation(invitation: value) { err in
+            }
+        }
+        
     }
     
     private func _recvPKFinish(invitation: ShowPKInvitation) {
