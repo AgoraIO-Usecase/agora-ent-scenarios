@@ -8,6 +8,10 @@
 import UIKit
 
 extension RethinkSyncManager: ISyncManager {
+    func subscribeConnectState(state: @escaping (SocketConnectState) -> Void) {
+        connectStateBlock = state
+    }
+
     func createScene(scene: Scene, success: SuccessBlockVoid?, fail: FailBlock?) {
         /** add room in list **/
         let attr = Attribute(key: scene.id, value: scene.toJson())

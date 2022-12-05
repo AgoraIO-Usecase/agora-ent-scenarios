@@ -87,6 +87,21 @@ class ShowLiveViewController: UIViewController {
         return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
+    private var currentInteraction: ShowInteractionInfo? {
+        didSet {
+            if oldValue == currentInteraction {
+                return
+            }
+            
+            if let info = oldValue {
+                _stopInteraction(interaction: info)
+            }
+            if let info = currentInteraction {
+                _startInteraction(interaction: info)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
@@ -113,6 +128,7 @@ class ShowLiveViewController: UIViewController {
     private func leaveRoom(){
         ByteBeautyManager.shareManager.destroy()
         agoraKitManager.leaveChannel()
+        AppContext.showServiceImp.unsubscribeEvent(delegate: self)
         dismiss(animated: true) {
             AppContext.showServiceImp.leaveRoom { error in
                 print("error == \(error.debugDescription)")
@@ -153,6 +169,16 @@ class ShowLiveViewController: UIViewController {
 
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
+    func onConnectStateChanged(state: ShowServiceConnectState) {
+        guard state == .open else {
+            ToastView.show(text: "net work error: \(state)")
+            return
+        }
+        
+        _refreshInvitationList()
+        _refreshInteractionList()
+    }
+    
     func onInterationUpdated(interaction: ShowInteractionInfo) {
         liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
         liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
@@ -183,7 +209,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             guard let self = self, error == nil else { return }
             if self.interactionList == nil, let interaction = interactionList?.first {
                 // first load
-                self.onInteractionBegan(interaction: interaction)
+                if self.room?.ownerId == VLUserCenter.user.id {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                } else {
+                    self.onInteractionBegan(interaction: interaction)
+                }
             }
             
             self.interactionList = interactionList
@@ -376,7 +407,18 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
+        self.currentInteraction = interaction
+        _refreshInvitationList()
         _refreshInteractionList()
+    }
+    
+    func onInterationEnded(interaction: ShowInteractionInfo) {
+        self.currentInteraction = nil
+        _refreshInvitationList()
+        _refreshInteractionList()
+    }
+    
+    private func _startInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
             if room?.roomId != interaction.roomId {
@@ -404,8 +446,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
-    func onInterationEnded(interaction: ShowInteractionInfo) {
-        _refreshInteractionList()
+    private func _stopInteraction(interaction: ShowInteractionInfo) {
         let options = AgoraRtcChannelMediaOptions()
         switch interaction.interactStatus {
         case .pking:
@@ -436,6 +477,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             break
         }
         agoraKitManager.agoraKit.updateChannel(with: options)
+        
     }
 }
 
@@ -470,13 +512,35 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //            }
 //            present(vc, animated: true)
 //        }
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = uid
-        videoCanvas.view = nil
-        videoCanvas.renderMode = .hidden
-        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-        liveView.canvasView.setRemoteUserInfo(name: "")
-        liveView.canvasView.canvasType = .none
+//        let videoCanvas = AgoraRtcVideoCanvas()
+//        videoCanvas.uid = uid
+//        videoCanvas.view = nil
+//        videoCanvas.renderMode = .hidden
+//        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
+//        liveView.canvasView.setRemoteUserInfo(name: "")
+//        liveView.canvasView.canvasType = .none
+//        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
+        if let interaction = self.currentInteraction {
+            let isRoomOwner: Bool = room?.ownerId ?? "" == VLUserCenter.user.id
+            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
+            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
+            if isInteractionLeave {
+                if isRoomOwner {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                } else if roomOwnerExit {
+                    //room owner exit
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                }
+            } else {
+                //roomowner exit while onseat or pk
+                if roomOwnerExit {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                }
+            }
+        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
