@@ -223,6 +223,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     
     //MARK: ShowSubscribeServiceProtocol
+    func onRoomExpired() {
+        let vc = ShowReceiveLiveFinishAlertVC()
+        vc.dismissAlert { [weak self] in
+            self?.leaveRoom()
+        }
+        
+        self.present(vc, animated: true)
+    }
+    
     func onUserCountChanged(userCount: Int) {
         self.liveView.roomUserCount = userCount
     }

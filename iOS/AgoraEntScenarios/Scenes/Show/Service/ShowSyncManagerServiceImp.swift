@@ -110,6 +110,32 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         pkCreatedInvitationMap = [String: ShowPKInvitation]()
     }
     
+    private func _checkRoomExpire() {
+        guard let room = self.room else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
+        guard currentTs - room.createdAt > expiredDuration else { return }
+        
+        self.subscribeDelegate?.onRoomExpired()
+    }
+    
+    private func _startCheckExpire() {
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomId == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
+    }
+    
     //MARK: ShowServiceProtocol
     func getRoomList(page: Int, completion: @escaping (Error?, [ShowRoomListModel]?) -> Void) {
         _getRoomList(page: page) { [weak self] error, list in
@@ -158,6 +184,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     let output = ShowRoomDetailModel.yy_model(with: params!)
                     self.roomList?.append(room)
                     completion(nil, output)
+                    self._startCheckExpire()
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
@@ -197,6 +224,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     let output = ShowRoomDetailModel.yy_model(with: params!)
                     completion(nil, output)
+                    self._startCheckExpire()
                     self._subscribeAll()
                     self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
