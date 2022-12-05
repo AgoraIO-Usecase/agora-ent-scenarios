@@ -3,6 +3,7 @@ package io.agora.scene.ktv.live;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -99,7 +100,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                 boolean isOutSeat = item == null || TextUtils.isEmpty(item.getUserNo());
                 binding.getRoot().setOnClickListener(v -> {
-                    if(!isOutSeat){
+                    if (!isOutSeat) {
                         // 下麦
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
@@ -118,7 +119,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     }
                 });
 
-                if(isOutSeat){
+                if (isOutSeat) {
                     binding.avatarItemRoomSpeaker.setImageResource(R.mipmap.ktv_ic_seat);
                     binding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                     binding.tvZC.setVisibility(View.GONE);
@@ -126,7 +127,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     binding.ivMute.setVisibility(View.GONE);
                     binding.tvUserName.setText(String.valueOf(position + 1));
                     binding.flVideoContainer.removeAllViews();
-                }else{
+                } else {
                     binding.tvUserName.setText(item.getName());
 
                     if (item.isMaster() && position == 0) {
@@ -143,7 +144,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     }
 
                     // video
-                    if(item.isVideoMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()){
+                    if (item.isVideoMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                         binding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                         binding.flVideoContainer.removeAllViews();
                         GlideApp.with(binding.getRoot())
@@ -151,7 +152,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 .error(R.mipmap.userimage)
                                 .transform(new CenterCropRoundCornerTransform(100))
                                 .into(binding.avatarItemRoomSpeaker);
-                    }else{
+                    } else {
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
                         binding.flVideoContainer.removeAllViews();
                         SurfaceView surfaceView = fillWithRenderView(binding.flVideoContainer);
@@ -240,9 +241,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
 
         roomLivingViewModel.loadingDialogVisible.observe(this, visible -> {
-            if(visible){
+            if (visible) {
                 showLoadingView();
-            }else{
+            } else {
                 hideLoadingView();
             }
         });
@@ -271,7 +272,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().groupEmptyPrompt.setVisibility(isOnSeat ? View.GONE : View.VISIBLE);
         });
         roomLivingViewModel.seatListLiveData.observe(this, seatModels -> {
-            if(seatModels == null){
+            if (seatModels == null) {
                 return;
             }
             for (RoomSeatModel seatModel : seatModels) {
@@ -320,7 +321,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (model == null) {
                 roomLivingViewModel.musicStop();
                 return;
-            };
+            }
             onMusicChanged(model);
             getBinding().lrcControlView.setScoreControlView(roomLivingViewModel.songPlayingLiveData.getValue());
         });
@@ -344,7 +345,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.playerMusicLrcDataLiveData.observe(this, lrcData -> {
-            if (lrcData == null) getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.ktv_no_lrc));
+            if (lrcData == null)
+                getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.ktv_no_lrc));
             getBinding().lrcControlView.getLrcView().setLrcData(lrcData);
             getBinding().lrcControlView.getPitchView().setLrcData(lrcData);
         });
@@ -412,7 +414,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("cwtsw", "onResume() " + isBlackDarkStatus());
+        Log.d("cwtsw", "onResume() " + isBlackDarkStatus() + " " +
+                Resources.getSystem().getDisplayMetrics().density + " " +
+                Resources.getSystem().getDisplayMetrics().densityDpi + " " + Resources.getSystem().getDisplayMetrics().heightPixels);
         setDarkStatusIcon(isBlackDarkStatus());
     }
 
@@ -502,7 +506,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         moreDialog.dismiss();
     }
 
-    private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap){
+    private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
         // 0 -> "项目热歌榜单"
         // 1 -> "声网热歌榜"
         // 2 -> "新歌榜"
@@ -558,7 +562,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
                         SongActionListenerImpl chooseSongListener =
                                 new SongActionListenerImpl(this,
-                                        roomLivingViewModel, filterSongTypeMap(typeMap),false);
+                                        roomLivingViewModel, filterSongTypeMap(typeMap), false);
                         mChooseSongDialog.setChooseSongTabsTitle(
                                 chooseSongListener.getSongTypeTitles(this),
                                 0);
