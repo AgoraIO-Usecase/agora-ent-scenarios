@@ -72,8 +72,12 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         // 自动弹出预设
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        if isOutsise {
             self.didClickPreSetBarButton()
+        }else{
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.didClickPreSetBarButton()
+            }
         }
     }
     
