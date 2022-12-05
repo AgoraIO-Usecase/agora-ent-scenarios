@@ -34,8 +34,8 @@ extension UIImage {
             return value != scale
         }
         scales.append(scale)
-        for value in 0...scales.count - 1 {
-            let imageName = scale > 1 ? "\(pureName)@\(value)x" : pureName
+        for value in scales {
+            let imageName = value > 1 ? "\(pureName)@\(value)x" : pureName
             if let path = bundle.path(forResource: imageName, ofType: suffix) {
                 let image = UIImage(contentsOfFile: path)
                 return image
