@@ -15,6 +15,7 @@
 #import "bef_effect_ai_api.h"
 #import "BytedLicenseDefine.h"
 #endif
+#import "BundleUtil.h"
 
 using namespace std;
 
@@ -75,7 +76,8 @@ static BELicenseHelper* _instance = nil;
         {
             _licenseProvider->setParam("mode", "OFFLINE");
             NSString *licenseName = [NSString stringWithFormat:@"/%s", LICENSE_NAME];
-            NSString* licensePath = [[NSBundle mainBundle] pathForResource:OFFLIN_LICENSE_PATH ofType:OFFLIN_BUNDLE];
+            NSBundle *budle = [BundleUtil bundleWithBundleName:@"ByteEffectLib" podName:@"bytedEffect"];
+            NSString* licensePath = [budle pathForResource:@"LicenseBag" ofType:OFFLIN_BUNDLE];
             licensePath = [licensePath stringByAppendingString:licenseName];
             _licenseProvider->setParam("licensePath", [licensePath UTF8String]);
         }
