@@ -10,11 +10,14 @@
 
 ### 2 项目配置
 
-1. 将effectAAR-release.aar放在**scenes/show/libs**目录下
+1. 将effectAAR-release.aar放在**scenes/show/aars**目录下
 
-2. 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下： resource/LicenseBag.bundle
-   resource/ModelResource.bundle resource/StickerResource.bundle resource/ComposeMakeup.bundle
-   resource/FilterResource.bundle
+2. 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下： 
+- resource/LicenseBag.bundle : 证书资源
+- resource/ModelResource.bundle : AI等训练模型资源
+- resource/StickerResource.bundle : 贴纸资源
+- resource/ComposeMakeup.bundle : 美妆资源
+- resource/FilterResource.bundle : 滤镜资源
 
 3. 将证书放到**scenes/show/src/main/assets/resource/LicenseBag.bundle**目录下，然后在**
    scenes/show/src/main/java/com/bytedance/labcv/core/Config.java**配置
