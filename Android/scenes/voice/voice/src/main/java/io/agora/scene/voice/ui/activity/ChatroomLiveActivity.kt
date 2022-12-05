@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider
 import io.agora.CallBack
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
-import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.net.OnResourceParseCallback
@@ -26,21 +25,18 @@ import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 import io.agora.chat.ChatClient
-import io.agora.chat.adapter.EMAChatRoomManagerListener
 import io.agora.scene.voice.R
-import io.agora.scene.voice.model.RoomKitBean
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
-import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.imkit.manager.ChatroomListener
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.model.VoiceMicInfoModel
-import io.agora.scene.voice.model.VoiceRoomInfo
-import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.model.*
+import io.agora.scene.voice.service.VoiceRoomServiceKickedReason
+import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
@@ -53,7 +49,7 @@ import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
 class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
-    EasyPermissions.RationaleCallbacks, ChatroomListener {
+    EasyPermissions.RationaleCallbacks, VoiceRoomSubscribeDelegate {
 
     companion object {
         const val RC_PERMISSIONS = 101
@@ -70,6 +66,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
     private lateinit var giftViewDelegate: RoomGiftViewDelegate
+    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
     /**
      * 代理头部view以及麦位view
@@ -110,7 +107,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             VoiceBuddyFactory.get().getVoiceBuddy().nickName()
         )
         binding.messageView.refreshSelectLast()
-        ChatroomConfigManager.getInstance().setChatRoomListener(this)
 //        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
@@ -132,7 +128,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
-                        ChatroomCacheManager.cacheManager.setMemberList(ChatroomIMManager.getInstance().mySelfModel)
+                        ChatroomIMManager.getInstance().setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                     }
                 }
             })
@@ -186,6 +182,120 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
             override fun onListClickListener() {
                 reset()
+            }
+        })
+        voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
+            override fun onReceiveGift(roomId: String, message: ChatMessageData?) {
+                super.onReceiveGift(roomId, message)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                binding.chatroomGiftView.refresh()
+                if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
+                    giftViewDelegate.showGiftAction()
+                }
+                roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
+            }
+
+            override fun onReceiveTextMsg(roomId: String, message: ChatMessageData?) {
+                super.onReceiveTextMsg(roomId, message)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                binding.messageView.refreshSelectLast()
+            }
+
+            override fun onReceiveSeatRequest(roomId: String, applicant: ChatMessageData) {
+                super.onReceiveSeatRequest(roomId, applicant)
+                "onReceiveSeatRequest ${roomKitBean.isOwner}".logE("liveActivity")
+                binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
+            }
+
+            override fun onReceiveSeatRequestRejected(roomId: String, chatUid: String) {
+                super.onReceiveSeatRequestRejected(roomId, chatUid)
+                "onReceiveSeatRequestRejected $chatUid".logE("liveActivity")
+                ThreadManager.getInstance().runOnMainThread {
+                    //刷新 owner 申请列表
+                    roomObservableDelegate.handsUpdate(0)
+                }
+                ChatroomIMManager.getInstance().removeSubmitMember(chatUid)
+            }
+
+            override fun onReceiveSeatInvitation(roomId: String, message: ChatMessageData) {
+                super.onReceiveSeatInvitation(roomId, message)
+                "onReceiveSeatInvitation $message".logE("liveActivity")
+                roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
+            }
+
+            override fun onReceiveSeatInvitationRejected(
+                roomId: String,
+                message: ChatMessageData?
+            ) {
+                super.onReceiveSeatInvitationRejected(roomId, message)
+                "onReceiveSeatInvitationRejected $message".logE("liveActivity")
+            }
+
+            override fun onAnnouncementChanged(roomId: String, content: String) {
+                super.onAnnouncementChanged(roomId, content)
+                "onAnnouncementChanged $content".logE("liveActivity")
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                roomObservableDelegate.updateAnnouncement(content)
+            }
+
+            override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
+                super.onUserJoinedRoom(roomId, voiceMember)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
+                voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
+                ThreadManager.getInstance().runOnMainThread {
+                    binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+                    binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
+                }
+                voiceMember.let {
+                    ChatroomIMManager.getInstance().setMemberList(it)
+                }
+                binding.messageView.refreshSelectLast()
+            }
+
+            override fun onUserLeftRoom(roomId: String, chatUid: String) {
+                super.onUserLeftRoom(roomId, chatUid)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                chatUid.let { ChatroomIMManager.getInstance().removeMember(it) }
+                voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
+                ThreadManager.getInstance().runOnMainThread {
+                    binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
+                }
+            }
+
+            override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
+                super.onUserBeKicked(roomId, reason)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                Log.e("ChatroomLiveActivity", "userBeKicked: $reason")
+                if (reason == VoiceRoomServiceKickedReason.destroyed) {
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
+                    finish()
+                } else if (reason == VoiceRoomServiceKickedReason.removed) {
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member), Toast.LENGTH_SHORT)
+                    finish()
+                }
+            }
+
+            override fun onSeatUpdated(
+                roomId: String,
+                attributeMap: Map<String, String>,
+                fromId: String
+            ) {
+                super.onSeatUpdated(roomId, attributeMap, fromId)
+                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logE()
+                if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                attributeMap.let {
+                    ChatroomIMManager.getInstance().updateMicInfoCache(it)
+                    roomObservableDelegate.onSeatUpdated(it)
+                }
+            }
+
+            override fun onRoomDestroyed(roomId: String) {
+                super.onRoomDestroyed(roomId)
+                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                Log.e("ChatroomLiveActivity", "onRoomDestroyed: ")
+                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
+                finish()
             }
         })
     }
@@ -299,8 +409,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     R.id.voice_extend_item_gift -> {
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
-                                roomObservableDelegate.onSendGiftSuccess()
-                                roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
+                                roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
@@ -330,7 +439,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                 }
                             }
 
-                            override fun onError(messageId: String?, code: Int, error: String?) {
+                            override fun onError(code: Int, error: String?) {
                                 Log.e("send error", " $code $error")
                             }
                         })
@@ -348,7 +457,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     override fun finish() {
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
-        ChatroomConfigManager.getInstance().removeChatRoomListener(this)
+        voiceServiceProtocol.unsubscribeEvent()
         ChatroomIMManager.getInstance().logout(false)
         ChatroomIMManager.getInstance().clearCache()
         if (roomKitBean.isOwner) {
@@ -417,139 +526,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
     }
 
-    override fun receiveTextMessage(roomId: String?, message: ChatMessageData?) {
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        binding.messageView.refreshSelectLast()
-    }
-
-    override fun receiveGift(roomId: String?, message: ChatMessageData?) {
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        binding.chatroomGiftView.refresh()
-        if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
-            giftViewDelegate.showGiftAction()
-        }
-        roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
-    }
-
-    override fun receiveApplySite(roomId: String?, message: ChatMessageData?) {
-        Log.e("liveActivity", "receiveApplySite ${roomKitBean.isOwner}")
-        binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
-    }
-
-    override fun announcementChanged(roomId: String?, announcement: String?) {
-        super.announcementChanged(roomId, announcement)
-        "announcementChanged roomId:$roomId  announcement:$announcement".logD()
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        roomObservableDelegate.updateAnnouncement(announcement)
-    }
-
-    override fun roomAttributesDidUpdated(roomId: String?, attributeMap: Map<String, String>?, fromId: String?) {
-        super.roomAttributesDidUpdated(roomId, attributeMap, fromId)
-        "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logE()
-        if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        attributeMap?.let {
-            ChatroomIMManager.getInstance().updateMicInfoCache(it)
-            roomObservableDelegate.onSeatUpdated(it)
-        }
-    }
-
-    //接收取消申请上麦
-    override fun receiveCancelApplySite(roomId: String?, message: ChatMessageData?) {
-        Log.e("ChatroomLiveActivity", "receiveCancelApplySite" + message.toString())
-        ThreadManager.getInstance().runOnMainThread {
-            //刷新 owner 申请列表
-            roomObservableDelegate.handsUpdate(0)
-        }
-    }
-
-    //接收拒绝邀请消息
-    override fun receiveInviteRefusedSite(roomId: String?, message: ChatMessageData?) {
-        Log.e("ChatroomLiveActivity", "receiveInviteRefusedSite" + message.toString())
-        ToastTools.show(this, getString(R.string.voice_chatroom_mic_audience_rejected_invitation, ""))
-    }
-
     private fun checkFocus(focus: Boolean) {
         binding.likeView.isVisible = focus
-    }
-
-    override fun roomAttributesDidRemoved(roomId: String?, keyList: List<String>?, fromId: String?) {
-        super.roomAttributesDidRemoved(roomId, keyList, fromId)
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        "roomAttributesDidRemoved roomId:$roomId  fromId:$fromId keyList:$keyList".logE("roomAttributesDid")
-    }
-
-    override fun onTokenWillExpire() {
-        // TODO:
-    }
-
-    //接收拒绝申请消息(目前暂无拒绝申请)
-    override fun receiveDeclineApply(roomId: String?, message: ChatMessageData?) {
-        super.receiveDeclineApply(roomId, message)
-        Log.e("ChatroomLiveActivity", "receiveDeclineApply" + message.toString())
-        ToastTools.show(this, getString(R.string.voice_chatroom_mic_audience_rejected_invitation, ""))
-    }
-
-    //接收邀请消息
-    override fun receiveInviteSite(roomId: String?, message: ChatMessageData?) {
-        super.receiveInviteSite(roomId, message)
-        roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
-    }
-
-    override fun receiveSystem(roomId: String?, message: ChatMessageData?) {
-        super.receiveSystem(roomId, message)
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        val ext: MutableMap<String, String>? = CustomMsgHelper.getInstance().getCustomMsgParams(message)
-        "ext: $ext ${Thread.currentThread()}".logE("receiveSystem")
-        ext?.let {
-            roomObservableDelegate.receiveSystem(ext)
-        }
-        binding.messageView.refreshSelectLast()
-    }
-
-    override fun voiceRoomUpdateRobotVolume(roomId: String?, volume: String?) {
-        super.voiceRoomUpdateRobotVolume(roomId, volume)
-        "voiceRoomUpdateRobotVolume roomId:$roomId,volume:$volume".logE()
-        if (!TextUtils.equals(roomId, roomKitBean.chatroomId)) return
-        roomObservableDelegate.updateRobotVolume(volume)
-    }
-
-    override fun userJoinedRoom(roomId: String?, uid: String?) {
-        super.userJoinedRoom(roomId, uid)
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
-        voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
-        ThreadManager.getInstance().runOnMainThread {
-            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
-            binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
-        }
-    }
-
-    override fun onMemberExited(roomId: String?, chatUid: String?, s2: String?) {
-        super.onMemberExited(roomId, chatUid, s2)
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        chatUid?.let { ChatroomCacheManager.cacheManager.removeMember(it) }
-        voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
-        ThreadManager.getInstance().runOnMainThread {
-            binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
-        }
-    }
-
-    override fun userBeKicked(roomId: String?, reason: Int) {
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        Log.e("ChatroomLiveActivity", "userBeKicked: $reason")
-        if (reason == EMAChatRoomManagerListener.DESTROYED) {
-            ToastTools.show(this, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
-            finish()
-        } else if (reason == EMAChatRoomManagerListener.BE_KICKED) {
-            ToastTools.show(this, getString(R.string.voice_room_kick_member), Toast.LENGTH_SHORT)
-            finish()
-        }
-    }
-
-    override fun onRoomDestroyed(roomId: String?) {
-        if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-        Log.e("ChatroomLiveActivity", "onRoomDestroyed: ")
-        ToastTools.show(this, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
-        finish()
     }
 }

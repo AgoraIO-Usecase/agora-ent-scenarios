@@ -17,7 +17,6 @@ import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.model.VoiceMemberModel;
@@ -33,7 +32,7 @@ import io.agora.voice.common.utils.GsonTools;
  *      用于接收不同的自定义消息类型（目前仅礼物，点赞及弹幕消息）。
  * （4）发送自定义消息：
  *      a、如果自定义消息类型与library相同，且所传参数相同或者相近，可以直接调用如下方法：
- *      {@link #sendGiftMsg(String,String,String,int,String,String,OnMsgCallBack)},
+ *      {@link #sendGiftMsg(String,String,String,int,String,String, OnMsgCallBack)},
  *      {@link #sendPraiseMsg(int, OnMsgCallBack)},
  *      {@link #sendGiftMsg(Map, OnMsgCallBack)},
  *      {@link #sendPraiseMsg(Map, OnMsgCallBack)},
@@ -123,7 +122,7 @@ public class CustomMsgHelper implements MessageListener {
                     if (map.containsKey("user")){
                         VoiceRoomApply voiceRoomApply = GsonTools.toBean(map.get("user"), VoiceRoomApply.class);
                         if (voiceRoomApply != null && voiceRoomApply.getMember() != null){
-                            ChatroomCacheManager.Companion.getCacheManager().setSubmitMicList(voiceRoomApply.getMember());
+                            ChatroomIMManager.getInstance().setSubmitMicList(voiceRoomApply.getMember());
                         }
                     }
                     if(listener != null) {
@@ -134,7 +133,7 @@ public class CustomMsgHelper implements MessageListener {
                     if(listener != null) {
                         listener.onReceiveCancelApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
-                    ChatroomCacheManager.Companion.getCacheManager().removeSubmitMember(message.getFrom());
+                    ChatroomIMManager.getInstance().removeSubmitMember(message.getFrom());
                     break;
                 case CHATROOM_INVITE_REFUSED_SITE:
                     if(listener != null) {
@@ -177,21 +176,10 @@ public class CustomMsgHelper implements MessageListener {
                     break;
                 case CHATROOM_SYSTEM:
                     AllNormalList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    if (map.containsKey("user")){
-                        VoiceMemberModel memberModel =  GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
-                        if (memberModel != null){
-                            ChatroomCacheManager.Companion.getCacheManager().setMemberList(memberModel);
-                        }
-                    }
                     if (listener != null){
                         listener.onReceiveSystem(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
-                case CHATROOM_UPDATE_ROBOT_VOLUME:
-                    if (listener != null){
-                        listener.voiceRoomUpdateRobotVolume(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    }
             }
         }
     }
