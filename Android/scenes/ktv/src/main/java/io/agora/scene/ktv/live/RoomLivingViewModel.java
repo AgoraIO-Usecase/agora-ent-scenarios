@@ -1,5 +1,7 @@
 package io.agora.scene.ktv.live;
 
+import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
+
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -176,7 +178,6 @@ public class RoomLivingViewModel extends ViewModel {
         initRoom();
         initSeats();
         initSongs();
-        initSingScore();
     }
 
     public void release() {
@@ -937,7 +938,6 @@ public class RoomLivingViewModel extends ViewModel {
                 mRtcEngine.muteAllRemoteAudioStreams(false);
                 mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
             }
-            mPlayer.setAudioDualMonoMode(2);
             mPlayer.stop();
         }
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
@@ -1022,12 +1022,19 @@ public class RoomLivingViewModel extends ViewModel {
                         // 伴唱收到原唱伴唱调整指令
                         if (mPlayer == null) return;
                         int TrackMode = jsonMsg.getInt("mode");
-                        mPlayer.setAudioDualMonoMode(TrackMode);
+                        mPlayer.selectAudioTrack(TrackMode);
                     } else if (jsonMsg.getString("cmd").equals("Seek")) {
                         // 伴唱收到原唱seek指令
                         if (mPlayer == null) return;
                         long position = jsonMsg.getLong("position");
                         mPlayer.seek(position);
+                    } else if (jsonMsg.getString("cmd").equals("SyncPitch")) {
+                        // 伴唱收到原唱seek指令
+                        if (mPlayer == null) return;
+                        double pitch = jsonMsg.getDouble("pitch");
+                        if (mPlayer != null && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
+                            playerPitchLiveData.postValue(pitch);
+                        }
                     }
                 } catch (JSONException exp) {
                     Log.e(TAG, "onStreamMessage:" + exp.toString());
@@ -1046,6 +1053,10 @@ public class RoomLivingViewModel extends ViewModel {
                     for (AudioVolumeInfo info : speakers) {
                         if (info.uid == 0 && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
                             ktvServiceProtocol.updateSingingScore(new UpdateSingingScoreInputModel(info.voicePitch));
+                            if (mPlayer != null && mPlayer.getState() == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                                playerPitchLiveData.postValue(info.voicePitch);
+                                pitch = info.voicePitch;
+                            }
                         }
                     }
                 }
@@ -1108,6 +1119,11 @@ public class RoomLivingViewModel extends ViewModel {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
             contentInspectConfig.extraInfo = jsonObject.toString();
+            ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
+            module.interval = 30;
+            module.type = CONTENT_INSPECT_TYPE_SUPERVISE;
+            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module };
+            contentInspectConfig.moduleCount = 1;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
@@ -1181,6 +1197,7 @@ public class RoomLivingViewModel extends ViewModel {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         if (!songPlayingLiveData.getValue().isChorus()) {
                             startSyncLrc(songPlayingLiveData.getValue().getSongNo(), mPlayer.getDuration());
+                            startSyncPitch();
                         }
                         break;
                     case PLAYER_STATE_PAUSED:
@@ -1396,16 +1413,16 @@ public class RoomLivingViewModel extends ViewModel {
                 mAudioTrackIndex = 1;
                 if (needSendStatus) {
                     // 合唱时 发送状态
-                    sendTrackMode(2);
+                    sendTrackMode(0);
                 }
-                mPlayer.setAudioDualMonoMode(2);
+                mPlayer.selectAudioTrack(0);
             } else {
                 mAudioTrackIndex = 0;
                 if (needSendStatus) {
                     // 合唱时 发送状态
                     sendTrackMode(1);
                 }
-                mPlayer.setAudioDualMonoMode(1);
+                mPlayer.selectAudioTrack(1);
             }
             return false;
         } else {
@@ -1472,6 +1489,7 @@ public class RoomLivingViewModel extends ViewModel {
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
         Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         mPlayer.stop();
+        stopSyncPitch();
         stopSyncLrc();
         stopDisplayLrc();
         mRecvedPlayPosition = 0;
@@ -1594,6 +1612,7 @@ public class RoomLivingViewModel extends ViewModel {
         // 列表中无歌曲， 还原状态
         if (mPlayer != null) {
             mPlayer.stop();
+            stopSyncPitch();
             stopSyncLrc();
             stopDisplayLrc();
             mRecvedPlayPosition = 0;
@@ -1844,6 +1863,69 @@ public class RoomLivingViewModel extends ViewModel {
                 mSyncLrcThread.join();
             } catch (InterruptedException exp) {
                 Log.e(TAG, "stopSyncLrc: " + exp.toString());
+            }
+        }
+    }
+
+    // ------------------ 音高pitch同步 ------------------
+    private Thread mSyncPitchThread;
+    private boolean mStopSyncPitch = true;
+    private double pitch = 0;
+    // 开始同步音高
+    private void startSyncPitch() {
+        mSyncPitchThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                mStopSyncPitch = false;
+                while (!mStopSyncPitch) {
+                    if (mPlayer == null) {
+                        break;
+                    }
+                    if (mLastRecvPlayPosTime != null && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
+                        sendSyncPitch(pitch);
+                    }
+
+                    try {
+                        Thread.sleep(999L);
+                    } catch (InterruptedException exp) {
+                        break;
+                    }
+                }
+            }
+
+            private void sendSyncPitch(double pitch) {
+                Map<String, Object> msg = new HashMap<>();
+                msg.put("cmd", "SyncPitch");
+                msg.put("pitch", pitch);
+                JSONObject jsonMsg = new JSONObject(msg);
+
+                if (streamId == 0) {
+                    DataStreamConfig cfg = new DataStreamConfig();
+                    cfg.syncWithAudio = true;
+                    cfg.ordered = true;
+                    streamId = mRtcEngine.createDataStream(cfg);
+                }
+
+                int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
+                if (ret < 0) {
+                    Log.e(TAG, "sendPitch() sendStreamMessage called returned: " + ret);
+                }
+            }
+        });
+        mSyncPitchThread.setName("Thread-SyncPitch");
+        mSyncPitchThread.start();
+    }
+
+    // 停止同步歌词
+    private void stopSyncPitch() {
+        mStopSyncPitch = true;
+        pitch = 0;
+        if (mSyncPitchThread != null) {
+            try {
+                mSyncPitchThread.join();
+            } catch (InterruptedException exp) {
+                Log.e(TAG, "stopSyncPitch: " + exp.toString());
             }
         }
     }

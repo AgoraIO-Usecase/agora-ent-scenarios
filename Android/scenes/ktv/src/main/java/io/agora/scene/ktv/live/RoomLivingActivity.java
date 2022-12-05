@@ -518,7 +518,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
             int key = entry.getKey();
             String value = entry.getValue();
-            if (key == 1) {
+            if (key == 2) {
                 value = getString(R.string.ktv_song_rank_7);
                 ret.put(key, value);
             } else if (key == 3 || key == 4 || key == 6) {
