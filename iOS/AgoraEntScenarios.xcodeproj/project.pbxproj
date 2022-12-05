@@ -159,6 +159,8 @@
 		A845AD42291BB11C00A41D8D /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */; };
 		A845AD44291BB8F300A41D8D /* ShowMusicItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */; };
 		A845AD46291C9A0800A41D8D /* ShowChatInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */; };
+		A8899D46293DC3F80020F933 /* ShowAgoraKitManager+Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8899D45293DC3F80020F933 /* ShowAgoraKitManager+Setting.swift */; };
+		A8899D48293DC6320020F933 /* ShowAgoraKitManager+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8899D47293DC6320020F933 /* ShowAgoraKitManager+Music.swift */; };
 		A88D142A2914B0A300F5DF6A /* NSString+Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D14292914B0A300F5DF6A /* NSString+Show.swift */; };
 		A88D142C2914BA4100F5DF6A /* ShowBeautySettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */; };
 		A88D142E2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */; };
@@ -666,6 +668,8 @@
 		A845AD41291BB11C00A41D8D /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
 		A845AD43291BB8F300A41D8D /* ShowMusicItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMusicItemCell.swift; sourceTree = "<group>"; };
 		A845AD45291C9A0800A41D8D /* ShowChatInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowChatInputView.swift; sourceTree = "<group>"; };
+		A8899D45293DC3F80020F933 /* ShowAgoraKitManager+Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Setting.swift"; sourceTree = "<group>"; };
+		A8899D47293DC6320020F933 /* ShowAgoraKitManager+Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Music.swift"; sourceTree = "<group>"; };
 		A88D14292914B0A300F5DF6A /* NSString+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSString+Show.swift"; sourceTree = "<group>"; };
 		A88D142B2914BA4100F5DF6A /* ShowBeautySettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautySettingVC.swift; sourceTree = "<group>"; };
 		A88D142D2914BFAB00F5DF6A /* ShowBeautyFaceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowBeautyFaceVC.swift; sourceTree = "<group>"; };
@@ -1529,6 +1533,8 @@
 				A81ED019292244AE00B40454 /* Setting */,
 				A845AD39291B82AE00A41D8D /* ShowChatModel.swift */,
 				A82E14B2292CCC3C00832D00 /* ShowAgoraKitManager.swift */,
+				A8899D45293DC3F80020F933 /* ShowAgoraKitManager+Setting.swift */,
+				A8899D47293DC6320020F933 /* ShowAgoraKitManager+Music.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3494,6 +3500,7 @@
 				05FFE721290F73670024D22F /* VoiceRoomInviteUsersController.swift in Sources */,
 				DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */,
 				057DD9E5290B9495001329E6 /* VoiceRoomRequest.swift in Sources */,
+				A8899D46293DC3F80020F933 /* ShowAgoraKitManager+Setting.swift in Sources */,
 				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
 				DD8417C129090C520026B624 /* AppContext+KTV.m in Sources */,
 				0510B858290B799E0063E57A /* VRRoomMenuBar.swift in Sources */,
@@ -3603,6 +3610,7 @@
 				0510B859290B799E0063E57A /* HorizontalCardView.swift in Sources */,
 				DDA19A6D28FFE57A009D3E61 /* EntryAppearanceDescriptor.swift in Sources */,
 				05FFE6F7290F706C0024D22F /* VoiceRoomGiftsView.swift in Sources */,
+				A8899D48293DC6320020F933 /* ShowAgoraKitManager+Music.swift in Sources */,
 				DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */,
 				0510B864290B7A6E0063E57A /* VRRoomsViewController.swift in Sources */,
 				05FFE736290F74560024D22F /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,

@@ -25,7 +25,11 @@ class ShowCreateLiveVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
         agoraKitManager.startPreview(canvasView: localView)
+        agoraKitManager.defaultSetting()
         configNaviBar()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.onClickSettingBtnAction()
+        }
     }
     
     func configNaviBar() {
@@ -101,6 +105,15 @@ class ShowCreateLiveVC: UIViewController {
 }
 
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
+    
+    func onClickSettingBtnAction() {
+        let vc = ShowAdvancedSettingVC()
+        vc.mode = .signle
+        vc.isBroadcaster = true
+        vc.isOutsise = true
+        vc.settingManager = agoraKitManager
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     
     func onClickCameraBtnAction() {
 //        agoraKit?.switchCamera()

@@ -48,6 +48,15 @@ class ShowReceiveLiveFinishAlertVC: UIViewController {
 
 }
 
+extension ShowReceiveLiveFinishAlertVC {
+    class func present(dismiss: @escaping (()->())){
+        let vc = ShowReceiveLiveFinishAlertVC()
+        vc.dismissAlert = dismiss
+        let topVC = UIViewController.cl_topViewController()
+        topVC?.present(vc, animated: true)
+    }
+}
+
 extension ShowReceiveLiveFinishAlertVC: ShowReceiveFinishViewDelegate {
     func onClickBackButton() {
         dismiss(animated: true) { [weak self] in

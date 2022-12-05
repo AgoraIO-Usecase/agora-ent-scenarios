@@ -10,14 +10,32 @@ import AgoraRtcKit
 import UIKit
 
 class ShowAgoraKitManager: NSObject {
-    private var exConnection: AgoraRtcConnection?
-    private lazy var videoEncoderConfig: AgoraVideoEncoderConfiguration = {
-        return AgoraVideoEncoderConfiguration(size: CGSize(width: 540, height: 960),
-                                       frameRate: .fps30,
-                                       bitrate: AgoraVideoBitrateStandard,
-                                       orientationMode: .fixedPortrait,
-                                       mirrorMode: .auto)
+    
+    lazy var musicDataArray: [ShowMusicConfigData] = {
+        return [musicBg, beautyVoice, mixVoice]
     }()
+    
+    // 背景音乐
+    lazy var musicBg: ShowMusicConfigData = {
+        return musicBgConfigData()
+    }()
+    
+    // 美声
+    lazy var beautyVoice: ShowMusicConfigData = {
+        return beautyVoiceConfigData()
+    }()
+    
+    // 混响
+    lazy var mixVoice: ShowMusicConfigData = {
+        return mixVoiceConfigData()
+    }()
+    
+    // 预设类型
+    var presetType: ShowPresetType?
+    
+    let videoEncoderConfig = AgoraVideoEncoderConfiguration()
+    
+    private var exConnection: AgoraRtcConnection?
     
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
        let config = AgoraRtcEngineConfig()
@@ -99,6 +117,7 @@ class ShowAgoraKitManager: NSObject {
     func setCaptureVideoDimensions(_ size: CGSize){
         agoraKit.disableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        print("采集分辨率切换为 width = \(size.width), height = \(size.height)")
         agoraKit?.setCameraCapturerConfiguration(captureConfig)
         agoraKit.enableVideo()
     }
