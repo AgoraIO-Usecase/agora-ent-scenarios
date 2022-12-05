@@ -21,6 +21,9 @@ class ShowCanvasView: UIView {
     lazy var remoteView: UIView = {
         let view = UIView()
         view.isHidden = true
+//        view.addTarget(self, action: #selector(onTapRemoteButton), for: .touchUpInside)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTapRemoteButton))
+        view.addGestureRecognizer(tap)
         return view
     }()
     
@@ -52,7 +55,6 @@ class ShowCanvasView: UIView {
                         for: .selected,
                         postion: .right,
                         spacing: 5)
-        button.addTarget(self, action: #selector(onTapRemoteButton), for: .touchUpInside)
         return button
     }()
     private lazy var remoteUserLabel: UILabel = {

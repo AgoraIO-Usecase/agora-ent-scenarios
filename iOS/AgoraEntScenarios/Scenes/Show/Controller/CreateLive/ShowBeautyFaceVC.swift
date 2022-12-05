@@ -28,13 +28,17 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    
+    static let beautyData = ByteBeautyModel.createBeautyData()
+    static let styleData = ByteBeautyModel.createStyleData()
+    static let filterData = ByteBeautyModel.createFilterData()
+    static let stickerData = ByteBeautyModel.createStickerData()
+     
     private lazy var dataArray: [ByteBeautyModel] = {
         switch type {
-        case .beauty: return ByteBeautyModel.createBeautyData()
-        case .style: return ByteBeautyModel.createStyleData()
-        case .filter: return ByteBeautyModel.createFilterData()
-        case .sticker: return ByteBeautyModel.createStickerData()
+        case .beauty: return ShowBeautyFaceVC.beautyData
+        case .style: return ShowBeautyFaceVC.styleData
+        case .filter: return ShowBeautyFaceVC.filterData
+        case .sticker: return ShowBeautyFaceVC.stickerData
         }
     }()
     
@@ -137,16 +141,25 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
                                                                           for: indexPath) as! ShowBeautyFaceCell
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
-        if indexPath.item == 0 {
+        if model.isSelected {
             selectedItemClosure?(model.value, model.path == nil)
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let preModel = dataArray[defalutSelectIndex]
+        preModel.isSelected = false
+        dataArray[defalutSelectIndex] = preModel
+        collectionView.reloadItems(at: [IndexPath(item: defalutSelectIndex, section: 0)])
+        
         defalutSelectIndex = indexPath.item
         let model = dataArray[indexPath.item]
         setBeautyHandler(value: model.value)
+        model.isSelected = true
+        dataArray[indexPath.item] = model
+        collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
+        
         if type == .sticker {
             selectedItemClosure?(0, true)
             return

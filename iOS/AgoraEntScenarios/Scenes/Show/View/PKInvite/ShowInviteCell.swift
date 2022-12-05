@@ -160,10 +160,12 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     private var seatApplyModel: ShowMicSeatApply?
     private var seatInvitationModel: ShowUser?
 
-    func setupApplyAndInviteData(model: Any?) {
+    func setupApplyAndInviteData(model: Any?, isLink: Bool) {
+        statusButton.isHidden = isLink
         if let model = model as? ShowMicSeatApply {
             seatApplyModel = model
             nameLabel.text = model.userName
+            statusButton.tag = 1
             avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             switch model.status {
@@ -185,6 +187,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
         } else if let model = model as? ShowUser {
             seatInvitationModel = model
             nameLabel.text = model.userName
+            statusButton.tag = 2
             avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
 
@@ -235,7 +238,7 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
-        if let model = seatApplyModel {
+        if let model = seatApplyModel, sender.tag == 1 {
             AppContext.showServiceImp.acceptMicSeatApply(apply: model) { _ in
                 self.refreshDataClosure?()
             }

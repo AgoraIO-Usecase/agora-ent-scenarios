@@ -57,8 +57,7 @@ class ShowLiveViewController: UIViewController {
     }()
     
     private lazy var beautyVC = ShowBeautySettingVC()
-    //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
-    private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
     
@@ -485,6 +484,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         default:
             break
         }
+        let text = interaction.interactStatus == .pking ? "PK已断开哦".show_localized : "连麦已断开哦".show_localized
+        ToastView.show(text: text)
         agoraKitManager.agoraKit.updateChannel(with: options)
         
     }
@@ -560,6 +561,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         realTimeView.statsInfo?.updateLocalAudioStats(stats)
     }
     
+    func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
+        realTimeView.statsInfo?.updateLocalVideoStats(stats)
+    }
+    
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
     }
@@ -582,8 +587,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
         guard let info = interactionList?.first else { return }
         let menuVC = ShowToolMenuViewController()
-        settingMenuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.type = ShowMenuType.managerMic
+        menuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.delegate = self
         present(menuVC, animated: true)
     }

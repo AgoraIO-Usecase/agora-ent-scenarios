@@ -223,7 +223,7 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
                                                  for: indexPath) as! ShowSeatApplyAndInviteViewCell
         let model = self.tableView.dataArray?[indexPath.row]
         
-        cell.setupApplyAndInviteData(model: model)
+        cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil)
         return cell
     }
 }
