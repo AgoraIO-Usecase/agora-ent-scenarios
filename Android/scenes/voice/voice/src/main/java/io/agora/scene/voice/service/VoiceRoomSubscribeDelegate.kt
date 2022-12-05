@@ -1,7 +1,6 @@
 package io.agora.scene.voice.service
 
 import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.scene.voice.model.VoiceGiftModel
 import io.agora.scene.voice.model.VoiceMemberModel
 
 /**
@@ -13,9 +12,15 @@ interface VoiceRoomSubscribeDelegate {
     /**
      * 收到礼物消息
      * @param roomId 环信IMSDK聊天室id
-     * @param gift
+     * @param message
      */
-    fun onReceiveGift(roomId: String, gift: VoiceGiftModel){}
+    fun onReceiveGift(roomId: String, message: ChatMessageData?){}
+
+    /**
+     * 接收到普通消息
+     * @param message
+     */
+    fun onReceiveTextMsg(roomId: String,message: ChatMessageData?){}
 
     /**
      * 收到上麦申请消息
@@ -43,11 +48,11 @@ interface VoiceRoomSubscribeDelegate {
      */
     fun onReceiveSeatInvitationRejected(roomId: String, message: ChatMessageData?) {}
 
-    /**
-     * 接收拒绝申请消息
-     *  @param roomId 环信IM SDK聊天室id
-     */
-    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
+//    /**
+//     * 接收拒绝申请消息
+//     *  @param roomId 环信IM SDK聊天室id
+//     */
+//    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
 
     /**
      * 聊天室公告更新
@@ -55,13 +60,6 @@ interface VoiceRoomSubscribeDelegate {
      * @param content 公告变化内容
      */
     fun onAnnouncementChanged(roomId: String, content: String) {}
-
-    /**
-     * 机器人音量更新
-     * @param roomId 环信IM SDK聊天室id
-     * @param volume 音量数值
-     */
-    fun onRobotVolumeUpdated(roomId: String, volume: String) {}
 
     /**
      * 用户加入聊天室回调，带所有用户信息
@@ -83,6 +81,11 @@ interface VoiceRoomSubscribeDelegate {
      * @param reason 被踢出房间
      */
     fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {}
+
+    /**
+     * 房间销毁
+     */
+    fun onRoomDestroyed(roomId: String){}
 
     /**
      *  聊天室自定义麦位属性发生变化

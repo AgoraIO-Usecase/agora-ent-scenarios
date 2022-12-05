@@ -1,13 +1,12 @@
 package io.agora.scene.voice.imkit.custorm;
 
-import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.CallBack;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
 
 public abstract class OnMsgCallBack implements CallBack {
     /**
      * 为了回调发送的message，不建议使用此回调
      */
-    @Deprecated
     @Override
     public void onSuccess() {
 
