@@ -21,11 +21,14 @@ protocol ShowToolMenuViewControllerDelegate: NSObjectProtocol {
 
 class ShowToolMenuViewController: UIViewController {
     
-    var menuTitle: String?
-    var type: ShowMenuType? {
+    var menuTitle: String? {
+        didSet {
+            menuView?.title = menuTitle
+        }
+    }
+    var type: ShowMenuType = .idle_audience {
         didSet {
             if type == oldValue { return }
-            guard let type = type else { return }
             updateLayoutForType(type)
         }
     }
@@ -54,11 +57,10 @@ class ShowToolMenuViewController: UIViewController {
     }
     
     private func setUpUI(){
-        guard let type = self.type else { return  }
-        menuView = ShowToolMenuView(type: type, title: menuTitle)
+        menuView = ShowToolMenuView(type: type)
         view.addSubview(menuView!)
         updateLayoutForType(type)
-        menuView!.onTapItemClosure = {[weak self] modelType, isSelected in
+        menuView?.onTapItemClosure = {[weak self] modelType, isSelected in
             switch modelType {
             case .camera:
                 self?.delegate?.onClickCameraButtonSelected(isSelected)
@@ -94,7 +96,7 @@ class ShowToolMenuViewController: UIViewController {
         if type == .idle_audience {
             height = 150
         }
-        menuView?.type = type ?? .idle_audience
+        menuView?.type = type
         menuView?.snp.remakeConstraints({ make in
             make.left.bottom.right.equalToSuperview()
             make.height.equalTo(height)

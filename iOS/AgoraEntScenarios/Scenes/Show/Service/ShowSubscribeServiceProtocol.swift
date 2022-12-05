@@ -7,8 +7,18 @@
 
 import Foundation
 
-protocol ShowSubscribeServiceProtocol: NSObject {
+public enum ShowServiceConnectState: Int {
+    case connecting = 0
+    case open = 1
+    case fail = 2
+    case closed = 3
+}
 
+protocol ShowSubscribeServiceProtocol: NSObject {
+    
+    /// 网络状态变化
+    /// - Parameter state: <#state description#>
+    func onConnectStateChanged(state: ShowServiceConnectState)
     
     /// 房间内用户数变化
     /// - Parameter userCount: <#userCount description#>

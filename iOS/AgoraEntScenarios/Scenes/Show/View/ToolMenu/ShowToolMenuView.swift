@@ -80,7 +80,11 @@ enum ShowMenuType {
 }
 
 class ShowToolMenuView: UIView {
-    var title: String?
+    var title: String? {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
     var onTapItemClosure: ((ShowToolMenuType, Bool) -> Void)?
     
     public lazy var collectionView: AGECollectionView = {
@@ -116,9 +120,8 @@ class ShowToolMenuView: UIView {
         }
     }
     
-    init(type: ShowMenuType, title: String? = nil) {
+    init(type: ShowMenuType) {
         super.init(frame: .zero)
-        self.title = title
         setupUI()
         defer {
             self.type = type
@@ -194,7 +197,7 @@ extension ShowToolMenuView: AGECollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: Screen.width, height: title == nil ? 0 : 50)
+        CGSize(width: Screen.width, height: (type == .idle_audience || type == .idle_broadcaster) ? 0 : 50)
     }
 }
 
