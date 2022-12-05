@@ -23,7 +23,11 @@ class ShowRoomLiveView: UIView {
     var room: ShowRoomListModel? {
         didSet{
             roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
-            self.roomUserCount = room?.roomUserCount ?? 1
+            guard let count = room?.roomUserCount else {
+                roomUserCount = 1
+                return
+            }
+            self.roomUserCount = count
         }
     }
     
@@ -216,6 +220,10 @@ extension ShowRoomLiveView: ShowChatInputViewDelegate {
     }
     
     func onClickSendButton(text: String) {
+        if text.count > 80 {
+            ToastView.show(text: "show_live_chat_text_length_beyond_bounds".show_localized)
+            return
+        }
         delegate?.onClickSendMsgButton(text: text)
     }
     

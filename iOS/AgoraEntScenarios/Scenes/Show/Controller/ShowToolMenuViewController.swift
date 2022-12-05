@@ -23,22 +23,24 @@ class ShowToolMenuViewController: UIViewController {
     
     var menuTitle: String? {
         didSet {
-            menuView.title = menuTitle
+            menuView?.title = menuTitle
         }
     }
     var type: ShowMenuType = .idle_audience {
         didSet {
-            menuView.type = type
+            if type == oldValue { return }
+            updateLayoutForType(type)
         }
     }
     var delegate: ShowToolMenuViewControllerDelegate?
     
-    private var menuView = ShowToolMenuView(type: .idle_audience)
+    private var menuView: ShowToolMenuView?
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
-        modalTransitionStyle = .crossDissolve
+//        modalTransitionStyle = .crossDissolve
+        
     }
     
     required init?(coder: NSCoder) {
@@ -55,9 +57,10 @@ class ShowToolMenuViewController: UIViewController {
     }
     
     private func setUpUI(){
-        view.addSubview(menuView)
+        menuView = ShowToolMenuView(type: type)
+        view.addSubview(menuView!)
         updateLayoutForType(type)
-        menuView.onTapItemClosure = {[weak self] modelType, isSelected in
+        menuView?.onTapItemClosure = {[weak self] modelType, isSelected in
             switch modelType {
             case .camera:
                 self?.delegate?.onClickCameraButtonSelected(isSelected)
@@ -93,8 +96,8 @@ class ShowToolMenuViewController: UIViewController {
         if type == .idle_audience {
             height = 150
         }
-        menuView.type = type
-        menuView.snp.remakeConstraints({ make in
+        menuView?.type = type
+        menuView?.snp.remakeConstraints({ make in
             make.left.bottom.right.equalToSuperview()
             make.height.equalTo(height)
         })
