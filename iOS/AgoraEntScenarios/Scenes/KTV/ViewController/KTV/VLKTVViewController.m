@@ -84,8 +84,8 @@ VLPopScoreViewDelegate
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
 @property (nonatomic, strong) VLSongItmModel *choosedSongModel; //点的歌曲
-@property (nonatomic, assign) float currentTime;
-@property (nonatomic, assign) float currentDuration;
+@property (nonatomic, assign) NSInteger currentTime;
+@property (nonatomic, assign) NSInteger currentDuration;
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
@@ -227,12 +227,12 @@ VLPopScoreViewDelegate
         [weakSelf setRoomUsersCount:count];
     }];
     
-    [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
-        if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
-            //audience use sync to update pitch value, main singer don't
-            weakSelf.currentVoicePitch = score;
-        }
-    }];
+//    [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
+//        if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+//            //audience use sync to update pitch value, main singer don't
+//            weakSelf.currentVoicePitch = score;
+//        }
+//    }];
     
     [[AppContext ktvServiceImp] subscribeSeatListChangedWithBlock:^(KTVSubscribe status, VLRoomSeatModel* seatModel) {
         
@@ -486,7 +486,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
     
     self.currentVoicePitch = speaker.voicePitch;
-    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
+//    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
+    [self sendVoicePitchMessage:speaker.voicePitch];
 }
 
 - (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol> _Nonnull)playerKit
@@ -556,9 +557,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         } else {
             RtcMusicLrcMessage *musicLrcMessage = [RtcMusicLrcMessage vj_modelWithDictionary:dict];
-            float postion = musicLrcMessage.time;
+            NSInteger postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
+            NSLog(@"receiveStreamMessageFromUid1 setLrcTime: %ld", postion);
 //            KTVLogInfo(@"setLrcTime: %.2f/%.2f, songNo: %@", self.currentTime, self.currentDuration, self.currentPlayingSongNo);
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
@@ -579,6 +581,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                               currentSong:song];
         }
         VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
+    } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {  //voice pitch
+        int pitch = [dict[@"pitch"] intValue];
+        NSInteger time = [dict[@"time"] integerValue];
+        self.currentVoicePitch = pitch;
+        NSLog(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 //    else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
 //        [self.rtcMediaPlayer selectAudioTrack:[dict[@"value"] intValue]];
@@ -1225,7 +1232,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(NSTimeInterval)getTotalTime {
     VLRoomSelSongModel *model = self.selSongsArray.firstObject;
     if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
-        NSTimeInterval time = [_rtcMediaPlayer getDuration];
+        NSInteger time = [_rtcMediaPlayer getDuration];
         return time;
     }
     return self.currentDuration;
@@ -1234,7 +1241,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (NSTimeInterval)getPlayerCurrentTime {
     VLRoomSelSongModel *model = self.selSongsArray.firstObject;
     if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
-        NSTimeInterval time = [_rtcMediaPlayer getPosition];
+        NSInteger time = [_rtcMediaPlayer getPosition];
         return time;
     }
     
@@ -1504,6 +1511,17 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             @"value":@"1"
         };
     }
+    [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
+    }];
+}
+
+- (void)sendVoicePitchMessage:(NSInteger)pitch {
+    NSDictionary *dict;
+    dict = @{
+        @"cmd":@"setVoicePitch",
+        @"pitch":@(pitch),
+        @"time": @([self.rtcMediaPlayer getPosition])
+    };
     [self sendStremMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
 }
