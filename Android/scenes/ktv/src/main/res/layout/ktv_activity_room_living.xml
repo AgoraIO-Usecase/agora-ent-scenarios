@@ -91,8 +91,6 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="15dp"
         android:layout_marginTop="24dp"
-        android:minWidth="345dp"
-        android:minHeight="300dp"
         app:layout_constraintBottom_toTopOf="@id/rvUserMember"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
