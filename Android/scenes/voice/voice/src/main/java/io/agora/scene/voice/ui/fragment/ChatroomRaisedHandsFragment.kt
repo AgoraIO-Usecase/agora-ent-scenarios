@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
@@ -37,6 +37,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
     private var isLoadingNextPage = false
     private var emptyView: View? = null
     private var currentIndex:Int = 0
+    private var total:Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         emptyView = layoutInflater.inflate(R.layout.voice_no_data_layout, container, false)
@@ -89,8 +90,11 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                 parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                     override fun onSuccess(data: List<VoiceMemberModel>?) {
                         finishRefresh()
-                        if (data == null) return
-                        val total = data.size
+                        if (data == null){
+                            onFragmentListener?.getItemCount(0)
+                            return
+                        }
+                        total = data.size
                         adapter?.data = data
                         onFragmentListener?.getItemCount(total)
                         isRefreshing = false
@@ -120,7 +124,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
                             it.member?.chatUid?.let { chatUid ->
-                                ChatroomCacheManager.cacheManager.removeSubmitMember(
+                                ChatroomIMManager.getInstance().removeSubmitMember(
                                     chatUid
                                 )
                                 adapter?.notifyItemRemoved(currentIndex)
