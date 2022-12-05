@@ -69,7 +69,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     // MARK: Private
     private func getRoomId() -> String {
         guard let _roomId = roomId else {
-            agoraAssert("roomId == nil")
+//            agoraAssert("roomId == nil")
             return ""
         }
 

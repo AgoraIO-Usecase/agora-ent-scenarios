@@ -13,11 +13,12 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?
     var isBroadcaster = true
+    var isOutsise = false
 
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    var settingManager: ShowSettingManager!
+    var settingManager: ShowAgoraKitManager!
     
     // 当前设置的预设值
     var presetModeName: String?
@@ -25,11 +26,11 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized]
     
-    private lazy var videoSettingVC: ShowVideoSettingVC = {
+    private lazy var videoSettingVC: ShowVideoSettingVC? = {
         return createSettingVCForIndex(0)
     }()
     
-    private lazy var audioSettingVC: ShowVideoSettingVC = {
+    private lazy var audioSettingVC: ShowVideoSettingVC? = {
         return createSettingVCForIndex(1)
     }()
     
@@ -84,11 +85,16 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             make.left.right.equalToSuperview()
             make.top.equalTo(naviBar.snp.bottom)
         }
-    
+        segmentedView.isHidden = !isBroadcaster
+        
         view.addSubview(listContainerView)
         listContainerView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
-            make.top.equalTo(segmentedView.snp.bottom).offset(10)
+            if self.isBroadcaster {
+                make.top.equalTo(segmentedView.snp.bottom).offset(10)
+            }else{
+                make.top.equalTo(naviBar.snp.bottom).offset(10)
+            }
             make.bottom.equalToSuperview()
         }
     }
@@ -102,9 +108,9 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(naviBar)
     }
     
-    private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC {
+    private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC? {
         // 主播端设置
-        let broadcasterVideoSettings: [ShowSettingKey] = [
+        let outsideSettings: [ShowSettingKey] = [
             .H265,
             .colorEnhance,
             .lowlightEnhance,
@@ -114,6 +120,16 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .FPS,
             .videoBitRate
         ]
+        let insideSettings: [ShowSettingKey] = [
+            .colorEnhance,
+            .lowlightEnhance,
+            .videoDenoiser,
+            .PVC,
+            .videoEncodeSize,
+            .FPS,
+            .videoBitRate
+        ]
+        let broadcasterVideoSettings: [ShowSettingKey] = isOutsise ? outsideSettings : insideSettings
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
             .SR
@@ -124,10 +140,14 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .recordingSignalVolume,
             .musincVolume,
         ]
-        let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings,[]]
+        let settings = isBroadcaster ? [broadcasterVideoSettings, audioSettings] : [audienceVideoSettings]
+        if settings.count <= index {
+            return nil
+        }
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
+       
         vc.dataArray = settings[index]
         vc.willChangeSettingParams = {[weak self] key, value in
             guard let wSelf = self else { return false }
@@ -144,8 +164,8 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             showAlert(title:"show_presetting_alert_will_change_value_title".show_localized, message: "\(msg1)\"\(presetModeName!)\"\(msg2)") { [weak self] in
                 self?.presetModeName = nil
                 key.writeValue(value)
-                self?.videoSettingVC.reloadData()
-                self?.audioSettingVC.reloadData()
+                self?.videoSettingVC?.reloadData()
+                self?.audioSettingVC?.reloadData()
             }
         }
         return presetModeName == nil
@@ -160,8 +180,8 @@ extension ShowAdvancedSettingVC {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
             self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .signle)
-            self?.videoSettingVC.reloadData()
-            self?.audioSettingVC.reloadData()
+            self?.videoSettingVC?.reloadData()
+            self?.audioSettingVC?.reloadData()
             let text1 = "show_presetting_update_toast1".show_localized
             let text2 = "show_presetting_update_toast2".show_localized
             ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
@@ -180,9 +200,9 @@ extension ShowAdvancedSettingVC:  AEAListContainerViewDataSource{
     
     func listContainerView(_ listContainerView: AEAListContainerView, viewControllerFor index: Int) -> UIViewController {
         if index == 0 {
-            return videoSettingVC
+            return videoSettingVC ?? UIViewController()
         }
-        return audioSettingVC
+        return audioSettingVC ?? UIViewController()
     }
 }
 

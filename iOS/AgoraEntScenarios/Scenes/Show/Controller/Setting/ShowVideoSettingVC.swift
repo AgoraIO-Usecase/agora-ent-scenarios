@@ -14,8 +14,10 @@ private let LabelCellID = "LabelCellID"
 
 class ShowVideoSettingVC: UIViewController {
     
+    private let transDelegate = ShowPresentTransitioningDelegate()
+    
     var dataArray = [ShowSettingKey]()
-    var settingManager: ShowSettingManager!
+    var settingManager: ShowAgoraKitManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     
     private lazy var tableView: UITableView = {
@@ -86,17 +88,20 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
             let index = data.intValue
             let value = data.items[index]
-            cell.setTitle(data.title, value: value) {
+            cell.setTitle(data.title, value: value) { [weak self] in
                 let vc = ShowSettingActionSheetVC()
+                vc.transitioningDelegate = self?.transDelegate
                 vc.title = data.title
                 vc.defaultSelectedIndex = data.intValue
                 vc.dataArray = data.items
-                vc.didSelectedIndex = { index in
+                vc.didSelectedIndex = {[weak self] index in
                     data.writeValue(index)
-                    self.settingManager.updateSettingForkey(data)
+                    self?.settingManager.updateSettingForkey(data)
                     tableView.reloadData()
                 }
-                self.present(vc, animated: true)
+                self?.present(vc, animated: true, completion: {
+                    vc.showBgView()
+                })
             }
             return cell
         }else {

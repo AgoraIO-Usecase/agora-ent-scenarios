@@ -18,6 +18,13 @@ class ShowSettingActionSheetVC: UIViewController {
     var defaultSelectedIndex: Int = 0
     var didSelectedIndex: ((_ index: Int)->())?
     var dataArray = [String]()
+
+    private lazy var bgView: UIView = {
+        let bgView = UIView()
+        bgView.backgroundColor = .show_cover
+        bgView.alpha = 0
+        return bgView
+    }()
     
     private lazy var headerView: ShowSettingHeaderView = {
         let headerView = ShowSettingHeaderView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: TableHeaderHeight))
@@ -46,7 +53,7 @@ class ShowSettingActionSheetVC: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
-        modalTransitionStyle = .crossDissolve
+//        modalTransitionStyle = .crossDissolve
     }
     
     required init?(coder: NSCoder) {
@@ -60,8 +67,6 @@ class ShowSettingActionSheetVC: UIViewController {
     
     private func setUpUI(){
         
-        let bgView = UIView()
-        bgView.backgroundColor = .show_cover
         view.addSubview(bgView)
         bgView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -84,11 +89,29 @@ class ShowSettingActionSheetVC: UIViewController {
     }
     
     @objc private func didClickCancelButton(){
-        dismiss(animated: true)
+        dismiss()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        dismiss(animated: true)
+       dismiss()
+    }
+}
+
+extension ShowSettingActionSheetVC {
+    
+    func showBgView(){
+        UIView.animate(withDuration: 0.2) {
+            self.bgView.alpha = 1
+        }
+    }
+    
+    private func dismiss() {
+        UIView.animate(withDuration: 0.2) {
+            self.bgView.alpha = 0
+        } completion: { finish in
+            self.dismiss(animated: true)
+        }
+
     }
 }
 
@@ -109,7 +132,7 @@ extension ShowSettingActionSheetVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         didSelectedIndex?(indexPath.row)
-        dismiss(animated: true)
+        dismiss()
     }
 }
 
