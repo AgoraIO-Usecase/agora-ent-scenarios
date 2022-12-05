@@ -5,8 +5,7 @@ package com.bytedance.labcv.core.effect;
  */
 public interface EffectResourceProvider {
     String getModelPath();
-    String getComposePath();
-    String getFilterPath();
+    String getComposePath(String compose);
     String getFilterPath(String filter);
     String getStickerPath(String sticker);
 }

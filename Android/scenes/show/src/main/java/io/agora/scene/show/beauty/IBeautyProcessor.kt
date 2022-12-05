@@ -2,9 +2,11 @@ package io.agora.scene.show.beauty
 
 import io.agora.base.VideoFrame
 import io.agora.rtc2.video.IVideoFrameObserver
+import java.util.concurrent.Executors
 
 
 abstract class IBeautyProcessor: IVideoFrameObserver {
+    private val workerExecutor = Executors.newSingleThreadExecutor()
 
     @Volatile
     private var isEnable = true
@@ -24,7 +26,11 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
 
     // Publish Functions
 
-    abstract fun release()
+    open fun release(){
+        if(workerExecutor.isShutdown){
+            workerExecutor.shutdownNow()
+        }
+    }
 
     fun setEnable(enable: Boolean){
         isEnable = enable
@@ -35,24 +41,32 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
     fun setFaceBeautify(itemId: Int, intensity: Float){
         BeautyCache.cacheItemValue(GROUP_ID_BEAUTY, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_BEAUTY, itemId)
-        setFaceBeautifyAfterCached(itemId, intensity)
+        workerExecutor.execute {
+            setFaceBeautifyAfterCached(itemId, intensity)
+        }
     }
 
     fun setFilter(itemId: Int, intensity: Float){
         BeautyCache.cacheItemValue(GROUP_ID_FILTER, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_FILTER, itemId)
-        setFilterAfterCached(itemId, intensity)
+        workerExecutor.execute {
+            setFilterAfterCached(itemId, intensity)
+        }
     }
 
     fun setEffect(itemId: Int, intensity: Float){
         BeautyCache.cacheItemValue(GROUP_ID_EFFECT, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_EFFECT, itemId)
-        setEffectAfterCached(itemId, intensity)
+        workerExecutor.execute{
+            setEffectAfterCached(itemId, intensity)
+        }
     }
 
     fun setSticker(itemId: Int){
         BeautyCache.cacheOperation(GROUP_ID_STICKER, itemId)
-        setStickerAfterCached(itemId)
+        workerExecutor.execute{
+            setStickerAfterCached(itemId)
+        }
     }
 
 
