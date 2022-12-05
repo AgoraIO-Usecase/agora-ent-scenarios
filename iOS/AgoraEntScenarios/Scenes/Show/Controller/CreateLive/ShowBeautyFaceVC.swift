@@ -61,19 +61,19 @@ class ShowBeautyFaceVC: UIViewController {
     
     func changeValueHandler(value: CGFloat) {
         guard value > 0 else { return }
-        setBeautyHandler(value: value)
+        setBeautyHandler(value: value, isReset: false)
     }
     
     func reloadData() {
         collectionView.reloadData()
     }
     
-    private func setBeautyHandler(value: CGFloat) {
+    private func setBeautyHandler(value: CGFloat, isReset: Bool) {
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
         case .beauty:
-            if value <= 0 {
+            if isReset {
                 ByteBeautyManager.shareManager.reset(datas: dataArray)
                 return
             }
@@ -82,7 +82,7 @@ class ShowBeautyFaceVC: UIViewController {
                                                      value: model.value)
             
         case .filter:
-            if value <= 0 {
+            if isReset {
                 ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
                 return
             }
@@ -90,7 +90,7 @@ class ShowBeautyFaceVC: UIViewController {
                                                      value: model.value)
             
         case .style:
-            if value <= 0 {
+            if isReset {
                 ByteBeautyManager.shareManager.reset(datas: dataArray)
                 ByteBeautyManager.shareManager.reset(datas: dataArray,
                                                      key: "Makeup_ALL")
@@ -155,7 +155,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         
         defalutSelectIndex = indexPath.item
         let model = dataArray[indexPath.item]
-        setBeautyHandler(value: model.value)
+        setBeautyHandler(value: model.value, isReset: model.path == nil)
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
