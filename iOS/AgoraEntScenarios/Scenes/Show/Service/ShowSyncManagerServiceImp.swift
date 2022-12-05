@@ -524,31 +524,40 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func acceptPKInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("accept invitation not found")
-            return
-        }
-        invitation.status = .accepted
-        _updatePKInvitation(invitation: invitation, completion: completion)
-        
-        let interaction = ShowInteractionInfo()
-        interaction.userId = invitation.fromUserId
-        interaction.userName = invitation.fromName
-        interaction.roomId = invitation.fromRoomId
-        interaction.interactStatus = .pking
-        interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        _addInteraction(interaction: interaction) { error in
+        guard let room = room else { return }
+        _getAllPKInvitationList(room: room) { [weak self] (error, list) in
+            guard let self = self,
+                  let list = list,
+                  let invitation = list.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraPrint("accept invitation not found")
+                return
+            }
+            
+            invitation.status = .accepted
+            self._updatePKInvitation(invitation: invitation, completion: completion)
+            
+            let interaction = ShowInteractionInfo()
+            interaction.userId = invitation.fromUserId
+            interaction.userName = invitation.fromName
+            interaction.roomId = invitation.fromRoomId
+            interaction.interactStatus = .pking
+            interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
+            self._addInteraction(interaction: interaction) { error in
+            }
         }
     }
     
     func rejectPKInvitation(completion: @escaping (Error?) -> Void) {
-        guard let invitation = self.pkInvitationList.filter({ $0.userId == VLUserCenter.user.id }).first else {
-            agoraAssert("accept invitation not found")
-            return
+        guard let room = room else { return }
+        _getAllPKInvitationList(room: room) { [weak self] (error, list) in
+            guard let self = self,
+                  let list = list,
+                  let invitation = list.filter({ $0.userId == VLUserCenter.user.id }).first else {
+                agoraPrint("accept invitation not found")
+                return
+            }
+            self._removePKInvitation(invitation: invitation, completion: completion)
         }
-//        invitation.status = .rejected
-//        _updatePKInvitation(invitation: invitation, completion: completion)
-        _removePKInvitation(invitation: invitation, completion: completion)
     }
     
     func getAllInterationList(completion: @escaping (Error?, [ShowInteractionInfo]?) -> Void) {
