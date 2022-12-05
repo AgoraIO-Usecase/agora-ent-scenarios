@@ -174,7 +174,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             return
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -193,11 +193,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
-    private func _refreshInvitationList() {
+    private func _refreshPKUserList() {
         AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
             self?.pkUserInvitationList = pkUserList
         }
@@ -222,6 +222,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     
     //MARK: ShowSubscribeServiceProtocol
+    func onRoomExpired() {
+        let vc = ShowReceiveLiveFinishAlertVC()
+        vc.dismissAlert { [weak self] in
+            self?.leaveRoom()
+        }
+        
+        self.present(vc, animated: true)
+    }
+    
     func onUserCountChanged(userCount: Int) {
         self.liveView.roomUserCount = userCount
     }
@@ -274,7 +283,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         }
@@ -288,7 +297,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
@@ -316,13 +325,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
         guard "\(roomOwnerId)" == invitation.userId else { return }
-        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
+//        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
         liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
-        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
+//        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
         guard invitation.userId == VLUserCenter.user.id else { return }
         agoraKitManager.switchRole(role: .broadcaster,
                                    uid: invitation.userId,
@@ -384,8 +393,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
-        _refreshInvitationList()
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -400,20 +409,20 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
-        _refreshInvitationList()
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         self.currentInteraction = interaction
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         self.currentInteraction = nil
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -600,7 +609,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
