@@ -520,8 +520,26 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        liveView.canvasView.setRemoteUserInfo(name: "")
 //        liveView.canvasView.canvasType = .none
 //        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
-        if let interaction = self.currentInteraction, interaction.userId == "\(uid)" {
-            _stopInteraction(interaction: interaction)
+        if let interaction = self.currentInteraction {
+            let isRoomOwner: Bool = room?.ownerId ?? "" == VLUserCenter.user.id
+            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
+            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
+            if isInteractionLeave {
+                if isRoomOwner {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                } else if roomOwnerExit {
+                    //room owner exit
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                }
+            } else {
+                //roomowner exit while onseat or pk
+                if roomOwnerExit {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                }
+            }
         }
     }
 
