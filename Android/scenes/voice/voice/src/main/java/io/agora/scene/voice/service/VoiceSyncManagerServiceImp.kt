@@ -53,6 +53,10 @@ class VoiceSyncManagerServiceImp(
         roomServiceSubscribeDelegates.clear()
     }
 
+    override fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>{
+        return roomServiceSubscribeDelegates
+    }
+
     /**
      * 获取房间列表
      * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
