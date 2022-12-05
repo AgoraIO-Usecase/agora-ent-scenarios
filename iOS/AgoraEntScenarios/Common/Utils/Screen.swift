@@ -67,7 +67,7 @@ struct Screen {
 
     /// 安全区域顶部高度
     static func safeAreaTopHeight() -> CGFloat {
-        guard let safeInserts = UIApplication.keyWindow?.safeAreaInsets else {
+        guard let safeInserts = UIApplication.shared.windows.first?.safeAreaInsets else {
             return 0
         }
         return safeInserts.top
