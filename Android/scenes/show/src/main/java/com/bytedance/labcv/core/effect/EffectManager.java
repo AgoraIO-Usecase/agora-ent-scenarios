@@ -261,10 +261,9 @@ public class EffectManager {
      */
 
     public boolean appendComposeNodes(String[] nodes){
-        String prefix = mResourceProvider.getComposePath();
         String[] path = new String[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
-            path[i] = prefix + nodes[i];
+            path[i] = mResourceProvider.getComposePath(nodes[i]);;
         }
         if (mEnableSyncLoadResource){
             for (String item: path){
@@ -300,10 +299,9 @@ public class EffectManager {
      * @details Delete nodes at the same time, you need to maintain the state of the saved nodes
      */
     public boolean removeComposeNodes(String[] nodes){
-        String prefix = mResourceProvider.getComposePath();
         String[] path = new String[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
-            path[i] = prefix + nodes[i];
+            path[i] = mResourceProvider.getComposePath(nodes[i]);
             Iterator<SavedComposerItem>iterator = mSavedComposerNodes.iterator();
             while (iterator.hasNext()){
                 if (TextUtils.equals(iterator.next().node, nodes[i])){
@@ -340,10 +338,9 @@ public class EffectManager {
             }
         }
 
-        String prefix = mResourceProvider.getComposePath();
         String[] path = new String[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
-            path[i] = prefix + nodes[i];
+            path[i] = mResourceProvider.getComposePath(nodes[i]);
 
         }
         if (mEnableSyncLoadResource){
@@ -411,7 +408,7 @@ public class EffectManager {
             mSavedComposerNodes.remove(item);
         }
         mSavedComposerNodes.add(item);
-        String path = mResourceProvider.getComposePath() + node;
+        String path = mResourceProvider.getComposePath(node);
         LogUtils.d("updateComposerNodes node ="+path+" key = "+ key + " intensity ="+intensity);
 
         return mRenderManager.updateComposerNodes(path, key, intensity) == BEF_RESULT_SUC;
@@ -785,10 +782,9 @@ public class EffectManager {
 
         if (mSavedComposerNodes.size() > 0) {
             String[] nodes = getSavedComposerNodes(mSavedComposerNodes);
-            String prefix = mResourceProvider.getComposePath();
             String[] path = new String[nodes.length];
             for (int i = 0; i < nodes.length; i++) {
-                path[i] = prefix + nodes[i];
+                path[i] = mResourceProvider.getComposePath(nodes[i]);
             }
             if (mEnableSyncLoadResource){
                 for (String item: path){
@@ -807,7 +803,7 @@ public class EffectManager {
             }
 
             for (SavedComposerItem item : mSavedComposerNodes) {
-                String nodePath = prefix + item.node;
+                String nodePath = mResourceProvider.getComposePath(item.node);
                 LogUtils.d("updateComposerNodes node ="+nodePath+" key = "+ item.key + " intensity ="+item.intensity);
 
                 mRenderManager.updateComposerNodes(nodePath, item.key, item.intensity);

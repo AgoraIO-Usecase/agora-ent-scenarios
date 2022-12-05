@@ -27,13 +27,9 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_ZHOUN
 
 import android.content.Context;
 
-import com.bytedance.labcv.core.Config;
 import com.bytedance.labcv.core.effect.EffectManager;
-import com.bytedance.labcv.core.effect.EffectResourceHelper;
 import com.bytedance.labcv.core.util.ImageUtil;
 import com.bytedance.labcv.effectsdk.BytedEffectConstants;
-
-import java.io.File;
 
 import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
@@ -53,7 +49,6 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
 
     private final Context mContext;
-    private final String mResourcePath;
     private volatile boolean isReleased = false;
 
     private EffectManager mEffectManager;
@@ -63,7 +58,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     private volatile boolean resourceReady = false;
     private volatile boolean sdkIsInit = false;
 
-    private final AssetsCopyHelper assetsCopyHelper;
+    private final ResourcesHelper resourcesHelper;
 
     private TextureBufferHelper textureBufferHelper;
 
@@ -71,17 +66,15 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     public BeautyByteDanceImpl(Context context) {
         mContext = context;
-        mResourcePath = mContext.getExternalFilesDir("assets").getAbsolutePath() + File.separator + "resource";
-        assetsCopyHelper = new AssetsCopyHelper(context, "resource", mContext.getExternalFilesDir("assets").getAbsolutePath());
-        assetsCopyHelper.start(() -> resourceReady = true);
+        resourcesHelper = new ResourcesHelper(context);
+        resourcesHelper.init(() -> resourceReady = true);
     }
 
     /**
      * EffectManager的初始化，包括各种资源路径配置
      */
     private void cvSdkInit() {
-        String licensePath = new File(new File(mResourcePath, "LicenseBag.bundle"), Config.LICENSE_NAME).getAbsolutePath();
-        mEffectManager = new EffectManager(mContext, new EffectResourceHelper(mContext), licensePath);
+        mEffectManager = new EffectManager(mContext, resourcesHelper, resourcesHelper.getLicensePath());
         mImageUtil = new ImageUtil();
     }
 
@@ -203,9 +196,11 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     public void release() {
+        super.release();
         isReleased = true;
         sdkIsInit = false;
-        assetsCopyHelper.stop();
+        resourceReady = false;
+        resourcesHelper.release();
         if(textureBufferHelper != null){
             textureBufferHelper.invoke(() -> {
                 cvSdkUnInit();
@@ -243,23 +238,23 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
             mEffectManager.setFilterAbs(null);
         }
         else if(itemId == ITEM_ID_FILTER_CREAM){
-            mEffectManager.setFilter("/Filter/Filter_01_38");
+            mEffectManager.setFilter("Filter_01_38");
             mEffectManager.updateFilterIntensity(intensity);
         }
         else if(itemId == ITEM_ID_FILTER_MAKALONG){
-            mEffectManager.setFilter("/Filter/Filter_02_14");
+            mEffectManager.setFilter("Filter_02_14");
             mEffectManager.updateFilterIntensity(intensity);
         }
         else if(itemId == ITEM_ID_FILTER_OXGEN){
-            mEffectManager.setFilter("/Filter/Filter_03_20");
+            mEffectManager.setFilter("Filter_03_20");
             mEffectManager.updateFilterIntensity(intensity);
         }
         else if(itemId == ITEM_ID_FILTER_WUYU){
-            mEffectManager.setFilter("/Filter/Filter_04_12");
+            mEffectManager.setFilter("Filter_04_12");
             mEffectManager.updateFilterIntensity(intensity);
         }
         else if(itemId == ITEM_ID_FILTER_Po9){
-            mEffectManager.setFilter("/Filter/Filter_05_10");
+            mEffectManager.setFilter("Filter_05_10");
             mEffectManager.updateFilterIntensity(intensity);
         }
     }
@@ -275,10 +270,10 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
             mEffectManager.setSticker(null);
         }
         else if(itemId == ITEM_ID_STICKER_BITI){
-            mEffectManager.setSticker("/stickers/zhaocaimao");
+            mEffectManager.setSticker("maobing");
         }
         else if(itemId == ITEM_ID_STICKER_ZHOUNIAN){
-            mEffectManager.setSticker("/stickers/background_blur");
+            mEffectManager.setSticker("zhangshangyouxiji");
         }
     }
 }
