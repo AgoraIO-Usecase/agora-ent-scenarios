@@ -84,7 +84,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
             parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
                     finishRefresh()
-                    if (data == null) return
+                    if (data == null){
+                        onFragmentListener?.getItemCount(0)
+                        return
+                    }
                     val total = data.size
                     adapter?.data = data
                     onFragmentListener?.getItemCount(total)

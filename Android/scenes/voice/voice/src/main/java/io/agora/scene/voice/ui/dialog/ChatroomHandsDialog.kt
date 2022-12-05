@@ -141,6 +141,17 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
 
                         override fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {
                             onFragmentListener?.onAcceptMicSeatApply(voiceMicInfoModel)
+                            if (mCount > 0) {
+                                mCount -= 1
+                                activity?.let {
+                                    val content = requireActivity().getString(titles[index]) + getString(
+                                        R.string.voice_room_tab_layout_count,
+                                        mCount.toString()
+                                    )
+                                    "getItemCount content1: $content".logD(TAG)
+                                    title?.text = content
+                                }
+                            }
                         }
 
                     })

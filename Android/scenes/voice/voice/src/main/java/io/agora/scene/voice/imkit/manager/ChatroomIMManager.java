@@ -19,19 +19,23 @@ import io.agora.chat.ChatMessage;
 import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
+import io.agora.chat.adapter.EMAChatRoomManagerListener;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
+import io.agora.scene.voice.imkit.custorm.MsgConstant;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
-import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.model.VoiceGiftModel;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.model.VoiceMicInfoModel;
 import io.agora.scene.voice.model.VoiceRankUserModel;
 import io.agora.scene.voice.model.VoiceRoomInfo;
 import io.agora.scene.voice.model.VoiceRoomModel;
+import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
+import io.agora.voice.common.utils.GsonTools;
 import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
@@ -42,6 +46,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     public OnChatroomEventReceiveListener chatroomEventListener;
     public OnChatroomConnectionListener chatroomConnectionListener;
     private ChatroomProtocolDelegate delegate;
+    private ChatroomCacheManager cacheManager = ChatroomCacheManager.Companion.getCacheManager();
     private static final String TAG = "ChatroomIMManager";
 
     public static ChatroomIMManager getInstance() {
@@ -147,39 +152,6 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 发送礼物消息
-     * @param giftId
-     * @param num
-     * @param nickName
-     * @param callBack
-     */
-    public void sendGiftMsg(String nickName,String portrait,String giftId,int num,String price,String giftName, OnMsgCallBack callBack) {
-        CustomMsgHelper.getInstance().sendGiftMsg(nickName,portrait,giftId,num,price,giftName ,new OnMsgCallBack() {
-            @Override
-            public void onSuccess(ChatMessageData message) {
-                if(callBack != null) {
-                    callBack.onSuccess(message);
-                }
-            }
-
-            @Override
-            public void onProgress(int i, String s) {
-                super.onProgress(i, s);
-                if(callBack != null) {
-                    callBack.onProgress(i, s);
-                }
-            }
-
-            @Override
-            public void onError(String messageId, int code, String error) {
-                if(callBack != null) {
-                    callBack.onError(messageId, code, error);
-                }
-            }
-        });
-    }
-
-    /**
      * 插入欢迎消息
      * @param content
      * @param nick
@@ -276,6 +248,56 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
             userPortrait = ext.get("portrait");
         }
         return userPortrait;
+    }
+
+    /**
+     * 解析Gift消息获取 giftModel
+     * @param msg
+     * @return
+     */
+    public VoiceGiftModel getGiftModel(ChatMessageData msg){
+        Map<String, String> giftMap = CustomMsgHelper.getInstance().getCustomMsgParams(msg);
+        if (giftMap != null){
+            VoiceGiftModel voiceGiftModel = new VoiceGiftModel();
+            voiceGiftModel.setGift_id(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+            voiceGiftModel.setGift_count(giftMap.get(MsgConstant.CUSTOM_GIFT_KEY_NUM));
+            voiceGiftModel.setGift_name(giftMap.get(MsgConstant.CUSTOM_GIFT_NAME));
+            voiceGiftModel.setGift_price(giftMap.get(MsgConstant.CUSTOM_GIFT_PRICE));
+            voiceGiftModel.setUserName(giftMap.get(MsgConstant.CUSTOM_GIFT_USERNAME));
+            voiceGiftModel.setPortrait(giftMap.get(MsgConstant.CUSTOM_GIFT_PORTRAIT));
+            return voiceGiftModel;
+        }
+       return null;
+    }
+
+    /**
+     * 解析消息 获取VoiceMemberModel对象
+     * @param msg
+     * @return
+     */
+    public VoiceMemberModel getVoiceMemberModel(ChatMessageData msg){
+        Map<String, String> map = CustomMsgHelper.getInstance().getCustomMsgParams(msg);
+        if (map.containsKey("user")){
+            return GsonTools.toBean(map.get("user"),VoiceMemberModel.class);
+        }
+        return null;
+    }
+
+    /**
+     * 获取成员非主动退出房间原因
+     * @param reason
+     * @return
+     */
+    public VoiceRoomServiceKickedReason getKickReason(int reason){
+        switch (reason){
+            case EMAChatRoomManagerListener.BE_KICKED:
+                return VoiceRoomServiceKickedReason.removed;
+            case EMAChatRoomManagerListener.DESTROYED:
+                return VoiceRoomServiceKickedReason.destroyed;
+            case EMAChatRoomManagerListener.BE_KICKED_FOR_OFFLINE:
+                return VoiceRoomServiceKickedReason.offLined;
+            default: return null;
+        }
     }
 
 
@@ -608,7 +630,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 拒绝邀请
+     * 拒绝邀请（本期未实现）
      * @param chatUid
      * @param callBack
      */
@@ -713,4 +735,60 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         delegate.updateGiftAmount(chatUid,amount,callBack);
     }
 
+    ////////////////////////////本地缓存管理//////////////////////////////
+    /**
+     * 从服务端获取数据 直接赋值giftAmount
+     */
+    public void setGiftAmountCache(int amount){
+        cacheManager.setGiftAmountCache(amount);
+    }
+
+    /**
+     * 获取房间礼物总金额
+     */
+    public int getGiftAmountCache(){
+        return cacheManager.getGiftAmountCache();
+    }
+
+    /**
+     * 设置申请上麦列表
+     */
+    public void setSubmitMicList(VoiceMemberModel voiceMemberModel){
+        cacheManager.setSubmitMicList(voiceMemberModel);
+    }
+
+    /**
+     * 从申请列表移除指定成员对象
+     */
+    public void removeSubmitMember(String chatUid){
+        cacheManager.removeSubmitMember(chatUid);
+    }
+
+    /**
+     * 设置成员列表
+     */
+    public void setMemberList(VoiceMemberModel voiceMemberModel){
+        cacheManager.setMemberList(voiceMemberModel);
+    }
+
+    /**
+     * 从成员列表中移除指定成员( 成员退出回调中调用 )
+     */
+    public void removeMember(String chatUid){
+        cacheManager.removeMember(chatUid);
+    }
+
+    /**
+     * 设置榜单列表
+     */
+    public void setRankList(VoiceRankUserModel voiceRankUserModel){
+        cacheManager.setRankList(voiceRankUserModel);
+    }
+
+    /**
+     * 获取榜单列表
+     */
+    public List<VoiceRankUserModel> getRankList(){
+        return cacheManager.getRankList();
+    }
 }

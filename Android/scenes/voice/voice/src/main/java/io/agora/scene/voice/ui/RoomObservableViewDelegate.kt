@@ -9,41 +9,31 @@ import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
+import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceBuddyFactory.Companion.get
+import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.model.*
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
-import io.agora.scene.voice.model.*
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.constructor.RoomInfoConstructor
 import io.agora.scene.voice.model.constructor.RoomSoundAudioConstructor
-import io.agora.scene.voice.imkit.bean.ChatMessageData
-import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
-import io.agora.scene.voice.imkit.custorm.MsgConstant
-import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
+import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
-import io.agora.scene.voice.ui.dialog.RoomAINSSheetDialog
-import io.agora.scene.voice.ui.dialog.RoomAudioSettingsSheetDialog
+import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
-import io.agora.scene.voice.ui.dialog.RoomContributionAndAudienceSheetDialog
-import io.agora.scene.voice.ui.dialog.RoomNoticeSheetDialog
-import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
-import io.agora.scene.voice.ui.dialog.RoomMicManagerSheetDialog
-import io.agora.scene.voice.ui.dialog.RoomSocialChatSheetDialog
-import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
-import io.agora.voice.common.net.Resource
-import io.agora.scene.voice.ui.dialog.RoomSoundSelectionSheetDialog
-import io.agora.scene.voice.ui.dialog.RoomSpatialAudioSheetDialog
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
+import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.util.EMLog
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.IParserSource
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
@@ -728,31 +718,56 @@ class RoomObservableViewDelegate constructor(
     }
 
     // 发礼物成功回调
-    fun onSendGiftSuccess() {
-        ThreadManager.getInstance().runOnMainThread {
-            iRoomTopView.onRankMember(ChatroomCacheManager.cacheManager.getRankList())
-        }
-    }
-
-    // 收到礼物消息
-    fun receiveGift(roomId: String, message: ChatMessageData?) {
-        val giftMap: Map<String, String> = CustomMsgHelper.getInstance().getCustomMsgParams(message)
-        if (giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM] == null || giftMap[MsgConstant.CUSTOM_GIFT_PRICE] == null) return
-        val count = giftMap[MsgConstant.CUSTOM_GIFT_KEY_NUM]?.toIntOrNull() ?: 0
-        val price = giftMap[MsgConstant.CUSTOM_GIFT_PRICE]?.toIntOrNull() ?: 0
+    fun onSendGiftSuccess(roomId: String, message: ChatMessageData?) {
+        val voiceGiftModel = ChatroomIMManager.getInstance().getGiftModel(message)
+        val count = voiceGiftModel.gift_count?.toIntOrNull() ?: 0
+        val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
-        ChatroomCacheManager.cacheManager.updateGiftAmountCache(amount)
         ChatroomIMManager.getInstance()
-            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateRankList(get().getVoiceBuddy().chatUserName(), voiceGiftModel, object: CallBack{
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
-                        iRoomTopView.onUpdateGiftCount(ChatroomCacheManager.cacheManager.getGiftAmountCache())
+                        iRoomTopView.onRankMember(ChatroomIMManager.getInstance().rankList)
                     }
-                    EMLog.d(TAG, "updateAmount success")
+                    EMLog.d(TAG, "onSendGiftSuccess updateAmount success")
+                }
+
+                override fun onError(code: Int, error: String?) {
+                    EMLog.d(TAG, "onSendGiftSuccess updateAmount error$code $error")
+                }
+            })
+        ChatroomIMManager.getInstance()
+            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+                override fun onSuccess() {
+                    ThreadManager.getInstance().runOnMainThread {
+                        iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
+                    }
+                    EMLog.d(TAG, "onSendGiftSuccess updateAmount success")
                 }
 
                 override fun onError(code: Int, error: String) {
-                    EMLog.d(TAG, "updateAmount error$code $error")
+                    EMLog.d(TAG, "onSendGiftSuccess updateAmount error$code $error")
+                }
+            })
+    }
+
+    // 收到礼物消息回调
+    fun receiveGift(roomId: String, message: ChatMessageData?) {
+        val voiceGiftModel = ChatroomIMManager.getInstance().getGiftModel(message)
+        val count = voiceGiftModel.gift_count?.toIntOrNull() ?: 0
+        val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
+        val amount = count * price
+        ChatroomIMManager.getInstance()
+            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+                override fun onSuccess() {
+                    ThreadManager.getInstance().runOnMainThread {
+                        iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
+                    }
+                    EMLog.d(TAG, "receiveGift updateAmount success")
+                }
+
+                override fun onError(code: Int, error: String) {
+                    EMLog.d(TAG, "receiveGift updateAmount error$code $error")
                 }
             })
     }
@@ -870,15 +885,11 @@ class RoomObservableViewDelegate constructor(
         voiceRoomModel.announcement = announcement ?: ""
     }
 
-    // 更新机器人音量
-    fun updateRobotVolume(volume: String?) {
-        voiceRoomModel.robotVolume = volume?.toInt() ?: ConfigConstants.RotDefaultVolume
-    }
-
     fun onSeatUpdated(attributeMap: Map<String, String>) {
         if (attributeMap.containsKey("gift_amount")) {
             attributeMap["gift_amount"]?.toIntOrNull()?.let {
                 voiceRoomModel.giftAmount = it
+                ChatroomIMManager.getInstance().giftAmountCache = it
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onUpdateGiftCount(it)
                 }
@@ -897,7 +908,7 @@ class RoomObservableViewDelegate constructor(
             val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
             rankList?.let { rankUsers ->
                 rankUsers.forEach { rank ->
-                    ChatroomCacheManager.cacheManager.setRankList(rank)
+                    ChatroomIMManager.getInstance().setRankList(rank)
                 }
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onRankMember(rankUsers)
