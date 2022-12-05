@@ -73,6 +73,7 @@ class ByteBeautyManager {
     func reset(datas: [ByteBeautyModel], key: String? = nil) {
         datas.forEach({
             guard $0.path != nil else { return }
+            $0.isSelected = $0.path == nil
             processor.updateComposerNodeIntensity($0.path,
                                                   key: key ?? $0.key,
                                                   intensity: 0)
@@ -80,11 +81,17 @@ class ByteBeautyManager {
     }
     
     func resetFilter(datas: [ByteBeautyModel]) {
-        datas.forEach({ setFilter(path: $0.path, value: 0) })
+        datas.forEach({ item in
+            item.isSelected = item.path == nil
+            setFilter(path: item.path, value: 0)
+        })
     }
     
     func resetSticker(datas: [ByteBeautyModel]) {
-        datas.forEach({ _ in setSticker(path: "") })
+        datas.forEach({ item in
+            item.isSelected = item.path == nil
+            setSticker(path: "")
+        })
     }
     
     func processFrame(pixelBuffer: CVPixelBuffer?) -> CVPixelBuffer? {

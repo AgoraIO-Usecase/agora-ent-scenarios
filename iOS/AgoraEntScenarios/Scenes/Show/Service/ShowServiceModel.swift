@@ -151,4 +151,15 @@ class ShowInteractionInfo: ShowBaseInfo {
         return "userId: \(userId ?? "") roomId: \(roomId ?? "") status: \(interactStatus) objectId: \(objectId ?? "")"
     }
     #endif
+    
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let info = object as? ShowInteractionInfo,
+              userId == info.userId,
+              roomId == info.roomId,
+              interactStatus == info.interactStatus else {
+            return false
+        }
+        
+        return true
+    }
 }
