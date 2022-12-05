@@ -128,6 +128,7 @@ class ShowLiveViewController: UIViewController {
     private func leaveRoom(){
         ByteBeautyManager.shareManager.destroy()
         agoraKitManager.leaveChannel()
+        AppContext.showServiceImp.unsubscribeEvent(delegate: self)
         dismiss(animated: true) {
             AppContext.showServiceImp.leaveRoom { error in
                 print("error == \(error.debugDescription)")
@@ -208,7 +209,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             guard let self = self, error == nil else { return }
             if self.interactionList == nil, let interaction = interactionList?.first {
                 // first load
-                self.onInteractionBegan(interaction: interaction)
+                if self.room?.ownerId == VLUserCenter.user.id {
+                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    }
+                } else {
+                    self.onInteractionBegan(interaction: interaction)
+                }
             }
             
             self.interactionList = interactionList
@@ -513,6 +519,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
 //        liveView.canvasView.setRemoteUserInfo(name: "")
 //        liveView.canvasView.canvasType = .none
+//        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
+        if let interaction = self.currentInteraction, interaction.userId == "\(uid)" {
+            _stopInteraction(interaction: interaction)
+        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
