@@ -25,7 +25,7 @@ class ShowPresentAnimator: NSObject , UIViewControllerAnimatedTransitioning {
         if toView != nil {
             containerView.addSubview(toView!)
         }
-        toViewInitalFrame.origin = CGPoint(x: CGRectGetMinX(containerView.bounds), y: CGRectGetMaxY(containerView.bounds))
+        toViewInitalFrame.origin = CGPoint(x: containerView.bounds.minX, y: containerView.bounds.maxY)
         toViewInitalFrame.size = toViewFinalFrame.size
         toView?.frame = toViewInitalFrame
         
@@ -62,7 +62,7 @@ class ShowDismissAnimator: NSObject , UIViewControllerAnimatedTransitioning {
             containerView.addSubview(toView!)
         }
         
-        fromViewFinalFrame = CGRectOffset(fromView!.frame, 0, CGRectGetHeight(fromView!.frame))
+        fromViewFinalFrame = fromView!.frame.offsetBy(dx: 0, dy: fromView!.frame.height)
         let duration = transitionDuration(using: transitionContext)
         UIView.animate(withDuration: duration, delay: 0, animations: {
             fromView?.frame = fromViewFinalFrame
