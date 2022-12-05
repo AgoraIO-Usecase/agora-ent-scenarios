@@ -11,6 +11,7 @@ protocol ShowCreateLiveViewDelegate: NSObjectProtocol {
     func onClickCameraBtnAction()
     func onClickBeautyBtnAction()
     func onClickQualityBtnAction()
+    func onClickSettingBtnAction()
     func onClickStartBtnAction()
 }
 
@@ -107,6 +108,7 @@ class ShowCreateLiveView: UIView {
         
         // 复制按钮
         let copyButton = UIButton(type: .custom)
+        copyButton.isHidden = true
         roomInfoCoverVeiw.addSubview(copyButton)
         copyButton.setImage(UIImage.show_sceneImage(name: "show_create_copy"), for: .normal)
         copyButton.addTarget(self, action: #selector(didClickCopyButton), for: .touchUpInside)
@@ -198,7 +200,11 @@ class ShowCreateLiveView: UIView {
         let qualityButton = createButton(imgName: "show_create_quality", title: "create_button_quality".show_localized)
         qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
         
-        let buttonArray = [cameraButton, beautyButton, qualityButton]
+        // 设置
+        let settingButton = createButton(imgName: "show_setting", title: "create_button_settings".show_localized)
+        settingButton.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
+        
+        let buttonArray = [cameraButton, beautyButton, qualityButton,settingButton]
         let count = buttonArray.count
         let itemSpace: CGFloat = 40
         let itemWidth: CGFloat = 40
@@ -235,6 +241,11 @@ extension ShowCreateLiveView {
     // 点击画质按钮
     @objc private func didClickQualityButton(){
         delegate?.onClickQualityBtnAction()
+    }
+    
+    // 点击设置按钮
+    @objc private func didClickSettingButton(){
+        delegate?.onClickSettingBtnAction()
     }
     
     // 点击开始直播按钮
