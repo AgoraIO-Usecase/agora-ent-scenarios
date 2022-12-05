@@ -1,26 +1,24 @@
 //
-//  ShowMusicManager.swift
+//  ShowAgoraKitManager+Music.swift
 //  AgoraEntScenarios
 //
-//  Created by FanPengpeng on 2022/11/18.
+//  Created by FanPengpeng on 2022/12/5.
 //
-/*
+
 import Foundation
 import AgoraRtcKit
 
 private let defaultBeautyVoiceIndex = 0
 private let defaultMixVoiceIndex = 0
 
-class ShowMusicManager: NSObject {
+extension ShowAgoraKitManager {
     
-    lazy var dataArray: [ShowMusicConfigData] = {
+    var musicConfigDataArray: [ShowMusicConfigData] {
         return [musicBg, beautyVoice, mixVoice]
-    }()
-    
-    private var agoraKit: AgoraRtcEngineKit!
+    }
     
     // 美声选项
-    private lazy var beautyPresets: [AgoraVoiceBeautifierPreset] = {
+    var beautyPresets: [AgoraVoiceBeautifierPreset] {
         return [
             .presetOff,
             .presetSingingBeautifier,
@@ -28,10 +26,11 @@ class ShowMusicManager: NSObject {
             .presetChatBeautifierFresh,
             .presetChatBeautifierMagnetic,
             ]
-    }()
+    }
     
     // 混响选项
-    private lazy var mixPresets: [AgoraAudioEffectPreset] = {
+    
+    var mixPresets: [AgoraAudioEffectPreset]  {
         return [
             .off,
             .roomAcousticsKTV,
@@ -39,13 +38,10 @@ class ShowMusicManager: NSObject {
             .roomAcousStudio,
             .roomAcousSpatial
         ]
-    }()
-    
-    // 混响选项
-//    private lazy var mixPresets:
+    }
     
     // 背景音乐
-    private lazy var musicBg: ShowMusicConfigData = {
+    func musicBgConfigData() -> ShowMusicConfigData {
         var musicBgDataArray = [ShowMusicEffectCell.CellData]()
         let titles = [
             "show_music_setting_bg_happy".show_localized,
@@ -63,10 +59,10 @@ class ShowMusicManager: NSObject {
             musicBgDataArray.append(data)
         }
         return ShowMusicConfigData(title: "show_music_setting_bg_title".show_localized, dataArray: musicBgDataArray, type: .resource)
-    }()
+    }
     
     // 美声
-    private lazy var beautyVoice: ShowMusicConfigData = {
+    func beautyVoiceConfigData() -> ShowMusicConfigData {
         var beautyVoiceDataArray = [ShowMusicEffectCell.CellData]()
         
         let titles = [
@@ -88,10 +84,10 @@ class ShowMusicManager: NSObject {
             beautyVoiceDataArray.append(data)
         }
         return ShowMusicConfigData(title:  "show_music_setting_beatuy_title".show_localized, dataArray: beautyVoiceDataArray, type: .beauty)
-    }()
+    }
     
     // 混响
-    private lazy var mixVoice: ShowMusicConfigData = {
+    func mixVoiceConfigData() -> ShowMusicConfigData{
         var mixVoiceDataArray = [ShowMusicEffectCell.CellData]()
         let titles = [
             "show_music_setting_mix_none".show_localized,
@@ -113,15 +109,9 @@ class ShowMusicManager: NSObject {
             mixVoiceDataArray.append(data)
         }
         return ShowMusicConfigData(title: "show_music_setting_mix_title".show_localized, dataArray: mixVoiceDataArray, type: .mixture)
-    }()
-    
-    init(agoraKit: AgoraRtcEngineKit) {
-        self.agoraKit = agoraKit
     }
-}
-
-
-extension ShowMusicManager {
+    
+    
     // 选择音乐播放源
     func setMusicIndex(_ index: Int?) {
         if index != nil  {
@@ -152,10 +142,6 @@ extension ShowMusicManager {
     func setMixIndex(_ index: Int?){
         agoraKit.setAudioEffectPreset(mixPresets[index ?? 0])
     }
-
-}
-
-extension ShowMusicManager {
     
     private func playMusic(index: Int) {
         let musicNames = ["happy","romantic","relax"]
@@ -166,5 +152,3 @@ extension ShowMusicManager {
         agoraKit.startAudioMixing(musicPath, loopback: false, cycle: -1)
     }
 }
-
-*/

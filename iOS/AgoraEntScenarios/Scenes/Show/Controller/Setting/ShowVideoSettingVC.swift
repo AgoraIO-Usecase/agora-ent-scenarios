@@ -17,7 +17,7 @@ class ShowVideoSettingVC: UIViewController {
     private let transDelegate = ShowPresentTransitioningDelegate()
     
     var dataArray = [ShowSettingKey]()
-    var settingManager: ShowSettingManager!
+    var settingManager: ShowAgoraKitManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
     
     private lazy var tableView: UITableView = {

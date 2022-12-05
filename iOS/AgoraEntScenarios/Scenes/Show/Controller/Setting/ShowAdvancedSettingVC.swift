@@ -13,11 +13,12 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?
     var isBroadcaster = true
+    var isOutsise = false
 
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    var settingManager: ShowSettingManager!
+    var settingManager: ShowAgoraKitManager!
     
     // 当前设置的预设值
     var presetModeName: String?
@@ -109,7 +110,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     private func createSettingVCForIndex(_ index: Int) -> ShowVideoSettingVC? {
         // 主播端设置
-        let broadcasterVideoSettings: [ShowSettingKey] = [
+        let outsideSettings: [ShowSettingKey] = [
             .H265,
             .colorEnhance,
             .lowlightEnhance,
@@ -119,6 +120,16 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .FPS,
             .videoBitRate
         ]
+        let insideSettings: [ShowSettingKey] = [
+            .colorEnhance,
+            .lowlightEnhance,
+            .videoDenoiser,
+            .PVC,
+            .videoEncodeSize,
+            .FPS,
+            .videoBitRate
+        ]
+        let broadcasterVideoSettings: [ShowSettingKey] = isOutsise ? outsideSettings : insideSettings
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
             .SR
