@@ -284,7 +284,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         }
@@ -298,7 +298,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
@@ -326,13 +326,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
         guard "\(roomOwnerId)" == invitation.userId else { return }
-        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
+//        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
         liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
-        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
+//        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
         guard invitation.userId == VLUserCenter.user.id else { return }
         agoraKitManager.switchRole(role: .broadcaster,
                                    uid: invitation.userId,
@@ -394,7 +394,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshInvitationList()
         _refreshInteractionList()
     }
@@ -410,7 +410,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         _refreshInvitationList()
         _refreshInteractionList()
     }
