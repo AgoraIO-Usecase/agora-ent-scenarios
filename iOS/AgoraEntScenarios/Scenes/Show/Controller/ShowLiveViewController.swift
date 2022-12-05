@@ -175,7 +175,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             return
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -194,11 +194,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
-    private func _refreshInvitationList() {
+    private func _refreshPKUserList() {
         AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
             self?.pkUserInvitationList = pkUserList
         }
@@ -395,7 +395,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         //recv invitation
 //        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -411,19 +411,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         //recv invitation
 //        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         self.currentInteraction = interaction
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         self.currentInteraction = nil
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -604,7 +604,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
