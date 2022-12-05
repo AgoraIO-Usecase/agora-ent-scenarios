@@ -57,8 +57,7 @@ class ShowLiveViewController: UIViewController {
     }()
     
     private lazy var beautyVC = ShowBeautySettingVC()
-    //TODO: 实时数据View, 逻辑已处理完,  没找到弹窗的Button
-    private lazy var realTimeView = ShowRealTimeDataView(isLocal: false)
+    private lazy var realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
     private lazy var applyView = ShowApplyView()
     
@@ -549,6 +548,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
         realTimeView.statsInfo?.updateLocalAudioStats(stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
+        realTimeView.statsInfo?.updateLocalVideoStats(stats)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
