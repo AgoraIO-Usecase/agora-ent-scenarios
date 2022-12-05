@@ -449,7 +449,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     
                     //TODO: workaround
                     guard let interaction = self.interactionList.filter({ $0.userId == model.userId}).first else {return}
-                    if interaction.muteAudio == model.userMuteAudio { return }
+                    if interaction.ownerMuteAudio == model.fromUserMuteAudio,
+                        interaction.muteAudio == model.userMuteAudio {
+                        return
+                    }
                     interaction.muteAudio = model.userMuteAudio
                     interaction.ownerMuteAudio = model.fromUserMuteAudio
                     self._updateInteraction(interaction: interaction) { err in
