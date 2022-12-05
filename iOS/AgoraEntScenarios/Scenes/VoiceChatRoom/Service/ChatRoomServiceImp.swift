@@ -491,37 +491,39 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void) {
-        var mic_index = 1
-        let user = self.applicants.first(where: {
-            $0.member?.chat_uid ?? "" == chatUid
-        })
-        if user?.index ?? 0 < 1 {
-            mic_index = self.findMicIndex()
-        } else {
-            mic_index = user?.index ?? 1
-        }
-        let mic = VRRoomMic()
-        mic.mic_index = mic_index
-        mic.status = 0
-        mic.member = user?.member
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
-            if error == nil {
-                self.applicants.removeAll {
-                    $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
-                }
-                let currentMic = self.mics[safe: mic_index]
-                if currentMic?.status ?? 0 == -1 {
-                    self.mics[mic_index]  = mic
-                    completion(nil,mic)
-                } else {
-                    completion(self.normalError(),nil)
-                    return
-                }
+            var mic_index = 1
+            let user = self.applicants.first(where: {
+                $0.member?.chat_uid ?? "" == chatUid
+            })
+            if user?.index ?? 0 < 1 {
+                mic_index = self.findMicIndex()
             } else {
-                completion(self.convertError(error: error),nil)
+                mic_index = user?.index ?? 1
             }
-        })
-    }
+            let mic = VRRoomMic()
+            mic.mic_index = mic_index
+            mic.status = 0
+            mic.member = user?.member
+            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
+                if error == nil {
+                    self.applicants.removeAll {
+                        $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
+                    }
+                    self.userList?.first(where: { $0.chat_uid ?? "" == user?.member?.chat_uid ?? ""
+                    })?.mic_index = mic_index
+                    let currentMic = self.mics[safe: mic_index]
+                    if currentMic?.status ?? 0 == -1 {
+                        self.mics[mic_index]  = mic
+                        completion(nil,mic)
+                    } else {
+                        completion(self.normalError(),nil)
+                        return
+                    }
+                } else {
+                    completion(self.convertError(error: error),nil)
+                }
+            })
+        }
     
     func findMicIndex() -> Int {
         var mic_index = 0

@@ -251,6 +251,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
+                refreshApplicants(chat_uid: fromId)
             }
         }
     }
