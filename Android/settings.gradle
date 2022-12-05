@@ -31,3 +31,4 @@ include ':scenes:voice:imkit'
 include ':scenes:voice:rtckit'
 
 include ':scenes:show'
+include ':scenes:show:aars'

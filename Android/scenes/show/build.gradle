@@ -10,7 +10,8 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":scenes:show:aars")
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 
