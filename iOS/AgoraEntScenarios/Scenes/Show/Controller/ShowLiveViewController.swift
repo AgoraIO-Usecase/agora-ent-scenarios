@@ -573,8 +573,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
         guard let info = interactionList?.first else { return }
         let menuVC = ShowToolMenuViewController()
-        settingMenuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.type = ShowMenuType.managerMic
+        menuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.delegate = self
         present(menuVC, animated: true)
     }
