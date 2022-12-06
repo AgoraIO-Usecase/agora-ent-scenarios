@@ -17,7 +17,11 @@ class ShowCreateLiveVC: UIViewController {
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
-    private let agoraKitManager = ShowAgoraKitManager()
+    private lazy var agoraKitManager: ShowAgoraKitManager = {
+        let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
+        return manager
+    }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
 
@@ -25,7 +29,6 @@ class ShowCreateLiveVC: UIViewController {
         super.viewDidLoad()
         setUpUI()
         agoraKitManager.startPreview(canvasView: localView)
-        agoraKitManager.defaultSetting()
         configNaviBar()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
             self?.onClickSettingBtnAction()
@@ -110,7 +113,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         let vc = ShowAdvancedSettingVC()
         vc.mode = .signle
         vc.isBroadcaster = true
-        vc.isOutsise = true
+        vc.isOutside = true
         vc.settingManager = agoraKitManager
         self.navigationController?.pushViewController(vc, animated: true)
     }

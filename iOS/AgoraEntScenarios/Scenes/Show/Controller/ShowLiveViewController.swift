@@ -715,7 +715,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
-            vc.isOutsise = false
+            vc.isOutside = false
             vc.mode = wSelf.interactionStatus == .pking ? .pk : .signle // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
             vc.settingManager = wSelf.agoraKitManager

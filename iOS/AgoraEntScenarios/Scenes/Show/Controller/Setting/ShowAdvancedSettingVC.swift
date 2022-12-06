@@ -13,7 +13,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?
     var isBroadcaster = true
-    var isOutsise = false
+    var isOutside = false
 
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
@@ -72,7 +72,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         // 自动弹出预设
-        if isOutsise {
+        if isOutside {
             self.didClickPreSetBarButton()
         }else{
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -133,7 +133,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .FPS,
             .videoBitRate
         ]
-        let broadcasterVideoSettings: [ShowSettingKey] = isOutsise ? outsideSettings : insideSettings
+        let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
             .SR
