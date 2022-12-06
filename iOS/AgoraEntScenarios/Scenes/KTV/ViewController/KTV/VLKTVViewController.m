@@ -131,21 +131,28 @@ VLPopScoreViewDelegate
     self.topView = topView;
     topView.listModel = self.roomModel;
     
-    //MV视图(显示歌词...)
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, topView.bottom+13, SCREEN_WIDTH-30, (SCREEN_WIDTH-30)) withDelegate:self];
-    [self.view addSubview:self.MVView];
+    //底部按钮视图
+    self.bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40)
+                                               withDelegate:self
+                                                 withRoomNo:self.roomModel.roomNo
+                                                   withData:self.seatsArray];
+    self.bottomView.backgroundColor = UIColorClear;
+    [self.view addSubview:self.bottomView];
     
     //房间麦位视图
-    VLRoomPersonView *personView = [[VLRoomPersonView alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26) withDelegate:self withRTCkit:self.RTCkit];
-    self.roomPersonView = personView;
+    CGFloat seatViewHeight = (VLREALVALUE_WIDTH(54)+20)*2+26;
+    CGFloat seatPadding = 26;
+    self.roomPersonView = [[VLRoomPersonView alloc] initWithFrame:CGRectMake(0, self.bottomView.top - seatViewHeight - seatPadding, SCREEN_WIDTH, seatViewHeight)
+                                                     withDelegate:self
+                                                       withRTCkit:self.RTCkit];
     self.roomPersonView.roomSeatsArray = self.seatsArray;
-    [self.view addSubview:personView];
+    [self.view addSubview:self.roomPersonView];
     
-    //底部按钮视图
-    VLKTVBottomView *bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
-    self.bottomView = bottomView;
-    bottomView.backgroundColor = UIColorClear;
-    [self.view addSubview:bottomView];
+    //MV视图(显示歌词...)
+    CGFloat mvTop = topView.bottom + 13;
+    CGFloat mvHeight = self.roomPersonView.top - seatPadding - mvTop;
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, mvTop, SCREEN_WIDTH-30, mvHeight) withDelegate:self];
+    [self.view addSubview:self.MVView];
     
     //空位上麦视图
     VLTouristOnLineView *requestOnLineView = [[VLTouristOnLineView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
