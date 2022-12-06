@@ -38,7 +38,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Boolean>> =
+    private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String,Boolean>>> =
         SingleSourceLiveData()
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
@@ -82,7 +82,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
 
     /**更新公告*/
-    fun roomNoticeObservable(): LiveData<Resource<Boolean>> = _roomNoticeObservable
+    fun roomNoticeObservable(): LiveData<Resource<Pair<String,Boolean>>> = _roomNoticeObservable
 
     /**打开机器人*/
     fun openBotObservable(): LiveData<Resource<Boolean>> = _openBotObservable
