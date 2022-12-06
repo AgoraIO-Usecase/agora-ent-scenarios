@@ -28,6 +28,7 @@ import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.voice.common.net.Resource
+import io.agora.voice.common.utils.FastClickTools
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
@@ -61,6 +62,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         listAdapter = VoiceRoomListAdapter(null, object :
             OnItemClickListener<VoiceRoomModel> {
             override fun onItemClick(voiceRoomModel: VoiceRoomModel, view: View, position: Int, viewType: Long) {
+                if (FastClickTools.isFastClick(view)) return@onItemClick
                 onItemClick(voiceRoomModel)
             }
         }, VoiceRoomListAdapter.VoiceRoomListViewHolder::class.java)
