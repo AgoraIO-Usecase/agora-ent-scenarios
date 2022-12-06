@@ -17,9 +17,8 @@ class ShowCreateLiveVC: UIViewController {
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
-    private lazy var agoraKitManager: ShowAgoraKitManager = {
+    lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
         return manager
     }()
         
@@ -28,6 +27,7 @@ class ShowCreateLiveVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+        agoraKitManager.defaultSetting()
         agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
         showPreset()
