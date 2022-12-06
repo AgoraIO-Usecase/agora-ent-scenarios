@@ -466,7 +466,7 @@ class RoomObservableViewDelegate constructor(
                     roomLivingViewModel.enableRobot(isChecked)
                 }
 
-                override fun onBotVolumeChange(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                override fun onBotVolumeChange(progress: Int) {
                     roomLivingViewModel.updateBotVolume(progress)
                 }
 
