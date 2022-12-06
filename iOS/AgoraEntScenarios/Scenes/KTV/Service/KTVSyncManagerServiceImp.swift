@@ -60,7 +60,7 @@ private func _hideLoadingIfNeed() {
     private var seatListDidChanged: ((UInt, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
-    private var singingScoreDidChanged: ((Double) -> Void)?
+//    private var singingScoreDidChanged: ((Double) -> Void)?
     private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
     
@@ -98,7 +98,7 @@ private func _hideLoadingIfNeed() {
         seatListDidChanged = nil
         roomStatusDidChanged = nil
         chooseSongDidChanged = nil
-        singingScoreDidChanged = nil
+//        singingScoreDidChanged = nil
         networkDidChanged = nil
         roomExpiredDidChanged = nil
     }
@@ -466,11 +466,11 @@ private func _hideLoadingIfNeed() {
         _markSoloSongIfNeed()
     }
     
-    func updateSingingScore(withScore score: Double) {
-//        assertionFailure()
-        _addSingingScore(score: score) {
-        }
-    }
+//    func updateSingingScore(withScore score: Double) {
+////        assertionFailure()
+//        _addSingingScore(score: score) {
+//        }
+//    }
 
     //MARK: subscribe
     func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
@@ -525,10 +525,10 @@ private func _hideLoadingIfNeed() {
         }
     }
     
-    func subscribeSingingScoreChanged(_ changedBlock: @escaping (Double) -> Void) {
-        singingScoreDidChanged = changedBlock
-        _subscribeSingScore()
-    }
+//    func subscribeSingingScoreChanged(_ changedBlock: @escaping (Double) -> Void) {
+//        singingScoreDidChanged = changedBlock
+//        _subscribeSingScore()
+//    }
     
     func subscribeNetworkStatusChanged(_ changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
         networkDidChanged = changedBlock
@@ -1260,72 +1260,72 @@ extension KTVSyncManagerServiceImp {
 
 
 //MARK: song score operation
-extension KTVSyncManagerServiceImp {
-    private func _addSingingScore(score: Double, finished: @escaping () -> Void) {
-        guard let channelName = roomNo else {
-//            assert(false, "channelName = nil")
-            agoraPrint("_addSingingScore channelName = nil")
-            return
-        }
-        
-        if let publishScore = publishScore, abs(publishScore - score) < 0.01  {
-            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
-            return
-        }
-        
-        agoraPrint("imp singing score add ... [\(score)]")
-
-        let params = [
-            "score": score,
-            "objectId": channelName
-        ] as [String : Any]
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SINGING_SCORE_INFO)
-            .add(data: params,
-                 success: { [weak self] _ in
-                agoraPrint("imp singing score add success...")
-                self?.publishScore = score
-                finished()
-            }, fail: { error in
-                agoraPrint("imp singing score add fail :\(error.message)...")
-                agoraPrint(error.message)
-                finished()
-            })
-    }
-    
-    private func _subscribeSingScore() {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp singing score subscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: SYNC_MANAGER_SINGING_SCORE_INFO,
-                       onCreated: { [weak self] object in
-                guard let self = self,
-                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
-                else {
-                    return
-                }
-                agoraPrint("imp singing score subscribe onCreated... [\(score)]")
-                self.singingScoreDidChanged?(score)
-            }, onUpdated: { [weak self] object in
-                guard let self = self,
-                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
-                else {
-                    return
-                }
-                agoraPrint("imp singing score subscribe onUpdated... [\(score)]")
-                self.singingScoreDidChanged?(score)
-            }, onDeleted: { object in
-                agoraPrint("imp singing score subscribe onDeleted...")
-            }, onSubscribed: {
-//                LogUtils.log(message: "subscribe message", level: .info)
-            }, fail: { error in
-                agoraPrint("imp singing score subscribe fail \(error.message)...")
-                ToastView.show(text: error.message)
-            })
-    }
-}
+//extension KTVSyncManagerServiceImp {
+//    private func _addSingingScore(score: Double, finished: @escaping () -> Void) {
+//        guard let channelName = roomNo else {
+////            assert(false, "channelName = nil")
+//            agoraPrint("_addSingingScore channelName = nil")
+//            return
+//        }
+//        
+//        if let publishScore = publishScore, abs(publishScore - score) < 0.01  {
+//            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
+//            return
+//        }
+//        
+//        agoraPrint("imp singing score add ... [\(score)]")
+//
+//        let params = [
+//            "score": score,
+//            "objectId": channelName
+//        ] as [String : Any]
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .collection(className: SYNC_MANAGER_SINGING_SCORE_INFO)
+//            .add(data: params,
+//                 success: { [weak self] _ in
+//                agoraPrint("imp singing score add success...")
+//                self?.publishScore = score
+//                finished()
+//            }, fail: { error in
+//                agoraPrint("imp singing score add fail :\(error.message)...")
+//                agoraPrint(error.message)
+//                finished()
+//            })
+//    }
+//    
+//    private func _subscribeSingScore() {
+//        guard let channelName = roomNo else {
+//            agoraAssert("channelName = nil")
+//            return
+//        }
+//        agoraPrint("imp singing score subscribe...")
+//        SyncUtil
+//            .scene(id: channelName)?
+//            .subscribe(key: SYNC_MANAGER_SINGING_SCORE_INFO,
+//                       onCreated: { [weak self] object in
+//                guard let self = self,
+//                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
+//                else {
+//                    return
+//                }
+//                agoraPrint("imp singing score subscribe onCreated... [\(score)]")
+//                self.singingScoreDidChanged?(score)
+//            }, onUpdated: { [weak self] object in
+//                guard let self = self,
+//                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
+//                else {
+//                    return
+//                }
+//                agoraPrint("imp singing score subscribe onUpdated... [\(score)]")
+//                self.singingScoreDidChanged?(score)
+//            }, onDeleted: { object in
+//                agoraPrint("imp singing score subscribe onDeleted...")
+//            }, onSubscribed: {
+////                LogUtils.log(message: "subscribe message", level: .info)
+//            }, fail: { error in
+//                agoraPrint("imp singing score subscribe fail \(error.message)...")
+//                ToastView.show(text: error.message)
+//            })
+//    }
+//}
