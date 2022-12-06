@@ -58,12 +58,12 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 更新房间公告
      */
-    fun updateAnnouncement(content: String): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+    fun updateAnnouncement(content: String): LiveData<Resource<Pair<String, Boolean>>> {
+        val resource = object : NetworkOnlyResource<Pair<String, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<String, Boolean>>>) {
                 voiceServiceProtocol.updateAnnouncement(content, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+                        callBack.onSuccess(createLiveData(Pair(content, result)))
                     } else {
                         callBack.onError(error)
                     }
