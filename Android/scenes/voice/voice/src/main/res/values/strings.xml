@@ -62,6 +62,7 @@
     <string name="voice_dialog_gift_total_count">Contribution Total:%1$s</string>
     <string name="voice_chatroom_gift_title">Gifts</string>
     <string name="voice_chatroom_gift_dialog_send">Send</string>
+    <string name="voice_gift_sent">sent </string>
 
     <string name="voice_chatroom_send_gift_fail">Gift Sent Failed</string>
     <string name="voice_chatroom_create_tip1">This product is for testing only, not for commerce.</string>
