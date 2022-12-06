@@ -89,6 +89,7 @@ class ShowRoomListVC: UIViewController {
     // 创建房间
     private func createRoom(){
         let preVC = ShowCreateLiveVC()
+        preVC.agoraKitManager = agoraManager
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
         preNC.modalPresentationStyle = .fullScreen
