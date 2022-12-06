@@ -404,7 +404,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
         let old_mic = VRRoomMic()
-        old_mic.status = -1
+        old_mic.status = self.mics[old_index].status
         old_mic.mic_index = old_index
         let new_mic = VRRoomMic()
         new_mic.status = 0
