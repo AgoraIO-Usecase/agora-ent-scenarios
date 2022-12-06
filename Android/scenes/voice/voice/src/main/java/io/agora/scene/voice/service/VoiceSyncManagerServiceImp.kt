@@ -165,6 +165,7 @@ class VoiceSyncManagerServiceImp(
         initScene {
             Sync.Instance().joinScene(roomId, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
+                    "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
                     val curRoomInfo = roomMap[roomId] ?: return
                     curRoomInfo.memberCount = curRoomInfo.memberCount + 1
@@ -174,7 +175,7 @@ class VoiceSyncManagerServiceImp(
                     }
                     mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
                         override fun onSuccess(result: IObject?) {
-                            "syncManager update on onSuccess ${result?.id}".logE()
+                            "syncManager update onSuccess ${result?.id}".logD()
                         }
 
                         override fun onFail(exception: SyncManagerException?) {
@@ -187,6 +188,7 @@ class VoiceSyncManagerServiceImp(
 
                 override fun onFail(exception: SyncManagerException?) {
                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    "syncManager joinScene onFail ${exception.toString()}".logD()
                 }
             })
         }
@@ -211,12 +213,14 @@ class VoiceSyncManagerServiceImp(
                         resetCacheInfo(roomId, true)
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                     }
+                    "syncManager delete onSuccess".logD()
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
                     ThreadManager.getInstance().runOnIOThread {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
                     }
+                    "syncManager delete onFail：${exception.toString()}".logE()
                 }
             })
         } else {
@@ -232,6 +236,7 @@ class VoiceSyncManagerServiceImp(
                         resetCacheInfo(roomId, false)
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                     }
+                    "syncManager update onSuccess".logD()
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -239,6 +244,7 @@ class VoiceSyncManagerServiceImp(
                         resetCacheInfo(roomId, false)
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
                     }
+                    "syncManager update onFail：${exception.toString()}".logE()
                 }
             })
         }
@@ -651,16 +657,18 @@ class VoiceSyncManagerServiceImp(
                 item ?: return
                 val roomInfo = item.toObject(VoiceRoomModel::class.java)
                 roomMap[roomInfo.roomId] = roomInfo
+                "syncManager onUpdated:${roomInfo.roomId}".logD()
             }
 
             override fun onDeleted(item: IObject?) {
                 item ?: return
                 val roomInfo = roomMap[item.id] ?: return
                 resetCacheInfo(roomInfo.roomId, true)
+                "syncManager onDeleted:${roomInfo.roomId}".logD()
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
-
+                "syncManager onSubscribeError:${ex.toString()}".logE()
             }
 
         }

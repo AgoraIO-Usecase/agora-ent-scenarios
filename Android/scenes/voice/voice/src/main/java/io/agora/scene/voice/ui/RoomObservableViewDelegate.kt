@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
-import android.widget.SeekBar
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
@@ -77,10 +76,11 @@ class RoomObservableViewDelegate constructor(
 
     init {
         // 更新公告
-        roomLivingViewModel.roomNoticeObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
+        roomLivingViewModel.roomNoticeObservable().observe(activity) { response: Resource<Pair<String, Boolean>> ->
+            parseResource(response, object : OnResourceParseCallback<Pair<String, Boolean>>() {
+                override fun onSuccess(data: Pair<String, Boolean>?) {
+                    if (data?.second != true) return
+                    voiceRoomModel.announcement = data.first
                     ToastTools.show(activity, activity.getString(R.string.voice_chatroom_notice_posted))
                 }
 
@@ -363,7 +363,7 @@ class RoomObservableViewDelegate constructor(
             this.voiceRoomModel = vRoomInfo
             iRoomTopView.onChatroomInfo(vRoomInfo)
         }
-        if (!voiceRoomInfo.micInfo.isNullOrEmpty()){
+        if (!voiceRoomInfo.micInfo.isNullOrEmpty()) {
             // 麦位数据不为空
             voiceRoomInfo.micInfo?.let { micList ->
                 val micInfoList: List<VoiceMicInfoModel> =
@@ -726,7 +726,7 @@ class RoomObservableViewDelegate constructor(
         val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
         ChatroomIMManager.getInstance()
-            .updateRankList(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), voiceGiftModel, object: CallBack{
+            .updateRankList(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), voiceGiftModel, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onRankMember(ChatroomIMManager.getInstance().rankList)

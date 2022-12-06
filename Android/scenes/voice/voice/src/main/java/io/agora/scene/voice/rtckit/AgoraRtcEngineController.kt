@@ -163,6 +163,16 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
+        if (isBroadcaster){
+            mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
+        }
         return true
     }
 
@@ -274,27 +284,21 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
-        rtcEngine?.leaveChannel()
-        mediaPlayer?.let {
-            it.unRegisterPlayerObserver(firstMediaPlayerObserver)
-            it.destroy()
+        if (mediaPlayer != null) {
+            mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
+            mediaPlayer?.destroy()
+            mediaPlayer = null
         }
-        RtcEngineEx.destroy()
-        rtcEngine = null
+        if (rtcEngine != null) {
+            rtcEngine?.leaveChannel()
+            RtcEngineEx.destroy()
+            rtcEngine = null
+        }
     }
 
     private var soundSpeakerType = ConfigConstants.BotSpeaker.BotBlue
 
-    private val mediaPlayer: IMediaPlayer? by lazy {
-        rtcEngine?.createMediaPlayer()?.apply {
-            registerPlayerObserver(firstMediaPlayerObserver)
-        }?.also {
-            val options = ChannelMediaOptions()
-            options.publishMediaPlayerAudioTrack = true
-            options.publishMediaPlayerId = it.mediaPlayerId
-            rtcEngine?.updateChannelMediaOptions(options)
-        }
-    }
+    private var mediaPlayer:IMediaPlayer?=null
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
