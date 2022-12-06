@@ -237,7 +237,7 @@ class ChatroomProtocolDelegate constructor(
         val toKey = getMicIndex(toMicIndex)
         val fromBean = getMicInfo(fromMicIndex)
         val toMicBean = getMicInfo(toMicIndex)
-        if (toMicBean != null && fromBean != null && toMicBean.micStatus == -1) {
+        if (toMicBean != null && fromBean != null && (toMicBean.micStatus == MicStatus.Idle || toMicBean.micStatus == MicStatus.Mute || toMicBean.micStatus == MicStatus.ForceMute)) {
             fromBean.member?.micIndex  = toMicIndex
             fromBean.micIndex = toMicIndex
             toMicBean.micIndex = fromMicIndex
