@@ -570,9 +570,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     
     func muteAudio(mute:Bool, userId: String, completion: @escaping (Error?) -> Void) {
+        let isCurrentUser = userId == room?.ownerId ? true : false
         if let interaction = self.interactionList.filter({ $0.userId == userId}).first, interaction.interactStatus == .onSeat {
             //is on seat
-            if userId == room?.ownerId {
+            if isCurrentUser {
                 interaction.ownerMuteAudio = mute
             } else {
                 interaction.muteAudio = mute
@@ -581,16 +582,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             }
         }
         
-        //only owner can update pk invitation
-        guard userId == room?.ownerId else {
-            return
-        }
-        
         guard let pkInvitation = self.pkCreatedInvitationMap.values.filter({ $0.status == .accepted}).first else {
             // pk recviver
             _getAllPKInvitationList(room: nil) {[weak self] (error, list) in
                 guard let invitation = list?.filter({ $0.status == .accepted }).first else { return }
-                invitation.userMuteAudio = mute
+                if isCurrentUser {
+                    invitation.userMuteAudio = mute
+                } else {
+                    invitation.fromUserMuteAudio = mute
+                }
                 self?._updatePKInvitation(invitation: invitation) { err in
                 }
             }
@@ -598,7 +598,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         //is pk, send mute status (pk sender)
-        pkInvitation.fromUserMuteAudio = mute
+        if isCurrentUser {
+            pkInvitation.fromUserMuteAudio = mute
+        } else {
+            pkInvitation.userMuteAudio = mute
+        }
         _updatePKInvitation(invitation: pkInvitation) { err in
         }
     }
@@ -712,7 +716,7 @@ extension ShowSyncManagerServiceImp {
 
     private func _getUserList(finished: @escaping (Error?, [ShowUser]?) -> Void) {
         guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
+//            agoraAssert("channelName = nil")
             return
         }
         agoraPrint("imp user get...")
