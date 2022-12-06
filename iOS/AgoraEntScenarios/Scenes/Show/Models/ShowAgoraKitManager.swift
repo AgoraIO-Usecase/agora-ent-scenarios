@@ -68,6 +68,11 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
+    deinit {
+        AgoraRtcEngineKit.destroy()
+        print("--ShowAgoraKitManager deinit--AgoraRtcEngineKit.destroy----")
+    }
+    
     override init() {
         super.init()
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
@@ -136,7 +141,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.stopPreview()
         agoraKit?.disableAudio()
         agoraKit?.disableVideo()
-        AgoraRtcEngineKit.destroy()
+//        AgoraRtcEngineKit.destroy()
     }
     
     func leaveChannelEx() {

@@ -10,7 +10,7 @@ import UIKit
 struct ShowBarButtonItem {
     var title: String?
     var image: UIImage?
-    var target: AnyObject?
+    weak var target: AnyObject?
     var action: Selector
 }
 
