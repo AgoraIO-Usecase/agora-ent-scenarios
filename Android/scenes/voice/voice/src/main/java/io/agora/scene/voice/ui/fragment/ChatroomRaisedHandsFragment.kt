@@ -113,6 +113,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
 
                     override fun onError(code: Int, message: String) {
                         super.onError(code, message)
+                        finishRefresh()
                     }
                 })
             }
