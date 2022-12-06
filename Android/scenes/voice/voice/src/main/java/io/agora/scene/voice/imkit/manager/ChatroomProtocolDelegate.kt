@@ -355,7 +355,25 @@ class ChatroomProtocolDelegate constructor(
         if (memberBean != null) {
             memberBean.micIndex = micIndex?:getFirstFreeMic()
         }
-        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+        ThreadManager.getInstance().runOnIOThread {
+            if (checkMemberIsOnMic(memberBean)) return@runOnIOThread
+            updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+        }
+    }
+
+    /**
+     * check 用户是否在麦位上
+     */
+    private fun checkMemberIsOnMic(memberModel: VoiceMemberModel?): Boolean {
+        memberModel ?: return true
+        val micMap = ChatroomCacheManager.cacheManager.getMicInfoMap()
+        micMap?.forEach { (t, u) ->
+            val micMember = GsonTools.toBean(u, VoiceMicInfoModel::class.java)
+            if (TextUtils.equals(memberModel.chatUid, micMember?.member?.chatUid)) {
+                return true
+            }
+        }
+        return false
     }
 
     /**
@@ -411,7 +429,10 @@ class ChatroomProtocolDelegate constructor(
         if (memberBean != null) {
             memberBean.micIndex = micIndex?:getFirstFreeMic()
         }
-        updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+        ThreadManager.getInstance().runOnIOThread {
+            if (checkMemberIsOnMic(memberBean)) return@runOnIOThread
+            updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+        }
     }
 
     /////////////////////////// room ///////////////////////////////
