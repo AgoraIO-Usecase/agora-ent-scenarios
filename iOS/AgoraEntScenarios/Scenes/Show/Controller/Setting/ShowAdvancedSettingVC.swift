@@ -71,10 +71,8 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        // 自动弹出预设
-        if isOutside {
-            self.didClickPreSetBarButton()
-        }else{
+        if isBroadcaster {
+            // 自动弹出预设
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.didClickPreSetBarButton()
             }
@@ -107,8 +105,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         // 标题
         naviBar.title = "show_advanced_setting_title".show_localized
         // 右边按钮
-        let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
-        naviBar.rightItems = [preSetButtonItem]
+        if isBroadcaster {
+            let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
+            naviBar.rightItems = [preSetButtonItem]
+        }
         view.addSubview(naviBar)
     }
     
