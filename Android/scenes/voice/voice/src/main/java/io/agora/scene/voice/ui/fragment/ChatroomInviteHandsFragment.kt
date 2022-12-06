@@ -100,6 +100,11 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
                         }
                     }
                 }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    finishRefresh()
+                }
             })
         }
         // 邀请上麦

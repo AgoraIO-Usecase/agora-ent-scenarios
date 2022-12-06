@@ -6,24 +6,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
-
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.opensource.svgaplayer.SVGAVideoEntity;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-import io.agora.CallBack;
+import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.scene.voice.model.VoiceGiftModel;
-import io.agora.util.EMLog;
 import io.agora.voice.common.utils.ThreadManager;
 import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
@@ -140,7 +134,7 @@ public class RoomGiftViewDelegate {
                 if (time == 0) {
                     stopTask();
                     send.setEnabled(true);
-                    send.setText("Send");
+                    send.setText(activity.getString(R.string.voice_chatroom_gift_dialog_send));
                 } else {
                     handler.postDelayed(this, 1000);
                 }
