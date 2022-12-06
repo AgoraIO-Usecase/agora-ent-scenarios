@@ -57,6 +57,12 @@ class ShowRoomInfoView: UIView {
         return label
     }()
     
+    // 直播标识
+    private lazy var indicatorImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image =  UIImage.show_sceneImage(name: "show_live_duration")
+        return imageView
+    }()
     
     // 时间
     private lazy var timeLabel: UILabel = {
@@ -109,10 +115,16 @@ class ShowRoomInfoView: UIView {
             make.bottom.equalTo(-4)
         }
         
+        addSubview(indicatorImageView)
+        indicatorImageView.snp.makeConstraints { make in
+            make.left.equalTo(120)
+            make.centerY.equalTo(idLabel)
+        }
+        
         addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
             make.bottom.equalTo(idLabel)
-            make.right.equalTo(-28)
+            make.left.equalTo(indicatorImageView.snp.right).offset(4)
         }
     }
     
@@ -128,17 +140,11 @@ class ShowRoomInfoView: UIView {
     }
     
     private func updateTime(){
-        let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_live_duration")!)
-        attachment.bounds = CGRect(x: -4, y: 0, width: 6, height: 6)
-        let attriImg = NSAttributedString(attachment: attachment)
-        let attriText = NSMutableAttributedString(attributedString: attriImg)
         let duration = Int64(Date().timeIntervalSince1970) - startTime / 1000
         let seconds = duration % 60
         let minutes = duration / 60 % 60
         let hours = duration / 3600
-        let durationStr = String(format: " %02d:%02d:%02d", hours, minutes, seconds)
-        attriText.append(NSAttributedString(string: durationStr))
-        timeLabel.attributedText = attriText
-        
+        let durationStr = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        timeLabel.text = durationStr
     }
 }
