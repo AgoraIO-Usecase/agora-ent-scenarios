@@ -662,7 +662,7 @@ extension ShowLiveViewController {
 extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
-    func onClickCameraButtonSelected(_ selected: Bool) {
+    func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         if selected {
             agoraKitManager.agoraKit.stopPreview()
             agoraKitManager.agoraKit.enableLocalVideo(false)
@@ -673,7 +673,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     // 画质
-    func onClickHDButtonSelected(_ selected: Bool) {
+    func onClickHDButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: false)
         
         let vc = ShowSelectQualityVC()
@@ -691,36 +691,36 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     // 结束连麦
-    func onClickEndPkButtonSelected(_ selected: Bool) {
+    func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         guard let info = interactionList?.first else { return }
         AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
-            
         }
     }
     
     // 麦克风开关
-    func onClickMicButtonSelected(_ selected: Bool) {
+    func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.agoraKit.muteRecordingSignal(selected)
 //        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
 //        }
     }
     
     // 静音
-    func onClickMuteMicButtonSelected(_ selected: Bool) {
+    func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.agoraKit.muteAllRemoteAudioStreams(selected)
-        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
+        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
+        AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
         }
     }
     
-    func onClickRealTimeDataButtonSelected(_ selected: Bool) {
+    func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AlertManager.show(view: realTimeView, alertPostion: .top)
     }
     
-    func onClickSwitchCameraButtonSelected(_ selected: Bool) {
+    func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.switchCamera()
     }
     
-    func onClickSettingButtonSelected(_ selected: Bool) {
+    func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
