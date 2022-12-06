@@ -10,7 +10,6 @@ import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.global.VoiceBuddyFactory.Companion.get
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
@@ -364,24 +363,27 @@ class RoomObservableViewDelegate constructor(
             this.voiceRoomModel = vRoomInfo
             iRoomTopView.onChatroomInfo(vRoomInfo)
         }
-        voiceRoomInfo.micInfo?.let { micList ->
-            val micInfoList: List<VoiceMicInfoModel> =
-                RoomInfoConstructor.extendMicInfoList(micList, roomKitBean.roomType, roomKitBean.ownerId)
-            micInfoList.forEach { micInfo ->
-                micInfo.member?.let { userInfo ->
-                    val rtcUid = userInfo.rtcUid
-                    val micIndex = micInfo.micIndex
-                    if (rtcUid > 0) {
-                        // 自己
-                        if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                            localUserMicInfo = micInfo
-                            isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
+        if (!voiceRoomInfo.micInfo.isNullOrEmpty()){
+            // 麦位数据不为空
+            voiceRoomInfo.micInfo?.let { micList ->
+                val micInfoList: List<VoiceMicInfoModel> =
+                    RoomInfoConstructor.extendMicInfoList(micList, roomKitBean.roomType, roomKitBean.ownerId)
+                micInfoList.forEach { micInfo ->
+                    micInfo.member?.let { userInfo ->
+                        val rtcUid = userInfo.rtcUid
+                        val micIndex = micInfo.micIndex
+                        if (rtcUid > 0) {
+                            // 自己
+                            if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                                localUserMicInfo = micInfo
+                                isLocalAudioMute = micInfo.micStatus != MicStatus.Normal
+                            }
+                            micMap[micIndex] = rtcUid
                         }
-                        micMap[micIndex] = rtcUid
                     }
                 }
+                iRoomMicView.onInitMic(micInfoList, voiceRoomModel.useRobot)
             }
-            iRoomMicView.onInitMic(micInfoList, voiceRoomModel.useRobot)
         }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
     }
@@ -464,7 +466,7 @@ class RoomObservableViewDelegate constructor(
                     roomLivingViewModel.enableRobot(isChecked)
                 }
 
-                override fun onBotVolumeChange(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                override fun onBotVolumeChange(progress: Int) {
                     roomLivingViewModel.updateBotVolume(progress)
                 }
 
@@ -724,7 +726,7 @@ class RoomObservableViewDelegate constructor(
         val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
         ChatroomIMManager.getInstance()
-            .updateRankList(get().getVoiceBuddy().chatUserName(), voiceGiftModel, object: CallBack{
+            .updateRankList(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), voiceGiftModel, object: CallBack{
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onRankMember(ChatroomIMManager.getInstance().rankList)
@@ -737,7 +739,7 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         ChatroomIMManager.getInstance()
-            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
@@ -758,7 +760,7 @@ class RoomObservableViewDelegate constructor(
         val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
         ChatroomIMManager.getInstance()
-            .updateAmount(get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
@@ -894,17 +896,20 @@ class RoomObservableViewDelegate constructor(
                     iRoomTopView.onUpdateGiftCount(it)
                 }
             }
-        } else if (attributeMap.containsKey("robot_volume")) {
+        }
+        if (attributeMap.containsKey("robot_volume")) {
             attributeMap["robot_volume"]?.toIntOrNull()?.let {
                 voiceRoomModel.robotVolume = it
             }
-        } else if (attributeMap.containsKey("use_robot")) {
+        }
+        if (attributeMap.containsKey("use_robot")) {
             // TODO: 魔法值
             voiceRoomModel.useRobot = attributeMap["use_robot"] == "1"
             ThreadManager.getInstance().runOnMainThread {
                 iRoomMicView.activeBot(voiceRoomModel.useRobot)
             }
-        } else if (attributeMap.containsKey("ranking_list")) {
+        }
+        if (attributeMap.containsKey("ranking_list")) {
             val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
             rankList?.let { rankUsers ->
                 rankUsers.forEach { rank ->
