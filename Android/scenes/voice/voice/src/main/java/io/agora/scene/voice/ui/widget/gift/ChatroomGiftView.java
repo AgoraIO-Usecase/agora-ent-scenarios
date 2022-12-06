@@ -197,7 +197,7 @@ public class ChatroomGiftView extends LinearLayout {
             }
             StringBuilder builder = new StringBuilder();
             if (null != giftBean) {
-                builder.append(!TextUtils.isEmpty(userName) ? userName : message.getFrom()).append(":").append("\n").append("sent ").append(giftBean.getName());
+                builder.append(!TextUtils.isEmpty(userName) ? userName : message.getFrom()).append(":").append("\n").append(context.getString(R.string.voice_gift_sent)).append(giftBean.getName());
                 icon.setImageResource(giftBean.getResource());
             }
             SpannableString span = new SpannableString(builder.toString());

@@ -37,6 +37,7 @@ import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools.show
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.voice.common.net.Resource
+import io.agora.voice.common.utils.FastClickTools.isFastClick
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
@@ -100,7 +101,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             }
             encryption = binding.edPwd.text.toString().trim { it <= ' ' }
             roomName = binding.edRoomName.text.toString().trim { it <= ' ' }
-            checkPrivate()
+            if (it?.let { isFastClick(it, 1000) } == false) checkPrivate()
         }
         binding.randomLayout.setOnClickListener {
             binding.edRoomName.setText(randomName())
