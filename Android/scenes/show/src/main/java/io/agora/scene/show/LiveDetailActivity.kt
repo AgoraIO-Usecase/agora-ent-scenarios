@@ -8,11 +8,14 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.*
@@ -25,18 +28,19 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.bytedance.BeautyByteDanceImpl
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
-import io.agora.scene.show.service.ShowMessage
-import io.agora.scene.show.service.ShowRoomDetailModel
-import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.service.*
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.*
+import io.agora.scene.show.widget.link.LiveLinkDialog
+import io.agora.scene.show.widget.link.LiveLinkInvitationDialog
+import io.agora.scene.show.widget.link.OnLinkDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LiveDetailActivity : ComponentActivity() {
+class LiveDetailActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
@@ -57,9 +61,13 @@ class LiveDetailActivity : ComponentActivity() {
         null
     private val mMusicEffectDialog by lazy { MusicEffectDialog(this) }
 
+    private val mLinkDialog by lazy { LiveLinkDialog() }
     private val mBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
     private lateinit var mPermissionHelp: PermissionHelp
     private lateinit var mRtcEngine: RtcEngineEx
+
+    // 当前互动状态
+    private var interactionInfo: ShowInteractionInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +130,12 @@ class LiveDetailActivity : ComponentActivity() {
         }
         bottomLayout.ivMusic.setOnClickListener {
             showMusicEffectDialog()
+        }
+        bottomLayout.ivLinking.setOnClickListener {
+            ShowLinkingDialog()
+        }
+        bottomLayout.ivPK.setOnClickListener {
+            ShowPKDialog()
         }
     }
 
@@ -312,6 +326,71 @@ class LiveDetailActivity : ComponentActivity() {
         mMusicEffectDialog.show()
     }
 
+    private fun ShowLinkingDialog() {
+        mLinkDialog.setIsRoomOwner(isRoomOwner)
+        mLinkDialog.setLinkDialogActionListener(object : OnLinkDialogActionListener {
+            override fun onRequestMessageRefreshing(dialog: LiveLinkDialog) {
+                if (isRoomOwner) {
+                    mService.getAllMicSeatApplyList({
+                        mLinkDialog.setSeatApplyList(it)
+                    })
+                }
+            }
+
+            override fun onAcceptMicSeatApplyChosen(
+                dialog: LiveLinkDialog,
+                seatApply: ShowMicSeatApply
+            ) {
+                // 同意上麦
+                mService.acceptMicSeatApply(seatApply)
+            }
+
+            // 在线用户列表刷新
+            override fun onOnlineAudienceRefreshing(dialog: LiveLinkDialog) {
+                mService.getAllUserList({
+                    val list = it.filter { !it.userId.equals(UserManager.getInstance().user.id.toString())  }
+                    mLinkDialog.setSeatInvitationList(list)
+                })
+            }
+
+            override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, user: ShowUser) {
+                mService.createMicSeatInvitation(user)
+            }
+
+            override fun onStopLinkingChosen(dialog: LiveLinkDialog) {
+                // 停止连麦
+                if (interactionInfo != null) {
+                    mService.stopInteraction(interactionInfo!!, {
+                        // success
+                        interactionInfo = null
+                    })
+                }
+            }
+
+            override fun onApplyOnSeat(dialog: LiveLinkDialog) {
+                // 同意上麦
+                mService.createMicSeatApply {  }
+            }
+
+            override fun onStopApplyingChosen(dialog: LiveLinkDialog) {
+                // 取消申请
+                mService.cancelMicSeatApply {  }
+            }
+        })
+
+        val ft = supportFragmentManager.beginTransaction()
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        mLinkDialog.show(ft, "LinkDialog")
+    }
+
+    private fun ShowInvitationDialog() {
+
+    }
+
+    private fun ShowPKDialog() {
+
+    }
+
 
     //================== Service Operation ===============
 
@@ -323,6 +402,108 @@ class LiveDetailActivity : ComponentActivity() {
         }
         mService.subscribeMessage { _, showMessage ->
             insertMessageItem(showMessage)
+        }
+        mService.subscribeMicSeatApply { _, _ ->
+            mService.getAllMicSeatApplyList({
+                mLinkDialog.setSeatApplyList(it)
+            })
+        }
+        mService.subscribeMicSeatInvitation { status, invitation ->
+            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && !isRoomOwner) {
+                LiveLinkInvitationDialog(this).apply {
+                    init()
+                    setListener(object : LiveLinkInvitationDialog.Listener{
+                        override fun onAgreeSeatInvitation() {
+                            mService.acceptMicSeatInvitation {  }
+                        }
+
+                        override fun onCancelSeatInvitation() {
+                            mService.cancelMicSeatInvitation(invitation!!.userId)
+                        }
+
+                    })
+                    show()
+                }
+            } else if (invitation!!.status == ShowRoomRequestStatus.accepted) {
+                mLinkDialog.setSeatInvitationItemStatus(ShowUser(
+                    invitation.userId,
+                    invitation.userAvatar,
+                    invitation.userName,
+                    invitation.status
+                ))
+            }
+        }
+        mService.subscribeInteractionChanged { status, info ->
+            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
+                interactionInfo = info
+                mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                if (info.interactStatus == ShowInteractionStatus.onSeat) {
+                    val boardcasterVideoView = SurfaceView(this)
+                    val audienceVideoView = SurfaceView(this)
+                    mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
+                    mBinding.videoSinglehostLayout.root.isVisible = false
+                    mBinding.videoLinkingLayout.root.isVisible = true
+                    mBinding.videoLinkingLayout.videoContainer.addView(boardcasterVideoView)
+                    mBinding.videoLinkingLayout.videoContainer.addView(audienceVideoView, 105, 50)
+                    if (isRoomOwner) {
+                        mRtcEngine.setupLocalVideo(VideoCanvas(boardcasterVideoView))
+                        mRtcEngine.setupRemoteVideo(
+                            VideoCanvas(
+                                audienceVideoView,
+                                Constants.RENDER_MODE_HIDDEN,
+                                mRoomInfo.ownerId.toInt()
+                            )
+                        )
+                    } else {
+                        val channelMediaOptions = ChannelMediaOptions()
+                        channelMediaOptions.publishCameraTrack = true;
+                        channelMediaOptions.publishMicrophoneTrack = true;
+                        channelMediaOptions.publishCustomAudioTrack = false;
+                        channelMediaOptions.enableAudioRecordingOrPlayout = true;
+                        channelMediaOptions.autoSubscribeVideo = true;
+                        channelMediaOptions.autoSubscribeAudio = true;
+                        channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                        mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
+                        mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
+                        mRtcEngine.setupRemoteVideo(
+                            VideoCanvas(
+                                boardcasterVideoView,
+                                Constants.RENDER_MODE_HIDDEN,
+                                mRoomInfo.ownerId.toInt()
+                            )
+                        )
+                    }
+                } else if (info != null && info.interactStatus == ShowInteractionStatus.pking) {
+                    // TODO PK RTC + UI
+                }
+            } else {
+                // stop 互动
+                val boardcasterVideoView = SurfaceView(this)
+                mBinding.videoLinkingLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingLayout.root.isVisible = false
+                mBinding.videoSinglehostLayout.root.isVisible = true
+                mBinding.videoSinglehostLayout.videoContainer.addView(boardcasterVideoView)
+                if (isRoomOwner) {
+                    mRtcEngine.setupLocalVideo(VideoCanvas(boardcasterVideoView))
+                } else {
+                    val channelMediaOptions = ChannelMediaOptions()
+                    channelMediaOptions.publishCameraTrack = false;
+                    channelMediaOptions.publishMicrophoneTrack = false;
+                    channelMediaOptions.publishCustomAudioTrack = false;
+                    channelMediaOptions.enableAudioRecordingOrPlayout = true;
+                    channelMediaOptions.autoSubscribeVideo = true;
+                    channelMediaOptions.autoSubscribeAudio = true;
+                    channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+                    mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
+                    mRtcEngine.setupRemoteVideo(
+                        VideoCanvas(
+                            boardcasterVideoView,
+                            Constants.RENDER_MODE_HIDDEN,
+                            mRoomInfo.ownerId.toInt()
+                        )
+                    )
+                }
+            }
         }
     }
 

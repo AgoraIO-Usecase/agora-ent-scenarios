@@ -55,6 +55,7 @@
         style="@style/def_btn_full"
         android:layout_marginHorizontal="10dp"
         android:textColor="@color/white"
+        android:text="@string/confirm"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="@id/tvTitle"

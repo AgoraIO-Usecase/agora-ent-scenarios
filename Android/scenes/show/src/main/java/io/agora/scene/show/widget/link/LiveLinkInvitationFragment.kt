@@ -5,54 +5,79 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
+import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
+import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageBinding
+import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageListBinding
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
+import io.agora.scene.show.service.ShowMicSeatApply
+import io.agora.scene.show.service.ShowRoomRequestStatus
+import io.agora.scene.show.service.ShowUser
 import io.agora.scene.show.widget.UserItem
 
 class LiveLinkInvitationFragment : BaseFragment() {
-    private lateinit var mBinding : ShowLiveLinkRequestMessageListBinding
+    private val mBinding by lazy {
+        ShowLiveLinkInvitationMessageListBinding.inflate(
+            LayoutInflater.from(
+                context
+            )
+        )}
     private val linkInvitationViewAdapter : LiveLinkInvitationViewAdapter = LiveLinkInvitationViewAdapter()
-    private lateinit var mListener : LiveLinkInvitationFragment.Listener
+    private lateinit var mListener : Listener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkInvitationViewAdapter.setClickListener(object : LiveLinkInvitationViewAdapter.OnClickListener {
-            override fun onClick(userItem: UserItem, position: Int) {
+            override fun onClick(userItem: ShowUser, position: Int) {
                 // 主播发起邀请
-                mListener.onInviteMicSeatItemChosen(userItem, position)
+                mListener.onInviteMicSeatItemChosen(userItem)
             }
         })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mBinding = ShowLiveLinkRequestMessageListBinding.inflate(layoutInflater)
         return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.iBtnStopLink.setOnClickListener {
-            // 主播停止连麦
-            mListener.onStopLinkingChosen()
+        mBinding.linkInvitationList.adapter = linkInvitationViewAdapter
+        mBinding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+            mListener.onRequestRefreshing()
         }
+        mBinding.smartRefreshLayout.autoRefresh()
     }
 
     /**
-     * 连麦邀请列表-设置在线主播列表
+     * 连麦邀请列表-设置在线用户列表
      */
-    fun setSeatInvitationList(list : List<UserItem>) {
+    fun setSeatInvitationList(list : List<ShowUser>) {
         if (list == null || list.isEmpty()) {
             mBinding.linkRequestListEmpty.setVisibility(View.VISIBLE)
         } else {
             mBinding.linkRequestListEmpty.setVisibility(View.GONE)
         }
         linkInvitationViewAdapter.resetAll(list)
+        mBinding.smartRefreshLayout.finishRefresh()
     }
 
     /**
      * 连麦邀请列表-接受连麦-更新item选中状态
      */
-    fun setSeatInvitationItemStatus(applyItem: UserItem, isAccept: Boolean) {
-        mBinding.textLinking.setText("与观众" + applyItem.userName + "连麦中")
+    fun setSeatInvitationItemStatus(user: ShowUser) {
+        val itemCount: Int = linkInvitationViewAdapter.getItemCount()
+        for (i in 0 until itemCount) {
+            var item: ShowUser = linkInvitationViewAdapter.getItem(i)!!
+            if (item.userId == user.userId) {
+                item = ShowUser(
+                    item.userId,
+                    item.avatar,
+                    item.userName,
+                    user.status
+                )
+                linkInvitationViewAdapter.notifyItemChanged(i)
+                break
+            }
+        }
     }
 
     fun setListener(listener : Listener) {
@@ -60,8 +85,8 @@ class LiveLinkInvitationFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onInviteMicSeatItemChosen(userItem: UserItem, position: Int)
-        fun onRequestRefreshing(tagIndex: Int)
+        fun onInviteMicSeatItemChosen(userItem: ShowUser)
+        fun onRequestRefreshing()
         fun onStopLinkingChosen()
     }
 }

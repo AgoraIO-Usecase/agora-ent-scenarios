@@ -3,6 +3,7 @@ package io.agora.scene.show.service
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.syncmanager.rtm.*
@@ -12,7 +13,7 @@ class ShowSyncManagerServiceImpl(
     private val context: Context,
     private val errorHandler: (Exception) -> Unit
 ) : ShowServiceProtocol {
-
+    private val TAG = "ShowSyncManagerServiceImpl"
     private val kSceneId = "scene_show"
     private val kCollectionIdUser = "userCollection"
     private val kCollectionIdMessage = "show_message_collection"
@@ -144,6 +145,9 @@ class ShowSyncManagerServiceImpl(
                             error?.invoke(it) ?: errorHandler.invoke(it)
                             currRoomNo = ""
                         })
+                        innerSubscribeSeatApplyChanged()
+                        innerSubscribeInteractionChanged()
+                        innerSubscribeSeatInvitationChanged()
                     }
 
                     override fun onFail(exception: SyncManagerException?) {
@@ -555,7 +559,7 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        if (interaction.interactStatus == ShowInteractionStatus.pking) return
+        innerRemoveInteration(objIdOfInteractionInfo[0], success, error)
     }
 
     // =================================== 内部实现 ===================================
@@ -651,11 +655,11 @@ class ShowSyncManagerServiceImpl(
                 override fun onSuccess(result: MutableList<IObject>?) {
                     result ?: return
                     val map = result.map { it.toObject(ShowUser::class.java) }
-                    success.invoke(map)
+                    runOnMainThread { success.invoke(map) }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    error.invoke(exception!!)
+                    runOnMainThread { error.invoke(exception!!) }
                 }
             })
     }
@@ -814,6 +818,7 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun innerSubscribeSeatApplyChanged() {
+        val sceneReference = currSceneReference ?: return
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
                 // do Nothing
@@ -821,24 +826,29 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatApply::class.java) ?: return
-                micSeatApplySubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.updated,
-                    info
-                )
+                runOnMainThread {
+                    micSeatApplySubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.updated,
+                        info
+                    )
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-                micSeatApplySubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                    null
-                )
+                runOnMainThread {
+                    micSeatApplySubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
             }
         }
         currEventListeners.add(listener)
-        currSceneReference?.subscribe(kCollectionIdSeatApply, listener)
+        sceneReference.collection(kCollectionIdSeatApply)
+            .subscribe(listener)
     }
 
     // ----------------------------------- 连麦邀请 -----------------------------------
@@ -879,6 +889,7 @@ class ShowSyncManagerServiceImpl(
         currSceneReference?.collection(kCollectionIdSeatInvitation)
             ?.add(seatInvitation, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject) {
+                    getAllMicSeatInvitationList({ })
                     runOnMainThread { success?.invoke() }
                 }
 
@@ -924,6 +935,7 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun innerSubscribeSeatInvitationChanged() {
+        val sceneReference = currSceneReference ?: return
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
                 // do Nothing
@@ -931,24 +943,30 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatInvitation::class.java) ?: return
-                micSeatInvitationSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.updated,
-                    info
-                )
+                runOnMainThread {
+                    micSeatInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.updated,
+                        info
+                    )
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-                micSeatInvitationSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                    null
-                )
+                runOnMainThread {
+                    micSeatInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
+
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
             }
         }
         currEventListeners.add(listener)
-        currSceneReference?.subscribe(kCollectionIdSeatInvitation, listener)
+        sceneReference.collection(kCollectionIdSeatInvitation)
+            .subscribe(listener)
     }
 
     // ----------------------------------- pk邀请 -----------------------------------
@@ -1034,6 +1052,7 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun innerSubscribePKInvitationChanged() {
+        val sceneReference = currSceneReference ?: return
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
                 // do Nothing
@@ -1041,24 +1060,28 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowPKInvitation::class.java) ?: return
-                micPKInvitationSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.updated,
-                    info
-                )
+                runOnMainThread {
+                    micPKInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.updated,
+                        info
+                    )
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-                micPKInvitationSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                    null
-                )
+                runOnMainThread {
+                    micPKInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
             }
         }
         currEventListeners.add(listener)
-        currSceneReference?.subscribe(kCollectionIdPKInvitation, listener)
+        sceneReference.collection(kCollectionIdPKInvitation).subscribe(listener)
     }
 
     // ----------------------------------- 互动状态 -----------------------------------
@@ -1096,13 +1119,17 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        Log.d(TAG, "innerCreateInteration called")
         currSceneReference?.collection(kCollectionIdInteractionInfo)
             ?.add(info, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject) {
+                    Log.d(TAG, "innerCreateInteration success")
+                    innerGetAllInterationList(null, null)
                     runOnMainThread { success?.invoke() }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
+                    Log.d(TAG, "innerCreateInteration failed")
                     runOnMainThread { error?.invoke(exception!!) }
                 }
             })
@@ -1144,30 +1171,42 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun innerSubscribeInteractionChanged() {
+        Log.d(TAG, "innerSubscribeInteractionChanged called")
+        val sceneReference = currSceneReference ?: return
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
+                Log.d(TAG, "innerSubscribeInteractionChanged onCreated")
                 // do Nothing
             }
 
             override fun onUpdated(item: IObject?) {
+                Log.d(TAG, "innerSubscribeInteractionChanged onUpdated")
                 val info = item?.toObject(ShowInteractionInfo::class.java) ?: return
-                micInteractionInfoSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.updated,
-                    info
-                )
+                runOnMainThread {
+                    micInteractionInfoSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.updated,
+                        info
+                    )
+                }
+
             }
 
             override fun onDeleted(item: IObject?) {
-                micInteractionInfoSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                    null
-                )
+                Log.d(TAG, "innerSubscribeInteractionChanged onDeleted")
+                cancelMicSeatApply()
+                runOnMainThread {
+                    micInteractionInfoSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
+                Log.d(TAG, "innerSubscribeInteractionChanged onSubscribeError: " + ex)
             }
         }
         currEventListeners.add(listener)
-        currSceneReference?.subscribe(kCollectionIdInteractionInfo, listener)
+        sceneReference.collection(kCollectionIdInteractionInfo).subscribe(listener)
     }
 }
