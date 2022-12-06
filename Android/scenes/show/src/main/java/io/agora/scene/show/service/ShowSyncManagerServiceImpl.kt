@@ -265,7 +265,7 @@ class ShowSyncManagerServiceImpl(
 
     override fun createMicSeatApply(success: (() -> Unit)?, error: ((Exception) -> Unit)?) {
         val apply = ShowMicSeatApply(
-            UserManager.getInstance().user.userNo,
+            UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.headUrl,
             UserManager.getInstance().user.name,
             ShowRoomRequestStatus.waitting,
@@ -279,7 +279,7 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("The seat apply list is empty!"))
             return
         }
-        val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.userNo }.getOrNull(0)
+        val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetApply == null) {
             error?.invoke(RuntimeException("The seat apply found!"))
             return
@@ -413,7 +413,7 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.userNo }.getOrNull(0)
+        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetInvitation == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
@@ -449,7 +449,7 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.userNo }.getOrNull(0)
+        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetInvitation == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
@@ -490,7 +490,7 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = pKInvitationList.filter { it.userId == UserManager.getInstance().user.userNo }.getOrNull(0)
+        val targetInvitation = pKInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetInvitation == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
@@ -519,7 +519,7 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = pKInvitationList.filter { it.userId == UserManager.getInstance().user.userNo }.getOrNull(0)
+        val targetInvitation = pKInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetInvitation == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
@@ -943,6 +943,15 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatInvitation::class.java) ?: return
+                val list = micSeatInvitationList.filter { it.userId.equals(info.userId) }
+                if (list.isEmpty()) {
+                    micSeatInvitationList.add(info)
+                    objIdOfSeatInvitation.add(item.id)
+                } else {
+                    val indexOf = micSeatInvitationList.indexOf(list[0])
+                    micSeatInvitationList[indexOf] = info
+                    objIdOfSeatInvitation[indexOf] = item.id
+                }
                 runOnMainThread {
                     micSeatInvitationSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.updated,
@@ -952,6 +961,13 @@ class ShowSyncManagerServiceImpl(
             }
 
             override fun onDeleted(item: IObject?) {
+                val info = item?.toObject(ShowMicSeatInvitation::class.java) ?: return
+                val list = micSeatInvitationList.filter { it.userId.equals(info.userId) }
+                if (!list.isEmpty()) {
+                    val indexOf = micSeatInvitationList.indexOf(list[0])
+                    micSeatInvitationList.removeAt(indexOf)
+                    objIdOfSeatInvitation.removeAt(indexOf)
+                }
                 runOnMainThread {
                     micSeatInvitationSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
@@ -1124,7 +1140,8 @@ class ShowSyncManagerServiceImpl(
             ?.add(info, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject) {
                     Log.d(TAG, "innerCreateInteration success")
-                    innerGetAllInterationList(null, null)
+                    objIdOfInteractionInfo.add(result.id)
+                    interactionInfoList.add(info)
                     runOnMainThread { success?.invoke() }
                 }
 

@@ -384,7 +384,19 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun ShowInvitationDialog() {
+        LiveLinkInvitationDialog(this).apply {
+            init()
+            setListener(object : LiveLinkInvitationDialog.Listener {
+                override fun onAgreeSeatInvitation() {
+                    mService.acceptMicSeatInvitation()
+                }
 
+                override fun onCancelSeatInvitation() {
+                    mService.rejectMicSeatInvitation()
+                }
+            })
+            show()
+        }
     }
 
     private fun ShowPKDialog() {
@@ -409,28 +421,26 @@ class LiveDetailActivity : AppCompatActivity() {
             })
         }
         mService.subscribeMicSeatInvitation { status, invitation ->
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && !isRoomOwner) {
-                LiveLinkInvitationDialog(this).apply {
-                    init()
-                    setListener(object : LiveLinkInvitationDialog.Listener{
-                        override fun onAgreeSeatInvitation() {
-                            mService.acceptMicSeatInvitation {  }
-                        }
-
-                        override fun onCancelSeatInvitation() {
-                            mService.cancelMicSeatInvitation(invitation!!.userId)
-                        }
-
-                    })
-                    show()
+            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && invitation != null) {
+                if (invitation.status == ShowRoomRequestStatus.waitting) {
+                    if (isRoomOwner) {
+                        mLinkDialog.setSeatInvitationItemStatus(ShowUser(
+                            invitation.userId,
+                            invitation.userAvatar,
+                            invitation.userName,
+                            invitation.status
+                        ))
+                    } else {
+                        ShowInvitationDialog()
+                    }
+                } else {
+                    mLinkDialog.setSeatInvitationItemStatus(ShowUser(
+                        invitation.userId,
+                        invitation.userAvatar,
+                        invitation.userName,
+                        invitation.status
+                    ))
                 }
-            } else if (invitation!!.status == ShowRoomRequestStatus.accepted) {
-                mLinkDialog.setSeatInvitationItemStatus(ShowUser(
-                    invitation.userId,
-                    invitation.userAvatar,
-                    invitation.userName,
-                    invitation.status
-                ))
             }
         }
         mService.subscribeInteractionChanged { status, info ->
