@@ -9,23 +9,34 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
+import io.agora.scene.show.databinding.ShowLiveLinkInvitationDialogBinding
+import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.widget.UserItem
+import io.agora.scene.show.service.ShowUser
 
 class LiveLinkDialog : BottomSheetDialogFragment() {
-    private lateinit var mBinding: ShowLiveLinkDialogBinding
+    private val mBinding by lazy { ShowLiveLinkDialogBinding.inflate(
+        LayoutInflater.from(
+            context
+        ))}
     private lateinit var linkDialogListener: OnLinkDialogActionListener;
     private val linkFragment: LiveLinkRequestFragment = LiveLinkRequestFragment()
     private val onlineUserFragment: LiveLinkInvitationFragment = LiveLinkInvitationFragment()
+    private val audicenceFragment: LiveLinkAudienceFragment = LiveLinkAudienceFragment()
+    private var isRoomOwner: Boolean = true;
+
+    fun setIsRoomOwner(value: Boolean) {
+        isRoomOwner = value
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mBinding = ShowLiveLinkDialogBinding.inflate(layoutInflater)
         return mBinding.root
     }
 
@@ -51,68 +62,98 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
         mBinding.rBtnRequestMessage.setChecked(true)
         mBinding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
-        linkFragment.setListener(object: LiveLinkRequestFragment.Listener {
-            override fun onAcceptMicSeatItemChosen(userItem: ShowMicSeatApply, position: Int) {
-                if (linkDialogListener != null) {
-                    linkDialogListener.onAcceptMicSeatApplyChosen(this@LiveLinkDialog, userItem)
+        if (isRoomOwner) {
+            linkFragment.setListener(object: LiveLinkRequestFragment.Listener {
+                override fun onAcceptMicSeatItemChosen(seatApply: ShowMicSeatApply, position: Int) {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onAcceptMicSeatApplyChosen(this@LiveLinkDialog, seatApply)
+                    }
                 }
-            }
 
-            override fun onRequestRefreshing(tagIndex: Int) {
-                if (linkDialogListener != null) {
-                    linkDialogListener.onRequestMessageRefreshing(this@LiveLinkDialog, tagIndex)
+                override fun onRequestRefreshing() {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onRequestMessageRefreshing(this@LiveLinkDialog)
+                    }
                 }
-            }
 
-            override fun onStopLinkingChosen() {
-                if (linkDialogListener != null) {
+                override fun onStopLinkingChosen() {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onStopLinkingChosen(this@LiveLinkDialog)
+                    }
+                }
+            })
+
+            onlineUserFragment.setListener(object: LiveLinkInvitationFragment.Listener {
+                override fun onInviteMicSeatItemChosen(userItem: ShowUser) {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onOnlineAudienceInvitation(this@LiveLinkDialog, userItem)
+                    }
+                }
+
+                override fun onRequestRefreshing() {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onOnlineAudienceRefreshing(this@LiveLinkDialog)
+                    }
+                }
+
+                override fun onStopLinkingChosen() {
+                    if (linkDialogListener != null) {
+                        linkDialogListener.onStopLinkingChosen(this@LiveLinkDialog)
+                    }
+                }
+            })
+
+            val fragments = arrayOf<Fragment>(linkFragment, onlineUserFragment)
+            mBinding.pager.isSaveEnabled = false
+            mBinding.pager.adapter =
+                object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
+                    override fun getItemCount(): Int {
+                        return fragments.size
+                    }
+
+                    override fun createFragment(position: Int): Fragment {
+                        return fragments[position]
+                    }
+                }
+            mBinding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    if (position == 0) {
+                        mBinding.rBtnRequestMessage.setChecked(true)
+                    } else {
+                        mBinding.rBtnOnlineUser.setChecked(true)
+                    }
+                }
+            })
+        } else {
+            mBinding.radioGroup.visibility = View.INVISIBLE
+            mBinding.rBtnRequestText.isVisible = true
+            audicenceFragment.setListener(object: LiveLinkAudienceFragment.Listener {
+                override fun onApplyOnSeat() {
+                    linkDialogListener.onApplyOnSeat(this@LiveLinkDialog)
+                }
+
+                override fun onStopLinkingChosen() {
                     linkDialogListener.onStopLinkingChosen(this@LiveLinkDialog)
                 }
-            }
-        })
 
-        onlineUserFragment.setListener(object: LiveLinkInvitationFragment.Listener {
-            override fun onInviteMicSeatItemChosen(userItem: UserItem, position: Int) {
-                if (linkDialogListener != null) {
-                    linkDialogListener.onOnlineAudienceRefreshing(this@LiveLinkDialog, position)
+                override fun onStopApplyingChosen() {
+                    linkDialogListener.onStopApplyingChosen(this@LiveLinkDialog)
                 }
-            }
+            })
 
-            override fun onRequestRefreshing(tagIndex: Int) {
-                if (linkDialogListener != null) {
-                    linkDialogListener.onOnlineAudienceRefreshing(this@LiveLinkDialog, tagIndex)
-                }
-            }
+            mBinding.pager.isSaveEnabled = false
+            mBinding.pager.adapter =
+                object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
+                    override fun getItemCount(): Int {
+                        return 1
+                    }
 
-            override fun onStopLinkingChosen() {
-                if (linkDialogListener != null) {
-                    linkDialogListener.onStopLinkingChosen(this@LiveLinkDialog)
+                    override fun createFragment(position: Int): Fragment {
+                        return audicenceFragment
+                    }
                 }
-            }
-        })
-
-        val fragments = arrayOf<Fragment>(linkFragment, onlineUserFragment)
-        mBinding.pager.isSaveEnabled = false
-        mBinding.pager.adapter =
-            object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
-                override fun getItemCount(): Int {
-                    return fragments.size
-                }
-
-                override fun createFragment(position: Int): Fragment {
-                    return fragments[position]
-                }
-            }
-        mBinding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                if (position == 0) {
-                    mBinding.rBtnRequestMessage.setChecked(true)
-                } else {
-                    mBinding.rBtnOnlineUser.setChecked(true)
-                }
-            }
-        })
+        }
     }
 
     override fun onStart() {
@@ -136,35 +177,43 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     /**
      * 连麦申请列表-设置当前麦上状态
      */
-    fun setOnSeatStatus(userName: String) {
-        linkFragment.setOnSeatStatus(userName)
+    fun setOnSeatStatus(userName: String, status: ShowInteractionStatus) {
+        if (isRoomOwner) {
+            linkFragment.setOnSeatStatus(userName, status)
+        } else {
+            audicenceFragment.setOnSeatStatus(status)
+        }
     }
 
     /**
      * 连麦申请列表-设置连麦申请列表
      */
     fun setSeatApplyList(list : List<ShowMicSeatApply>) {
-        linkFragment.setSeatApplyList(list)
+        if (isRoomOwner) {
+            linkFragment.setSeatApplyList(list)
+        } else {
+            audicenceFragment.setSeatApplyList(list)
+        }
     }
 
     /**
      * 连麦申请列表-更新item选中状态
      */
-    fun setSeatApplyItemStatus(applyItem: ShowMicSeatApply, isAccept: Boolean) {
-        linkFragment.setSeatApplyItemStatus(applyItem, isAccept)
+    fun setSeatApplyItemStatus(applyItem: ShowMicSeatApply) {
+        linkFragment.setSeatApplyItemStatus(applyItem)
     }
 
     /**
      * 连麦邀请列表-设置在线主播列表
      */
-    fun setSeatInvitationList(list : List<UserItem>) {
-        onlineUserFragment.setSeatInvitationList(list)
+    fun setSeatInvitationList(userList : List<ShowUser>) {
+        onlineUserFragment.setSeatInvitationList(userList)
     }
 
     /**
      * 连麦邀请列表-接受连麦-更新item选中状态
      */
-    fun setSeatInvitationItemStatus(applyItem: UserItem, isAccept: Boolean) {
-        onlineUserFragment.setSeatInvitationItemStatus(applyItem, isAccept)
+    fun setSeatInvitationItemStatus(user: ShowUser) {
+        onlineUserFragment.setSeatInvitationItemStatus(user)
     }
 }

@@ -32,24 +32,37 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="@mipmap/close"
-        android:src="@mipmap/ic_close"
+        android:text="@string/show_stop_linking"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/linkRequestList"
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="681dp"
-        android:orientation="vertical"
-        android:overScrollMode="never"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/textLinking"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:spanCount="1"
-        tools:ignore="MissingConstraints"
-        tools:listitem="@layout/show_live_link_request_message" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textLinking"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/linkRequestList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="1"
+            tools:listitem="@layout/show_live_link_request_message" />
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/linkRequestListEmpty"

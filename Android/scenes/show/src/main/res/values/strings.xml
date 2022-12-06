@@ -98,9 +98,14 @@
     <string name="show_online_audience">在线观众</string>
     <string name="show_agree_onseat">同意上麦</string>
     <string name="show_application">邀请</string>
+    <string name="show_application_waitting">等待中</string>
     <string name="show_empty_onseat_apply">暂无上麦申请</string>
+    <string name="show_apply_onseat">申请连麦</string>
+    <string name="show_stop_linking">停止连麦</string>
+    <string name="show_cancel_linking">撤回连麦</string>
     <string name="show_linking">正在连麦</string>
     <string name="show_is_onseat">已上麦</string>
+    <string name="show_reject_onseat">已拒绝</string>
 
     <!-- pk   -->
     <string name="show_online_boardcaster">在线主播</string>
