@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 private let kSceneId = "scene_show"
 
@@ -91,8 +92,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             }
             
             let showState = ShowServiceConnectState(rawValue: state.rawValue) ?? .open
-            self.subscribeDelegate?.onConnectStateChanged(state: showState)
-            guard state == .open, !self.syncUtilsInited else { return }
+            self.subscribeDelegate?.onConnectStateChanged(state: showState)            
+            guard state == .open else { return }
+            guard !self.syncUtilsInited else {
+                self._fetchCreatePkInvitation()
+                self._getUserList {[weak self] (err, list) in
+                    self?.subscribeDelegate?.onUserCountChanged(userCount: list?.count ?? 0)
+                }
+                return
+            }
             
             self.syncUtilsInited = true
 
@@ -445,47 +453,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             guard let self = self, error == nil, let invitationList = invitationList else { return }
             
             self._unsubscribePKInvitationChanged(roomId: room.roomId)
-            self._subscribePKInvitationChanged(channelName: room.roomId!) { status, invitation in
-                if status == .created {
-                    self.pkCreatedInvitationMap[invitation.roomId!] = invitation
-                }
-                guard let model = self.pkCreatedInvitationMap.values.filter({ $0.objectId == invitation.objectId }).first else {
-                    return
-                }
-                model.userMuteAudio = invitation.userMuteAudio
-                model.fromUserMuteAudio = invitation.fromUserMuteAudio
-                if status == .deleted {
-                    if model.status == .accepted {
-                        self._recvPKFinish(invitation: model)
-                    } else {
-                        self._recvPKRejected(invitation: model)
-                    }
-                } else {
-                    model.status = invitation.status
-                    switch model.status {
-                    case .rejected:
-                        self._recvPKRejected(invitation: model)
-                    case .accepted:
-                        self._recvPKAccepted(invitation: model)
-                    case .ended:
-                        self._recvPKFinish(invitation: model)
-                        self.subscribeDelegate?.onPKInvitationUpdated(invitation: model)
-                    default:
-                        self.subscribeDelegate?.onPKInvitationUpdated(invitation: model)
-                        break
-                    }
-                    
-                    //TODO: workaround
-                    guard let interaction = self.interactionList.filter({ $0.userId == model.userId}).first else {return}
-                    if interaction.ownerMuteAudio == model.fromUserMuteAudio,
-                        interaction.muteAudio == model.userMuteAudio {
-                        return
-                    }
-                    interaction.muteAudio = model.userMuteAudio
-                    interaction.ownerMuteAudio = model.fromUserMuteAudio
-                    self._updateInteraction(interaction: interaction) { err in
-                    }
-                }
+            self._subscribePKInvitationChanged(channelName: room.roomId!) {[weak self] (status, invitation) in
+                self?._handleCreatePkInvitationRespone(invitation: invitation, status: status)
             }
             
             guard let completion = self.createPkInvitationClosure else {
@@ -1558,6 +1527,50 @@ extension ShowSyncManagerServiceImp {
             completion(model)
         }
     }
+    
+    //recv pk invitation feedback(accpet/reject/...)
+    func _handleCreatePkInvitationRespone(invitation: ShowPKInvitation, status: ShowSubscribeStatus) {
+        if status == .created {
+            self.pkCreatedInvitationMap[invitation.roomId!] = invitation
+        }
+        guard let model = self.pkCreatedInvitationMap.values.filter({ $0.objectId == invitation.objectId }).first else {
+            return
+        }
+        model.userMuteAudio = invitation.userMuteAudio
+        model.fromUserMuteAudio = invitation.fromUserMuteAudio
+        if status == .deleted {
+            if model.status == .accepted {
+                self._recvPKFinish(invitation: model)
+            } else {
+                self._recvPKRejected(invitation: model)
+            }
+        } else {
+            model.status = invitation.status
+            switch model.status {
+            case .rejected:
+                self._recvPKRejected(invitation: model)
+            case .accepted:
+                self._recvPKAccepted(invitation: model)
+            case .ended:
+                self._recvPKFinish(invitation: model)
+                self.subscribeDelegate?.onPKInvitationUpdated(invitation: model)
+            default:
+                self.subscribeDelegate?.onPKInvitationUpdated(invitation: model)
+                break
+            }
+            
+            //TODO: workaround
+            guard let interaction = self.interactionList.filter({ $0.userId == model.userId}).first else {return}
+            if interaction.ownerMuteAudio == model.fromUserMuteAudio,
+                interaction.muteAudio == model.userMuteAudio {
+                return
+            }
+            interaction.muteAudio = model.userMuteAudio
+            interaction.ownerMuteAudio = model.fromUserMuteAudio
+            self._updateInteraction(interaction: interaction) { err in
+            }
+        }
+    }
 }
 
 //MARK: Interaction
@@ -1700,5 +1713,34 @@ extension ShowSyncManagerServiceImp {
                 agoraPrint("imp interaction update fail :\(error.message)...")
                 completion(NSError(domain: error.message, code: error.code))
             })
+    }
+}
+
+//lost connected
+extension ShowSyncManagerServiceImp {
+    private func _fetchCreatePkInvitation() {
+        self.getRoomList(page: 0) { [weak self] (err, list) in
+            guard let self = self else { return }
+            self.pkCreatedInvitationMap.forEach { (key: String, value: ShowPKInvitation) in
+                guard let room = list?.filter({ $0.roomId == key }).first else {
+                    //room did remove
+                    self._handleCreatePkInvitationRespone(invitation: value, status: .deleted)
+                    return
+                }
+                self._getAllPKInvitationList(room: room) { err, list in
+                    guard let invitation = list?.filter({ $0.objectId == value.objectId }).first else {
+                        // invitation did remove
+                        self._handleCreatePkInvitationRespone(invitation: value, status: .deleted)
+                        return
+                    }
+                    
+                    guard invitation == value else {
+                        return
+                    }
+                    
+                    self._handleCreatePkInvitationRespone(invitation: invitation, status: .updated)
+                }
+            }
+        }
     }
 }
