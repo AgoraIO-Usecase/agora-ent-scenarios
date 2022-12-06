@@ -85,7 +85,7 @@ class ShowCreateLiveView: UIView {
             make.top.equalTo(18)
             make.right.equalTo(-50)
         }
-        nameTextField.becomeFirstResponder()
+//        nameTextField.becomeFirstResponder()
         
         // 编辑按钮
         let editButton = UIButton(type: .custom)
