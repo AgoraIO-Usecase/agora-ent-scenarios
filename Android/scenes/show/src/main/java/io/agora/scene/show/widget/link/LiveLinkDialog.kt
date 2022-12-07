@@ -2,6 +2,7 @@ package io.agora.scene.show.widget.link
 
 import android.content.DialogInterface
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +17,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
-import io.agora.scene.show.databinding.ShowLiveLinkInvitationDialogBinding
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowUser
 
 class LiveLinkDialog : BottomSheetDialogFragment() {
-    private val mBinding by lazy { ShowLiveLinkDialogBinding.inflate(
-        LayoutInflater.from(
-            context
-        ))}
+    private var mBinding : ShowLiveLinkDialogBinding? = null
+    private val binding get() = mBinding!!
     private lateinit var linkDialogListener: OnLinkDialogActionListener;
     private val linkFragment: LiveLinkRequestFragment = LiveLinkRequestFragment()
     private val onlineUserFragment: LiveLinkInvitationFragment = LiveLinkInvitationFragment()
@@ -37,7 +35,8 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return mBinding.root
+        mBinding = ShowLiveLinkDialogBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,12 +54,12 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
         ) { v: View?, insets: WindowInsetsCompat ->
             val inset =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            mBinding.pager.setPadding(0, 0, 0, inset.bottom)
+            binding.pager.setPadding(0, 0, 0, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
 
-        mBinding.rBtnRequestMessage.setChecked(true)
-        mBinding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
+        binding.rBtnRequestMessage.setChecked(true)
+        binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         if (isRoomOwner) {
             linkFragment.setListener(object: LiveLinkRequestFragment.Listener {
@@ -104,8 +103,8 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
             })
 
             val fragments = arrayOf<Fragment>(linkFragment, onlineUserFragment)
-            mBinding.pager.isSaveEnabled = false
-            mBinding.pager.adapter =
+            binding.pager.isSaveEnabled = false
+            binding.pager.adapter =
                 object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
                     override fun getItemCount(): Int {
                         return fragments.size
@@ -115,19 +114,23 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
                         return fragments[position]
                     }
                 }
-            mBinding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     if (position == 0) {
-                        mBinding.rBtnRequestMessage.setChecked(true)
+                        binding.rBtnRequestMessage.setChecked(true)
+                        binding.rBtnRequestMessage.setTypeface(null, Typeface.BOLD)
+                        binding.rBtnOnlineUser.setTypeface(null, Typeface.NORMAL)
                     } else {
-                        mBinding.rBtnOnlineUser.setChecked(true)
+                        binding.rBtnOnlineUser.setChecked(true)
+                        binding.rBtnOnlineUser.setTypeface(null, Typeface.BOLD)
+                        binding.rBtnRequestMessage.setTypeface(null, Typeface.NORMAL)
                     }
                 }
             })
         } else {
-            mBinding.radioGroup.visibility = View.INVISIBLE
-            mBinding.rBtnRequestText.isVisible = true
+            binding.radioGroup.visibility = View.INVISIBLE
+            binding.rBtnRequestText.isVisible = true
             audicenceFragment.setListener(object: LiveLinkAudienceFragment.Listener {
                 override fun onApplyOnSeat() {
                     linkDialogListener.onApplyOnSeat(this@LiveLinkDialog)
@@ -142,8 +145,8 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
                 }
             })
 
-            mBinding.pager.isSaveEnabled = false
-            mBinding.pager.adapter =
+            binding.pager.isSaveEnabled = false
+            binding.pager.adapter =
                 object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
                     override fun getItemCount(): Int {
                         return 1
@@ -158,13 +161,18 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        mBinding.radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+        binding.radioGroup.setOnCheckedChangeListener { radioGroup, i ->
             if (i === R.id.rBtnRequestMessage) {
-                mBinding.pager.currentItem = 0
+                binding.pager.currentItem = 0
             } else if (i === R.id.rBtnOnlineUser) {
-                mBinding.pager.currentItem = 1
+                binding.pager.currentItem = 1
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
     }
 
     /**

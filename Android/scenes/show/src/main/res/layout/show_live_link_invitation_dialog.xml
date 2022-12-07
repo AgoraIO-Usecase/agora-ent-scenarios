@@ -39,10 +39,11 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnLeft"
-        style="@style/def_btn_empty"
+        android:layout_width="108dp"
+        android:layout_height="40dp"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="40dp"
-        android:background="@drawable/bg_full_white_ef_r50"
+        android:background="@drawable/show_pk_or_link_cancel_btn_bg"
         android:text="@string/cancel"
         android:textSize="16sp"
         android:textStyle="normal"
@@ -52,12 +53,14 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnRight"
-        style="@style/def_btn_full"
+        android:layout_width="108dp"
+        android:layout_height="40dp"
         android:layout_marginHorizontal="10dp"
         android:textColor="@color/white"
         android:text="@string/confirm"
         android:textSize="16sp"
         android:textStyle="normal"
+        android:background="@drawable/show_pk_or_link_btn_bg"
         app:layout_constraintEnd_toEndOf="@id/tvTitle"
         app:layout_constraintStart_toEndOf="@id/btnLeft"
         app:layout_constraintTop_toTopOf="@id/btnLeft" />

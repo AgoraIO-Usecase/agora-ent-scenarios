@@ -27,33 +27,71 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/iBtnSeatApplyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/show_apply_onseat"
+        android:textColor="@drawable/show_purple"
+        app:layout_constraintBottom_toBottomOf="@id/textLinking"
+        app:layout_constraintEnd_toStartOf="@id/iBtnSeatApply"
+        app:layout_constraintTop_toTopOf="@id/textLinking" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnSeatApply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="@string/show_apply_onseat"
+        android:background="@mipmap/ic_close"
+        android:src="@mipmap/ic_close"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/iBtnCancelApplyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/show_cancel_linking"
+        android:textColor="@drawable/show_purple"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/textLinking"
+        app:layout_constraintEnd_toStartOf="@id/iBtnCancelApply"
+        app:layout_constraintTop_toTopOf="@id/textLinking" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnCancelApply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="@string/show_cancel_linking"
+        android:background="@mipmap/ic_close"
+        android:src="@mipmap/ic_close"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/iBtnStopLinkText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/show_stop_linking"
+        android:textColor="@drawable/show_purple"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/textLinking"
+        app:layout_constraintEnd_toStartOf="@id/iBtnStopLink"
+        app:layout_constraintTop_toTopOf="@id/textLinking" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnStopLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="@string/show_stop_linking"
+        android:background="@mipmap/ic_close"
+        android:src="@mipmap/ic_close"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
@@ -84,11 +122,21 @@
             android:layout_height="wrap_content" />
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/linkRequestListEmptyImg"
+        android:layout_width="147dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="80dp"
+        android:src="@mipmap/show_link_empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textLinking" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/linkRequestListEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="154dp"
+        android:layout_marginTop="39dp"
         android:drawablePadding="12dp"
         android:gravity="center"
         android:text="@string/show_empty_onseat_apply"
@@ -97,6 +145,6 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textLinking" />
+        app:layout_constraintTop_toBottomOf="@id/linkRequestListEmptyImg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

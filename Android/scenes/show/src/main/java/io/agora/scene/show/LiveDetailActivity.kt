@@ -6,10 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.view.LayoutInflater
-import android.view.SurfaceView
+import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
-import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -29,6 +27,7 @@ import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.service.*
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.*
+import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.LiveLinkInvitationDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
@@ -59,7 +58,7 @@ class LiveDetailActivity : AppCompatActivity() {
         null
     private val mMusicEffectDialog by lazy { MusicEffectDialog(this) }
     private val mSettingDialog by lazy { SettingDialog(this) }
-
+    private val mLinkSettingDialog by lazy { LiveLinkAudienceSettingsDialog(this) }
     private val mLinkDialog by lazy { LiveLinkDialog() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
     private lateinit var mPermissionHelp: PermissionHelp
@@ -380,6 +379,26 @@ class LiveDetailActivity : AppCompatActivity() {
         mMusicEffectDialog.show()
     }
 
+    private fun ShowLinkSettingsDialog() {
+        mLinkSettingDialog.apply {
+            setAudienceInfo(interactionInfo!!.userName)
+            setOnItemActivateChangedListener { _, itemId, activated ->
+                when (itemId) {
+                    LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
+                    LiveLinkAudienceSettingsDialog.ITEM_ID_STOP_LINK -> {
+                        if (interactionInfo != null) {
+                            mService.stopInteraction(interactionInfo!!, {
+                                // success
+                                dismiss()
+                            })
+                        }
+                    }
+                }
+            }
+            show()
+        }
+    }
+
     private fun ShowLinkingDialog() {
         mLinkDialog.setIsRoomOwner(isRoomOwner)
         mLinkDialog.setLinkDialogActionListener(object : OnLinkDialogActionListener {
@@ -501,40 +520,67 @@ class LiveDetailActivity : AppCompatActivity() {
                 interactionInfo = info
                 mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
                 if (info.interactStatus == ShowInteractionStatus.onSeat) {
-                    val boardcasterVideoView = SurfaceView(this)
-                    val audienceVideoView = SurfaceView(this)
+                    // 开始连麦
+                    val boardcasterVideoView = TextureView(this)
+                    val audienceVideoView = TextureView(this)
                     mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
                     mBinding.videoSinglehostLayout.root.isVisible = false
                     mBinding.videoLinkingLayout.root.isVisible = true
+                    mBinding.videoLinkingAudienceLayout.root.isVisible = true
+                    mBinding.videoLinkingAudienceLayout.root.bringToFront()
                     mBinding.videoLinkingLayout.videoContainer.addView(boardcasterVideoView)
-                    mBinding.videoLinkingLayout.videoContainer.addView(audienceVideoView, 105, 50)
+                    mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
                     if (isRoomOwner) {
+                        // 连麦主播视角
+                        audienceVideoView.setOnClickListener {
+                            // 主播弹出view
+                            ShowLinkSettingsDialog()
+                        }
                         mRtcEngine.setupLocalVideo(VideoCanvas(boardcasterVideoView))
                         mRtcEngine.setupRemoteVideo(
                             VideoCanvas(
                                 audienceVideoView,
                                 Constants.RENDER_MODE_HIDDEN,
-                                mRoomInfo.ownerId.toInt()
+                                info.userId.toInt()
                             )
                         )
                     } else {
-                        val channelMediaOptions = ChannelMediaOptions()
-                        channelMediaOptions.publishCameraTrack = true;
-                        channelMediaOptions.publishMicrophoneTrack = true;
-                        channelMediaOptions.publishCustomAudioTrack = false;
-                        channelMediaOptions.enableAudioRecordingOrPlayout = true;
-                        channelMediaOptions.autoSubscribeVideo = true;
-                        channelMediaOptions.autoSubscribeAudio = true;
-                        channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                        mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
-                        mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
-                        mRtcEngine.setupRemoteVideo(
-                            VideoCanvas(
-                                boardcasterVideoView,
-                                Constants.RENDER_MODE_HIDDEN,
-                                mRoomInfo.ownerId.toInt()
+                        // 连麦观众视角
+                        if (info.userId.equals(UserManager.getInstance().user.id.toString())) {
+                            val channelMediaOptions = ChannelMediaOptions()
+                            channelMediaOptions.publishCameraTrack = true;
+                            channelMediaOptions.publishMicrophoneTrack = true;
+                            channelMediaOptions.publishCustomAudioTrack = false;
+                            channelMediaOptions.enableAudioRecordingOrPlayout = true;
+                            channelMediaOptions.autoSubscribeVideo = true;
+                            channelMediaOptions.autoSubscribeAudio = true;
+                            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                            mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
+                            mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    boardcasterVideoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    mRoomInfo.ownerId.toInt()
+                                )
                             )
-                        )
+                        } else {
+                            // 其他观众视角
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    audienceVideoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    info.userId.toInt()
+                                )
+                            )
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    boardcasterVideoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    mRoomInfo.ownerId.toInt()
+                                )
+                            )
+                        }
                     }
                 } else if (info != null && info.interactStatus == ShowInteractionStatus.pking) {
                     // TODO PK RTC + UI
@@ -545,7 +591,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 mLinkDialog.setOnSeatStatus("", ShowInteractionStatus.idle)
                 val boardcasterVideoView = SurfaceView(this)
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingLayout.root.isVisible = false
+                mBinding.videoLinkingAudienceLayout.root.isVisible = false
                 mBinding.videoSinglehostLayout.root.isVisible = true
                 mBinding.videoSinglehostLayout.videoContainer.addView(boardcasterVideoView)
                 if (isRoomOwner) {

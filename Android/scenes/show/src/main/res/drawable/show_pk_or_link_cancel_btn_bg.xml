@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/show_pk_or_link_cancel_button_bg" android:state_enabled="true" />
+    <item android:drawable="@drawable/bg_full_grey_r50" android:state_enabled="false" />
+</selector>

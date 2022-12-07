@@ -106,6 +106,7 @@
     <string name="show_linking">正在连麦</string>
     <string name="show_is_onseat">已上麦</string>
     <string name="show_reject_onseat">已拒绝</string>
+    <string name="show_audience_settings">观众设置</string>
 
     <!-- pk   -->
     <string name="show_online_boardcaster">在线主播</string>

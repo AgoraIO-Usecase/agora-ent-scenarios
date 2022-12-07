@@ -1,6 +1,7 @@
 package io.agora.scene.show.widget.link
 
 import android.view.View
+import androidx.core.view.isVisible
 import io.agora.scene.base.GlideApp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageBinding
@@ -30,6 +31,7 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
             .transform(CenterCropRoundCornerTransform(10))
             .into(binding.coverUserIcon);
         if (isRoomOwner) {
+            binding.userNum.isVisible = false
             if (seatApply.status == ShowRoomRequestStatus.accepted) {
                 binding.btnItemAgreeRequest.setEnabled(false)
                 binding.btnItemAgreeRequest.setText(R.string.show_is_onseat)
@@ -42,6 +44,8 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
                 }
             }
         } else {
+            binding.userNum.isVisible = true
+            binding.userNum.setText((position+1).toString())
             binding.btnItemAgreeRequest.visibility = View.GONE
         }
     }

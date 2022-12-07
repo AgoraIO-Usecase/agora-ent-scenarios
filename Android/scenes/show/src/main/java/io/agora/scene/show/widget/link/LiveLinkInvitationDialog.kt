@@ -3,8 +3,6 @@ package io.agora.scene.show.widget.link
 import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.WindowInsets
-import androidx.core.view.updatePadding
 import io.agora.scene.show.databinding.ShowLiveLinkInvitationDialogBinding
 
 class LiveLinkInvitationDialog(context: Context) : Dialog(context) {
@@ -27,7 +25,7 @@ class LiveLinkInvitationDialog(context: Context) : Dialog(context) {
         }
     }
 
-    fun setListener(listener: LiveLinkInvitationDialog.Listener) {
+    fun setListener(listener: Listener) {
         mListener = listener
     }
 
