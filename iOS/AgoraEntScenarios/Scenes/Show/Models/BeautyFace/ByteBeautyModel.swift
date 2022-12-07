@@ -36,7 +36,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/beauty_IOS_lite"
         model.key = "smooth"
-        model.value = 0.8
+        model.value = 0.3
         model.name = "磨皮".show_localized
         model.icon = "meiyan_icon_mopi"
         dataArray.append(model)
@@ -44,7 +44,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/beauty_IOS_lite"
         model.key = "whiten"
-        model.value = 0.35
+        model.value = 0.5
         model.name = "美白".show_localized
         model.icon = "meiyan_icon_meibai"
         dataArray.append(model)
@@ -52,7 +52,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Overall"
-        model.value = 0.35
+        model.value = 0.15
         model.name = "瘦脸".show_localized
         model.icon = "meiyan_icon_shoulian"
         model.enableNegative = true
@@ -61,7 +61,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Cheekbone"
-        model.value = 0.2
+        model.value = 0.3
         model.name = "瘦颧骨".show_localized
         model.icon = "meiyan_icon_shouquangu"
         model.enableNegative = true
@@ -70,7 +70,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Eye"
-        model.value = 0.4
+        model.value = 0.15
         model.name = "大眼".show_localized
         model.icon = "meiyan_icon_dayan"
         model.enableNegative = true
@@ -79,7 +79,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Nose"
-        model.value = 0.2
+        model.value = 0.15
         model.name = "瘦鼻".show_localized
         model.icon = "meiyan_icon_shoubi"
         model.enableNegative = true
@@ -88,7 +88,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Chin"
-        model.value = 0.6
+        model.value = 0.06
         model.name = "下巴".show_localized
         model.icon = "meiyan_icon_xiaba"
         model.enableNegative = true
@@ -97,7 +97,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Jawbone"
-        model.value = 0.2
+        model.value = 0.06
         model.name = "下颌骨".show_localized
         model.icon = "meiyan_icon_xiahegu"
         model.enableNegative = true
@@ -106,7 +106,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Forehead"
-        model.value = 0.1
+        model.value = 0.4
         model.name = "额头".show_localized
         model.icon = "meiyan_icon_etou"
         model.enableNegative = true
@@ -115,7 +115,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_ZoomMouth"
-        model.value = 0.1
+        model.value = 0.16
         model.name = "嘴型".show_localized
         model.icon = "meiyan_icon_zuixing"
         model.enableNegative = true
@@ -124,7 +124,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/beauty_4Items"
         model.key = "BEF_BEAUTY_WHITEN_TEETH"
-        model.value = 0.6
+        model.value = 0.2
         model.name = "美牙".show_localized
         model.icon = "meiyan_icon_meiya"
         dataArray.append(model)
