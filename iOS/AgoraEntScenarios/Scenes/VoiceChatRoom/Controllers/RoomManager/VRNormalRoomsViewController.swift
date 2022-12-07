@@ -29,6 +29,7 @@ public class VRNormalRoomsViewController: UIViewController {
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.refresh()
     }
     
 }
