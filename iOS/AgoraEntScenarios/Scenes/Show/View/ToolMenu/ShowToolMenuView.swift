@@ -115,7 +115,7 @@ class ShowToolMenuView: UIView {
             case .managerMic:
                 updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .mute_mic || $0 == .end_pk }))
             case .idle_audience:
-                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .real_time_data || $0 == .setting }))
+                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .real_time_data }))
             }
         }
     }
