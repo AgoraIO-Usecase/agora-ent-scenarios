@@ -8,11 +8,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <io.agora.scene.voice.ui.widget.recyclerview.EmptyRecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/voiceNoData"
+        layout="@layout/voice_no_data_layout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
