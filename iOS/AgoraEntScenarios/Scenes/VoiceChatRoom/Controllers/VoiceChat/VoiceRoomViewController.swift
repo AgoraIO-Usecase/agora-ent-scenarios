@@ -430,8 +430,8 @@ extension VoiceRoomViewController {
     }
 
     func showSoundView() {
-        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 240), soundEffect: roomInfo?.room?.sound_effect ?? 0)
-        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 240)), custom: soundView)
+        let soundView = VMSoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 0)), soundEffect: roomInfo?.room?.sound_effect ?? 0)
+        let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 0))), custom: soundView)
         presentViewController(vc)
     }
 
@@ -571,6 +571,25 @@ extension VoiceRoomViewController {
     @objc func updateMicInfo(noti: Notification){
         guard let obj: VRRoomMic = noti.object as? VRRoomMic else {return}
         self.rtcView.updateUser(obj)
+    }
+    
+    func textHeight(text: String, fontSize: CGFloat, width: CGFloat) -> CGFloat {
+        return text.boundingRect(with: CGSize(width: width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [.font: UIFont.systemFont(ofSize: fontSize)], context: nil).size.height + 5
+    }
+
+    private func getDetailTextHeight(_ effect: Int) -> CGFloat{
+        var detailStr: String = ""
+        switch effect {
+        case 0:
+            detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
+        case 1:
+            detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
+        case 2:
+            detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
+        default:
+            detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
+        }
+        return textHeight(text: detailStr, fontSize: 13, width: self.view.bounds.size.width - 40~)
     }
 }
 
