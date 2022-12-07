@@ -163,10 +163,10 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                     guard let volBlock = self?.volBlock else { return }
                     volBlock(vol)
                 }
-                if let volume = roomInfo?.room?.robot_volume {
-                    cell.slider.value = Float(volume) / 100.0
-                    cell.countLabel.text = "\(volume)"
-                }
+                
+                let volume = roomInfo?.room?.robot_volume ?? 50
+                cell.slider.value = Float(volume) / 100.0
+                cell.countLabel.text = "\(volume)"
                 return cell
             }
         } else if indexPath.section == 1 {
@@ -222,7 +222,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
         case 2:
             soundType = "Gaming Buddy".localized()
         case 3:
-            soundType = "Professional podcaster".localized()
+            soundType = "Professional Podcaster".localized()
         default:
             soundType = "Social Chat".localized()
         }
