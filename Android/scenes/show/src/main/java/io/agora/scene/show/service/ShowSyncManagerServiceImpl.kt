@@ -559,6 +559,15 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
+        if (interactionInfoList.size <= 0) {
+            error?.invoke(RuntimeException("The interaction list is empty!"))
+            return
+        }
+        val targetInvitation = interactionInfoList.filter { it.userId == interaction.userId }.getOrNull(0)
+        if (targetInvitation == null) {
+            error?.invoke(RuntimeException("The interaction not found!"))
+            return
+        }
         innerRemoveInteration(objIdOfInteractionInfo[0], success, error)
     }
 
@@ -943,7 +952,7 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatInvitation::class.java) ?: return
-                val list = micSeatInvitationList.filter { it.userId.equals(info.userId) }
+                val list = micSeatInvitationList.filter { it.userId == info.userId }
                 if (list.isEmpty()) {
                     micSeatInvitationList.add(info)
                     objIdOfSeatInvitation.add(item.id)
@@ -962,7 +971,7 @@ class ShowSyncManagerServiceImpl(
 
             override fun onDeleted(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatInvitation::class.java) ?: return
-                val list = micSeatInvitationList.filter { it.userId.equals(info.userId) }
+                val list = micSeatInvitationList.filter { it.userId == info.userId }
                 if (!list.isEmpty()) {
                     val indexOf = micSeatInvitationList.indexOf(list[0])
                     micSeatInvitationList.removeAt(indexOf)
@@ -1140,8 +1149,6 @@ class ShowSyncManagerServiceImpl(
             ?.add(info, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject) {
                     Log.d(TAG, "innerCreateInteration success")
-                    objIdOfInteractionInfo.add(result.id)
-                    interactionInfoList.add(info)
                     runOnMainThread { success?.invoke() }
                 }
 
@@ -1199,6 +1206,16 @@ class ShowSyncManagerServiceImpl(
             override fun onUpdated(item: IObject?) {
                 Log.d(TAG, "innerSubscribeInteractionChanged onUpdated")
                 val info = item?.toObject(ShowInteractionInfo::class.java) ?: return
+                val list = interactionInfoList.filter { it.userId == info.userId }
+                if (list.isEmpty()) {
+                    interactionInfoList.add(info)
+                    objIdOfInteractionInfo.add(item.id)
+                } else {
+                    val indexOf = interactionInfoList.indexOf(list[0])
+                    interactionInfoList[indexOf] = info
+                    objIdOfInteractionInfo[indexOf] = item.id
+                }
+
                 runOnMainThread {
                     micInteractionInfoSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.updated,
@@ -1211,6 +1228,13 @@ class ShowSyncManagerServiceImpl(
             override fun onDeleted(item: IObject?) {
                 Log.d(TAG, "innerSubscribeInteractionChanged onDeleted")
                 cancelMicSeatApply()
+//                val info = item?.toObject(ShowInteractionInfo::class.java) ?: return
+//                val list = interactionInfoList.filter { it.userId == info.userId }
+//                if (!list.isEmpty()) {
+//                    val indexOf = interactionInfoList.indexOf(list[0])
+//                    interactionInfoList.removeAt(indexOf)
+//                    objIdOfInteractionInfo.removeAt(indexOf)
+//                }
                 runOnMainThread {
                     micInteractionInfoSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,

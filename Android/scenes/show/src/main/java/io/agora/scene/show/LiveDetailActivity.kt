@@ -362,7 +362,6 @@ class LiveDetailActivity : AppCompatActivity() {
                 if (interactionInfo != null) {
                     mService.stopInteraction(interactionInfo!!, {
                         // success
-                        interactionInfo = null
                     })
                 }
             }
@@ -488,6 +487,8 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
             } else {
                 // stop 互动
+                interactionInfo = null
+                mLinkDialog.setOnSeatStatus("", ShowInteractionStatus.idle)
                 val boardcasterVideoView = SurfaceView(this)
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingLayout.root.isVisible = false
