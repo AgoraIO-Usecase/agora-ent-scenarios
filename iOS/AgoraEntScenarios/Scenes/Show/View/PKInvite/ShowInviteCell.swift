@@ -149,6 +149,10 @@ class ShowPKInviteViewCell: ShowInviteCell {
         }
 
         AppContext.showServiceImp.createPKInvitation(room: invitation) {[weak self] error in
+            if let err = error {
+                ToastView.show(text: err.localizedDescription)
+                return
+            }
             self?.refreshDataClosure?()
         }
     }
@@ -243,7 +247,12 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
                 self.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp.createMicSeatInvitation(user: model) { _ in
+            AppContext.showServiceImp.createMicSeatInvitation(user: model) { error in
+                if let err = error {
+                    ToastView.show(text: err.localizedDescription)
+                    return
+                }
+                
                 self.refreshDataClosure?()
             }
         }

@@ -13,7 +13,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var mode: ShowMode?
     var isBroadcaster = true
-    var isOutsise = false
+    var isOutside = false
 
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
@@ -71,9 +71,11 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        // 自动弹出预设
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.didClickPreSetBarButton()
+        if isBroadcaster {
+            // 自动弹出预设
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.didClickPreSetBarButton()
+            }
         }
     }
     
@@ -103,8 +105,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         // 标题
         naviBar.title = "show_advanced_setting_title".show_localized
         // 右边按钮
-        let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
-        naviBar.rightItems = [preSetButtonItem]
+        if isBroadcaster {
+            let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
+            naviBar.rightItems = [preSetButtonItem]
+        }
         view.addSubview(naviBar)
     }
     
@@ -129,7 +133,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .FPS,
             .videoBitRate
         ]
-        let broadcasterVideoSettings: [ShowSettingKey] = isOutsise ? outsideSettings : insideSettings
+        let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings
         // 观众端设置
         let audienceVideoSettings: [ShowSettingKey] = [
             .SR

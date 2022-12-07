@@ -129,6 +129,24 @@ class ShowPKInvitation: ShowBaseInfo {
     var fromUserMuteAudio: Bool = false              //fromUserId静音状态
     var createdAt: Int64 = 0                         //创建时间，与19700101时间比较的毫秒数
     
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let info = object as? ShowPKInvitation,
+              userId == info.userId,
+              userName == info.userName,
+              roomId == info.roomId,
+              fromUserId == info.fromUserId,
+              fromName == info.fromName,
+              fromRoomId == info.fromRoomId,
+              status == info.status,
+              userMuteAudio == info.userMuteAudio,
+              fromUserMuteAudio == info.fromUserMuteAudio,
+              createdAt == info.createdAt else {
+            return false
+        }
+        
+        return true
+    }
+    
     #if DEBUG
     override var description: String {
         return "userId: \(userId ?? "") roomId: \(roomId ?? "") fromUserId: \(fromUserId ?? "") fromRoomId: \(fromRoomId ?? "") status: \(status) objectId: \(objectId ?? "")"
