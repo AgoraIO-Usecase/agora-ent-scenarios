@@ -129,6 +129,12 @@ interface ShowServiceProtocol {
         error: ((Exception) -> Unit)? = null
     )
 
+    /// 获取可PK对象列表(目前等价getRoomList)
+    fun getAllPKUserList(
+        success: ((List<ShowRoomDetailModel>) -> Unit),
+        error: ((Exception) -> Unit)? = null
+    )
+
     // 获取PK邀请列表
     fun getAllPKInvitationList(
         success: ((List<ShowPKInvitation>) -> Unit),

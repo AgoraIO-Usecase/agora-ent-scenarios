@@ -467,6 +467,25 @@ class ShowSyncManagerServiceImpl(
         innerUpdateSeatInvitation(objIdOfSeatInvitation[indexOf], invitation, success, error)
     }
 
+    override fun getAllPKUserList(
+        success: ((List<ShowRoomDetailModel>) -> Unit),
+        error: ((Exception) -> Unit)?
+    ) {
+        Sync.Instance().getScenes(object : Sync.DataListCallback {
+            override fun onSuccess(result: MutableList<IObject>?) {
+                val roomList = result!!.map {
+                    it.toObject(ShowRoomDetailModel::class.java)
+                }
+                val list = roomList.filter { it.ownerId != UserManager.getInstance().user.id.toString() }
+                runOnMainThread { success.invoke(list.sortedBy { it.createdAt }) }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+            }
+        })
+    }
+
     override fun getAllPKInvitationList(
         success: (List<ShowPKInvitation>) -> Unit,
         error: ((Exception) -> Unit)?
