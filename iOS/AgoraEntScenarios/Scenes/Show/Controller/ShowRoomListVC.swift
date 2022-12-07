@@ -17,7 +17,9 @@ class ShowRoomListVC: UIViewController {
     private let naviBar = ShowNavigationBar()
     
     private lazy var agoraManager: ShowAgoraKitManager = {
-        ShowAgoraKitManager()
+        let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
+        return manager
     }()
     
     deinit {
@@ -42,12 +44,12 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickSettingButton(){
-        let vc = ShowAdvancedSettingVC()
-        vc.isOutside = true
-        vc.mode = .signle // 根据当前模式设置
+        let vc = ShowPresettingVC()
         vc.isBroadcaster = false
-        vc.settingManager = agoraManager
-        navigationController?.pushViewController(vc, animated: true)
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.agoraManager.updatePresetForType(type, mode: .signle)
+        }
+        present(vc, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {

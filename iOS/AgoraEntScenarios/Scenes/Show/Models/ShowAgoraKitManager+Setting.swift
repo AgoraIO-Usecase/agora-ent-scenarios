@@ -13,6 +13,15 @@ private let hasOpenedKey = "hasOpenKey"
 
 extension ShowAgoraKitManager {
     
+    // 超分倍数
+    enum SRType: Int {
+        case x1 = 6
+        case x1_33 = 7
+        case x1_5 = 8
+        case x2 = 3
+        case x_sharpen = 11
+    }
+    
     private var dimensionsItems: [CGSize] {
         ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     }
@@ -34,6 +43,7 @@ extension ShowAgoraKitManager {
         // 默认音量设置
         ShowSettingKey.recordingSignalVolume.writeValue(80)
         ShowSettingKey.musincVolume.writeValue(30)
+        ShowSettingKey.SR.writeValue(false) // 默认关闭sr
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
         // 第一次进入房间的时候设置
         if hasOpened == false {
@@ -73,6 +83,16 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.PVC)
     }
     
+    /// 设置观众端画质增强
+    private func _setQualityEnable(_ isOn: Bool, srType: SRType? = nil){
+        ShowSettingKey.SR.writeValue(isOn)
+        agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+        if srType != nil {
+            agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType!.rawValue)}")
+            agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+        }
+    }
+    
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode) {
         switch type {
         case .show_low:
@@ -102,6 +122,20 @@ extension ShowAgoraKitManager {
             }
             
             break
+            
+        case .quality_low:
+            _setQualityEnable(false)
+            break
+        case .quality_medium:
+            _setQualityEnable(true, srType: SRType.x1_5)
+        case .quality_high:
+            _setQualityEnable(true, srType: SRType.x2)
+        case .base_low:
+            _setQualityEnable(false)
+        case .base_medium:
+            _setQualityEnable(false)
+        case .base_high:
+            _setQualityEnable(false)
         }
     }
     
