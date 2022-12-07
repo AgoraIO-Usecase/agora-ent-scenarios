@@ -8,24 +8,22 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.SurfaceView
-import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import io.agora.rtc2.*
-import io.agora.rtc2.video.CameraCapturerConfiguration
-import io.agora.rtc2.video.VideoCanvas
-import io.agora.rtc2.video.VideoEncoderConfiguration
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.video.*
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.beauty.bytedance.BeautyByteDanceImpl
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.service.*
@@ -60,11 +58,13 @@ class LiveDetailActivity : AppCompatActivity() {
     private var mMessageAdapter: BindingSingleAdapter<ShowMessage, ShowLiveDetailMessageItemBinding>? =
         null
     private val mMusicEffectDialog by lazy { MusicEffectDialog(this) }
+    private val mSettingDialog by lazy { SettingDialog(this) }
 
     private val mLinkDialog by lazy { LiveLinkDialog() }
-    private val mBeautyProcessor by lazy { BeautyByteDanceImpl(this) }
+    private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
     private lateinit var mPermissionHelp: PermissionHelp
-    private lateinit var mRtcEngine: RtcEngineEx
+    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
+    private var mRtcEngineHandler: IRtcEngineEventHandler? = null
 
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
@@ -230,22 +230,74 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showSettingDialog() {
-        SettingDialog(this).apply {
+        mSettingDialog.apply {
             setHostView(isRoomOwner)
-            setItemActivated(SettingDialog.ITEM_ID_VIDEO, true)
-            setItemActivated(SettingDialog.ITEM_ID_MIC, true)
-            setOnItemActivateChangedListener{dialog, itemId, activated ->
-                when(itemId){
-                    SettingDialog.ITEM_ID_CAMERA -> {
-                        VideoSetting.cameraIsFront = !VideoSetting.cameraIsFront
-                        mRtcEngine.switchCamera()
-                    }
+            setOnItemActivateChangedListener { _, itemId, activated ->
+                when (itemId) {
+                    SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.enableLocalVideo(activated)
                     SettingDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
-                    SettingDialog.ITEM_ID_SETTING -> {
+                    SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
+                }
+            }
+            show()
+        }
+    }
 
+    private fun showAdvanceSettingDialog() {
+        AdvanceSettingDialog(this).apply {
+            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
+            setOnSwitchChangeListener { _, itemId, isChecked ->
+                when (itemId) {
+                    AdvanceSettingDialog.ITEM_ID_SWITCH_EAR_BACK -> {
+                        mRtcEngine.enableInEarMonitoring(isChecked)
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SWITCH_COLOR_ENHANCE -> {
+                        mRtcEngine.setColorEnhanceOptions(isChecked, ColorEnhanceOptions())
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SWITCH_DARK_ENHANCE -> {
+                        mRtcEngine.setLowlightEnhanceOptions(isChecked, LowLightEnhanceOptions())
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE -> {
+                        mRtcEngine.setVideoDenoiserOptions(isChecked, VideoDenoiserOptions())
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE -> {
+                        mRtcEngine.setParameters("{\"rtc.video.enable_pvc\":${isChecked}}")
+                    }
+                }
+            }
+            setOnSelectorChangeListener { dialog, itemId, selected ->
+                when (itemId) {
+                    AdvanceSettingDialog.ITEM_ID_SELECTOR_RESOLUTION -> {
+                        RtcEngineInstance.videoEncoderConfiguration.apply {
+                            val resolution = dialog.getResolution(selected)
+                            dimensions = VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height)
+                            mRtcEngine.setVideoEncoderConfiguration(this)
+                        }
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SELECTOR_FRAMERATE -> {
+                        RtcEngineInstance.videoEncoderConfiguration.apply {
+                            frameRate = dialog.getFrameRate(selected)
+                            mRtcEngine.setVideoEncoderConfiguration(this)
+                        }
+                    }
+                }
+            }
+            setOnSeekbarChangeListener { _, itemId, value ->
+                when (itemId) {
+                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE -> {
+                        RtcEngineInstance.videoEncoderConfiguration.apply {
+                            bitrate = value
+                            mRtcEngine.setVideoEncoderConfiguration(this)
+                        }
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_VOCAL_VOLUME -> {
+                        mRtcEngine.adjustRecordingSignalVolume(value)
+                    }
+                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_MUSIC_VOLUME -> {
+                        mRtcEngine.adjustAudioMixingVolume(value)
                     }
                 }
             }
@@ -255,10 +307,12 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showPictureQualityDialog(parentDialog: SettingDialog) {
         PictureQualityDialog(this).apply {
-            setSelectQuality(VideoSetting.cameraResolution.width, VideoSetting.cameraResolution.height)
-            setOnQualitySelectListener { dialog, qualityIndex, size ->
-                VideoSetting.cameraResolution = size
-                updateRtcVideoConfig()
+            setOnQualitySelectListener { _, _, size ->
+                mRtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                        CameraCapturerConfiguration.CaptureFormat(size.width,
+                            size.height,
+                            15)
+                    ))
             }
 
             setOnShowListener { parentDialog.dismiss() }
@@ -267,7 +321,7 @@ class LiveDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun showBeautyDialog(){
+    private fun showBeautyDialog() {
         BeautyDialog(this).apply {
             setBeautyProcessor(mBeautyProcessor)
             show()
@@ -526,10 +580,7 @@ class LiveDetailActivity : AppCompatActivity() {
     //================== RTC Operation ===================
 
     private fun initRtcEngine() {
-        val config = RtcEngineConfig()
-        config.mContext = this
-        config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
-        config.mEventHandler = object : IRtcEngineEventHandler() {
+        mRtcEngine.addHandler(object : IRtcEngineEventHandler() {
 
             override fun onError(err: Int) {
                 super.onError(err)
@@ -563,11 +614,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 )
             }
 
-        }
-        mRtcEngine = RtcEngine.create(config) as RtcEngineEx
-        mRtcEngine.enableVideo()
-        mRtcEngine.registerVideoFrameObserver(mBeautyProcessor)
-        updateRtcVideoConfig()
+        }.apply {
+            mRtcEngineHandler = this
+        })
 
         checkRequirePerms {
             joinChannel()
@@ -575,10 +624,9 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun destroyRtcEngine() {
+        mRtcEngine.removeHandler(mRtcEngineHandler)
         mRtcEngine.stopPreview()
         mRtcEngine.leaveChannel()
-        mBeautyProcessor.release()
-        RtcEngine.destroy()
     }
 
     private fun joinChannel() {
@@ -605,6 +653,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
                 if (isRoomOwner) {
                     mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
+                    mRtcEngine.startPreview()
                 } else {
                     mRtcEngine.setupRemoteVideo(
                         VideoCanvas(
@@ -632,30 +681,5 @@ class LiveDetailActivity : AppCompatActivity() {
             force
         )
     }
-
-    private fun updateRtcVideoConfig(){
-        val resolution = VideoSetting.cameraResolution
-        val isFrontCamera = VideoSetting.cameraIsFront
-
-        mRtcEngine.setCameraCapturerConfiguration(
-            CameraCapturerConfiguration(
-                if (isFrontCamera) CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT else CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_REAR,
-                CameraCapturerConfiguration.CaptureFormat(
-                    resolution.width,
-                    resolution.height,
-                    15
-                )
-            )
-        )
-        mRtcEngine.setVideoEncoderConfiguration(
-            VideoEncoderConfiguration(
-                VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height),
-                VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_15,
-                0,
-                VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE
-            )
-        )
-    }
-
 
 }

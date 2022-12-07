@@ -8,10 +8,14 @@ import android.view.WindowManager;
 
 public class StatusBarUtil {
 
-    public static void hideStatusBar(Window window, boolean darkText) {
+    public static void hideStatusBar(Window window, boolean darkText){
+        hideStatusBar(window, Color.TRANSPARENT, darkText);
+    }
+
+    public static void hideStatusBar(Window window, int statusBarColor, boolean darkText) {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setStatusBarColor(statusBarColor);
         window.setNavigationBarColor(Color.TRANSPARENT);
 
         int flag = 0;

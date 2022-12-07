@@ -23,14 +23,38 @@
         <item name="android:backgroundDimAmount">0</item>
     </style>
 
-    <style name="show_bottom_dark_dialog" parent="Theme.AppCompat.Dialog">
+    <style name="show_bottom_dialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:backgroundDimAmount">0</item>
         <item name="enableEdgeToEdge">true</item>
     </style>
 
+    <style name="show_toast_dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimAmount">0</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
+
+    <style name="show_alert_dialog" parent="Theme.AppCompat.Dialog">
+        <item name="alertDialogStyle">@style/show_alert_dialog_style</item>
+    </style>
+
+    <style name="show_alert_dialog_style" parent="AlertDialog.AppCompat">
+        <item name="android:layout">@layout/show_alert_dialog_layout</item>
+    </style>
+
     <style name="show_beauty_slider" parent="Widget.Material3.Tooltip">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:minWidth">28dp</item>
+        <item name="android:minHeight">28dp</item>
+        <item name="shapeAppearance">@null</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <style name="show_setting_advance_slider" parent="Widget.Material3.Tooltip">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:padding">4dp</item>
         <item name="android:minWidth">28dp</item>

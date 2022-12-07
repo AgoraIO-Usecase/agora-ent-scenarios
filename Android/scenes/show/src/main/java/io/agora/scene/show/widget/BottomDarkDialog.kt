@@ -15,7 +15,7 @@ import io.agora.scene.widget.utils.StatusBarUtil
 open class BottomDarkDialog : BottomSheetDialog {
     private val mBinding by lazy { ShowWidgetBottomDarkDialogBinding.inflate(LayoutInflater.from(context)) }
 
-    constructor(context: Context) : this(context, R.style.show_bottom_dark_dialog)
+    constructor(context: Context) : this(context, R.style.show_bottom_dialog)
     constructor(context: Context, theme: Int) : super(context, theme){
         super.setContentView(mBinding.root)
         window?.decorView?.setOnApplyWindowInsetsListener { _, insets ->

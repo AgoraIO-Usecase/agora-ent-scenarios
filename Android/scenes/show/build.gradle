@@ -15,7 +15,7 @@ dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
 
-    implementation rootProject.ext.deps.lyricsView
+    implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.annotation
     api rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
