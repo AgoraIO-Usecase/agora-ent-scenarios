@@ -19,13 +19,16 @@ private let SYNC_MANAGER_INTERACTION_COLLECTION = "show_interaction_collection"
 
 enum ShowError: Int, Error {
     case unknown = 0                 //unknown error
-    case interactionMaximumReach     //interaction reach the maximum
+    case pkInteractionMaximumReach     //pk interaction reach the maximum
+    case seatInteractionMaximumReach     //seat interaction reach the maximum
     
     
     func desc() -> String {
         switch self {
-        case .interactionMaximumReach:
+        case .pkInteractionMaximumReach:
             return "show_error_pk_interaction_exist".show_localized
+        case .seatInteractionMaximumReach:
+            return "show_error_seat_interaction_exist".show_localized
         default:
             return "unknown error"
         }
@@ -386,7 +389,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func createMicSeatInvitation(user: ShowUser, completion: @escaping (NSError?) -> Void) {
         //check interaction maximum
         if self.interactionList.count > 0 {
-            completion(ShowError.interactionMaximumReach.toNSError())
+            completion(ShowError.seatInteractionMaximumReach.toNSError())
             return
         }
         
@@ -480,7 +483,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                             completion: @escaping (NSError?) -> Void) {
         //check interaction maximum
         if self.interactionList.count > 0 {
-            completion(ShowError.interactionMaximumReach.toNSError())
+            completion(ShowError.pkInteractionMaximumReach.toNSError())
             return
         }
         
@@ -1646,40 +1649,45 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_INTERACTION_COLLECTION,
                        onCreated: { _ in
-                       }, onUpdated: { [weak self] object in
-                           agoraPrint("imp pk interaction subscribe onUpdated...")
-                           guard let self = self,
-                                 let jsonStr = object.toJson(),
-                                 let model = ShowInteractionInfo.yy_model(withJSON: jsonStr) else {
-                               return
-                           }
+            }, onUpdated: { [weak self] object in
+                agoraPrint("imp interaction subscribe onUpdated...")
+                guard let self = self,
+                      let jsonStr = object.toJson(),
+                      let model = ShowInteractionInfo.yy_model(withJSON: jsonStr) else {
+                    return
+                }
+                if let index = self.interactionList.firstIndex(where: { $0.userId == model.userId }) {
+                    let origModel = self.interactionList[index]
+                    self.interactionList.remove(at: index)
+                    self.interactionList.append(model)
+                    if origModel.objectId == nil {
+                        self.subscribeDelegate?.onInteractionBegan(interaction: model)
+                    } else {
+                        self.subscribeDelegate?.onInterationUpdated(interaction: model)
+                    }
+                    return
+                }
+                self.interactionList.append(model)
+                self.subscribeDelegate?.onInteractionBegan(interaction: model)
+            }, onDeleted: {[weak self] object in
+                agoraPrint("imp interaction subscribe onDeleted...")
+                guard let self = self else {return}
+                var model: ShowInteractionInfo? = nil
+                if let index = self.interactionList.firstIndex(where: { object.getId() == $0.objectId }) {
+                    model = self.interactionList[index]
+                    self.interactionList.remove(at: index)
+                }
+                guard let _invitation = model ?? ShowInteractionInfo.yy_model(withJSON: object.toJson() ?? "") else {
+                    agoraAssert("fail to handle delete pk invitation")
+                    return
+                }
+                self.subscribeDelegate?.onInterationEnded(interaction: _invitation)
+            }, onSubscribed: {
+            }, fail: { error in
+                agoraPrint("imp interaction subscribe fail \(error.message)...")
+                ToastView.show(text: error.message)
+            })
                            
-                           if let index = self.interactionList.firstIndex(where: { $0.userId == model.userId }) {
-                               self.interactionList.remove(at: index)
-                               self.interactionList.append(model)
-                               self.subscribeDelegate?.onInterationUpdated(interaction: model)
-                               return
-                           }
-                           self.interactionList.append(model)
-                           self.subscribeDelegate?.onInteractionBegan(interaction: model)
-                       }, onDeleted: {[weak self] object in
-                           agoraPrint("imp interaction subscribe onDeleted...")
-                           guard let self = self else {return}
-                           var model: ShowInteractionInfo? = nil
-                           if let index = self.interactionList.firstIndex(where: { object.getId() == $0.objectId }) {
-                               model = self.interactionList[index]
-                               self.interactionList.remove(at: index)
-                           }
-                           guard let _invitation = model ?? ShowInteractionInfo.yy_model(withJSON: object.toJson() ?? "") else {
-                               agoraAssert("fail to handle delete pk invitation")
-                               return
-                           }
-                           self.subscribeDelegate?.onInterationEnded(interaction: _invitation)
-                       }, onSubscribed: {
-                       }, fail: { error in
-                           agoraPrint("imp interaction subscribe fail \(error.message)...")
-                           ToastView.show(text: error.message)
-                       })
     }
     
     private func _addInteraction(interaction: ShowInteractionInfo, completion: @escaping (NSError?) -> Void) {
@@ -1703,6 +1711,9 @@ extension ShowSyncManagerServiceImp {
             })
         
         _updateInteractionStatus(with: interaction.interactStatus)
+        
+        //add interation immediately to prevent received multi pk invitations at the same time
+        interactionList.append(interaction)
     }
     
     private func _removeInteraction(invitation: ShowPKInvitation, completion: @escaping (NSError?) -> Void) {
