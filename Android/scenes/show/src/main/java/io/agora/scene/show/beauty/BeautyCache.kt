@@ -6,7 +6,7 @@ object BeautyCache {
     private val cacheItemOperation = mutableMapOf<Int, List<Int>>()
 
 
-    fun getItemValue(itemId: Int): Float = cacheItemValueMap.getOrDefault(itemId, 0.0f)
+    fun getItemValue(itemId: Int): Float = cacheItemValueMap[itemId] ?: 0.0f
 
     fun getLastOperationItemId(groupId: Int): Int {
         return cacheItemOperation[groupId]?.lastOrNull() ?: groupId
