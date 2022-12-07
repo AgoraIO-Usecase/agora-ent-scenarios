@@ -128,7 +128,7 @@
 		05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73D290F752C0024D22F /* VMEQSettingView.swift */; };
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
-		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		8DE0B29D1839798F8A52FF8E /* libPods-AgoraEntScenarios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5CF4DF472565F7AE2E56B8D /* libPods-AgoraEntScenarios.a */; };
 		A8088D06293065C1005AA4B7 /* ShowPresettingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8088D05293065C1005AA4B7 /* ShowPresettingHeaderView.swift */; };
 		A81ECFF12921E01200B40454 /* ShowAdvancedSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF02921E01200B40454 /* ShowAdvancedSettingVC.swift */; };
 		A81ECFF32921E07A00B40454 /* ShowVideoSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81ECFF22921E07A00B40454 /* ShowVideoSettingVC.swift */; };
@@ -513,7 +513,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0510B820290B72FC0063E57A /* VRRoomEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomEntity.swift; sourceTree = "<group>"; };
 		0510B821290B72FC0063E57A /* VRRoomMenuBarEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomMenuBarEntity.swift; sourceTree = "<group>"; };
 		0510B822290B72FC0063E57A /* VRUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRUser.swift; sourceTree = "<group>"; };
@@ -707,6 +706,7 @@
 		A8F3725B2924D25100CEA88D /* ShowReceiveLiveFinishAlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceiveLiveFinishAlertVC.swift; sourceTree = "<group>"; };
 		A8F3725D2924D26A00CEA88D /* ShowReceiveFinishView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowReceiveFinishView.swift; sourceTree = "<group>"; };
 		A8F3725F2924E7A300CEA88D /* ShowSettingKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowSettingKey.swift; sourceTree = "<group>"; };
+		C5CF4DF472565F7AE2E56B8D /* libPods-AgoraEntScenarios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AgoraEntScenarios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD0260232925E96200D88B68 /* Date+Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Show.swift"; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1158,7 +1158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */,
+				8DE0B29D1839798F8A52FF8E /* libPods-AgoraEntScenarios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1455,7 +1455,7 @@
 		7DA7DCDFD58495527BB462D0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */,
+				C5CF4DF472565F7AE2E56B8D /* libPods-AgoraEntScenarios.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3826,7 +3826,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3874,7 +3874,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (

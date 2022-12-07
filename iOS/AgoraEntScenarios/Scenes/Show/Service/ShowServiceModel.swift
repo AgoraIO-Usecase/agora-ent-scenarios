@@ -34,6 +34,14 @@ import Foundation
     case onSeat = 1
     /// pk中
     case pking = 2
+    
+    var toastTitle: String {
+        switch self {
+        case .idle: return ""
+        case .onSeat: return "连麦已断开哦".show_localized
+        case .pking: return "PK已断开哦".show_localized
+        }
+    }
 }
 
 @objcMembers
