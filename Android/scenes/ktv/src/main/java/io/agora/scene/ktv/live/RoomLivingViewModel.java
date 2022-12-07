@@ -387,7 +387,17 @@ public class RoomLivingViewModel extends ViewModel {
 
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                    mRtcEngine.setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
+                    isOnSeat = false;
+                    if (mRtcEngine != null) {
+                        mainChannelMediaOption.publishCameraTrack = false;
+                        mainChannelMediaOption.publishMicrophoneTrack = false;
+                        mainChannelMediaOption.publishCustomAudioTrack = false;
+                        mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                        mainChannelMediaOption.autoSubscribeVideo = true;
+                        mainChannelMediaOption.autoSubscribeAudio = true;
+                        mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+                        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+                    }
 
                     // 合唱相关逻辑
                     if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getChorusNo())) {
@@ -482,9 +492,9 @@ public class RoomLivingViewModel extends ViewModel {
                     if (e == null) {
                         // success
                         Log.d(TAG, "RoomLivingViewModel.leaveSeat() success");
-                        isOnSeat = false;
                         if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
                             if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                                isOnSeat = false;
                                 if (mRtcEngine != null) {
                                     mainChannelMediaOption.publishCameraTrack = false;
                                     mainChannelMediaOption.publishMicrophoneTrack = false;
@@ -1608,7 +1618,7 @@ public class RoomLivingViewModel extends ViewModel {
 
     // ------------------ 歌曲结束播放 ------------------
     public void musicStop() {
-        Log.d(TAG, "RoomLivingViewModel.musicStop() called");
+         Log.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
         if (mPlayer != null) {
             mPlayer.stop();
