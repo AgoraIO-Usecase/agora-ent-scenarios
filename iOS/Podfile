@@ -5,7 +5,7 @@ inhibit_all_warnings!
 
 def all_pods
   
-  use_frameworks!
+  use_modular_headers!
   # 网络层
   pod 'AFNetworking', '~> 4.0.1'
   # 布局
