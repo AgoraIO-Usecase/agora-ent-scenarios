@@ -5,22 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
-import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
-import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageBinding
 import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageListBinding
-import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
-import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.widget.UserItem
 
 class LiveLinkInvitationFragment : BaseFragment() {
-    private val mBinding by lazy {
-        ShowLiveLinkInvitationMessageListBinding.inflate(
-            LayoutInflater.from(
-                context
-            )
-        )}
+    private var mBinding : ShowLiveLinkInvitationMessageListBinding? = null
+    private val binding get() = mBinding!!
     private val linkInvitationViewAdapter : LiveLinkInvitationViewAdapter = LiveLinkInvitationViewAdapter()
     private lateinit var mListener : Listener
 
@@ -35,29 +25,33 @@ class LiveLinkInvitationFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return mBinding.root
+        mBinding = ShowLiveLinkInvitationMessageListBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.linkInvitationList.adapter = linkInvitationViewAdapter
-        mBinding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+        binding.linkInvitationList.adapter = linkInvitationViewAdapter
+        binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
             mListener.onRequestRefreshing()
         }
-        mBinding.smartRefreshLayout.autoRefresh()
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     /**
      * 连麦邀请列表-设置在线用户列表
      */
     fun setSeatInvitationList(list : List<ShowUser>) {
+        if (mBinding == null) return
         if (list == null || list.isEmpty()) {
-            mBinding.linkRequestListEmpty.setVisibility(View.VISIBLE)
+            binding.linkRequestListEmptyImg.setVisibility(View.VISIBLE)
+            binding.linkRequestListEmpty.setVisibility(View.VISIBLE)
         } else {
-            mBinding.linkRequestListEmpty.setVisibility(View.GONE)
+            binding.linkRequestListEmptyImg.setVisibility(View.GONE)
+            binding.linkRequestListEmpty.setVisibility(View.GONE)
         }
         linkInvitationViewAdapter.resetAll(list)
-        mBinding.smartRefreshLayout.finishRefresh()
+        binding.smartRefreshLayout.finishRefresh()
     }
 
     /**
@@ -66,16 +60,17 @@ class LiveLinkInvitationFragment : BaseFragment() {
     fun setSeatInvitationItemStatus(user: ShowUser) {
         val itemCount: Int = linkInvitationViewAdapter.getItemCount()
         for (i in 0 until itemCount) {
-            var item: ShowUser = linkInvitationViewAdapter.getItem(i)!!
-            if (item.userId == user.userId) {
-                item = ShowUser(
-                    item.userId,
-                    item.avatar,
-                    item.userName,
-                    user.status
-                )
-                linkInvitationViewAdapter.notifyItemChanged(i)
-                break
+            linkInvitationViewAdapter.getItem(i)?.let {
+                if (it.userId == user.userId) {
+                    linkInvitationViewAdapter.replace(i, ShowUser(
+                        it.userId,
+                        it.avatar,
+                        it.userName,
+                        user.status
+                    ))
+                    linkInvitationViewAdapter.notifyItemChanged(i)
+                    return
+                }
             }
         }
     }

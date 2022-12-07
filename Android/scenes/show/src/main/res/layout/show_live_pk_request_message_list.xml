@@ -50,11 +50,21 @@
         tools:ignore="MissingConstraints"
         tools:listitem="@layout/show_live_pk_request_message" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/linkRequestListEmptyImg"
+        android:layout_width="147dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="80dp"
+        android:src="@mipmap/show_link_empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textPking" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/linkRequestListEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="154dp"
+        android:layout_marginTop="39dp"
         android:drawablePadding="12dp"
         android:gravity="center"
         android:text="@string/show_empty_online_boardcaster"
@@ -63,5 +73,5 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textPking" />
+        app:layout_constraintTop_toBottomOf="@id/linkRequestListEmptyImg" />
 </androidx.constraintlayout.widget.ConstraintLayout>

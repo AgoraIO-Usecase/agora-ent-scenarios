@@ -22,6 +22,18 @@
         tools:visibility="visible" />
 
     <include
+        android:id="@+id/videoLinkingAudienceLayout"
+        layout="@layout/show_live_link_view"
+        android:layout_width="109dp"
+        android:layout_height="163dp"
+        android:layout_marginStart="246dp"
+        android:layout_marginTop="110dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <include
         android:id="@+id/videoPKLayout"
         layout="@layout/show_live_detail_video_pk"
         android:layout_width="match_parent"

@@ -9,7 +9,6 @@ import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LiveLinkAudienceFragment : BaseFragment() {
     private val mBinding by lazy {
@@ -39,6 +38,9 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnSeatApply.isVisible = false
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnCancelApply.isVisible = true
+            mBinding.iBtnSeatApplyText.isVisible = false
+            mBinding.iBtnStopLinkText.isVisible = false
+            mBinding.iBtnCancelApplyText.isVisible = true
         }
         mBinding.iBtnStopLink.setOnClickListener {
             // 观众停止连麦
@@ -50,6 +52,9 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnCancelApply.isVisible = false
+            mBinding.iBtnSeatApplyText.isVisible = true
+            mBinding.iBtnStopLinkText.isVisible = false
+            mBinding.iBtnCancelApplyText.isVisible = false
         }
     }
 
@@ -60,12 +65,16 @@ class LiveLinkAudienceFragment : BaseFragment() {
         if (status == ShowInteractionStatus.onSeat) {
             mBinding.iBtnSeatApply.isVisible = false
             mBinding.iBtnStopLink.isVisible = true
-            mBinding.iBtnSeatApply.setText("已上麦")
+            mBinding.iBtnSeatApplyText.isVisible = false
+            mBinding.iBtnCancelApplyText.isVisible = false
+            mBinding.iBtnStopLinkText.isVisible = true
             mBinding.textLinking.setText("与主播连麦中")
         } else if (status == ShowInteractionStatus.idle) {
             mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
-            mBinding.iBtnSeatApply.setText("申请连麦")
+            mBinding.iBtnSeatApplyText.isVisible = true
+            mBinding.iBtnStopLinkText.isVisible = false
+            mBinding.iBtnCancelApplyText.isVisible = false
             mBinding.textLinking.setText("可申请连麦")
         }
     }
@@ -78,8 +87,10 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnSeatApply.visibility = View.VISIBLE
             mBinding.iBtnStopLink.visibility = View.GONE
             mBinding.iBtnCancelApply.visibility = View.GONE
+            mBinding.linkRequestListEmptyImg.visibility = View.VISIBLE
             mBinding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
+            mBinding.linkRequestListEmptyImg.visibility = View.GONE
             mBinding.linkRequestListEmpty.visibility = View.GONE
         }
         linkRequestViewAdapter.resetAll(list)

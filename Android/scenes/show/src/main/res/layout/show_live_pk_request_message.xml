@@ -31,7 +31,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_item_request"
-        style="@style/def_btn_full"
+        android:background="@drawable/show_pk_or_link_btn_bg"
         android:layout_width="56dp"
         android:layout_height="28dp"
         android:layout_marginEnd="25dp"
@@ -47,6 +47,6 @@
         android:layout_height="1dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="14dp"
-        android:background="@color/white_20_percent"
+        android:background="@color/grey_e1"
         app:layout_constraintTop_toBottomOf="@id/cover_boardcaster_icon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

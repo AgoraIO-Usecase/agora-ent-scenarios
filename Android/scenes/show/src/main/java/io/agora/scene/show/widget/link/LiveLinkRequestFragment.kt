@@ -11,12 +11,8 @@ import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LiveLinkRequestFragment : BaseFragment() {
-    private val mBinding by lazy {
-        ShowLiveLinkRequestMessageListBinding.inflate(
-            LayoutInflater.from(
-                context
-            )
-        )}
+    private var mBinding : ShowLiveLinkRequestMessageListBinding? = null
+    private val binding get() = mBinding!!
     private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
     private lateinit var mListener : Listener
 
@@ -31,32 +27,40 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return mBinding.root
+        mBinding = ShowLiveLinkRequestMessageListBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.linkRequestList.adapter = linkRequestViewAdapter
-        mBinding.iBtnStopLink.setOnClickListener {
+        binding.linkRequestList.adapter = linkRequestViewAdapter
+        binding.iBtnStopLink.setOnClickListener {
             // 主播停止连麦
             mListener.onStopLinkingChosen()
         }
-        mBinding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+        binding.iBtnStopLink.isEnabled = false
+        binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
             mListener.onRequestRefreshing()
         }
-        mBinding.smartRefreshLayout.autoRefresh()
+        binding.smartRefreshLayout.autoRefresh()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
     }
 
     /**
      * 设置当前麦上状态
      */
     fun setOnSeatStatus(userName: String, status: ShowInteractionStatus) {
+        if (mBinding == null) return
         if (status == ShowInteractionStatus.onSeat) {
-            mBinding.iBtnStopLink.isEnabled = true
-            mBinding.textLinking.setText("与观众" + userName + "连麦中")
+            binding.iBtnStopLink.isEnabled = true
+            binding.textLinking.setText("与观众 " + userName + " 连麦中")
         } else if (status == ShowInteractionStatus.idle) {
-            mBinding.iBtnStopLink.isEnabled = false
-            mBinding.textLinking.setText("未连麦")
+            binding.iBtnStopLink.isEnabled = false
+            binding.textLinking.setText("未连麦")
         }
     }
 
@@ -64,13 +68,16 @@ class LiveLinkRequestFragment : BaseFragment() {
      * 设置连麦申请列表
      */
     fun setSeatApplyList(list: List<ShowMicSeatApply>) {
+        if (mBinding == null) return
         if (list == null || list.isEmpty()) {
-            mBinding.linkRequestListEmpty.visibility = View.VISIBLE
+            binding.linkRequestListEmptyImg.visibility = View.VISIBLE
+            binding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
-            mBinding.linkRequestListEmpty.visibility = View.GONE
+            binding.linkRequestListEmptyImg.visibility = View.GONE
+            binding.linkRequestListEmpty.visibility = View.GONE
         }
         linkRequestViewAdapter.resetAll(list)
-        mBinding.smartRefreshLayout.finishRefresh()
+        binding.smartRefreshLayout.finishRefresh()
     }
 
     /**
@@ -80,17 +87,18 @@ class LiveLinkRequestFragment : BaseFragment() {
         if (seatApply.status == ShowRoomRequestStatus.accepted) {
             val itemCount: Int = linkRequestViewAdapter.getItemCount()
             for (i in 0 until itemCount) {
-                var item: ShowMicSeatApply = linkRequestViewAdapter.getItem(i)!!
-                if (item.userId == seatApply.userId) {
-                    item = ShowMicSeatApply(
-                        item.userId,
-                        item.userAvatar,
-                        item.userName,
-                        seatApply.status,
-                        item.createAt
-                    )
-                    linkRequestViewAdapter.notifyItemChanged(i)
-                    break
+                linkRequestViewAdapter.getItem(i)?.let {
+                    if (it.userId == seatApply.userId) {
+                        linkRequestViewAdapter.replace(i, ShowMicSeatApply(
+                            it.userId,
+                            it.userAvatar,
+                            it.userName,
+                            seatApply.status,
+                            it.createAt
+                        ))
+                        linkRequestViewAdapter.notifyItemChanged(i)
+                        return
+                    }
                 }
             }
         }
