@@ -79,7 +79,7 @@ typedef enum : NSUInteger {
 
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type;
-- (void)setChorusOptViewHidden;
+- (void)setCoundDown:(NSInteger)seconds;
 
 #pragma mark - 歌词相关
 
