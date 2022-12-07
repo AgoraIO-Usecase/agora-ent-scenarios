@@ -9,7 +9,7 @@ import UIKit
 
 class ShowMusicEffectVC: UIViewController {
     
-    var musicManager: ShowAgoraKitManager?
+    var musicManager: ShowMusicManager?
     
     private let headerView = ShowMusicTableHeaderView()
     
@@ -70,7 +70,7 @@ extension ShowMusicEffectVC {
 extension ShowMusicEffectVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return musicManager?.musicDataArray.count ?? 0
+        return musicManager?.dataArray.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -79,7 +79,7 @@ extension ShowMusicEffectVC: UITableViewDelegate, UITableViewDataSource {
         if cell == nil {
             cell = ShowMusicEffectCell(style: .default, reuseIdentifier: cellID)
         }
-        guard let data = musicManager?.musicDataArray[indexPath.row] else {
+        guard let data = musicManager?.dataArray[indexPath.row] else {
             return cell!
         }
         cell?.setTitle(data.title, dataArray: data.dataArray, selectAction: {[weak self] index in

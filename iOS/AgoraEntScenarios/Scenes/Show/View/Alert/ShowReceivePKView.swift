@@ -18,6 +18,8 @@ class ShowReceivePKView: UIView {
 
     weak var delegate: ShowReceivePKViewDelegate?
     
+    private var style: Style? = .pk
+    
     var countDown: Int = 0 {
         didSet {
             let text = "show_alert_pk_refuse".show_localized + "(\(countDown)s)"
@@ -29,7 +31,8 @@ class ShowReceivePKView: UIView {
         didSet {
             let attributedText = NSMutableAttributedString(string: "show_alert_pk_title_1".show_localized, attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_Ellipse6])
             let attributedName = NSAttributedString(string: name ?? "", attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_blue03])
-            let tailText = NSAttributedString(string: "show_alert_pk_title_2".show_localized, attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_Ellipse6])
+            let styleText = style == .pk ? "show_alert_pk_title_2".show_localized : "show_alert_link_title_2".show_localized
+            let tailText = NSAttributedString(string: styleText , attributes: [NSAttributedString.Key.foregroundColor : UIColor.show_Ellipse6])
             attributedText.append(attributedName)
             attributedText.append(tailText)
             titleLabel.attributedText = attributedText
@@ -47,7 +50,7 @@ class ShowReceivePKView: UIView {
     
     // PK
     private lazy var pkImgView: UIImageView =  {
-        let imgeView =  UIImageView(image: UIImage.show_sceneImage(name: "show_alert_pk"))
+        let imgeView =  UIImageView(image: UIImage.show_sceneImage(name: style == .pk ? "show_alert_pk" : "show_alert_mic"))
         return imgeView
     }()
     
@@ -85,6 +88,11 @@ class ShowReceivePKView: UIView {
         return button
     }()
     
+    init(style: Style?) {
+        self.style = style
+        super.init(frame: .zero)
+        createSubviews()
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -133,6 +141,13 @@ class ShowReceivePKView: UIView {
             make.width.greaterThanOrEqualTo(108)
         }
         
+    }
+}
+
+extension ShowReceivePKView {
+    enum Style {
+        case pk  // pk
+        case mic // 连麦
     }
 }
 
