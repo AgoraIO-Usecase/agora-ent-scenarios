@@ -237,10 +237,7 @@ KTVApiDelegate
         
         if (status == KTVSubscribeCreated || status == KTVSubscribeUpdated) {
             //上麦消息 / 是否打开视频 / 是否静音
-            
             [model resetWithInfo:seatModel];
-            model.isJoinedChorus = [weakSelf isJoinedChorusWithUserNo:seatModel.userNo];
-            
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         } else if (status == KTVSubscribeDeleted) {
             // 下麦消息
@@ -250,7 +247,7 @@ KTVApiDelegate
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
                 [weakSelf.MVView updateUIWithSong:song onSeat:NO];;
-                [weakSelf resetChorusStatus:model.userNo];
+//                [weakSelf resetChorusStatus:model.userNo];
             }
             
             // 下麦重置占位模型
@@ -468,15 +465,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         }
     } else if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
-        int leftSecond = [dict[@"time"] intValue];
-        VLRoomSelSongModel *song = self.selSongsArray.firstObject;
-        //TODO
-//        if(self.currentPlayingSongNo == nil) {
-//            [self.MVView receiveCountDown:leftSecond
-//                                   onSeat:self.isOnMicSeat
-//                              currentSong:song];
-//        }
-        VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
+        NSInteger leftSecond = [dict[@"time"] integerValue];
+        [self.MVView setCoundDown:leftSecond];
     }
 }
 
@@ -537,7 +527,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-//        [weakSelf destroyMediaPlayer];
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
@@ -550,7 +539,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
+    if(model.isChorus) {
         // for new chorus song, need to wait till co-singer joins or force solo
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
@@ -566,7 +555,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    [self markSongDidPlayWithModel:model];
+    [self markSongPlaying:model];
     
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience;
@@ -627,6 +616,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         leftSecond -= 1;
         if (leftSecond == 0) {
             [weakSelf stopCoSingerWait];
+        } else {
+            [weakSelf.MVView setCoundDown:leftSecond];
+            [weakSelf syncChorusMatchCountDown:leftSecond];
         }
     } userInfo:@"Fire" repeats:YES];
     [self.chorusMatchingTimer fire];
@@ -790,7 +782,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         [LEEAlert popLeaveRoomDialogWithCancelBlock:nil
                                       withDoneBlock:^{
-            [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
+//            [weakSelf resetChorusStatus:VLUserCenter.user.userNo];
             [weakSelf leaveRoom];
         }];
     }
@@ -938,22 +930,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }else if (index == 4){
         [self.RTCkit setVoiceBeautifierPreset:AgoraVoiceBeautifierPresetChatBeautifierVitality];
     }
-}
-
-// Reset chorus to audience
-- (void)resetChorusStatus:(NSString *)userNo {
-//    if([self ifChorusSinger:userNo]) {
-//        [self setSelfChorusUserNo:nil];
-//        if([userNo isEqualToString:VLUserCenter.user.userNo]) {
-//            if(self.rtcMediaPlayer != nil) {
-//                [self.rtcMediaPlayer stop];
-//            }
-//            [self resetPlayer];
-//            [self disableMediaChannel];
-//        }
-//    } else if(userNo == nil) {
-//        [self setSelfChorusUserNo:nil];
-//    }
 }
 
 #pragma mark VLDropOnLineViewDelegate
@@ -1144,8 +1120,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 //主唱告诉后台当前播放的歌曲
-- (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)model {
-    if ([model waittingForChorusMatch] || model.status == 2) {
+- (void)markSongPlaying:(VLRoomSelSongModel *)model {
+    if (model.status == 2) {
         return;
     }
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
@@ -1169,6 +1145,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.soloControl sendStreamMessageWithDict:dict success:nil];
 }
 
+- (void)syncChorusMatchCountDown:(NSInteger)seconds {
+    NSDictionary *dict = @{
+        @"cmd":@"countdown",
+        @"time":@(seconds)
+    };
+    [self.soloControl sendStreamMessageWithDict:dict success:nil];
+}
+
 - (void)joinChorus {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     
@@ -1186,39 +1170,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return [selSongModel.userNo isEqualToString:userNo];
 }
 
-- (BOOL)isJoinedChorusWithUserNo:(NSString*)userNo {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    return selSongModel.isChorus && [selSongModel.chorusNo isEqualToString:userNo];
-}
-
-- (BOOL)ifChorusSinger:(NSString *)userNo {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    VLLog(@"Agora - Song chorusNo: %@, userNo: %@", selSongModel.chorusNo, userNo);
-    if(selSongModel != nil && selSongModel.isChorus && [selSongModel.chorusNo isEqualToString:userNo]) {
-        return YES;
-    }
-    
-    return NO;
-}
-
-- (NSString *)getChrousSingerUserNo {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    if(selSongModel != nil && selSongModel.isChorus && selSongModel.chorusNo != nil) {
-        return selSongModel.chorusNo;
-    }
-    
-    return nil;
-}
-
-- (BOOL)isCurrentSongChorus {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    if(selSongModel != nil) {
-        return selSongModel.isChorus;
-    }
-    
-    return NO;
-}
-
 #pragma mark other
 - (void)setLrcLyric:(NSString*)url withCallback:(void (^ _Nullable)(NSString* lyricUrl))block
 {
@@ -1228,28 +1179,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.lyricCallbacks setObject:block forKey:url];
     }
     [self.MVView.lrcView setLrcUrlWithUrl:url];
-}
-
-- (void)setSelfChorusUserNo:(NSString *)userNo {
-    VLRoomSelSongModel *song = self.selSongsArray.firstObject;
-    if(song != nil) {
-        if(userNo == nil) {
-            song.isChorus = NO;
-        }
-        song.chorusNo = userNo;
-    }
-}
-
-- (void)setUserJoinChorus:(NSString *)userNo {
-    [self setSelfChorusUserNo:userNo];
-    
-    for (VLRoomSeatModel *seat in self.seatsArray) {
-        if ([seat.userNo isEqualToString:userNo]) {
-            seat.isJoinedChorus = YES;
-            break;
-        }
-    }
-    self.roomPersonView.roomSeatsArray = self.seatsArray;
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -1442,9 +1371,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         //chorus
         if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
-            if([updatedTopSong waittingForChorusMatch]) {
-                [self startChorusMatching];
-            }
+            [self startChorusMatching];
         }
         if([updatedTopSong doneChorusMatch]) {
             [self loadAndPlaySong];
