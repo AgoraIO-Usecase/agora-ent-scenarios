@@ -16,15 +16,25 @@ class ShowPresettingVC: UIViewController {
     
     // 选中预设
     var didSelectedPresetType: ((_ type: ShowPresetType, _ modeName: String)->())?
+    var isBroadcaster = true
+//    var selectedIndexPath: IndexPath?
     
     private var selectedType: ShowPresetType?
     private var modeName: String?
     
-    private var dataArray: [ShowPresettingModel] = {
-        
-        let model1 = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
-        return [model1]
-    }()
+    private var dataArray: [ShowPresettingModel] {
+        if isBroadcaster {
+            // 秀场模式
+            let showMode = ShowPresettingModel(title: "show_presetting_mode_show_title".show_localized, desc: "show_presetting_mode_show_desc".show_localized,standard: .douyin, optionsArray: [.show_low,.show_medium,.show_high])
+            return [showMode]
+        }else {
+            // 画质增强模式
+            let qualityMode = ShowPresettingModel(title: "show_presetting_mode_qulity_title".show_localized, desc: "show_presetting_mode_qulity_desc".show_localized,standard: .douyin, optionsArray: [.quality_low,.quality_medium,.quality_high])
+            // 基础模式
+            let baseMode = ShowPresettingModel(title: "show_presetting_mode_base_title".show_localized, desc: "show_presetting_mode_base_title".show_localized,standard: .douyin, optionsArray: [.base_low,.base_medium,.base_high])
+            return [qualityMode,baseMode]
+        }
+    }
     
     private lazy var headerView: ShowNavigationBar = {
         let headerView = ShowNavigationBar()
@@ -60,10 +70,22 @@ class ShowPresettingVC: UIViewController {
         setUpUI()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        /*
+        if isBroadcaster == false, ShowPresettingVC.selectedIndexPath != nil {
+            self.tableView.selectRow(at: ShowPresettingVC.selectedIndexPath, animated: false, scrollPosition: .none)
+        }
+         */
+    }
+    
     private func setUpUI(){
         view.backgroundColor = .white
-        
-        headerView.title = "show_advance_setting_presetting_title".show_localized
+        if isBroadcaster {
+            headerView.title = "show_advance_setting_presetting_title".show_localized
+        }else{
+            headerView.title = "show_advance_setting_presetting_audience_title".show_localized
+        }
         view.addSubview(headerView)
         headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_preset_close"))
         let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
@@ -128,5 +150,6 @@ extension ShowPresettingVC: UITableViewDelegate, UITableViewDataSource {
         let model = dataArray[indexPath.section]
         selectedType = model.optionsArray[indexPath.row]
         modeName = model.title
+//        selectedIndexPath = indexPath
     }
 }

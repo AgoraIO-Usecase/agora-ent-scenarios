@@ -27,7 +27,7 @@ class ShowCreateLiveVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        agoraKitManager.defaultSetting()
+//        agoraKitManager.defaultSetting()
         agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
         showPreset()
