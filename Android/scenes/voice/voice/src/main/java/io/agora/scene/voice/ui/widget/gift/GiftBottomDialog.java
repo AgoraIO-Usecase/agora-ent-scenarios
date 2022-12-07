@@ -88,7 +88,7 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         binding.send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (giftBean != null && listener != null)
+                if (giftBean != null && listener != null && giftBean.isChecked())
                     listener.SendGift(v, giftBean);
             }
         });
