@@ -197,7 +197,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             guard let self = self, error == nil else { return }
             if self.interactionList == nil, let interaction = interactionList?.first {
                 // first load
-                if self.room?.ownerId == VLUserCenter.user.id {
+                if self.role == .broadcaster {
                     AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
                     }
                 } else {
@@ -534,7 +534,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        liveView.canvasView.canvasType = .none
 //        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
         if let interaction = self.currentInteraction {
-            let isRoomOwner: Bool = room?.ownerId ?? "" == VLUserCenter.user.id
+            let isRoomOwner: Bool = role == .broadcaster ? true : false
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
             let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
             if roomOwnerExit {
