@@ -3,18 +3,18 @@
 //  VoiceOnLine
 //
 
-#import "VLSoloSongView.h"
+#import "VLStartSoloView.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLSoloSongView ()
+@interface VLStartSoloView ()
 
 @property(nonatomic, weak) id <VLSoloSongViewDelegate>delegate;
 
 @end
 
-@implementation VLSoloSongView
+@implementation VLStartSoloView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSoloSongViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
@@ -62,8 +62,8 @@
 }
 
 - (void)soloBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(soloBtnClickAction)]) {
-        [self.delegate soloBtnClickAction];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onStartSoloBtn)]) {
+        [self.delegate onStartSoloBtn];
     }
 }
 

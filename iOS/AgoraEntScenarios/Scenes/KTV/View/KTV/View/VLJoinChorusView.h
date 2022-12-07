@@ -11,11 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 /// 合唱点击
-- (void)robViewChorusAction;
+- (void)onJoinChorusBtn;
 
 @end
 
-@interface VLRobMicrophoneView : UIView
+@interface VLJoinChorusView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRobMicrophoneViewDelegate>)delegate;
 
