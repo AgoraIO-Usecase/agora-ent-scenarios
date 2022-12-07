@@ -127,6 +127,11 @@ extension VoiceRoomViewController {
                 self.roomInfo?.mic_info?[to] = new_mic
                 self.rtcView.updateUser(old_mic)
                 self.rtcView.updateUser(new_mic)
+                guard let mic = ChatRoomServiceImp.getSharedInstance().mics.first(where: {
+                                    VoiceRoomUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
+                                }) else { return }
+                self.rtckit.setClientRole(role: mic.status == 0 ? .owner : .audience)
+                self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
             }
         }
 
