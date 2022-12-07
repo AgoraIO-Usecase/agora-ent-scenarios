@@ -67,12 +67,6 @@ public enum updateRoomState {
     ///   - content: 公告变化内容
     func onAnnouncementChanged(roomId: String, content: String)
     
-    /// Description 聊天室自定义机器人音量属性发生变化
-    /// - Parameters:
-    ///   - roomId: 环信IMSDK聊天室id
-    ///   - volume: 音量述职
-    func onRobotVolumeUpdated(roomId: String, volume: String)
-    
     /// Description 用户被踢
     /// - Parameters:
     ///   - roomId: 环信IMSDK聊天室id
@@ -84,7 +78,28 @@ public enum updateRoomState {
     ///   - roomId: 环信IMSDK聊天室id
     ///   - attributeMap: 变换的属性kv
     ///   - fromId: 谁操作发生的变化
-    func onSeatUpdated(roomId: String, attributeMap: [String: String]?, from fromId: String)
+    func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String)
+    
+    /// Description 机器人
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - enable: 机器人开关变化
+    ///   - fromId: 操作人userName
+    func onRobotSwitch(roomId: String, enable: Bool, from fromId: String)
+    
+    /// Description 机器人
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - volume: 机器人开关变化
+    ///   - fromId: 操作人userName
+    func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String)
+    
+    /// Description 贡献榜单变化
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - ranking_list: 排行榜
+    ///   - fromId: 操作人userName
+    func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String)
     
     /// Description 成员离开
     /// - Parameters:

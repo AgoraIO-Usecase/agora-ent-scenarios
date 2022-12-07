@@ -69,40 +69,65 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc private func entryRoom() {
-        
         AgoraChatClient.shared().logout(false)
-        
         SVProgressHUD.show(withStatus: "Loading".localized())
+        self.toLive.isUserInteractionEnabled = false
+        self.navigation.back.isUserInteractionEnabled = false
+        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+        let entity = self.createEntity()
+        ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+            entity.chatroom_id = room_id
+            entity.owner = VoiceRoomUserInfo.shared.user
+            entity.owner?.chat_uid = uid
+            VLUserCenter.user.im_token = im_token
+            VLUserCenter.user.chat_uid = uid
+            VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
+                if error == nil {
+                    ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
+                        SVProgressHUD.dismiss()
+                        if let room = room {
+                            self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                            self.entryRoom(room: room)
+                            self.toLive.isUserInteractionEnabled = true
+                            self.navigation.back.isUserInteractionEnabled = true
+                        } else {
+                            self.toLive.isUserInteractionEnabled = true
+                            self.navigation.back.isUserInteractionEnabled = true
+                            self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                        }
+                    }
+                } else {
+                    self.toLive.isUserInteractionEnabled = true
+                    self.navigation.back.isUserInteractionEnabled = true
+                }
+            })
+            
+        }
+        
+    }
+    
+    private func createEntity() -> VRRoomEntity {
         let entity: VRRoomEntity = VRRoomEntity()
         entity.sound_effect = effects.type
         entity.is_private = !code.isEmpty
         entity.name = name
         entity.roomPassword = code
-        self.toLive.isUserInteractionEnabled = false
-        self.navigation.back.isUserInteractionEnabled = false
-        ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
-            SVProgressHUD.dismiss()
-            if let room = room {
-                self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-                VoiceRoomIMManager.shared?.loginIM(userName: room.owner?.rtc_uid ?? "" , token: VLUserCenter.user.im_token , completion: { userName, error in
-                    if error == nil {
-                        let info: VRRoomInfo = VRRoomInfo()
-                        info.room = room
-                        info.mic_info = nil
-                        let vc = VoiceRoomViewController(info: info)
-                        self.navigationController?.pushViewController(vc, animated: true)
-                        self.toLive.isUserInteractionEnabled = true
-                        self.navigation.back.isUserInteractionEnabled = true
-                    } else {
-                        self.toLive.isUserInteractionEnabled = true
-                        self.navigation.back.isUserInteractionEnabled = true
-                    }
-                })
-            } else {
-                self.toLive.isUserInteractionEnabled = true
-                self.navigation.back.isUserInteractionEnabled = true
-                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-            }
-        }
+        entity.rtc_uid = Int(VLUserCenter.user.id)
+        let timeInterval: TimeInterval = Date().timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        entity.room_id = String(millisecond)
+        entity.channel_id = String(millisecond)
+        entity.created_at = UInt(millisecond)
+        entity.click_count = 3
+        entity.member_count = 3
+        return entity
+    }
+    
+    private func entryRoom(room: VRRoomEntity) {
+        let info: VRRoomInfo = VRRoomInfo()
+        info.room = room
+        info.mic_info = nil
+        let vc = VoiceRoomViewController(info: info)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }

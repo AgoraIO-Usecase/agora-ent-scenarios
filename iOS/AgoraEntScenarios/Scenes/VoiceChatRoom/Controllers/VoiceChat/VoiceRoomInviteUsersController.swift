@@ -78,7 +78,7 @@ extension VoiceRoomInviteUsersController {
     @objc private func fetchUsers() {
         ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
             self.tableView.refreshControl?.endRefreshing()
-            if users != nil , error == nil {
+            if users != nil, error == nil {
                 if self.apply == nil {
                     let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()
                     model.members = users?.filter({
@@ -93,7 +93,6 @@ extension VoiceRoomInviteUsersController {
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
-            self.view.makeToast("\(error?.localizedDescription ?? "")")
         }
         
     }
@@ -103,11 +102,7 @@ extension VoiceRoomInviteUsersController {
         let chat_uid: String = user?.chat_uid ?? ""
         ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
             SVProgressHUD.dismiss()
-            if error == nil {
-                self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
-            } else {
-                
-            }
+            self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
         }
 
     }
