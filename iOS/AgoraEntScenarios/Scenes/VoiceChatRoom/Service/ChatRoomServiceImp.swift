@@ -547,14 +547,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     self.mics[mic_index]  = mic
                     completion(nil,mic)
                 } else {
-                    completion(self.normalError(),nil)
-                    return
+                    completion(self.convertError(error: error),nil)
                 }
-            } else {
-                completion(self.convertError(error: error),nil)
-            }
-        })
-    }
+            })
+        }
     
     func findMicIndex() -> Int {
         var mic_index = 0
