@@ -65,6 +65,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
         } else if (status == ShowInteractionStatus.idle) {
             mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
+            mBinding.iBtnSeatApply.setText("申请连麦")
             mBinding.textLinking.setText("可申请连麦")
         }
     }

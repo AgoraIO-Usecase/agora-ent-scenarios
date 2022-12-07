@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@string/show_stop_linking"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />
