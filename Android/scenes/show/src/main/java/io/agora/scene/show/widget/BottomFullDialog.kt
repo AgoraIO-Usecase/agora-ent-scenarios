@@ -4,8 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.view.View
-import android.view.WindowInsets
-import androidx.core.view.updatePadding
+import androidx.core.view.ViewCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -23,6 +22,7 @@ open class BottomFullDialog : BottomSheetDialog {
 
     override fun onStart() {
         super.onStart()
+        behavior.isDraggable = false
         behavior.peekHeight = Int.MAX_VALUE
         behavior.skipCollapsed = true
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -40,6 +40,10 @@ open class BottomFullDialog : BottomSheetDialog {
             }
 
         })
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         StatusBarUtil.hideStatusBar(window, Color.WHITE, true)
         onDialogStatusChanged(mParentContext, true)
     }
@@ -56,7 +60,7 @@ open class BottomFullDialog : BottomSheetDialog {
     }
 
     open fun onDialogStatusChanged(parentContext: Context, visibleAndIdle: Boolean) {
-        if(changeStatusBar){
+        if (changeStatusBar) {
             if (visibleAndIdle) {
                 (parentContext as? Activity)?.apply {
                     StatusBarUtil.hideStatusBar(window, Color.WHITE, true)
@@ -70,9 +74,11 @@ open class BottomFullDialog : BottomSheetDialog {
     }
 
     override fun setContentView(view: View) {
+        view.fitsSystemWindows = true
         super.setContentView(view)
-        window?.decorView?.setOnApplyWindowInsetsListener { _, insets ->
-            view.updatePadding(bottom = insets.getInsets(WindowInsets.Type.navigationBars()).bottom)
+        ViewCompat.setOnApplyWindowInsetsListener(
+            window?.decorView!!
+        ) { v, insets ->
             view.layoutParams = (view.layoutParams)?.apply {
                 height = window?.decorView?.height ?: 0
             }

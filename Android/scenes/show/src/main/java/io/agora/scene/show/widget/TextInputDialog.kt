@@ -5,12 +5,12 @@ import android.content.DialogInterface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnApplyWindowInsetsListener
 import android.view.ViewGroup.MarginLayoutParams
-import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetTextInputDialogBinding
@@ -40,14 +40,13 @@ class TextInputDialog : BottomSheetDialog {
                     or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
         );
         window?.setDecorFitsSystemWindows(false)
-        window?.decorView?.setOnApplyWindowInsetsListener(object : OnApplyWindowInsetsListener {
-            override fun onApplyWindowInsets(v: View?, insets: WindowInsets?): WindowInsets {
-                val imeInset = insets?.getInsets(WindowInsets.Type.ime())
-                Log.d(TAG, "imeInset: $imeInset")
-                onIMEHeightChanged(imeInset?.bottom ?: 0)
-                return insets!!
-            }
-        })
+        ViewCompat.setOnApplyWindowInsetsListener(window?.decorView!!){ view: View, insets: WindowInsetsCompat ->
+
+            val imeInset = insets.getInsets(WindowInsetsCompat.Type.ime())
+            Log.d(TAG, "imeInset: $imeInset")
+            onIMEHeightChanged(imeInset.bottom)
+            insets
+        }
 
         mBinding.editText.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
