@@ -423,6 +423,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInterationUpdated(interaction: ShowInteractionInfo) {
+        guard let model = interactionList?.filter( { $0.objectId == interaction.objectId}).first else {
+            return
+        }
+        model.ownerMuteAudio = interaction.ownerMuteAudio
+        model.muteAudio = interaction.muteAudio
+        currentInteraction = model
         liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
         liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
     }
@@ -593,6 +599,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         guard let info = interactionList?.first else { return }
         let menuVC = ShowToolMenuViewController()
         menuVC.type = ShowMenuType.managerMic
+        menuVC.selectedMap = [.mute_mic: info.muteAudio]
         menuVC.menuTitle = "对观众\(info.userName ?? "")"
         menuVC.delegate = self
         present(menuVC, animated: true)
