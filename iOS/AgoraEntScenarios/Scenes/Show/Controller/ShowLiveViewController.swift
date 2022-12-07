@@ -322,8 +322,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     break
                 }
             }
-            
             self.present(vc, animated: true)
+        }
+        if invitation.status == .ended {
+            ToastView.show(text: "连麦已断开哦".show_localized)
         }
     }
     
@@ -352,6 +354,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
+        if invitation.status == .ended {
+            ToastView.show(text: "PK已断开哦".show_localized)
+        }
         if invitation.fromRoomId == room?.roomId {
             //send invitation
             createPKInvitationMap[invitation.roomId ?? ""] = invitation
@@ -488,8 +493,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         default:
             break
         }
-        let text = interaction.interactStatus == .pking ? "PK已断开哦".show_localized : "连麦已断开哦".show_localized
-        ToastView.show(text: text)
+        ToastView.show(text: interaction.interactStatus.toastTitle)
         agoraKitManager.agoraKit.updateChannel(with: options)
         
     }
