@@ -116,7 +116,7 @@ class ShowRoomBottomBar: UIView {
         if isBroadcastor {
             buttonArray = [pkButton, linkButton, beautyButton, musicButton, settingButton]
         }else{
-            buttonArray = [linkButton, settingButton]
+            buttonArray = [linkButton]
         }
         
         var i = 0

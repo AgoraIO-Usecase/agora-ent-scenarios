@@ -47,6 +47,8 @@ static NSString * const kTitleCellID = @"AEACategoryTitleCell";
 
 @property (nonatomic, strong) NSArray *dataArray;
 
+@property (nonatomic, strong) AEACategoryViewLayout *categoryLayout;
+
 @end
 
 @implementation AEACategoryView
@@ -68,6 +70,7 @@ static NSString * const kTitleCellID = @"AEACategoryTitleCell";
 
 - (void)createSubviewsWithLayout:(AEACategoryViewLayout *)categoryLayout {
     
+    self.categoryLayout = categoryLayout;
     self.backgroundColor = [UIColor whiteColor];
     
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
@@ -153,6 +156,9 @@ static NSString * const kTitleCellID = @"AEACategoryTitleCell";
         }else{
             changeCenter();
         }
+    }else {
+        CGFloat defaultSelectedCellCenterX = (self.categoryLayout.contentInsets.left + (_selectedIndex + 1) * self.categoryLayout.itemSize.width + self.categoryLayout.minSpacing * _selectedIndex ) * 0.5;
+        self.indicator.center = CGPointMake(defaultSelectedCellCenterX, self.bounds.size.height - self.indicator.bounds.size.height);
     }
 }
 

@@ -8,29 +8,48 @@
 import UIKit
 import MJRefresh
 
-class ShowRoomListVC: ShowBaseViewController {
+class ShowRoomListVC: UIViewController {
 
     private var roomListView: ShowRoomListView!
     private var roomList: [ShowRoomListModel]?
     
-    override func preferredNavigationBarHidden() -> Bool {
-        return true
-    }
+    // 自定义导航栏
+    private let naviBar = ShowNavigationBar()
     
-    override func configNavigationBar(_ navigationBar: UINavigationBar) {
-        setNaviTitleName("navi_title_show_live".show_localized)
-        setBackBtn()
-    }
+    private lazy var agoraManager: ShowAgoraKitManager = {
+        let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
+        return manager
+    }()
     
     deinit {
         AppContext.unloadShowServiceImp()
+        print("---ShowRoomListVC 销毁了---")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        hidesBottomBarWhenPushed = true
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-//        getRoomList()
+        setUpNaviBar()
         addRefresh()
+    }
+    
+    @objc private func didClickSettingButton(){
+        let vc = ShowPresettingVC()
+        vc.isBroadcaster = false
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.agoraManager.updatePresetForType(type, mode: .signle)
+        }
+        present(vc, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -61,9 +80,18 @@ class ShowRoomListVC: ShowBaseViewController {
         }
     }
     
+    private func setUpNaviBar() {
+        navigationController?.isNavigationBarHidden = true
+        naviBar.title = "navi_title_show_live".show_localized
+        view.addSubview(naviBar)
+        let saveButtonItem = ShowBarButtonItem(title: "room_list_audience_setting".show_localized, target: self, action: #selector(didClickSettingButton))
+        naviBar.rightItems = [saveButtonItem]
+    }
+    
     // 创建房间
     private func createRoom(){
         let preVC = ShowCreateLiveVC()
+        preVC.agoraKitManager = agoraManager
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
         preNC.modalPresentationStyle = .fullScreen
@@ -74,11 +102,13 @@ class ShowRoomListVC: ShowBaseViewController {
     private func joinRoom(_ room: ShowRoomListModel){
         AppContext.showServiceImp.joinRoom(room: room) {[weak self] error, detailModel in
             if error == nil {
+                guard let wSelf = self else { return }
                 let vc = ShowLiveViewController()
+                vc.agoraKitManager = wSelf.agoraManager
                 vc.room = room
                 let nc = UINavigationController(rootViewController: vc)
                 nc.modalPresentationStyle = .fullScreen
-                self?.present(nc, animated: true)
+                wSelf.present(nc, animated: true)
             }
         }
     }

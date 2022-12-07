@@ -17,19 +17,20 @@ class ShowCreateLiveVC: UIViewController {
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
-    private let agoraKitManager = ShowAgoraKitManager()
+    lazy var agoraKitManager: ShowAgoraKitManager = {
+        let manager = ShowAgoraKitManager()
+        return manager
+    }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+//        agoraKitManager.defaultSetting()
         agoraKitManager.startPreview(canvasView: localView)
-        agoraKitManager.defaultSetting()
         configNaviBar()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.onClickSettingBtnAction()
-        }
+        showPreset()
     }
     
     func configNaviBar() {
@@ -77,26 +78,17 @@ class ShowCreateLiveVC: UIViewController {
             self?.createView.hideBottomViews = false
         }
     }
-    /*
-    private func setupAgoraKit() {
-        agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
-//        agoraKit?.setLogFile(LogUtils.sdkLogPath())
-        agoraKit?.setClientRole(.broadcaster)
-        agoraKit?.setVideoEncoderConfiguration(videoEncoderConfig)
-        
-        agoraKit?.setVideoFrameDelegate(self)
-        /// 开启扬声器
-        agoraKit?.setDefaultAudioRouteToSpeakerphone(true)
-        let canvas = AgoraRtcVideoCanvas()
-        canvas.uid = UInt(VLUserCenter.user.id) ?? 0
-        canvas.renderMode = .hidden
-        canvas.view = localView
-        canvas.mirrorMode = .disabled
-        agoraKit?.setupLocalVideo(canvas)
-        agoraKit?.enableAudio()
-        agoraKit?.enableVideo()
-        agoraKit?.startPreview()
-    }*/
+    
+    private func showPreset() {
+        let vc = ShowPresettingVC()
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.agoraKitManager.updatePresetForType(type, mode: .signle)
+            let text1 = "show_presetting_update_toast1".show_localized
+            let text2 = "show_presetting_update_toast2".show_localized
+            ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
+        }
+        present(vc, animated: true)
+    }
     
     @objc private func didClickCancelButton(){
         ByteBeautyManager.shareManager.destroy()
@@ -110,7 +102,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         let vc = ShowAdvancedSettingVC()
         vc.mode = .signle
         vc.isBroadcaster = true
-        vc.isOutsise = true
+        vc.isOutside = true
         vc.settingManager = agoraKitManager
         self.navigationController?.pushViewController(vc, animated: true)
     }
