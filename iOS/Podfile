@@ -57,7 +57,7 @@ def all_pods
   
   #歌词组件
 #  pod 'AgoraLyricsScore', '~> 1.0.8.5'
-  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :branch => 'feature/voicePitch'
+  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
   
