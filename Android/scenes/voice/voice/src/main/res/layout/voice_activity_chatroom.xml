@@ -48,7 +48,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.65" />
 
-    <io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
+    <io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
         android:id="@+id/message_view"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/glHorizontal72"
