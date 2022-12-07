@@ -19,6 +19,7 @@ class ShowCreateLiveVC: UIViewController {
     
     lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
         return manager
     }()
         
