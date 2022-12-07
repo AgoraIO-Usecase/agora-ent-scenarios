@@ -53,7 +53,9 @@
         layout="@layout/show_live_detail_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp" />
+        android:layout_marginHorizontal="15dp"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="0dp" />
 
     <include
         android:id="@+id/bottomLayout"

@@ -114,6 +114,8 @@
     <string name="show_stop_pking">结束</string>
     <string name="show_empty_online_boardcaster">暂无在线主播</string>
     <string name="show_empty_online_audience">暂无在线观众</string>
+    <string name="show_pk">连线互动</string>
+
 
 
     <string name="show_setting_preset">预设</string>
