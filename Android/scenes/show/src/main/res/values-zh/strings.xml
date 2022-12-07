@@ -115,6 +115,7 @@
     <string name="show_empty_online_boardcaster">暂无在线主播</string>
     <string name="show_empty_online_audience">暂无在线观众</string>
     <string name="show_setting_preset">预设</string>
+    <string name="show_pk">连线互动</string>
 
     <string name="show_setting_advance_video_setting">视频设置</string>
     <string name="show_setting_advance_audio_setting">音频设置</string>
