@@ -110,7 +110,7 @@ class LiveDetailActivity : AppCompatActivity() {
         topLayout.tvTimer.post(object : Runnable {
             override fun run() {
                 topLayout.tvTimer.text =
-                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.createAt)
+                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.createdAt)
                 topLayout.tvTimer.postDelayed(this, 1000)
             }
         })

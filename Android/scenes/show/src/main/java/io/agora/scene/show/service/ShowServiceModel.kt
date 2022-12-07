@@ -32,20 +32,22 @@ data class ShowRoomDetailModel(
     val ownerId: String,
     val ownerAvater: String,// http url
     val roomStatus: Int = ShowRoomStatus.activity.value,
-    val createAt: Double,
-    val updateAt: Double,
+    val interactStatus: Int = ShowInteractionStatus.idle.value,
+    val createdAt: Double,
+    val updatedAt: Double,
 ): java.io.Serializable {
     fun toMap(): HashMap<String, Any>{
         return hashMapOf(
             Pair("roomId", roomId),
             Pair("roomName", roomName),
             Pair("roomUserCount", roomUserCount),
-            Pair("thumbnailId", ""),
+            Pair("thumbnailId", thumbnailId),
             Pair("ownerId", ownerId),
             Pair("ownerAvater", ownerAvater),
             Pair("roomStatus", roomStatus),
-            Pair("crateAt", createAt),
-            Pair("updateAt", updateAt),
+            Pair("interactStatus", interactStatus),
+            Pair("createdAt", createdAt),
+            Pair("updatedAt", updatedAt),
         )
     }
 

@@ -69,7 +69,7 @@ class ShowSyncManagerServiceImpl(
                     }
                     roomMap.clear()
                     roomList.forEach { roomMap[it.roomId] = it.copy() }
-                    success.invoke(roomList.sortedBy { it.createAt })
+                    success.invoke(roomList.sortedBy { it.createdAt })
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -95,6 +95,7 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.id.toString(),
                 UserManager.getInstance().user.headUrl,
                 ShowRoomStatus.activity.value,
+                ShowInteractionStatus.idle.value,
                 System.currentTimeMillis().toDouble(),
                 System.currentTimeMillis().toDouble()
             )
@@ -618,8 +619,9 @@ class ShowSyncManagerServiceImpl(
             roomInfo.ownerId,
             roomInfo.ownerAvater,
             roomInfo.roomStatus,
-            roomInfo.createAt,
-            roomInfo.updateAt
+            roomInfo.interactStatus,
+            roomInfo.createdAt,
+            roomInfo.updatedAt
         )
         sceneReference.update(nRoomInfo.toMap(), object : Sync.DataItemCallback {
             override fun onSuccess(result: IObject?) {
