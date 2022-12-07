@@ -34,7 +34,8 @@
 #import "KTVMacro.h"
 #import "LEEAlert+KTVModal.h"
 #import "LSTPopView+KTVModal.h"
-#import "KTVSoloController.h"
+#import "KTVApi.h"
+#import "HWWeakTimer.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -49,6 +50,7 @@ typedef enum : NSUInteger {
 
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
+typedef void (^ChorusCallback)(void);
 
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
@@ -68,7 +70,7 @@ AgoraLrcViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLPopScoreViewDelegate,
-KTVSoloControllerDelegate
+KTVApiDelegate
 >
 
 @property (nonatomic, strong) VLKTVMVView *MVView;
@@ -89,11 +91,10 @@ KTVSoloControllerDelegate
 @property (nonatomic, assign) float currentTime;
 @property (nonatomic, assign) float currentDuration;
 @property (nonatomic, strong) AgoraRtcEngineKit *RTCkit;
+@property (nonatomic, strong) NSTimer *chorusMatchingTimer;
+@property (nonatomic, strong) ChorusCallback chorusMatchingCallback;
 
 @property (nonatomic, strong) VLPopScoreView *scoreView;
-
-@property (nonatomic, strong) AgoraRtcConnection *mediaPlayerConnection;
-@property (nonatomic, strong) NSString *mutedRemoteUserId;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
@@ -105,7 +106,7 @@ KTVSoloControllerDelegate
 @property (nonatomic, assign) double currentVoicePitch;
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
-@property (nonatomic, strong) KTVSoloController* soloControl;
+@property (nonatomic, strong) KTVApi* soloControl;
 
 @end
 
@@ -157,7 +158,7 @@ KTVSoloControllerDelegate
     
     //start join
     [self joinRTCChannel];
-    self.soloControl = [[KTVSoloController alloc] initWithRtcEngine:self.RTCkit musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:streamId delegate:self];
+    self.soloControl = [[KTVApi alloc] initWithRtcEngine:self.RTCkit musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:streamId delegate:self];
     
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -248,7 +249,7 @@ KTVSoloControllerDelegate
             if ([model.userNo isEqualToString:VLUserCenter.user.userNo]) {
                 //当前的座位用户离开RTC通道
                 VLRoomSelSongModel *song = weakSelf.selSongsArray.firstObject;
-                [weakSelf.MVView updateUIWithUserOnSeat:NO song:song];
+                [weakSelf.MVView updateUIWithSong:song onSeat:NO];;
                 [weakSelf resetChorusStatus:model.userNo];
             }
             
@@ -433,7 +434,8 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
     }
     
     self.currentVoicePitch = speaker.voicePitch;
-    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
+    //TODO use stream message
+//    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -544,32 +546,42 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-- (void)loadAndPlaySong {
+- (void)startChorusMatching
+{
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-//    if (model == nil || [model waittingForChorus]) {
-//        VLLog(@"skip load, song %@ waitting for chorus", model.songNo);
-//        //刷新MV里的视图
-//        return;
-//    }
-    if (model.status != 2 && [model readyToPlay]) {
-        [self markSongDidPlayWithModel:model];
-        VLLog(@"skip load, song %@ need to mark to playing", model.songNo);
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
+        // for new chorus song, need to wait till co-singer joins or force solo
+        if([model isSongOwner]){
+            //only song owner setup the timer, audience do nothing
+            [self startCoSingerWaitForSeconds:20 withCallback:^() {
+                [[AppContext ktvServiceImp] enterSoloMode];
+            }];
+        }
         return;
     }
+}
+
+- (void)loadAndPlaySong {
+    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    [self markSongDidPlayWithModel:model];
+    
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience;
+    KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
     VL(weakSelf);
-    [self.soloControl loadSong:[[model songNo] integerValue] asRole:role withCallback:^(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state) {
+    [self.soloControl loadSong:[[model songNo] integerValue] withSongType:type asRole:role withCallback:^(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
             [weakSelf setLrcLyric:lyricUrl withCallback:^(NSString *lyricUrl) {
                 if(lyricUrl) {
-                    [weakSelf.soloControl playSong:[[model songNo] integerValue] asRole:role];
+                    [weakSelf.soloControl playSong:[[model songNo] integerValue] withSongType:type asRole:role];
                 }
             }];
         }
     }];
+    
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index {
@@ -599,6 +611,35 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.seatIndex = seatModel.seatIndex;
     [[AppContext ktvServiceImp] leaveSeatWithInput:inputModel
                                         completion:completion];
+}
+
+- (void)startCoSingerWaitForSeconds:(NSInteger)seconds withCallback:(void (^ _Nullable)(void))block
+{
+    if(self.chorusMatchingTimer) {
+        //already waiting, ignore
+        KTVLogInfo(@"already waiting for chorus, ignore call");
+        return;
+    }
+    self.chorusMatchingCallback = block;
+    __block NSInteger leftSecond = seconds;
+    VL(weakSelf);
+    self.chorusMatchingTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
+        leftSecond -= 1;
+        if (leftSecond == 0) {
+            [weakSelf stopCoSingerWait];
+        }
+    } userInfo:@"Fire" repeats:YES];
+    [self.chorusMatchingTimer fire];
+}
+
+- (void)stopCoSingerWait
+{
+    [self.chorusMatchingTimer invalidate];
+    if (self.chorusMatchingCallback) {
+        self.chorusMatchingCallback();
+    }
+    self.chorusMatchingTimer = nil;
+    self.chorusMatchingCallback = nil;
 }
 
 #pragma mark - rtc utils
@@ -697,37 +738,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     return option;
 }
 
-- (void)updateRemoteUserMuteStatus:(NSString *)userId
-                            doMute:(BOOL)doMute {
-    VLLog(@"Agora - updating UID: %@ to %d", userId, doMute);
-    [self.RTCkit muteRemoteAudioStream:[VLGlobalHelper getAgoraPlayerUserId:userId] mute:doMute];
-}
-
-- (void)resetPlayer
-{
-    VLLog(@"Agora - updating unmute all user");
-    self.mutedRemoteUserId = nil;
-    [self.RTCkit muteAllRemoteAudioStreams:NO];
-}
-
 #pragma mark - KTVSoloController
-- (void)controller:(KTVSoloController *)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state
+- (void)controller:(KTVApi *)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        VLRoomSelSongModel* model = [[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-            return [[evaluatedObject songNo] integerValue] == songCode;
-        }]] firstObject];
         if(state == AgoraMediaPlayerStatePlaying) {
             //track has to be selected after loaded
             [self.soloControl selectTrackMode:self.trackMode];
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-            [self.MVView updateUIWithUserOnSeat:NO song:model];
             [self syncPlayState:KTVPlayerSyncStatePlaying];
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView stop];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
-            [self.MVView updateUIWithUserOnSeat:NO song:model];
             [self syncPlayState:KTVPlayerSyncStatePaused];
         } else if(state == AgoraMediaPlayerStateStopped) {
             self.currentTime = 0;
@@ -743,7 +766,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     });
 }
 
--(void)controller:(KTVSoloController *)controller song:(NSInteger)songCode didChangedToPosition:(NSInteger)position
+-(void)controller:(KTVApi *)controller song:(NSInteger)songCode didChangedToPosition:(NSInteger)position
 {
     if ([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
         //if i am main singer
@@ -998,30 +1021,32 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 //合唱的倒计时事件
-- (void)onKTVMVView:(VLKTVMVView *)view timerCountDown:(NSInteger)countDownSecond {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    if ([selSongModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
-        NSDictionary *dict = @{
-            @"cmd":@"countdown",
-            @"time":@(countDownSecond)
-        };
-//        [self sendStreamMessageWithDict:dict
-//                               success:^(BOOL ifSuccess) {
-//            if (ifSuccess) {
-//                VLLog(@"倒计时发送成功");
-//            }
-//        }];
-    }
-}
+//- (void)onKTVMVView:(VLKTVMVView *)view timerCountDown:(NSInteger)countDownSecond {
+//    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+//    if ([selSongModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
+//        NSDictionary *dict = @{
+//            @"cmd":@"countdown",
+//            @"time":@(countDownSecond)
+//        };
+////        [self sendStreamMessageWithDict:dict
+////                               success:^(BOOL ifSuccess) {
+////            if (ifSuccess) {
+////                VLLog(@"倒计时发送成功");
+////            }
+////        }];
+//    }
+//}
 
-- (void)onKTVMVView:(VLKTVMVView *)view startSingType:(VLKTVMVViewSingActionType)singType {
+- (void)onKTVMVView:(VLKTVMVView *)view chorusSingAction:(VLKTVMVViewSingActionType)singType {
     if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱
         //发送独唱的消息
-        [self enterSoloMode];
+        [self.MVView setChorusOptViewHidden];
+        [self stopCoSingerWait];
     } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
         if(!self.isOnMicSeat) {
             [VLToast toast:KTVLocalizedString(@"请先上坐")];
         } else {
+            [self.MVView setChorusOptViewHidden];
             [self joinChorus]; //发送加入合唱的消息
         }
     }
@@ -1120,7 +1145,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 //主唱告诉后台当前播放的歌曲
 - (void)markSongDidPlayWithModel:(VLRoomSelSongModel *)model {
-    if ([model waittingForChorus] || model.status == 2) {
+    if ([model waittingForChorusMatch] || model.status == 2) {
         return;
     }
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
@@ -1142,11 +1167,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         @"value":[NSString stringWithFormat:@"%ld", mode]
     };
     [self.soloControl sendStreamMessageWithDict:dict success:nil];
-}
-
-//发送独唱的消息
-- (void)enterSoloMode {
-    [[AppContext ktvServiceImp] enterSoloMode];
 }
 
 - (void)joinChorus {
@@ -1349,7 +1369,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
     } else {
         [self.RTCkit setClientRole:AgoraClientRoleAudience];
-        [self resetPlayer];
     }
     [self.RTCkit enableLocalAudio:isOnMicSeat];
     [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
@@ -1408,9 +1427,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
     
-    if([[selSongsArray firstObject] songNo] != [[oldSongsArray firstObject] songNo]) {
-        //if top songno changes, try to load and play new song
-        [self loadAndPlaySong];
+    VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
+    VLRoomSelSongModel* updatedTopSong = [selSongsArray firstObject];
+    
+    if(!updatedTopSong.isChorus) {
+        //solo
+        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+            //song changes
+            [self loadAndPlaySong];
+        } else if([updatedTopSong doneChorusMatch]) {
+            //chorus go solo
+            [self loadAndPlaySong];
+        }
+    } else {
+        //chorus
+        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+            if([updatedTopSong waittingForChorusMatch]) {
+                [self startChorusMatching];
+            }
+        }
+        if([updatedTopSong doneChorusMatch]) {
+            [self loadAndPlaySong];
+        }
     }
 }
 

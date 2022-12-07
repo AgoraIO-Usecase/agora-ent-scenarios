@@ -367,7 +367,7 @@ private func _hideLoadingIfNeed() {
         }
         //isChorus always true
         topSong.isChorus = inputModel.isChorus == "1" ? true : false
-        topSong.status = 2
+        topSong.status = 3
         topSong.chorusNo = VLUserCenter.user.userNo
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
@@ -1118,7 +1118,7 @@ extension KTVSyncManagerServiceImp {
         }
 
         topSong.isChorus = false
-        topSong.status = 2
+        topSong.status = 3
         _updateChooseSong(songInfo: topSong) { error in
         }
     }

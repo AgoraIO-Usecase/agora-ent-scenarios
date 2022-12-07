@@ -10,10 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol VLSoloSongViewDelegate <NSObject>
 
 @optional
-- (void)soloBtnClickAction;
+- (void)onStartSoloBtn;
 @end
 
-@interface VLSoloSongView : UIView
+@interface VLStartSoloView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSoloSongViewDelegate>)delegate;
 

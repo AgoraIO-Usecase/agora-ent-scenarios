@@ -20,7 +20,12 @@
     return !self.isChorus || (self.isChorus && [self.chorusNo length] > 0);
 }
 
-- (BOOL)waittingForChorus {
-    return self.isChorus && self.chorusNo.length == 0;
+- (BOOL)waittingForChorusMatch {
+    return self.isChorus && self.chorusNo.length == 0 && self.status == 0;
 }
+
+- (BOOL)doneChorusMatch {
+    return self.status == 3;
+}
+
 @end
