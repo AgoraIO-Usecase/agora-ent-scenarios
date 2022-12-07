@@ -2,29 +2,29 @@ package io.agora.scene.voice.ui.widget.recyclerview
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
 /**
  * @author create by zhangwei03
  */
-class EmptyRecyclerView  : RecyclerView {
+class EmptyRecyclerView : RecyclerView {
 
     var mEmptyView: View? = null
 
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onChanged() {
             super.onChanged()
-            val lAdapter = adapter
-            if (lAdapter != null && mEmptyView != null) {
-                if (lAdapter.itemCount == 0) {
-                    mEmptyView?.visibility = VISIBLE
-                } else {
-                    mEmptyView?.visibility = GONE
-                }
-            }
+            checkIfEmpty()
+        }
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+            super.onItemRangeRemoved(positionStart, itemCount)
+            checkIfEmpty()
+        }
+
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            super.onItemRangeInserted(positionStart, itemCount)
+            checkIfEmpty()
         }
     }
 
@@ -38,12 +38,25 @@ class EmptyRecyclerView  : RecyclerView {
     fun setEmptyView(view: View?) {
         view?.let {
             mEmptyView = it
+            checkIfEmpty()
         }
     }
 
-    override fun setAdapter(adapter: Adapter<*>?) {
-        super.setAdapter(adapter)
-        adapter?.registerAdapterDataObserver(emptyObserver)
-        emptyObserver.onChanged()
+    override fun setAdapter(newAdapter: Adapter<*>?) {
+        val oldAdapter = adapter
+        oldAdapter?.unregisterAdapterDataObserver(emptyObserver)
+        super.setAdapter(newAdapter)
+        newAdapter?.registerAdapterDataObserver(emptyObserver)
+        checkIfEmpty()
+    }
+
+    private fun checkIfEmpty() {
+        mEmptyView?.let { view ->
+            adapter?.let { adapter ->
+                val emptyViewVisible = adapter.itemCount == 0
+                view.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
+                visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
+            }
+        }
     }
 }
