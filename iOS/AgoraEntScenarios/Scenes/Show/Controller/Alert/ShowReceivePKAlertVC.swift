@@ -7,15 +7,18 @@
 
 import UIKit
 
+typealias ShowReceivePKAlertVCDismiss = (_ result: ShowReceivePKAlertVC.Result)->()
 
 class ShowReceivePKAlertVC: UIViewController {
     
     var name: String?
     
-    private var dismissWithResult: ((_ result: ShowReceivePKAlertVC.Result)->())?
+    var style: ShowReceivePKView.Style?
+    
+    private var dismissWithResult: ShowReceivePKAlertVCDismiss?
     
     private lazy var pkAlertView: ShowReceivePKView = {
-        let view = ShowReceivePKView()
+        let view = ShowReceivePKView(style: style)
         view.delegate = self
         return view
     }()
@@ -68,7 +71,7 @@ class ShowReceivePKAlertVC: UIViewController {
         timer?.fire()
     }
     
-    func dismissWithResult(_ dismissWithResult: @escaping ((_ result: ShowReceivePKAlertVC.Result)->())) {
+    func dismissWithResult(_ dismissWithResult: @escaping ShowReceivePKAlertVCDismiss) {
         self.dismissWithResult = dismissWithResult
     }
 
@@ -86,6 +89,17 @@ extension ShowReceivePKAlertVC: ShowReceivePKViewDelegate {
         dismissWithResult?(.accept)
     }
 
+}
+
+extension ShowReceivePKAlertVC {
+    class func present(name:String?,style: ShowReceivePKView.Style = .pk, dismiss: @escaping ShowReceivePKAlertVCDismiss){
+        let vc = ShowReceivePKAlertVC()
+        vc.name = name
+        vc.style = style
+        vc.dismissWithResult = dismiss
+        let topVC = UIViewController.cl_topViewController()
+        topVC?.present(vc, animated: true)
+    }
 }
 
 extension ShowReceivePKAlertVC {

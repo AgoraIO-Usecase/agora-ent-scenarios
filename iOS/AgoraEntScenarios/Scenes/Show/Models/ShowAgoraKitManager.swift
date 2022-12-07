@@ -10,7 +10,7 @@ import AgoraRtcKit
 import UIKit
 
 class ShowAgoraKitManager: NSObject {
-    
+    /*
     lazy var musicDataArray: [ShowMusicConfigData] = {
         return [musicBg, beautyVoice, mixVoice]
     }()
@@ -29,6 +29,7 @@ class ShowAgoraKitManager: NSObject {
     lazy var mixVoice: ShowMusicConfigData = {
         return mixVoiceConfigData()
     }()
+    */
     
     // 预设类型
     var presetType: ShowPresetType?

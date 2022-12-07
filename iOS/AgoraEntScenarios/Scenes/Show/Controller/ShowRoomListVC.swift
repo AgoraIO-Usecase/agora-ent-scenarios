@@ -15,12 +15,8 @@ class ShowRoomListVC: UIViewController {
     
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
-    
-    private lazy var agoraManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
-        return manager
-    }()
+    // 观众端预设类型
+    private var audiencePresetType: ShowPresetType?
     
     deinit {
         AppContext.unloadShowServiceImp()
@@ -47,7 +43,7 @@ class ShowRoomListVC: UIViewController {
         let vc = ShowPresettingVC()
         vc.isBroadcaster = false
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraManager.updatePresetForType(type, mode: .signle)
+            self?.audiencePresetType = type
         }
         present(vc, animated: true)
     }
@@ -91,7 +87,6 @@ class ShowRoomListVC: UIViewController {
     // 创建房间
     private func createRoom(){
         let preVC = ShowCreateLiveVC()
-        preVC.agoraKitManager = agoraManager
         let preNC = UINavigationController(rootViewController: preVC)
         preNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
         preNC.modalPresentationStyle = .fullScreen
@@ -104,7 +99,7 @@ class ShowRoomListVC: UIViewController {
             if error == nil {
                 guard let wSelf = self else { return }
                 let vc = ShowLiveViewController()
-                vc.agoraKitManager = wSelf.agoraManager
+                vc.audiencePresetType = wSelf.audiencePresetType
                 vc.room = room
                 let nc = UINavigationController(rootViewController: vc)
                 nc.modalPresentationStyle = .fullScreen
