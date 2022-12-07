@@ -78,14 +78,16 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             R.mipmap.show_setting_ic_video_off,
             R.mipmap.show_setting_ic_video_on,
             R.string.show_setting_video_off,
-            R.string.show_setting_video_on
+            R.string.show_setting_video_on,
+            true
         ),
         SettingItem(
             ITEM_ID_MIC,
             R.mipmap.show_setting_ic_mic_off,
             R.mipmap.show_setting_ic_mic_on,
             R.string.show_setting_mic_off,
-            R.string.show_setting_mic_on
+            R.string.show_setting_mic_on,
+            true
         ),
         SettingItem(
             ITEM_ID_STATISTIC,

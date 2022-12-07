@@ -75,9 +75,9 @@ class MusicEffectDialog(context: Context) : BottomDarkDialog(context) {
         )
     }
 
-    private lateinit var mBackMusicAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem01Binding>
-    private lateinit var mBeautyVoiceAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem02Binding>
-    private lateinit var mMixingAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem02Binding>
+    private val mBackMusicAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem01Binding>
+    private val mBeautyVoiceAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem02Binding>
+    private val mMixingAdapter: BindingSingleAdapter<ItemInfo, ShowWidgetMusicEffectItem02Binding>
     private var onItemSelectedListener: ((MusicEffectDialog, itemId:Int)->Unit)? = null
 
 

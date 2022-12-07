@@ -9,7 +9,7 @@
         android:id="@+id/flVideoContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black_80_percent"/>
+        android:background="@color/black_80_percent" />
 
     <FrameLayout
         android:id="@+id/llTitle"
@@ -31,8 +31,8 @@
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center"
+            android:gravity="center"
             android:text="@string/show_live_prepare_title"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
@@ -54,9 +54,9 @@
             android:id="@+id/ivRoomCover"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:scaleType="centerCrop"
             app:shapeAppearance="@style/show_roundStyle_12"
             tools:src="@mipmap/portrait01" />
 
@@ -67,27 +67,27 @@
             android:layout_marginStart="10dp"
             android:background="@null"
             android:ellipsize="end"
+            android:hint="@string/show_live_prepare_room_name_hint"
+            android:imeOptions="actionDone"
             android:singleLine="true"
             android:textColor="@color/white"
+            android:textColorHint="@color/white_60_percent"
             android:textSize="15sp"
-            android:imeOptions="actionDone"
+            app:layout_constraintBottom_toTopOf="@id/tvRoomId"
+            app:layout_constraintEnd_toStartOf="@id/ivEdit"
             app:layout_constraintHorizontal_weight="0.6"
             app:layout_constraintStart_toEndOf="@id/ivRoomCover"
             app:layout_constraintTop_toTopOf="@id/ivRoomCover"
-            app:layout_constraintEnd_toStartOf="@id/ivEdit"
-            app:layout_constraintBottom_toTopOf="@id/tvRoomId"
-            android:textColorHint="@color/white_60_percent"
-            android:hint="@string/show_live_prepare_room_name_hint"
             tools:text="12345345435345345345345" />
 
         <ImageView
             android:id="@+id/ivEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/show_live_prepare_ic_edit"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="20dp"
+            android:src="@mipmap/show_live_prepare_ic_edit"
             app:layout_constraintBottom_toBottomOf="@id/etRoomName"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/etRoomName"
             app:layout_constraintTop_toTopOf="@id/etRoomName" />
 
@@ -144,11 +144,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableTop="@mipmap/show_live_prepare_ic_beauty"
+            android:drawablePadding="3dp"
+            android:gravity="center"
             android:text="@string/show_live_prepare_beauty"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:drawablePadding="3dp"
-            android:gravity="center"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toStartOf="@id/tvHD"
             app:layout_constraintStart_toEndOf="@id/tvRotate" />
@@ -158,27 +158,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableTop="@mipmap/show_live_prepare_ic_hd"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_hd"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/tvTip"
+            app:layout_constraintEnd_toStartOf="@id/tvSetting"
+            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
+
+        <TextView
+            android:id="@+id/tvSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@mipmap/show_live_prepare_ic_setting"
+            android:drawablePadding="3dp"
+            android:gravity="center"
+            android:text="@string/show_live_prepare_hd"
+            android:textColor="@color/white"
+            android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:drawablePadding="3dp"
-            android:text="@string/show_live_prepare_hd"
-            app:layout_constraintStart_toEndOf="@id/tvBeauty" />
+            app:layout_constraintStart_toEndOf="@id/tvHD" />
 
         <TextView
             android:id="@+id/tvTip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableStart="@mipmap/show_live_prepare_ic_tip"
+            android:drawablePadding="6dp"
+            android:paddingVertical="25dp"
+            android:text="@string/show_live_prepare_tip"
+            android:textColor="@color/white_80_percent"
+            android:textSize="11sp"
             app:layout_constraintBottom_toTopOf="@id/btnStartLive"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="11sp"
-            android:paddingVertical="25dp"
-            android:drawablePadding="6dp"
-            android:textColor="@color/white_80_percent"
-            android:text="@string/show_live_prepare_tip"
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
