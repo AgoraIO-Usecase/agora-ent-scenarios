@@ -428,6 +428,7 @@ extension VoiceRoomViewController {
             UIView.animate(withDuration: 0.5, animations: {
                 self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
             }) { _ in
+                if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
                 self.sRtcView.isUserInteractionEnabled = true
