@@ -12,8 +12,6 @@ import ZSwiftBaseLib
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
 
-var serviceImp: ChatRoomServiceImp? = ChatRoomServiceImp.getSharedInstance()
-
 @objc public final class VRRoomsViewController: VRBaseViewController {
     private var index: Int = 0 {
         didSet {
@@ -121,16 +119,6 @@ extension VRRoomsViewController {
         component.destination = .center
         component.canPanDismiss = false
         return component
-    }
-
-    private func validatePassword(room: VRRoomEntity, password: String) {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .validatePassWord(roomId: room.room_id ?? ""), params: ["password": password]) { dic, error in
-            if error == nil, let result = dic?["result"] as? Bool, result {
-                self.loginIMThenPush(room: room)
-            } else {
-                self.view.makeToast("Password wrong!")
-            }
-        }
     }
 
     private func loginIMThenPush(room: VRRoomEntity) {

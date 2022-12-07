@@ -100,12 +100,6 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
         }
     }
     
-    public func voiceRoomUpdateRobotVolume(roomId: String, volume: String) {
-        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onRobotVolumeUpdated(roomId:volume:))) {
-            self.roomServiceDelegate?.onRobotVolumeUpdated(roomId: roomId, volume: volume)
-        }
-    }
-    
     public func userBeKicked(roomId: String, reason: AgoraChatroomBeKickedReason) {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserBeKicked(roomId:reason:))) {
             self.roomServiceDelegate?.onUserBeKicked(roomId: roomId, reason: ChatRoomServiceKickedReason(rawValue: UInt(reason.rawValue)) ?? .removed)
@@ -113,13 +107,45 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     }
     
     public func roomAttributesDidUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onSeatUpdated(roomId:attributeMap:from:))) {
-            self.roomServiceDelegate?.onSeatUpdated(roomId: roomId, attributeMap: attributeMap, from: fromId)
+        guard let map = attributeMap else { return }
+        if map.keys.contains(where: { $0.hasPrefix("mic_") }) {
+            if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onSeatUpdated(roomId:mics:from:))) {
+                self.roomServiceDelegate?.onSeatUpdated(roomId: roomId, mics: self.parserMics(map: map), from: fromId)
+            }
         }
+        if map.keys.contains(where: { $0.hasPrefix("use_robot") }) {
+            if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onRobotSwitch(roomId:enable:from:))) {
+                guard let use_robot = map["use_robot"],let enable = Int(use_robot) else { return }
+                self.roomServiceDelegate?.onRobotSwitch(roomId: roomId, enable: enable == 1, from: fromId)
+            }
+        }
+        if map.keys.contains(where: { $0.hasPrefix("robot_volume") }) {
+            guard let robot_volume = map["robot_volume"] else { return }
+            self.roomServiceDelegate?.onRobotVolumeChanged(roomId: roomId, volume: UInt(robot_volume) ?? 50, from: fromId)
+        }
+        if map.keys.contains(where: { $0.hasPrefix("ranking_list") }) {
+            guard let json = map["ranking_list"] else { return }
+            let ranking_list = json.toArray()?.kj.modelArray(VRUser.self)
+            self.roomServiceDelegate?.onContributionListChanged(roomId: roomId, ranking_list: ranking_list ?? [], from: fromId)
+        }
+    }
+    
+    func parserMics(map: [String:String]) -> [VRRoomMic] {
+        var mics = [VRRoomMic]()
+        for key in map.keys {
+            if key.hasPrefix("mic_") {
+                let value: String = map[key] ?? ""
+                let mic_dic: [String: Any] = value.z.jsonToDictionary()
+                let mic: VRRoomMic = model(from: mic_dic, type: VRRoomMic.self) as! VRRoomMic
+                mics.append(mic)
+            }
+        }
+        return mics
     }
     
     public func memberLeave(roomId: String, userName: String) {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onUserLeftRoom(roomId:userName:))) {
+            self.mics.first { $0.member?.chat_uid ?? "" == userName }?.member = nil
             self.roomServiceDelegate?.onUserLeftRoom(roomId: roomId, userName: userName)
         }
     }
@@ -404,7 +430,12 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
         let old_mic = VRRoomMic()
-        old_mic.status = self.mics[old_index].status
+        switch self.mics[old_index].status {
+        case 2,3,4:
+            old_mic.status = self.mics[old_index].status
+        default:
+            old_mic.status = -1
+        }
         old_mic.mic_index = old_index
         let new_mic = VRRoomMic()
         new_mic.status = 0
@@ -509,6 +540,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.applicants.removeAll {
                     $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                 }
+                self.userList?.first(where: { $0.chat_uid ?? "" == user?.member?.chat_uid ?? ""
+                                })?.mic_index = mic_index
                 let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 {
                     self.mics[mic_index]  = mic
@@ -585,21 +618,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
     func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?, VRRoomEntity?) -> Void) {
-        let room_entity: VRRoomEntity = VRRoomEntity()
-        room_entity.rtc_uid = Int(VLUserCenter.user.id)
-        
-        let timeInterval: TimeInterval = Date().timeIntervalSince1970
-        let millisecond = CLongLong(round(timeInterval*1000))
-        
-        room_entity.room_id = String(millisecond)
-        room_entity.channel_id = String(millisecond)
-        room_entity.sound_effect = room.sound_effect
-        room_entity.is_private = room.is_private
-        room_entity.name = room.name
-        room_entity.created_at = UInt(millisecond)
-        room_entity.roomPassword = room.roomPassword
-        room_entity.click_count = 3
-        room_entity.member_count = 3
         
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
@@ -607,27 +625,17 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         owner.uid = VLUserCenter.user.userNo
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
-        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-        initIM(with: room_entity.name ?? "", chatId: nil, channelId: room_entity.channel_id ?? "",  imUid: imId, pwd: "12345678") {[weak self] im_token, uid, room_id in
-            owner.chat_uid = uid
-            room_entity.chatroom_id = room_id
-            room_entity.owner = owner
-            VLUserCenter.user.im_token = im_token
-            VLUserCenter.user.chat_uid = uid
-            
-            if let strongSelf = self {
-                strongSelf.roomList?.append(room_entity)
-                let params = room_entity.kj.JSONObject()
-                strongSelf.initScene {
-                    SyncUtil.joinScene(id: room_entity.room_id ?? "",
-                                       userId:VLUserCenter.user.userNo,
-                                       property: params) { result in
-                        let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
-                        completion(nil,model)
-                    } fail: { error in
-                        completion(error, nil)
-                    }
-                }
+        
+        self.roomList?.append(room)
+        let params = room.kj.JSONObject()
+        self.initScene {
+            SyncUtil.joinScene(id: room.room_id ?? "",
+                               userId:VLUserCenter.user.userNo,
+                               property: params) { result in
+                let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                completion(nil,model)
+            } fail: { error in
+                completion(error, nil)
             }
         }
 
@@ -767,10 +775,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         var chatroom_id = ""
 
         let impGroup = DispatchGroup()
-        let impQueue = DispatchQueue(label: "com.agora.imp.www")
+        let imQueue = DispatchQueue(label: "com.agora.imp.www")
+        let tokenQueue = DispatchQueue(label: "token")
 
         impGroup.enter()
-        impQueue.async {
+        imQueue.async {
             NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id) { uid, room_id, token in
                 im_uid = uid ?? ""
                 chatroom_id = room_id ?? ""
@@ -781,17 +790,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         
         impGroup.enter()
-        impQueue.async {
+        tokenQueue.async {
             NetworkManager.shared.generateToken(channelName: channelId, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
                 VLUserCenter.user.agoraRTCToken = token ?? ""
                 impGroup.leave()
             }
         }
         
-        impGroup.notify(queue: impQueue) {
-            DispatchQueue.main.async {
-                completion(im_token, im_uid, chatroom_id )
-            }
+        impGroup.notify(queue: .main) {
+            completion(im_token, im_uid, chatroom_id )
         }
     }
 }
