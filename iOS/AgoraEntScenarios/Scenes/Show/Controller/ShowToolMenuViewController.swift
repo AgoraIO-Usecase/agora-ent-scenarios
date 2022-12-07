@@ -31,6 +31,11 @@ class ShowToolMenuViewController: UIViewController {
             updateLayoutForType(type)
         }
     }
+    var selectedMap: [ShowToolMenuType: Bool] = [ShowToolMenuType: Bool]() {
+        didSet {
+            self.menuView?.selectedMap = selectedMap
+        }
+    }
     var delegate: ShowToolMenuViewControllerDelegate?
     
     private var menuView: ShowToolMenuView?
@@ -59,6 +64,7 @@ class ShowToolMenuViewController: UIViewController {
         menuView = ShowToolMenuView(type: type)
         view.addSubview(menuView!)
         menuView?.title = menuTitle
+        menuView?.selectedMap = selectedMap
         updateLayoutForType(type)
         menuView?.onTapItemClosure = {[weak self] modelType, isSelected in
             guard let self = self else { return }
