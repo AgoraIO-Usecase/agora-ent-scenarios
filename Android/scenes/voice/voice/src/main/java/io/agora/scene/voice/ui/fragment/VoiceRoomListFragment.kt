@@ -27,6 +27,7 @@ import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
+import io.agora.scene.voice.ui.widget.recyclerview.EmptyRecyclerView
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.utils.FastClickTools
 
@@ -56,19 +57,19 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         voiceRoomObservable()
     }
 
-    private fun initAdapter(recyclerView: RecyclerView) {
+    private fun initAdapter(recyclerView: EmptyRecyclerView) {
         val offsetPx = resources.getDimension(R.dimen.voice_space_84dp)
         recyclerView.addItemDecoration(BottomOffsetDecoration(offsetPx.toInt()))
         listAdapter = VoiceRoomListAdapter(null, object :
             OnItemClickListener<VoiceRoomModel> {
             override fun onItemClick(voiceRoomModel: VoiceRoomModel, view: View, position: Int, viewType: Long) {
-                if (FastClickTools.isFastClick(view)) return@onItemClick
+                if (FastClickTools.isFastClick(view)) return
                 onItemClick(voiceRoomModel)
             }
         }, VoiceRoomListAdapter.VoiceRoomListViewHolder::class.java)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = listAdapter
-
+        recyclerView.setEmptyView(binding?.voiceNoData?.root)
     }
 
     private fun voiceRoomObservable() {
