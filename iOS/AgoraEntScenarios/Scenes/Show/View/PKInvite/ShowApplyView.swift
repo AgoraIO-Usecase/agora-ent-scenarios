@@ -175,13 +175,12 @@ class ShowApplyView: UIView {
     
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
-        if sender.tag == 0 {
+        if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
             revokeutton.isHidden = true
             AppContext.showServiceImp.cancelMicSeatApply { _ in }
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
-            let count = tableView.dataArray?.count ?? 0
-            setupTipsInfo(count: count)
+            setupTipsInfo(count: dataArray.count)
         } else if let interactionModel = interactionModel {
             AppContext.showServiceImp.stopInteraction(interaction: interactionModel) { _ in }
             AlertManager.hiddenView()
