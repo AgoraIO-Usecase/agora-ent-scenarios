@@ -14,8 +14,9 @@ import ZSwiftBaseLib
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
+    
     func chatTokenWillExpire() {
-        self.reLogin()
+        AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
     }
     
     func onReceiveGift(roomId: String, gift: VoiceRoomGiftEntity) {
@@ -53,6 +54,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.refreshApplicants(chat_uid: chat_uid)
     }
     
+    /// Description 刷新申请人列表
+    /// - Parameter chat_uid: 环信userName
     func refreshApplicants(chat_uid: String) {
         ChatRoomServiceImp.getSharedInstance().applicants = ChatRoomServiceImp.getSharedInstance().applicants.filter({
             ($0.member?.chat_uid ?? "") != chat_uid
@@ -99,45 +102,30 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
-        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in
-            
-        }
+        ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in }
         self.didHeaderAction(with: .back, destroyed: destroyed)
     }
     
-    func onSeatUpdated(roomId: String, attributeMap: [String : String]?, from fromId: String) {
-        guard let properties = attributeMap else { return }
-        if properties.keys.contains(where: { text in
-            text.hasPrefix("mic_")
-        }) {
-            self.updateMic(attributeMap, fromId: fromId)
-        }
-        
-        if properties.keys.contains(where: { text in
-            text.hasPrefix("use_robot")
-        }) {
-            guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
-            let use_robot: String = (attributeMap?["use_robot"])! as String
-            let mic_info = mic
-            mic_info.status = use_robot == "1" ? 5 : -2
-            self.roomInfo?.room?.use_robot = use_robot == "1"
-            self.roomInfo?.mic_info![6] = mic_info
-            self.rtcView.updateAlien(mic_info.status)
-        }
-        
-        if attributeMap!.keys.contains(where: { text in
-            text.hasPrefix("robot_volume")
-        }) {
-            let robot_volume: String = (attributeMap?["robot_volume"])! as String
-            roomInfo?.room?.robot_volume = UInt(robot_volume)
-        }
-
-        if properties.keys.contains(where: {
-            $0 == "ranking_list"
-        }) {
-            self.roomInfo?.room?.ranking_list = properties["ranking_list"]?.toArray()?.kj.modelArray(VRUser.self)
-            self.headerView.updateHeader(with: self.roomInfo?.room)
-        }
+    func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
+        self.updateMic(mics, fromId: fromId)
+    }
+    
+    func onRobotSwitch(roomId: String, enable: Bool, from fromId: String) {
+        guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
+        let mic_info = mic
+        mic_info.status = enable ? 5 : -2
+        self.roomInfo?.room?.use_robot = enable
+        self.roomInfo?.mic_info![6] = mic_info
+        self.rtcView.updateAlien(mic_info.status)
+    }
+    
+    func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
+        roomInfo?.room?.robot_volume = volume
+    }
+    
+    func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String) {
+        self.roomInfo?.room?.ranking_list = ranking_list
+        self.headerView.updateHeader(with: self.roomInfo?.room)
     }
     
     func onUserLeftRoom(roomId: String, userName: String) {
@@ -172,74 +160,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         }
     }
 
-    private func updateMic(_ map: [String: String]?, fromId: String) {
-        //如果换麦的话fromId也就是操作人是同一个，只需要取首位两个key对应模型的index将本地缓存互换即可，如果是上麦的话，单次操作人只会操作一个麦位直接取第一个更新即可，机器人收到开关本地更新即可，这里不做任何机器人逻辑，浪费io
-        
-        guard let mic_info = map else { return }
-        let keys = mic_info.keys.map { $0 }
-        var mics = [VRRoomMic]()
-        for key in keys {
-            let value: String = mic_info[key] ?? ""
-            let mic_dic: [String: Any] = value.z.jsonToDictionary()
-            let mic: VRRoomMic = model(from: mic_dic, type: VRRoomMic.self) as! VRRoomMic
-            let status = mic.status
-            let mic_index = mic.mic_index
-            if fromId == self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
-                refreshHandsUp(status: status)
-            }
-
+    private func updateMic(_ mics: [VRRoomMic], fromId: String) {
+        for mic in mics {
             ChatRoomServiceImp.getSharedInstance().mics[mic.mic_index] = mic
-            let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
-                $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
-            })
-            if micUser != nil {
-                micUser?.mic_index = mic_index
-            }
-            if !isOwner {
-                if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
-                    local_index = nil
-                }
-            }
-
-            /**
-             如果房主踢用户下麦
-             */
-            if let host: VRUser = roomInfo?.room?.owner {
-                if host.uid == fromId && status == -1 {
-                    view.makeToast("Removed Stage".localized())
-                }
-            }
-
-            if status == 5 || status == -2 {
-                // 刷新机器人
-                roomInfo?.mic_info?[mic_index] = mic
-                rtcView.updateAlien(mic.status)
-            } else {
-                // 刷新普通用户
-                if mic.member != nil {
-                    mic.member?.mic_index = mic_index
-                }
-                mics.append(mic)
-                if let user = mic.member {
-                    if let uid = user.uid {
-                        let local_uid = VoiceRoomUserInfo.shared.user?.uid
-                        if uid == local_uid {
-                            local_index = mic_index
-                            if !isOwner {
-                                rtckit.setClientRole(role: status == 0 ? .owner : .audience)
-                            }
-                            // 如果当前是0的状态  就设置成主播
-                            rtckit.muteLocalAudioStream(mute: status != 0)
-                        }
-                    }
-                } else {
-                    if local_index == nil || mic_index == local_index {
-                        rtckit.setClientRole(role: .audience)
-                        rtckit.muteLocalAudioStream(mute: true)
-                    }
-                }
-            }
         }
+        //如果有两个mic对象来自同一个人证明是换麦 否则是上下麦或者被禁用静音等
         if mics.count == 2,let first = mics.first,let last = mics.last {
             ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
             ChatRoomServiceImp.getSharedInstance().mics[last.mic_index] = last
@@ -248,6 +173,55 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             rtcView.updateUser(last)
         } else {
             if let first = mics.first {
+                let status = first.status
+                let mic_index = first.mic_index
+                //刷新底部✋🏻状态
+                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
+                    refreshHandsUp(status: status)
+                }
+                //将userList中的上麦用户做标记，便于后续过滤
+                let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
+                    $0.chat_uid ?? "" == first.member?.chat_uid ?? ""
+                })
+                if micUser != nil {
+                    micUser?.mic_index = mic_index
+                }
+                if !isOwner {
+                    if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
+                        local_index = nil
+                    }
+                }
+                /**
+                 如果房主踢用户下麦
+                 */
+                if let host: VRUser = roomInfo?.room?.owner {
+                    if host.uid == fromId && status == -1 {
+                        ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
+                        view.makeToast("Removed Stage".localized())
+                    }  else {
+                        self.refreshApplicants(chat_uid: fromId)
+                    }
+                } else {
+                    self.refreshApplicants(chat_uid: fromId)
+                }
+
+                // 刷新普通用户
+                if first.member != nil {
+                    first.member?.mic_index = mic_index
+                }
+                if fromId == VoiceRoomUserInfo.shared.user?.chat_uid ?? "" {
+                    local_index = mic_index
+                    if !isOwner {
+                        rtckit.setClientRole(role: status == 0 ? .owner : .audience)
+                    }
+                    // 如果当前是0的状态  就设置成主播
+                    rtckit.muteLocalAudioStream(mute: status != 0)
+                } else {
+                    if local_index == nil || mic_index == local_index {
+                        rtckit.setClientRole(role: .audience)
+                        rtckit.muteLocalAudioStream(mute: true)
+                    }
+                }
                 ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
@@ -274,17 +248,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if error == nil, message != nil {
             } else {
                 self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
-            }
-        }
-    }
-
-    func reLogin() {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": UIDevice.current.deviceUUID, "portrait": VoiceRoomUserInfo.shared.user?.portrait ?? userAvatar, "name": VoiceRoomUserInfo.shared.user?.name ?? ""], classType: VRUser.self) { [weak self] user, error in
-            if error == nil {
-                VoiceRoomUserInfo.shared.user = user
-                AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
-            } else {
-                self?.view.makeToast("\(error?.localizedDescription ?? "")", point: self?.toastPoint ?? .zero, title: nil, image: nil, completion: nil)
             }
         }
     }

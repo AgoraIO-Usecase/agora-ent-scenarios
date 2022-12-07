@@ -8,6 +8,7 @@
 import Foundation
 import SVGAPlayer
 import KakaJSON
+import ZSwiftBaseLib
 
 extension VoiceRoomViewController {
     func showEQView() {
@@ -175,20 +176,6 @@ extension VoiceRoomViewController {
         }
     }
 
-    func notifyServerGiftInfo(id: String, count: String, uid: String, completion: @escaping () -> Void) {
-        if let roomId = roomInfo?.room?.room_id {
-            VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .giftTo(roomId: roomId), params: ["gift_id": id, "num": Int(count) ?? 1, "to_uid": uid]) { dic, error in
-                if let result = dic?["result"] as? Bool, error == nil, result {
-                    debugPrint("result:\(result)")
-                    self.requestRankList()
-                    completion()
-                } else {
-                    self.view.makeToast("Send failed!", point: self.toastPoint, title: nil, image: nil, completion: nil)
-                }
-            }
-        }
-    }
-
     func rocketAnimation() {
         let player = SVGAPlayer(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight))
         player.loops = 1
@@ -315,7 +302,7 @@ extension VoiceRoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: VLUserCenter.user.chat_uid) { error, flag in
+        ChatRoomServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
             if error == nil {
                 self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
@@ -349,5 +336,25 @@ extension VoiceRoomViewController {
             }
         }
         presentViewController(vc)
+    }
+    
+    func giftList() -> VoiceRoomGiftView {
+        VoiceRoomGiftView(frame: CGRect(x: 10, y: chatView.frame.minY - (ScreenWidth / 9.0 * 2), width: ScreenWidth / 3.0 * 2 + 20, height: ScreenWidth / 9.0 * 1.8)).backgroundColor(.clear).tag(1111)
+    }
+
+    func startMessage() -> VoiceRoomChatEntity {
+        VoiceRoomUserInfo.shared.currentRoomOwner = roomInfo?.room?.owner
+        let entity = VoiceRoomChatEntity()
+        entity.userName = roomInfo?.room?.owner?.name
+        entity.content = "Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.".localized()
+        entity.attributeContent = entity.attributeContent
+        entity.uid = roomInfo?.room?.owner?.uid
+        entity.width = entity.width
+        entity.height = entity.height
+        return entity
+    }
+
+    @objc func resignKeyboard() {
+        inputBar.hiddenInputBar()
     }
 }

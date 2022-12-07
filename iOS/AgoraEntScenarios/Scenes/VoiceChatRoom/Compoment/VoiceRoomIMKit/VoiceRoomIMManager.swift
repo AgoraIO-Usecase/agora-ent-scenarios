@@ -14,7 +14,7 @@ public let VoiceRoomPraise = "chatroom_praise" // like 点赞
 public let VoiceRoomInviteSite = "chatroom_inviteSiteNotify"
 public let VoiceRoomApplySite = "chatroom_applySiteNotify"
 public let VoiceRoomSubmitApplySite = "chatroom_submitApplySiteNotify"
-public let VoiceRoomCancelApplySite = "chatroom_submitApplySiteNotify"
+public let VoiceRoomCancelApplySite = "chatroom_submitApplySiteNotifyCancel"
 public let VoiceRoomDeclineApply = "chatroom_applyRefusedNotify"
 public let VoiceRoomUpdateRobotVolume = "chatroom_updateRobotVolume"
 public let VoiceRoomJoinedMember = "chatroom_join"
@@ -42,8 +42,6 @@ public let VoiceRoomJoinedMember = "chatroom_join"
     func userJoinedRoom(roomId: String, username: String, ext: [String: Any]?)
 
     func announcementChanged(roomId: String, content: String)
-
-    func voiceRoomUpdateRobotVolume(roomId: String, volume: String)
 
     func userBeKicked(roomId: String, reason: AgoraChatroomBeKickedReason)
 
@@ -152,10 +150,6 @@ public extension VoiceRoomIMManager {
                     case VoiceRoomDeclineApply:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.refuseInvite(roomId:meta:))) {
                             self.delegate?.refuseInvite(roomId: self.currentRoomId, meta: body.customExt)
-                        }
-                    case VoiceRoomUpdateRobotVolume:
-                        if delegate!.responds(to: #selector(VoiceRoomIMDelegate.voiceRoomUpdateRobotVolume(roomId:volume:))) {
-                            self.delegate?.voiceRoomUpdateRobotVolume(roomId: self.currentRoomId, volume: body.customExt["volume"] ?? "")
                         }
                     case VoiceRoomJoinedMember:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.userJoinedRoom(roomId:username:ext:))) {
