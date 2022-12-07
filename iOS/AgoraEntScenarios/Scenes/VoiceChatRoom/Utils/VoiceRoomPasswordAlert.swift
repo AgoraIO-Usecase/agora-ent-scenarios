@@ -40,7 +40,9 @@ public class VoiceRoomPasswordAlert: UIView {
 
     @objc func buttonAction(_ sender: UIButton) {
         if actionEvents != nil {
-            actionEvents!(sender.tag)
+            DispatchQueue.main.async {
+                self.actionEvents!(sender.tag)
+            }
         }
     }
 }

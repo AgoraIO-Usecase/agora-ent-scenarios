@@ -54,20 +54,6 @@ extension VRAllRoomsViewController {
             }
         }
         
-//        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: nil), params: [:], classType: VRRoomsEntity.self) { rooms, error in
-//            self.roomList.refreshControl?.endRefreshing()
-//            if error == nil {
-//                guard let total = rooms?.total else { return }
-//                self.fillDataSource(rooms: rooms)
-//                self.roomList.reloadData()
-//                if self.totalCountClosure != nil {
-//                    self.totalCountClosure!(total)
-//                }
-//                self.empty.isHidden = (total > 0)
-//            } else {
-//                self.view.makeToast("\(error?.localizedDescription ?? "")")
-//            }
-//        }
     }
 
     private func fillDataSource(rooms: VRRoomsEntity?) {
