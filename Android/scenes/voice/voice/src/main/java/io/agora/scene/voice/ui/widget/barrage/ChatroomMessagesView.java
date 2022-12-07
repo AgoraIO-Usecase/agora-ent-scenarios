@@ -48,7 +48,7 @@ import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 /**
  * MessagesView
  */
-public class RoomMessagesView extends RelativeLayout{
+public class ChatroomMessagesView extends RelativeLayout{
     private ListAdapter adapter;
     private RecyclerView listview;
     private static final int ITEM_DEFAULT_TYPE = 0;
@@ -58,16 +58,16 @@ public class RoomMessagesView extends RelativeLayout{
     private Context mContext;
     private boolean isScrollBottom;
 
-    public RoomMessagesView(Context context) {
+    public ChatroomMessagesView(Context context) {
         super(context);
         init(context, null);
     }
 
-    public RoomMessagesView(Context context, AttributeSet attrs) {
+    public ChatroomMessagesView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public RoomMessagesView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ChatroomMessagesView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }

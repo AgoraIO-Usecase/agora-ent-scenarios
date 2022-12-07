@@ -16,6 +16,7 @@ import io.agora.ConnectionListener;
 import io.agora.ValueCallBack;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
+import io.agora.chat.ChatRoom;
 import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
@@ -37,6 +38,7 @@ import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
 import io.agora.voice.common.utils.GsonTools;
 import io.agora.voice.common.utils.LogTools;
+import io.agora.voice.common.utils.ThreadManager;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;
@@ -471,6 +473,70 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
             @Override
             public void onError(int code, String desc) {
                 EMLog.e(TAG,"logout onError code: " + code + "  " + desc);
+            }
+        });
+    }
+
+    /**
+     * 加入房间
+     * @param chatroomId
+     * @param callBack
+     */
+    public void joinRoom(String chatroomId, ValueCallBack<ChatRoom> callBack){
+        ChatClient.getInstance().chatroomManager()
+                .joinChatRoom(chatroomId, new ValueCallBack<ChatRoom>() {
+                    @Override
+                    public void onSuccess(ChatRoom value) {
+                        ThreadManager.getInstance().runOnMainThreadDelay(new Runnable() {
+                            @Override
+                            public void run() {
+                                callBack.onSuccess(value);
+                            }
+                        },200);
+                    }
+
+                    @Override
+                    public void onError(int error, String errorMsg) {
+                        ThreadManager.getInstance().runOnMainThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                callBack.onError(error,errorMsg);
+                            }
+                        });
+                    }
+                });
+    }
+
+    /**
+     * 离开房间
+     */
+    public void leaveChatRoom(String chatroomId){
+        ChatClient.getInstance().chatroomManager().leaveChatRoom(chatroomId);
+    }
+
+    /**
+     * 销毁房间
+     */
+    public void asyncDestroyChatRoom(String chatroomId,CallBack callBack){
+        ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(chatroomId, new CallBack() {
+            @Override
+            public void onSuccess() {
+                ThreadManager.getInstance().runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                ThreadManager.getInstance().runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onError(code,error);
+                    }
+                });
             }
         });
     }

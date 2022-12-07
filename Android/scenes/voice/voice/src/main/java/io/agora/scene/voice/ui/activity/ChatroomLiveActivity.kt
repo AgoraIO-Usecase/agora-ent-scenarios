@@ -24,7 +24,6 @@ import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import io.agora.chat.ChatClient
 import io.agora.scene.voice.R
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
@@ -40,7 +39,7 @@ import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
-import io.agora.scene.voice.ui.widget.barrage.RoomMessagesView
+import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.voice.common.constant.ConfigConstants
@@ -176,7 +175,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             reset()
             false
         }
-        binding.messageView.setMessageViewListener(object : RoomMessagesView.MessageViewListener {
+        binding.messageView.setMessageViewListener(object : ChatroomMessagesView.MessageViewListener {
             override fun onItemClickListener(message: ChatMessageData?) {
             }
 
@@ -461,14 +460,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         ChatroomIMManager.getInstance().logout(false)
         ChatroomIMManager.getInstance().clearCache()
         if (roomKitBean.isOwner) {
-            ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
+            ChatroomIMManager.getInstance().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
                 CallBack {
                 override fun onSuccess() {}
 
                 override fun onError(code: Int, error: String?) {}
             })
         }
-        ChatClient.getInstance().chatroomManager().leaveChatRoom(roomKitBean.chatroomId)
+        ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
         super.finish()
     }
