@@ -8,6 +8,7 @@ import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoom
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.model.VoiceRoomModel
@@ -168,8 +169,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 }
             }
         )
-        ChatClient.getInstance().chatroomManager()
-            .joinChatRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
+        ChatroomIMManager.getInstance()
+            .joinRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
                     "im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logE()
                     joinImRoom.set(true)
@@ -177,13 +178,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
-                    ThreadManager.getInstance().runOnMainThread {
-                        _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
-                            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                                callBack.onError(error, errorMsg)
-                            }
-                        }.asLiveData())
-                    }
+                    _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
+                        override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                            callBack.onError(error, errorMsg)
+                        }
+                    }.asLiveData())
                     "im joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg".logE()
                 }
             })
@@ -191,13 +190,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     private fun checkJoinRoom() {
         if (joinRtcChannel.get() && joinImRoom.get()) {
-            ThreadManager.getInstance().runOnMainThreadDelay({
-                _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
-                    override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                        callBack.onSuccess(MutableLiveData(true))
-                    }
-                }.asLiveData())
-            }, 200)
+            _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
+                override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                    callBack.onSuccess(MutableLiveData(true))
+                }
+            }.asLiveData())
         }
     }
 
