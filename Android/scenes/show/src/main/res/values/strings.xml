@@ -101,7 +101,7 @@
     <string name="show_application_waitting">等待中</string>
     <string name="show_empty_onseat_apply">暂无上麦申请</string>
     <string name="show_apply_onseat">申请连麦</string>
-    <string name="show_stop_linking">停止连麦</string>
+    <string name="show_stop_linking">结束</string>
     <string name="show_cancel_linking">撤回连麦</string>
     <string name="show_linking">正在连麦</string>
     <string name="show_is_onseat">已上麦</string>
@@ -111,6 +111,7 @@
     <!-- pk   -->
     <string name="show_online_boardcaster">在线主播</string>
     <string name="show_pking">正在pk</string>
+    <string name="show_stop_pking">结束</string>
     <string name="show_empty_online_boardcaster">暂无在线主播</string>
     <string name="show_empty_online_audience">暂无在线观众</string>
 

@@ -5,47 +5,59 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.base.component.BaseFragment
-import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
-import io.agora.scene.show.databinding.ShowLivePkRequestMessageBinding
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageListBinding
-import io.agora.scene.show.widget.UserItem
-import io.agora.scene.show.widget.link.LiveLinkRequestViewAdapter
+import io.agora.scene.show.service.ShowRoomDetailModel
 
 class LivePKRequestMessageFragment : BaseFragment() {
-    private lateinit var mBinding : ShowLivePkRequestMessageListBinding
+    private var mBinding : ShowLivePkRequestMessageListBinding? = null
+    private val binding get() = mBinding!!
     private lateinit var mListener : Listener
     private val linkPKViewAdapter : LivePKViewAdapter = LivePKViewAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkPKViewAdapter.setClickListener(object: LivePKViewAdapter.OnClickListener{
-            override fun onClick(userItem: UserItem, position: Int) {
-                mListener.onAcceptMicSeatItemChosen(userItem)
+            override fun onClick(roomItem: ShowRoomDetailModel, position: Int) {
+                mListener.onAcceptMicSeatItemChosen(roomItem)
             }
         })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mBinding = ShowLivePkRequestMessageListBinding.inflate(layoutInflater)
-        return mBinding.root
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.onlineBoardcasterList.adapter = linkPKViewAdapter
+        binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+            mListener.onRequestRefreshing()
+        }
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBoardcasterList(userList : List<UserItem>) {
-        if (userList == null || userList.isEmpty()) {
-            mBinding.linkRequestListEmpty.setVisibility(View.VISIBLE)
+    fun setOnlineBoardcasterList(roomList : List<ShowRoomDetailModel>) {
+        if (mBinding == null) return
+        if (roomList == null || roomList.isEmpty()) {
+            binding.linkRequestListEmptyImg.setVisibility(View.VISIBLE)
+            binding.linkRequestListEmpty.setVisibility(View.VISIBLE)
         } else {
-            mBinding.linkRequestListEmpty.setVisibility(View.GONE)
+            binding.linkRequestListEmptyImg.setVisibility(View.GONE)
+            binding.linkRequestListEmpty.setVisibility(View.GONE)
         }
-        linkPKViewAdapter.resetAll(userList)
+        linkPKViewAdapter.resetAll(roomList)
+        binding.smartRefreshLayout.finishRefresh()
     }
 
     /**
      * pk-更新item选中状态
      */
-    fun setPKInvitationItemStatus(userItem: UserItem, isInvited: Boolean) {
-        mBinding.textPking.setText("与主播" + userItem + "连麦中")
+    fun setPKInvitationItemStatus(roomItem: ShowRoomDetailModel, isInvited: Boolean) {
+        if (mBinding == null) return
+        binding.textPking.setText("与主播" + roomItem.roomName + "连麦中")
     }
 
     fun setListener(listener : Listener) {
@@ -53,7 +65,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onAcceptMicSeatItemChosen(userItem: UserItem)
-        fun onRequestRefreshing(tagIndex: Int)
+        fun onAcceptMicSeatItemChosen(roomItem: ShowRoomDetailModel)
+        fun onRequestRefreshing()
     }
 }

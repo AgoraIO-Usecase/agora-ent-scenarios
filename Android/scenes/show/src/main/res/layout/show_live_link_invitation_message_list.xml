@@ -6,33 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textLinking"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/show_pk_or_link_status_bg"
-        android:drawablePadding="8dp"
-        android:gravity="center_vertical"
-        android:hint="@string/show_linking"
-        android:imeOptions="actionSearch"
-        android:maxLines="1"
-        android:paddingHorizontal="15dp"
-        android:singleLine="true"
-        android:textColor="@color/black"
-        android:textColorHint="@color/text_color_66"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         android:id="@+id/smart_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textLinking">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.scwang.smart.refresh.header.ClassicsHeader
             android:layout_width="match_parent"
@@ -56,17 +35,17 @@
         android:id="@+id/linkRequestListEmptyImg"
         android:layout_width="147dp"
         android:layout_height="93dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="117dp"
         android:src="@mipmap/show_link_empty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textLinking" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/linkRequestListEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="154dp"
+        android:layout_marginTop="39dp"
         android:drawablePadding="12dp"
         android:gravity="center"
         android:text="@string/show_empty_online_audience"
@@ -75,6 +54,6 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textLinking" />
+        app:layout_constraintTop_toBottomOf="@+id/linkRequestListEmptyImg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

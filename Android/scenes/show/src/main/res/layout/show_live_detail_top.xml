@@ -179,7 +179,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:src="@mipmap/show_live_detail_top_statistic_close"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/tlStatistic"
         app:layout_constraintTop_toTopOf="@id/tlStatistic"

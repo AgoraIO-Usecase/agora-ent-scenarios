@@ -31,6 +31,8 @@ import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.LiveLinkInvitationDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
+import io.agora.scene.show.widget.pk.LivePKDialog
+import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -60,6 +62,7 @@ class LiveDetailActivity : AppCompatActivity() {
     private val mSettingDialog by lazy { SettingDialog(this) }
     private val mLinkSettingDialog by lazy { LiveLinkAudienceSettingsDialog(this) }
     private val mLinkDialog by lazy { LiveLinkDialog() }
+    private val mPKDialog by lazy { LivePKDialog() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
     private lateinit var mPermissionHelp: PermissionHelp
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -134,7 +137,9 @@ class LiveDetailActivity : AppCompatActivity() {
             ShowLinkingDialog()
         }
         bottomLayout.ivPK.setOnClickListener {
-            ShowPKDialog()
+            if (isRoomOwner) {
+                ShowPKDialog()
+            }
         }
     }
 
@@ -472,7 +477,20 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun ShowPKDialog() {
+        mPKDialog.setLinkDialogActionListener(object : OnPKDialogActionListener {
+            override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
+                mService.getAllPKUserList({
+                    mPKDialog.setOnlineBoardcasterList(it)
+                })
+            }
 
+            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: ShowRoomDetailModel) {
+                //TODO("Not yet implemented")
+            }
+        })
+        val ft = supportFragmentManager.beginTransaction()
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        mPKDialog.show(ft, "PKDialog")
     }
 
 

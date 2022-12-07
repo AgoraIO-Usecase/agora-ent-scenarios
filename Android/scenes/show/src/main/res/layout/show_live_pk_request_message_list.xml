@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textPking"
@@ -27,7 +26,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/iBtnStopLinkText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/show_stop_pking"
+        android:textColor="@drawable/show_purple"
+        app:layout_constraintBottom_toBottomOf="@id/textPking"
+        app:layout_constraintEnd_toStartOf="@id/iBtnStopPK"
+        app:layout_constraintTop_toTopOf="@id/textPking" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnStopPK"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,17 +48,32 @@
         app:layout_constraintEnd_toEndOf="@id/textPking"
         app:layout_constraintTop_toTopOf="@id/textPking" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/onlineBoardcasterList"
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="681dp"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/textPking"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:spanCount="1"
-        tools:ignore="MissingConstraints"
-        tools:listitem="@layout/show_live_pk_request_message" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textPking"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/onlineBoardcasterList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="1"
+            tools:listitem="@layout/show_live_pk_request_message" />
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/linkRequestListEmptyImg"

@@ -6,30 +6,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import io.agora.scene.show.databinding.ShowLiveDetailVideoPkBinding
-import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLivePkDialogBinding
-import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.UserItem
+import io.agora.scene.show.service.ShowRoomDetailModel
 
-class LivePKDialog : AppCompatDialogFragment() {
-    private lateinit var mBinding : ShowLivePkDialogBinding
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
-
+class LivePKDialog : BottomSheetDialogFragment() {
+    private var mBinding : ShowLivePkDialogBinding? = null
+    private val binding get() = mBinding!!
     private lateinit var pkDialogListener : OnPKDialogActionListener;
     private val pkFragment : LivePKRequestMessageFragment = LivePKRequestMessageFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mBinding = ShowLivePkDialogBinding.inflate(layoutInflater)
-        return mBinding.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,33 +36,43 @@ class LivePKDialog : AppCompatDialogFragment() {
                 Color.TRANSPARENT
             )
         }
-
         ViewCompat.setOnApplyWindowInsetsListener(
             requireDialog().window!!.decorView
         ) { v: View?, insets: WindowInsetsCompat ->
             val inset =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            mBinding.pager.setPadding(0, 0, 0, inset.bottom)
+            binding.pager.setPadding(0, 0, 0, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        mBinding.rBtnRequestMessage.setChecked(true)
-        mBinding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
+
+        binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         pkFragment.setListener(object : LivePKRequestMessageFragment.Listener {
-            override fun onAcceptMicSeatItemChosen(userItem: UserItem) {
-                if (pkDialogListener != null) {
-                    pkDialogListener.onInviteButtonChosen(this@LivePKDialog, userItem)
-                }
+            override fun onAcceptMicSeatItemChosen(roomItem: ShowRoomDetailModel) {
+                pkDialogListener.onInviteButtonChosen(this@LivePKDialog, roomItem)
             }
 
-            override fun onRequestRefreshing(tagIndex: Int) {
-                if (pkDialogListener != null) {
-                    pkDialogListener.onRequestMessageRefreshing(this@LivePKDialog, tagIndex)
-                }
+            override fun onRequestRefreshing() {
+                pkDialogListener.onRequestMessageRefreshing(this@LivePKDialog)
             }
         })
 
-        setChosenItemCount(0)
+        binding.pager.isSaveEnabled = false
+        binding.pager.adapter =
+            object : FragmentStateAdapter(childFragmentManager, viewLifecycleOwner.lifecycle) {
+                override fun getItemCount(): Int {
+                    return 1
+                }
+
+                override fun createFragment(position: Int): Fragment {
+                    return pkFragment
+                }
+            }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
     }
 
     /**
@@ -81,30 +85,14 @@ class LivePKDialog : AppCompatDialogFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBoardcasterList(userList : List<UserItem>) {
-        pkFragment.setOnlineBoardcasterList(userList)
+    fun setOnlineBoardcasterList(roomItem : List<ShowRoomDetailModel>) {
+        pkFragment.setOnlineBoardcasterList(roomItem)
     }
 
     /**
      * pk-更新item选中状态
      */
-    fun setPKInvitationItemStatus(userItem: UserItem, isInvited: Boolean) {
-        pkFragment.setPKInvitationItemStatus(userItem, isInvited)
-    }
-
-    private fun setChosenItemCount(count: Int) {
-        var count = count
-        if (mBinding == null) {
-            return
-        }
-        if (count > 0) {
-            mBinding.rBtnRequestMessage.setVisibility(View.VISIBLE)
-            if (count > 99) {
-                count = 99
-            }
-            mBinding.rBtnRequestMessage.setText(count.toString())
-        } else {
-            mBinding.rBtnRequestMessage.setVisibility(View.GONE)
-        }
+    fun setPKInvitationItemStatus(roomItem: ShowRoomDetailModel, isInvited: Boolean) {
+        pkFragment.setPKInvitationItemStatus(roomItem, isInvited)
     }
 }
