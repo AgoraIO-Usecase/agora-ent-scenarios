@@ -178,7 +178,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             return
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -197,11 +197,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             self?.liveView.canvasView.canvasType = status == .onSeat ? .joint_broadcasting : .none
         }
         
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
-    private func _refreshInvitationList() {
+    private func _refreshPKUserList() {
         AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
             self?.pkUserInvitationList = pkUserList
         }
@@ -226,6 +226,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     
     //MARK: ShowSubscribeServiceProtocol
+    func onRoomExpired() {
+        let vc = ShowReceiveLiveFinishAlertVC()
+        vc.dismissAlert { [weak self] in
+            self?.leaveRoom()
+        }
+        
+        self.present(vc, animated: true)
+    }
+    
     func onUserCountChanged(userCount: Int) {
         self.liveView.roomUserCount = userCount
     }
@@ -278,7 +287,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         }
@@ -292,7 +301,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
         guard  apply.userId == VLUserCenter.user.id else { return }
-        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
@@ -320,13 +329,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
         guard "\(roomOwnerId)" == invitation.userId else { return }
-        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
+//        ToastView.show(text: "seat invitation \(invitation.userName ?? "") did reject")
     }
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
         liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
-        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
+//        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
         guard invitation.userId == VLUserCenter.user.id else { return }
         agoraKitManager.switchRole(role: .broadcaster,
                                    uid: invitation.userId,
@@ -388,8 +397,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
-        _refreshInvitationList()
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -404,20 +413,20 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         
         //recv invitation
-        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
-        _refreshInvitationList()
+//        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         self.currentInteraction = interaction
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         self.currentInteraction = nil
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -604,7 +613,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
-        _refreshInvitationList()
+        _refreshPKUserList()
         _refreshInteractionList()
     }
     
@@ -653,7 +662,7 @@ extension ShowLiveViewController {
 extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
-    func onClickCameraButtonSelected(_ selected: Bool) {
+    func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         if selected {
             agoraKitManager.agoraKit.stopPreview()
             agoraKitManager.agoraKit.enableLocalVideo(false)
@@ -664,7 +673,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     // 画质
-    func onClickHDButtonSelected(_ selected: Bool) {
+    func onClickHDButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: false)
         
         let vc = ShowSelectQualityVC()
@@ -682,36 +691,36 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     // 结束连麦
-    func onClickEndPkButtonSelected(_ selected: Bool) {
+    func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         guard let info = interactionList?.first else { return }
         AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
-            
         }
     }
     
     // 麦克风开关
-    func onClickMicButtonSelected(_ selected: Bool) {
+    func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.agoraKit.muteRecordingSignal(selected)
 //        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
 //        }
     }
     
     // 静音
-    func onClickMuteMicButtonSelected(_ selected: Bool) {
+    func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.agoraKit.muteAllRemoteAudioStreams(selected)
-        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
+        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
+        AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
         }
     }
     
-    func onClickRealTimeDataButtonSelected(_ selected: Bool) {
+    func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         AlertManager.show(view: realTimeView, alertPostion: .top)
     }
     
-    func onClickSwitchCameraButtonSelected(_ selected: Bool) {
+    func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         agoraKitManager.switchCamera()
     }
     
-    func onClickSettingButtonSelected(_ selected: Bool) {
+    func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()

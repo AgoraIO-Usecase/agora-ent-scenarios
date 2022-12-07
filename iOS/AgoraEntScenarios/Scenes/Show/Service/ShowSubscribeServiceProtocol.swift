@@ -16,6 +16,10 @@ public enum ShowServiceConnectState: Int {
 
 protocol ShowSubscribeServiceProtocol: NSObject {
     
+    
+    /// 房间过期
+    func onRoomExpired()
+    
     /// 网络状态变化
     /// - Parameter state: <#state description#>
     func onConnectStateChanged(state: ShowServiceConnectState)

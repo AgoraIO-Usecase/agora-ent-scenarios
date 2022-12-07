@@ -8,15 +8,14 @@
 import UIKit
 
 protocol ShowToolMenuViewControllerDelegate: NSObjectProtocol {
-    func onClickCameraButtonSelected(_ selected: Bool)
-    func onClickHDButtonSelected(_ selected: Bool)
-    func onClickEndPkButtonSelected(_ selected: Bool)
-    func onClickMicButtonSelected(_ selected: Bool)
-    func onClickMuteMicButtonSelected(_ selected: Bool)
-    func onClickRealTimeDataButtonSelected(_ selected: Bool)
-    func onClickSwitchCameraButtonSelected(_ selected: Bool)
-    func onClickSettingButtonSelected(_ selected: Bool)
-
+    func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickHDButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
+    func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool)
 }
 
 class ShowToolMenuViewController: UIViewController {
@@ -59,33 +58,35 @@ class ShowToolMenuViewController: UIViewController {
     private func setUpUI(){
         menuView = ShowToolMenuView(type: type)
         view.addSubview(menuView!)
+        menuView?.title = menuTitle
         updateLayoutForType(type)
         menuView?.onTapItemClosure = {[weak self] modelType, isSelected in
+            guard let self = self else { return }
             switch modelType {
             case .camera:
-                self?.delegate?.onClickCameraButtonSelected(isSelected)
+                self.delegate?.onClickCameraButtonSelected(self, isSelected)
                 break
             case .HD:
-                self?.delegate?.onClickHDButtonSelected(isSelected)
+                self.delegate?.onClickHDButtonSelected(self, isSelected)
                 break
             case .end_pk:
-                self?.dismiss(animated: true)
-                self?.delegate?.onClickEndPkButtonSelected(isSelected)
+                self.dismiss(animated: true)
+                self.delegate?.onClickEndPkButtonSelected(self, isSelected)
                 break
             case .mic:
-                self?.delegate?.onClickMicButtonSelected(isSelected)
+                self.delegate?.onClickMicButtonSelected(self, isSelected)
                 break
             case .mute_mic:
-                self?.delegate?.onClickMuteMicButtonSelected(isSelected)
+                self.delegate?.onClickMuteMicButtonSelected(self, isSelected)
                 break
             case .real_time_data:
-                self?.delegate?.onClickRealTimeDataButtonSelected(isSelected)
+                self.delegate?.onClickRealTimeDataButtonSelected(self, isSelected)
                 break
             case .switch_camera:
-                self?.delegate?.onClickSwitchCameraButtonSelected(isSelected)
+                self.delegate?.onClickSwitchCameraButtonSelected(self, isSelected)
                 break
             case .setting:
-                self?.delegate?.onClickSettingButtonSelected(isSelected)
+                self.delegate?.onClickSettingButtonSelected(self, isSelected)
                 break
             }
         }
