@@ -156,12 +156,13 @@
         VLRoomSelSongModel *songModel = choosedSongArray.firstObject;
         for (VLRoomSeatModel *seatModel in self.roomSeatsArray) {
             BOOL isOwner = [seatModel.userNo isEqualToString:songModel.userNo];
+            BOOL isJoinedChorus = [seatModel.userNo isEqualToString:songModel.chorusNo];
             if (isOwner != seatModel.isOwner) {
                 seatModel.isOwner = isOwner;
                 hasChanged = YES;
             }
-            if (seatModel.isJoinedChorus) {
-                seatModel.isJoinedChorus = NO;
+            if (isJoinedChorus != seatModel.isJoinedChorus) {
+                seatModel.isJoinedChorus = isJoinedChorus;
                 hasChanged = YES;
             }
         }

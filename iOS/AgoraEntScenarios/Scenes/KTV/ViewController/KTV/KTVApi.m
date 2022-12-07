@@ -5,7 +5,7 @@
 //  Created by ZQZ on 2022/11/29.
 //
 
-#import "KTVSoloController.h"
+#import "KTVApi.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
 #import <AgoraLyricsScore-Swift.h>
@@ -15,7 +15,7 @@
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
-@interface KTVSoloController ()<
+@interface KTVApi ()<
     AgoraRtcMediaPlayerDelegate,
     AgoraMusicContentCenterEventDelegate
 >
@@ -32,9 +32,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 @end
 
-@implementation KTVSoloController
+@implementation KTVApi
 
--(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(nonnull id<KTVSoloControllerDelegate>)delegate
+-(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(nonnull id<KTVApiDelegate>)delegate
 {
     if (self = [super init]) {
         self.delegate = delegate;
@@ -61,7 +61,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [[AppContext shared] unregisterPlayerEventDelegate:self];
 }
 
--(void)loadSong:(NSInteger)songCode asRole:(KTVSingRole)role withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block
+-(void)loadSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block
 {
     NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:songCode]];
     if(loadHistory) {
@@ -108,7 +108,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     }
 }
 
--(void)playSong:(NSInteger)songCode asRole:(KTVSingRole)role
+-(void)playSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role
 {
     if(role == KTVSingRoleMainSinger) {
         self.openedSongCode = songCode;

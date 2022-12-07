@@ -3,18 +3,18 @@
 //  VoiceOnLine
 //
 
-#import "VLRobMicrophoneView.h"
+#import "VLJoinChorusView.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLRobMicrophoneView ()
+@interface VLJoinChorusView ()
 
 @property(nonatomic, weak) id <VLRobMicrophoneViewDelegate>delegate;
 
 @end
 
-@implementation VLRobMicrophoneView
+@implementation VLJoinChorusView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRobMicrophoneViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
@@ -62,8 +62,8 @@
 }
 
 - (void)joinBtnClickEvent:(UIButton*)sender {
-    if ([self.delegate respondsToSelector:@selector(robViewChorusAction)]) {
-        [self.delegate robViewChorusAction];
+    if ([self.delegate respondsToSelector:@selector(onJoinChorusBtn)]) {
+        [self.delegate onJoinChorusBtn];
     }
 }
 
