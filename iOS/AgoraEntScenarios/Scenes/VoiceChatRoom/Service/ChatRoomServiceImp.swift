@@ -431,14 +431,25 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         let old_mic = VRRoomMic()
         switch self.mics[old_index].status {
-        case 2,3,4:
+        case 2:
             old_mic.status = self.mics[old_index].status
+        case 3,4:
+            completion(self.normalError(),nil)
+            return
         default:
             old_mic.status = -1
         }
         old_mic.mic_index = old_index
         let new_mic = VRRoomMic()
-        new_mic.status = 0
+        switch self.mics[new_index].status {
+        case 2:
+            new_mic.status = self.mics[old_index].status
+        case 3,4:
+            completion(self.normalError(),nil)
+            return
+        default:
+            new_mic.status = -1
+        }
         new_mic.mic_index = new_index
         new_mic.member = VoiceRoomUserInfo.shared.user
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)":old_mic.kj.JSONString(),"mic_\(new_index)":new_mic.kj.JSONString()], completion: { error in
@@ -472,7 +483,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             mic.mic_index = self.findMicIndex()
         }
-        mic.status = 0
+        switch self.mics[mic.mic_index].status {
+        case 2:
+            mic.status = self.mics[mic.mic_index].status
+        case 3,4:
+            completion(self.normalError(),nil)
+            return
+        default:
+            mic.status = 0
+        }
         mic.member = user
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(user?.mic_index ?? 1)":mic.kj.JSONString()], completion: { error in
             if error == nil {
@@ -533,7 +552,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         let mic = VRRoomMic()
         mic.mic_index = mic_index
-        mic.status = 0
+        switch self.mics[mic_index].status {
+        case 2:
+            mic.status = self.mics[mic_index].status
+        case 3,4:
+            completion(self.normalError(),nil)
+            return
+        default:
+            mic.status = 0
+        }
         mic.member = user?.member
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
