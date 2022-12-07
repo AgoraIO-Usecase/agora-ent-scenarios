@@ -140,7 +140,7 @@ class ShowLiveViewController: UIViewController {
     
     private func joinChannel() {
         agoraKitManager.delegate = self
-        agoraKitManager.defaultSetting()
+//        agoraKitManager.defaultSetting()
         guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
             return
         }
