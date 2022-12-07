@@ -373,7 +373,7 @@ class KTVSyncManagerServiceImp(
         val seatInfo = seatMap[inputModel.userOnSeat.toString()]
         if (seatInfo != null) {
             // 移除歌曲
-            innerRemoveAllUsersChooseSong()
+            innerRemoveAllUsersChooseSong(seatInfo.userNo)
             // 移除座位
             innerRemoveSeat(seatInfo) {}
         }
@@ -1151,8 +1151,8 @@ class KTVSyncManagerServiceImp(
             })
     }
 
-    private fun innerRemoveAllUsersChooseSong() {
-        songChosenList.filter { it.userNo == UserManager.getInstance().user.userNo }
+    private fun innerRemoveAllUsersChooseSong(userNo: String) {
+        songChosenList.filter { it.userNo == userNo }
             .forEach {
                 val indexOf = songChosenList.indexOf(it)
                 songChosenList.removeAt(indexOf)
