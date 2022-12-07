@@ -391,7 +391,7 @@ class AgoraChatRoomHeaderView: UIView {
         case 2:
             soundType = "Gaming Buddy".localized()
         case 3:
-            soundType = "Professional podcaster".localized()
+            soundType = "Professional Podcaster".localized()
         default:
             soundType = "Social Chat".localized()
         }
