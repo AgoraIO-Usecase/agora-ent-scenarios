@@ -323,7 +323,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func sendChatMessage(message: ShowMessage, completion: ((NSError?) -> Void)?) {
-//        agoraAssert("not implemented")
         _addMessage(message: message, finished: completion)
     }
     
@@ -887,7 +886,7 @@ extension ShowSyncManagerServiceImp {
         }
         
         guard let objectId = userList.filter({ $0.userId == VLUserCenter.user.id }).first?.objectId else {
-            agoraAssert("_removeUser objectId = nil")
+            agoraPrint("_removeUser objectId = nil")
             return
         }
         agoraPrint("imp user delete... [\(objectId)]")
@@ -1619,7 +1618,7 @@ extension ShowSyncManagerServiceImp {
 extension ShowSyncManagerServiceImp {
     private func _getAllInteractionList(completion: @escaping (NSError?, [ShowInteractionInfo]?) -> Void) {
         guard let channelName = roomId else {
-            agoraAssert("channelName = nil")
+            agoraPrint("channelName = nil")
             return
         }
         agoraPrint("imp interaction get...")
@@ -1655,7 +1654,9 @@ extension ShowSyncManagerServiceImp {
                                return
                            }
                            
-                           if self.interactionList.contains(where: { $0.userId == model.userId }) {
+                           if let index = self.interactionList.firstIndex(where: { $0.userId == model.userId }) {
+                               self.interactionList.remove(at: index)
+                               self.interactionList.append(model)
                                self.subscribeDelegate?.onInterationUpdated(interaction: model)
                                return
                            }

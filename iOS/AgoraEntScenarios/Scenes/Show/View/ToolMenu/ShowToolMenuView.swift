@@ -86,6 +86,11 @@ class ShowToolMenuView: UIView {
         }
     }
     var onTapItemClosure: ((ShowToolMenuType, Bool) -> Void)?
+    var selectedMap: [ShowToolMenuType: Bool]? {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
     
     public lazy var collectionView: AGECollectionView = {
         let view = AGECollectionView()
@@ -109,13 +114,13 @@ class ShowToolMenuView: UIView {
             
             switch type {
             case .idle_broadcaster:
-                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 != .mute_mic && $0 != .end_pk }))
+                updateToolType(type: [.mute_mic, .end_pk])
             case .pking:
-                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .switch_camera || $0 == .camera || $0 == .mute_mic || $0 == .end_pk }))
+                updateToolType(type: [.switch_camera, .camera, .mute_mic, .end_pk])
             case .managerMic:
-                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .mute_mic || $0 == .end_pk }))
+                updateToolType(type: [.mute_mic, .end_pk])
             case .idle_audience:
-                updateToolType(type: ShowToolMenuType.allCases.filter({ $0 == .real_time_data || $0 == .setting }))
+                updateToolType(type: [.real_time_data, .setting])
             }
         }
     }
@@ -132,7 +137,7 @@ class ShowToolMenuView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateToolType(type: [ShowToolMenuType], isSelected: Bool = false) {
+    func updateToolType(type: [ShowToolMenuType]) {
         var datas = [ShowToolMenuModel]()
         type.forEach({
             let model = ShowToolMenuModel()
@@ -140,7 +145,7 @@ class ShowToolMenuView: UIView {
             model.selectedImageName = $0.selectedImageName ?? $0.imageName
             model.title = $0.title
             model.type = $0
-            model.isSelected = isSelected
+            model.isSelected = selectedMap?[$0] ?? false
             datas.append(model)
         })
         collectionView.dataArray = datas
