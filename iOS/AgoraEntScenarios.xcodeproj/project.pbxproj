@@ -128,7 +128,7 @@
 		05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73D290F752C0024D22F /* VMEQSettingView.swift */; };
 		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
 		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
-		447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */; };
+		3C7681F3E3A7C84FAD6EBBFE /* libPods-AgoraEntScenarios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 253AC3FC93E9924AC8969608 /* libPods-AgoraEntScenarios.a */; };
 		7F6BE3DE2919ED4900F6714D /* VLPopMoreSelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3D72919ED4900F6714D /* VLPopMoreSelView.m */; };
 		7F6BE3DF2919ED4900F6714D /* VLPopScoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DA2919ED4900F6714D /* VLPopScoreView.m */; };
 		7F6BE3E02919ED4900F6714D /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */; };
@@ -420,7 +420,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0510B820290B72FC0063E57A /* VRRoomEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomEntity.swift; sourceTree = "<group>"; };
 		0510B821290B72FC0063E57A /* VRRoomMenuBarEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRRoomMenuBarEntity.swift; sourceTree = "<group>"; };
 		0510B822290B72FC0063E57A /* VRUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRUser.swift; sourceTree = "<group>"; };
@@ -543,6 +542,7 @@
 		05FFE73D290F752C0024D22F /* VMEQSettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMEQSettingView.swift; sourceTree = "<group>"; };
 		05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomEndLiveAlert.swift; sourceTree = "<group>"; };
 		05FFE73F290F752C0024D22F /* VMSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMSoundView.swift; sourceTree = "<group>"; };
+		253AC3FC93E9924AC8969608 /* libPods-AgoraEntScenarios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AgoraEntScenarios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		7F6BE3D62919ED4900F6714D /* VLPopScoreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopScoreView.h; sourceTree = "<group>"; };
@@ -956,7 +956,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				447809FE2C285BCF21F98176 /* Pods_AgoraEntScenarios.framework in Frameworks */,
+				3C7681F3E3A7C84FAD6EBBFE /* libPods-AgoraEntScenarios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1253,7 +1253,7 @@
 		7DA7DCDFD58495527BB462D0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0062AC4563F55534FC7DCB14 /* Pods_AgoraEntScenarios.framework */,
+				253AC3FC93E9924AC8969608 /* libPods-AgoraEntScenarios.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2492,6 +2492,7 @@
 				DD2A43C428FFCEE7004CEDCF /* Frameworks */,
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */,
+				97C6DDD9280AE959C95F0F57 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -2644,6 +2645,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		97C6DDD9280AE959C95F0F57 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
