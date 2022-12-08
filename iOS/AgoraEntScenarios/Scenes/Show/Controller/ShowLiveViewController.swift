@@ -288,6 +288,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
+        guard apply.userId == VLUserCenter.user.id else { return }
         if apply.status == .waitting && role == .broadcaster {
             liveView.bottomBar.linkButton.isShowRedDot = true
 
@@ -306,13 +307,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isSelected = false
             
         } else {
-            liveView.canvasView.canvasType = .none
+//            liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isSelected = false
         }
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
-        guard  apply.userId == VLUserCenter.user.id else { return }
+        guard apply.userId == VLUserCenter.user.id else { return }
 //        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
         if role == .broadcaster {
             applyAndInviteView.reloadData()
@@ -321,12 +322,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
         applyAndInviteView.reloadData()
-        liveView.canvasView.canvasType = .joint_broadcasting
+//        liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
-        guard  apply.userId == VLUserCenter.user.id else { return }
+        guard apply.userId == VLUserCenter.user.id else { return }
 //        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
     }
     
@@ -358,7 +359,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
-        liveView.canvasView.canvasType = .joint_broadcasting
+//        liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
 //        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
         guard invitation.userId == VLUserCenter.user.id else { return }
@@ -615,6 +616,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
         guard let info = interactionList?.first else { return }
+        if role == .audience, info.userId != VLUserCenter.user.id {
+            return
+        }
         let menuVC = ShowToolMenuViewController()
         menuVC.type = ShowMenuType.managerMic
         menuVC.selectedMap = [.mute_mic: info.muteAudio]

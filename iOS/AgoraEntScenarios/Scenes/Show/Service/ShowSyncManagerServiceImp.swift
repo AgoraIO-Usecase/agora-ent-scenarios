@@ -1045,12 +1045,12 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .get(success: { [weak self] list in
-                agoraPrint("imp seat apply success...")
+                agoraPrint("imp seat apply get success...")
                 let seatApplyList = list.compactMap({ ShowMicSeatApply.yy_model(withJSON: $0.toJson()!)! })
                 self?.seatApplyList = seatApplyList
                 completion(nil, seatApplyList)
             }, fail: { error in
-                agoraPrint("imp seat apply fail :\(error.message)...")
+                agoraPrint("imp seat apply get fail :\(error.message)...")
                 completion(error.toNSError(), nil)
             })
     }
