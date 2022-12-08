@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import IQKeyboardManager
+import SwiftUI
 
 class ShowLiveViewController: UIViewController {
 
@@ -102,6 +103,25 @@ class ShowLiveViewController: UIViewController {
             if let info = currentInteraction {
                 _startInteraction(interaction: info)
             }
+            
+            
+            //update audio status
+            guard let interaction = currentInteraction else { return }
+            
+            liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
+            liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
+            
+            if role == .broadcaster {
+                agoraKitManager.agoraKit.muteLocalAudioStream(interaction.ownerMuteAudio)
+            } else if interaction.userId == VLUserCenter.user.id {
+                agoraKitManager.agoraKit.muteLocalAudioStream(interaction.muteAudio)
+            }
+        }
+    }
+    
+    private var muteLocalAudio: Bool = false {
+        didSet {
+            agoraKitManager.agoraKit.muteLocalAudioStream(muteLocalAudio)
         }
     }
     
@@ -423,14 +443,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onInterationUpdated(interaction: ShowInteractionInfo) {
-        guard let model = interactionList?.filter( { $0.objectId == interaction.objectId}).first else {
+        guard let index = interactionList?.firstIndex(where: { $0.objectId == interaction.objectId}) else {
             return
         }
-        model.ownerMuteAudio = interaction.ownerMuteAudio
-        model.muteAudio = interaction.muteAudio
-        currentInteraction = model
-        liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
-        liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
+        interactionList?.remove(at: index)
+        interactionList?.insert(interaction, at: index)
+        currentInteraction = interactionList?.first
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
@@ -718,6 +736,8 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
         AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
         }
+        
+        self.muteLocalAudio = selected
     }
     
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
