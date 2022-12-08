@@ -45,7 +45,7 @@
         android:layout_marginTop="59dp"
         android:background="@drawable/bg_full_black_25_r10"
         android:gravity="center"
-        android:text="@string/coming_soon"
+        android:text="@string/app_coming_soon"
         android:textColor="@color/white"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/ivScenesBg"
