@@ -5,7 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLRoomSelSongModel.h"
-#import <AgoraLyricsScore-Swift.h>
+@import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
