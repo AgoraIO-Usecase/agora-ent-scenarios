@@ -11,22 +11,11 @@
 @import AgoraRtmKit;
 
 typedef enum : NSUInteger {
-    VLSendMessageTypeOnSeat = 0,         // 上麦
-    VLSendMessageTypeDropSeat = 1,       // 下麦
-    VLSendMessageTypeChooseSong = 2,     // 点歌
-    VLSendMessageTypeChangeSong = 3,     // 切歌
-    VLSendMessageTypeCloseRoom = 4,      // 关闭房间
-    VLSendMessageTypeChangeMVBg = 5,     // 切换MV背景
-
-    VLSendMessageTypeAudioMute= 9,       // 静音
-    VLSendMessageTypeVideoIfOpen = 10,    // 摄像头
-    VLSendMessageTypeTellSingerSomeBodyJoin = 11,     //通知主唱有人加入合唱
-    VLSendMessageTypeTellJoinUID = 12, //通知合唱者 主唱UID
-    VLSendMessageTypeSoloSong = 13,  //独唱
-    VLSendMessageTypeSeeScore = 14,   //观众看到分数
-    
-    VLSendMessageAuditFail = 20,
-} VLSendMessageType;
+    KTVServiceNetworkStatusConnecting = 0,
+    KTVServiceNetworkStatusOpen,
+    KTVServiceNetworkStatusFail,
+    KTVServiceNetworkStatusClosed,
+} KTVServiceNetworkStatus;
 
 
 typedef enum : NSUInteger {
@@ -149,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 更新得分
 /// @param score <#totalVolume description#>
-- (void)updateSingingScoreWithScore:(double)score;
+//- (void)updateSingingScoreWithScore:(double)score;
 
 
 //subscribe
@@ -172,9 +161,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 订阅歌曲评分变化
 /// @param changedBlock <#changedBlock description#>
-- (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
+//- (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
 
 
+/// 订阅网络状态变化
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeNetworkStatusChangedWithBlock:(void(^)(KTVServiceNetworkStatus))changedBlock;
+
+
+
+/// 订阅房间过期
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeRoomWillExpire:(void(^)(void))changedBlock;
 
 /// 取消全部订阅
 - (void)unsubscribeAll;
