@@ -67,7 +67,7 @@
         android:background="@drawable/bg_frame_blue_15"
         android:paddingHorizontal="3dp"
         android:paddingVertical="0.5dp"
-        android:text="@string/score"
+        android:text="@string/ktv_score"
         android:textColor="@color/blue_15"
         android:textSize="9sp"
         app:layout_constraintBottom_toBottomOf="@id/tvAccompany"
