@@ -93,65 +93,65 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                 )
             )
         ),
-        GroupInfo(
-            GROUP_ID_FILTER, R.string.show_beauty_group_filter, arrayListOf(
-                ItemInfo(
-                    ITEM_ID_FILTER_NONE,
-                    R.string.show_beauty_item_none,
-                    R.mipmap.show_beauty_ic_none
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_CREAM,
-                    R.string.show_beauty_item_filter_cream,
-                    R.mipmap.show_beauty_ic_filter_naiyou
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_MAKALONG,
-                    R.string.show_beauty_item_filter_mokalong,
-                    R.mipmap.show_beauty_ic_filter_makalong
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_OXGEN,
-                    R.string.show_beauty_item_filter_oxgen,
-                    R.mipmap.show_beauty_ic_filter_yangqi
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_WUYU,
-                    R.string.show_beauty_item_filter_wuyu,
-                    R.mipmap.show_beauty_ic_filter_wuyu
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_Po9,
-                    R.string.show_beauty_item_filter_po9,
-                    R.mipmap.show_beauty_ic_filter_haibian
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_LOLITA,
-                    R.string.show_beauty_item_filter_lolita,
-                    R.mipmap.show_beauty_ic_filter_luolita
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_MITAO,
-                    R.string.show_beauty_item_filter_mitao,
-                    R.mipmap.show_beauty_ic_filter_mitao
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_YINHUA,
-                    R.string.show_beauty_item_filter_yinhua,
-                    R.mipmap.show_beauty_ic_filter_yinghua
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_BEIHAIDAO,
-                    R.string.show_beauty_item_filter_beihaidao,
-                    R.mipmap.show_beauty_ic_filter_beihaidao
-                ),
-                ItemInfo(
-                    ITEM_ID_FILTER_S3,
-                    R.string.show_beauty_item_filter_s3,
-                    R.mipmap.show_beauty_ic_filter_lvtu
-                ),
-            )
-        ),
+//        GroupInfo(
+//            GROUP_ID_FILTER, R.string.show_beauty_group_filter, arrayListOf(
+//                ItemInfo(
+//                    ITEM_ID_FILTER_NONE,
+//                    R.string.show_beauty_item_none,
+//                    R.mipmap.show_beauty_ic_none
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_CREAM,
+//                    R.string.show_beauty_item_filter_cream,
+//                    R.mipmap.show_beauty_ic_filter_naiyou
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_MAKALONG,
+//                    R.string.show_beauty_item_filter_mokalong,
+//                    R.mipmap.show_beauty_ic_filter_makalong
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_OXGEN,
+//                    R.string.show_beauty_item_filter_oxgen,
+//                    R.mipmap.show_beauty_ic_filter_yangqi
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_WUYU,
+//                    R.string.show_beauty_item_filter_wuyu,
+//                    R.mipmap.show_beauty_ic_filter_wuyu
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_Po9,
+//                    R.string.show_beauty_item_filter_po9,
+//                    R.mipmap.show_beauty_ic_filter_haibian
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_LOLITA,
+//                    R.string.show_beauty_item_filter_lolita,
+//                    R.mipmap.show_beauty_ic_filter_luolita
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_MITAO,
+//                    R.string.show_beauty_item_filter_mitao,
+//                    R.mipmap.show_beauty_ic_filter_mitao
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_YINHUA,
+//                    R.string.show_beauty_item_filter_yinhua,
+//                    R.mipmap.show_beauty_ic_filter_yinghua
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_BEIHAIDAO,
+//                    R.string.show_beauty_item_filter_beihaidao,
+//                    R.mipmap.show_beauty_ic_filter_beihaidao
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_FILTER_S3,
+//                    R.string.show_beauty_item_filter_s3,
+//                    R.mipmap.show_beauty_ic_filter_lvtu
+//                ),
+//            )
+//        ),
         GroupInfo(
             GROUP_ID_EFFECT, R.string.show_beauty_group_effect, arrayListOf(
                 ItemInfo(
@@ -189,13 +189,13 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     R.mipmap.show_beauty_ic_none
                 ),
                 ItemInfo(
-                    ITEM_ID_STICKER_BITI,
-                    R.string.show_beauty_item_sticker_biti,
+                    ITEM_ID_STICKER_HUAHUA,
+                    R.string.show_beauty_item_sticker_huahua,
                     R.mipmap.show_beauty_ic_filter_naiyou
                 ),
                 ItemInfo(
-                    ITEM_ID_STICKER_ZHOUNIAN,
-                    R.string.show_beauty_item_sticker_zhounian,
+                    ITEM_ID_STICKER_WOCHAOTIAN,
+                    R.string.show_beauty_item_sticker_wochaotian,
                     R.mipmap.show_beauty_ic_filter_makalong
                 ),
             )
@@ -261,6 +261,9 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
                             holder.binding.ivIcon.isActivated = position == groupItem.selectedIndex
                             holder.binding.ivIcon.setImageResource(itemInfo.icon)
+                            if (groupItem.selectedIndex == position) {
+                                refreshTopLayout(groupItem.id, itemInfo.id)
+                            }
                             holder.binding.ivIcon.setOnClickListener {
                                 if (position == groupItem.selectedIndex) {
                                     return@setOnClickListener
@@ -327,42 +330,32 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
         this.beautyProcessor = processor
     }
 
-    private fun onItemSelected(groupId: Int, itemId: Int) {
+    private fun refreshTopLayout(groupId: Int, itemId: Int){
+        mTopBinding.slider.clearOnChangeListeners()
 
         when (groupId) {
             GROUP_ID_BEAUTY -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_BEAUTY_NONE
-                mTopBinding.slider.clearOnChangeListeners()
-                if (itemId == ITEM_ID_BEAUTY_NONE) {
-                    beautyProcessor?.setFaceBeautify(itemId, 0.0f)
-                } else {
-                    mTopBinding.slider.value = BeautyCache.getItemValue(itemId)
+                if (itemId != ITEM_ID_BEAUTY_NONE) {
+                    mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, sValure, fromUser ->
                         beautyProcessor?.setFaceBeautify(itemId, sValure)
                     }
                 }
-
             }
             GROUP_ID_FILTER -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_FILTER_NONE
-                mTopBinding.slider.clearOnChangeListeners()
-                if (itemId == ITEM_ID_FILTER_NONE) {
-                    beautyProcessor?.setFilter(itemId, 0.0f)
-                } else {
-                    mTopBinding.slider.value = BeautyCache.getItemValue(itemId)
+                if (itemId != ITEM_ID_FILTER_NONE) {
+                    mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setFilter(itemId, value)
                     }
                 }
-
             }
             GROUP_ID_EFFECT -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_EFFECT_NONE
-                mTopBinding.slider.clearOnChangeListeners()
-                if (itemId == ITEM_ID_EFFECT_NONE) {
-                    beautyProcessor?.setEffect(itemId, 0.0f)
-                } else {
-                    mTopBinding.slider.value = BeautyCache.getItemValue(itemId)
+                if (itemId != ITEM_ID_EFFECT_NONE) {
+                    mTopBinding.slider.value = BeautyCache.getItemValueWithDefault(itemId)
                     mTopBinding.slider.addOnChangeListener { slider, value, fromUser ->
                         beautyProcessor?.setEffect(itemId, value)
                     }
@@ -370,6 +363,36 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             }
             GROUP_ID_STICKER -> {
                 mTopBinding.root.isVisible = false
+            }
+        }
+    }
+
+    private fun onItemSelected(groupId: Int, itemId: Int) {
+        refreshTopLayout(groupId, itemId)
+        when (groupId) {
+            GROUP_ID_BEAUTY -> {
+                if (itemId == ITEM_ID_BEAUTY_NONE) {
+                    beautyProcessor?.setFaceBeautify(itemId, 0.0f)
+                } else {
+                    beautyProcessor?.setFaceBeautify(itemId, mTopBinding.slider.value)
+                }
+            }
+            GROUP_ID_FILTER -> {
+                if (itemId == ITEM_ID_FILTER_NONE) {
+                    beautyProcessor?.setFilter(itemId, 0.0f)
+                } else {
+                    beautyProcessor?.setFilter(itemId, mTopBinding.slider.value)
+                }
+
+            }
+            GROUP_ID_EFFECT -> {
+                if (itemId == ITEM_ID_EFFECT_NONE) {
+                    beautyProcessor?.setEffect(itemId, 0.0f)
+                } else {
+                    beautyProcessor?.setEffect(itemId, mTopBinding.slider.value)
+                }
+            }
+            GROUP_ID_STICKER -> {
                 beautyProcessor?.setSticker(itemId)
             }
         }

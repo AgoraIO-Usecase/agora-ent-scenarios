@@ -15,15 +15,20 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_BAIXI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_CWEI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_TIANMEI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_YUANQI;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_BEIHAIDAO;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_CREAM;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_LOLITA;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_MAKALONG;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_MITAO;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_NONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_OXGEN;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_Po9;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_S3;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_WUYU;
-import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_BITI;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_YINHUA;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_HUAHUA;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
-import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_ZHOUNIAN;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_WOCHAOTIAN;
 
 import android.content.Context;
 
@@ -45,7 +50,6 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     private final String STYLE_TIANMEI_NODE = "style_makeup/tianmei";
     private final String STYLE_CWEI_NODE = "style_makeup/cwei";
     private final String STYLE_YUANQI_NODE = "style_makeup/yuanqi";
-
 
 
     private final Context mContext;
@@ -79,7 +83,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     }
 
     private void cvSdkUnInit() {
-        if(mEffectManager != null){
+        if (mEffectManager != null) {
             mEffectManager.destroy();
             mImageUtil.release();
             mEffectManager = null;
@@ -103,15 +107,14 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     public boolean onCaptureVideoFrame(VideoFrame videoFrame) {
-        if(!isEnable()){
+        if (!isEnable()) {
             return true;
         }
 
         VideoFrame.Buffer buffer = videoFrame.getBuffer();
-        if(!(buffer instanceof VideoFrame.TextureBuffer)){
+        if (!(buffer instanceof VideoFrame.TextureBuffer)) {
             return true;
         }
-
 
 
         VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
@@ -201,7 +204,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         sdkIsInit = false;
         resourceReady = false;
         resourcesHelper.release();
-        if(textureBufferHelper != null){
+        if (textureBufferHelper != null) {
             textureBufferHelper.invoke(() -> {
                 cvSdkUnInit();
                 return null;
@@ -234,46 +237,126 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         if (isReleased) {
             return;
         }
-        if(itemId == ITEM_ID_FILTER_NONE){
+        if (itemId == ITEM_ID_FILTER_NONE) {
             mEffectManager.setFilterAbs(null);
-        }
-        else if(itemId == ITEM_ID_FILTER_CREAM){
-            mEffectManager.setFilter("Filter_01_38");
+        } else if (itemId == ITEM_ID_FILTER_CREAM) {
+            mEffectManager.setFilter("filter_cream");
             mEffectManager.updateFilterIntensity(intensity);
-        }
-        else if(itemId == ITEM_ID_FILTER_MAKALONG){
-            mEffectManager.setFilter("Filter_02_14");
+        } else if (itemId == ITEM_ID_FILTER_MAKALONG) {
+            mEffectManager.setFilter("filter_makalong");
             mEffectManager.updateFilterIntensity(intensity);
-        }
-        else if(itemId == ITEM_ID_FILTER_OXGEN){
-            mEffectManager.setFilter("Filter_03_20");
+        } else if (itemId == ITEM_ID_FILTER_OXGEN) {
+            mEffectManager.setFilter("filter_oxgen");
             mEffectManager.updateFilterIntensity(intensity);
-        }
-        else if(itemId == ITEM_ID_FILTER_WUYU){
-            mEffectManager.setFilter("Filter_04_12");
+        } else if (itemId == ITEM_ID_FILTER_WUYU) {
+            mEffectManager.setFilter("filter_wuyu");
             mEffectManager.updateFilterIntensity(intensity);
-        }
-        else if(itemId == ITEM_ID_FILTER_Po9){
-            mEffectManager.setFilter("Filter_05_10");
+        } else if (itemId == ITEM_ID_FILTER_Po9) {
+            mEffectManager.setFilter("filter_Po9");
+            mEffectManager.updateFilterIntensity(intensity);
+        } else if (itemId == ITEM_ID_FILTER_LOLITA) {
+            mEffectManager.setFilter("filter_lolita");
+            mEffectManager.updateFilterIntensity(intensity);
+        } else if (itemId == ITEM_ID_FILTER_MITAO) {
+            mEffectManager.setFilter("filter_mitao");
+            mEffectManager.updateFilterIntensity(intensity);
+        } else if (itemId == ITEM_ID_FILTER_YINHUA) {
+            mEffectManager.setFilter("filter_yinhua");
+            mEffectManager.updateFilterIntensity(intensity);
+        } else if (itemId == ITEM_ID_FILTER_BEIHAIDAO) {
+            mEffectManager.setFilter("filter_beihaidao");
+            mEffectManager.updateFilterIntensity(intensity);
+        } else if (itemId == ITEM_ID_FILTER_S3) {
+            mEffectManager.setFilter("filter_S3");
             mEffectManager.updateFilterIntensity(intensity);
         }
     }
 
-
+// Test Stickers
+//    private static int stickPosition = 0;
+//    private static List<String> stickers = new ArrayList<>();
+//
+//    static {
+//        stickers.add("baby_gan");
+//        stickers.add("baibianfaxing");
+//        stickers.add("biaobaiqixi");
+//        stickers.add("bracelet1");
+//        stickers.add("bracelet2");
+//        stickers.add("chitushaonv");
+//        stickers.add("cinamiheti");
+//        stickers.add("dianjita");
+//        stickers.add("eldermakup");
+//        stickers.add("gongzhumianju");
+//        stickers.add("haoqilongbao");
+//        stickers.add("heimaoyanjing");
+//        stickers.add("huahua");
+//        stickers.add("huanletuchiluobo");
+//        stickers.add("huanlongshu");
+//        stickers.add("jiamian");
+//        stickers.add("jiancedanshenyinyuan");
+//        stickers.add("katongnan");
+//        stickers.add("katongnv");
+//        stickers.add("kejiganqueaixiong");
+//        stickers.add("kidmakup");
+//        stickers.add("konglong");
+//        stickers.add("konglongceshi");
+//        stickers.add("konglongshiguangji");
+//        stickers.add("kongquegongzhu");
+//        stickers.add("kuailexiaopingzi");
+//        stickers.add("landiaoxueying");
+//        stickers.add("lizishengdan");
+//        stickers.add("luzhihuakuang");
+//        stickers.add("matting_bg");
+//        stickers.add("meihaoxinqing");
+//        stickers.add("mengguiyaotang");
+//        stickers.add("merry_chrismas");
+//        stickers.add("mofabaoshi");
+//        stickers.add("nuannuandoupeng");
+//        stickers.add("only_gan");
+//        stickers.add("qianduoduo");
+//        stickers.add("sd_gan");
+//        stickers.add("shahua");
+//        stickers.add("shangke");
+//        stickers.add("shengrikuaile");
+//        stickers.add("shenshi");
+//        stickers.add("shuihaimeigeqiutian");
+//        stickers.add("shuiliandong");
+//        stickers.add("tiaowuhuoji");
+//        stickers.add("watch1");
+//        stickers.add("watch2");
+//        stickers.add("weilandongrizhuang");
+//        stickers.add("weixiaoyaotou");
+//        stickers.add("wochaotian");
+//        stickers.add("wulong");
+//        stickers.add("xiaribingshuang");
+//        stickers.add("xiatiandefeng");
+//        stickers.add("yanlidoushini");
+//        stickers.add("zhangshangyouxiji");
+//        stickers.add("zhaocaimao");
+//        stickers.add("zhuluojimaoxian");
+//        stickers.add("zhutouzhuer");
+//        stickers.add("zisemeihuo");
+//    }
+//
+//    private String getNextSticker(){
+//        int i = stickPosition % stickers.size();
+//        String s = stickers.get(i);
+//        stickPosition++;
+//        Log.d("BeautyByteDance", "sticker: " + s);
+//        return s;
+//    }
 
     @Override
     protected void setStickerAfterCached(int itemId) {
         if (isReleased) {
             return;
         }
-        if(itemId == ITEM_ID_STICKER_NONE){
+        if (itemId == ITEM_ID_STICKER_NONE) {
             mEffectManager.setSticker(null);
-        }
-        else if(itemId == ITEM_ID_STICKER_BITI){
-            mEffectManager.setSticker("maobing");
-        }
-        else if(itemId == ITEM_ID_STICKER_ZHOUNIAN){
-            mEffectManager.setSticker("zhangshangyouxiji");
+        } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
+            mEffectManager.setSticker("huahua");
+        } else if (itemId == ITEM_ID_STICKER_WOCHAOTIAN) {
+            mEffectManager.setSticker("wochaotian");
         }
     }
 }
