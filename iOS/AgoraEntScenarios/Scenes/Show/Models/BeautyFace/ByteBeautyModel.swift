@@ -88,7 +88,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Chin"
-        model.value = 0.06
+        model.value = 0.46
         model.name = "下巴".show_localized
         model.icon = "meiyan_icon_xiaba"
         model.enableNegative = true
@@ -97,7 +97,7 @@ class ByteBeautyModel: ByteBaseModel {
         model = ByteBeautyModel()
         model.path = "/reshape_lite"
         model.key = "Internal_Deform_Zoom_Jawbone"
-        model.value = 0.06
+        model.value = 0.46
         model.name = "下颌骨".show_localized
         model.icon = "meiyan_icon_xiahegu"
         model.enableNegative = true
