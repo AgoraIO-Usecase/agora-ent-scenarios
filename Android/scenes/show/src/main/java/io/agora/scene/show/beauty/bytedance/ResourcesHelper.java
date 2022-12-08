@@ -25,7 +25,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class ResourcesHelper implements EffectResourceProvider {
-    private static final int RESOURCE_VERSION = 1;
+    private static final int RESOURCE_VERSION = 2;
     private static final String VERSION_FILE_NAME = "Version";
     private static final String ASSETS_RESOURCE_PATH = "resource";
 
