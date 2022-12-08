@@ -423,14 +423,24 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         ChatClient.getInstance().loginWithAgoraToken(uid, token, new CallBack() {
             @Override
             public void onSuccess() {
-                callBack.onSuccess();
+                ThreadManager.getInstance().runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onSuccess();
+                    }
+                });
                 Log.d("ChatroomConfigManager","Login success");
             }
 
             @Override
             public void onError(int code, String msg) {
+                ThreadManager.getInstance().runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onError(code,msg);
+                    }
+                });
                 Log.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
-                callBack.onError(code,msg);
             }
         });
     }
@@ -835,6 +845,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public void setMemberList(VoiceMemberModel voiceMemberModel){
         cacheManager.setMemberList(voiceMemberModel);
+    }
+
+    /**
+     * 检查指定id是否在成员列表中
+     */
+    public boolean checkMember(String chatUid){
+       return cacheManager.getSubmitMic(chatUid) != null;
     }
 
     /**
