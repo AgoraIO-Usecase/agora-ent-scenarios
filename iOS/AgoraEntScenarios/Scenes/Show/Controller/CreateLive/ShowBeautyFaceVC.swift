@@ -37,7 +37,7 @@ class ShowBeautyFaceVC: UIViewController {
         switch type {
         case .beauty: return ShowBeautyFaceVC.beautyData
         case .style: return ShowBeautyFaceVC.styleData
-        case .filter: return ShowBeautyFaceVC.filterData
+//        case .filter: return ShowBeautyFaceVC.filterData
         case .sticker: return ShowBeautyFaceVC.stickerData
         }
     }()
@@ -81,13 +81,13 @@ class ShowBeautyFaceVC: UIViewController {
                                                      key: model.key,
                                                      value: model.value)
             
-        case .filter:
-            if isReset {
-                ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
-                return
-            }
-            ByteBeautyManager.shareManager.setFilter(path: model.path,
-                                                     value: model.value)
+//        case .filter:
+//            if isReset {
+//                ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
+//                return
+//            }
+//            ByteBeautyManager.shareManager.setFilter(path: model.path,
+//                                                     value: model.value)
             
         case .style:
             if isReset {
