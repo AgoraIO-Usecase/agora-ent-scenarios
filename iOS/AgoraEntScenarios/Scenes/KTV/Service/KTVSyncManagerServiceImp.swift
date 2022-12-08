@@ -256,7 +256,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 
     func leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
-            agoraAssert("leaveRoom channelName = nil")
+//            agoraAssert("leaveRoom channelName = nil")
             return
         }
         
