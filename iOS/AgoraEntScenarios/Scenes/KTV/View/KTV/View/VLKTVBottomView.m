@@ -70,6 +70,7 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [heChangeBtn setImage:[UIImage sceneImageWithName:@"ktv_hechang_icon"] forState:UIControlStateNormal];
     [heChangeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:heChangeBtn];
+    heChangeBtn.enabled = NO;
     
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {

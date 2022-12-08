@@ -71,6 +71,7 @@ public class RethinkSyncManager: NSObject {
         appId = config.appId
         reConnect(isRemove: true)
         completeBlock = complete
+        complete?(0)
         NotificationCenter.default.addObserver(self, selector: #selector(enterForegroundNotification),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
@@ -218,12 +219,11 @@ public class RethinkSyncManager: NSObject {
 
 extension RethinkSyncManager: SRWebSocketDelegate {
     public func webSocketDidOpen(_ webSocket: SRWebSocket) {
-        Log.info(text: "connect status == \(webSocket.readyState.rawValue)", tag: "connect")
+        Log.info(text: "websocket open: \(webSocket.readyState.rawValue)", tag: "connect")
         if state != webSocket.readyState {
             connectStateBlock?(SocketConnectState(rawValue: webSocket.readyState.rawValue) ?? .closed)
         }
         state = webSocket.readyState
-        
         if let complete = completeBlock {
             complete(state == .OPEN ? 0 : -1)
             completeBlock = nil
@@ -306,12 +306,14 @@ extension RethinkSyncManager: SRWebSocketDelegate {
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didFailWithError error: Error) {
-        Log.errorText(text: "socket fail: \(error.localizedDescription)", tag: "error")
+        Log.errorText(text: "websocket fail: \(error.localizedDescription)", tag: "error")
+        state = webSocket.readyState
         connectStateBlock?(.fail)
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didCloseWithCode code: Int, reason: String?, wasClean: Bool) {
-        Log.warning(text: "socket closed == \(reason ?? "")", tag: "closed")
+        Log.warning(text: "websocket closed: \(reason ?? "")", tag: "closed")
+        state = webSocket.readyState
         connectStateBlock?(.closed)
         reConnect()
     }

@@ -45,6 +45,8 @@
 @property (nonatomic, assign) int totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) double currentTime;
+
+@property (nonatomic, assign) BOOL isPlayAccompany;
 @end
 
 @implementation VLKTVMVView
@@ -57,6 +59,14 @@
     }
     return self;
 }
+
+#pragma setter
+- (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
+    [self.originBtn setSelected:!isPlayAccompany];
+    [self _refreshOriginButton];
+}
+
+#pragma mark private
 
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
@@ -117,6 +127,17 @@
     
     self.lrcView.config = self.config;
     [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+}
+
+- (void)_refreshOriginButton {
+    if (self.originBtn.selected) {
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+    }
+    else {
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
+    }
 }
 
 #pragma mark - public
@@ -372,14 +393,7 @@
 - (void)originClick:(UIButton *)button {
     button.selected = !button.selected;
     VLKTVMVViewActionType origin = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
-    if (button.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
-    }
+    [self _refreshOriginButton];
     
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
         [self.delegate onKTVMVView:self btnTappedWithActionType:origin];
@@ -442,6 +456,9 @@
 
 - (void)reset {
     [_lrcView reset];
+    [self setSongScore:0];
+    self.isPlayAccompany = NO;
+    [self cleanMusicText];
 }
 
 - (void)resetTime {
@@ -469,7 +486,7 @@
         // 评分组件配置
         AgoraScoreItemConfigModel *scoreConfig = [[AgoraScoreItemConfigModel alloc] init];
         scoreConfig.tailAnimateColor = [UIColor yellowColor];
-        scoreConfig.scoreViewHeight = 59; // 评分视图高度
+        scoreConfig.scoreViewHeight = 100; // 评分视图高度
         scoreConfig.emitterColors = @[[UIColor purpleColor]];
         scoreConfig.isHiddenSeparatorLine = NO;
         scoreConfig.separatorLineColor = [UIColor whiteColor];
