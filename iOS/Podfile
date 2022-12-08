@@ -49,7 +49,7 @@ def all_pods
 #  pod 'Displayer'
   pod 'YYText'
   pod 'LSTPopView'
-  pod 'QMUIKit'
+  pod 'QMUIKit', '4.5.1'
   pod 'InputKit'
   pod 'CYLTabBarController'
 #  pod 'ZQTCustomSwitch'
