@@ -2,15 +2,12 @@ package io.agora.scene.voice.imkit.custorm;
 
 import android.text.TextUtils;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import io.agora.CallBack;
 import io.agora.MessageListener;
 import io.agora.chat.ChatClient;
@@ -19,7 +16,6 @@ import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
-import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.model.VoiceRoomApply;
 import io.agora.voice.common.utils.GsonTools;
 
@@ -113,27 +109,34 @@ public class CustomMsgHelper implements MessageListener {
             }
             switch (msgType) {
                 case CHATROOM_INVITE_SITE:
+                    Map<String, String> inviteMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
                     if(listener != null) {
-                        listener.onReceiveInviteSite(ChatroomIMManager.getInstance().parseChatMessage(message));
+                        if (inviteMap.containsKey("chatroomId") && TextUtils.equals(chatRoomId,inviteMap.get("chatroomId"))){
+                            listener.onReceiveInviteSite(ChatroomIMManager.getInstance().parseChatMessage(message));
+                        }
                     }
                     break;
                 case CHATROOM_APPLY_SITE:
-                    Map<String, String> map = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
-                    if (map.containsKey("user")){
-                        VoiceRoomApply voiceRoomApply = GsonTools.toBean(map.get("user"), VoiceRoomApply.class);
-                        if (voiceRoomApply != null && voiceRoomApply.getMember() != null){
-                            ChatroomIMManager.getInstance().setSubmitMicList(voiceRoomApply.getMember());
+                    Map<String, String> applyMap = getCustomMsgParams(ChatroomIMManager.getInstance().parseChatMessage(message));
+                    if(listener != null ) {
+                        if (applyMap.containsKey("chatroomId") && TextUtils.equals(chatRoomId,applyMap.get("chatroomId"))){
+                            if (applyMap.containsKey("user")){
+                                VoiceRoomApply voiceRoomApply = GsonTools.toBean(applyMap.get("user"), VoiceRoomApply.class);
+                                if (voiceRoomApply != null && voiceRoomApply.getMember() != null){
+                                    ChatroomIMManager.getInstance().setSubmitMicList(voiceRoomApply.getMember());
+                                }
+                            }
+                            listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                         }
-                    }
-                    if(listener != null) {
-                        listener.onReceiveApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
                     }
                     break;
                 case CHATROOM_CANCEL_APPLY_SITE:
                     if(listener != null) {
-                        listener.onReceiveCancelApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
+                        if (ChatroomIMManager.getInstance().checkMember(message.getFrom())){
+                            ChatroomIMManager.getInstance().removeSubmitMember(message.getFrom());
+                            listener.onReceiveCancelApplySite(ChatroomIMManager.getInstance().parseChatMessage(message));
+                        }
                     }
-                    ChatroomIMManager.getInstance().removeSubmitMember(message.getFrom());
                     break;
                 case CHATROOM_INVITE_REFUSED_SITE:
                     if(listener != null) {

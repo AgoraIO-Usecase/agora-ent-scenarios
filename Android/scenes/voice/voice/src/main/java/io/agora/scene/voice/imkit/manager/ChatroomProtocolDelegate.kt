@@ -344,6 +344,7 @@ class ChatroomProtocolDelegate constructor(
         "startMicSeatApply:$memberBean".logE(TAG)
         voiceRoomApply.created_at = System.currentTimeMillis()
         attributeMap["user"] = GsonTools.beanToString(voiceRoomApply).toString()
+        attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
     }
 
@@ -407,6 +408,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
+        attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
         sendChatroomEvent(true, chatUid, CustomMsgType.CHATROOM_INVITE_SITE, attributeMap, callback)
     }
 
@@ -418,6 +420,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
+        attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
     }
 
