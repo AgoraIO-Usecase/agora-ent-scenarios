@@ -21,7 +21,7 @@ object ScenesConstructor {
         return mutableListOf(
             ScenesModel(
                 SceneType.Voice_Chat,
-                context.getString(R.string.voice_chat),
+                context.getString(R.string.app_voice_chat),
                 R.mipmap.bg_btn_home3,
                 R.mipmap.bg_btn_home_chat,
                 true

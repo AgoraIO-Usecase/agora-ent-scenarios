@@ -10,11 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
+import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;
 import com.agora.entfulldemo.home.holder.HomeIndexHolder;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
         Context context = getContext();
         if (context != null) {
             List<ScenesModel> scenesModels = ScenesConstructor.buildData(context);
-            BaseRecyclerViewAdapter<ItemHomeIndexBinding, ScenesModel, HomeIndexHolder> homeIndexAdapter = new BaseRecyclerViewAdapter<>(scenesModels, new OnItemClickListener<ScenesModel>() {
+            BaseRecyclerViewAdapter<AppItemHomeIndexBinding, ScenesModel, HomeIndexHolder> homeIndexAdapter = new BaseRecyclerViewAdapter<>(scenesModels, new OnItemClickListener<ScenesModel>() {
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
                     if (scenesModel.getActive()) {
