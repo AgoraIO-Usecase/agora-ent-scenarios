@@ -117,22 +117,21 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     if (!ChatroomIMManager.getInstance().isLoggedIn) {
                         ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
                             override fun onSuccess() {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    goChatroomPage()
-                                }
+                                goChatroomPage()
                             }
 
                             override fun onError(code: Int, desc: String) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    dismissLoading()
-                                }
+                                dismissLoading()
                             }
                         })
                     } else {
-                        ThreadManager.getInstance().runOnMainThread {
-                            goChatroomPage()
-                        }
+                        goChatroomPage()
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    dismissLoading()
                 }
             })
         }

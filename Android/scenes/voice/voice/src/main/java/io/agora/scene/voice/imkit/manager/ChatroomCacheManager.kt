@@ -158,6 +158,17 @@ class ChatroomCacheManager {
     }
 
     /**
+     * 获取申请上麦列表中指定成员model
+     */
+    fun getSubmitMic(chatUid: String):VoiceMemberModel?{
+        return if (submitMicMap.containsKey(chatUid)){
+            submitMicMap[chatUid]
+        }else{
+            null
+        }
+    }
+
+    /**
      * 从申请列表移除指定成员对象
      */
     fun removeSubmitMember(chatUid: String){

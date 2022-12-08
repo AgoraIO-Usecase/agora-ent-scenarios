@@ -105,7 +105,7 @@ public class ChatroomConfigManager {
                 Log.e(TAG,"onReceiveSeatRequest");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatRequest(message.getConversationId(), message);
+                        listener.onReceiveSeatRequest(message);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -117,7 +117,7 @@ public class ChatroomConfigManager {
                 Log.e(TAG,"onReceiveSeatRequestRejected");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatRequestRejected(message.getConversationId(), message.getFrom());
+                        listener.onReceiveSeatRequestRejected(message.getFrom());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -129,7 +129,7 @@ public class ChatroomConfigManager {
                 Log.e(TAG,"onReceiveSeatInvitation");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
-                        listener.onReceiveSeatInvitation(message.getConversationId(), message);
+                        listener.onReceiveSeatInvitation(message);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
