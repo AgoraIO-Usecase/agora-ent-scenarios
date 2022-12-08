@@ -284,7 +284,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
         
         guard let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first else {
-            agoraAssert("leaveRoom channelName = nil")
+//            agoraAssert("leaveRoom channelName = nil")
             return
         }
         _removeUser { err in
