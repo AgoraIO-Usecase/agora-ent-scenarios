@@ -23,6 +23,7 @@
         android:textColor="@color/black"
         android:textColorHint="@color/text_color_66"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,6 +35,7 @@
         android:layout_marginEnd="6dp"
         android:text="@string/show_stop_linking"
         android:textColor="@drawable/show_purple"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toStartOf="@id/iBtnStopLink"
         app:layout_constraintTop_toTopOf="@id/textLinking" />
@@ -45,6 +47,7 @@
         android:layout_marginEnd="8dp"
         android:background="@mipmap/ic_close"
         android:src="@mipmap/ic_close"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textLinking"
         app:layout_constraintEnd_toEndOf="@id/textLinking"
         app:layout_constraintTop_toTopOf="@id/textLinking" />

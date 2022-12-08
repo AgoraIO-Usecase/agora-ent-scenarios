@@ -33,7 +33,6 @@ import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.*
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.show.widget.link.LiveLinkDialog
-import io.agora.scene.show.widget.link.LiveLinkInvitationDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
 import io.agora.scene.show.widget.pk.LivePKDialog
 import io.agora.scene.show.widget.pk.OnPKDialogActionListener
@@ -493,18 +492,20 @@ class LiveDetailActivity : AppCompatActivity() {
         mLinkDialog.setIsRoomOwner(isRoomOwner)
         mLinkDialog.setLinkDialogActionListener(object : OnLinkDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LiveLinkDialog) {
-                if (isRoomOwner) {
-                    mService.getAllMicSeatApplyList({
-                        mLinkDialog.setSeatApplyList(it)
-                    })
-                }
+                mService.getAllMicSeatApplyList({
+                    mLinkDialog.setSeatApplyList(interactionInfo, it)
+                })
             }
 
+            // 主播点击同意连麦申请
             override fun onAcceptMicSeatApplyChosen(
                 dialog: LiveLinkDialog,
                 seatApply: ShowMicSeatApply
             ) {
-                // 同意上麦
+                if (interactionInfo != null) {
+                    ToastUtils.showToast("正在互动， 请互动结束后再接受连麦申请");
+                    return
+                }
                 mService.acceptMicSeatApply(seatApply)
             }
 
@@ -516,12 +517,17 @@ class LiveDetailActivity : AppCompatActivity() {
                 })
             }
 
+            // 主播邀请用户连麦
             override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, user: ShowUser) {
+                if (interactionInfo != null) {
+                    ToastUtils.showToast("正在互动， 请互动结束后再邀请观众连麦");
+                    return
+                }
                 mService.createMicSeatInvitation(user)
             }
 
+            // 主播或连麦者停止连麦
             override fun onStopLinkingChosen(dialog: LiveLinkDialog) {
-                // 停止连麦
                 if (interactionInfo != null) {
                     mService.stopInteraction(interactionInfo!!, {
                         // success
@@ -529,13 +535,17 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
             }
 
+            // 观众发送连麦申请
             override fun onApplyOnSeat(dialog: LiveLinkDialog) {
-                // 同意上麦
+                if (interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
+                    ToastUtils.showToast("正在互动， 请互动结束后再申请连麦");
+                    return
+                }
                 mService.createMicSeatApply {  }
             }
 
+            // 观众撤回连麦申请
             override fun onStopApplyingChosen(dialog: LiveLinkDialog) {
-                // 取消申请
                 mService.cancelMicSeatApply {  }
             }
         })
@@ -545,20 +555,21 @@ class LiveDetailActivity : AppCompatActivity() {
         mLinkDialog.show(ft, "LinkDialog")
     }
 
+    private val invitationDialog by lazy {
+        AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
+            setTitle("主播邀请你加入连麦")
+            setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                mService.acceptMicSeatInvitation()
+                dialog.dismiss()
+            }
+            setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+                mService.rejectMicSeatInvitation()
+                dialog.dismiss()
+            }
+        }.create()
+    }
     private fun ShowInvitationDialog() {
-        LiveLinkInvitationDialog(this).apply {
-            init()
-            setListener(object : LiveLinkInvitationDialog.Listener {
-                override fun onAgreeSeatInvitation() {
-                    mService.acceptMicSeatInvitation()
-                }
-
-                override fun onCancelSeatInvitation() {
-                    mService.rejectMicSeatInvitation()
-                }
-            })
-            show()
-        }
+        invitationDialog.show()
     }
 
     private fun ShowPKDialog() {
@@ -575,55 +586,53 @@ class LiveDetailActivity : AppCompatActivity() {
         })
         val ft = supportFragmentManager.beginTransaction()
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        mPKDialog.show(ft, "PKDialog")
+        mPKDialog.dialog?.show()
     }
 
 
     //================== Service Operation ===============
 
     private fun initService() {
-        mService.subscribeUser { _, _ ->
+        mService.subscribeUser { status, user ->
             mService.getAllUserList({
                 refreshTopUserCount(it.size)
             })
+            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && user != null) {
+                if (user.status == ShowRoomRequestStatus.waitting.value) {
+                    if (isRoomOwner) {
+                        mLinkDialog.setSeatInvitationItemStatus(ShowUser(
+                            user.userId,
+                            user.avatar,
+                            user.userName,
+                            user.status
+                        ))
+                    } else if (user.userId.equals(UserManager.getInstance().user.id.toString())) {
+                        ShowInvitationDialog()
+                    }
+                } else {
+                    mLinkDialog.setSeatInvitationItemStatus(ShowUser(
+                        user.userId,
+                        user.avatar,
+                        user.userName,
+                        user.status
+                    ))
+                }
+            }
         }
         mService.subscribeMessage { _, showMessage ->
             insertMessageItem(showMessage)
         }
         mService.subscribeMicSeatApply { _, _ ->
             mService.getAllMicSeatApplyList({
-                mLinkDialog.setSeatApplyList(it)
+                mLinkDialog.setSeatApplyList(interactionInfo, it)
             })
-        }
-        mService.subscribeMicSeatInvitation { status, invitation ->
-            if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && invitation != null) {
-                if (invitation.status == ShowRoomRequestStatus.waitting) {
-                    if (isRoomOwner) {
-                        mLinkDialog.setSeatInvitationItemStatus(ShowUser(
-                            invitation.userId,
-                            invitation.userAvatar,
-                            invitation.userName,
-                            invitation.status
-                        ))
-                    } else {
-                        ShowInvitationDialog()
-                    }
-                } else {
-                    mLinkDialog.setSeatInvitationItemStatus(ShowUser(
-                        invitation.userId,
-                        invitation.userAvatar,
-                        invitation.userName,
-                        invitation.status
-                    ))
-                }
-            }
         }
         mService.subscribeInteractionChanged { status, info ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
                 interactionInfo = info
                 refreshBottomLayout()
                 mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
-                if (info.interactStatus == ShowInteractionStatus.onSeat) {
+                if (info.interactStatus == ShowInteractionStatus.onSeat.value) {
                     // 开始连麦
                     val boardcasterVideoView = TextureView(this)
                     val audienceVideoView = TextureView(this)
@@ -686,14 +695,13 @@ class LiveDetailActivity : AppCompatActivity() {
                             )
                         }
                     }
-                } else if (info != null && info.interactStatus == ShowInteractionStatus.pking) {
+                } else if (info != null && info.interactStatus == ShowInteractionStatus.pking.value) {
                     // TODO PK RTC + UI
                 }
             } else {
                 // stop 互动
                 interactionInfo = null
-                refreshBottomLayout()
-                mLinkDialog.setOnSeatStatus("", ShowInteractionStatus.idle)
+                mLinkDialog.setOnSeatStatus("", null)
                 val boardcasterVideoView = SurfaceView(this)
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
@@ -727,9 +735,9 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun isMeLinking() = isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()
 
-    private fun isLinking() = (interactionInfo?.interactStatus?.value ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.onSeat.value
+    private fun isLinking() = (interactionInfo?.interactStatus ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.onSeat.value
 
-    private fun isPKing() = (interactionInfo?.interactStatus?.value ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
+    private fun isPKing() = (interactionInfo?.interactStatus ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
         mService.leaveRoom()
@@ -807,21 +815,52 @@ class LiveDetailActivity : AppCompatActivity() {
                     channelMediaOptions
                 )
 
-                // Render host video
-                val videoView = SurfaceView(this)
-                mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
-                if (isRoomOwner) {
-                    mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
-                    mRtcEngine.startPreview()
-                } else {
-                    mRtcEngine.setupRemoteVideo(
-                        VideoCanvas(
-                            videoView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            mRoomInfo.ownerId.toInt()
-                        )
-                    )
-                }
+                mService.getAllInterationList ({
+                    val interactionInfo = it.getOrNull(0)
+                    if (interactionInfo != null) {
+                        if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value && !isRoomOwner) {
+                            val boardcasterVideoView = TextureView(this)
+                            val audienceVideoView = TextureView(this)
+                            mBinding.videoSinglehostLayout.root.isVisible = false
+                            mBinding.videoLinkingLayout.root.isVisible = true
+                            mBinding.videoLinkingAudienceLayout.root.isVisible = true
+                            mBinding.videoLinkingAudienceLayout.root.bringToFront()
+                            mBinding.videoLinkingLayout.videoContainer.addView(boardcasterVideoView)
+                            mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
+                            // 其他观众视角
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    audienceVideoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    interactionInfo.userId.toInt()
+                                )
+                            )
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    boardcasterVideoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    mRoomInfo.ownerId.toInt()
+                                )
+                            )
+                        }
+                    } else {
+                        // Render host video
+                        val videoView = SurfaceView(this)
+                        mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
+                        if (isRoomOwner) {
+                            mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
+                            mRtcEngine.startPreview()
+                        } else {
+                            mRtcEngine.setupRemoteVideo(
+                                VideoCanvas(
+                                    videoView,
+                                    Constants.RENDER_MODE_HIDDEN,
+                                    mRoomInfo.ownerId.toInt()
+                                )
+                            )
+                        }
+                    }
+                })
             })
     }
 

@@ -3,6 +3,7 @@ package io.agora.scene.show.widget.link
 import android.view.View
 import androidx.core.view.isVisible
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageBinding
 import io.agora.scene.show.service.ShowMicSeatApply
@@ -25,14 +26,14 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
         val binding = holder.binding
         binding.titleItemUserStatus.setText(seatApply.userName)
         binding.coverUserIcon.setVisibility(View.VISIBLE)
-        GlideApp.with(binding.coverUserIcon).load(seatApply.userAvatar)
+        GlideApp.with(binding.coverUserIcon).load(seatApply.avatar)
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
             .transform(CenterCropRoundCornerTransform(10))
             .into(binding.coverUserIcon);
         if (isRoomOwner) {
             binding.userNum.isVisible = false
-            if (seatApply.status == ShowRoomRequestStatus.accepted) {
+            if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
                 binding.btnItemAgreeRequest.setEnabled(false)
                 binding.btnItemAgreeRequest.setText(R.string.show_is_onseat)
                 binding.btnItemAgreeRequest.setOnClickListener(null)
@@ -44,6 +45,9 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
                 }
             }
         } else {
+            if (seatApply.userId == UserManager.getInstance().user.id.toString()) {
+                binding.titleItemUserStatus.setTextColor(R.color.show_text)
+            }
             binding.userNum.isVisible = true
             binding.userNum.setText((position+1).toString())
             binding.btnItemAgreeRequest.visibility = View.GONE

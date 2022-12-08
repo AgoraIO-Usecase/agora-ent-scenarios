@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseFragment
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
+import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
 
@@ -31,6 +34,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mBinding.textLinking.setText("可申请连麦")
         mBinding.linkRequestList.adapter = linkRequestViewAdapter
         mBinding.iBtnSeatApply.setOnClickListener {
             // 观众申请连麦
@@ -56,20 +60,27 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnStopLinkText.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
         }
+        mBinding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+            mListener.onRequestRefreshing()
+        }
+        mBinding.smartRefreshLayout.autoRefresh()
     }
 
     /**
      * 设置当前麦上状态
      */
-    fun setOnSeatStatus(status: ShowInteractionStatus) {
-        if (status == ShowInteractionStatus.onSeat) {
-            mBinding.iBtnSeatApply.isVisible = false
-            mBinding.iBtnStopLink.isVisible = true
-            mBinding.iBtnSeatApplyText.isVisible = false
-            mBinding.iBtnCancelApplyText.isVisible = false
-            mBinding.iBtnStopLinkText.isVisible = true
-            mBinding.textLinking.setText("与主播连麦中")
-        } else if (status == ShowInteractionStatus.idle) {
+    fun setOnSeatStatus(userName: String, status: Int?) {
+        if (status == ShowInteractionStatus.onSeat.value) {
+            if (userName.equals(UserManager.getInstance().user.name)) {
+                mBinding.iBtnSeatApply.isVisible = false
+                mBinding.iBtnSeatApplyText.isVisible = false
+                mBinding.iBtnCancelApply.isVisible = false
+                mBinding.iBtnCancelApplyText.isVisible = false
+                mBinding.iBtnStopLinkText.isVisible = true
+                mBinding.iBtnStopLink.isVisible = true
+                mBinding.textLinking.setText("与主播连麦中")
+            }
+        } else if (status == null) {
             mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnSeatApplyText.isVisible = true
@@ -82,18 +93,27 @@ class LiveLinkAudienceFragment : BaseFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setSeatApplyList(list: List<ShowMicSeatApply>) {
-        if (list == null || list.isEmpty()) {
-            mBinding.iBtnSeatApply.visibility = View.VISIBLE
-            mBinding.iBtnStopLink.visibility = View.GONE
-            mBinding.iBtnCancelApply.visibility = View.GONE
+    fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
+        if (list.isEmpty()) {
             mBinding.linkRequestListEmptyImg.visibility = View.VISIBLE
             mBinding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
             mBinding.linkRequestListEmptyImg.visibility = View.GONE
             mBinding.linkRequestListEmpty.visibility = View.GONE
         }
+
+        if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&
+            interactionInfo.userId.equals(UserManager.getInstance().user.id.toString())) {
+            mBinding.iBtnSeatApply.isVisible = false
+            mBinding.iBtnSeatApplyText.isVisible = false
+            mBinding.iBtnCancelApply.isVisible = false
+            mBinding.iBtnCancelApplyText.isVisible = false
+            mBinding.iBtnStopLinkText.isVisible = true
+            mBinding.iBtnStopLink.isVisible = true
+            mBinding.textLinking.setText("与主播连麦中")
+        }
         linkRequestViewAdapter.resetAll(list)
+        mBinding.smartRefreshLayout.finishRefresh()
     }
 
     fun setListener(listener : Listener) {
@@ -101,6 +121,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
     }
 
     interface Listener {
+        fun onRequestRefreshing()
         fun onApplyOnSeat()
         fun onStopLinkingChosen()
         fun onStopApplyingChosen()

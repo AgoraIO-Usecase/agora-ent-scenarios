@@ -83,7 +83,7 @@ data class ShowUser(
     val userId: String,
     val avatar: String,
     val userName: String,
-    val status: ShowRoomRequestStatus = ShowRoomRequestStatus.idle
+    val status: Int = ShowRoomRequestStatus.idle.value
 )
 
 // 聊天消息
@@ -97,18 +97,18 @@ data class ShowMessage(
 // 连麦申请
 data class ShowMicSeatApply(
     val userId: String,
-    val userAvatar: String,
+    val avatar: String,
     val userName: String,
-    val status: ShowRoomRequestStatus,
+    val status: Int,
     val createAt: Double
 )
 
 // 连麦邀请
 data class ShowMicSeatInvitation(
     val userId: String,
-    val userAvatar: String,
+    val avatar: String,
     val userName: String,
-    val status: ShowRoomRequestStatus,
+    val status: Int,
 )
 
 // PK邀请
@@ -119,25 +119,10 @@ data class ShowPKInvitation(
     val fromUserId: String,
     val fromName: String,
     val fromRoomId: String,
-    val status: ShowRoomRequestStatus,
+    val status: Int,
     var userMuteAudio: Boolean = false,
     var fromUserMuteAudio: Boolean = false,
     val createAt: Double
-)
-
-//房间列表信息
-data class ShowRoomListModel(
-    val roomId: String,                                //房间号
-    val roomName: String,                             //房间名
-    val roomUserCount: Int,                       //房间人数
-    val thumbnailId: String,                         //缩略图id
-    val ownerId: String,                             //房主user id (rtc uid)
-    val ownerAvater: String,                           //房主头像
-    val ownerName: String,                            //房主名
-    val roomStatus: ShowRoomStatus,         //直播状态
-    val interactStatus: ShowInteractionStatus,  //互动状态
-    val createdAt: Double,                          //创建时间，与19700101时间比较的毫秒数
-    val updatedAt: Double
 )
 
 //连麦/Pk模型
@@ -145,7 +130,7 @@ data class ShowInteractionInfo(
     val userId: String,
     val userName: String,
     val roomId: String,
-    val interactStatus: ShowInteractionStatus,
+    val interactStatus: Int,
     val muteAudio: Boolean = false,
     val ownerMuteAudio: Boolean = false,
     val createdAt: Double
