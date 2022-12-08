@@ -5,7 +5,7 @@ inhibit_all_warnings!
 
 def all_pods
   
-  use_frameworks!
+  use_modular_headers!
   # 网络层
   pod 'AFNetworking', '~> 4.0.1'
   # 布局
@@ -46,13 +46,13 @@ def all_pods
 #  pod 'Displayer'
   pod 'YYText'
   pod 'LSTPopView'
-  pod 'QMUIKit'
+  pod 'QMUIKit', '4.5.1'
   pod 'InputKit'
   pod 'CYLTabBarController'
 #  pod 'ZQTCustomSwitch'
 
   pod 'SocketRocket'
-  pod 'Fastboard'
+#  pod 'Fastboard'
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
