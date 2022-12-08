@@ -65,8 +65,6 @@
     VLHomeOnLineListView *listView = [[VLHomeOnLineListView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];
     self.listView = listView;
     [self.view addSubview:listView];
-    
-    [self.listView getRoomListIfRefresh:YES];
 }
 
 - (BOOL)checkIsLogin {
