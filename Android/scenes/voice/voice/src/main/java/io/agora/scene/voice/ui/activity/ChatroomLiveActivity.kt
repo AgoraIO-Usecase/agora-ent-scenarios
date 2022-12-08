@@ -200,14 +200,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 binding.messageView.refreshSelectLast()
             }
 
-            override fun onReceiveSeatRequest(roomId: String, applicant: ChatMessageData) {
-                super.onReceiveSeatRequest(roomId, applicant)
+            override fun onReceiveSeatRequest(message: ChatMessageData) {
+                super.onReceiveSeatRequest(message)
                 "onReceiveSeatRequest ${roomKitBean.isOwner}".logE("liveActivity")
                 binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
             }
 
-            override fun onReceiveSeatRequestRejected(roomId: String, chatUid: String) {
-                super.onReceiveSeatRequestRejected(roomId, chatUid)
+            override fun onReceiveSeatRequestRejected(chatUid: String) {
+                super.onReceiveSeatRequestRejected(chatUid)
                 "onReceiveSeatRequestRejected $chatUid".logE("liveActivity")
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
@@ -216,17 +216,17 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 ChatroomIMManager.getInstance().removeSubmitMember(chatUid)
             }
 
-            override fun onReceiveSeatInvitation(roomId: String, message: ChatMessageData) {
-                super.onReceiveSeatInvitation(roomId, message)
+            override fun onReceiveSeatInvitation(message: ChatMessageData) {
+                super.onReceiveSeatInvitation(message)
                 "onReceiveSeatInvitation $message".logE("liveActivity")
                 roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
             }
 
             override fun onReceiveSeatInvitationRejected(
-                roomId: String,
+                conversationId: String,
                 message: ChatMessageData?
             ) {
-                super.onReceiveSeatInvitationRejected(roomId, message)
+                super.onReceiveSeatInvitationRejected(conversationId, message)
                 "onReceiveSeatInvitationRejected $message".logE("liveActivity")
             }
 
