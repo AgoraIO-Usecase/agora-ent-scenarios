@@ -24,29 +24,27 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 收到上麦申请消息
-     * @param roomId 环信IM SDK聊天室id
-     * @param applicant
+     * @param message 消息对象
      */
-    fun onReceiveSeatRequest(roomId: String, applicant: ChatMessageData) {}
+    fun onReceiveSeatRequest( message: ChatMessageData) {}
 
     /**
      * 收到取消上麦申请消息
-     * @param roomId 环信IM SDK聊天室id
      * @param chatUid 环信IM SDK 用户id
      */
-    fun onReceiveSeatRequestRejected(roomId: String, chatUid: String) {}
+    fun onReceiveSeatRequestRejected(chatUid: String) {}
 
     /**
      * 接收邀请消息
-     * @param roomId 环信IM SDK聊天室id
+     * @param message IM消息对象
      */
-    fun onReceiveSeatInvitation(roomId: String, message: ChatMessageData) {}
+    fun onReceiveSeatInvitation(message: ChatMessageData) {}
 
     /**
      * 接收拒绝邀请消息
-     *  @param roomId 环信IM SDK聊天室id
+     *  @param conversationId 环信IM 会话id
      */
-    fun onReceiveSeatInvitationRejected(roomId: String, message: ChatMessageData?) {}
+    fun onReceiveSeatInvitationRejected(conversationId: String, message: ChatMessageData?) {}
 
 //    /**
 //     * 接收拒绝申请消息
