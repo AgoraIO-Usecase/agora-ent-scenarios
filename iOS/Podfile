@@ -46,7 +46,7 @@ def all_pods
 #  pod 'Displayer'
   pod 'YYText'
   pod 'LSTPopView'
-  pod 'QMUIKit'
+  pod 'QMUIKit', '4.5.1'
   pod 'InputKit'
   pod 'CYLTabBarController'
 #  pod 'ZQTCustomSwitch'
@@ -56,8 +56,8 @@ def all_pods
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
-#  pod 'AgoraLyricsScore', '~> 1.0.8.5'
-  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
+  pod 'AgoraLyricsScore', '~> 1.0.8.6'
+#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
   
