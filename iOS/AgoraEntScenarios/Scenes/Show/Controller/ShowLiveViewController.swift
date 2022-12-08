@@ -159,9 +159,9 @@ class ShowLiveViewController: UIViewController {
         ByteBeautyManager.shareManager.destroy()
         agoraKitManager.leaveChannel()
         AppContext.showServiceImp.unsubscribeEvent(delegate: self)
-        dismiss(animated: true) {
-            AppContext.showServiceImp.leaveRoom { error in
-                print("error == \(error.debugDescription)")
+        
+        AppContext.showServiceImp.leaveRoom { error in
+            self.dismiss(animated: true) {
             }
         }
     }
