@@ -10,14 +10,14 @@ import JXCategoryView
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
-    case filter
+//    case filter
     case style
     case sticker
     
     var title: String {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
-        case .filter: return "create_beauty_setting_filter".show_localized
+//        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
         }
