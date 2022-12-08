@@ -72,7 +72,7 @@ data class VoiceMicInfoModel constructor(
     @SerializedName("mic_index") var micIndex: Int = 0,
     var member: VoiceMemberModel? = null,
     @SerializedName("status") var micStatus: Int = -1, // 座位状态
-    var userStatus: Int = -1, // 用户状态，备用
+    @Transient var userStatus: Int = -1, // 用户状态，备用
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
 ) : BaseRoomBean
