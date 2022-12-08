@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageListBinding
+import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowRoomRequestStatus
@@ -38,7 +40,6 @@ class LiveLinkRequestFragment : BaseFragment() {
             // 主播停止连麦
             mListener.onStopLinkingChosen()
         }
-        binding.iBtnStopLink.isEnabled = false
         binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
             mListener.onRequestRefreshing()
         }
@@ -53,21 +54,24 @@ class LiveLinkRequestFragment : BaseFragment() {
     /**
      * 设置当前麦上状态
      */
-    fun setOnSeatStatus(userName: String, status: ShowInteractionStatus) {
+    fun setOnSeatStatus(userName: String, status: Int?) {
         if (mBinding == null) return
-        if (status == ShowInteractionStatus.onSeat) {
-            binding.iBtnStopLink.isEnabled = true
+        if (status == null) {
+            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnStopLink.isVisible = false
+            binding.textLinking.isVisible = false
+        } else if (status == ShowInteractionStatus.onSeat.value) {
+            binding.textLinking.isVisible = true
+            binding.iBtnStopLinkText.isVisible = true
+            binding.iBtnStopLink.isVisible = true
             binding.textLinking.setText("与观众 " + userName + " 连麦中")
-        } else if (status == ShowInteractionStatus.idle) {
-            binding.iBtnStopLink.isEnabled = false
-            binding.textLinking.setText("未连麦")
         }
     }
 
     /**
      * 设置连麦申请列表
      */
-    fun setSeatApplyList(list: List<ShowMicSeatApply>) {
+    fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
         if (mBinding == null) return
         if (list == null || list.isEmpty()) {
             binding.linkRequestListEmptyImg.visibility = View.VISIBLE
@@ -75,6 +79,11 @@ class LiveLinkRequestFragment : BaseFragment() {
         } else {
             binding.linkRequestListEmptyImg.visibility = View.GONE
             binding.linkRequestListEmpty.visibility = View.GONE
+        }
+        if (interactionInfo == null) {
+            updateUI("", null)
+        } else {
+            updateUI(interactionInfo.userName, interactionInfo.interactStatus)
         }
         linkRequestViewAdapter.resetAll(list)
         binding.smartRefreshLayout.finishRefresh()
@@ -84,14 +93,14 @@ class LiveLinkRequestFragment : BaseFragment() {
      * 接受连麦-更新item选中状态
      */
     fun setSeatApplyItemStatus(seatApply: ShowMicSeatApply) {
-        if (seatApply.status == ShowRoomRequestStatus.accepted) {
+        if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
             val itemCount: Int = linkRequestViewAdapter.getItemCount()
             for (i in 0 until itemCount) {
                 linkRequestViewAdapter.getItem(i)?.let {
                     if (it.userId == seatApply.userId) {
                         linkRequestViewAdapter.replace(i, ShowMicSeatApply(
                             it.userId,
-                            it.userAvatar,
+                            it.avatar,
                             it.userName,
                             seatApply.status,
                             it.createAt
@@ -112,5 +121,18 @@ class LiveLinkRequestFragment : BaseFragment() {
         fun onAcceptMicSeatItemChosen(seatApply: ShowMicSeatApply, position: Int)
         fun onRequestRefreshing()
         fun onStopLinkingChosen()
+    }
+
+    private fun updateUI(userName: String, status: Int?) {
+        if (status == ShowInteractionStatus.onSeat.value) {
+            binding.textLinking.isVisible = true
+            binding.iBtnStopLinkText.isVisible = true
+            binding.iBtnStopLink.isVisible = true
+            binding.textLinking.setText("与观众 " + userName + " 连麦中")
+        } else if (status == null) {
+            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnStopLink.isVisible = false
+            binding.textLinking.isVisible = false
+        }
     }
 }

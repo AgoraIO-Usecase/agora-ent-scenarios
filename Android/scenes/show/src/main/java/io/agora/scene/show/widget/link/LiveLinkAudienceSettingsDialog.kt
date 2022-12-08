@@ -55,8 +55,8 @@ class LiveLinkAudienceSettingsDialog(context: Context) : BottomDarkDialog(contex
         ),
         SettingItem(
             ITEM_ID_STOP_LINK,
-            R.mipmap.show_setting_ic_statistic,
-            R.mipmap.show_setting_ic_statistic,
+            R.mipmap.show_stop_link,
+            R.mipmap.show_stop_link,
             R.string.show_stop_linking,
             R.string.show_stop_linking
         )

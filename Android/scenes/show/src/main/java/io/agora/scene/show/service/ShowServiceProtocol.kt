@@ -146,7 +146,7 @@ interface ShowServiceProtocol {
 
     // 创建PK邀请
     fun createPKInvitation(
-        room: ShowRoomListModel,
+        room: ShowRoomDetailModel,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )

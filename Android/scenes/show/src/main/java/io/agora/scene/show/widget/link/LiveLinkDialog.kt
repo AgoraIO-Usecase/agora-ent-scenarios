@@ -15,11 +15,10 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
-import io.agora.scene.show.service.ShowInteractionStatus
-import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowUser
+import io.agora.scene.show.service.*
 
 class LiveLinkDialog : BottomSheetDialogFragment() {
     private var mBinding : ShowLiveLinkDialogBinding? = null
@@ -132,6 +131,10 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
             binding.radioGroup.visibility = View.INVISIBLE
             binding.rBtnRequestText.isVisible = true
             audicenceFragment.setListener(object: LiveLinkAudienceFragment.Listener {
+                override fun onRequestRefreshing() {
+                    linkDialogListener.onRequestMessageRefreshing(this@LiveLinkDialog)
+                }
+
                 override fun onApplyOnSeat() {
                     linkDialogListener.onApplyOnSeat(this@LiveLinkDialog)
                 }
@@ -185,22 +188,23 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     /**
      * 连麦申请列表-设置当前麦上状态
      */
-    fun setOnSeatStatus(userName: String, status: ShowInteractionStatus) {
+    fun setOnSeatStatus(userName: String, status: Int?) {
         if (isRoomOwner) {
             linkFragment.setOnSeatStatus(userName, status)
         } else {
-            audicenceFragment.setOnSeatStatus(status)
+            audicenceFragment.setOnSeatStatus(userName, status)
         }
     }
 
     /**
      * 连麦申请列表-设置连麦申请列表
      */
-    fun setSeatApplyList(list : List<ShowMicSeatApply>) {
+    fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list : List<ShowMicSeatApply>) {
         if (isRoomOwner) {
-            linkFragment.setSeatApplyList(list)
+            linkFragment.setSeatApplyList(interactionInfo, list)
         } else {
-            audicenceFragment.setSeatApplyList(list)
+            val waitList = list.filter { it.status == ShowRoomRequestStatus.waitting.value }
+            audicenceFragment.setSeatApplyList(interactionInfo, waitList)
         }
     }
 

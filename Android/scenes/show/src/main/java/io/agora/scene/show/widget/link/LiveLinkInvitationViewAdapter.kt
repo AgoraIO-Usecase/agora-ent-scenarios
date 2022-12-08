@@ -25,11 +25,11 @@ class LiveLinkInvitationViewAdapter: BindingSingleAdapter<ShowUser, ShowLiveLink
             .error(R.mipmap.show_default_icon)
             .transform(CenterCropRoundCornerTransform(10))
             .into(binding.coverUserIcon);
-        if (userItem.status == ShowRoomRequestStatus.accepted) {
+        if (userItem.status == ShowRoomRequestStatus.accepted.value) {
             binding.btnItemInvite.setEnabled(false)
             binding.btnItemInvite.setText(R.string.show_is_onseat)
             binding.btnItemInvite.setOnClickListener(null)
-        } else if (userItem.status == ShowRoomRequestStatus.idle) {
+        } else if (userItem.status == ShowRoomRequestStatus.idle.value) {
             binding.btnItemInvite.setEnabled(true)
             binding.btnItemInvite.setText(R.string.show_application)
             binding.btnItemInvite.setOnClickListener {
@@ -37,11 +37,11 @@ class LiveLinkInvitationViewAdapter: BindingSingleAdapter<ShowUser, ShowLiveLink
                     onClickListener.onClick(userItem, position)
                 }
             }
-        } else if (userItem.status == ShowRoomRequestStatus.waitting) {
+        } else if (userItem.status == ShowRoomRequestStatus.waitting.value) {
             binding.btnItemInvite.setEnabled(false)
             binding.btnItemInvite.setText(R.string.show_application_waitting)
             binding.btnItemInvite.setOnClickListener(null)
-        } else if (userItem.status == ShowRoomRequestStatus.rejected) {
+        } else if (userItem.status == ShowRoomRequestStatus.rejected.value) {
             binding.btnItemInvite.setEnabled(false)
             binding.btnItemInvite.setText(R.string.show_reject_onseat)
             binding.btnItemInvite.setOnClickListener(null)

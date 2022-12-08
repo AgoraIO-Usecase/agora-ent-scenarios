@@ -29,7 +29,7 @@ class ShowSyncManagerServiceImpl(
     // global cache data
     private val roomMap = mutableMapOf<String, ShowRoomDetailModel>()
     private val objIdOfUserId = mutableMapOf<String, String>() // key: userId, value: objectId
-
+    private val userList = ArrayList<ShowUser>()
     private val micSeatApplyList = ArrayList<ShowMicSeatApply>()
     private val micSeatInvitationList = ArrayList<ShowMicSeatInvitation>()
     private val pKInvitationList = ArrayList<ShowPKInvitation>()
@@ -148,7 +148,7 @@ class ShowSyncManagerServiceImpl(
                         })
                         innerSubscribeSeatApplyChanged()
                         innerSubscribeInteractionChanged()
-                        innerSubscribeSeatInvitationChanged()
+                        //innerSubscribeSeatInvitationChanged()
                     }
 
                     override fun onFail(exception: SyncManagerException?) {
@@ -269,7 +269,7 @@ class ShowSyncManagerServiceImpl(
             UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.headUrl,
             UserManager.getInstance().user.name,
-            ShowRoomRequestStatus.waitting,
+            ShowRoomRequestStatus.waitting.value,
             System.currentTimeMillis().toDouble()
         )
         innerCreateSeatApply(apply, success, error)
@@ -310,9 +310,9 @@ class ShowSyncManagerServiceImpl(
 
         val seatApply = ShowMicSeatApply(
             targetApply.userId,
-            targetApply.userAvatar,
+            targetApply.avatar,
             targetApply.userName,
-            ShowRoomRequestStatus.accepted,
+            ShowRoomRequestStatus.accepted.value,
             targetApply.createAt
         )
 
@@ -324,7 +324,7 @@ class ShowSyncManagerServiceImpl(
             apply.userId,
             apply.userName,
             currRoomNo,
-            ShowInteractionStatus.onSeat,
+            ShowInteractionStatus.onSeat.value,
             false,
             false,
             apply.createAt
@@ -349,9 +349,9 @@ class ShowSyncManagerServiceImpl(
 
         val seatApply = ShowMicSeatApply(
             targetApply.userId,
-            targetApply.userAvatar,
+            targetApply.avatar,
             targetApply.userName,
-            ShowRoomRequestStatus.rejected,
+            ShowRoomRequestStatus.rejected.value,
             targetApply.createAt
         )
         val indexOf = micSeatApplyList.indexOf(targetApply);
@@ -363,7 +363,9 @@ class ShowSyncManagerServiceImpl(
         success: (List<ShowMicSeatInvitation>) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        innerGetSeatInvitationList(success, error)
+//        innerGetUserList(success) {
+//            error?.invoke(it) ?: errorHandler.invoke(it)
+//        }
     }
 
     override fun subscribeMicSeatInvitation(onMicSeatInvitationChange: (ShowServiceProtocol.ShowSubscribeStatus, ShowMicSeatInvitation?) -> Unit) {
@@ -375,13 +377,13 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        val invatation = ShowMicSeatInvitation(
+        val userItem = ShowUser(
             user.userId,
             user.avatar,
             user.userName,
-            ShowRoomRequestStatus.waitting
+            ShowRoomRequestStatus.waitting.value,
         )
-        innerCreateSeatInvitation(invatation, success, error)
+        innerUpdateUserRoomRequestStatus(userItem, {}, {})
     }
 
     override fun cancelMicSeatInvitation(
@@ -410,31 +412,28 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        if (micSeatInvitationList.size <= 0) {
+        if (userList.size <= 0) {
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
-        if (targetInvitation == null) {
+        val user = userList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
+        if (user == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
         }
-
-        val invitation = ShowMicSeatInvitation(
-            targetInvitation.userId,
-            targetInvitation.userAvatar,
-            targetInvitation.userName,
-            ShowRoomRequestStatus.accepted,
+        val userItem = ShowUser(
+            user.userId,
+            user.avatar,
+            user.userName,
+            ShowRoomRequestStatus.accepted.value,
         )
-        val indexOf = micSeatInvitationList.indexOf(targetInvitation);
-        micSeatInvitationList[indexOf] = invitation;
-        innerUpdateSeatInvitation(objIdOfSeatInvitation[indexOf], invitation, success, error)
+        innerUpdateUserRoomRequestStatus(userItem, {}, {})
 
         val interaction = ShowInteractionInfo(
-            invitation.userId,
-            invitation.userName,
+            user.userId,
+            user.userName,
             currRoomNo,
-            ShowInteractionStatus.onSeat,
+            ShowInteractionStatus.onSeat.value,
             false,
             false,
             0.0 //TODO
@@ -446,25 +445,22 @@ class ShowSyncManagerServiceImpl(
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        if (micSeatInvitationList.size <= 0) {
+        if (userList.size <= 0) {
             error?.invoke(RuntimeException("The seat invitation list is empty!"))
             return
         }
-        val targetInvitation = micSeatInvitationList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
-        if (targetInvitation == null) {
+        val user = userList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
+        if (user == null) {
             error?.invoke(RuntimeException("The seat invitation found!"))
             return
         }
-
-        val invitation = ShowMicSeatInvitation(
-            targetInvitation.userId,
-            targetInvitation.userAvatar,
-            targetInvitation.userName,
-            ShowRoomRequestStatus.rejected,
+        val userItem = ShowUser(
+            user.userId,
+            user.avatar,
+            user.userName,
+            ShowRoomRequestStatus.idle.value,
         )
-        val indexOf = micSeatInvitationList.indexOf(targetInvitation);
-        micSeatInvitationList[indexOf] = invitation;
-        innerUpdateSeatInvitation(objIdOfSeatInvitation[indexOf], invitation, success, error)
+        innerUpdateUserRoomRequestStatus(userItem, {}, {})
     }
 
     override fun getAllPKUserList(
@@ -498,7 +494,7 @@ class ShowSyncManagerServiceImpl(
     }
 
     override fun createPKInvitation(
-        room: ShowRoomListModel,
+        room: ShowRoomDetailModel,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
@@ -523,7 +519,7 @@ class ShowSyncManagerServiceImpl(
             targetInvitation.fromUserId,
             targetInvitation.fromName,
             targetInvitation.fromRoomId,
-            ShowRoomRequestStatus.rejected,
+            ShowRoomRequestStatus.rejected.value,
             false,
             false,
             targetInvitation.createAt
@@ -552,7 +548,7 @@ class ShowSyncManagerServiceImpl(
             targetInvitation.fromUserId,
             targetInvitation.fromName,
             targetInvitation.fromRoomId,
-            ShowRoomRequestStatus.rejected,
+            ShowRoomRequestStatus.rejected.value,
             false,
             false,
             targetInvitation.createAt
@@ -589,6 +585,23 @@ class ShowSyncManagerServiceImpl(
             return
         }
         innerRemoveInteration(objIdOfInteractionInfo[0], success, error)
+        val apply = micSeatApplyList.filter { it.userId.equals(interaction.userId) }.getOrNull(0)
+        if (apply != null) {
+            // 停止连麦者 移除连麦申请
+            val index = micSeatApplyList.indexOf(apply)
+            innerRemoveSeatApply(objIdOfSeatApply[index], {}, {})
+        }
+
+        val user = userList.filter { it.userId.equals(interaction.userId) }.getOrNull(0)
+        if (user != null && user.status != ShowRoomRequestStatus.idle.value) {
+            val userItem = ShowUser(
+                user.userId,
+                user.avatar,
+                user.userName,
+                ShowRoomRequestStatus.idle.value,
+            )
+            innerUpdateUserRoomRequestStatus(userItem, {}, {})
+        }
     }
 
     // =================================== 内部实现 ===================================
@@ -620,6 +633,38 @@ class ShowSyncManagerServiceImpl(
                 }
             }
         )
+    }
+
+    private fun innerUpdateRoomInteractStatus(
+        interactStatus: Int,
+        success: () -> Unit,
+        error: (Exception) -> Unit
+    ) {
+        val roomInfo = roomMap[currRoomNo] ?: return
+        val sceneReference = currSceneReference ?: return
+
+        val nRoomInfo = ShowRoomDetailModel(
+            roomInfo.roomId,
+            roomInfo.roomName,
+            roomInfo.roomUserCount,
+            roomInfo.thumbnailId,
+            roomInfo.ownerId,
+            roomInfo.ownerAvater,
+            roomInfo.roomStatus,
+            interactStatus,
+            roomInfo.createdAt,
+            roomInfo.updatedAt
+        )
+        sceneReference.update(nRoomInfo.toMap(), object : Sync.DataItemCallback {
+            override fun onSuccess(result: IObject?) {
+                roomMap[currRoomNo] = nRoomInfo
+                success.invoke()
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                error.invoke(exception!!)
+            }
+        })
     }
 
     private fun innerUpdateRoomUserCount(
@@ -685,6 +730,14 @@ class ShowSyncManagerServiceImpl(
                 override fun onSuccess(result: MutableList<IObject>?) {
                     result ?: return
                     val map = result.map { it.toObject(ShowUser::class.java) }
+                    userList.clear()
+
+                    val ret = ArrayList<ShowUser>()
+                    result.forEach {
+                        val obj = it.toObject(ShowUser::class.java)
+                        ret.add(obj)
+                    }
+                    userList.addAll(ret)
                     runOnMainThread { success.invoke(map) }
                 }
 
@@ -731,6 +784,24 @@ class ShowSyncManagerServiceImpl(
             })
     }
 
+    private fun innerUpdateUserRoomRequestStatus(
+        user: ShowUser,
+        success: () -> Unit,
+        error: (Exception) -> Unit
+    ) {
+        val objectId = objIdOfUserId[user.userId] ?: return
+        currSceneReference?.collection(kCollectionIdUser)
+            ?.update(objectId, user, object : Sync.Callback {
+                override fun onSuccess() {
+                    runOnMainThread { success?.invoke() }
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    runOnMainThread { error?.invoke(exception!!) }
+                }
+            })
+    }
+
     private fun innerSubscribeUserChange() {
         val sceneReference = currSceneReference ?: return
         val listener = object : Sync.EventListener {
@@ -741,17 +812,21 @@ class ShowSyncManagerServiceImpl(
             override fun onUpdated(item: IObject?) {
                 val user = item?.toObject(ShowUser::class.java) ?: return
                 objIdOfUserId[user.userId] = item.id
-                currUserChangeSubscriber?.invoke(
+                runOnMainThread {
+                    currUserChangeSubscriber?.invoke(
                     ShowServiceProtocol.ShowSubscribeStatus.updated,
                     user
-                )
+                )}
+
             }
 
             override fun onDeleted(item: IObject?) {
-                currUserChangeSubscriber?.invoke(
-                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                    null
-                )
+                runOnMainThread {
+                    currUserChangeSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
@@ -856,6 +931,15 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowMicSeatApply::class.java) ?: return
+                val list = micSeatApplyList.filter { it.userId == info.userId }
+                if (list.isEmpty()) {
+                    micSeatApplyList.add(info)
+                    objIdOfSeatApply.add(item.id)
+                } else {
+                    val indexOf = micSeatApplyList.indexOf(list[0])
+                    micSeatApplyList[indexOf] = info
+                    objIdOfSeatApply[indexOf] = item.id
+                }
                 runOnMainThread {
                     micSeatApplySubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.updated,
@@ -865,6 +949,13 @@ class ShowSyncManagerServiceImpl(
             }
 
             override fun onDeleted(item: IObject?) {
+                val info = item?.toObject(ShowMicSeatApply::class.java) ?: return
+                val list = micSeatApplyList.filter { it.userId == info.userId }
+                if (!list.isEmpty()) {
+                    val indexOf = micSeatApplyList.indexOf(list[0])
+                    micSeatApplyList.removeAt(indexOf)
+                    objIdOfSeatApply.removeAt(indexOf)
+                }
                 runOnMainThread {
                     micSeatApplySubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
@@ -1150,7 +1241,7 @@ class ShowSyncManagerServiceImpl(
                 objIdOfInteractionInfo.addAll(retObjId)
 
                 //按照创建时间顺序排序
-                ret.sortBy { it.createdAt }
+                //ret.sortBy { it.createdAt }
                 runOnMainThread { success?.invoke(ret) }
             }
 
@@ -1170,6 +1261,7 @@ class ShowSyncManagerServiceImpl(
             ?.add(info, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject) {
                     Log.d(TAG, "innerCreateInteration success")
+                    innerUpdateRoomInteractStatus(info.interactStatus, {}, {})
                     runOnMainThread { success?.invoke() }
                 }
 
@@ -1206,6 +1298,7 @@ class ShowSyncManagerServiceImpl(
         currSceneReference?.collection(kCollectionIdInteractionInfo)
             ?.delete(objectId, object : Sync.Callback {
                 override fun onSuccess() {
+                    innerUpdateRoomInteractStatus(ShowInteractionStatus.idle.value, {}, {})
                     runOnMainThread { success?.invoke() }
                 }
 
@@ -1248,8 +1341,10 @@ class ShowSyncManagerServiceImpl(
 
             override fun onDeleted(item: IObject?) {
                 Log.d(TAG, "innerSubscribeInteractionChanged onDeleted")
-                cancelMicSeatApply()
 //                val info = item?.toObject(ShowInteractionInfo::class.java) ?: return
+//                val apply = micSeatApplyList.filter { it.userId == info.userId }.getOrNull(0) ?: return
+//                val index = micSeatApplyList.indexOf(apply)
+//                innerRemoveSeatApply(objIdOfSeatApply[index], {}, {})
 //                val list = interactionInfoList.filter { it.userId == info.userId }
 //                if (!list.isEmpty()) {
 //                    val indexOf = interactionInfoList.indexOf(list[0])
