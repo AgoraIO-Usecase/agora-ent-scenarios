@@ -2,12 +2,16 @@ package io.agora.scene.show
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.view.*
+import android.view.LayoutInflater
+import android.view.SurfaceView
+import android.view.TextureView
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -141,6 +145,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 ShowPKDialog()
             }
         }
+        refreshBottomLayout()
     }
 
     private fun initMessageLayout() {
@@ -166,6 +171,86 @@ class LiveDetailActivity : AppCompatActivity() {
             it.stackFromEnd = true
         }
         messageLayout.rvMessage.adapter = mMessageAdapter
+    }
+
+    private fun refreshBottomLayout() {
+        val bottomLayout = mBinding.bottomLayout
+        if (isRoomOwner) {
+            // 房主
+
+            // 房主都能控制视频
+            bottomLayout.ivSetting.isVisible = true
+            bottomLayout.ivMusic.isVisible = true
+            bottomLayout.ivBeauty.isVisible = true
+
+            if(isPKing()){
+                // PK状态
+                // 房主一定是PK的一方
+                bottomLayout.ivLinking.isVisible = false
+                bottomLayout.ivSetting.isVisible = true
+                bottomLayout.ivMusic.isVisible = true
+                bottomLayout.ivBeauty.isVisible = true
+                bottomLayout.ivPK.isVisible = true
+            }
+            else if(isLinking()){
+                // 连麦状态
+                // 房主一定是连麦的一方
+                bottomLayout.ivPK.isVisible = false
+                bottomLayout.ivLinking.isVisible = true
+                bottomLayout.ivLinking.imageTintList = null
+            }
+            else{
+                // 单主播状态
+                // 房主是主播
+                bottomLayout.ivPK.isVisible = true
+                bottomLayout.ivLinking.isVisible = true
+                bottomLayout.ivLinking.imageTintList = null
+            }
+
+        } else {
+            // 观众
+
+            // 观众没有PK权限
+            bottomLayout.ivPK.isVisible = false
+
+            if(isPKing()){
+                // PK状态
+                // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
+                bottomLayout.ivSetting.isVisible = false
+                bottomLayout.ivMusic.isVisible = false
+                bottomLayout.ivBeauty.isVisible = false
+                bottomLayout.ivLinking.isVisible = false
+            }
+            else if (isLinking()){
+                // 连麦状态
+                if (isMeLinking()) {
+                    // 连麦中的一方
+                    bottomLayout.ivSetting.isVisible = true
+                    bottomLayout.ivMusic.isVisible = true
+                    bottomLayout.ivBeauty.isVisible = true
+
+                    bottomLayout.ivLinking.isVisible = true
+                    bottomLayout.ivLinking.imageTintList = null
+                } else {
+                    // 只是观看者，不参与连麦
+                    bottomLayout.ivSetting.isVisible = false
+                    bottomLayout.ivMusic.isVisible = false
+                    bottomLayout.ivBeauty.isVisible = false
+                    bottomLayout.ivLinking.isVisible = false
+                }
+            }
+            else{
+                // 单主播状态
+                // 普通观众，只有发起连麦申请的按钮
+                bottomLayout.ivSetting.isVisible = false
+                bottomLayout.ivMusic.isVisible = false
+                bottomLayout.ivBeauty.isVisible = false
+
+                bottomLayout.ivLinking.isVisible = true
+                bottomLayout.ivLinking.imageTintList =
+                    ColorStateList.valueOf(getColor(R.color.grey_7e))
+            }
+        }
     }
 
     private fun showMessageInputDialog() {
@@ -235,7 +320,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showSettingDialog() {
         mSettingDialog.apply {
-            setHostView(isRoomOwner)
+            setHostView(isRoomOwner || isMeLinking())
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
@@ -536,6 +621,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mService.subscribeInteractionChanged { status, info ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
                 interactionInfo = info
+                refreshBottomLayout()
                 mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
                 if (info.interactStatus == ShowInteractionStatus.onSeat) {
                     // 开始连麦
@@ -606,6 +692,7 @@ class LiveDetailActivity : AppCompatActivity() {
             } else {
                 // stop 互动
                 interactionInfo = null
+                refreshBottomLayout()
                 mLinkDialog.setOnSeatStatus("", ShowInteractionStatus.idle)
                 val boardcasterVideoView = SurfaceView(this)
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
@@ -637,6 +724,12 @@ class LiveDetailActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun isMeLinking() = isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()
+
+    private fun isLinking() = (interactionInfo?.interactStatus?.value ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.onSeat.value
+
+    private fun isPKing() = (interactionInfo?.interactStatus?.value ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
         mService.leaveRoom()
