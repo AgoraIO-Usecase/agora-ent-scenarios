@@ -615,6 +615,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
         guard let info = interactionList?.first else { return }
+        if role == .audience, info.userId != VLUserCenter.user.id {
+            return
+        }
         let menuVC = ShowToolMenuViewController()
         menuVC.type = ShowMenuType.managerMic
         menuVC.selectedMap = [.mute_mic: info.muteAudio]
