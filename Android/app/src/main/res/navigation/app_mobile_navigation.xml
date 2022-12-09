@@ -8,18 +8,18 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.agora.entfulldemo.home.HomeIndexFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home_index" />
+        android:label="@string/app_title_home"
+        tools:layout="@layout/app_fragment_home_index" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.agora.entfulldemo.home.HomeFindFragment"
-        android:label="@string/title_find"
-        tools:layout="@layout/fragment_home_find" />
+        android:label="@string/app_title_find"
+        tools:layout="@layout/app_fragment_home_find" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.agora.entfulldemo.home.HomeMineFragment"
-        android:label="@string/title_mine"
-        tools:layout="@layout/fragment_home_mine" />
+        android:label="@string/app_title_mine"
+        tools:layout="@layout/app_fragment_home_mine" />
 </navigation>
