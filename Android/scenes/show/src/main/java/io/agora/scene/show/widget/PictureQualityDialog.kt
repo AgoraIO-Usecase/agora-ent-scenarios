@@ -41,7 +41,7 @@ class PictureQualityDialog(context: Context) : BottomDarkDialog(context) {
             QualityItem(QUALITY_INDEX_180P, R.string.show_picture_quality_180p, Size(180, 320)),
         )
 
-        private var cacheSelectedIndex = QUALITY_INDEX_360P
+        private var cacheSelectedIndex = QUALITY_INDEX_720P
 
         fun getCacheQualityResolution() = QualityItemList[cacheSelectedIndex].size
     }

@@ -36,7 +36,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:thumbTint="@color/white"
+        tools:visibility="gone"
         app:track="@drawable/show_setting_advanch_switch_track" />
+
+    <TextView
+        android:id="@+id/tvSwitch"
+        app:layout_constraintEnd_toStartOf="@id/switchCompat"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="#CC303553"
+        android:textSize="14sp"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_height="wrap_content"
+        android:text="@string/show_setting_closed"/>
 
     <View
         android:layout_width="match_parent"

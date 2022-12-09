@@ -735,6 +735,7 @@ class ShowSyncManagerServiceImpl(
                     val ret = ArrayList<ShowUser>()
                     result.forEach {
                         val obj = it.toObject(ShowUser::class.java)
+                        objIdOfUserId[obj.userId] = it.id
                         ret.add(obj)
                     }
                     userList.addAll(ret)
@@ -821,10 +822,13 @@ class ShowSyncManagerServiceImpl(
             }
 
             override fun onDeleted(item: IObject?) {
+                val userId = objIdOfUserId.filterValues { it == item?.id }.entries.firstOrNull()?.key ?: return
+                val userInfo = userList.filter { it.userId == userId }.getOrNull(0) ?: return
+                userList.remove(userInfo)
                 runOnMainThread {
                     currUserChangeSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                        null
+                        userInfo
                     )
                 }
             }

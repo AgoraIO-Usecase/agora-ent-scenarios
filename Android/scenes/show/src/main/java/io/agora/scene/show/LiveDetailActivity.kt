@@ -22,12 +22,14 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.video.*
+import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
+import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.service.*
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.*
@@ -89,6 +91,14 @@ class LiveDetailActivity : AppCompatActivity() {
         super.onDestroy()
         destroyService()
         destroyRtcEngine()
+    }
+
+    override fun onBackPressed() {
+        if(isRoomOwner){
+            showEndRoomDialog()
+        }else{
+            super.onBackPressed()
+        }
     }
 
     //================== UI Operation ===============
@@ -336,59 +346,9 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showAdvanceSettingDialog() {
         AdvanceSettingDialog(this).apply {
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
-            setOnSwitchChangeListener { _, itemId, isChecked ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_EAR_BACK -> {
-                        mRtcEngine.enableInEarMonitoring(isChecked)
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_COLOR_ENHANCE -> {
-                        mRtcEngine.setColorEnhanceOptions(isChecked, ColorEnhanceOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_DARK_ENHANCE -> {
-                        mRtcEngine.setLowlightEnhanceOptions(isChecked, LowLightEnhanceOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE -> {
-                        mRtcEngine.setVideoDenoiserOptions(isChecked, VideoDenoiserOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE -> {
-                        mRtcEngine.setParameters("{\"rtc.video.enable_pvc\":${isChecked}}")
-                    }
-                }
-            }
-            setOnSelectorChangeListener { dialog, itemId, selected ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SELECTOR_RESOLUTION -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            val resolution = dialog.getResolution(selected)
-                            dimensions = VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height)
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SELECTOR_FRAMERATE -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            frameRate = dialog.getFrameRate(selected)
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                }
-            }
-            setOnSeekbarChangeListener { _, itemId, value ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            bitrate = value
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_VOCAL_VOLUME -> {
-                        mRtcEngine.adjustRecordingSignalVolume(value)
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_MUSIC_VOLUME -> {
-                        mRtcEngine.adjustAudioMixingVolume(value)
-                    }
-                }
-            }
+            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
+            setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
+            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE, true)
             show()
         }
     }
@@ -414,6 +374,19 @@ class LiveDetailActivity : AppCompatActivity() {
             setBeautyProcessor(mBeautyProcessor)
             show()
         }
+    }
+
+    private fun showEndRoomDialog(){
+        AlertDialog.Builder(this, R.style.show_alert_dialog)
+            .setTitle(R.string.show_live_end_room_or_not)
+            .setPositiveButton(R.string.show_setting_confirm){ dialog, id ->
+                finish()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.show_setting_cancel){dialog, id ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun showMusicEffectDialog(){
@@ -627,6 +600,8 @@ class LiveDetailActivity : AppCompatActivity() {
                         user.status
                     ))
                 }
+            }else if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted && user?.userId == mRoomInfo.ownerId){
+                showLivingEndDialog()
             }
         }
         mService.subscribeMessage { _, showMessage ->
@@ -640,6 +615,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mService.subscribeInteractionChanged { status, info ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
                 interactionInfo = info
+                updateVideoSetting()
                 refreshBottomLayout()
                 mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
                 if (info.interactStatus == ShowInteractionStatus.onSeat.value) {
@@ -711,6 +687,8 @@ class LiveDetailActivity : AppCompatActivity() {
             } else {
                 // stop 互动
                 interactionInfo = null
+                refreshBottomLayout()
+                updateVideoSetting()
                 mLinkDialog.setOnSeatStatus("", null)
                 val boardcasterVideoView = SurfaceView(this)
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
@@ -741,6 +719,8 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
             }
         }
+
+        mService.sendChatMessage(getString(R.string.show_live_chat_coming))
     }
 
     private fun isMeLinking() = isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()
@@ -753,6 +733,19 @@ class LiveDetailActivity : AppCompatActivity() {
         mService.leaveRoom()
     }
 
+    private fun showLivingEndDialog() {
+        AlertDialog.Builder(this, R.style.show_alert_dialog)
+            .setView(ShowLivingEndDialogBinding.inflate(LayoutInflater.from(this)).apply {
+                Glide.with(this@LiveDetailActivity)
+                    .load(mRoomInfo.ownerAvater)
+                    .into(ivAvatar)
+            }.root)
+            .setPositiveButton(R.string.show_living_end_back_room_list){dialog, id ->
+                finish()
+                dialog.dismiss()
+            }
+            .show()
+    }
 
     //================== RTC Operation ===================
 
@@ -797,6 +790,18 @@ class LiveDetailActivity : AppCompatActivity() {
 
         checkRequirePerms {
             joinChannel()
+            if (isRoomOwner) {
+                val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
+                mRtcEngine.setCameraCapturerConfiguration(
+                    CameraCapturerConfiguration(
+                        CameraCapturerConfiguration.CaptureFormat(
+                            cacheQualityResolution.width,
+                            cacheQualityResolution.height,
+                            15
+                        )
+                    )
+                )
+            }
         }
     }
 
@@ -827,6 +832,8 @@ class LiveDetailActivity : AppCompatActivity() {
 
                 mService.getAllInterationList ({
                     val interactionInfo = it.getOrNull(0)
+                    refreshBottomLayout()
+                    updateVideoSetting()
                     if (interactionInfo != null) {
                         if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value && !isRoomOwner) {
                             val boardcasterVideoView = TextureView(this)
@@ -872,6 +879,15 @@ class LiveDetailActivity : AppCompatActivity() {
                     }
                 })
             })
+    }
+
+    private fun updateVideoSetting(){
+        VideoSetting.updateBroadcastSetting(
+            when(interactionInfo?.interactStatus){
+                ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
+                else -> VideoSetting.LiveMode.OneVOne
+            }
+        )
     }
 
     private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {

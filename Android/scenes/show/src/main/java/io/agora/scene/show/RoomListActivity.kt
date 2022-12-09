@@ -9,7 +9,7 @@ import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.AdvanceSettingDialog
+import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -87,28 +87,8 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun showAudioSetting(){
-        AdvanceSettingDialog(this).apply {
-            setShowPreset(false)
-            hideAudioSetting()
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_COLOR_ENHANCE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_DARK_ENHANCE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SELECTOR_RESOLUTION, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SELECTOR_FRAMERATE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE, true)
-            setOnSwitchChangeListener { _, itemId, isChecked ->
-                when(itemId){
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE -> {
-                        RtcEngineInstance.rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${isChecked}, \"mode\": 2}}")
-                    }
-                }
-            }
-            setOnDismissListener {
-                StatusBarUtil.hideStatusBar(this@RoomListActivity.window,true)
-            }
-            show()
-        }
+        AdvanceSettingAudienceDialog(this)
+            .show()
     }
 
     override fun onDestroy() {
