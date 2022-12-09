@@ -7,6 +7,7 @@
 #import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -65,11 +66,12 @@
     [self.contentView addSubview:self.nickNameLabel];
     
     self.muteImgView = [[UIImageView alloc]initWithFrame:CGRectMake(VLREALVALUE_WIDTH(54)/2-12, VLREALVALUE_WIDTH(54)/2-12, 24, 24)];
-    self.muteImgView.image = [UIImage imageNamed:@"ktv_self_seatMute"];
+    self.muteImgView.image = [UIImage sceneImageWithName:@"ktv_self_seatMute"];
     self.muteImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.muteImgView];
     
-    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] title:NSLocalizedString(@"主唱", nil)];
+    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"]
+                                                       title: KTVLocalizedString(@"主唱")];
     self.singingBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
@@ -83,7 +85,8 @@
     self.singingBtn.alpha = 0.6;
     [self.contentView addSubview:self.singingBtn];
 
-    self.joinChorusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] title:NSLocalizedString(@"合唱", nil)];
+    self.joinChorusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"]
+                                                          title:KTVLocalizedString(@"合唱")];
     self.joinChorusBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.joinChorusBtn.layer.cornerRadius = 6;
     self.joinChorusBtn.layer.masksToBounds = YES;
@@ -96,6 +99,8 @@
     self.joinChorusBtn.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.5);
     self.joinChorusBtn.alpha = 0.6;
     [self.contentView addSubview:self.joinChorusBtn];
+    
+    
 }
 
 @end

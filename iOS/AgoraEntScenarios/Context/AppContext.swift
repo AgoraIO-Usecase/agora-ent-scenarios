@@ -12,7 +12,7 @@ import Bugly
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
-    
+    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
     
     override init() {
         super.init()
@@ -54,15 +54,15 @@ import Bugly
         return KeyCenter.Certificate
     }
 
-    @objc func appRtcToken() -> String? {
+    @objc func appHostUrl() -> String {
+        return KeyCenter.HostUrl
+    }
+    
+    @objc func appRTCToken() -> String {
         return VLUserCenter.user.agoraRTCToken
     }
     
-    @objc func appRtmToken() -> String? {
+    @objc func appRTMToken() -> String {
         return VLUserCenter.user.agoraRTMToken
-    }
-
-    @objc func appHostUrl() -> String {
-        return KeyCenter.HostUrl
     }
 }
