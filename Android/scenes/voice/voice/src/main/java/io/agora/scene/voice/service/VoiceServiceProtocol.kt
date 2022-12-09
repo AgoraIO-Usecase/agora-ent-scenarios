@@ -16,6 +16,7 @@ interface VoiceServiceProtocol {
         const val ERR_OK = 0
         const val ERR_FAILED = 1
         const val ERR_LOGIN_ERROR = 2
+        const val ERR_LOGIN_SUCCESS = 3
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->

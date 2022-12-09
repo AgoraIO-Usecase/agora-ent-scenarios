@@ -55,7 +55,7 @@ class EmptyRecyclerView : RecyclerView {
             adapter?.let { adapter ->
                 val emptyViewVisible = adapter.itemCount == 0
                 view.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
-                visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
+//                visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
             }
         }
     }

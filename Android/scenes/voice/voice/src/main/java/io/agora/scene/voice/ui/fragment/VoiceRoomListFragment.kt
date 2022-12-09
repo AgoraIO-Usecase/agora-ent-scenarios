@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.agora.CallBack
+import io.agora.chat.adapter.EMAError
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
@@ -108,19 +109,22 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice room list chat_username:$chatUsername".logD()
                     "Voice room list im_token:$chatToken".logD()
-                    if (!ChatroomIMManager.getInstance().isLoggedIn) {
-                        ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                            override fun onSuccess() {
-                                goChatroomPage()
-                            }
+                    ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
+                        override fun onSuccess() {
+                            goChatroomPage()
+                        }
 
-                            override fun onError(code: Int, desc: String) {
+                        override fun onError(code: Int, desc: String) {
+                            if (code == EMAError.USER_ALREADY_LOGIN) {
+                                goChatroomPage()
+                            } else {
                                 dismissLoading()
+                                activity?.let {
+                                    ToastTools.show(it, it.getString(R.string.voice_room_login_exception))
+                                }
                             }
-                        })
-                    } else {
-                        goChatroomPage()
-                    }
+                        }
+                    })
                 }
 
                 override fun onError(code: Int, message: String?) {
