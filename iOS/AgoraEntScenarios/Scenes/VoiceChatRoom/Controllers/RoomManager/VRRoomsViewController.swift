@@ -125,9 +125,14 @@ extension VRRoomsViewController {
         SVProgressHUD.show(withStatus: "Loading".localized())
         ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
             SVProgressHUD.dismiss()
+            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty {
+                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                return
+            }
             if error == nil, room_entity != nil {
-                VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
+                VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
                     if error == nil {
+                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
                         self.mapUser(user: VLUserCenter.user)
                         let info: VRRoomInfo = VRRoomInfo()
                         info.room = room
@@ -135,11 +140,11 @@ extension VRRoomsViewController {
                         let vc = VoiceRoomViewController(info: info)
                         self.navigationController?.pushViewController(vc, animated: true)
                     } else {
-                        self.view.makeToast("Loading failed,please retry or install again!")
+                        SVProgressHUD.showError(withStatus: "IM login failed!")
                     }
                 })
             } else {
-                self.view.makeToast("Members reach limit!")
+                SVProgressHUD.showError(withStatus: "Members reach limit!")
             }
         }
     }
