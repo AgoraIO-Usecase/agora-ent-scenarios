@@ -28,9 +28,14 @@ object ToastTools {
     private fun show(
         context: Activity, msg: String, toastType: Int = InternalToast.COMMON, duration: Int = Toast.LENGTH_SHORT
     ) {
-        ThreadManager.getInstance().runOnMainThread {
+        if (ThreadManager.getInstance().isMainThread) {
             InternalToast.init(context.application)
             InternalToast.show(msg, toastType, duration)
+        } else {
+            ThreadManager.getInstance().runOnMainThread {
+                InternalToast.init(context.application)
+                InternalToast.show(msg, toastType, duration)
+            }
         }
     }
 }

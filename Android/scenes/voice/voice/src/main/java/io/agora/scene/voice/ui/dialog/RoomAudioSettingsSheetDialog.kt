@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.SeekBar
 import androidx.core.view.isVisible
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
@@ -18,7 +17,6 @@ import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ToastTools
-import io.agora.voice.common.utils.doOnProgressChanged
 import io.agora.voice.common.utils.onStopTrackingTouch
 
 class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
