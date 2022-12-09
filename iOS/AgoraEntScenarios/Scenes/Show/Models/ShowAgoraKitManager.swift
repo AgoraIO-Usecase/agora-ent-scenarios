@@ -193,7 +193,7 @@ class ShowAgoraKitManager: NSObject {
         agoraKit?.setClientRole(role, options: roleOptions)
         agoraKit?.enableVideo()
         
-        let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRtcToken ?? "",
+        let ret = agoraKit?.joinChannel(byToken: AppContext.shared.appRTCToken(),
                                         channelId: channelName,
                                         info: nil,
                                         uid: uid)
