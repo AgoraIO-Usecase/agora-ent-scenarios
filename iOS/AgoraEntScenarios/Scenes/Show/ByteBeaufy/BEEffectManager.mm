@@ -167,7 +167,9 @@ static const bool USE_PIPELINE = YES;
     if ([self be_empty:path]) {
         path = [self.provider filterPath:path];
     }
-    
+    if (path == nil) {
+        return;
+    }
     bef_effect_result_t status = BEF_RESULT_SUC;
     status = bef_effect_ai_set_color_filter_v2(_handle, [path UTF8String]);
 
