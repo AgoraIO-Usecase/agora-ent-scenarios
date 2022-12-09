@@ -169,21 +169,45 @@ private func _hideLoadingIfNeed() {
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
+                
+                let playerRTCUid = arc4random_uniform(1000000) + 10
+                VLUserCenter.user.agoraPlayerRTCUid = playerRTCUid
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: channelName ?? "",
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(playerRTCUid)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
                     guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
                         _hideLoadingIfNeed()
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
                         _hideLoadingIfNeed()
@@ -222,21 +246,45 @@ private func _hideLoadingIfNeed() {
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
+                
+                let playerRTCUid = arc4random_uniform(1000000) + 10
+                VLUserCenter.user.agoraPlayerRTCUid = playerRTCUid
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: channelName ?? "",
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(playerRTCUid)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
                     guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         _hideLoadingIfNeed()
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self._autoOnSeatIfNeed { seatArray in
                         _hideLoadingIfNeed()
                         let output = KTVJoinRoomOutputModel()

@@ -158,7 +158,7 @@ KTVApiDelegate
     
     //start join
     [self joinRTCChannel];
-    self.soloControl = [[KTVApi alloc] initWithRtcEngine:self.RTCkit musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:streamId delegate:self];
+    self.soloControl = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:streamId delegate:self];
     
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -539,7 +539,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus) {
+    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
         // for new chorus song, need to wait till co-singer joins or force solo
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
@@ -1371,7 +1371,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else {
         //chorus
         if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
-            [self startChorusMatching];
+            if([updatedTopSong waittingForChorusMatch]) {
+                [self startChorusMatching];
+            }
         }
         if([updatedTopSong doneChorusMatch]) {
             [self loadAndPlaySong];
