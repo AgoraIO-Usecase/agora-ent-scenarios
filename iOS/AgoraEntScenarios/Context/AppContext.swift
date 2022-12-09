@@ -6,11 +6,29 @@
 //
 
 import Foundation
+import Bugly
 
 @objc class AppContext: NSObject {
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
+    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
+    
+    override init() {
+        super.init()
+        setupBugly()
+    }
+    
+    private func setupBugly() {
+#if DEBUG
+#else
+        let config = BuglyConfig()
+        config.reportLogLevel = BuglyLogLevel.warn
+        config.unexpectedTerminatingDetectionEnable = true
+        config.debugMode = true
+        Bugly.start(withAppId: "e188384728", config: config)
+#endif
+    }
 
     @objc func getLang() -> String {
         guard let lang = NSLocale.preferredLanguages.first else {
@@ -34,10 +52,6 @@ import Foundation
 
     @objc func appCertificate() -> String? {
         return KeyCenter.Certificate
-    }
-
-    @objc func appToken() -> String? {
-        return KeyCenter.Token
     }
 
     @objc func appHostUrl() -> String {

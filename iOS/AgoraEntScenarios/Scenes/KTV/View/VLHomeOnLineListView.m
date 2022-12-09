@@ -9,8 +9,7 @@
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "VLAPIRequest.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;
 @import MJRefresh;
@@ -33,7 +32,6 @@
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLHomeOnLineListViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(exitRoomEvent) name:kExitRoomNotification object:nil];
         self.delegate = delegate;
         [self setupView];
     }
@@ -97,56 +95,11 @@
             self.emptyView.hidden = NO;
         }
     }];
-    
-//    NSDictionary *param = @{
-//        @"size" : @(10),
-//        @"current": @(self.page)
-//    };
-//    [VLAPIRequest postRequestURL:kURLGetRoolList parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            [self.listCollectionView.mj_header endRefreshing];
-//            self.page += 1;
-//            NSArray *array = [VLRoomListModel vj_modelArrayWithJson:response.data[@"records"]];
-//            
-//            if (ifRefresh) {
-//                [self.roomListModeArray removeAllObjects];
-//                self.roomListModeArray = array.mutableCopy;
-//                if (array.count > 0) {
-//                    self.listCollectionView.mj_footer.hidden = NO;
-//                }else{
-//                    self.listCollectionView.mj_footer.hidden = YES;
-//                }
-//            }else{
-//                for (VLRoomListModel *model in array) {
-//                    [self.roomListModeArray addObject:model];
-//                }
-//            }
-//            [self.listCollectionView reloadData];
-//            if (array.count < 10) {
-//                [self.listCollectionView.mj_footer endRefreshing];
-//                self.listCollectionView.mj_footer.hidden = YES;
-//            }else{
-//                [self.listCollectionView.mj_footer endRefreshing];
-//            }
-//            if(self.roomListModeArray.count > 0) {
-//                self.emptyView.hidden = YES;
-//            }
-//            else {
-//                self.emptyView.hidden = NO;
-//            }
-//        }else{
-//            [self.listCollectionView.mj_header endRefreshing];
-//            [self.listCollectionView.mj_footer endRefreshing];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//        [self.listCollectionView.mj_header endRefreshing];
-//        [self.listCollectionView.mj_footer endRefreshing];
-//    }];
 }
 
-- (void)exitRoomEvent {
-    [self getRoomListIfRefresh:YES];
-}
+//- (void)exitRoomEvent {
+//    [self getRoomListIfRefresh:YES];
+//}
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -208,7 +161,8 @@
 - (QMUIButton *)createBtn {
     if (!_createBtn) {
         
-        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"] title:NSLocalizedString(@"创建房间", nil)];
+        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
+                                                      title:KTVLocalizedString(@"创建房间")];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;
