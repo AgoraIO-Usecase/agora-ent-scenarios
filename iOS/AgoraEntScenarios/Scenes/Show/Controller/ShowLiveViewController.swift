@@ -304,11 +304,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
         _updateApplyMenu()
-        guard apply.userId == VLUserCenter.user.id else { return }
-        if apply.status == .waitting && role == .broadcaster {
+        if apply.status == .waitting, role == .broadcaster {
             liveView.bottomBar.linkButton.isShowRedDot = true
-
-        } else if apply.status == .accepted {
+        }
+        guard apply.userId == VLUserCenter.user.id else { return }
+        //TODO: migration to interaction did start
+        if apply.status == .accepted {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
             if apply.userId == VLUserCenter.user.id {
