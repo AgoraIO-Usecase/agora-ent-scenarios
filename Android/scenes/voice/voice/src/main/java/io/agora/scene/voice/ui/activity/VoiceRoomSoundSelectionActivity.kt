@@ -143,30 +143,15 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean?>() {
                 override fun onSuccess(result: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice create room chat_username:$chatUsername".logD()
-                    "Voice create room im_token:$chatToken".logD()
-                    if (!ChatroomIMManager.getInstance().isLoggedIn) {
-                        ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                            override fun onSuccess() {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    goVoiceRoom()
-                                }
-                            }
-
-                            override fun onError(code: Int, desc: String) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    binding.bottomGoLive.isEnabled = true
-                                    dismissLoading()
-                                }
-                            }
-                        })
-                    } else {
-                        ThreadManager.getInstance().runOnMainThread {
-                            goVoiceRoom()
-                        }
+                    ThreadManager.getInstance().runOnMainThread {
+                        goVoiceRoom()
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    dismissLoading()
+                    "SoundSelectionActivity syncJoinRoom fail:$code $message".logD()
                 }
             })
         }
