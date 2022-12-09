@@ -61,7 +61,7 @@ public abstract class NetworkOnlyResource<ResultType> {
                                 try {
                                     saveCallResult(processResponse(response));
                                 } catch (Exception e) {
-                                    LogTools.logE("save call result failed: " + e, TAG);
+                                    LogTools.e(TAG,"save call result failed: " + e);
                                 }
                                 result.postValue(Resource.success(response));
                             });
