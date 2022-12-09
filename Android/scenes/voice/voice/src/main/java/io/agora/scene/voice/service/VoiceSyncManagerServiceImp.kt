@@ -137,23 +137,51 @@ class VoiceSyncManagerServiceImp(
                     return@requestToolboxService
                 }
                 voiceRoomModel.chatroomId = chatroomId
-                // 3、创建房间
-                initScene {
-                    val scene = Scene()
-                    scene.id = voiceRoomModel.roomId
-                    scene.userId = owner.userId
-                    scene.property = GsonTools.beanToMap(voiceRoomModel)
-                    Sync.Instance().createScene(scene, object : Sync.Callback {
+                ChatroomIMManager.getInstance().login(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+                    VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
                         override fun onSuccess() {
-                            roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
+                            // 3、创建房间
+                            initScene {
+                                val scene = Scene()
+                                scene.id = voiceRoomModel.roomId
+                                scene.userId = owner.userId
+                                scene.property = GsonTools.beanToMap(voiceRoomModel)
+                                Sync.Instance().createScene(scene, object : Sync.Callback {
+                                    override fun onSuccess() {
+                                        roomMap[voiceRoomModel.roomId] = voiceRoomModel
+                                        completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
+                                    }
+
+                                    override fun onFail(exception: SyncManagerException?) {
+                                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
+                                    }
+                                })
+                            }
                         }
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
+                        override fun onError(code: Int, desc: String) {
+                            if (code == 200){
+                                initScene {
+                                    val scene = Scene()
+                                    scene.id = voiceRoomModel.roomId
+                                    scene.userId = owner.userId
+                                    scene.property = GsonTools.beanToMap(voiceRoomModel)
+                                    Sync.Instance().createScene(scene, object : Sync.Callback {
+                                        override fun onSuccess() {
+                                            roomMap[voiceRoomModel.roomId] = voiceRoomModel
+                                            completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
+                                        }
+
+                                        override fun onFail(exception: SyncManagerException?) {
+                                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
+                                        }
+                                    })
+                                }
+                            }else{
+                                completion.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR, voiceRoomModel)
+                            }
                         }
                     })
-                }
             })
     }
 
@@ -310,10 +338,10 @@ class VoiceSyncManagerServiceImp(
      */
     override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
        val raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
-        if (raisedList != null && raisedList.size > 0){
+        if (raisedList != null){
             completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
         }else{
-            completion.invoke(VoiceServiceProtocol.ERR_FAILED,raisedList)
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED, mutableListOf())
         }
     }
 
