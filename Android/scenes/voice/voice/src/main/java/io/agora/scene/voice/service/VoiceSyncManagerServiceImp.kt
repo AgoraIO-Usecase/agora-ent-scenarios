@@ -195,7 +195,11 @@ class VoiceSyncManagerServiceImp(
                 override fun onSuccess(sceneReference: SceneReference?) {
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
-                    val curRoomInfo = roomMap[roomId] ?: return
+                    if (roomMap[roomId] == null){
+                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                        " room is not existent ".logE()
+                    }
+                    val curRoomInfo = roomMap[roomId]?: return
                     curRoomInfo.memberCount = curRoomInfo.memberCount + 1
                     curRoomInfo.clickCount = curRoomInfo.clickCount + 1
                     val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
