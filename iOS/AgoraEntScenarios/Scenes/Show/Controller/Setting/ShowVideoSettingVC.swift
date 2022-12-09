@@ -16,6 +16,7 @@ class ShowVideoSettingVC: UIViewController {
     
     private let transDelegate = ShowPresentTransitioningDelegate()
     
+    var isOutside = true // 频道外
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowAgoraKitManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
@@ -62,7 +63,11 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
         var cell: UITableViewCell!
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            cell.setTitle(data.title, isOn: data.boolValue) {[weak self] isOn in
+            var enable = true
+            if data == .H265 || data == .PVC {
+                enable = isOutside
+            }
+            cell.setTitle(data.title,enable:enable, isOn: data.boolValue) {[weak self] isOn in
                 self?.changeValue(isOn, forSettingKey: data)
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
