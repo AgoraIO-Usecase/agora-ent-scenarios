@@ -7,21 +7,22 @@
 #import "KTVServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@class VLRoomListModel;
+@class VLPopChooseSongView;
 @protocol VLPopChooseSongViewDelegate <NSObject>
 
 @optional
-
+- (void)chooseSongView:(VLPopChooseSongView*)view tabbarDidClick:(NSUInteger)tabIndex;
 
 @end
 
 @interface VLPopChooseSongView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus;
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus;
 
 @property (nonatomic, strong) NSArray *selSongsArray;
-
-- (NSArray *)validateSelSongArray;
 
 @end
 

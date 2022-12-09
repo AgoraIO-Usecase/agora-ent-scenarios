@@ -7,6 +7,7 @@
 #import "VLSelectSongView.h"
 #import "VLChoosedSongView.h"
 #import "VLHotSpotBtn.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -29,7 +30,10 @@
 
 @implementation VLPopChooseSongView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLPopChooseSongViewDelegate>)delegate withRoomNo:(NSString *)roomNo ifChorus:(BOOL)ifChorus{
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                   withRoomNo:(NSString *)roomNo
+                     ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -66,12 +70,14 @@
         [self.dianGeBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         self.selsectSongView.hidden = YES;
         self.choosedSongView.hidden = NO;
-        [self.choosedSongView loadChoosedSongWithRoomNo:self.roomNo];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(chooseSongView:tabbarDidClick:)]) {
+        [self.delegate chooseSongView:self tabbarDidClick:sender.tag];
     }
 }
 
 #pragma mark --setter,getter
-
 - (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
     if (selSongsArray.count > 0) {
@@ -83,15 +89,10 @@
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
-- (NSArray *)validateSelSongArray {
-    [self setSelSongsArray:[self.choosedSongView getSelSongArray]];
-    return self.selSongsArray;
-}
-
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
-        [_dianGeBtn setTitle:NSLocalizedString(@"点歌", nil) forState:UIControlStateNormal];
+        [_dianGeBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
         _dianGeBtn.titleLabel.font = UIFontBoldMake(16);
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
@@ -103,7 +104,7 @@
 - (VLHotSpotBtn *)choosedBtn {
     if (!_choosedBtn) {
         _choosedBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(_dianGeBtn.right+28, 20, 34, 22)];
-        [_choosedBtn setTitle:NSLocalizedString(@"已点", nil) forState:UIControlStateNormal];
+        [_choosedBtn setTitle:KTVLocalizedString(@"已点") forState:UIControlStateNormal];
         _choosedBtn.titleLabel.font = UIFontMake(14);
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;
@@ -130,7 +131,7 @@
         _sourceLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width-25-90, _dianGeBtn.centerY-7, 90, 14)];
         _sourceLabel.textColor = UIColorMakeWithHex(@"#979CBB");
         _sourceLabel.font = UIFontMake(10);
-        _sourceLabel.text = NSLocalizedString(@"歌曲来自咪咕音乐", nil);
+        _sourceLabel.text = KTVLocalizedString(@"歌曲来自咪咕音乐");
         _sourceLabel.textAlignment = NSTextAlignmentRight;
         _sourceLabel.hidden = YES;
     }

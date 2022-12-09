@@ -13,10 +13,11 @@ typedef enum : NSUInteger {
 } VLKTVSoundEffectType;
 
 NS_ASSUME_NONNULL_BEGIN
+@class VLsoundEffectView;
 @protocol VLsoundEffectViewDelegate <NSObject>
 
 @optional
-- (void)soundEffectViewBackBtnAction;
+- (void)soundEffectViewBackBtnActionWithView:(VLsoundEffectView*)view;
 - (void)soundEffectItemClickAction:(VLKTVSoundEffectType)effectType;
 
 @end

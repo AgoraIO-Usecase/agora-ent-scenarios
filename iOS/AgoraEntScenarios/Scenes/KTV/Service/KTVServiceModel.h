@@ -68,13 +68,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString* userId;
 @property (nonatomic, copy) NSString* userName;
 @property (nonatomic, copy) NSString* userHeadUrl;
-@property (nonatomic, assign) NSInteger userOnSeat;
+@property (nonatomic, assign) NSInteger seatIndex;
 @end
 
 /// remove song input parameter
 @interface KTVRemoveSongInputModel : NSObject
 @property (nonatomic, copy) NSString* songNo;
-@property (nonatomic, assign) NSString* sort;
 @property (nonatomic, copy, nullable) NSString* objectId;
 @end
 
@@ -84,22 +83,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString* songNo;
 @end
 
-@interface KTVSongDetailInputModel : NSObject
-@property (nonatomic, assign) NSUInteger lyricType;
-@property (nonatomic, copy) NSString* songNo;
-@end
-
-@interface KTVSongDetailOutputModel : NSObject
-@property (nonatomic, copy) NSString* songNo;
-@property (nonatomic, copy) NSString* lyric;
-@property (nonatomic, copy) NSString* songUrl;
-@end
-
 @interface KTVChooseSongInputModel : NSObject
 @property (nonatomic, assign) BOOL isChorus;
 @property (nonatomic, copy) NSString* songName;
 @property (nonatomic, copy) NSString* songNo;
-@property (nonatomic, copy) NSString* songUrl;
+//@property (nonatomic, copy) NSString* songUrl;
 @property (nonatomic, copy) NSString* singer;
 @property (nonatomic, copy) NSString* imageUrl;
 @end
