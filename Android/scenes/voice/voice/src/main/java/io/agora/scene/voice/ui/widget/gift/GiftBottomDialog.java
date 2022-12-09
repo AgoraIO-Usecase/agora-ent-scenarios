@@ -170,6 +170,7 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         itemView.getLocationInWindow(location);
         if (getContext() != null) {
             new CommonPopupWindow.ViewDataBindingBuilder<VoicePopGiftLayoutBinding>()
+                    .viewDataBinding(VoicePopGiftLayoutBinding.inflate(LayoutInflater.from(getContext())))
                     .width(DeviceTools.dp2px(getContext(), 120))
                     .height(DeviceTools.dp2px(getContext(), 186))
                     .outsideTouchable(true)
