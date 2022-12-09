@@ -94,19 +94,19 @@ class ShowLiveViewController: UIViewController {
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
             //update audio status
-            guard let interaction = currentInteraction else { return }
-            
-            liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
-            liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
-            
-            let options = AgoraRtcChannelMediaOptions()
-            if role == .broadcaster {
-                options.publishMicrophoneTrack = !interaction.ownerMuteAudio
-                agoraKitManager.agoraKit.updateChannel(with: options)
+            if let interaction = currentInteraction {
+                liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
+                liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
                 
-            } else if interaction.userId == VLUserCenter.user.id {
-                options.publishMicrophoneTrack = !interaction.muteAudio
-                agoraKitManager.agoraKit.updateChannel(with: options)
+                let options = AgoraRtcChannelMediaOptions()
+                if role == .broadcaster {
+                    options.publishMicrophoneTrack = !interaction.ownerMuteAudio
+                    agoraKitManager.agoraKit.updateChannel(with: options)
+                    
+                } else if interaction.userId == VLUserCenter.user.id {
+                    options.publishMicrophoneTrack = !interaction.muteAudio
+                    agoraKitManager.agoraKit.updateChannel(with: options)
+                }
             }
             
             if currentInteraction == oldValue {
