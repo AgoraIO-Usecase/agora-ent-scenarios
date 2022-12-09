@@ -34,12 +34,6 @@
 @implementation KTVJoinChorusInputModel
 @end
 
-@implementation KTVSongDetailInputModel
-@end
-
-@implementation KTVSongDetailOutputModel
-@end
-
 @implementation KTVChooseSongInputModel
 @end
 

@@ -5,7 +5,7 @@
 
 #import "VLHomeViewController.h"
 #import "VLHomeView.h"
-#import "VLOnLineListVC.h"
+//#import "VLOnLineListVC.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
 
@@ -51,24 +51,14 @@
 
 - (void)itemClickAction:(int)tagValue {
     switch (tagValue) {
-        case 0:
-        {
-            VRRoomsViewController *roomVc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
-            roomVc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:roomVc animated:YES];
-        }
-            break;
-        case 1:
-        {
-            VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
-            [self.navigationController pushViewController:listVC animated:YES];
-        }
-            break;
-        case 2:
-        {
+        case 0: {
+//            VLOnLineListVC *listVC = [[VLOnLineListVC alloc]init];
+//            [self.navigationController pushViewController:listVC animated:YES];
+        } break;
+        case 1: {
             ShowRoomListVC *listVC = [ShowRoomListVC new];
             [self.navigationController pushViewController:listVC animated:YES];
-        }
+        } break;
         default:
             break;
     }

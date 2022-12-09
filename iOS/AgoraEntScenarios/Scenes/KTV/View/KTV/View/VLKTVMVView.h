@@ -26,45 +26,22 @@ typedef enum : NSUInteger {
     VLKTVMVViewSingActionTypeJoinChorus,    // 加入合唱
 } VLKTVMVViewSingActionType;
 
-@protocol VLKTVMVViewDelegate <NSObject>
+@class VLKTVMVView;
+@protocol VLKTVMVViewDelegate <NSObject, AgoraLrcDownloadDelegate, AgoraLrcViewDelegate>
 
-- (BOOL)ktvIsMyselfOnSeat;
+//- (BOOL)ktvIsMyselfOnSeat;
+//
+//- (void)ktvNotifyUserNotOnSeat;
 
-- (void)ktvNotifyUserNotOnSeat;
+- (void)onKTVMVView:(VLKTVMVView*)view startSingType:(VLKTVMVViewSingActionType)singType;
 
-- (void)ktvMVViewDidClickSingType:(VLKTVMVViewSingActionType)singType;
+- (void)onKTVMVView:(VLKTVMVView*)view btnTappedWithActionType:(VLKTVMVViewActionType)type;
 
-- (void)ktvMVViewDidClick:(VLKTVMVViewActionType)type;
-
-- (void)ktvMVViewTimerCountDown:(NSInteger)countDownSecond;
-
-/// 获取当前歌曲播放进度（秒）。
-/// 你需要自定实现如下逻辑：通过 AgoraRtcMediaPlayerProtocol 类的 getPosition 获取当前播放进度
-/// 并将返回值传入歌词组件。
-- (NSTimeInterval)ktvMVViewMusicCurrentTime;
-
-/// 获取歌曲总时长（秒）
-/// 你需要自定实现如下逻辑：通过 AgoraRtcMediaPlayerProtocol 的 getDuration 获取歌曲总时长，
-/// 并将返回值传入歌词组件
-- (NSTimeInterval)ktvMVViewMusicTotalTime;
-
-@optional
-
-/// 定位到指定的播放位置
-/// @param time 指定位置
-- (void)ktvMVViewMusicSeekToTime:(NSTimeInterval)time;
-/// 获取当前播放的歌词和进度
-/// @param lrc 路径
-/// @param progress 进度
-- (void)ktvMVViewMusicLrc:(NSString *)lrc progress:(CGFloat)progress;
-/// 获取每个歌词文字的标准 pitch
-/// @param pitch 歌词
-/// @param totoalCount 个数
-- (void)ktvMVViewMusicAgoraWordPitch:(NSInteger)pitch totoalCount:(NSInteger)totoalCount;
+- (void)onKTVMVView:(VLKTVMVView*)view timerCountDown:(NSInteger)countDownSecond;
 
 /// 打分实时回调
 /// @param score 分数
-- (void)ktvMVViewMusicScore:(int)score;
+- (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
 @end
 
@@ -100,12 +77,10 @@ typedef enum : NSUInteger {
 /// @param song 歌曲信息
 - (void)updateUIWithUserOnSeat:(BOOL)onSeat song:(VLRoomSelSongModel *)song;
 
-- (void)cleanMusicText;
+//- (void)cleanMusicText;
 - (int)getSongScore;
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
-
-- (void)validateSingType;
 
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 

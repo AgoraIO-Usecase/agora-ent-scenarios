@@ -27,6 +27,8 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     lazy var toLive: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: 30, y: 15, width: ScreenWidth - 60, height: 50)).title(LanguageManager.localValue(key: "Go Live"), .normal).font(.systemFont(ofSize: 16, weight: .semibold)).setGradient([UIColor(red: 0.13, green: 0.608, blue: 1, alpha: 1), UIColor(red: 0.204, green: 0.366, blue: 1, alpha: 1)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)]).cornerRadius(25).addTargetFor(self, action: #selector(VRSoundEffectsViewController.entryRoom), for: .touchUpInside)
     }()
+    
+    fileprivate var serviceImp: ChatRoomServiceImp = ChatRoomServiceImp()
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -69,13 +71,23 @@ public class VRSoundEffectsViewController: VRBaseViewController {
 
     @objc private func entryRoom() {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
+        let entity: VRRoomEntity = VRRoomEntity()
+        entity.sound_effect = effects.type
+        entity.is_private = !code.isEmpty
+        entity.name = name
+        entity.roomPassword = code
+        serviceImp.createRoom(room: entity) { error, entity in
             SVProgressHUD.dismiss()
-            if error == nil {
-                self.goLive()
+            if error == nil, entity != nil {
+                self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                let info: VRRoomInfo = VRRoomInfo()
+                info.room = entity
+                info.mic_info = nil
+                let vc = VoiceRoomViewController(info: info)
+                self.navigationController?.pushViewController(vc, animated: true)
             } else {
-                self.view.makeToast("Login failed!", point: self.view.center, title: nil, image: nil, completion: nil)
+                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
             }
-        })
+       }
     }
 }

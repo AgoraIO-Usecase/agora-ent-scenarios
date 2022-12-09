@@ -19,14 +19,13 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import java.util.Random;
 
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
-import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.ActivityRoomCreateBinding;
+import io.agora.scene.ktv.live.RoomLivingActivity;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
 /**
@@ -51,7 +50,6 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
         roomCreateViewModel = new ViewModelProvider(this).get(RoomCreateViewModel.class);
-        roomCreateViewModel.setLifecycleOwner(this);
         setRandomRoomTitleAndCover();
     }
 
@@ -99,18 +97,19 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         getBinding().superLayout.setOnClickListener(view -> {
             hideInput();
         });
-        roomCreateViewModel.setISingleCallback((type, o) -> {
-            if (type == KtvConstant.CALLBACK_TYPE_ROOM_CREATE_FAIL) {
-                hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_CREATE_SUCCESS) {
-                PagePilotManager.pageRoomLiving();
+        roomCreateViewModel.joinRoomResult.observe(this, out -> {
+            if(out != null){
+                RoomLivingActivity.launch(RoomCreateActivity.this, out);
                 finish();
                 hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_JOIN_SUCCESS) {
-                finish();
+            }else{
                 hideLoadingView();
-            } else if (type == KtvConstant.CALLBACK_TYPE_ROOM_JOIN_FAIL) {
-                finish();
+            }
+        });
+        roomCreateViewModel.createRoomResult.observe(this, out -> {
+            if(out != null){
+                roomCreateViewModel.joinRoom(out.getRoomNo(), out.getPassword());
+            }else{
                 hideLoadingView();
             }
         });
@@ -196,7 +195,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
         } else {
             isPrivate = 1;
         }
-        roomCreateViewModel.requestCreateRoom(isPrivate, roomName, password, userNo, bgOption);
+        roomCreateViewModel.createRoom(isPrivate, roomName, password, userNo, bgOption);
     }
 
     /**
