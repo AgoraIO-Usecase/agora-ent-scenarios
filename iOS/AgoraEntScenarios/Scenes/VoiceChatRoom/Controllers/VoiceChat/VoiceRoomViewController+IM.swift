@@ -176,9 +176,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 let status = first.status
                 let mic_index = first.mic_index
                 //刷新底部✋🏻状态
-                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
+                if !isOwner {
                     refreshHandsUp(status: status)
                 }
+//                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
+//                    refreshHandsUp(status: status)
+//                }
                 //将userList中的上麦用户做标记，便于后续过滤
                 let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                     $0.chat_uid ?? "" == first.member?.chat_uid ?? ""

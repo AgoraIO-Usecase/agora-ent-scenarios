@@ -496,7 +496,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             mic.status = 0
         }
         mic.member = user
-        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(user?.mic_index ?? 1)":mic.kj.JSONString()], completion: { error in
+        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic.mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.userList?.first(where: {
                     $0.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.uid ?? ""
@@ -738,9 +738,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         isOwner = owner_uid == VLUserCenter.user.userNo
                     }
                     if isOwner {
-                        SyncUtil.scene(id: roomId)?.deleteScenes()
                         self.roomList?.remove(at: index)
                         VoiceRoomIMManager.shared?.userDestroyedChatroom()
+                        SyncUtil.scene(id: roomId)?.deleteScenes()
                     } else {
                         let updateRoom: VRRoomEntity = room
                         updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
