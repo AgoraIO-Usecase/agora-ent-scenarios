@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "KTVServiceModel.h"
 #import "VLRoomListModel.h"
+#import "VLLoginModel.h"
 @import AgoraRtmKit;
 
 typedef enum : NSUInteger {
@@ -157,6 +158,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅用户变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeUserListCountChangedWithBlock:(void(^)(NSUInteger))changedBlock;
+
+/// 用户属性变化
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeUserChangedWithBlock:(void(^)(NSUInteger, VLLoginModel*))changedBlock;
 
 /// 订阅麦位变化
 /// @param changedBlock <#changedBlock description#>
