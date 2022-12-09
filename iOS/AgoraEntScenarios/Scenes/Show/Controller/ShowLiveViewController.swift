@@ -80,6 +80,7 @@ class ShowLiveViewController: UIViewController {
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
             self.pkInviteView.interactionList = interactionList ?? []
+            self.currentInteraction = interactionList?.first
         }
     }
     
@@ -88,7 +89,8 @@ class ShowLiveViewController: UIViewController {
     
     //get current interaction status
     private var interactionStatus: ShowInteractionStatus {
-        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
+        return currentInteraction?.interactStatus ?? .idle
+//        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
     private var currentInteraction: ShowInteractionInfo? {
@@ -451,6 +453,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         //recv invitation
 //        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
+        //TODO:
         _refreshPKUserList()
         _refreshInteractionList()
     }
@@ -461,17 +464,20 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         interactionList?.remove(at: index)
         interactionList?.insert(interaction, at: index)
+        //TODO:
         currentInteraction = interactionList?.first
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
         self.currentInteraction = interaction
+        //TODO:
         _refreshPKUserList()
         _refreshInteractionList()
     }
     
     func onInterationEnded(interaction: ShowInteractionInfo) {
         self.currentInteraction = nil
+        //TODO:
         _refreshPKUserList()
         _refreshInteractionList()
     }
@@ -627,7 +633,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickRemoteCanvas() {
-        guard let info = interactionList?.first else { return }
+        guard let info = currentInteraction else { return }
         if role == .audience, info.userId != VLUserCenter.user.id {
             return
         }
@@ -684,7 +690,7 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
-            settingMenuVC.type = .pking
+            settingMenuVC.type = role == .broadcaster ? .pking : (currentInteraction?.userId == VLUserCenter.user.id ? .pking : .idle_audience)
             settingMenuVC.menuTitle = "show_setting_menu_on_pk_title".show_localized
         }
         present(settingMenuVC, animated: true)
@@ -734,14 +740,14 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 结束连麦
     func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        guard let info = interactionList?.first else { return }
+        guard let info = currentInteraction else { return }
         AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
         }
     }
     
     // 麦克风开关
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        guard let info = interactionList?.first else { return }
+        guard let info = currentInteraction else { return }
         let options = AgoraRtcChannelMediaOptions()
         if info.userId == VLUserCenter.user.id {
             options.publishMicrophoneTrack = selected
