@@ -91,7 +91,7 @@ class NetworkManager:NSObject {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
-                      "expire": 1200,
+                      "expire": 1500,
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": type.rawValue,
