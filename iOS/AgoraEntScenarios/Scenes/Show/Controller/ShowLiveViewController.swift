@@ -462,10 +462,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         guard let index = interactionList?.firstIndex(where: { $0.objectId == interaction.objectId}) else {
             return
         }
-        interactionList?.remove(at: index)
-        interactionList?.insert(interaction, at: index)
-        //TODO:
-        currentInteraction = interactionList?.first
+        var list = interactionList
+        list?.remove(at: index)
+        list?.insert(interaction, at: index)
+        interactionList = list
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
@@ -691,6 +691,12 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
+        if let info = currentInteraction, info.userId == VLUserCenter.user.id {
+            settingMenuVC.selectedMap = [.mute_mic: info.muteAudio]
+        } else {
+            settingMenuVC.selectedMap.removeAll()
+        }
+        
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
