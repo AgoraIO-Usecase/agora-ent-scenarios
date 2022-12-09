@@ -16,6 +16,7 @@ enum ShowAgoraVideoDimensions: String, CaseIterable {
     case _960x540 = "960x540"
     case _960x720 = "960x720"
     case _1280x720 = "1280x720"
+    case _1920x1080 = "1920x1080"
      
     var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
