@@ -50,6 +50,18 @@ private func _hideLoadingIfNeed() {
     MBProgressHUD.hide(for: window, animated: true)
 }
 
+private func agoraAssert(_ message: String) {
+    agoraAssert(false, message)
+}
+
+private func agoraAssert(_ condition: Bool, _ message: String) {
+    #if DEBUG
+    assert(condition, message)
+    #else
+    
+    #endif
+}
+
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
     private var roomList: [VLRoomListModel]?
     private var userList: [VLLoginModel] = .init()
