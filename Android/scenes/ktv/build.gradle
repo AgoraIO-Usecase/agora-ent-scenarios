@@ -27,4 +27,6 @@ dependencies {
     implementation rootProject.ext.deps.lifecycle
     implementation rootProject.ext.deps.fragment_ktx
 
+    implementation rootProject.ext.deps.syncManager
+
 }

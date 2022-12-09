@@ -1,11 +1,12 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-# platform :ios, '10.0'
+platform :ios, '12.0'
 inhibit_all_warnings!
 
 def all_pods
   
-  use_modular_headers!
+#  use_modular_headers!
+  use_frameworks!
   # 网络层
   pod 'AFNetworking', '~> 4.0.1'
   # 布局
@@ -56,10 +57,11 @@ def all_pods
 
   pod 'SocketRocket'
 #  pod 'Fastboard'
-  pod 'Agora-Scene-Utils', '~> 1.0.8'
+  pod 'Agora-Scene-Utils', '~> 1.1.0'
   
   #歌词组件
-  pod 'AgoraLyricsScore', '~> 1.0.8'
+  pod 'AgoraLyricsScore', '~> 1.0.8.6'
+#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
   

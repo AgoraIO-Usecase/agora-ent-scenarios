@@ -95,7 +95,7 @@ class AgoraChatRoomBaseUserCollectionViewCell: UICollectionViewCell {
         }
 
         rtcUserView.iconView.isHidden = mic.member == nil
-        rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
+        rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
         rtcUserView.nameBtn.setImage(UIImage(mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }

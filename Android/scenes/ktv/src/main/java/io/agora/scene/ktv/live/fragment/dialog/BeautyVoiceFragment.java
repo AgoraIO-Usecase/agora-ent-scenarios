@@ -10,8 +10,8 @@ import androidx.annotation.Nullable;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvFragmentBeautyVoiceBinding;
-import io.agora.scene.ktv.dialog.MusicSettingBean;
 import io.agora.scene.ktv.live.RoomLivingActivity;
+import io.agora.scene.ktv.widget.MusicSettingBean;
 
 public class BeautyVoiceFragment extends BaseViewBindingFragment<KtvFragmentBeautyVoiceBinding> {
     public static final String TAG = "BeautyVoiceFragment";
