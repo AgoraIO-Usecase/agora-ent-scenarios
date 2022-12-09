@@ -215,9 +215,14 @@ KTVApiDelegate
 #pragma mark service handler
 - (void)subscribeServiceEvent {
     VL(weakSelf);
+    [[AppContext ktvServiceImp] unsubscribeAll];
     [[AppContext ktvServiceImp] subscribeUserListCountChangedWithBlock:^(NSUInteger count) {
         //TODO
         [weakSelf setRoomUsersCount:count];
+    }];
+    
+    [[AppContext ktvServiceImp] subscribeUserChangedWithBlock:^(KTVSubscribe status, VLLoginModel * userModel) {
+        NSLog(@"subscribeUserChangedWithBlock: %ld, %@", status, userModel.name);
     }];
     
     [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {

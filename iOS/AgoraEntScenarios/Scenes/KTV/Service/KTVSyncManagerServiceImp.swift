@@ -57,6 +57,7 @@ private func _hideLoadingIfNeed() {
     private var songList: [VLRoomSelSongModel] = .init()
 
     private var userListCountDidChanged: ((UInt) -> Void)?
+    private var userDidChanged: ((UInt, VLLoginModel) -> Void)?
     private var seatListDidChanged: ((UInt, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
@@ -491,10 +492,14 @@ private func _hideLoadingIfNeed() {
 
     //MARK: subscribe
     func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
-        _unsubscribeAll()
+//        _unsubscribeAll()
         userListCountDidChanged = changedBlock
         _subscribeOnlineUsers {
         }
+    }
+    
+    func subscribeUserChanged(_ changedBlock: @escaping (UInt, VLLoginModel) -> Void) {
+        userDidChanged = changedBlock
     }
 
     func subscribeSeatListChanged(_ changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
@@ -668,13 +673,18 @@ extension KTVSyncManagerServiceImp {
                            agoraPrint("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(),
-                                 let model = VLLoginModel.yy_model(withJSON: jsonStr),
-                                 !self.userList.contains(where: { $0.userNo == model.userNo })
+                                 let model = VLLoginModel.yy_model(withJSON: jsonStr)
                            else {
                                return
                            }
+                           if self.userList.contains(where: { $0.userNo == model.userNo }) {
+                               self.userDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                               return
+                           }
+                           
                            self.userList.append(model)
                            agoraPrint("imp user subscribe onUpdated2... \(self.userList.count)")
+                           self.userDidChanged?(KTVSubscribeCreated.rawValue, model)
                            self._updateUserCount { error in
                            }
                        }, onDeleted: {[weak self] object in
@@ -682,6 +692,8 @@ extension KTVSyncManagerServiceImp {
                            guard let self = self, let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else {
                                return
                            }
+                           let model = self.userList[index]
+                           self.userDidChanged?(KTVSubscribeDeleted.rawValue, model)
                            self.userList.remove(at: index)
                            self._updateUserCount { error in
                            }
