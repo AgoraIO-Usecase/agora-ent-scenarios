@@ -11,15 +11,16 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
-import io.agora.rtc2.video.*
+import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.utils.PermissionHelp
-import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.PictureQualityDialog
+import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class LivePrepareActivity : ComponentActivity() {
@@ -72,78 +73,16 @@ class LivePrepareActivity : ComponentActivity() {
             showPictureQualityDialog()
         }
         mBinding.tvSetting.setOnClickListener {
-            showAdvanceSettingDialog()
+            showPresetDialog()
         }
 
         checkRequirePerms {
             initRtcEngine()
-            showAdvanceSettingDialog().apply {
-                setDismissWhenPresetDone(true)
-            }
+            showPresetDialog()
         }
     }
 
-    private fun showAdvanceSettingDialog() =
-        AdvanceSettingDialog(this).apply {
-            setOnSwitchChangeListener { _, itemId, isChecked ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_EAR_BACK -> {
-                        mRtcEngine.enableInEarMonitoring(isChecked)
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE -> {
-                        mRtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":${isChecked}}")
-                        mRtcEngine.setParameters("{\"engine.video.codec_type\":\"${if(isChecked) 3 else 2}\"}")
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_COLOR_ENHANCE -> {
-                        mRtcEngine.setColorEnhanceOptions(isChecked, ColorEnhanceOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_DARK_ENHANCE -> {
-                        mRtcEngine.setLowlightEnhanceOptions(isChecked, LowLightEnhanceOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_VIDEO_NOISE_REDUCE -> {
-                        mRtcEngine.setVideoDenoiserOptions(isChecked, VideoDenoiserOptions())
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE -> {
-                        mRtcEngine.setParameters("{\"rtc.video.enable_pvc\":${isChecked}}")
-                    }
-                }
-            }
-            setOnSelectorChangeListener { dialog, itemId, selected ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SELECTOR_RESOLUTION -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            val resolution = dialog.getResolution(selected)
-                            dimensions = VideoEncoderConfiguration.VideoDimensions(resolution.width, resolution.height)
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SELECTOR_FRAMERATE -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            frameRate = dialog.getFrameRate(selected)
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                }
-            }
-            setOnSeekbarChangeListener { _, itemId, value ->
-                when (itemId) {
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE -> {
-                        RtcEngineInstance.videoEncoderConfiguration.apply {
-                            bitrate = value
-                            mRtcEngine.setVideoEncoderConfiguration(this)
-                        }
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_VOCAL_VOLUME -> {
-                        mRtcEngine.adjustRecordingSignalVolume(value)
-                    }
-                    AdvanceSettingDialog.ITEM_ID_SEEKBAR_MUSIC_VOLUME -> {
-                        mRtcEngine.adjustAudioMixingVolume(value)
-                    }
-                }
-            }
-            show()
-        }
-
+    private fun showPresetDialog() = PresetDialog(this).show()
 
     private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
         mPermissionHelp.checkCameraPerm(
@@ -190,6 +129,16 @@ class LivePrepareActivity : ComponentActivity() {
             VideoCanvas(SurfaceView(this).apply {
                 mBinding.flVideoContainer.addView(this)
             })
+        )
+        val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
+        mRtcEngine.setCameraCapturerConfiguration(
+            CameraCapturerConfiguration(
+                CameraCapturerConfiguration.CaptureFormat(
+                    cacheQualityResolution.width,
+                    cacheQualityResolution.height,
+                    15
+                )
+            )
         )
         mRtcEngine.startPreview()
     }

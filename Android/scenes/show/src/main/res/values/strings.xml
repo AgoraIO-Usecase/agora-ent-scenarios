@@ -134,7 +134,7 @@
     <string name="show_setting_advance_quality_enhance">画质增强</string>
     <string name="show_setting_advance_ok">OK</string>
     <string name="show_setting_confirm">确认</string>
-    <string name="show_setting_preset_title">推荐场景配置</string>
+    <string name="show_setting_preset_title">画质推荐配置</string>
     <string name="show_setting_advance_quality_enhance_tip">打开开关后，将使用一系列画质提升策略，包含但不限于h265的编码技术，主要保证在同等码率下，提升画质体验</string>
     <string name="show_setting_advance_color_enhance">色彩增强</string>
     <string name="show_setting_advance_color_enhance_tip">打开该开关后，将自动调整视频画面的色彩饱和度，使得画面色彩更加鲜明逼真，提升视觉主观感受</string>
@@ -167,4 +167,10 @@
     <string name="show_setting_cancel">取消</string>
     <string name="show_setting_preset_done">已更新到\"秀场模式\"最佳配置</string>
     <string name="show_setting_audience">观众设置</string>
+    <string name="show_living_end_title">直播结束</string>
+    <string name="show_living_end_back_room_list">返回房间列表</string>
+    <string name="show_live_chat_coming">来了</string>
+    <string name="show_live_end_room_or_not">是否结束直播?</string>
+    <string name="show_setting_opened">已打开</string>
+    <string name="show_setting_closed">已关闭</string>
 </resources>

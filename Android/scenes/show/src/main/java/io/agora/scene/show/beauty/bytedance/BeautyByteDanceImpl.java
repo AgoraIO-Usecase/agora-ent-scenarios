@@ -38,6 +38,7 @@ import com.bytedance.labcv.effectsdk.BytedEffectConstants;
 
 import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
+import io.agora.base.internal.video.EglBase;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -67,6 +68,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     private TextureBufferHelper textureBufferHelper;
 
     private boolean isFrontCamera = true;
+    private EglBase.Context mEglBaseContext;
 
     public BeautyByteDanceImpl(Context context) {
         mContext = context;
@@ -119,11 +121,20 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
         VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
         if (textureBufferHelper == null) {
-            textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", textureBuffer.getEglBaseContext());
+            mEglBaseContext = textureBuffer.getEglBaseContext();
+            textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
             textureBufferHelper.invoke(() -> {
                 cvSdkInit();
                 return null;
             });
+        }else if(mEglBaseContext != textureBuffer.getEglBaseContext()){
+            textureBufferHelper.invoke(() -> {
+                cvSdkUnInit();
+                return null;
+            });
+            textureBufferHelper.dispose();
+            textureBufferHelper = null;
+            return true;
         }
         int texture = textureBufferHelper.invoke(() -> process(textureBuffer.getTextureId(), textureBuffer.getWidth(), textureBuffer.getHeight()));
 
@@ -200,6 +211,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     @Override
     public void release() {
         super.release();
+        mEglBaseContext = null;
         isReleased = true;
         sdkIsInit = false;
         resourceReady = false;

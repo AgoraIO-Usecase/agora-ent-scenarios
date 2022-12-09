@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    tools:background="@drawable/show_alert_dialog_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingHorizontal="80dp"
+    android:paddingTop="30dp"
+    android:theme="@style/Theme.Material3.Dark">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_living_end_title"
+        android:textColor="#040A25"
+        android:textSize="18sp" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivAvatar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:src="@mipmap/show_default_avatar"
+        app:shapeAppearance="@style/show_roundStyle_50" />
+
+</LinearLayout>

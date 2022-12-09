@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     tools:theme="@style/Theme.AppCompat"
     android:orientation="vertical">
@@ -30,35 +29,28 @@
 
     </FrameLayout>
 
-    <FrameLayout
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@color/show_deliver"/>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:tabIndicatorColor="#7A59FB"
-            app:tabMode="scrollable"
-            app:tabMinWidth="120dp"
-            app:tabIndicatorFullWidth="false"
-            app:tabSelectedTextColor="@color/black"
-            app:tabTextColor="#6D7291"
-            app:tabIndicatorHeight="2dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="bottom"
-            android:background="@color/show_deliver"/>
-    </FrameLayout>
-
-
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager2"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/qualityEnhance"
+                layout="@layout/show_setting_advance_item_switch"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 </LinearLayout>
