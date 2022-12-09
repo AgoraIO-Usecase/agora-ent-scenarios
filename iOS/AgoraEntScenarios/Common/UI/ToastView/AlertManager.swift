@@ -196,15 +196,19 @@ class AlertManager: NSObject {
 extension UIViewController {
     static var keyWindow: UIWindow? {
         // Get connected scenes
-        return UIApplication.shared.connectedScenes
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.connectedScenes
             // Keep only active scenes, onscreen and visible to the user
-            .filter { $0.activationState == .foregroundActive }
+                .filter { $0.activationState == .foregroundActive }
             // Keep only the first `UIWindowScene`
-            .first(where: { $0 is UIWindowScene })
+                .first(where: { $0 is UIWindowScene })
             // Get its associated windows
-            .flatMap({ $0 as? UIWindowScene })?.windows
+                .flatMap({ $0 as? UIWindowScene })?.windows
             // Finally, keep only the key window
-            .first(where: \.isKeyWindow)
+                .first(where: \.isKeyWindow)
+        } else {
+            return UIApplication.shared.keyWindow
+        }
     }
 
     static func cl_topViewController(_ viewController: UIViewController? = nil) -> UIViewController? {

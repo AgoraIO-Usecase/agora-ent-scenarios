@@ -26,7 +26,7 @@ struct Screen {
 
     /// 安全区域高度
     static func safeHeight() -> CGFloat {
-        guard let safeInserts = UIApplication.keyWindow?.safeAreaInsets else {
+        guard let safeInserts = UIApplication.kWindow?.safeAreaInsets else {
             return 0
         }
         return height - safeInserts.top - safeInserts.bottom
@@ -41,7 +41,7 @@ struct Screen {
     static func statusHeight() -> CGFloat {
         var height: CGFloat = 0.0
         if #available(iOS 13.0, *) {
-            let statusBarManager = UIApplication.keyWindow?.windowScene?.statusBarManager
+            let statusBarManager = UIApplication.kWindow?.windowScene?.statusBarManager
             height = statusBarManager?.statusBarFrame.height ?? 44
 
         } else {
@@ -59,7 +59,7 @@ struct Screen {
 
     /// 安全区域底部高度
     static func safeAreaBottomHeight() -> CGFloat {
-        guard let safeInserts = UIApplication.keyWindow?.safeAreaInsets else {
+        guard let safeInserts = UIApplication.kWindow?.safeAreaInsets else {
             return 0
         }
         return safeInserts.bottom

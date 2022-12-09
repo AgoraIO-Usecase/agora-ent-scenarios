@@ -149,7 +149,11 @@ class VMMuteView: UIView {
         addSubview(muteBtn)
 
         sepView.frame = CGRect(x: ScreenWidth / 2.0, y: 180, width: 1, height: 20)
-        sepView.backgroundColor = .separator
+        if #available(iOS 13.0, *) {
+            sepView.backgroundColor = .separator
+        } else {
+            sepView.backgroundColor = UIColor(hexString: "#F8F5FA")
+        }
         addSubview(sepView)
     }
 

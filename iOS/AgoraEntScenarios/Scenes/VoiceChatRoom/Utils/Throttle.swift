@@ -13,10 +13,14 @@ public enum Throttler {
     typealias WorkIdentifier = String
 
     typealias Work = () -> Void
+    @available(iOS 13.0, *)
     typealias Subject = PassthroughSubject<Work, Never>?
+    @available(iOS 13.0, *)
     typealias Bag = Set<AnyCancellable>
 
+    @available(iOS 13.0, *)
     private static var subjects: [WorkIdentifier: Subject] = [:]
+    @available(iOS 13.0, *)
     private static var bags: [WorkIdentifier: Bag] = [:]
 
     /// - Note: Pay special attention to the identifier parameter. the default identifier is \("Thread.callStackSymbols") to make api trailing closure for one liner for the sake of brevity. However, it is highly recommend that a developer should provide explicit identifier for their work to debounce. Also, please note that the default queue is global queue, it may cause thread explosion issue if not explicitly specified , so use at your own risk.
@@ -29,6 +33,7 @@ public enum Throttler {
     ///   - shouldRunLatest: A Boolean value that indicates whether to publish the most recent element. If `false`, the publisher emits the first element received during the interval.
     ///   - work: a work to run
     /// - Returns: Void
+    @available(iOS 13.0, *)
     public static func throttle(identifier: String = "\(Thread.callStackSymbols)",
                                 queue: DispatchQueue? = nil,
                                 delay: DispatchQueue.SchedulerTimeType.Stride = .seconds(1),
