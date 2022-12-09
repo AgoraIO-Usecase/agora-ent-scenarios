@@ -551,23 +551,25 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
 //        LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
+        print("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
 //        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
-        print("errorCode == \(errorCode.rawValue)")
+        print("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
 //        LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
-        print("-----didJoinChannel")
+        print("rtcEngine didJoinChannel")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        print("join Uid === \(uid)")
+        print("rtcEngine didJoinedOfUid === \(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
+        print("rtcEngine didOfflineOfUid === \(uid)")
 //        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
 //        didOfflineOfUid(uid: uid)
 //        if roomOwnerId == uid {
@@ -585,20 +587,20 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        liveView.canvasView.setRemoteUserInfo(name: "")
 //        liveView.canvasView.canvasType = .none
 //        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
-        if let interaction = self.currentInteraction {
-            let isRoomOwner: Bool = role == .broadcaster ? true : false
-            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
-            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
-            if roomOwnerExit {
-                //room owner exit
-                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
-                }
-            } else if isRoomOwner, isInteractionLeave {
-                //room owner found interaction(pk/onseat) user offline
-                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
-                }
-            }
-        }
+//        if let interaction = self.currentInteraction {
+//            let isRoomOwner: Bool = role == .broadcaster ? true : false
+//            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
+//            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
+//            if roomOwnerExit {
+//                //room owner exit
+//                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+//                }
+//            } else if isRoomOwner, isInteractionLeave {
+//                //room owner found interaction(pk/onseat) user offline
+//                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+//                }
+//            }
+//        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
