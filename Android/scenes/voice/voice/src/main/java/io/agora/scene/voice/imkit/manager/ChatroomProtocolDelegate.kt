@@ -238,9 +238,18 @@ class ChatroomProtocolDelegate constructor(
         val fromBean = getMicInfo(fromMicIndex)
         val toMicBean = getMicInfo(toMicIndex)
         if (toMicBean != null && fromBean != null && (toMicBean.micStatus == MicStatus.Idle || toMicBean.micStatus == MicStatus.Mute || toMicBean.micStatus == MicStatus.ForceMute)) {
+            val fromMicStatus = fromBean.micStatus
+            val toMicStatus = toMicBean.micStatus
             fromBean.member?.micIndex  = toMicIndex
             fromBean.micIndex = toMicIndex
+            fromBean.micStatus = toMicStatus
+
             toMicBean.micIndex = fromMicIndex
+            toMicBean.micStatus = if (fromMicStatus == MicStatus.ForceMute) {
+                MicStatus.ForceMute
+            } else {
+                MicStatus.Idle
+            }
             val fromBeanValue = GsonTools.beanToString(fromBean)
             val toBeanValue = GsonTools.beanToString(toMicBean)
             if (toBeanValue != null) {
