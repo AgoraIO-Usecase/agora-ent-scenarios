@@ -13,15 +13,15 @@
     return self;
 }
 
-- (void)resetLeaveSeat {
-    self.isMaster = false;
-    self.headUrl = @"";
-    self.name = @"";
-    self.userNo = @"";
-    self.id = nil;
-    self.isSelfMuted = 0;
-    self.isVideoMuted = 0;
-    self.ifJoinedChorus = NO;
+- (void)resetWithInfo:(VLRoomSeatModel*)seatInfo {
+    self.isMaster = seatInfo ? seatInfo.isMaster : false;
+    self.headUrl = seatInfo ? seatInfo.headUrl : @"";
+    self.name = seatInfo ? seatInfo.name : @"";
+    self.userNo = seatInfo ? seatInfo.userNo : @"";
+    self.rtcUid = seatInfo ? seatInfo.rtcUid : nil;
+    self.isAudioMuted = seatInfo ? seatInfo.isAudioMuted : 0;
+    self.isVideoMuted = seatInfo ? seatInfo.isVideoMuted : 0;
+    self.isJoinedChorus = seatInfo ? seatInfo.isJoinedChorus : NO;
 }
 
 @end

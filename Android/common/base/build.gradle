@@ -47,7 +47,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation rootProject.ext.deps.appcompat
-    implementation rootProject.ext.deps.multidex
+    api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.material
@@ -55,7 +55,7 @@ dependencies {
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
     api rootProject.ext.deps.rxjava2
-    implementation rootProject.ext.deps.rxandroid2
+    api rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.okhttp
     implementation rootProject.ext.deps.retrofit2
     implementation rootProject.ext.deps.retrofit2_adapter

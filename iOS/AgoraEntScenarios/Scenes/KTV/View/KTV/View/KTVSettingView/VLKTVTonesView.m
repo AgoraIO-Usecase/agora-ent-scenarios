@@ -4,6 +4,7 @@
 //
 
 #import "VLKTVTonesView.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
 @import QMUIKit;
 
@@ -107,7 +108,7 @@
 - (UIButton *)addButton {
     if (!_addButton) {
         _addButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_addButton setImage:[UIImage imageNamed:@"icon_ktv_add"] forState:UIControlStateNormal];
+        [_addButton setImage:[UIImage sceneImageWithName:@"icon_ktv_add"] forState:UIControlStateNormal];
         [_addButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _addButton;
@@ -116,7 +117,7 @@
 - (UIButton *)reduceButton {
     if (!_reduceButton) {
         _reduceButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_reduceButton setImage:[UIImage imageNamed:@"icon_ktv_reduce"] forState:UIControlStateNormal];
+        [_reduceButton setImage:[UIImage sceneImageWithName:@"icon_ktv_reduce"] forState:UIControlStateNormal];
         [_reduceButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _reduceButton;

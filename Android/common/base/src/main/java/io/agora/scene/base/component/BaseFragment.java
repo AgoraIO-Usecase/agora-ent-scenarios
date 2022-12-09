@@ -21,6 +21,12 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        isInit = false;
+    }
+
     public void initView() {
     }
 
@@ -29,4 +35,5 @@ public abstract class BaseFragment extends Fragment {
 
     public void requestData() {
     }
+
 }
