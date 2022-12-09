@@ -31,6 +31,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
@@ -111,7 +112,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         binding.bottomLayout.setOnClickListener {
             if (roomType == 0) {
                 if (FastClickTools.isFastClick(it)) return@setOnClickListener
-                createNormalRoom(soundEffect)
+                checkPrivate(soundEffect)
             }
             //      else {
 //         createSpatialRoom();
@@ -131,7 +132,11 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
 
                 override fun onError(code: Int, message: String?) {
                     dismissLoading()
-                    ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_create_error))
+                    if(code == VoiceServiceProtocol.ERR_LOGIN_ERROR){
+                        ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_login_exception))
+                    }else{
+                        ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_create_error))
+                    }
                 }
             })
         }
@@ -167,7 +172,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         }
     }
 
-    private fun createNormalRoom(sound_effect: Int) {
+    private fun checkPrivate(sound_effect: Int){
         showLoading(false)
         if (isPublic) {
             voiceRoomViewModel.createRoom(roomName, sound_effect, "")
@@ -175,6 +180,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             if (!TextUtils.isEmpty(encryption) && encryption.length == 4) {
                 voiceRoomViewModel.createRoom(roomName, sound_effect, encryption)
             } else {
+                dismissLoading()
                 ToastTools.show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
             }
         }

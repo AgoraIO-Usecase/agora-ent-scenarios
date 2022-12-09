@@ -137,22 +137,26 @@ class VoiceSyncManagerServiceImp(
                     return@requestToolboxService
                 }
                 voiceRoomModel.chatroomId = chatroomId
-                // 3、创建房间
-                initScene {
-                    val scene = Scene()
-                    scene.id = voiceRoomModel.roomId
-                    scene.userId = owner.userId
-                    scene.property = GsonTools.beanToMap(voiceRoomModel)
-                    Sync.Instance().createScene(scene, object : Sync.Callback {
-                        override fun onSuccess() {
-                            roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
-                        }
+                if(ChatroomIMManager.getInstance().isLoggedIn){
+                    // 3、创建房间
+                    initScene {
+                        val scene = Scene()
+                        scene.id = voiceRoomModel.roomId
+                        scene.userId = owner.userId
+                        scene.property = GsonTools.beanToMap(voiceRoomModel)
+                        Sync.Instance().createScene(scene, object : Sync.Callback {
+                            override fun onSuccess() {
+                                roomMap[voiceRoomModel.roomId] = voiceRoomModel
+                                completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
+                            }
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
-                        }
-                    })
+                            override fun onFail(exception: SyncManagerException?) {
+                                completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
+                            }
+                        })
+                    }
+                }else{
+                    completion.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR, voiceRoomModel)
                 }
             })
     }

@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
@@ -43,6 +44,7 @@ import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
@@ -213,7 +215,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
                 }
-                ChatroomIMManager.getInstance().removeSubmitMember(chatUid)
             }
 
             override fun onReceiveSeatInvitation(message: ChatMessageData) {
@@ -287,6 +288,21 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     ChatroomIMManager.getInstance().updateMicInfoCache(it)
                     roomObservableDelegate.onSeatUpdated(it)
                 }
+                attributeMap
+                    .filter { it.key.startsWith("mic_") }
+                    .forEach { (key, value) ->
+                        val micInfo =
+                            GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
+                        micInfo?.let {
+                            if (ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
+                                ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
+                                ThreadManager.getInstance().runOnMainThread {
+                                    //刷新 owner 申请列表
+                                    roomObservableDelegate.handsUpdate(0)
+                                }
+                            }
+                        }
+                    }
             }
 
             override fun onRoomDestroyed(roomId: String) {
