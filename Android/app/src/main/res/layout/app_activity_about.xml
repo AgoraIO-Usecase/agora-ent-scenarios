@@ -8,7 +8,7 @@
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/title_view"
         style="@style/title_view"
-        app:ctv_centerText="@string/about"
+        app:ctv_centerText="@string/app_about"
         tools:ignore="MissingConstraints" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="122dp"
         android:layout_marginTop="91dp"
-        android:src="@mipmap/welcome_app_logo"
+        android:src="@mipmap/app_welcome_app_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_view" />
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="3dp"
-        android:text="@string/privacy_agreement"
+        android:text="@string/app_privacy_agreement"
         android:textColor="@color/bg_color_blue_31"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@id/tvAnd"
@@ -48,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="103dp"
-        android:text="@string/and"
+        android:text="@string/app_and"
         android:textColor="@color/def_text_color_040"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -60,7 +60,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
-        android:text="@string/privacy_agreement"
+        android:text="@string/app_privacy_agreement"
         android:textColor="@color/bg_color_blue_31"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/tvAnd"
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="3dp"
         android:layout_marginBottom="6dp"
-        android:text="@string/used_agree"
+        android:text="@string/app_used_agree"
         android:textColor="@color/black_50_percent"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@id/tvAnd"
