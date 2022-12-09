@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogCloseRoomBinding;
 
 public class CloseRoomDialog extends BaseDialog<DialogCloseRoomBinding> {
@@ -32,8 +32,8 @@ public class CloseRoomDialog extends BaseDialog<DialogCloseRoomBinding> {
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(300),
-                KTVUtil.dp2px(120)
+                UiUtil.dp2px(300),
+                UiUtil.dp2px(120)
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
