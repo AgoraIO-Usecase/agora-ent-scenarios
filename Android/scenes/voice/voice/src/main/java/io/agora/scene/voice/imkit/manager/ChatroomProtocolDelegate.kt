@@ -391,7 +391,7 @@ class ChatroomProtocolDelegate constructor(
         val attributeMap = mutableMapOf<String, String>()
         val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
         attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
-        sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_APPLY_SITE, attributeMap, callback)
+        sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_CANCEL_APPLY_SITE, attributeMap, callback)
     }
 
     /**

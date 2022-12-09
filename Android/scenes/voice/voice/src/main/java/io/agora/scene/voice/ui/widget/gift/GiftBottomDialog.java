@@ -176,7 +176,6 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
                     .focusable(true)
                     .clippingEnabled(false)
                     .alpha(0.618f)
-                    .layoutId(getContext(), R.layout.voice_pop_gift_layout)
                     .intercept((popupWindow, view) -> {
                         isShowPop(true);
                         String[] data = {"999", "599", "199", "99", "9", "1"};
