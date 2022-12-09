@@ -18,28 +18,31 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *singer;
 @property (nonatomic, copy) NSString *songName;
 @property (nonatomic, copy) NSString *songNo;
-@property (nonatomic, copy) NSString *songUrl;
+//@property (nonatomic, copy) NSString *songUrl;
 ///歌词
-@property (nonatomic, copy) NSString *lyric;;
-///排序
-@property (nonatomic, copy) NSString *sort;
+//@property (nonatomic, copy) NSString *lyric;
+///创建时间
+@property (nonatomic, assign) int64_t createAt;
+//置顶时间
+@property (nonatomic, assign) int64_t pinAt;
+
 ///0 未开始 1.已唱 2.正在唱
-@property (nonatomic, assign) NSInteger  status;
+@property (nonatomic, assign) NSInteger status;
 ///是谁点的歌
 @property (nonatomic, copy) NSString *userNo;
-@property (nonatomic, copy) NSString *userId;
+
 ///点歌人昵称
 @property (nonatomic, copy) NSString *name;
 
-/// 得分
-@property (nonatomic, assign) double score;
-
-#pragma mark - 自定义字段
-/// 是否是自己点的歌曲
-@property (nonatomic, assign, readonly) bool isOwnSong;
-
-
 @property (nonatomic, copy, nullable) NSString* objectId;
+
+
+/// 是否是自己点的歌曲
+- (BOOL)isSongOwner;
+
+- (BOOL)readyToPlay;
+
+- (BOOL)waittingForChorus;
 @end
 
 NS_ASSUME_NONNULL_END

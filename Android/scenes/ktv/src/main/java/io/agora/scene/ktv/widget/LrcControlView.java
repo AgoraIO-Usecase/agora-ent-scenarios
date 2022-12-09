@@ -17,11 +17,11 @@ import androidx.palette.graphics.Palette;
 
 import io.agora.lrcview.LrcView;
 import io.agora.lrcview.PitchView;
-import io.agora.scene.base.bean.MemberMusicModel;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
+import io.agora.scene.ktv.manager.RoomManager;
+import io.agora.scene.ktv.service.VLRoomSelSongModel;
 
 /**
  * 歌词控制View
@@ -176,9 +176,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
-        if (RoomManager.getInstance().mMusicModel != null && RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-            this.mRole = Role.Singer;
-        }
+//        if (RoomManager.getInstance().mMusicModel != null
+//                && RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
+//            this.mRole = Role.Singer;
+//        }
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
@@ -200,9 +201,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 mBinding.ilActive.switchOriginal.setVisibility(View.GONE);
                 mBinding.ilActive.ivMusicMenu.setVisibility(View.GONE);
             }
-        } else if (RoomManager.getInstance().mMusicModel == null || !RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
         }
+//        else if (RoomManager.getInstance().mMusicModel == null || !RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
+//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+//        }
         stopTimer();
     }
 
@@ -221,7 +223,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     public void setScoreControlView() {
         if (RoomManager.getInstance().mMusicModel != null && RoomManager.getInstance().mMusicModel.isChorus) {
             if (RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)
-                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.user1Id)) {
+                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userId)) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
             } else {
                 mBinding.scoreControlView.setVisibility(GONE);
@@ -267,12 +269,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         }
     }
 
-    public void setMusic(@NonNull MemberMusicModel mMusic) {
+    public void setMusic(@NonNull VLRoomSelSongModel mMusic) {
         mBinding.ilActive.lrcView.reset();
         mBinding.ilActive.pitchView.setLrcData(null);
 
-        mBinding.tvMusicName.setText(mMusic.songName + "-" + mMusic.singer);
-        mBinding.ilChorus.tvMusicName2.setText(mMusic.songName + "-" + mMusic.singer);
+        mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
+        mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
     }
 
     public void setCountDown(int time) {

@@ -6,7 +6,8 @@ public class MusicModelNew {
     public String songName;
     public String songUrl;
     public String singer;
+    public String lyric;
     public String type;
-    public int status;
+    public int status;//0 未开始 1.已唱 2.正在唱
     public String imageUrl;
 }
