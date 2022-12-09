@@ -393,7 +393,7 @@ DEPENDENCIES:
   - MBProgressHUD (~> 1.1.0)
   - MJExtension
   - MJRefresh (~> 3.2.0)
-  - QMUIKit
+  - QMUIKit (= 4.5.1)
   - SDWebImage (~> 5.0.3)
   - SnapKit
   - SocketRocket
@@ -489,6 +489,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: 59e03efddaabb49abad267c4a97504362347d4a0
+PODFILE CHECKSUM: 4ff269a84193d67ea0a640dcb2817298b3dc7c96
 
 COCOAPODS: 1.11.3
