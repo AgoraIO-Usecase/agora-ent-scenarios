@@ -21,12 +21,10 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
-import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.net.OnResourceParseCallback
@@ -34,8 +32,7 @@ import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.DeviceTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools.show
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.utils.FastClickTools.isFastClick
@@ -159,9 +156,9 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                     binding.bottomNext.isEnabled = true
                     dismissLoading()
                     if(code == VoiceServiceProtocol.ERR_LOGIN_ERROR){
-                        show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
+                        ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
                     }else{
-                        show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
+                        ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
                     }
                 }
             })
@@ -262,14 +259,14 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
 
     private fun checkPrivate() {
         if (TextUtils.isEmpty(roomName)) {
-            show(this, getString(R.string.voice_room_create_empty_name), Toast.LENGTH_LONG)
+            ToastTools.show(this, getString(R.string.voice_room_create_empty_name), Toast.LENGTH_LONG)
             binding.bottomNext.isEnabled = true
             dismissLoading()
             return
         }
         if (!isPublic && encryption.length != 4) {
             binding.inputTip.visibility = View.VISIBLE
-            show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
+            ToastTools.show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
             binding.bottomNext.isEnabled = true
             dismissLoading()
             return

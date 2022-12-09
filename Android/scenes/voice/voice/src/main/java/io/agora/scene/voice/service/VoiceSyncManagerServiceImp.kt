@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
+import io.agora.chat.adapter.EMAError
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
@@ -137,51 +138,46 @@ class VoiceSyncManagerServiceImp(
                     return@requestToolboxService
                 }
                 voiceRoomModel.chatroomId = chatroomId
-                ChatroomIMManager.getInstance().login(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                    VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
-                        override fun onSuccess() {
-                            // 3、创建房间
-                            initScene {
-                                val scene = Scene()
-                                scene.id = voiceRoomModel.roomId
-                                scene.userId = owner.userId
-                                scene.property = GsonTools.beanToMap(voiceRoomModel)
-                                Sync.Instance().createScene(scene, object : Sync.Callback {
-                                    override fun onSuccess() {
-                                        roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                                        completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
-                                    }
-
-                                    override fun onFail(exception: SyncManagerException?) {
-                                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
-                                    }
-                                })
-                            }
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            if (code == 200){
-                                initScene {
-                                    val scene = Scene()
-                                    scene.id = voiceRoomModel.roomId
-                                    scene.userId = owner.userId
-                                    scene.property = GsonTools.beanToMap(voiceRoomModel)
-                                    Sync.Instance().createScene(scene, object : Sync.Callback {
-                                        override fun onSuccess() {
-                                            roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                                            completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
-                                        }
-
-                                        override fun onFail(exception: SyncManagerException?) {
-                                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
-                                        }
-                                    })
+                beforeCreateRoomLoginImTask(loginCallBack = { error->
+                    if (error == VoiceServiceProtocol.ERR_LOGIN_SUCCESS){
+                        // 3、创建房间
+                        initScene {
+                            val scene = Scene()
+                            scene.id = voiceRoomModel.roomId
+                            scene.userId = owner.userId
+                            scene.property = GsonTools.beanToMap(voiceRoomModel)
+                            Sync.Instance().createScene(scene, object : Sync.Callback {
+                                override fun onSuccess() {
+                                    roomMap[voiceRoomModel.roomId] = voiceRoomModel
+                                    completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
                                 }
-                            }else{
-                                completion.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR, voiceRoomModel)
-                            }
+
+                                override fun onFail(exception: SyncManagerException?) {
+                                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
+                                }
+                            })
                         }
-                    })
+                    }else{
+                        completion.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR, voiceRoomModel)
+                    }
+                })
+            })
+    }
+
+    private fun beforeCreateRoomLoginImTask(loginCallBack: (error: Int) -> Unit){
+        ChatroomIMManager.getInstance().login(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+            VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
+                override fun onSuccess() {
+                    loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_SUCCESS)
+                }
+
+                override fun onError(code: Int, desc: String) {
+                    if (code == EMAError.USER_ALREADY_LOGIN) {
+                        loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_SUCCESS)
+                    } else {
+                        loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR)
+                    }
+                }
             })
     }
 
