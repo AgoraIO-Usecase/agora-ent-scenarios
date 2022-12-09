@@ -221,4 +221,5 @@
 
     <string name="voice_room_input_chat_title">Let\'s Chat</string>
     <string name="voice_room_system_msg_member_add">Joined</string>
+    <string name="voice_room_login_exception">Login exception</string>
 </resources>
