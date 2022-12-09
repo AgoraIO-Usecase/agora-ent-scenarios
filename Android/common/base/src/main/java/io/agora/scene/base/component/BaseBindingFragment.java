@@ -22,16 +22,19 @@ public abstract class BaseBindingFragment<T extends ViewBinding> extends BaseFra
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        _binding = getViewBinding(inflater, container);
+
         if (rootView == null) {
+            _binding = getViewBinding(inflater, container);
             rootView = _binding.getRoot();
         }
         return rootView;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         _binding = null;
+        rootView = null;
     }
+
 }

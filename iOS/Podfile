@@ -5,7 +5,8 @@ inhibit_all_warnings!
 
 def all_pods
   
-  use_modular_headers!
+#  use_modular_headers!
+  use_frameworks!
   # 网络层
   pod 'AFNetworking', '~> 4.0.1'
   # 布局
@@ -38,7 +39,7 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.9'
+  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.2'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 #pod 'AgoraRtcEngine_iOS', :path => './libs'
 
@@ -59,7 +60,8 @@ def all_pods
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
-  pod 'AgoraLyricsScore', '~> 1.0.8'
+  pod 'AgoraLyricsScore', '~> 1.0.8.6'
+#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
   

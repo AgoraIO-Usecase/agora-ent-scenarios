@@ -79,7 +79,7 @@ class VMManagerView: UIView {
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
-                iconView.image = UIImage(iconStr)
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
                 nameLabel.text = username
 //                micView.setState(.on)
 //                micView.setVolume(100)
@@ -87,7 +87,7 @@ class VMManagerView: UIView {
                 inviteBtn.setTitle(LanguageManager.localValue(key: "Kick"), for: .normal)
             } else if m_type == 2 {
                 iconView.isHidden = false
-                iconView.image = UIImage(iconStr)
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
                 nameLabel.text = username
 //                micView.setState(.forbidden)
 //                micView.isHidden = false
