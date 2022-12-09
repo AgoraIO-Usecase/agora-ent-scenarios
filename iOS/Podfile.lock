@@ -14,11 +14,11 @@ PODS:
   - AFNetworking/Serialization (4.0.1)
   - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
-  - Agora-Scene-Utils (1.0.8)
+  - Agora-Scene-Utils (1.1.0)
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.0.8.6):
     - Zip
-  - AgoraRtcEngine_Special_iOS (4.0.1.2)
+  - AgoraRtcEngine_Special_iOS (4.0.0.9)
   - AgoraRtm_iOS (1.5.1)
   - Bugly (2.5.93)
   - bytedEffect (4.3.0):
@@ -48,7 +48,7 @@ PODS:
   - MBProgressHUD (1.1.0)
   - MJExtension (3.4.1)
   - MJRefresh (3.2.3)
-  - Protobuf (3.21.9)
+  - Protobuf (3.21.11)
   - QMUIKit (4.5.1):
     - QMUIKit/QMUIComponents (= 4.5.1)
     - QMUIKit/QMUICore (= 4.5.1)
@@ -371,10 +371,10 @@ PODS:
 
 DEPENDENCIES:
   - AFNetworking (~> 4.0.1)
-  - Agora-Scene-Utils (~> 1.0.8)
+  - Agora-Scene-Utils (~> 1.1.0)
   - Agora_Chat_iOS
   - AgoraLyricsScore (~> 1.0.8.6)
-  - AgoraRtcEngine_Special_iOS (= 4.0.1.2)
+  - AgoraRtcEngine_Special_iOS (= 4.0.0.9)
   - AgoraRtm_iOS
   - Bugly
   - bytedEffect (from `bytedEffect.podspec`)
@@ -451,10 +451,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
-  Agora-Scene-Utils: 7da6dff7bbd23b02baf7c3845a406e0eb2f334d0
+  Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: ee80fe4f33fec56b3cdd53e28383fbb4d82c743d
-  AgoraRtcEngine_Special_iOS: bf70410a02e34ef7119cff5522fbf4348b6e0d1d
+  AgoraRtcEngine_Special_iOS: c109da5fbdeafc63b337112586a4098804fbd587
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 38b05fb3c272a050021efb7b322aff795e329825
@@ -474,7 +474,7 @@ SPEC CHECKSUMS:
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   MJExtension: 21c5f6f8c4d5d8844b7ae8fbae08fed0b501f961
   MJRefresh: 2b1214a2dc8f4df4c5dcb028ea2ad4e245425fb7
-  Protobuf: 02524ec14183fe08fb259741659e79683788158b
+  Protobuf: 3acb308a1e208605afd50866b98ec220141bcb8c
   QMUIKit: 3e717c45730ecdf5011ca76751990ad1a23ba7e1
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
@@ -489,6 +489,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: c0c4530ebf4a1b43e2bdc785c71aa27e0ca3c7ff
+PODFILE CHECKSUM: 530a2b687167a054eb421cebf9908451e0ae5ebc
 
 COCOAPODS: 1.11.3
