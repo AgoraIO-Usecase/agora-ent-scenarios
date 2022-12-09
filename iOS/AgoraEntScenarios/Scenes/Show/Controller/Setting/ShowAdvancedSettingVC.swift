@@ -71,12 +71,6 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         setUpUI()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        if isBroadcaster {
-            // 自动弹出预设
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.didClickPreSetBarButton()
-            }
-        }
     }
     
     private func setUpUI() {
@@ -106,8 +100,10 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         naviBar.title = "show_advanced_setting_title".show_localized
         // 右边按钮
         if isBroadcaster {
+            /*
             let preSetButtonItem = ShowBarButtonItem(title: "show_advanced_setting_preset".show_localized, target: self, action: #selector(didClickPreSetBarButton))
             naviBar.rightItems = [preSetButtonItem]
+             */
         }
         view.addSubview(naviBar)
     }
@@ -122,16 +118,15 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .PVC,
             .videoEncodeSize,
             .FPS,
-            .videoBitRate
         ]
         let insideSettings: [ShowSettingKey] = [
+            .H265,
             .colorEnhance,
             .lowlightEnhance,
             .videoDenoiser,
             .PVC,
             .videoEncodeSize,
             .FPS,
-            .videoBitRate
         ]
         let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings
         // 观众端设置
@@ -151,6 +146,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
+        vc.isOutside = isOutside
        
         vc.dataArray = settings[index]
         vc.willChangeSettingParams = {[weak self] key, value in

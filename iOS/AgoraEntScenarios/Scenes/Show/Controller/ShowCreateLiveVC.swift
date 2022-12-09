@@ -100,12 +100,13 @@ class ShowCreateLiveVC: UIViewController {
 extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     
     func onClickSettingBtnAction() {
-        let vc = ShowAdvancedSettingVC()
-        vc.mode = .signle
-        vc.isBroadcaster = true
-        vc.isOutside = true
-        vc.settingManager = agoraKitManager
-        self.navigationController?.pushViewController(vc, animated: true)
+//        let vc = ShowAdvancedSettingVC()
+//        vc.mode = .signle
+//        vc.isBroadcaster = true
+//        vc.isOutside = true
+//        vc.settingManager = agoraKitManager
+//        self.navigationController?.pushViewController(vc, animated: true)
+        showPreset()
     }
     
     func onClickCameraBtnAction() {
