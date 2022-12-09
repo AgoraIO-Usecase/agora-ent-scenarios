@@ -209,11 +209,11 @@ extension VoiceRoomViewController {
 
     func changeMicState() {
         guard let idx = local_index else {
-            view.makeToast("you have no wheat slots!", point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         if !isOwner, idx == 0 {
-            view.makeToast("you have no wheat slots!", point: view.center, title: nil, image: nil, completion: nil)
+            view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         chatBar.micState = !chatBar.micState
