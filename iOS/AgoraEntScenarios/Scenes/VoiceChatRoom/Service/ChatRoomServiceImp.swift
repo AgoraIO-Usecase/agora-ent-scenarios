@@ -446,7 +446,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let new_mic = VRRoomMic()
         switch self.mics[new_index].status {
         case 2:
-            new_mic.status = self.mics[new_index].status
+            new_mic.status = self.mics[old_index].status
         case 3,4:
             completion(self.normalError(),nil)
             return
