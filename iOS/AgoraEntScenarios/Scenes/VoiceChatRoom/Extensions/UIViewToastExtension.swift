@@ -282,7 +282,13 @@ public extension UIView {
             activityView.layer.shadowOffset = style.shadowOffset
         }
 
-        let activityIndicatorView = UIActivityIndicatorView(style: .large)
+        var activityIndicatorView = UIActivityIndicatorView()
+        if #available(iOS 13.0, *) {
+            activityIndicatorView = UIActivityIndicatorView(style: .large)
+        } else {
+            // Fallback on earlier versions
+            activityIndicatorView.style = .white
+        }
         activityIndicatorView.center = CGPoint(x: activityView.bounds.size.width / 2.0, y: activityView.bounds.size.height / 2.0)
         activityView.addSubview(activityIndicatorView)
         activityIndicatorView.color = style.activityIndicatorColor

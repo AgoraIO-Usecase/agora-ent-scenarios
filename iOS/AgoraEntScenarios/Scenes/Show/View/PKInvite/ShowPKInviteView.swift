@@ -59,9 +59,10 @@ class ShowPKInviteView: UIView {
         let button = AGEButton()
         button.setTitle("结束".show_localized, for: .normal)
         button.setTitleColor(UIColor(hex: "#684BF2"), for: .normal)
-        let image = UIImage(systemName: "xmark.circle")?.withTintColor(UIColor(hex: "#684BF2"),
-                                                                       renderingMode: .alwaysOriginal)
-        button.setImage(image, for: .normal, postion: .right, spacing: 5)
+        button.setImage(UIImage.show_sceneImage(name: "show_live_end"),
+                        for: .normal,
+                        postion: .right,
+                        spacing: 5)
         button.addTarget(self, action: #selector(onTapEndButton(sender:)), for: .touchUpInside)
         return button
     }()
