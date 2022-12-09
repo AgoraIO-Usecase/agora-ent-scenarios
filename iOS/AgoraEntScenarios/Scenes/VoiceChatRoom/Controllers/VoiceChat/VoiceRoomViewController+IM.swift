@@ -187,7 +187,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     micUser?.mic_index = mic_index
                 }
                 if !isOwner {
-                    if mic_index == local_index && (status == -1 || status == 3 || status == 4) {
+                    if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
                     }
                 }
@@ -209,22 +209,29 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 if first.member != nil {
                     first.member?.mic_index = mic_index
                 }
-                if fromId == VoiceRoomUserInfo.shared.user?.chat_uid ?? "" {
-                    local_index = mic_index
-                    if !isOwner {
-                        rtckit.setClientRole(role: status == 0 ? .owner : .audience)
+
+                if let _ = first.member {
+                    let local_uid: String = VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
+                    let cp_uid: String = first.member?.chat_uid ?? ""
+                    if local_uid == cp_uid {
+                        local_index = mic_index
+                        if !isOwner {
+                            self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
+                        }
+                        //如果当前是0的状态  就设置成主播
+                        self.rtckit.muteLocalAudioStream(mute: status != 0)
                     }
-                    // 如果当前是0的状态  就设置成主播
-                    rtckit.muteLocalAudioStream(mute: status != 0)
                 } else {
                     if local_index == nil || mic_index == local_index {
                         rtckit.setClientRole(role: .audience)
                         rtckit.muteLocalAudioStream(mute: true)
                     }
                 }
+                
                 ChatRoomServiceImp.getSharedInstance().mics[first.mic_index] = first
                 roomInfo?.mic_info = ChatRoomServiceImp.getSharedInstance().mics
                 rtcView.updateUser(first)
+                refreshApplicants(chat_uid: fromId)
             }
         }
     }
