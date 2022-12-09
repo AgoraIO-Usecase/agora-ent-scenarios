@@ -25,15 +25,15 @@ class SyncUtil: NSObject {
 //        })
         let config = AgoraSyncManager.RethinkConfig(appId: KeyCenter.AppId,
                                                     channelName: sceneId)
-        ToastView.showWait(text: "join Scene...", view: nil)
+//        ToastView.showWait(text: "join Scene...", view: nil)
         manager = AgoraSyncManager(config: config, complete: { code in
-            ToastView.hidden()
+//            ToastView.hidden()
             if code == 0 {
                 print("SyncManager init success")
                 complete()
             } else {
                 print("SyncManager init error")
-                ToastView.show(text: "SyncManager 连接失败")
+//                ToastView.show(text: "SyncManager 连接失败")
             }
         })
     }

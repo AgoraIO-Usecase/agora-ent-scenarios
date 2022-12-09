@@ -4,7 +4,7 @@
 //
 
 #import "VLSoloSongView.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -40,7 +40,7 @@
     [self addSubview:self.musicLabel];
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width*0.5-45, musicIcon.bottom+5, 75, 20)];
-    tipsLabel.text = NSLocalizedString(@"抢麦倒计时", nil);
+    tipsLabel.text = KTVLocalizedString(@"抢麦倒计时");
     tipsLabel.font = UIFontMake(14);
     tipsLabel.textColor = UIColorMakeWithHex(@"#FFFFFF");
     [self addSubview:tipsLabel];
@@ -55,7 +55,7 @@
     soloBtn.layer.masksToBounds = YES;
     [soloBtn addTarget:self action:@selector(soloBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [soloBtn setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-    [soloBtn setTitle:NSLocalizedString(@"不等了，独唱", nil) forState:UIControlStateNormal];
+    [soloBtn setTitle:KTVLocalizedString(@"不等了，独唱") forState:UIControlStateNormal];
     [soloBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     soloBtn.titleLabel.font = UIFontBoldMake(14);
     [self addSubview:soloBtn];
