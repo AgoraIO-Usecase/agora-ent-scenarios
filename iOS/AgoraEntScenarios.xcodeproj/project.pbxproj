@@ -400,6 +400,10 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		DDE84336291CB91B009C762C /* LSTPopView+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */; };
+		E333F64E29150ECB0031B35F /* ChatRoomServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64A29150ECB0031B35F /* ChatRoomServiceImp.swift */; };
+		E333F64F29150ECB0031B35F /* VoiceChatServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64B29150ECB0031B35F /* VoiceChatServiceModel.swift */; };
+		E333F65029150ECB0031B35F /* VoiceServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */; };
+		E333F65129150ECB0031B35F /* ChatRoomServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -949,6 +953,10 @@
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		DDE84334291CB91B009C762C /* LSTPopView+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LSTPopView+KTVModal.h"; sourceTree = "<group>"; };
 		DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LSTPopView+KTVModal.m"; sourceTree = "<group>"; };
+		E333F64A29150ECB0031B35F /* ChatRoomServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceImp.swift; sourceTree = "<group>"; };
+		E333F64B29150ECB0031B35F /* VoiceChatServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatServiceModel.swift; sourceTree = "<group>"; };
+		E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceServiceProtocol.swift; sourceTree = "<group>"; };
+		E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1014,6 +1022,7 @@
 		053998BA290A70CB005143C7 /* VoiceChatRoom */ = {
 			isa = PBXGroup;
 			children = (
+				E333F64929150ECB0031B35F /* Service */,
 				057DD9C1290B9495001329E6 /* Compoment */,
 				0510B85A290B79E60063E57A /* Controllers */,
 				057DD9C7290B9495001329E6 /* Extensions */,
@@ -2480,6 +2489,17 @@
 			path = Context;
 			sourceTree = "<group>";
 		};
+		E333F64929150ECB0031B35F /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				E333F64A29150ECB0031B35F /* ChatRoomServiceImp.swift */,
+				E333F64B29150ECB0031B35F /* VoiceChatServiceModel.swift */,
+				E333F64C29150ECB0031B35F /* VoiceServiceProtocol.swift */,
+				E333F64D29150ECB0031B35F /* ChatRoomServiceProtocol.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2786,6 +2806,7 @@
 				DD84177E29090C520026B624 /* VLHomeView.m in Sources */,
 				DDA199E428FFE579009D3E61 /* VLDeviceUtils.m in Sources */,
 				0510B838290B77330063E57A /* VRRoomListCell.swift in Sources */,
+				E333F65029150ECB0031B35F /* VoiceServiceProtocol.swift in Sources */,
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
 				DD84178429090C520026B624 /* VLDiscoveryViewController.m in Sources */,
 				DDA19A4128FFE57A009D3E61 /* UIEdgeInsets+Utils.swift in Sources */,
@@ -2819,6 +2840,7 @@
 				DD8417A129090C520026B624 /* VLBadNetWorkView.m in Sources */,
 				DDA19A3B28FFE57A009D3E61 /* UIRectCorner+Short.swift in Sources */,
 				0510B851290B799E0063E57A /* HorizontalCardsView.swift in Sources */,
+				E333F64F29150ECB0031B35F /* VoiceChatServiceModel.swift in Sources */,
 				05FFE6FB290F706C0024D22F /* VoiceRoomInputBar.swift in Sources */,
 				DDA19A4528FFE57A009D3E61 /* EKColor.swift in Sources */,
 				DDA19A5A28FFE57A009D3E61 /* EKPopUpMessage.swift in Sources */,
@@ -2996,6 +3018,7 @@
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD8417B129090C520026B624 /* VLSelectSongView.m in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
+				E333F64E29150ECB0031B35F /* ChatRoomServiceImp.swift in Sources */,
 				05FFE703290F706C0024D22F /* VoiceRoomEmojiListView.swift in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DDA19A5328FFE57A009D3E61 /* EKAttributes+WindowLevel.swift in Sources */,
@@ -3042,6 +3065,7 @@
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
+				E333F65129150ECB0031B35F /* ChatRoomServiceProtocol.swift in Sources */,
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD8417C029090C520026B624 /* KTVSyncManagerServiceImp.swift in Sources */,
