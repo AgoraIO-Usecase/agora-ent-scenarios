@@ -142,6 +142,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     ThreadManager.getInstance().runOnMainThread {
                         voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
                     }
+                }else{
+                    dismissLoading()
                 }
             })
     }
