@@ -13,7 +13,6 @@ import Bugly
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
     @objc var extDic: NSMutableDictionary = NSMutableDictionary()
-    @objc var appRtcToken: String?
     
     override init() {
         super.init()
@@ -57,5 +56,13 @@ import Bugly
 
     @objc func appHostUrl() -> String {
         return KeyCenter.HostUrl
+    }
+    
+    @objc func appRTCToken() -> String {
+        return VLUserCenter.user.agoraRTCToken
+    }
+    
+    @objc func appRTMToken() -> String {
+        return VLUserCenter.user.agoraRTMToken
     }
 }
