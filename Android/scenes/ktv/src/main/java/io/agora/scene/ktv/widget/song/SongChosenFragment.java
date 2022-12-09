@@ -37,6 +37,8 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                 binding.tvMusicName.setText(item.songName);
                 binding.tvChooser.setText(item.chooser);
                 GlideApp.with(binding.ivCover).load(item.imageUrl)
+                        .fallback(R.mipmap.ktv_ic_song_default)
+                        .error(R.mipmap.ktv_ic_song_default)
                         .transform(new CenterCropRoundCornerTransform(10))
                         .into(binding.ivCover);
                 if (position == 0) {
@@ -70,9 +72,9 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmen
                     binding.ivToTop.setVisibility(View.GONE);
                 }
                 if (item.isChorus) {
-                    binding.tvChorus.setText(getString(R.string.song_ordering_person_chorus));
+                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person_chorus));
                 } else {
-                    binding.tvChorus.setText(getString(R.string.song_ordering_person));
+                    binding.tvChorus.setText(getString(R.string.ktv_song_ordering_person));
                 }
             }
         }

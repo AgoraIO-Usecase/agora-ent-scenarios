@@ -13,7 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogMusicSettingBinding;
 
@@ -118,7 +118,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
     }
 
     private void setSoundMode() {
-        int margin = KTVUtil.dp2px(10);
+        int margin = UiUtil.dp2px(10);
         String[] stringArray = getResources().getStringArray(R.array.ktv_audioPreset);
         for (int i = 0; i < stringArray.length; i++) {
             RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.btn_sound_mode, null);

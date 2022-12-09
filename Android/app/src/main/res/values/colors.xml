@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
-
-    <color name="search_hint_color">#010419</color>
-
+    <color name="app_search_hint_color">#010419</color>
 </resources>
