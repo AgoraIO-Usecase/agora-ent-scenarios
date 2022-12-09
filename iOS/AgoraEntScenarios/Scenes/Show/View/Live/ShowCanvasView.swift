@@ -32,11 +32,11 @@ class ShowCanvasView: UIView {
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name1", for: .normal)
-        button.setImage(UIImage(systemName: "mic.fill")?.withTintColor(.white, renderingMode: .alwaysOriginal),
+        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
                         for: .normal,
                         postion: .right,
                         spacing: 5)
-        button.setImage(UIImage(systemName: "mic.slash.fill")?.withTintColor(.white, renderingMode: .alwaysOriginal),
+        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
                         for: .selected,
                         postion: .right,
                         spacing: 5)
@@ -47,11 +47,11 @@ class ShowCanvasView: UIView {
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name2", for: .normal)
-        button.setImage(UIImage(systemName: "mic.fill")?.withTintColor(.white, renderingMode: .alwaysOriginal),
+        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
                         for: .normal,
                         postion: .right,
                         spacing: 5)
-        button.setImage(UIImage(systemName: "mic.slash.fill")?.withTintColor(.white, renderingMode: .alwaysOriginal),
+        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
                         for: .selected,
                         postion: .right,
                         spacing: 5)

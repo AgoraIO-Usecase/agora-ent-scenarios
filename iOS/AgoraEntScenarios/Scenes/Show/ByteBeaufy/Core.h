@@ -6,7 +6,7 @@
 
 static NSString *OFFLIN_LICENSE_PATH = @"LicenseBag";
 static NSString *OFFLIN_BUNDLE = @"bundle";
-static LICENSE_MODE_ENUM LICENSE_MODE = ONLINE_LICENSE;
+static LICENSE_MODE_ENUM LICENSE_MODE = OFFLINE_LICENSE;
 
 #define CHECK_RET_AND_RETURN(MSG, ret) \
 if (ret != 0 && ret != -11 && ret != 1) {\

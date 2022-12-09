@@ -63,7 +63,11 @@ extension VRCreateRoomViewController {
         VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
             SVProgressHUD.dismiss()
             if error == nil {
-                Throttler.throttle {
+                if #available(iOS 13.0, *) {
+                    Throttler.throttle {
+                        self.goLive()
+                    }
+                } else {
                     self.goLive()
                 }
             } else {

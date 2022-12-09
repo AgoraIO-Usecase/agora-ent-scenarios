@@ -48,7 +48,11 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         if name.isEmpty || effects.type.isEmpty {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
-        Throttler.throttle {
+        if #available(iOS 13.0, *) {
+            Throttler.throttle {
+                self.createRoom()
+            }
+        } else {
             self.createRoom()
         }
     }

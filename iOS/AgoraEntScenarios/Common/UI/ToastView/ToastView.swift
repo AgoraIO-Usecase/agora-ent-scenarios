@@ -217,7 +217,7 @@ extension UIViewController {
                 // Finally, keep only the key window
                 .first(where: \.isKeyWindow)
         } else {
-            return UIApplication.keyWindow
+            return UIApplication.kWindow
         }
     }
 }
