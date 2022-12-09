@@ -83,6 +83,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             SVProgressHUD.dismiss()
             if im_token.isEmpty || uid.isEmpty {
                 SVProgressHUD.showError(withStatus: "Fetch IMConfig failed!")
+                return
             }
             SVProgressHUD.show(withStatus: "Loading".localized())
             VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
