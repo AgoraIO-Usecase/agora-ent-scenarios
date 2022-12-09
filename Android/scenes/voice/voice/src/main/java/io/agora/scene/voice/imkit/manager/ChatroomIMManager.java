@@ -848,7 +848,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 检查指定id是否在成员列表中
+     * 检查指定id是否在申请列表中
      */
     public boolean checkMember(String chatUid){
        return cacheManager.getSubmitMic(chatUid) != null;
