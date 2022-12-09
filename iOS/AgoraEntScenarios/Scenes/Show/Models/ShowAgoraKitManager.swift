@@ -77,6 +77,26 @@ class ShowAgoraKitManager: NSObject {
     override init() {
         super.init()
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
+        setupContentInspectConfig()
+    }
+    
+    //MARK: private
+    private func setupContentInspectConfig() {
+        let config = AgoraContentInspectConfig()
+        let dic: [String: String] = [ "userNo": VLUserCenter.user.id ]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            print("setupContentInspectConfig fail")
+            return
+        }
+        let jsonStr = String(data: jsonData, encoding: .utf8)
+        config.extraInfo = jsonStr
+        let module = AgoraContentInspectModule()
+        module.interval = 30
+        module.type = .moderation
+        config.modules = [module]
+        let ret = agoraKit.enableContentInspect(true, config: config)
+        print("setupContentInspectConfig: \(ret)")
     }
     
     /// 初始化并预览

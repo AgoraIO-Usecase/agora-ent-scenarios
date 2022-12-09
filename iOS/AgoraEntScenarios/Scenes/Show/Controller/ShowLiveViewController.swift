@@ -628,6 +628,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
         realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
     }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
+        print("contentInspectResult: \(result.rawValue)")
+    }
 }
 
 
