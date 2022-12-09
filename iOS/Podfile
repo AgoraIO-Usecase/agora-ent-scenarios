@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-# platform :ios, '10.0'
+platform :ios, '12.0'
 inhibit_all_warnings!
 
 def all_pods
@@ -39,7 +39,7 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.2'
+  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.9'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 #pod 'AgoraRtcEngine_iOS', :path => './libs'
 
@@ -57,7 +57,7 @@ def all_pods
 
   pod 'SocketRocket'
 #  pod 'Fastboard'
-  pod 'Agora-Scene-Utils', '~> 1.0.8'
+  pod 'Agora-Scene-Utils', '~> 1.1.0'
   
   #歌词组件
   pod 'AgoraLyricsScore', '~> 1.0.8.6'
