@@ -94,19 +94,19 @@ class ShowLiveViewController: UIViewController {
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
             //update audio status
-            guard let interaction = currentInteraction else { return }
-            
-            liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
-            liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
-            
-            let options = AgoraRtcChannelMediaOptions()
-            if role == .broadcaster {
-                options.publishMicrophoneTrack = !interaction.ownerMuteAudio
-                agoraKitManager.agoraKit.updateChannel(with: options)
+            if let interaction = currentInteraction {
+                liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
+                liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
                 
-            } else if interaction.userId == VLUserCenter.user.id {
-                options.publishMicrophoneTrack = !interaction.muteAudio
-                agoraKitManager.agoraKit.updateChannel(with: options)
+                let options = AgoraRtcChannelMediaOptions()
+                if role == .broadcaster {
+                    options.publishMicrophoneTrack = !interaction.ownerMuteAudio
+                    agoraKitManager.agoraKit.updateChannel(with: options)
+                    
+                } else if interaction.userId == VLUserCenter.user.id {
+                    options.publishMicrophoneTrack = !interaction.muteAudio
+                    agoraKitManager.agoraKit.updateChannel(with: options)
+                }
             }
             
             if currentInteraction == oldValue {
@@ -206,6 +206,17 @@ class ShowLiveViewController: UIViewController {
     }
 }
 
+//MARK: private ui
+extension ShowLiveViewController {
+    private func _updateApplyMenu() {
+        if role == .broadcaster {
+            applyAndInviteView.reloadData()
+        } else {
+            applyView.getAllMicSeatList(autoApply: false)
+        }
+    }
+}
+
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _subscribeServiceEvent() {
@@ -292,6 +303,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyUpdated(apply: ShowMicSeatApply) {
+        _updateApplyMenu()
         guard apply.userId == VLUserCenter.user.id else { return }
         if apply.status == .waitting && role == .broadcaster {
             liveView.bottomBar.linkButton.isShowRedDot = true
@@ -319,22 +331,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onMicSeatApplyDeleted(apply: ShowMicSeatApply) {
-        guard apply.userId == VLUserCenter.user.id else { return }
-//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
-        if role == .broadcaster {
-            applyAndInviteView.reloadData()
-        }
+        _updateApplyMenu()
     }
     
     func onMicSeatApplyAccepted(apply: ShowMicSeatApply) {
-        applyAndInviteView.reloadData()
-//        liveView.canvasView.canvasType = .joint_broadcasting
-        liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
+        _updateApplyMenu()
     }
     
     func onMicSeatApplyRejected(apply: ShowMicSeatApply) {
-        guard apply.userId == VLUserCenter.user.id else { return }
-//        ToastView.show(text: "seat apply \(apply.userName ?? "") did reject")
+        _updateApplyMenu()
     }
     
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
