@@ -302,8 +302,8 @@
 
 - (void)setCoundDown:(NSInteger)seconds
 {
-    self.joinChorusView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",seconds];
-    self.startSoloView.countDownLabel.text = [NSString stringWithFormat:@"00:%02d",seconds];
+    self.joinChorusView.countDownLabel.text = [NSString stringWithFormat:@"00:%02ld",seconds];
+    self.startSoloView.countDownLabel.text = [NSString stringWithFormat:@"00:%02ld",seconds];
 }
 
 #pragma mark - VLSoloSongViewDelegate
