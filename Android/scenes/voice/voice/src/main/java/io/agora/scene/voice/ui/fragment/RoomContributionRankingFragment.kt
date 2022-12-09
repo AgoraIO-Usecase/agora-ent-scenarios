@@ -18,7 +18,6 @@ import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
@@ -42,8 +41,6 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
     }
 
     private var roomKitBean: RoomKitBean? = null
-    private var total = 0
-    private var isEnd = false
 
     private lateinit var roomRankViewModel: VoiceUserListViewModel
 
@@ -68,27 +65,26 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
             slContributionRanking.setOnRefreshListener(this@RoomContributionRankingFragment)
         }
         roomRankViewModel.fetchGiftContribute()
-        roomRankViewModel.contributeListObservable().observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
-                override fun onSuccess(data: List<VoiceRankUserModel>?) {
-                    binding?.slContributionRanking?.isRefreshing = false
-                    total = data?.size ?: 0
-                    "getGifts total：${total}".logD()
-                    if (data == null) return
-                    isEnd = true
-                    checkEmpty()
-                    contributionAdapter?.submitListAndPurge(data)
-                }
+        roomRankViewModel.contributeListObservable()
+            .observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
+                    override fun onSuccess(data: List<VoiceRankUserModel>?) {
+                        binding?.slContributionRanking?.isRefreshing = false
+                        val total = data?.size ?: 0
+                        "getGifts total：$total".logD()
+                        checkEmpty(total)
+                        contributionAdapter?.submitListAndPurge(data ?: mutableListOf())
+                    }
 
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    binding?.slContributionRanking?.isRefreshing = false
-                }
-            })
-        }
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        binding?.slContributionRanking?.isRefreshing = false
+                    }
+                })
+            }
     }
 
-    private fun checkEmpty() {
+    private fun checkEmpty(total: Int) {
         binding?.apply {
             if (total == 0) {
                 ivContributionEmpty.isVisible = true
@@ -123,14 +119,8 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
     }
 
     override fun onRefresh() {
-        if (isEnd) {
-            ThreadManager.getInstance().runOnMainThreadDelay({
-                binding?.slContributionRanking?.isRefreshing = false
-            }, 1500)
-        } else {
-            roomKitBean?.let {
-                roomRankViewModel.fetchGiftContribute()
-            }
+        roomKitBean?.let {
+            roomRankViewModel.fetchGiftContribute()
         }
     }
 }

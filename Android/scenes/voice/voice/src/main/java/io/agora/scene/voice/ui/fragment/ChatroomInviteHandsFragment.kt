@@ -84,12 +84,8 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceFragmentHandsListLayoutB
             parseResource(response, object : OnResourceParseCallback<List<VoiceMemberModel>>() {
                 override fun onSuccess(data: List<VoiceMemberModel>?) {
                     finishRefresh()
-                    if (data == null){
-                        onFragmentListener?.getItemCount(0)
-                        return
-                    }
-                    val total = data.size
-                    adapter?.data = data
+                    val total = data?.size ?: 0
+                    adapter?.data = data ?: mutableListOf()
                     onFragmentListener?.getItemCount(total)
                     isRefreshing = false
                     adapter?.data?.let {
