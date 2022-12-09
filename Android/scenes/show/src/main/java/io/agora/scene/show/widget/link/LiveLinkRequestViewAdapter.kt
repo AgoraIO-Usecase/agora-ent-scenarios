@@ -8,7 +8,6 @@ import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageBinding
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowRoomRequestStatus
-import io.agora.scene.show.widget.UserItem
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform
@@ -24,8 +23,8 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
     ) {
         val seatApply = getItem(position)!!
         val binding = holder.binding
-        binding.titleItemUserStatus.setText(seatApply.userName)
-        binding.coverUserIcon.setVisibility(View.VISIBLE)
+        binding.titleItemUserStatus.text = seatApply.userName
+        binding.coverUserIcon.visibility = View.VISIBLE
         GlideApp.with(binding.coverUserIcon).load(seatApply.avatar)
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
@@ -34,11 +33,11 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
         if (isRoomOwner) {
             binding.userNum.isVisible = false
             if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
-                binding.btnItemAgreeRequest.setEnabled(false)
+                binding.btnItemAgreeRequest.isEnabled = false
                 binding.btnItemAgreeRequest.setText(R.string.show_is_onseat)
                 binding.btnItemAgreeRequest.setOnClickListener(null)
             } else {
-                binding.btnItemAgreeRequest.setEnabled(true)
+                binding.btnItemAgreeRequest.isEnabled = true
                 binding.btnItemAgreeRequest.setText(R.string.show_agree_onseat)
                 binding.btnItemAgreeRequest.setOnClickListener {
                     onClickListener.onClick(seatApply, position)
@@ -49,14 +48,14 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
                 binding.titleItemUserStatus.setTextColor(R.color.show_text)
             }
             binding.userNum.isVisible = true
-            binding.userNum.setText((position+1).toString())
+            binding.userNum.text = (position+1).toString()
             binding.btnItemAgreeRequest.visibility = View.GONE
         }
     }
 
     private lateinit var onClickListener : OnClickListener
     interface OnClickListener {
-        fun onClick(userItem: ShowMicSeatApply, position: Int)
+        fun onClick(seatApply: ShowMicSeatApply, position: Int)
     }
 
     fun setClickListener(listener : OnClickListener) {

@@ -8,24 +8,4 @@
     app:cardCornerRadius="20dp"
     app:cardBackgroundColor="@color/show_view">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/cover_audience_icon"
-        android:layout_width="51dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/cover_audience_id"
-        android:layout_width="71dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="19dp"
-        android:layout_marginTop="85dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.cardview.widget.CardView>

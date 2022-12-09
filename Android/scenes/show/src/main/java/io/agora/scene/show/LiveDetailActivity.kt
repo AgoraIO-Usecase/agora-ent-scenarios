@@ -141,7 +141,7 @@ class LiveDetailActivity : AppCompatActivity() {
         }
         bottomLayout.ivPK.setOnClickListener {
             if (isRoomOwner) {
-                ShowPKDialog()
+                showPKDialog()
             }
         }
         refreshBottomLayout()
@@ -503,7 +503,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 seatApply: ShowMicSeatApply
             ) {
                 if (interactionInfo != null) {
-                    ToastUtils.showToast("正在互动， 请互动结束后再接受连麦申请");
+                    ToastUtils.showToast(R.string.show_cannot_accept);
                     return
                 }
                 mService.acceptMicSeatApply(seatApply)
@@ -520,7 +520,7 @@ class LiveDetailActivity : AppCompatActivity() {
             // 主播邀请用户连麦
             override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, user: ShowUser) {
                 if (interactionInfo != null) {
-                    ToastUtils.showToast("正在互动， 请互动结束后再邀请观众连麦");
+                    ToastUtils.showToast(R.string.show_cannot_invite);
                     return
                 }
                 mService.createMicSeatInvitation(user)
@@ -538,7 +538,7 @@ class LiveDetailActivity : AppCompatActivity() {
             // 观众发送连麦申请
             override fun onApplyOnSeat(dialog: LiveLinkDialog) {
                 if (interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
-                    ToastUtils.showToast("正在互动， 请互动结束后再申请连麦");
+                    ToastUtils.showToast(R.string.show_cannot_apply);
                     return
                 }
                 mService.createMicSeatApply {  }
@@ -555,9 +555,9 @@ class LiveDetailActivity : AppCompatActivity() {
         mLinkDialog.show(ft, "LinkDialog")
     }
 
-    private val invitationDialog by lazy {
+    private fun showInvitationDialog() {
         AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
-            setTitle("主播邀请你加入连麦")
+            setTitle(R.string.show_ask_for_link)
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                 mService.acceptMicSeatInvitation()
                 dialog.dismiss()
@@ -566,17 +566,14 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.rejectMicSeatInvitation()
                 dialog.dismiss()
             }
-        }.create()
-    }
-    private fun ShowInvitationDialog() {
-        invitationDialog.show()
+        }.create().show()
     }
 
-    private fun ShowPKDialog() {
+    private fun showPKDialog() {
         mPKDialog.setLinkDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
                 mService.getAllPKUserList({
-                    mPKDialog.setOnlineBoardcasterList(it)
+                    mPKDialog.setOnlineBroadcasterList(it)
                 })
             }
 
@@ -586,9 +583,22 @@ class LiveDetailActivity : AppCompatActivity() {
         })
         val ft = supportFragmentManager.beginTransaction()
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        mPKDialog.dialog?.show()
+        mPKDialog.show(ft, "PKDialog")
     }
 
+    private fun showPKInvitationDialog() {
+        AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
+            setTitle(R.string.show_ask_for_pk)
+            setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                // TODO 同意视频连线
+                dialog.dismiss()
+            }
+            setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+                // TODO 拒绝视频连线
+                dialog.dismiss()
+            }
+        }.create().show()
+    }
 
     //================== Service Operation ===============
 
@@ -607,7 +617,7 @@ class LiveDetailActivity : AppCompatActivity() {
                             user.status
                         ))
                     } else if (user.userId.equals(UserManager.getInstance().user.id.toString())) {
-                        ShowInvitationDialog()
+                        showInvitationDialog()
                     }
                 } else {
                     mLinkDialog.setSeatInvitationItemStatus(ShowUser(

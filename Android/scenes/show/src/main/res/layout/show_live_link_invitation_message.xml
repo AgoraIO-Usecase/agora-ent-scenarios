@@ -38,6 +38,7 @@
         android:text="@string/show_application"
         android:textColor="@android:color/white"
         android:textSize="12sp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="@id/cover_user_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/cover_user_icon" />

@@ -22,7 +22,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
         })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         mBinding = ShowLivePkRequestMessageListBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -30,7 +30,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.onlineBoardcasterList.adapter = linkPKViewAdapter
-        binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
+        binding.smartRefreshLayout.setOnRefreshListener {
             mListener.onRequestRefreshing()
         }
         binding.smartRefreshLayout.autoRefresh()
@@ -39,14 +39,14 @@ class LivePKRequestMessageFragment : BaseFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBoardcasterList(roomList : List<ShowRoomDetailModel>) {
+    fun setOnlineBroadcasterList(roomList : List<ShowRoomDetailModel>) {
         if (mBinding == null) return
-        if (roomList == null || roomList.isEmpty()) {
-            binding.linkRequestListEmptyImg.setVisibility(View.VISIBLE)
-            binding.linkRequestListEmpty.setVisibility(View.VISIBLE)
+        if (roomList.isEmpty()) {
+            binding.linkRequestListEmptyImg.visibility = View.VISIBLE
+            binding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
-            binding.linkRequestListEmptyImg.setVisibility(View.GONE)
-            binding.linkRequestListEmpty.setVisibility(View.GONE)
+            binding.linkRequestListEmptyImg.visibility = View.GONE
+            binding.linkRequestListEmpty.visibility = View.GONE
         }
         linkPKViewAdapter.resetAll(roomList)
         binding.smartRefreshLayout.finishRefresh()
@@ -57,7 +57,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
      */
     fun setPKInvitationItemStatus(roomItem: ShowRoomDetailModel, isInvited: Boolean) {
         if (mBinding == null) return
-        binding.textPking.setText("与主播" + roomItem.roomName + "连麦中")
+        binding.textPking.text = "与主播" + roomItem.roomName + "连麦中"
     }
 
     fun setListener(listener : Listener) {
