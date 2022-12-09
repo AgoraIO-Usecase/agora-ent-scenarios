@@ -18,21 +18,21 @@ import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.MemberMusicModel;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
-import io.agora.scene.base.data.model.AgoraMember;
-import io.agora.scene.base.manager.RTCManager;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
+import io.agora.scene.ktv.manager.RTCManager;
+import io.agora.scene.ktv.manager.RoomManager;
+import io.agora.scene.ktv.service.VLRoomSeatModel;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 
-public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemRoomSpeakerBinding, AgoraMember> {
+public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvItemRoomSpeakerBinding, VLRoomSeatModel> {
     public RoomPeopleHolder(@NonNull KtvItemRoomSpeakerBinding mBinding) {
         super(mBinding);
     }
 
     @Override
-    public void binding(AgoraMember member, int selectedIndex) {
+    public void binding(VLRoomSeatModel member, int selectedIndex) {
         mBinding.tvUserName.setText(String.valueOf(getAdapterPosition() + 1));
         mBinding.avatarItemRoomSpeaker.setImageResource(R.mipmap.ktv_ic_seat);
         mBinding.tvZC.setVisibility(View.GONE);
@@ -45,23 +45,24 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
             }
             return;
         }
-        if (member.isMaster && getAdapterPosition() == 0) {
+        if (member.isMaster() && getAdapterPosition() == 0) {
             mBinding.tvRoomOwner.setVisibility(View.VISIBLE);
         }
-        mBinding.tvUserName.setText(member.name);
-        if (member.isSelfMuted == 1) {
+        mBinding.tvUserName.setText(member.getName());
+        if (member.isSelfMuted() == 1) {
             mBinding.ivMute.setVisibility(View.VISIBLE);
         } else {
             mBinding.ivMute.setVisibility(View.GONE);
         }
-        GlideApp.with(itemView).load(member.headUrl).error(R.mipmap.userimage)
+        GlideApp.with(itemView).load(member.getHeadUrl()).error(R.mipmap.userimage)
                 .transform(new CenterCropRoundCornerTransform(100)).into(mBinding.avatarItemRoomSpeaker);
+
         MemberMusicModel mMusicModel = RoomManager.getInstance().getMusicModel();
         if (mMusicModel != null) {
-            if (mMusicModel.userNo.equals(member.userNo)) {
+            if (member.getUserNo().equals(mMusicModel.userNo)) {
                 mBinding.tvZC.setText("主唱");
                 mBinding.tvZC.setVisibility(View.VISIBLE);
-            } else if (member.userNo.equals(mMusicModel.user1Id) || member.userNo.equals(mMusicModel.chorusNo)) {
+            } else if (member.getUserNo().equals(mMusicModel.userId) || member.getUserNo().equals(mMusicModel.chorusNo)) {
                 mBinding.tvZC.setText("合唱");
                 mBinding.tvZC.setVisibility(View.VISIBLE);
             } else {
@@ -71,12 +72,12 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
         showAvatarOrCameraView(member);
     }
 
-    private void showAvatarOrCameraView(AgoraMember member) {
+    private void showAvatarOrCameraView(VLRoomSeatModel member) {
         Context mContext = itemView.getContext();
         User mUser = UserManager.getInstance().getUser();
         RtcEngine engine = RTCManager.getInstance().getRtcEngine();
         if (mUser != null) {
-            if (member.isVideoMuted == 0) { // 未开启摄像头 《==》 移除存在的SurfaceView，显示头像
+            if (member.isVideoMuted() == 0) { // 未开启摄像头 《==》 移除存在的SurfaceView，显示头像
                 mBinding.avatarItemRoomSpeaker.setVisibility(View.VISIBLE);
                 if (mBinding.superLayout.getChildAt(0) instanceof CardView) {
                     mBinding.superLayout.removeViewAt(0);
@@ -89,11 +90,11 @@ public class RoomPeopleHolder extends BaseRecyclerViewAdapter.BaseViewHolder<Ktv
                 }
 //                } else {
                 SurfaceView surfaceView = loadRenderView(mContext);
-                if (member.userNo.equals(UserManager.getInstance().getUser().userNo)) { // 是本人
+                if (member.getUserNo().equals(UserManager.getInstance().getUser().userNo)) { // 是本人
                     engine.startPreview();
                     engine.setupLocalVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, 0));
                 } else {
-                    int id = member.getStreamId().intValue();
+                    int id = Integer.parseInt(member.getId());
                     RTCManager.getInstance().getRtcEngine().setupRemoteVideo(new VideoCanvas(surfaceView, Constants.RENDER_MODE_HIDDEN, id));
                 }
 //            }

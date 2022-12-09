@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *imageName;
 
-@property (nonatomic, assign) BOOL ifSelect;
+@property (nonatomic, assign) BOOL isSelect;
 
 
 @end

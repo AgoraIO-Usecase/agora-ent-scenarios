@@ -5,6 +5,7 @@
 
 #import "VLDropOnLineView.h"
 #import "VLRoomSeatModel.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 @import SDWebImage;
@@ -55,7 +56,7 @@
     UIButton *dropLineBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.width-102)*0.5, nickNameLabel.bottom+48, 102, 32)];
     dropLineBtn.layer.cornerRadius = 16;
     dropLineBtn.layer.masksToBounds = YES;
-    [dropLineBtn setTitle:NSLocalizedString(@"下麦", nil) forState:UIControlStateNormal];
+    [dropLineBtn setTitle:KTVLocalizedString(@"下麦") forState:UIControlStateNormal];
     [dropLineBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     dropLineBtn.titleLabel.font = UIFontMake(12);
     [dropLineBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
@@ -63,15 +64,19 @@
     [self addSubview:dropLineBtn];
 }
 
-- (void)setPartRoundWithView:(UIView *)view corners:(UIRectCorner)corners cornerRadius:(float)cornerRadius {
+- (void)setPartRoundWithView:(UIView *)view
+                     corners:(UIRectCorner)corners
+                cornerRadius:(float)cornerRadius {
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-    shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:view.bounds byRoundingCorners:corners cornerRadii:CGSizeMake(cornerRadius, cornerRadius)].CGPath;
+    shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:view.bounds
+                                            byRoundingCorners:corners
+                                                  cornerRadii:CGSizeMake(cornerRadius, cornerRadius)].CGPath;
     view.layer.mask = shapeLayer;
 }
 
 - (void)dropLineBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(dropOnLineAction:)]) {
-        [self.delegate dropOnLineAction:self.seatModel];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLDropOnLineView:action:)]) {
+        [self.delegate onVLDropOnLineView:self action:self.seatModel];
     }
 }
 
