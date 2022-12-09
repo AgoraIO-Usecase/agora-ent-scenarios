@@ -32,7 +32,7 @@ public interface IParserSource {
             ThreadManager.getInstance().runOnMainThread(() -> {
                 callback.onHideLoading();
                 if (!callback.hideErrorMsg) {
-                    LogTools.logE(response.getMessage(), "parseResource ");
+                    LogTools.e("parseResource", response.getMessage());
                 }
                 callback.onError(response.errorCode, response.getMessage());
             });

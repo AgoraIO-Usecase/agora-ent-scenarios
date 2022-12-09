@@ -18,6 +18,7 @@ import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.net.callback.ResultCallBack
+import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.viewmodel.SingleSourceLiveData
@@ -151,7 +152,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
-                    "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logE()
+                    "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logD()
                     joinRtcChannel.set(true)
                     checkJoinRoom()
                 }
@@ -172,7 +173,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         ChatroomIMManager.getInstance()
             .joinRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
                 override fun onSuccess(value: ChatRoom?) {
-                    "im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logE()
+                    "im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logD()
                     joinImRoom.set(true)
                     checkJoinRoom()
                 }

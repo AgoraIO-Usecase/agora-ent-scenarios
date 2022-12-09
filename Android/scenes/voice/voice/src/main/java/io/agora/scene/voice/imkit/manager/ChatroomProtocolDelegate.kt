@@ -59,7 +59,7 @@ class ChatroomProtocolDelegate constructor(
             if (code == 0 && result_map.isEmpty()) {
                 callBack.onSuccess()
                 ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
-                "initMicInfo update result onSuccess roomId:$roomId,".logE(TAG)
+                "initMicInfo update result onSuccess roomId:$roomId,".logD(TAG)
             } else {
                 callBack.onError(code, result_map.toString())
                 "initMicInfo update result onError roomId:$roomId, $code $result_map ".logE(TAG)
@@ -100,7 +100,7 @@ class ChatroomProtocolDelegate constructor(
                         } else if (key == "member_list") {
                             val memberList = GsonTools.toList(value, VoiceMemberModel::class.java)
                             memberList?.let { members ->
-                                "member_list($members) fetchRoomDetail onSuccess: ".logE(TAG)
+                                "member_list($members) fetchRoomDetail onSuccess: ".logD(TAG)
                                 addMemberListBySelf(members, object : ValueCallBack<List<VoiceMemberModel>> {
                                         override fun onSuccess(value: List<VoiceMemberModel>) {
                                             voiceRoomInfo.roomInfo?.memberList = value
@@ -173,7 +173,7 @@ class ChatroomProtocolDelegate constructor(
                 }
 
                 override fun onError(error: Int, desc: String?) {
-                    "onError: $error $desc".logE(TAG)
+                    "getMicInfoFromServer onError: $error $desc".logE(TAG)
                     callback.onError(error,desc)
                 }
             })
@@ -267,7 +267,7 @@ class ChatroomProtocolDelegate constructor(
                     map[toMicIndex] = fromBean
                     attributeMap.let { ChatroomCacheManager.cacheManager.setMicInfo(it) }
                     callback.onSuccess(map)
-                    "changeMic update result onSuccess: ".logE(TAG)
+                    "changeMic update result onSuccess: ".logD(TAG)
                 } else {
                     callback.onError(code, result_map.toString())
                     "changeMic update result onError: $code $result_map ".logE(TAG)
@@ -350,7 +350,7 @@ class ChatroomProtocolDelegate constructor(
             memberBean.micIndex = micIndex
         }
         voiceRoomApply.member = memberBean
-        "startMicSeatApply:$memberBean".logE(TAG)
+        "startMicSeatApply:$memberBean".logD(TAG)
         voiceRoomApply.created_at = System.currentTimeMillis()
         attributeMap["user"] = GsonTools.beanToString(voiceRoomApply).toString()
         attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
@@ -500,7 +500,7 @@ class ChatroomProtocolDelegate constructor(
                     map[7] = robot7
                     ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
                     callback.onSuccess(true)
-                    "enableRobot($enable) update result onSuccess: ".logE(TAG)
+                    "enableRobot($enable) update result onSuccess: ".logD(TAG)
                 } else {
                     callback.onError(code, result.toString())
                     "enableRobot($enable) update result onError: $code $result ".logE(TAG)
@@ -545,7 +545,7 @@ class ChatroomProtocolDelegate constructor(
                         attributeMap[getMicIndex(micIndex)] = value
                         ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
                         callback.onSuccess(voiceMicInfo)
-                        "Forced updateMic onSuccess: ".logE(TAG)
+                        "Forced updateMic onSuccess: ".logD(TAG)
                     }
 
                     override fun onError(code: Int, desc: String?) {
@@ -561,7 +561,7 @@ class ChatroomProtocolDelegate constructor(
                         attributeMap[getMicIndex(micIndex)] = value
                         ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)
                         callback.onSuccess(voiceMicInfo)
-                        "updateMic onSuccess: ".logE(TAG)
+                        "updateMic onSuccess: ".logD(TAG)
                     }
 
                     override fun onError(code: Int, desc: String?) {
@@ -717,7 +717,7 @@ class ChatroomProtocolDelegate constructor(
             roomManager.asyncSetChatroomAttribute(roomId,"gift_amount",giftAmount.toString(),true,object :
                 CallBack{
                 override fun onSuccess() {
-                    "update giftAmount onSuccess: $giftAmount".logE(TAG)
+                    "update giftAmount onSuccess: $giftAmount".logD(TAG)
                     ChatroomCacheManager.cacheManager.updateGiftAmountCache(newAmount)
                     callback.onSuccess()
                 }
@@ -749,7 +749,7 @@ class ChatroomProtocolDelegate constructor(
                             }
                             callback.onSuccess(rankList)
                         }
-                        "getRankList onSuccess: $value".logE(TAG)
+                        "getRankList onSuccess: $value".logD(TAG)
                     }
                 }
 
@@ -800,7 +800,7 @@ class ChatroomProtocolDelegate constructor(
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
             micIndex = micIndex).also {
-                "getMySelfModel:$it".logE(TAG)
+                "getMySelfModel:$it".logD(TAG)
         }
     }
 
@@ -815,7 +815,7 @@ class ChatroomProtocolDelegate constructor(
             "member_list",member,false,object : CallBack{
             override fun onSuccess() {
                 callback.onSuccess(newMemberList)
-                "addMemberListBySelf onSuccess: ".logE(TAG)
+                "addMemberListBySelf onSuccess: ".logD(TAG)
             }
 
             override fun onError(code: Int, error: String?) {
@@ -834,7 +834,7 @@ class ChatroomProtocolDelegate constructor(
                 eventType.getName(), params, object : OnMsgCallBack() {
                     override fun onSuccess(message: ChatMessageData?) {
                         callback.onSuccess()
-                        "sendCustomSingleMsg onSuccess: $message".logE(TAG)
+                        "sendCustomSingleMsg onSuccess: $message".logD(TAG)
                     }
 
                     override fun onError(messageId: String?, code: Int, desc: String?) {
@@ -846,7 +846,7 @@ class ChatroomProtocolDelegate constructor(
             CustomMsgHelper.getInstance().sendCustomMsg(roomId, params, object : OnMsgCallBack() {
                 override fun onSuccess(message: ChatMessageData?) {
                     callback.onSuccess()
-                    "sendCustomMsg onSuccess: $message".logE(TAG)
+                    "sendCustomMsg onSuccess: $message".logD(TAG)
                 }
 
                 override fun onError(messageId: String?, code: Int, desc: String?) {

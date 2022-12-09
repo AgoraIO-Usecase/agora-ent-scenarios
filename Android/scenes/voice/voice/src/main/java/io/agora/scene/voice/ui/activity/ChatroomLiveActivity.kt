@@ -5,12 +5,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -55,6 +53,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     companion object {
         const val RC_PERMISSIONS = 101
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
+        const val TAG = "ChatroomLiveActivity"
 
         fun startActivity(activity: Activity, voiceRoomModel: VoiceRoomModel) {
             val intent = Intent(activity, ChatroomLiveActivity::class.java).apply {
@@ -143,7 +142,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     CustomMsgHelper.getInstance().sendSystemMsg(
                         roomKitBean.ownerChatUid, object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
-                                "sendSystemMsg onSuccess $message".logE()
+                                "sendSystemMsg onSuccess $message".logD()
                                 binding.messageView.refreshSelectLast()
                             }
 
@@ -167,7 +166,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View?, insets: WindowInsetsCompat ->
             val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logE(
+            "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logD(
                 "insets=="
             )
             binding.clMain.setPaddingRelative(0, systemInset.top, 0, systemInset.bottom)
@@ -189,28 +188,36 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             override fun onReceiveGift(roomId: String, message: ChatMessageData?) {
                 super.onReceiveGift(roomId, message)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                binding.chatroomGiftView.refresh()
-                if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
-                    giftViewDelegate.showGiftAction()
+                "onReceiveGift $roomId ${message?.content}".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    binding.chatroomGiftView.refresh()
+                    if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
+                        giftViewDelegate.showGiftAction()
+                    }
+                    roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
                 }
-                roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
             }
 
             override fun onReceiveTextMsg(roomId: String, message: ChatMessageData?) {
                 super.onReceiveTextMsg(roomId, message)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                binding.messageView.refreshSelectLast()
+                "onReceiveTextMsg $roomId ${message?.content}".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    binding.messageView.refreshSelectLast()
+                }
             }
 
             override fun onReceiveSeatRequest(message: ChatMessageData) {
                 super.onReceiveSeatRequest(message)
-                "onReceiveSeatRequest ${roomKitBean.isOwner}".logE("liveActivity")
-                binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
+                "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
+                }
             }
 
             override fun onReceiveSeatRequestRejected(chatUid: String) {
                 super.onReceiveSeatRequestRejected(chatUid)
-                "onReceiveSeatRequestRejected $chatUid".logE("liveActivity")
+                "onReceiveSeatRequestRejected $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
@@ -219,8 +226,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
             override fun onReceiveSeatInvitation(message: ChatMessageData) {
                 super.onReceiveSeatInvitation(message)
-                "onReceiveSeatInvitation $message".logE("liveActivity")
-                roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
+                "onReceiveSeatInvitation $message".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
+                }
             }
 
             override fun onReceiveSeatInvitationRejected(
@@ -228,37 +237,41 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 message: ChatMessageData?
             ) {
                 super.onReceiveSeatInvitationRejected(conversationId, message)
-                "onReceiveSeatInvitationRejected $message".logE("liveActivity")
+                "onReceiveSeatInvitationRejected $conversationId ${message?.content}".logD(TAG)
             }
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
                 super.onAnnouncementChanged(roomId, content)
-                "onAnnouncementChanged $content".logE("liveActivity")
+                "onAnnouncementChanged $content".logD(TAG)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                roomObservableDelegate.updateAnnouncement(content)
+                ThreadManager.getInstance().runOnMainThread {
+                    roomObservableDelegate.updateAnnouncement(content)
+                }
             }
 
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
-                voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
+                "onUserJoinedRoom $roomId, ${voiceMember.chatUid}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
+                    voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
+                    voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
+                    voiceMember.let {
+                        ChatroomIMManager.getInstance().setMemberList(it)
+                    }
+                    binding.messageView.refreshSelectLast()
                 }
-                voiceMember.let {
-                    ChatroomIMManager.getInstance().setMemberList(it)
-                }
-                binding.messageView.refreshSelectLast()
             }
 
             override fun onUserLeftRoom(roomId: String, chatUid: String) {
                 super.onUserLeftRoom(roomId, chatUid)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                chatUid.let { ChatroomIMManager.getInstance().removeMember(it) }
-                voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
+                "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
+                    chatUid.let { ChatroomIMManager.getInstance().removeMember(it) }
+                    voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                 }
             }
@@ -266,13 +279,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
                 super.onUserBeKicked(roomId, reason)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                Log.e("ChatroomLiveActivity", "userBeKicked: $reason")
-                if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
-                    finish()
-                } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
-                    finish()
+                "userBeKicked $reason".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    if (reason == VoiceRoomServiceKickedReason.destroyed) {
+                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                        finish()
+                    } else if (reason == VoiceRoomServiceKickedReason.removed) {
+                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
+                        finish()
+                    }
                 }
             }
 
@@ -282,7 +297,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 fromId: String
             ) {
                 super.onSeatUpdated(roomId, attributeMap, fromId)
-                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logE()
+                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logD()
                 if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 attributeMap.let {
                     ChatroomIMManager.getInstance().updateMicInfoCache(it)
@@ -308,9 +323,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             override fun onRoomDestroyed(roomId: String) {
                 super.onRoomDestroyed(roomId)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                Log.e("ChatroomLiveActivity", "onRoomDestroyed: ")
-                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
-                finish()
+                "onRoomDestroyed $roomId".logD(TAG)
+                ThreadManager.getInstance().runOnMainThread {
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                    finish()
+                }
             }
         })
     }
@@ -455,7 +472,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             }
 
                             override fun onError(code: Int, error: String?) {
-                                Log.e("send error", " $code $error")
+                                "onSendMessage onError  $code $error".logE(TAG)
                             }
                         })
             }
@@ -505,12 +522,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     private fun onPermissionGrant() {
-        "onPermissionGrant initSdkJoin".logE()
+        "onPermissionGrant initSdkJoin".logD(TAG)
         roomLivingViewModel.initSdkJoin(roomKitBean)
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        "onPermissionsGranted requestCode$requestCode $perms".logD()
+        "onPermissionsGranted requestCode$requestCode $perms".logD(TAG)
         if (requestCode == RC_PERMISSIONS) {
             onPermissionGrant()
         }
@@ -521,14 +538,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     }
 
     override fun onRationaleAccepted(requestCode: Int) {
-        "onRationaleAccepted requestCode$requestCode ".logD()
+        "onRationaleAccepted requestCode$requestCode ".logD(TAG)
         if (requestCode == RC_PERMISSIONS) {
             onPermissionGrant()
         }
     }
 
     override fun onRationaleDenied(requestCode: Int) {
-        "onRationaleDenied requestCode$requestCode ".logD()
+        "onRationaleDenied requestCode$requestCode ".logD(TAG)
     }
 
     private fun reset() {
