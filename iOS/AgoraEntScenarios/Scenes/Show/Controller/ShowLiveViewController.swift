@@ -462,10 +462,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         guard let index = interactionList?.firstIndex(where: { $0.objectId == interaction.objectId}) else {
             return
         }
-        interactionList?.remove(at: index)
-        interactionList?.insert(interaction, at: index)
-        //TODO:
-        currentInteraction = interactionList?.first
+        var list = interactionList
+        list?.remove(at: index)
+        list?.insert(interaction, at: index)
+        interactionList = list
     }
     
     func onInteractionBegan(interaction: ShowInteractionInfo) {
@@ -631,6 +631,50 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
         print("contentInspectResult: \(result.rawValue)")
+        guard result == .porn else { return }
+        /*
+         toast
+         单主播直主播端违规
+         * 主播端toast 因内容违规已结束你的直播
+         * 观众端toast 此内容因违规已提前结束
+
+         PK主播A违规
+         * 主播A toast 因内容违规已结束你的直播
+         * 主播B toast 主播已离开，PK结束
+
+         1V1主播违规
+         * 主播 toast 因内容违规已结束你的直播
+         * 麦上观众 toast 主播已离开，连麦结束
+
+         1v1麦上观众违规
+         * 主播toast 观众X已离开，连麦结束
+         * 麦上观众 toast 因内容违规已结束你的连麦
+         */
+        
+        guard let interaction = currentInteraction else {
+            if role == .broadcaster {
+                ToastView.show(text: "因内容违规已结束你的直播")
+                leaveRoom()
+            } else {
+                //TODO: unused?
+                ToastView.show(text: "此内容因违规已提前结束")
+            }
+            return
+        }
+        
+        if role == .broadcaster {
+            ToastView.show(text: "因内容违规已结束你的直播")
+            leaveRoom()
+        } else {
+            if interaction.interactStatus == .pking {
+                //TODO: unused?
+                ToastView.show(text: "主播已离开，连麦结束")
+                _stopInteraction(interaction: interaction)
+            } else {
+                ToastView.show(text: "因内容违规已结束你的连麦")
+                _stopInteraction(interaction: interaction)
+            }
+        }
     }
 }
 
@@ -691,6 +735,12 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
+        if let info = currentInteraction, info.userId == VLUserCenter.user.id {
+            settingMenuVC.selectedMap = [.mute_mic: info.muteAudio]
+        } else {
+            settingMenuVC.selectedMap.removeAll()
+        }
+        
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
         }else{
