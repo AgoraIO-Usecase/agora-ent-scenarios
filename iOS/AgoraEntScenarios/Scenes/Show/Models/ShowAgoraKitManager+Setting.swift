@@ -81,6 +81,9 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
         updateSettingForkey(.PVC)
+        
+        // 设置采集分辨率
+//        setCaptureVideoDimensions(videoSize.sizeValue)
     }
     
     /// 设置观众端画质增强

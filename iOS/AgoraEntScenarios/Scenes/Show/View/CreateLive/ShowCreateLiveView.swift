@@ -202,14 +202,14 @@ class ShowCreateLiveView: UIView {
         beautyButton.addTarget(self, action: #selector(didClickBeautyButton), for: .touchUpInside)
         
         // 画质
-        let qualityButton = createButton(imgName: "show_create_quality", title: "create_button_quality".show_localized)
-        qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
+//        let qualityButton = createButton(imgName: "show_create_quality", title: "create_button_quality".show_localized)
+//        qualityButton.addTarget(self, action: #selector(didClickQualityButton), for: .touchUpInside)
         
         // 设置
         let settingButton = createButton(imgName: "show_setting", title: "create_button_settings".show_localized)
         settingButton.addTarget(self, action: #selector(didClickSettingButton), for: .touchUpInside)
         
-        let buttonArray = [cameraButton, beautyButton, qualityButton,settingButton]
+        let buttonArray = [cameraButton, beautyButton, settingButton]
         let count = buttonArray.count
         let itemSpace: CGFloat = 40
         let itemWidth: CGFloat = 40
