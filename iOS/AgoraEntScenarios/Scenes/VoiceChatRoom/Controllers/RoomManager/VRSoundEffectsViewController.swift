@@ -72,7 +72,6 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.show(withStatus: "Loading".localized())
         self.toLive.isUserInteractionEnabled = false
-        self.navigation.back.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
         ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
@@ -81,24 +80,28 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             entity.owner?.chat_uid = uid
             VLUserCenter.user.im_token = im_token
             VLUserCenter.user.chat_uid = uid
-            VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.id , token: VLUserCenter.user.im_token , completion: { userName, error in
+            SVProgressHUD.dismiss()
+            if im_token.isEmpty || uid.isEmpty {
+                SVProgressHUD.showError(withStatus: "Fetch IMConfig failed!")
+            }
+            SVProgressHUD.show(withStatus: "Loading".localized())
+            VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
+                SVProgressHUD.dismiss()
                 if error == nil {
                     ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
                         SVProgressHUD.dismiss()
                         if let room = room {
-                            self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                            SVProgressHUD.showSuccess(withStatus: "Room Created".localized())
                             self.entryRoom(room: room)
                             self.toLive.isUserInteractionEnabled = true
-                            self.navigation.back.isUserInteractionEnabled = true
                         } else {
                             self.toLive.isUserInteractionEnabled = true
-                            self.navigation.back.isUserInteractionEnabled = true
-                            self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
+                            SVProgressHUD.showError(withStatus: "Create failed!".localized())
                         }
                     }
                 } else {
+                    SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
                     self.toLive.isUserInteractionEnabled = true
-                    self.navigation.back.isUserInteractionEnabled = true
                 }
             })
             
