@@ -16,12 +16,12 @@ import androidx.constraintlayout.widget.ConstraintSet
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.LogTools.logE
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.model.constructor.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceViewRoom3dMicLayoutBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
+import io.agora.voice.common.utils.LogTools.logD
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.hypot
@@ -230,7 +230,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 lastX = x
                 lastY = y
                 isMove = false
-                "onTouchEvent ACTION_DOWN x:${x} y:${y}".logE(TAG)
+                "onTouchEvent ACTION_DOWN x:${x} y:${y}".logD(TAG)
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
@@ -264,7 +264,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         preMovePoint.y = curPoint.y
                         preAngle = angle
                     }
-                    "onTouchEvent ACTION_MOVE x:${x} y:${y} dx:${dx} dy:${dy} angle:${angle}".logE(TAG)
+                    "onTouchEvent ACTION_MOVE x:${x} y:${y} dx:${dx} dy:${dy} angle:${angle}".logD(TAG)
                 }
                 return true
             }
@@ -301,7 +301,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                     preMovePoint.x = curPoint.x
                     preMovePoint.y = curPoint.y
                     preAngle = angle
-                    "onTouchEvent ACTION_UP x:${x} y:${y} dx:${dx} dy:${dy} z:${dz} angle:${angle}".logE(TAG)
+                    "onTouchEvent ACTION_UP x:${x} y:${y} dx:${dx} dy:${dy} z:${dz} angle:${angle}".logD(TAG)
                 }
             }
             MotionEvent.ACTION_CANCEL -> {}
@@ -342,7 +342,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
      */
     private fun check3DMicChildView(x: Int, y: Int): Boolean {
         if (getRect(binding.micV4Center).contains(x.toFloat(), y.toFloat())) {
-            "onTouchEvent ACTION_DOWN checkChildView:${x} ${y}".logE(TAG)
+            "onTouchEvent ACTION_DOWN checkChildView:${x} ${y}".logD(TAG)
             return true
         }
         return false

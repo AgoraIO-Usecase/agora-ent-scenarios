@@ -10,7 +10,7 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.LogTools.logD
 import java.io.*
 
 class ChatroomCacheManager {
@@ -34,6 +34,7 @@ class ChatroomCacheManager {
     private var giftAmount:Int=0
 
     companion object {
+        const val TAG = "ChatroomCacheManager"
         val cacheManager = ChatroomCacheManager().apply {
             mSharedPreferences = ChatroomConfigManager.getInstance().context.getSharedPreferences(
                 "SP_AT_PROFILE",
@@ -57,14 +58,14 @@ class ChatroomCacheManager {
      */
     fun updateGiftAmountCache(amount:Int){
         giftAmount += amount
-        "updateGiftAmountCache(${giftAmount}) ".logE("ChatroomCacheManager")
+        "updateGiftAmountCache(${giftAmount}) ".logD(TAG)
     }
 
     /**
      * 获取房间礼物总金额
      */
     fun getGiftAmountCache():Int{
-        "getGiftAmountCache(${giftAmount}) ".logE("ChatroomCacheManager")
+        "getGiftAmountCache(${giftAmount}) ".logD(TAG)
         return giftAmount
     }
 
@@ -205,7 +206,7 @@ class ChatroomCacheManager {
      * 根据chatUid 获取对应实体类
      */
     fun getMember(chatUid: String): VoiceMemberModel?{
-        "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logE("ChatroomCacheManager")
+        "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logD(TAG)
         return roomMemberMap[chatUid]
     }
 
@@ -223,11 +224,11 @@ class ChatroomCacheManager {
         invitationMap.clear()
         invitationList.clear()
         invitationMap.putAll(roomMemberMap)
-        "invitationMap(${invitationMap}) invitationMap".logE("ChatroomCacheManager")
+        "invitationMap(${invitationMap}) invitationMap".logD(TAG)
         for (entry in getMicInfoMap()?.entries!!) {
             val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
             micInfo?.member?.chatUid.let {
-                "invitationMap remove(${it})".logE("ChatroomCacheManager")
+                "invitationMap remove(${it})".logD(TAG)
                 invitationMap.remove(it)
             }
         }
@@ -278,7 +279,7 @@ class ChatroomCacheManager {
             o2.amount.compareTo(o1.amount)
         }
         rankingList.sortWith(comparator)
-        "getRankList (${rankingList})".logE("ChatroomCacheManager")
+        "getRankList (${rankingList})".logD(TAG)
         return rankingList
     }
 

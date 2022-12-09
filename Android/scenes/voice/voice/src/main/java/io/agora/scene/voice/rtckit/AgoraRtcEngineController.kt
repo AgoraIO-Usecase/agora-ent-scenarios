@@ -302,7 +302,7 @@ class AgoraRtcEngineController {
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
-            "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logE()
+            "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logD(TAG)
 
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
