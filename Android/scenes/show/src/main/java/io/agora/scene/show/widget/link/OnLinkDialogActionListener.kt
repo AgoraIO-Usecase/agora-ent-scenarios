@@ -2,7 +2,6 @@ package io.agora.scene.show.widget.link
 
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowUser
-import io.agora.scene.show.widget.UserItem
 
 interface OnLinkDialogActionListener {
     /**

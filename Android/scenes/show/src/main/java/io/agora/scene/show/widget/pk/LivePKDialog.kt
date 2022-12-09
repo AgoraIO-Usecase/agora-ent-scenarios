@@ -18,10 +18,10 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 class LivePKDialog : BottomSheetDialogFragment() {
     private var mBinding : ShowLivePkDialogBinding? = null
     private val binding get() = mBinding!!
-    private lateinit var pkDialogListener : OnPKDialogActionListener;
+    private lateinit var pkDialogListener : OnPKDialogActionListener
     private val pkFragment : LivePKRequestMessageFragment = LivePKRequestMessageFragment()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         mBinding = ShowLivePkDialogBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -31,14 +31,14 @@ class LivePKDialog : BottomSheetDialogFragment() {
 
         // 设置背景透明
         WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
-        requireDialog().setOnShowListener { dialog: DialogInterface? ->
+        requireDialog().setOnShowListener {
             (view.parent as ViewGroup).setBackgroundColor(
                 Color.TRANSPARENT
             )
         }
         ViewCompat.setOnApplyWindowInsetsListener(
             requireDialog().window!!.decorView
-        ) { v: View?, insets: WindowInsetsCompat ->
+        ) { _: View?, insets: WindowInsetsCompat ->
             val inset =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.pager.setPadding(0, 0, 0, inset.bottom)
@@ -85,8 +85,8 @@ class LivePKDialog : BottomSheetDialogFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBoardcasterList(roomItem : List<ShowRoomDetailModel>) {
-        pkFragment.setOnlineBoardcasterList(roomItem)
+    fun setOnlineBroadcasterList(roomItem : List<ShowRoomDetailModel>) {
+        pkFragment.setOnlineBroadcasterList(roomItem)
     }
 
     /**

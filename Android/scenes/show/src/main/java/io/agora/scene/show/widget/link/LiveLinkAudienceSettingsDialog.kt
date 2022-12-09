@@ -7,7 +7,6 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetLinkSettingsDialogBinding
-import io.agora.scene.show.databinding.ShowWidgetSettingDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogItemBinding
 import io.agora.scene.show.widget.BottomDarkDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
@@ -122,20 +121,8 @@ class LiveLinkAudienceSettingsDialog(context: Context) : BottomDarkDialog(contex
         mAdapter.resetAll(mHostItemList)
     }
 
-    fun setItemActivated(@ItemId itemId: Int, activate: Boolean){
-        for (i in 0 .. mAdapter.itemCount){
-            mAdapter.getItem(i)?.let {
-                if (it.itemId == itemId) {
-                    it.activated = activate
-                    mAdapter.notifyItemChanged(i)
-                    return
-                }
-            }
-        }
-    }
-
     fun setAudienceInfo(userName : String) {
-        mBinding.userName.setText("对观众" + userName)
+        mBinding.userName.text = "对观众$userName"
     }
 
     fun setOnItemActivateChangedListener(listener: (dialog: LiveLinkAudienceSettingsDialog, itemId: Int, activated: Boolean)->Unit) {

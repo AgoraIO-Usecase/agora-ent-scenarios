@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
@@ -21,24 +21,24 @@ class LiveLinkAudienceFragment : BaseFragment() {
             )
         )}
     private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
-    private lateinit var mListener : Listener
+    private var mListener : Listener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkRequestViewAdapter.setIsRoomOwner(false)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.textLinking.setText("可申请连麦")
+        mBinding.textLinking.setText(R.string.show_can_apply)
         mBinding.linkRequestList.adapter = linkRequestViewAdapter
         mBinding.iBtnSeatApply.setOnClickListener {
             // 观众申请连麦
-            mListener.onApplyOnSeat()
+            mListener?.onApplyOnSeat()
             mBinding.iBtnSeatApply.isVisible = false
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnCancelApply.isVisible = true
@@ -48,11 +48,11 @@ class LiveLinkAudienceFragment : BaseFragment() {
         }
         mBinding.iBtnStopLink.setOnClickListener {
             // 观众停止连麦
-            mListener.onStopLinkingChosen()
+            mListener?.onStopLinkingChosen()
         }
         mBinding.iBtnCancelApply.setOnClickListener {
             // 观众撤回申请
-            mListener.onStopApplyingChosen()
+            mListener?.onStopApplyingChosen()
             mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnCancelApply.isVisible = false
@@ -60,8 +60,8 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnStopLinkText.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
         }
-        mBinding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
-            mListener.onRequestRefreshing()
+        mBinding.smartRefreshLayout.setOnRefreshListener {
+            mListener?.onRequestRefreshing()
         }
         mBinding.smartRefreshLayout.autoRefresh()
     }
@@ -71,14 +71,14 @@ class LiveLinkAudienceFragment : BaseFragment() {
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (status == ShowInteractionStatus.onSeat.value) {
-            if (userName.equals(UserManager.getInstance().user.name)) {
+            if (userName == UserManager.getInstance().user.name) {
                 mBinding.iBtnSeatApply.isVisible = false
                 mBinding.iBtnSeatApplyText.isVisible = false
                 mBinding.iBtnCancelApply.isVisible = false
                 mBinding.iBtnCancelApplyText.isVisible = false
                 mBinding.iBtnStopLinkText.isVisible = true
                 mBinding.iBtnStopLink.isVisible = true
-                mBinding.textLinking.setText("与主播连麦中")
+                mBinding.textLinking.setText(R.string.show_linking)
             }
         } else if (status == null) {
             mBinding.iBtnSeatApply.isVisible = true
@@ -86,7 +86,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
             mBinding.iBtnSeatApplyText.isVisible = true
             mBinding.iBtnStopLinkText.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
-            mBinding.textLinking.setText("可申请连麦")
+            mBinding.textLinking.setText(R.string.show_can_apply)
         }
     }
 
@@ -103,14 +103,15 @@ class LiveLinkAudienceFragment : BaseFragment() {
         }
 
         if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&
-            interactionInfo.userId.equals(UserManager.getInstance().user.id.toString())) {
+            interactionInfo.userId == UserManager.getInstance().user.id.toString()
+        ) {
             mBinding.iBtnSeatApply.isVisible = false
             mBinding.iBtnSeatApplyText.isVisible = false
             mBinding.iBtnCancelApply.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
             mBinding.iBtnStopLinkText.isVisible = true
             mBinding.iBtnStopLink.isVisible = true
-            mBinding.textLinking.setText("与主播连麦中")
+            mBinding.textLinking.setText(R.string.show_linking)
         }
         linkRequestViewAdapter.resetAll(list)
         mBinding.smartRefreshLayout.finishRefresh()

@@ -16,19 +16,19 @@ class LiveLinkRequestFragment : BaseFragment() {
     private var mBinding : ShowLiveLinkRequestMessageListBinding? = null
     private val binding get() = mBinding!!
     private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
-    private lateinit var mListener : Listener
+    private var mListener : Listener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkRequestViewAdapter.setClickListener(object : LiveLinkRequestViewAdapter.OnClickListener {
             override fun onClick(seatApply: ShowMicSeatApply, position: Int) {
                 // 主播接受连麦
-                mListener.onAcceptMicSeatItemChosen(seatApply, position)
+                mListener?.onAcceptMicSeatItemChosen(seatApply, position)
             }
         })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         mBinding = ShowLiveLinkRequestMessageListBinding.inflate(LayoutInflater.from(context))
         return binding.root
     }
@@ -38,10 +38,10 @@ class LiveLinkRequestFragment : BaseFragment() {
         binding.linkRequestList.adapter = linkRequestViewAdapter
         binding.iBtnStopLink.setOnClickListener {
             // 主播停止连麦
-            mListener.onStopLinkingChosen()
+            mListener?.onStopLinkingChosen()
         }
-        binding.smartRefreshLayout.setOnRefreshListener { refreshLayout ->
-            mListener.onRequestRefreshing()
+        binding.smartRefreshLayout.setOnRefreshListener {
+            mListener?.onRequestRefreshing()
         }
         binding.smartRefreshLayout.autoRefresh()
     }
@@ -64,7 +64,7 @@ class LiveLinkRequestFragment : BaseFragment() {
             binding.textLinking.isVisible = true
             binding.iBtnStopLinkText.isVisible = true
             binding.iBtnStopLink.isVisible = true
-            binding.textLinking.setText("与观众 " + userName + " 连麦中")
+            binding.textLinking.text = "与观众 $userName 连麦中"
         }
     }
 
@@ -73,7 +73,7 @@ class LiveLinkRequestFragment : BaseFragment() {
      */
     fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
         if (mBinding == null) return
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             binding.linkRequestListEmptyImg.visibility = View.VISIBLE
             binding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
@@ -94,7 +94,7 @@ class LiveLinkRequestFragment : BaseFragment() {
      */
     fun setSeatApplyItemStatus(seatApply: ShowMicSeatApply) {
         if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
-            val itemCount: Int = linkRequestViewAdapter.getItemCount()
+            val itemCount: Int = linkRequestViewAdapter.itemCount
             for (i in 0 until itemCount) {
                 linkRequestViewAdapter.getItem(i)?.let {
                     if (it.userId == seatApply.userId) {
@@ -128,7 +128,7 @@ class LiveLinkRequestFragment : BaseFragment() {
             binding.textLinking.isVisible = true
             binding.iBtnStopLinkText.isVisible = true
             binding.iBtnStopLink.isVisible = true
-            binding.textLinking.setText("与观众 " + userName + " 连麦中")
+            binding.textLinking.text = "与观众 $userName 连麦中"
         } else if (status == null) {
             binding.iBtnStopLinkText.isVisible = false
             binding.iBtnStopLink.isVisible = false

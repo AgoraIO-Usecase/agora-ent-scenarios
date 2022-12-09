@@ -17,21 +17,21 @@ class LivePKViewAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowLivePkReq
     ) {
         val roomItem = getItem(position)!!
         val binding = holder.binding
-        binding.titleItemBoardcasterStatus.setText(roomItem.roomName)
-        binding.coverBoardcasterIcon.setVisibility(View.VISIBLE)
+        binding.titleItemBoardcasterStatus.text = roomItem.roomName
+        binding.coverBoardcasterIcon.visibility = View.VISIBLE
         GlideApp.with(binding.coverBoardcasterIcon).load(roomItem.ownerAvater)
             .fallback(R.mipmap.show_default_icon)
             .error(R.mipmap.show_default_icon)
             .transform(CenterCropRoundCornerTransform(10))
-            .into(binding.coverBoardcasterIcon);
+            .into(binding.coverBoardcasterIcon)
         if (roomItem.interactStatus == ShowInteractionStatus.idle.value) {
-            binding.btnItemRequest.setEnabled(true)
+            binding.btnItemRequest.isEnabled = true
             binding.btnItemRequest.setText(R.string.show_application)
             binding.btnItemRequest.setOnClickListener {
                 onClickListener.onClick(roomItem, position)
             }
         } else if (roomItem.interactStatus == ShowInteractionStatus.pking.value) {
-            binding.btnItemRequest.setEnabled(false)
+            binding.btnItemRequest.isEnabled = false
             binding.btnItemRequest.setText(R.string.show_pking)
             binding.btnItemRequest.setOnClickListener(null)
         }
