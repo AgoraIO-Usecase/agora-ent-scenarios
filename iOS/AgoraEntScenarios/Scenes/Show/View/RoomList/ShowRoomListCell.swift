@@ -32,7 +32,12 @@ class ShowRoomListCell: UICollectionViewCell {
         imageView.image = UIImage.show_sceneImage(name: "show_room_bg_\(img)")
         nameLabel.text = name
         idLablel.text = "ID: \(id ?? "0")"
-        let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_room_person")!)
+        var attachment = NSTextAttachment()
+        if #available(iOS 13.0, *) {
+            attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_room_person")!)
+        } else {
+            attachment.image = UIImage.show_sceneImage(name: "show_room_person")
+        }
         attachment.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
         let attriTipsImg = NSAttributedString(attachment: attachment)
         let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)

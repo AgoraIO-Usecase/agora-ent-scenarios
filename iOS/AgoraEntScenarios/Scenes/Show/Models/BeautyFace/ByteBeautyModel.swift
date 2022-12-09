@@ -269,14 +269,14 @@ class ByteBeautyModel: ByteBaseModel {
         dataArray.append(model)
         
         model = ByteBeautyModel()
-        model.path = "biti"
-        model.name = "鼻涕".show_localized
+        model.path = "huahua"
+        model.name = "花花".show_localized
         model.icon = "meiyan_lj_naiyou"
         dataArray.append(model)
         
         model = ByteBeautyModel()
-        model.path = "test_sticker"
-        model.name = "周年狂欢".show_localized
+        model.path = "wochaotian"
+        model.name = "我超甜".show_localized
         model.icon = "meiyan_lj_makalong"
         dataArray.append(model)
         

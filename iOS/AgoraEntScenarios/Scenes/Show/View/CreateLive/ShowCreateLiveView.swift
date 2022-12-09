@@ -130,7 +130,12 @@ class ShowCreateLiveView: UIView {
         // tips
         let tipsLabel = UILabel()
         let tipsText = "create_tips".show_localized
-        let attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_create_tips")!)
+        var attachment = NSTextAttachment()
+        if #available(iOS 13.0, *) {
+            attachment = NSTextAttachment(image: UIImage.show_sceneImage(name: "show_create_tips")!)
+        } else {
+            attachment.image = UIImage.show_sceneImage(name: "show_create_tips")
+        }
         attachment.bounds = CGRect(x: 0, y: -2, width: 11, height: 11)
         let attriTipsImg = NSAttributedString(attachment: attachment)
         let attriTips = NSMutableAttributedString(attributedString: attriTipsImg)
