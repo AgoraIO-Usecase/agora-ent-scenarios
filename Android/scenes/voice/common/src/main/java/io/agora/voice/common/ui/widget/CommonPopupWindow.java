@@ -3,17 +3,15 @@ package io.agora.voice.common.ui.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
+import androidx.viewbinding.ViewBinding;
 
 
-public abstract class CommonPopupWindow<V extends View, Binding extends ViewDataBinding> extends PopupWindow {
+public abstract class CommonPopupWindow<V extends View, Binding extends ViewBinding> extends PopupWindow {
     private Context context;
     private OnDismissListener onDismissListener;
 
@@ -45,9 +43,6 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewData
                 }
                 if (onDismissListener != null) {
                     onDismissListener.onDismiss();
-                }
-                if (builder.mBinding != null) {
-                    builder.mBinding.unbind();
                 }
             }
         });
@@ -132,7 +127,7 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewData
 
     abstract InterceptTransform getIntercept();
 
-    public static class ViewDataBindingBuilder<Binding extends ViewDataBinding> {
+    public static class ViewDataBindingBuilder<Binding extends ViewBinding> {
         private Binding mBinding;
         private int mWidth;
         private int mHeight;
@@ -155,11 +150,6 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewData
         private OnShowAfter<Binding> mOnShowAfter;
         private int mAnimationStyle = -1;
         private OnDismissListener onDismissListener;
-
-        public ViewDataBindingBuilder<Binding> layoutId(Context context, int layoutId) {
-            this.mBinding = DataBindingUtil.inflate(LayoutInflater.from(context), layoutId, null, false);
-            return this;
-        }
 
         public ViewDataBindingBuilder<Binding> viewDataBinding(Binding mBinding) {
             this.mBinding = mBinding;
@@ -356,7 +346,7 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewData
             return this;
         }
 
-        public <T extends ViewDataBinding> CommonPopupWindow<V, T> build(Context context) {
+        public <T extends ViewBinding> CommonPopupWindow<V, T> build(Context context) {
             return new CommonPopupWindow<V, T>(context, this) {
 
                 @Override
