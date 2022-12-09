@@ -145,7 +145,7 @@ class VMSoundView: UIView {
         default:
             detailStr = "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. ".localized()
             iconImgs = images[3]
-            typeStr = "Professional podcaster".localized()
+            typeStr = "Professional Podcaster".localized()
         }
         cellHeight = textHeight(text: detailStr, fontSize: 13, width: bounds.size.width - 40~)
     }
