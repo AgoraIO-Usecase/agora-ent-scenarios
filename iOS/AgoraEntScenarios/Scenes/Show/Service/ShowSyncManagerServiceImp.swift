@@ -285,6 +285,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         
         guard let roomInfo = roomList?.filter({ $0.roomId == self.getRoomId() }).first else {
 //            agoraAssert("leaveRoom channelName = nil")
+            completion(nil)
             return
         }
         _removeUser { err in
@@ -1045,7 +1046,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .get(success: { [weak self] list in
-                agoraPrint("imp seat apply get success...")
+                agoraPrint("imp seat apply get success... \(list.count)")
                 let seatApplyList = list.compactMap({ ShowMicSeatApply.yy_model(withJSON: $0.toJson()!)! })
                 self?.seatApplyList = seatApplyList
                 completion(nil, seatApplyList)
