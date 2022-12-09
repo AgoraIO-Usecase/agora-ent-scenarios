@@ -267,10 +267,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 Log.e("ChatroomLiveActivity", "userBeKicked: $reason")
                 if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
                     finish()
                 } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member), Toast.LENGTH_SHORT)
+                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
                     finish()
                 }
             }
@@ -293,7 +293,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 super.onRoomDestroyed(roomId)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 Log.e("ChatroomLiveActivity", "onRoomDestroyed: ")
-                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close), Toast.LENGTH_SHORT)
+                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
                 finish()
             }
         })
