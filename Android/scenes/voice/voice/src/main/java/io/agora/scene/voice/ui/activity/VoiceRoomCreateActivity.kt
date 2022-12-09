@@ -36,6 +36,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools.show
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.utils.FastClickTools.isFastClick
 import java.text.SimpleDateFormat
@@ -71,7 +72,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
-        chickPrivate()
+        initUi()
 //        binding.edRoomName.filters = arrayOf<InputFilter>(EmojiInputFilter(32))
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         initListener()
@@ -89,7 +90,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             } else if (checkedId == R.id.radioButton_public) {
                 isPublic = true
             }
-            chickPrivate()
+            initUi()
         }
         binding.titleBar.setOnBackPressListener {
             onBackPressed()
@@ -152,35 +153,32 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                         voiceRoomViewModel.joinRoom(it.roomId)
                     }
                 }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    binding.bottomNext.isEnabled = true
+                    dismissLoading()
+                    if(code == VoiceServiceProtocol.ERR_LOGIN_ERROR){
+                        show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
+                    }else{
+                        show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
+                    }
+                }
             })
         }
         voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(result: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice create room chat_username:$chatUsername".logD()
-                    "Voice create room im_token:$chatToken".logD()
-                    if (!ChatroomIMManager.getInstance().isLoggedIn) {
-                        ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                            override fun onSuccess() {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    goVoiceRoom()
-                                }
-                            }
-
-                            override fun onError(code: Int, desc: String) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    binding.bottomNext.isEnabled = true
-                                    dismissLoading()
-                                }
-                            }
-                        })
-                    } else {
-                        ThreadManager.getInstance().runOnMainThread {
-                            goVoiceRoom()
-                        }
+                    ThreadManager.getInstance().runOnMainThread {
+                        goVoiceRoom()
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    binding.bottomNext.isEnabled = true
+                    dismissLoading()
+                    "VoiceRoomCreateActivity syncJoinRoom fail:$code $message".logD()
                 }
             })
         }
@@ -245,7 +243,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         }
     }
 
-    private fun chickPrivate() {
+    private fun initUi() {
         if (isPublic) {
             binding.edPwd.visibility = View.GONE
             binding.baseLayout.requestFocus()
