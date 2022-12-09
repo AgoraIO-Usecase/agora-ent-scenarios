@@ -38,9 +38,6 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
     private var curVoiceRoomModel: VoiceRoomModel? = null
 
-    private var total = 0
-    private var isEnd = false
-
     var itemCountListener: ((count: Int) -> Unit)? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceFragmentRoomListLayoutBinding {
@@ -78,11 +75,8 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             parseResource(response, object : OnResourceParseCallback<List<VoiceRoomModel>>() {
                 override fun onSuccess(dataList: List<VoiceRoomModel>?) {
                     binding?.swipeLayout?.isRefreshing = false
-                    total = dataList?.size ?: 0
-                    "Voice room list total：${total}".logD()
-                    if (dataList == null || dataList.isEmpty()) return
-                    isEnd = true
-                    listAdapter?.submitListAndPurge(dataList)
+                    "Voice room list total：${dataList?.size ?: 0}".logD()
+                    listAdapter?.submitListAndPurge(dataList ?: mutableListOf())
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -142,7 +136,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             channelId = voiceRoomModel.channelId,
             chatroomId = voiceRoomModel.chatroomId,
             chatroomName = voiceRoomModel.roomName,
-            chatOwner = voiceRoomModel.owner?.chatUid?:"",
+            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
             completion = { error, _ ->
                 if (error == VoiceServiceProtocol.ERR_OK) {
                     ThreadManager.getInstance().runOnMainThread {
