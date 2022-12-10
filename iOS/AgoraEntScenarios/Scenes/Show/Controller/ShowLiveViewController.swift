@@ -314,11 +314,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         if apply.status == .accepted {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
-            if apply.userId == VLUserCenter.user.id {
-                agoraKitManager.switchRole(role: .broadcaster,
-                                           uid: apply.userId,
-                                           canvasView: liveView.canvasView.remoteView)
-            }
+//            if apply.userId == VLUserCenter.user.id {
+//                agoraKitManager.switchRole(role: .broadcaster,
+//                                           uid: apply.userId,
+//                                           canvasView: liveView.canvasView.remoteView)
+//            }
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             
@@ -376,10 +376,10 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //        liveView.canvasView.canvasType = .joint_broadcasting
         liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
 //        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
-        guard invitation.userId == VLUserCenter.user.id else { return }
-        agoraKitManager.switchRole(role: .broadcaster,
-                                   uid: invitation.userId,
-                                   canvasView: liveView.canvasView.remoteView)
+//        guard invitation.userId == VLUserCenter.user.id else { return }
+//        agoraKitManager.switchRole(role: .broadcaster,
+//                                   uid: invitation.userId,
+//                                   canvasView: liveView.canvasView.remoteView)
     }
     
     func onMicSeatInvitationRejected(invitation: ShowMicSeatInvitation) {
@@ -499,11 +499,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-            if interaction.userId != room?.ownerId {
-                agoraKitManager.switchRole(role: interaction.userId == VLUserCenter.user.id ? .broadcaster : .audience,
-                                                uid: interaction.userId,
-                                                canvasView: liveView.canvasView.remoteView)
+            //TODO(zhaoyongqiang): rtc offline while room owner accpeted apply
+            var rtcRole: AgoraClientRole = .audience
+            if role == .broadcaster || interaction.userId == VLUserCenter.user.id {
+                rtcRole = .broadcaster
             }
+            agoraKitManager.switchRole(role: rtcRole,
+                                            uid: interaction.userId,
+                                            canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             
@@ -525,9 +528,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             }
             
         case .onSeat:
-            if interaction.userId != room?.ownerId {
-                agoraKitManager.switchRole(role: .audience, uid: interaction.userId, canvasView: UIView())
+            //TODO(zhaoyongqiang): rtc offline while room owner stop interaction
+            var rtcRole: AgoraClientRole = .audience
+            if role == .broadcaster {
+                rtcRole = .broadcaster
             }
+            agoraKitManager.switchRole(role: rtcRole, uid: interaction.userId, canvasView: UIView())
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
             applyView.getAllMicSeatList(autoApply: false)
@@ -551,23 +557,25 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
 //        LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
+        print("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
 //        LogUtils.log(message: "error: \(errorCode)", level: .error)
 //        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
-        print("errorCode == \(errorCode.rawValue)")
+        print("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
 //        LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
-        print("-----didJoinChannel")
+        print("rtcEngine didJoinChannel")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        print("join Uid === \(uid)")
+        print("rtcEngine didJoinedOfUid === \(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
+        print("rtcEngine didOfflineOfUid === \(uid)")
 //        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
 //        didOfflineOfUid(uid: uid)
 //        if roomOwnerId == uid {
