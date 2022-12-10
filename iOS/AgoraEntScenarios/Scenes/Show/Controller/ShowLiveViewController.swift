@@ -593,20 +593,20 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        liveView.canvasView.setRemoteUserInfo(name: "")
 //        liveView.canvasView.canvasType = .none
 //        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
-//        if let interaction = self.currentInteraction {
-//            let isRoomOwner: Bool = role == .broadcaster ? true : false
-//            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
-//            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
-//            if roomOwnerExit {
-//                //room owner exit
-//                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
-//                }
-//            } else if isRoomOwner, isInteractionLeave {
-//                //room owner found interaction(pk/onseat) user offline
-//                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
-//                }
-//            }
-//        }
+        if let interaction = self.currentInteraction {
+            let isRoomOwner: Bool = role == .broadcaster ? true : false
+            let isInteractionLeave: Bool = interaction.userId == "\(uid)"
+            let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
+            if roomOwnerExit {
+                //room owner exit
+                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                }
+            } else if isRoomOwner, isInteractionLeave {
+                //room owner found interaction(pk/onseat) user offline
+                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                }
+            }
+        }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
