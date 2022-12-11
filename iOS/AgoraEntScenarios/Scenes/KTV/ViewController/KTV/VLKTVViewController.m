@@ -427,6 +427,11 @@ KTVApiDelegate
 }
 
 #pragma mark - rtc callbacks
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
+{
+    [self.soloControl onMainEngineRemoteUserJoin:uid];
+}
+
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
@@ -468,6 +473,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if(!self.MVView.lrcView.isStart) {
                 [self.MVView start];
             }
+            [self.soloControl processNTPSync];
         }
     } else if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         NSInteger leftSecond = [dict[@"time"] integerValue];
@@ -763,14 +769,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     });
 }
 
--(void)controller:(KTVApi *)controller song:(NSInteger)songCode didChangedToPosition:(NSInteger)position
+-(void)controller:(KTVApi *)controller song:(NSInteger)songCode config:(nonnull KTVSongConfiguration *)config didChangedToPosition:(NSInteger)position
 {
-    if ([self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
+    if (config.role == KTVSingRoleMainSinger) {
         //if i am main singer
         NSDictionary *dict = @{
             @"cmd":@"setLrcTime",
             @"duration":@([self getTotalTime]),
-            @"time":@(position),
+            @"time":@(position)
         };
         [self.soloControl sendStreamMessageWithDict:dict success:nil];
     }
@@ -1000,23 +1006,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self syncTrackMode:self.trackMode];
     }
 }
-
-//合唱的倒计时事件
-//- (void)onKTVMVView:(VLKTVMVView *)view timerCountDown:(NSInteger)countDownSecond {
-//    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-//    if ([selSongModel.userNo isEqualToString:VLUserCenter.user.userNo]) {
-//        NSDictionary *dict = @{
-//            @"cmd":@"countdown",
-//            @"time":@(countDownSecond)
-//        };
-////        [self sendStreamMessageWithDict:dict
-////                               success:^(BOOL ifSuccess) {
-////            if (ifSuccess) {
-////                VLLog(@"倒计时发送成功");
-////            }
-////        }];
-//    }
-//}
 
 - (void)onKTVMVView:(VLKTVMVView *)view chorusSingAction:(VLKTVMVViewSingActionType)singType {
     if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱

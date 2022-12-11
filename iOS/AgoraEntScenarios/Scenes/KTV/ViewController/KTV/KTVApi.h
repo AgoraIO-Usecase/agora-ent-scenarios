@@ -30,11 +30,27 @@ typedef enum : NSUInteger {
     KTVLoadSongStatePreloadFail
 } KTVLoadSongState;
 
+@interface KTVSongConfiguration : NSObject
+
+@property(nonatomic, assign)KTVSongType type;
+@property(nonatomic, assign)KTVSingRole role;
+@property(nonatomic, assign)NSInteger mainSingerUid;
+@property(nonatomic, assign)NSInteger coSingerUid;
+
+
+@end
+
+@implementation KTVSongConfiguration
+
+
+
+@end
+
 @class KTVApi;
 @protocol KTVApiDelegate <NSObject>
 
 - (void)controller:(KTVApi*)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state;
-- (void)controller:(KTVApi*)controller song:(NSInteger)songCode didChangedToPosition:(NSInteger)position;
+- (void)controller:(KTVApi*)controller song:(NSInteger)songCode config:(KTVSongConfiguration*)config didChangedToPosition:(NSInteger)position;
 
 @end
 
@@ -43,14 +59,16 @@ typedef enum : NSUInteger {
 @property(nonatomic, weak)id<KTVApiDelegate> delegate;
 
 -(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine channel:(NSString*)channelName musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(id<KTVApiDelegate>)delegate;
--(void)loadSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
--(void)playSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role;
+-(void)loadSong:(NSInteger)songCode withConfig:(KTVSongConfiguration*)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
+-(void)playSong:(NSInteger)songCode;
 -(void)stopSong;
 -(void)resumePlay;
 -(void)pausePlay;
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode;
 -(void)sendStreamMessageWithDict:(NSDictionary *)dict
                          success:(_Nullable sendStreamSuccess)success;
+-(void)onMainEngineRemoteUserJoin:(NSInteger)uid;
+-(void)processNTPSync;
 @end
 
 NS_ASSUME_NONNULL_END
