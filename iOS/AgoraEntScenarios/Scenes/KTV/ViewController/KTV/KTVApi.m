@@ -29,8 +29,12 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSNumber*>* loadDict;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSString*>* lyricUrlDict;
+@property (nonatomic, strong) AgoraRtcConnection* subChorusConnection;
 @property (nonatomic, strong) NSString* channelName;
+@property (nonatomic, assign) NSInteger currentPlayerPosition;
+@property (nonatomic, assign) NSInteger currentSystemTime;
 @property(nonatomic, assign)NSInteger dataStreamId;
+@property(nonatomic, strong)KTVSongConfiguration* config;
 
 @end
 
@@ -64,8 +68,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [[AppContext shared] unregisterPlayerEventDelegate:self];
 }
 
--(void)loadSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block
+-(void)loadSong:(NSInteger)songCode withConfig:(nonnull KTVSongConfiguration *)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block
 {
+    self.config = config;
+    KTVSingRole role = config.role;
     NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:songCode]];
     if(loadHistory) {
         KTVLoadSongState state = [loadHistory intValue];
@@ -127,8 +133,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     }
 }
 
--(void)playSong:(NSInteger)songCode withSongType:(KTVSongType)type asRole:(KTVSingRole)role
+-(void)playSong:(NSInteger)songCode
 {
+    KTVSingRole role = self.config.role;
+    KTVSongType type = self.config.type;
     if(type == KTVSongTypeSolo) {
         if(role == KTVSingRoleMainSinger) {
             self.openedSongCode = songCode;
@@ -156,19 +164,21 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
             options.publishMediaPlayerId = [self.rtcMediaPlayer getMediaPlayerId];
             options.publishMediaPlayerAudioTrack = YES;
             [self.engine updateChannelWithMediaOptions:options];
+            [self joinChorus2ndChannel];
         } else if(role == KTVSingRoleCoSinger) {
             self.openedSongCode = songCode;
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
-            options.autoSubscribeAudio = NO;
-            options.autoSubscribeVideo = NO;
+            options.autoSubscribeAudio = YES;
+            options.autoSubscribeVideo = YES;
             //co singer do not publish media player
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
+            [self joinChorus2ndChannel];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
-            options.autoSubscribeAudio = NO;
-            options.autoSubscribeVideo = NO;
+            options.autoSubscribeAudio = YES;
+            options.autoSubscribeVideo = YES;
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
         }
@@ -190,6 +200,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [self.rtcMediaPlayer stop];
     self.openedSongCode = -1;
     [self cancelAsyncTasks];
+    if(self.config.type == KTVSongTypeChorus) {
+        [self leaveChorus2ndChannel];
+    }
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -212,6 +225,31 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     };
 }
 
+- (void)onMainEngineRemoteUserJoin:(NSInteger)uid
+{
+    if(self.config.type == KTVSongTypeChorus &&
+       self.config.role == KTVSingRoleCoSinger &&
+       uid == self.config.mainSingerUid) {
+        [self.engine muteRemoteAudioStream:uid mute:YES];
+    }
+}
+
+- (void)processNTPSync:(NSInteger)remoteNtpTime position:(NSInteger)remotePlayerPosition
+{
+    if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
+        if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
+            NSInteger localNtpTime = 0;
+            NSInteger currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
+            NSInteger localPosition = currentSystemTime - self.currentSystemTime + self.currentPlayerPosition;
+            NSInteger expectPosition = localNtpTime - remoteNtpTime + remotePlayerPosition;
+            NSInteger diff = expectPosition - localPosition;
+            if(labs(diff) > 40) {
+                [self.rtcMediaPlayer seekToPosition:expectPosition];
+            }
+        }
+    }
+}
+
 #pragma mark - AgoraRtcMediaPlayerDelegate
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
@@ -227,7 +265,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
 {
-    [self.delegate controller:self song:self.openedSongCode didChangedToPosition:position];
+    self.currentPlayerPosition = position;
+    self.currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
+    [self.delegate controller:self song:self.openedSongCode config:self.config didChangedToPosition:position];
 }
 
 
@@ -287,10 +327,13 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 }
 
 #pragma private apis
-- (void)joinChorus2ndChannel:(KTVSingRole)role
+- (void)joinChorus2ndChannel
 {
+    KTVSingRole role = self.config.role;
     AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
-    options.autoSubscribeAudio = NO;
+    // main singer do not subscribe 2nd channel
+    // co singer auto sub
+    options.autoSubscribeAudio = role == KTVSingRoleMainSinger ? NO : YES;
     options.autoSubscribeVideo = NO;
     options.publishMicrophoneTrack = NO;
     options.enableAudioRecordingOrPlayout = NO;
@@ -300,9 +343,24 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     AgoraRtcConnection* connection = [AgoraRtcConnection new];
     connection.channelId = [NSString stringWithFormat:@"%@_ex", self.channelName];
     connection.localUid = VLUserCenter.user.agoraPlayerRTCUid;
+    self.subChorusConnection = connection;
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         
     }];
+}
+
+- (void)leaveChorus2ndChannel
+{
+    KTVSingRole role = self.config.role;
+    if(role == KTVSingRoleMainSinger) {
+        AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
+        options.publishDirectCustomAudioTrack = NO;
+        [self.engine updateChannelExWithMediaOptions:options connection:self.subChorusConnection];
+        [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
+    } else if(role == KTVSingRoleCoSinger) {
+        [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
+        [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:NO];
+    }
 }
 
 - (void)cancelAsyncTasks
