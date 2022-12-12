@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.*
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.ContentInspectConfig
+import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
@@ -39,8 +41,11 @@ import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
+import org.json.JSONException
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class LiveDetailActivity : AppCompatActivity() {
 
@@ -764,9 +769,35 @@ class LiveDetailActivity : AppCompatActivity() {
                 )
             }
 
+            override fun onContentInspectResult(result: Int) {
+                super.onContentInspectResult(result)
+                if (result > 1) {
+                    ToastUtils.showToast(R.string.show_content)
+                }
+            }
+
         }.apply {
             mRtcEngineHandler = this
         })
+
+        // ------------------ 开启鉴黄服务 ------------------
+        val contentInspectConfig = ContentInspectConfig()
+        try {
+            val jsonObject = JSONObject()
+            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
+            contentInspectConfig.extraInfo = jsonObject.toString()
+            val module1 = ContentInspectModule()
+            module1.interval = 30
+            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE
+            val module2 = ContentInspectModule()
+            module2.interval = 30
+            module2.type = CONTENT_INSPECT_TYPE_MODERATION
+            contentInspectConfig.modules = arrayOf(module1, module2)
+            contentInspectConfig.moduleCount = 2
+            mRtcEngine.enableContentInspect(true, contentInspectConfig)
+        } catch (_: JSONException) {
+
+        }
 
         checkRequirePerms {
             joinChannel()
