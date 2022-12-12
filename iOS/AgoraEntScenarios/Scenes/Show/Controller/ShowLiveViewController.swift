@@ -499,14 +499,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-            //TODO(zhaoyongqiang): rtc offline while room owner accpeted apply
-            var rtcRole: AgoraClientRole = .audience
-            if role == .broadcaster || interaction.userId == VLUserCenter.user.id {
-                rtcRole = .broadcaster
+            if VLUserCenter.user.id != room?.ownerId {
+                agoraKitManager.switchRole(role: interaction.userId == VLUserCenter.user.id ? .broadcaster : .audience,
+                                                uid: interaction.userId,
+                                                canvasView: liveView.canvasView.remoteView)
             }
-            agoraKitManager.switchRole(role: rtcRole,
-                                            uid: interaction.userId,
-                                            canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             
@@ -516,39 +513,35 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _stopInteraction(interaction: ShowInteractionInfo) {
-        let options = AgoraRtcChannelMediaOptions()
         switch interaction.interactStatus {
         case .pking:
             agoraKitManager.leaveChannelEx()
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
             if interaction.userId == VLUserCenter.user.id {
+                let options = AgoraRtcChannelMediaOptions()
                 options.publishCameraTrack = false
                 options.publishMicrophoneTrack = false
+                options.clientRoleType = .audience
+                agoraKitManager.agoraKit.updateChannel(with: options)
             }
             
         case .onSeat:
-            //TODO(zhaoyongqiang): rtc offline while room owner stop interaction
-            var rtcRole: AgoraClientRole = .audience
-            if role == .broadcaster {
-                rtcRole = .broadcaster
-            }
-            agoraKitManager.switchRole(role: rtcRole, uid: interaction.userId, canvasView: UIView())
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
             applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
             if interaction.userId == VLUserCenter.user.id {
-                options.publishMicrophoneTrack = false
+                agoraKitManager.switchRole(role: .audience,
+                                           uid: interaction.userId,
+                                           canvasView: UIView())
             }
             
         default:
             break
         }
         ToastView.show(text: interaction.interactStatus.toastTitle)
-        agoraKitManager.agoraKit.updateChannel(with: options)
-        
     }
 }
 
@@ -594,7 +587,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        liveView.canvasView.canvasType = .none
 //        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
         if let interaction = self.currentInteraction {
-            let isRoomOwner: Bool = role == .broadcaster ? true : false
+            let isRoomOwner: Bool = role == .broadcaster
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
             let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
             if roomOwnerExit {
