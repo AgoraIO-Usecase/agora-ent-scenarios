@@ -118,6 +118,25 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
+    /// 开启虚化背景
+    func enableVirtualBackground(isOn: Bool) {
+        let source = AgoraVirtualBackgroundSource()
+        source.backgroundSourceType = .blur
+        source.blurDegree = .high
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: nil)
+    }
+    
+    /// 设置虚拟背景
+    func seVirtualtBackgoundImage(imagePath: String?, isOn: Bool) {
+        guard let bundlePath = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
+              let bundle = Bundle(path: bundlePath) else { return }
+        let imgPath = bundle.path(forResource: imagePath, ofType: "jpg")
+        let source = AgoraVirtualBackgroundSource()
+        source.backgroundSourceType = .img
+        source.source = imgPath
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: nil)
+    }
+    
     /// 切换连麦角色
     func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView) {
         let options = AgoraRtcChannelMediaOptions()
