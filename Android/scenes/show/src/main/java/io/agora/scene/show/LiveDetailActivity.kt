@@ -785,6 +785,7 @@ class LiveDetailActivity : AppCompatActivity() {
         try {
             val jsonObject = JSONObject()
             jsonObject.put("userNo", UserManager.getInstance().user.userNo)
+            jsonObject.put("userId", UserManager.getInstance().user.id)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module1 = ContentInspectModule()
             module1.interval = 30
@@ -843,6 +844,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
                 mService.getAllInterationList ({
                     val interactionInfo = it.getOrNull(0)
+                    this.interactionInfo = interactionInfo
                     refreshBottomLayout()
                     updateVideoSetting()
                     if (interactionInfo != null) {
