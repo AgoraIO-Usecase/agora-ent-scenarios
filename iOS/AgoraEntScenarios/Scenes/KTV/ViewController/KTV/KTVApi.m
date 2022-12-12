@@ -238,7 +238,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 {
     if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
         if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
-            NSInteger localNtpTime = 0;
+            NSInteger localNtpTime = [self.engine getNtpTimeInMs];
             NSInteger currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
             NSInteger localPosition = currentSystemTime - self.currentSystemTime + self.currentPlayerPosition;
             NSInteger expectPosition = localNtpTime - remoteNtpTime + remotePlayerPosition;
