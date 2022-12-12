@@ -38,7 +38,7 @@ let page_size = 15
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
-        VoiceRoomIMManager.shared?.configIM(appkey: "81691796#990293")
+        VoiceRoomIMManager.shared?.configIM(appkey: "81399972#1019272")
 
         //  VoiceRoomBusinessRequest.shared.changeHost(host: "https://a1.chat.agora.io")
         mapUser(user: user)
