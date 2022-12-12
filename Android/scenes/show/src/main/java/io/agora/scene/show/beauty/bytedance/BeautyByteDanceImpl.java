@@ -31,6 +31,8 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_WOCHAOTIAN;
 
 import android.content.Context;
+import android.opengl.GLES11;
+import android.opengl.GLES11Ext;
 
 import com.bytedance.labcv.core.effect.EffectManager;
 import com.bytedance.labcv.core.util.ImageUtil;
@@ -136,7 +138,10 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
             textureBufferHelper = null;
             return true;
         }
-        int texture = textureBufferHelper.invoke(() -> process(textureBuffer.getTextureId(), textureBuffer.getWidth(), textureBuffer.getHeight()));
+        int texture = textureBufferHelper.invoke(() -> {
+            int texFormat = textureBuffer.getType() == VideoFrame.TextureBuffer.Type.OES ? GLES11Ext.GL_TEXTURE_EXTERNAL_OES : GLES11.GL_TEXTURE_2D;
+            return process(textureBuffer.getTextureId(), texFormat, textureBuffer.getWidth(), textureBuffer.getHeight());
+        });
 
         boolean isFront = videoFrame.getRotation() == 270;
         if (isFrontCamera != isFront) {
@@ -157,7 +162,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         return true;
     }
 
-    public int process(int oesTexId, int width, int height) {
+    public int process(int texId, int texFormat, int width, int height) {
         if (isReleased) {
             return -1;
         }
@@ -169,11 +174,15 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         mEffectManager.setCameraPosition(isFrontCamera);
         // 生成目标承载纹理
         int dstTexture = mImageUtil.prepareTexture(width, height);
-        // OES 纹理转2D纹理
-        int texture2d = mImageUtil.transferTextureToTexture(oesTexId,
-                BytedEffectConstants.TextureFormat.Texture_Oes,
-                BytedEffectConstants.TextureFormat.Texure2D,
-                width, height, new ImageUtil.Transition());
+        int texture2d = texId;
+        if(texFormat == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
+            // OES 纹理转2D纹理
+            texture2d = mImageUtil.transferTextureToTexture(texId,
+                    BytedEffectConstants.TextureFormat.Texture_Oes,
+                    BytedEffectConstants.TextureFormat.Texure2D,
+                    width, height, new ImageUtil.Transition());
+        }
+
         // CV SDK 特效处理
         boolean process = mEffectManager.process(texture2d, dstTexture, width, height,
                 BytedEffectConstants.Rotation.CLOCKWISE_ROTATE_0,
