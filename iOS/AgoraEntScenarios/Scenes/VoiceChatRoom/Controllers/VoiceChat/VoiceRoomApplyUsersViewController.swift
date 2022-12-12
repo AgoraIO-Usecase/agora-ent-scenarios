@@ -70,8 +70,8 @@ extension VoiceRoomApplyUsersViewController {
     @objc func refresh() {
         ChatRoomServiceImp.getSharedInstance().fetchApplicantsList { error, applicants in
             self.refreshEnd()
-            if error == nil,let datas = applicants {
-                self.empty.isHidden = datas.count > 0
+            guard let datas = applicants else {
+                return
             }
         }
     }
