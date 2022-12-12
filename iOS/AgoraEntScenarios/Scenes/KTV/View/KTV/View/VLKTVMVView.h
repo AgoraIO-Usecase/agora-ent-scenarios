@@ -26,7 +26,7 @@ typedef enum : NSUInteger {
 } VLKTVMVViewSingActionType;
 
 @class VLKTVMVView;
-@protocol VLKTVMVViewDelegate <NSObject, AgoraLrcDownloadDelegate, AgoraLrcViewDelegate>
+@protocol VLKTVMVViewDelegate <NSObject>
 
 //- (BOOL)ktvIsMyselfOnSeat;
 //
