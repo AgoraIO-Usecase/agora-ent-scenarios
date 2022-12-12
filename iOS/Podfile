@@ -36,7 +36,7 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.2'
+  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 
   #ThirdParty

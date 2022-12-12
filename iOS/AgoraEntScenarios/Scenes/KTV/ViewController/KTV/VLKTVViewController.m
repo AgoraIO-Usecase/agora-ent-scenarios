@@ -467,13 +467,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             float postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
+            NSInteger remoteNtp = [dict[@"ntp"] integerValue];
             
             //lyric play state may not be synced, need to do extra start here
             //to improve?
             if(!self.MVView.lrcView.isStart) {
                 [self.MVView start];
             }
-            [self.soloControl processNTPSync];
+            [self.soloControl processNTPSync:remoteNtp position:postion];
         }
     } else if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         NSInteger leftSecond = [dict[@"time"] integerValue];
@@ -571,12 +572,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger : KTVSingRoleAudience;
     KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
+    KTVSongConfiguration* config = [KTVSongConfiguration new];
+    
+    config.type = type;
+    config.role = role;
+    config.mainSingerUid = [[model userNo] integerValue];
+    config.coSingerUid = [[model chorusNo] integerValue];
+    
     VL(weakSelf);
-    [self.soloControl loadSong:[[model songNo] integerValue] withSongType:type asRole:role withCallback:^(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state) {
+    [self.soloControl loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
             [weakSelf setLrcLyric:lyricUrl withCallback:^(NSString *lyricUrl) {
                 if(lyricUrl) {
-                    [weakSelf.soloControl playSong:[[model songNo] integerValue] withSongType:type asRole:role];
+                    [weakSelf.soloControl playSong:[[model songNo] integerValue]];
                 }
             }];
         }
@@ -776,7 +784,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         NSDictionary *dict = @{
             @"cmd":@"setLrcTime",
             @"duration":@([self getTotalTime]),
-            @"time":@(position)
+            @"time":@(position),
+            @"ntp":@([self.RTCkit getNtpTimeInMs])
         };
         [self.soloControl sendStreamMessageWithDict:dict success:nil];
     }
