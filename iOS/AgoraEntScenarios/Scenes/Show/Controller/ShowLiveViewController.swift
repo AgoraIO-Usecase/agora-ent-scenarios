@@ -814,7 +814,6 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 静音
     func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        agoraKitManager.agoraKit.muteAllRemoteAudioStreams(selected)
         let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
         AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
         }
