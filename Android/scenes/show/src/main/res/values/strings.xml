@@ -126,6 +126,8 @@
     <string name="show_ask_for_link">主播邀请你加入连麦</string>
     <string name="show_ask_for_pk">主播邀请你视频连线</string>
 
+    <string name="show_content">检测到您有色情元素</string>
+
 
 
     <string name="show_setting_preset">预设</string>
