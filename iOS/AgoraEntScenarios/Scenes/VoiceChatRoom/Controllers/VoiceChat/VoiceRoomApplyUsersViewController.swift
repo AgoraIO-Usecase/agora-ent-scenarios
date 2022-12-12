@@ -73,6 +73,7 @@ extension VoiceRoomApplyUsersViewController {
             guard let datas = applicants else {
                 return
             }
+            self.empty.isHidden = datas.count > 0
         }
     }
     
