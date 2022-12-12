@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AgoraLyricsScore-Swift.h>
 @import AgoraRtcKit;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,7 +28,8 @@ typedef enum : NSUInteger {
     KTVLoadSongStateOK,
     KTVLoadSongStateInProgress,
     KTVLoadSongStateNoLyricUrl,
-    KTVLoadSongStatePreloadFail
+    KTVLoadSongStatePreloadFail,
+    KTVLoadSongStateIdle
 } KTVLoadSongState;
 
 @interface KTVSongConfiguration : NSObject
@@ -40,23 +42,18 @@ typedef enum : NSUInteger {
 
 @end
 
-@implementation KTVSongConfiguration
-
-
-
-@end
-
 @class KTVApi;
 @protocol KTVApiDelegate <NSObject>
 
-- (void)controller:(KTVApi*)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state;
-- (void)controller:(KTVApi*)controller song:(NSInteger)songCode config:(KTVSongConfiguration*)config didChangedToPosition:(NSInteger)position;
+- (void)controller:(KTVApi*)controller song:(NSInteger)songCode didChangedToState:(AgoraMediaPlayerState)state local:(BOOL)local;
+- (void)controller:(KTVApi*)controller song:(NSInteger)songCode config:(KTVSongConfiguration*)config didChangedToPosition:(NSInteger)position local:(BOOL)local;
 
 @end
 
 @interface KTVApi : NSObject
 
 @property(nonatomic, weak)id<KTVApiDelegate> delegate;
+@property(nonatomic, weak)AgoraLrcScoreView* lrcView;
 
 -(id)initWithRtcEngine:(AgoraRtcEngineKit *)engine channel:(NSString*)channelName musicCenter:(AgoraMusicContentCenter*)musicCenter player:(nonnull id<AgoraMusicPlayerProtocol>)rtcMediaPlayer dataStreamId:(NSInteger)streamId delegate:(id<KTVApiDelegate>)delegate;
 -(void)loadSong:(NSInteger)songCode withConfig:(KTVSongConfiguration*)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block;
@@ -65,10 +62,18 @@ typedef enum : NSUInteger {
 -(void)resumePlay;
 -(void)pausePlay;
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode;
--(void)sendStreamMessageWithDict:(NSDictionary *)dict
-                         success:(_Nullable sendStreamSuccess)success;
--(void)onMainEngineRemoteUserJoin:(NSInteger)uid;
--(void)processNTPSync:(NSInteger)remoteNtpTime position:(NSInteger)remotePlayerPosition;
+
+
+- (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed;
+- (void)mainRtcEngine:(AgoraRtcEngineKit *)engine
+reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
+      totalVolume:(NSInteger)totalVolume;
+- (void)mainRtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
+receiveStreamMessageFromUid:(NSUInteger)uid
+         streamId:(NSInteger)streamId
+             data:(NSData * _Nonnull)data;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -196,7 +196,6 @@
 		DD84179329090C520026B624 /* VLAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416E729090C520026B624 /* VLAddRoomModel.m */; };
 		DD84179429090C520026B624 /* VLRoomSeatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416EA29090C520026B624 /* VLRoomSeatModel.m */; };
 		DD84179529090C520026B624 /* VLSongItmModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416EB29090C520026B624 /* VLSongItmModel.m */; };
-		DD84179629090C520026B624 /* RtcMusicLrcMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416ED29090C520026B624 /* RtcMusicLrcMessage.m */; };
 		DD84179729090C520026B624 /* AgoraRtm.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416F129090C520026B624 /* AgoraRtm.m */; };
 		DD84179829090C520026B624 /* VLRoomListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416F429090C520026B624 /* VLRoomListModel.m */; };
 		DD84179929090C520026B624 /* VLBelcantoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416F529090C520026B624 /* VLBelcantoModel.m */; };
@@ -648,7 +647,6 @@
 		DD8416EA29090C520026B624 /* VLRoomSeatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSeatModel.m; sourceTree = "<group>"; };
 		DD8416EB29090C520026B624 /* VLSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongItmModel.m; sourceTree = "<group>"; };
 		DD8416EC29090C520026B624 /* AgoraRtm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgoraRtm.h; sourceTree = "<group>"; };
-		DD8416ED29090C520026B624 /* RtcMusicLrcMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RtcMusicLrcMessage.m; sourceTree = "<group>"; };
 		DD8416EE29090C520026B624 /* VLKTVSelBgModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSelBgModel.h; sourceTree = "<group>"; };
 		DD8416EF29090C520026B624 /* VLBelcantoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBelcantoModel.h; sourceTree = "<group>"; };
 		DD8416F029090C520026B624 /* VLRoomSelSongModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSelSongModel.h; sourceTree = "<group>"; };
@@ -658,7 +656,6 @@
 		DD8416F429090C520026B624 /* VLRoomListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomListModel.m; sourceTree = "<group>"; };
 		DD8416F529090C520026B624 /* VLBelcantoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLBelcantoModel.m; sourceTree = "<group>"; };
 		DD8416F629090C520026B624 /* VLKTVSelBgModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVSelBgModel.m; sourceTree = "<group>"; };
-		DD8416F729090C520026B624 /* RtcMusicLrcMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RtcMusicLrcMessage.h; sourceTree = "<group>"; };
 		DD8416F829090C520026B624 /* VLRoomSelSongModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSelSongModel.m; sourceTree = "<group>"; };
 		DD8416F929090C520026B624 /* VLAddRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAddRoomModel.h; sourceTree = "<group>"; };
 		DD8416FB29090C520026B624 /* VLHomeOnLineListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLHomeOnLineListView.h; sourceTree = "<group>"; };
@@ -1627,7 +1624,6 @@
 				DD8416EA29090C520026B624 /* VLRoomSeatModel.m */,
 				DD8416EB29090C520026B624 /* VLSongItmModel.m */,
 				DD8416EC29090C520026B624 /* AgoraRtm.h */,
-				DD8416ED29090C520026B624 /* RtcMusicLrcMessage.m */,
 				DD8416EE29090C520026B624 /* VLKTVSelBgModel.h */,
 				DD8416EF29090C520026B624 /* VLBelcantoModel.h */,
 				DD8416F029090C520026B624 /* VLRoomSelSongModel.h */,
@@ -1637,7 +1633,6 @@
 				DD8416F429090C520026B624 /* VLRoomListModel.m */,
 				DD8416F529090C520026B624 /* VLBelcantoModel.m */,
 				DD8416F629090C520026B624 /* VLKTVSelBgModel.m */,
-				DD8416F729090C520026B624 /* RtcMusicLrcMessage.h */,
 				DD8416F829090C520026B624 /* VLRoomSelSongModel.m */,
 			);
 			path = KTV;
@@ -3041,7 +3036,6 @@
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
 				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
 				05FFE6F3290F706C0024D22F /* VoiceRoomUserView.swift in Sources */,
-				DD84179629090C520026B624 /* RtcMusicLrcMessage.m in Sources */,
 				057DDA0C290B9778001329E6 /* AgoraSceneConfig.swift in Sources */,
 				DD84178B29090C520026B624 /* VLLoginViewController.m in Sources */,
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
