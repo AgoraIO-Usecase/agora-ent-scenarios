@@ -74,6 +74,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 //    private var seatInvitationList: [ShowMicSeatInvitation] = [ShowMicSeatInvitation]()
     private var pkInvitationList: [ShowPKInvitation] = [ShowPKInvitation]()
     private var interactionList: [ShowInteractionInfo] = [ShowInteractionInfo]()
+    //interaction List in sending queue
+    private var interactionPaddingIdsSet: Set<String> = Set<String>()
     
     private weak var subscribeDelegate: ShowSubscribeServiceProtocol?
     
@@ -571,6 +573,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func getAllInterationList(completion: @escaping (NSError?, [ShowInteractionInfo]?) -> Void) {
+        interactionPaddingIdsSet.removeAll()
         _getAllInteractionList(completion: completion)
     }
     
@@ -1630,7 +1633,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .get(success: { [weak self] list in
-                agoraPrint("imp interaction get success...")
+                agoraPrint("imp interaction get success... \(list.count)")
                 let interactionList = list.compactMap({ ShowInteractionInfo.yy_model(withJSON: $0.toJson()!)! })
                 self?.interactionList = interactionList
                 completion(nil, interactionList)
@@ -1658,7 +1661,8 @@ extension ShowSyncManagerServiceImp {
                 if let index = self.interactionList.firstIndex(where: { $0.userId == model.userId }) {
                     self.interactionList.remove(at: index)
                     self.interactionList.insert(model, at: index)
-                    self.subscribeDelegate?.onInteractionBegan(interaction: model)
+                    //callback before send msg success
+//                    self.subscribeDelegate?.onInteractionBegan(interaction: model)
                     return
                 }
             }, onUpdated: { [weak self] object in
@@ -1668,11 +1672,17 @@ extension ShowSyncManagerServiceImp {
                       let model = ShowInteractionInfo.yy_model(withJSON: jsonStr) else {
                     return
                 }
-                if let index = self.interactionList.firstIndex(where: { $0.userId == model.userId }) {
+                let userId = model.userId ?? ""
+                let index = self.interactionList.firstIndex(where: { $0.userId == model.userId })
+                if let index = index, !self.interactionPaddingIdsSet.contains(userId) {
                     self.interactionList.remove(at: index)
                     self.interactionList.insert(model, at: index)
                     self.subscribeDelegate?.onInterationUpdated(interaction: model)
                     return
+                }
+                self.interactionPaddingIdsSet.remove(userId)
+                if let index = index {
+                    self.interactionList.remove(at: index)
                 }
                 self.interactionList.append(model)
                 self.subscribeDelegate?.onInteractionBegan(interaction: model)
@@ -1708,6 +1718,7 @@ extension ShowSyncManagerServiceImp {
         let params = interaction.yy_modelToJSONObject() as! [String: Any]
         //add interation immediately to prevent received multi pk invitations at the same time
         interactionList.append(interaction)
+        interactionPaddingIdsSet.insert(interaction.userId ?? "")
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
