@@ -143,7 +143,7 @@ public extension VoiceRoomIMManager {
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveCancelApplySite(roomId:chat_uid:))) {
                             guard let chatRoomId = body.customExt?["chatroomId"] else {return}
                             if chatRoomId != self.currentRoomId {return}
-                            self.delegate?.receiveCancelApplySite(roomId: self.currentRoomId,chat_uid: message.to)
+                            self.delegate?.receiveCancelApplySite(roomId: self.currentRoomId,chat_uid: message.from)
                         }
                     case VoiceRoomApplySite:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveApplySite(roomId:meta:))) {

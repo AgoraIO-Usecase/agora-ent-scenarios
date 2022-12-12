@@ -53,10 +53,6 @@ public extension VRBaseViewController {
     var navBackgroundColor: UIColor { .clear }
 
     @objc func backAction() {
-        if navigationController?.viewControllers.count ?? 0 > 1 {
-            navigationController?.popViewController(animated: true)
-        } else {
-            dismiss(animated: true)
-        }
+        navigationController?.popViewController(animated: true)
     }
 }
