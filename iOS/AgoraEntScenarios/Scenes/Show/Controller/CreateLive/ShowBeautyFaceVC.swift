@@ -127,11 +127,6 @@ class ShowBeautyFaceVC: UIViewController {
         }
         collectionView.reloadData()
         CATransaction.commit()
-        ShowBeautyFaceVC.beautyData.forEach({
-            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
-                                                     key: $0.key,
-                                                     value: $0.value)
-        })
     }
 }
 
