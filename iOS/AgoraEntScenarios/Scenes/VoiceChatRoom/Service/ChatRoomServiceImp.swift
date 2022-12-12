@@ -664,6 +664,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
+                //添加鉴黄接口
+                NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 2 ? 0 : 1) { msg in
+                    print("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
+                }
             } fail: { error in
                 completion(error, nil)
             }
