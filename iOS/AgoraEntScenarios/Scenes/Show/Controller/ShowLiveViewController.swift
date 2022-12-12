@@ -499,11 +499,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-            if VLUserCenter.user.id != room?.ownerId {
-                agoraKitManager.switchRole(role: interaction.userId == VLUserCenter.user.id ? .broadcaster : .audience,
-                                                uid: interaction.userId,
-                                                canvasView: liveView.canvasView.remoteView)
-            }
+            agoraKitManager.switchRole(role: (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience,
+                                            uid: interaction.userId,
+                                            canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             
