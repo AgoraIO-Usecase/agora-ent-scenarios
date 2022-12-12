@@ -30,7 +30,7 @@ class ByteBeautyModel: ByteBaseModel {
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
-        model.isSelected = true
+        model.path = ""
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -39,6 +39,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.3
         model.name = "磨皮".show_localized
         model.icon = "meiyan_icon_mopi"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()

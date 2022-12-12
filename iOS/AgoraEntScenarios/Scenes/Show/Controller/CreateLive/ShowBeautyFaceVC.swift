@@ -127,6 +127,11 @@ class ShowBeautyFaceVC: UIViewController {
         }
         collectionView.reloadData()
         CATransaction.commit()
+        ShowBeautyFaceVC.beautyData.forEach({
+            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
+                                                     key: $0.key,
+                                                     value: $0.value)
+        })
     }
 }
 
@@ -142,7 +147,8 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.path == nil)
+            selectedItemClosure?(model.value, model.key == nil)
+            defalutSelectIndex = indexPath.item
         }
         return cell
     }
@@ -155,7 +161,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         
         defalutSelectIndex = indexPath.item
         let model = dataArray[indexPath.item]
-        setBeautyHandler(value: model.value, isReset: model.path == nil)
+        setBeautyHandler(value: model.value, isReset: model.key == nil)
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])

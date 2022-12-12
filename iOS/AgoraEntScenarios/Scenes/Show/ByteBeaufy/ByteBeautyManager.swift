@@ -72,7 +72,7 @@ class ByteBeautyManager {
     
     func reset(datas: [ByteBeautyModel], key: String? = nil) {
         datas.forEach({
-            $0.isSelected = $0.path == nil
+            $0.isSelected = $0.path == nil || $0.key == "smooth"
             guard $0.path != nil else { return }
             processor.updateComposerNodeIntensity($0.path,
                                                   key: key ?? $0.key,
