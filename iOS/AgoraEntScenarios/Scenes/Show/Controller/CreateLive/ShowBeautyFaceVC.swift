@@ -180,7 +180,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
-        if type == .sticker {
+        if type == .sticker || type == .background {
             selectedItemClosure?(0, true)
             return
         }

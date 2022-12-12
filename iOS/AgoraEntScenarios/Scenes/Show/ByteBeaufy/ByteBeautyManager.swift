@@ -108,5 +108,8 @@ class ByteBeautyManager {
         reset(datas: ShowBeautyFaceVC.styleData)
         resetSticker(datas: ShowBeautyFaceVC.stickerData)
         resetFilter(datas: ShowBeautyFaceVC.filterData)
+        ShowBeautyFaceVC.backgroundData.forEach({
+            $0.isSelected = $0.path == nil
+        })
     }
 }
