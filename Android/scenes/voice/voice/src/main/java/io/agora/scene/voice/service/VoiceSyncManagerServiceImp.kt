@@ -58,6 +58,10 @@ class VoiceSyncManagerServiceImp(
         return roomServiceSubscribeDelegates
     }
 
+    override fun reset() {
+        syncUtilsInit = false
+    }
+
     /**
      * 获取房间列表
      * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
