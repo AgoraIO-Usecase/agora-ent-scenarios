@@ -173,6 +173,26 @@ class NetworkManager {
             ToastView.hidden()
         })
     }
+    
+    func voiceIdentify(channelName: String,
+                       channelType: Int,
+                       success: @escaping (String?) -> Void) {
+        let params = ["appId": KeyCenter.AppId,
+                      "channelName": channelName,
+                      "channelType": channelType,
+                      "src": "iOS",
+                      "traceId": NSString.withUUID().md5] as [String: Any]
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
+        })
+    }
 
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {
         DispatchQueue.global().async {
