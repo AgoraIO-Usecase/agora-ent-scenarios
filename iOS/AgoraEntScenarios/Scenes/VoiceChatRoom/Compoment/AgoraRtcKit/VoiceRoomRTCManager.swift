@@ -365,6 +365,7 @@ public let kMPK_RTC_UID: UInt = 1
         } else if type == .game {
             rtcKit.setChannelProfile(.communication)
         } else if type == .anchor {
+            rtcKit.setChannelProfile(.liveBroadcasting)
             rtcKit.setAudioProfile(.musicHighQualityStereo)
             rtcKit.setAudioScenario(.gameStreaming)
             rtcKit.setParameters("{\"che.audio.custom_payload_type\":73}")
