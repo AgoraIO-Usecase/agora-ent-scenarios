@@ -153,7 +153,6 @@ extension VoiceRoomViewController {
                 } else {
                     self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
                     IMJoinSuccess = false
-                    VMGroup.leave()
                     self.view.makeToast("join IM failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 }
                 VMGroup.leave()
