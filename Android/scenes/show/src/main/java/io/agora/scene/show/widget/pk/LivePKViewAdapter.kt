@@ -17,7 +17,7 @@ class LivePKViewAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowLivePkReq
     ) {
         val roomItem = getItem(position)!!
         val binding = holder.binding
-        binding.titleItemBoardcasterStatus.text = roomItem.roomName
+        binding.titleItemBoardcasterStatus.text = roomItem.ownerName
         binding.coverBoardcasterIcon.visibility = View.VISIBLE
         GlideApp.with(binding.coverBoardcasterIcon).load(roomItem.ownerAvater)
             .fallback(R.mipmap.show_default_icon)
