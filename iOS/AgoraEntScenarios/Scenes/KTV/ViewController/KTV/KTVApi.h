@@ -68,7 +68,7 @@ typedef enum : NSUInteger {
 -(void)sendStreamMessageWithDict:(NSDictionary *)dict
                          success:(_Nullable sendStreamSuccess)success;
 -(void)onMainEngineRemoteUserJoin:(NSInteger)uid;
--(void)processNTPSync;
+-(void)processNTPSync:(NSInteger)remoteNtpTime position:(NSInteger)remotePlayerPosition;
 @end
 
 NS_ASSUME_NONNULL_END
