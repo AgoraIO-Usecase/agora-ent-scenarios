@@ -39,6 +39,8 @@ interface VoiceServiceProtocol {
      */
     fun unsubscribeEvent()
 
+    fun reset()
+
     fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>
 
     /**

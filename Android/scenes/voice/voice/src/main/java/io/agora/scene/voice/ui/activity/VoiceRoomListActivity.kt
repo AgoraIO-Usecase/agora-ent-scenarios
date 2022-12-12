@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -20,6 +21,7 @@ import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.utils.StatusBarCompat
@@ -33,6 +35,8 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
     private var title: TextView? = null
     private var index = 0
     private val titles = intArrayOf(R.string.voice_tab_layout_all)
+
+    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
     override fun getViewBinding(inflater: LayoutInflater): VoiceAgoraRoomListLayoutBinding? {
         return VoiceAgoraRoomListLayoutBinding.inflate(inflater)
     }
@@ -44,6 +48,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         }else{
             // library 初始化
             ResourcesTools.isZh(this)
+            voiceServiceProtocol.reset()
             VoiceConfigManager.initMain()
         }
     }
@@ -142,5 +147,14 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
             }
         // setup with viewpager2
         mediator.attach()
+    }
+
+    override fun finish() {
+        voiceServiceProtocol.reset()
+        super.finish()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return super.onKeyDown(keyCode, event)
     }
 }
