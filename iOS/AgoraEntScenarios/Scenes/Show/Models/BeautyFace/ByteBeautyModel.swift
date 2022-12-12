@@ -299,8 +299,8 @@ class ByteBeautyModel: ByteBaseModel {
         dataArray.append(model)
         
         model = ByteBeautyModel()
-        model.path = "show_virtual_test_image"
-        model.name = "测试".show_localized
+        model.path = "show_live_mritual_bg"
+        model.name = "蜜桃".show_localized
         model.icon = "meiyan_lj_makalong"
         dataArray.append(model)
         
