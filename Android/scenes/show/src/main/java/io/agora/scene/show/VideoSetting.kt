@@ -104,84 +104,84 @@ object VideoSetting {
 
         val LowDevice1v1 = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_540P,
-                FrameRate.FPS_15,
-                1500
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_540P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1500
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val MediumDevice1v1 = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_720P,
-                FrameRate.FPS_15,
-                1800
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_720P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val HighDevice1v1 = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_720P,
-                FrameRate.FPS_15,
-                1800
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_720P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val LowDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_540P,
-                FrameRate.FPS_15,
-                1500
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_540P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1500
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val MediumDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_720P,
-                FrameRate.FPS_15,
-                1800
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_720P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val HighDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                false,
-                false,
-                false,
-                false,
-                false,
-                Resolution.V_720P,
-                FrameRate.FPS_15,
-                1800
+                H265 = false,
+                colorEnhance = false,
+                lowLightEnhance = false,
+                videoDenoiser = false,
+                PVC = false,
+                resolution = Resolution.V_720P,
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )

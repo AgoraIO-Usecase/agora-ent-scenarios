@@ -30,30 +30,23 @@
 
     </FrameLayout>
 
-    <FrameLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp"
+        app:tabIndicatorColor="#7A59FB"
+        app:tabMode="scrollable"
+        app:tabMinWidth="120dp"
+        app:tabIndicatorFullWidth="false"
+        app:tabSelectedTextColor="@color/black"
+        app:tabTextColor="#6D7291"
+        app:tabIndicatorHeight="2dp"/>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:tabIndicatorColor="#7A59FB"
-            app:tabMode="scrollable"
-            app:tabMinWidth="120dp"
-            app:tabIndicatorFullWidth="false"
-            app:tabSelectedTextColor="@color/black"
-            app:tabTextColor="#6D7291"
-            app:tabIndicatorHeight="2dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="bottom"
-            android:background="@color/show_deliver"/>
-    </FrameLayout>
-
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@color/show_deliver"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"

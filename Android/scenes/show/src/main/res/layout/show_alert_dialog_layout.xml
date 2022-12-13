@@ -48,6 +48,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:textColor="#040925"
+                android:textStyle="bold"
                 android:textSize="16sp"
                 tools:text="1234" />
 
@@ -152,7 +153,7 @@
             android:layoutDirection="locale"
             android:orientation="horizontal"
             android:paddingTop="25dp"
-            android:paddingBottom="30dp">
+            android:paddingBottom="20dp">
 
             <Button
                 android:id="@android:id/button3"
@@ -162,7 +163,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/show_alert_dialog_btn_bg_light"
                 android:gravity="center"
-                android:minHeight="45dp"
+                android:minHeight="40dp"
                 android:stateListAnimator="@null"
                 android:textColor="#3C4267"
                 android:textSize="14sp"
@@ -177,7 +178,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/show_alert_dialog_btn_bg_light"
                 android:gravity="center"
-                android:minHeight="45dp"
+                android:minHeight="40dp"
                 android:stateListAnimator="@null"
                 android:textColor="#3C4267"
                 android:textSize="14sp"
@@ -192,7 +193,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/show_alert_dialog_btn_bg"
                 android:gravity="center"
-                android:minHeight="45dp"
+                android:minHeight="40dp"
                 android:stateListAnimator="@null"
                 android:textColor="@color/white"
                 android:textSize="14sp"
