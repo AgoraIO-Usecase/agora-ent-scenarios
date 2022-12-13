@@ -135,35 +135,28 @@ extension VoiceRoomViewController {
         }
 
         VMGroup.enter()
-        imQueue.async { [weak self] in
-            VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { [weak self] room, error in
-                guard let self = self else { return }
-                if error == nil {
-                    IMJoinSuccess = true
-                    // 获取房间详情
-                    //加入房间成功后，需要先更新
-                    if self.isOwner == true {
-                        //房主更新环信KV
-                        self.setChatroomAttributes()
-                    } else {
-                        //观众更新拉取详情后更新kv
-                        self.requestRoomDetail()
-                        self.sendJoinedMessage()
-                    }
-                } else {
-                    self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
-                    IMJoinSuccess = false
-                    self.view.makeToast("join IM failed!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
-                }
+        imQueue.async {
+            VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
+                IMJoinSuccess = error == nil
                 VMGroup.leave()
             })
         }
 
         VMGroup.notify(queue: .main) { [weak self] in
             let joinSuccess = rtcJoinSuccess && IMJoinSuccess
+            guard let `self` = self else { return }
             if !joinSuccess {
-                self?.view.makeToast("Join failed!")
-                self?.didHeaderAction(with: .back, destroyed: true)
+                self.view.makeToast("Join failed!")
+                self.didHeaderAction(with: .back, destroyed: true)
+            } else {
+                if self.isOwner == true {
+                    //房主更新环信KV
+                    self.setChatroomAttributes()
+                } else {
+                    //观众更新拉取详情后更新kv
+                    self.requestRoomDetail()
+                    self.sendJoinedMessage()
+                }
             }
         }
     }
