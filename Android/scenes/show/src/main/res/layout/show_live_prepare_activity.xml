@@ -162,6 +162,7 @@
             android:gravity="center"
             android:text="@string/show_live_prepare_hd"
             android:textColor="@color/white"
+            android:visibility="gone"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toStartOf="@id/tvSetting"

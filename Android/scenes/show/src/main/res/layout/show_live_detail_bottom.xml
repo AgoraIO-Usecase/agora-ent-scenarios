@@ -28,26 +28,61 @@
             android:layout_gravity="end"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/ivPK"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:src="@mipmap/show_live_bottom_ic_pk"
-                android:padding="8dp"
-                android:layout_marginStart="5dp"
-                android:scaleType="fitXY"
-                android:background="@drawable/show_live_detail_bottom_btn_bg" />
+            <FrameLayout
+                android:id="@+id/flPK"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/show_live_detail_bottom_btn_bg"
+                    android:padding="8dp"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/show_live_bottom_ic_pk" />
+
+                <View
+                    android:id="@+id/vPKDot"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/show_live_detail_bottom_btn_dot"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </FrameLayout>
 
 
-            <ImageView
-                android:id="@+id/ivLinking"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:src="@mipmap/show_live_bottom_ic_linking"
-                android:padding="8dp"
-                android:layout_marginStart="5dp"
-                android:scaleType="fitXY"
-                android:background="@drawable/show_live_detail_bottom_btn_bg" />
+            <FrameLayout
+                android:id="@+id/flLinking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/ivLinking"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/show_live_detail_bottom_btn_bg"
+                    android:padding="8dp"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/show_live_bottom_ic_linking" />
+
+                <View
+                    android:id="@+id/vLinkingDot"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/show_live_detail_bottom_btn_dot"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </FrameLayout>
 
 
 

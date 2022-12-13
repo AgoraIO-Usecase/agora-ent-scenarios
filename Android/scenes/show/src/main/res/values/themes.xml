@@ -39,6 +39,8 @@
 
     <style name="show_alert_dialog" parent="Theme.AppCompat.Dialog">
         <item name="alertDialogStyle">@style/show_alert_dialog_style</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
     </style>
 
     <style name="show_alert_dialog_style" parent="AlertDialog.AppCompat">

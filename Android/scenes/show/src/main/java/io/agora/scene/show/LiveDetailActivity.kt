@@ -152,9 +152,11 @@ class LiveDetailActivity : AppCompatActivity() {
             showMusicEffectDialog()
         }
         bottomLayout.ivLinking.setOnClickListener {
+            bottomLayout.vLinkingDot.isVisible = false
             showLinkingDialog()
         }
-        bottomLayout.ivPK.setOnClickListener {
+        bottomLayout.flPK.setOnClickListener {
+            bottomLayout.vPKDot.isVisible = false
             if (isRoomOwner) {
                 showPKDialog()
             }
@@ -200,67 +202,62 @@ class LiveDetailActivity : AppCompatActivity() {
             if(isPKing()){
                 // PK状态
                 // 房主一定是PK的一方
-                bottomLayout.ivLinking.isVisible = false
-                bottomLayout.ivSetting.isVisible = true
-                bottomLayout.ivMusic.isVisible = true
-                bottomLayout.ivBeauty.isVisible = true
-                bottomLayout.ivPK.isVisible = true
+                bottomLayout.flLinking.isVisible = false
+                bottomLayout.flPK.isVisible = true
             }
             else if(isLinking()){
                 // 连麦状态
                 // 房主一定是连麦的一方
-                bottomLayout.ivPK.isVisible = false
-                bottomLayout.ivLinking.isVisible = true
+                bottomLayout.flPK.isVisible = false
+                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
             }
             else{
                 // 单主播状态
                 // 房主是主播
-                bottomLayout.ivPK.isVisible = true
-                bottomLayout.ivLinking.isVisible = true
-                bottomLayout.ivLinking.imageTintList = null
+                bottomLayout.flPK.isVisible = true
+                bottomLayout.flLinking.isVisible = true
+                bottomLayout.ivLinking.imageTintList = ColorStateList.valueOf(getColor(R.color.grey_7e))
             }
 
         } else {
             // 观众
 
+            bottomLayout.ivSetting.isVisible = true
             // 观众没有PK权限
-            bottomLayout.ivPK.isVisible = false
+            bottomLayout.flPK.isVisible = false
+
 
             if(isPKing()){
                 // PK状态
                 // PK是房主和房主的事，和观众无关，观众只能看，同时无法再连麦
-                bottomLayout.ivSetting.isVisible = false
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
-                bottomLayout.ivLinking.isVisible = false
+                bottomLayout.flLinking.isVisible = false
             }
             else if (isLinking()){
                 // 连麦状态
                 if (isMeLinking()) {
                     // 连麦中的一方
-                    bottomLayout.ivSetting.isVisible = true
                     bottomLayout.ivMusic.isVisible = true
                     bottomLayout.ivBeauty.isVisible = true
 
-                    bottomLayout.ivLinking.isVisible = true
+                    bottomLayout.flLinking.isVisible = true
                     bottomLayout.ivLinking.imageTintList = null
                 } else {
                     // 只是观看者，不参与连麦
-                    bottomLayout.ivSetting.isVisible = false
                     bottomLayout.ivMusic.isVisible = false
                     bottomLayout.ivBeauty.isVisible = false
-                    bottomLayout.ivLinking.isVisible = false
+                    bottomLayout.flLinking.isVisible = false
                 }
             }
             else{
                 // 单主播状态
                 // 普通观众，只有发起连麦申请的按钮
-                bottomLayout.ivSetting.isVisible = false
                 bottomLayout.ivMusic.isVisible = false
                 bottomLayout.ivBeauty.isVisible = false
 
-                bottomLayout.ivLinking.isVisible = true
+                bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList =
                     ColorStateList.valueOf(getColor(R.color.grey_7e))
             }
@@ -409,7 +406,8 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showEndRoomDialog(){
         AlertDialog.Builder(this, R.style.show_alert_dialog)
-            .setTitle(R.string.show_live_end_room_or_not)
+            .setTitle(R.string.show_tip)
+            .setMessage(R.string.show_live_end_room_or_not)
             .setPositiveButton(R.string.show_setting_confirm){ dialog, id ->
                 finish()
                 dialog.dismiss()
@@ -662,8 +660,12 @@ class LiveDetailActivity : AppCompatActivity() {
             insertMessageItem(showMessage)
         }
         mService.subscribeMicSeatApply { _, _ ->
-            mService.getAllMicSeatApplyList({
-                mLinkDialog.setSeatApplyList(interactionInfo, it)
+            mService.getAllMicSeatApplyList({ list->
+                if (isRoomOwner) {
+                    mBinding.bottomLayout.vLinkingDot.isVisible =
+                        list.any { it.status == ShowRoomRequestStatus.waitting.value }
+                }
+                mLinkDialog.setSeatApplyList(interactionInfo, list)
             })
         }
         mService.subscribeInteractionChanged { status, info ->
@@ -681,13 +683,13 @@ class LiveDetailActivity : AppCompatActivity() {
             } else {
                 // 停止互动
                 // UI
-                refreshBottomLayout()
                 refreshViewDetailLayout(ShowInteractionStatus.idle.value)
                 updateVideoSetting()
                 mLinkDialog.setOnSeatStatus("", null)
                 // RTC
                 updateIdleMode()
                 interactionInfo = null
+                refreshBottomLayout()
             }
         }
 
