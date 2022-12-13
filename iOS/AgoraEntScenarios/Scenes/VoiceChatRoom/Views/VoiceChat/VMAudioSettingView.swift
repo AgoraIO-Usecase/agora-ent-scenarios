@@ -174,7 +174,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.iconView.image = UIImage(settingImage[2 + indexPath.row])
             cell.titleLabel.text = settingName[2 + indexPath.row]
             if indexPath.row == 0 {
-                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 0)
+                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
