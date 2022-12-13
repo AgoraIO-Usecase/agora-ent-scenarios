@@ -573,7 +573,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     }
     
     func getAllInterationList(completion: @escaping (NSError?, [ShowInteractionInfo]?) -> Void) {
-        interactionPaddingIdsSet.removeAll()
+//        interactionPaddingIdsSet.removeAll()
         _getAllInteractionList(completion: completion)
     }
     
