@@ -352,9 +352,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 let imp = AppContext.showServiceImp
                 switch result {
                 case .accept:
-                    AppContext.showServiceImp.acceptMicSeatInvitation { error in
+                    ToastView.showWait(text: "...")
+                    AppContext.showServiceImp.getAllInterationList { _, list in
+                        ToastView.hidden()
+                        guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+                        let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
+                        if isLink {
+                            AppContext.showServiceImp.rejectMicSeatInvitation { _ in }
+                            ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
+                            return
+                        }
+                        AppContext.showServiceImp.acceptMicSeatInvitation { error in }
                     }
-                    break
+
                 default:
                     imp.rejectMicSeatInvitation { error in
                     }
