@@ -454,37 +454,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - action utils / business
-- (void)leaveRoom {
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
-            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
-                [weakSelf.navigationController popToViewController:vc animated:YES];
-            }
-        }
-    }];
-}
-
-- (void)startChorusMatching
-{
-    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
-    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
-        // for new chorus song, need to wait till co-singer joins or force solo
-        if([model isSongOwner]){
-            //only song owner setup the timer, audience do nothing
-            [self startCoSingerWaitForSeconds:20 withCallback:^() {
-                [[AppContext ktvServiceImp] enterSoloMode];
-            }];
-        }
-        return;
-    }
-}
-
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
@@ -526,8 +495,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
 }
 
-#pragma mark private method
-- (void)_leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
+- (void)leaveSeatWithSeatModel:(VLRoomSeatModel * __nonnull)seatModel
                  withCompletion:(void(^ __nullable)(NSError*))completion {
     if(seatModel.rtcUid == VLUserCenter.user.id) {
         if(seatModel.isVideoMuted == 1) {
@@ -543,6 +511,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     inputModel.seatIndex = seatModel.seatIndex;
     [[AppContext ktvServiceImp] leaveSeatWithInput:inputModel
                                         completion:completion];
+}
+
+- (void)startChorusMatching
+{
+    VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
+    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
+        // for new chorus song, need to wait till co-singer joins or force solo
+        if([model isSongOwner]){
+            //only song owner setup the timer, audience do nothing
+            [self startCoSingerWaitForSeconds:20 withCallback:^() {
+                [[AppContext ktvServiceImp] enterSoloMode];
+            }];
+        }
+        return;
+    }
 }
 
 - (void)startCoSingerWaitForSeconds:(NSInteger)seconds withCallback:(void (^ _Nullable)(void))block
@@ -575,6 +559,111 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     self.chorusMatchingTimer = nil;
     self.chorusMatchingCallback = nil;
+}
+
+- (void)refreshChoosedSongList:(void (^ _Nullable)(void))block{
+    VL(weakSelf);
+    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
+        if (error != nil) {
+            return;
+        }
+        
+        weakSelf.selSongsArray = songArray;
+        if(block) {
+            block();
+        }
+    }];
+}
+
+- (void)markSongPlaying:(VLRoomSelSongModel *)model {
+    if (model.status == 2) {
+        return;
+    }
+    [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
+                                              completion:^(NSError * error) {
+    }];
+}
+- (void)syncChorusMatchCountDown:(NSInteger)seconds {
+    NSDictionary *dict = @{
+        @"cmd":@"countdown",
+        @"time":@(seconds)
+    };
+    [self sendStreamMessageWithDict:dict success:nil];
+}
+
+- (void)joinChorus {
+    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
+    
+    KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
+    inputModel.isChorus = YES;
+    inputModel.songNo = selSongModel.songNo;
+    [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
+                                         completion:^(NSError * error) {
+    }];
+}
+
+- (void)removeCurrentSongWithSync:(BOOL)sync
+{
+    VLRoomSelSongModel* top = [self.selSongsArray firstObject];
+    if(top && top.songNo.length != 0) {
+        [self removeSelSongWithSongNo:[top.songNo integerValue] sync:sync];
+    }
+}
+
+- (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+    __block VLRoomSelSongModel* removed;
+    NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        if([evaluatedObject.songNo integerValue] == songNo) {
+            removed = evaluatedObject;
+            return false;
+        }
+        return true;
+    }]]];
+    
+    if(removed != nil) {
+        //did remove
+        self.selSongsArray = updatedList;
+        
+        if(sync) {
+            KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
+            inputModel.songNo = removed.songNo;
+            inputModel.objectId = removed.objectId;
+            [[AppContext ktvServiceImp] removeSongWithInput:inputModel
+                                                 completion:^(NSError * error) {
+                if (error) {
+                    KTVLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+                }
+            }];
+        }
+    }
+}
+
+- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
+    NSMutableArray* selSongsArray = [NSMutableArray array];
+    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.songNo isEqualToString:songInfo.songNo]) {
+            [selSongsArray addObject:songInfo];
+            return;
+        }
+        [selSongsArray addObject:obj];
+    }];
+    
+    self.selSongsArray = selSongsArray;
+}
+
+- (void)leaveRoom {
+    VL(weakSelf);
+    [[AppContext ktvServiceImp] leaveRoomWithCompletion:^(NSError * error) {
+        if (error != nil) {
+            return;
+        }
+        
+        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+            if ([vc isKindOfClass:[VLOnLineListVC class]]) {
+                [weakSelf.navigationController popToViewController:vc animated:YES];
+            }
+        }
+    }];
 }
 
 #pragma mark - rtc utils
@@ -883,7 +972,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 #pragma mark VLDropOnLineViewDelegate
 - (void)onVLDropOnLineView:(VLDropOnLineView *)view action:(VLRoomSeatModel *)seatModel {
-    [self _leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
+    [self leaveSeatWithSeatModel:seatModel withCompletion:^(NSError *error) {
         [[LSTPopView getPopViewWithCustomView:view] dismiss];
     }];
 }
@@ -1013,90 +1102,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLLog(@"Agora - Setting effect type to %lu", effectType);
 }
 
-#pragma mark --
-- (void)refreshChoosedSongList:(void (^ _Nullable)(void))block{
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        weakSelf.selSongsArray = songArray;
-        if(block) {
-            block();
-        }
-    }];
-}
-
-//主唱告诉后台当前播放的歌曲
-- (void)markSongPlaying:(VLRoomSelSongModel *)model {
-    if (model.status == 2) {
-        return;
-    }
-    [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
-                                              completion:^(NSError * error) {
-    }];
-}
-- (void)syncChorusMatchCountDown:(NSInteger)seconds {
-    NSDictionary *dict = @{
-        @"cmd":@"countdown",
-        @"time":@(seconds)
-    };
-    [self sendStreamMessageWithDict:dict success:nil];
-}
-
-- (void)joinChorus {
-    VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
-    
-    KTVJoinChorusInputModel* inputModel = [KTVJoinChorusInputModel new];
-    inputModel.isChorus = YES;
-    inputModel.songNo = selSongModel.songNo;
-    [[AppContext ktvServiceImp] joinChorusWithInput:inputModel
-                                         completion:^(NSError * error) {
-    }];
-}
-
-#pragma mark - Util functions to check user character for current song.
+#pragma mark - getter/handy utils
 - (BOOL)isCurrentSongMainSinger:(NSString *)userNo {
     VLRoomSelSongModel *selSongModel = self.selSongsArray.firstObject;
     return [selSongModel.userNo isEqualToString:userNo];
 }
 
-#pragma mark other
-- (void)removeCurrentSongWithSync:(BOOL)sync
-{
-    VLRoomSelSongModel* top = [self.selSongsArray firstObject];
-    if(top && top.songNo.length != 0) {
-        [self removeSelSongWithSongNo:[top.songNo integerValue] sync:sync];
-    }
+- (BOOL)isRoomOwner {
+    return [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.userNo];
 }
 
-- (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
-    __block VLRoomSelSongModel* removed;
-    NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        if([evaluatedObject.songNo integerValue] == songNo) {
-            removed = evaluatedObject;
-            return false;
-        }
-        return true;
-    }]]];
-    
-    if(removed != nil) {
-        //did remove
-        self.selSongsArray = updatedList;
-        
-        if(sync) {
-            KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
-            inputModel.songNo = removed.songNo;
-            inputModel.objectId = removed.objectId;
-            [[AppContext ktvServiceImp] removeSongWithInput:inputModel
-                                                 completion:^(NSError * error) {
-                if (error) {
-                    KTVLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
-                }
-            }];
-        }
-    }
+- (BOOL)isBroadcaster {
+    return [self isRoomOwner] || self.isOnMicSeat;
 }
 
 - (VLRoomSelSongModel*)selSongWithSongNo:(NSString*)songNo {
@@ -1109,28 +1126,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }];
     
     return song;
-}
-
-- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
-    NSMutableArray* selSongsArray = [NSMutableArray array];
-    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.songNo isEqualToString:songInfo.songNo]) {
-            [selSongsArray addObject:songInfo];
-            return;
-        }
-        [selSongsArray addObject:obj];
-    }];
-    
-    self.selSongsArray = selSongsArray;
-}
-
-#pragma mark - getter/handy utils
-- (BOOL)isRoomOwner {
-    return [self.roomModel.creatorNo isEqualToString:VLUserCenter.user.userNo];
-}
-
-- (BOOL)isBroadcaster {
-    return [self isRoomOwner] || self.isOnMicSeat;
 }
 
 - (VLRoomSeatModel*)getCurrentUserSeatInfo {
