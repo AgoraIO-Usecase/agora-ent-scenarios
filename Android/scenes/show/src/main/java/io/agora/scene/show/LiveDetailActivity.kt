@@ -379,17 +379,21 @@ class LiveDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPermissionLeakDialog(yes: () -> Unit) {
+    private fun showPermissionLeakDialog(yes: () -> Unit, no: (()->Unit)? = null) {
         AlertDialog.Builder(this).apply {
             setMessage(R.string.show_live_perms_leak_tip)
             setCancelable(false)
             setPositiveButton(R.string.show_live_yes) { dialog, _ ->
                 dialog.dismiss()
-                checkRequirePerms(true, yes)
+                checkRequirePerms(true, no, yes)
             }
             setNegativeButton(R.string.show_live_no) { dialog, _ ->
                 dialog.dismiss()
-                finish()
+                if(no == null){
+                    finish()
+                }else{
+                    no.invoke()
+                }
             }
             show()
         }
@@ -756,7 +760,6 @@ class LiveDetailActivity : AppCompatActivity() {
                 // 停止互动
                 // UI
                 refreshViewDetailLayout(ShowInteractionStatus.idle.value)
-                updateVideoSetting()
                 mLinkDialog.setOnSeatStatus("", null)
                 mPKDialog.setPKInvitationItemStatus("", null)
                 // RTC
@@ -764,6 +767,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 interactionInfo = null
                 refreshBottomLayout()
                 refreshPKTimeCount()
+                updateVideoSetting()
             }
         }
 
@@ -881,18 +885,6 @@ class LiveDetailActivity : AppCompatActivity() {
 
         checkRequirePerms {
             joinChannel()
-            if (isRoomOwner) {
-                val cacheQualityResolution = PictureQualityDialog.getCacheQualityResolution()
-                mRtcEngine.setCameraCapturerConfiguration(
-                    CameraCapturerConfiguration(
-                        CameraCapturerConfiguration.CaptureFormat(
-                            cacheQualityResolution.width,
-                            cacheQualityResolution.height,
-                            15
-                        )
-                    )
-                )
-            }
         }
     }
 
@@ -933,34 +925,38 @@ class LiveDetailActivity : AppCompatActivity() {
                         } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking.value) {
                             updatePKingMode()
                         }
-                    } else {
-                        // Render host video
-                        val videoView = SurfaceView(this)
-                        mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
-                        if (isRoomOwner) {
-                            mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
-                            mRtcEngine.startPreview()
-                        } else {
-                            mRtcEngine.setupRemoteVideo(
-                                VideoCanvas(
-                                    videoView,
-                                    Constants.RENDER_MODE_HIDDEN,
-                                    mRoomInfo.ownerId.toInt()
-                                )
-                            )
-                        }
                     }
                 })
             })
+
+        // Render host video
+        val videoView = SurfaceView(this)
+        mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
+        if (isRoomOwner) {
+            mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
+            mRtcEngine.startPreview()
+        } else {
+            mRtcEngine.setupRemoteVideo(
+                VideoCanvas(
+                    videoView,
+                    Constants.RENDER_MODE_HIDDEN,
+                    mRoomInfo.ownerId.toInt()
+                )
+            )
+        }
     }
 
-    private fun updateVideoSetting(){
-        VideoSetting.updateBroadcastSetting(
-            when(interactionInfo?.interactStatus){
-                ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
-                else -> VideoSetting.LiveMode.OneVOne
-            }
-        )
+    private fun updateVideoSetting() {
+        if (isRoomOwner || isMeLinking()) {
+            VideoSetting.updateBroadcastSetting(
+                when (interactionInfo?.interactStatus) {
+                    ShowInteractionStatus.pking.value -> VideoSetting.LiveMode.PK
+                    else -> VideoSetting.LiveMode.OneVOne
+                }
+            )
+        } else {
+            VideoSetting.updateAudienceSetting()
+        }
     }
 
     private fun updateIdleMode() {
@@ -1031,15 +1027,21 @@ class LiveDetailActivity : AppCompatActivity() {
                 channelMediaOptions.autoSubscribeVideo = true
                 channelMediaOptions.autoSubscribeAudio = true
                 channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-                mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
-                mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
-                mRtcEngine.setupRemoteVideo(
-                    VideoCanvas(
-                        broadcasterVideoView,
-                        Constants.RENDER_MODE_HIDDEN,
-                        mRoomInfo.ownerId.toInt()
-                    )
-                )
+                checkRequirePerms(
+                    denied = {
+                        mService.stopInteraction(interactionInfo!!)
+                    },
+                    granted = {
+                        mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
+                        mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
+                        mRtcEngine.setupRemoteVideo(
+                            VideoCanvas(
+                                boardcasterVideoView,
+                                Constants.RENDER_MODE_HIDDEN,
+                                mRoomInfo.ownerId.toInt()
+                            )
+                        )
+                    })
             } else {
                 // 其他观众视角
                 mRtcEngine.setupRemoteVideo(
@@ -1164,14 +1166,18 @@ class LiveDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
-        if (!isRoomOwner) {
+    private fun checkRequirePerms(force: Boolean = false, denied: (()->Unit)?= null , granted: () -> Unit) {
+        if (!isRoomOwner && !isMeLinking()) {
             granted.invoke()
             return
         }
         mPermissionHelp.checkCameraAndMicPerms(
             {
-                granted.invoke()
+                mPermissionHelp.checkStoragePerm({
+                    granted.invoke()
+                }, {
+                    showPermissionLeakDialog(granted)
+                })
             },
             {
                 showPermissionLeakDialog(granted)
