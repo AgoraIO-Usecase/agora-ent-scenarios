@@ -214,10 +214,6 @@ KTVApiDelegate
         [weakSelf setRoomUsersCount:count];
     }];
     
-    [[AppContext ktvServiceImp] subscribeUserChangedWithBlock:^(KTVSubscribe status, VLLoginModel * userModel) {
-        NSLog(@"subscribeUserChangedWithBlock: %ld, %@", status, userModel.name);
-    }];
-    
 //    [[AppContext ktvServiceImp] subscribeSingingScoreChangedWithBlock:^(double score) {
 //        if(![self isCurrentSongMainSinger:VLUserCenter.user.userNo]) {
 //            //audience use sync to update pitch value, main singer don't
@@ -294,19 +290,6 @@ KTVApiDelegate
             }
             
             [weakSelf replaceSelSongWithInfo:songInfo];
-            
-            //有人加入合唱
-            //TODO
-//            if(songInfo.isChorus
-//               && weakSelf.currentPlayingSongNo == nil
-//               && songInfo.chorusNo != nil) {
-//                [weakSelf.MVView setJoinInViewHidden];
-//                [weakSelf setUserJoinChorus:songInfo.chorusNo];
-//                return;
-//            }
-            
-            //pin
-//            [weakSelf refreshChoosedSongList:nil];
         }
     }];
 }
