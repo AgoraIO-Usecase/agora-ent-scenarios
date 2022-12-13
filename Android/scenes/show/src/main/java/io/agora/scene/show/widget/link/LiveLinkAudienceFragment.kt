@@ -36,16 +36,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         mBinding.textLinking.setText(R.string.show_can_apply)
         mBinding.linkRequestList.adapter = linkRequestViewAdapter
-        mBinding.iBtnSeatApply.setOnClickListener {
-            // 观众申请连麦
-            mListener?.onApplyOnSeat()
-            mBinding.iBtnSeatApply.isVisible = false
-            mBinding.iBtnStopLink.isVisible = false
-            mBinding.iBtnCancelApply.isVisible = true
-            mBinding.iBtnSeatApplyText.isVisible = false
-            mBinding.iBtnStopLinkText.isVisible = false
-            mBinding.iBtnCancelApplyText.isVisible = true
-        }
         mBinding.iBtnStopLink.setOnClickListener {
             // 观众停止连麦
             mListener?.onStopLinkingChosen()
@@ -53,10 +43,8 @@ class LiveLinkAudienceFragment : BaseFragment() {
         mBinding.iBtnCancelApply.setOnClickListener {
             // 观众撤回申请
             mListener?.onStopApplyingChosen()
-            mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
             mBinding.iBtnCancelApply.isVisible = false
-            mBinding.iBtnSeatApplyText.isVisible = true
             mBinding.iBtnStopLinkText.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
         }
@@ -72,8 +60,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (status == ShowInteractionStatus.onSeat.value) {
             if (userName == UserManager.getInstance().user.name) {
-                mBinding.iBtnSeatApply.isVisible = false
-                mBinding.iBtnSeatApplyText.isVisible = false
                 mBinding.iBtnCancelApply.isVisible = false
                 mBinding.iBtnCancelApplyText.isVisible = false
                 mBinding.iBtnStopLinkText.isVisible = true
@@ -81,13 +67,16 @@ class LiveLinkAudienceFragment : BaseFragment() {
                 mBinding.textLinking.setText(R.string.show_linking)
             }
         } else if (status == null) {
-            mBinding.iBtnSeatApply.isVisible = true
             mBinding.iBtnStopLink.isVisible = false
-            mBinding.iBtnSeatApplyText.isVisible = true
             mBinding.iBtnStopLinkText.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
             mBinding.textLinking.setText(R.string.show_can_apply)
         }
+    }
+
+    fun setOnApplySuccess() {
+        mBinding.iBtnCancelApply.isVisible = true
+        mBinding.iBtnCancelApplyText.isVisible = true
     }
 
     /**
@@ -105,8 +94,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
         if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&
             interactionInfo.userId == UserManager.getInstance().user.id.toString()
         ) {
-            mBinding.iBtnSeatApply.isVisible = false
-            mBinding.iBtnSeatApplyText.isVisible = false
             mBinding.iBtnCancelApply.isVisible = false
             mBinding.iBtnCancelApplyText.isVisible = false
             mBinding.iBtnStopLinkText.isVisible = true
@@ -123,7 +110,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
 
     interface Listener {
         fun onRequestRefreshing()
-        fun onApplyOnSeat()
         fun onStopLinkingChosen()
         fun onStopApplyingChosen()
     }

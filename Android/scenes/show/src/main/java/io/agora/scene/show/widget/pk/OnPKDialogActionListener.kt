@@ -9,7 +9,12 @@ interface OnPKDialogActionListener {
     fun onRequestMessageRefreshing(dialog: LivePKDialog)
 
     /**
-     * 连麦-item"邀请"按钮点击时回调
+     * pk-item"邀请"按钮点击时回调
      */
     fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: ShowRoomDetailModel)
+
+    /**
+     * pk-"停止pk"按钮点击时回调
+     */
+    fun onStopPKingChosen(dialog: LivePKDialog)
 }
