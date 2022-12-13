@@ -8,7 +8,7 @@
 
 #import "VLJoinChorusView.h"
 #import "VLStartSoloView.h"
-#import "VLNoBodyOnLineView.h"
+#import "VLKTVMVIdleView.h"
 #import "HWWeakTimer.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
@@ -21,7 +21,7 @@
 @import Masonry;
 
 @class QMUIButton;
-@interface VLKTVMVView () <VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () <VLKTVMVIdleViewDelegate,VLJoinChorusViewDelegate,VLStartSoloViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -36,7 +36,7 @@
 @property (nonatomic, strong) VLHotSpotBtn *settingBtn; /// 设置参数按钮
 @property (nonatomic, strong) VLJoinChorusView *joinChorusView; // 合唱倒计时视图
 @property (nonatomic, strong) VLStartSoloView *startSoloView; // 独唱倒计时视图
-@property (nonatomic, strong) VLNoBodyOnLineView *idleView;//没有人演唱视图
+@property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
 
 @property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
 @property (nonatomic, assign) int totalLines;
@@ -108,7 +108,7 @@
     self.startSoloView.hidden = YES;
     [self addSubview:self.startSoloView];
     
-    self.idleView = [[VLNoBodyOnLineView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
+    self.idleView = [[VLKTVMVIdleView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height) withDelegate:self];
     self.idleView.hidden = NO;
     [self addSubview:self.idleView];
     

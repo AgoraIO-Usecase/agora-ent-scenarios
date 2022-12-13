@@ -6,7 +6,7 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@protocol VLRobMicrophoneViewDelegate <NSObject>
+@protocol VLJoinChorusViewDelegate <NSObject>
 
 @optional
 
@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLJoinChorusView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRobMicrophoneViewDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLJoinChorusViewDelegate>)delegate;
 
 @property (nonatomic, strong) UILabel *musicLabel;
 @property (nonatomic, strong) UILabel *countDownLabel;

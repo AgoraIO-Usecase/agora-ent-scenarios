@@ -3,8 +3,8 @@
 //  VoiceOnLine
 //
 
-#import "VLRoomPersonView.h"
-#import "VLRoomPersonIteimCCell.h"
+#import "VLMicSeatList.h"
+#import "VLMicSeatCell.h"
 #import "VLRoomSeatModel.h"
 #import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
@@ -13,16 +13,16 @@
 @import YYCategories;
 @import SDWebImage;
 
-@interface VLRoomPersonView ()<UICollectionViewDataSource,UICollectionViewDelegate>
+@interface VLMicSeatList ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
-@property(nonatomic, weak) id <VLRoomPersonViewDelegate>delegate;
+@property(nonatomic, weak) id <VLMicSeatListDelegate>delegate;
 
 @property (nonatomic, strong) UICollectionView *personCollectionView;
 @end
 
-@implementation VLRoomPersonView
+@implementation VLMicSeatList
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRoomPersonViewDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit{
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLMicSeatListDelegate>)delegate withRTCkit:(AgoraRtcEngineKit *)RTCkit{
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         self.roomSeatsArray = [[NSArray alloc]init];
@@ -55,7 +55,7 @@
     if (@available(iOS 11, *)) {
         self.personCollectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }
-    [self.personCollectionView registerClass:[VLRoomPersonIteimCCell class] forCellWithReuseIdentifier:[VLRoomPersonIteimCCell className]];
+    [self.personCollectionView registerClass:[VLMicSeatCell class] forCellWithReuseIdentifier:[VLMicSeatCell className]];
     [self addSubview:self.personCollectionView];
     
 }
@@ -76,8 +76,8 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    VLRoomPersonIteimCCell *cell = nil;
-    cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLRoomPersonIteimCCell className] forIndexPath:indexPath];
+    VLMicSeatCell *cell = nil;
+    cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLMicSeatCell className] forIndexPath:indexPath];
     
     for (UIView *view in cell.videoView.subviews) {
         if (view.tag > viewTag) {

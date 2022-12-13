@@ -96,9 +96,9 @@
 //弹出美声视图
 + (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
                            withBelcantoModel:(VLBelcantoModel *)belcantoModel
-                                withDelegate:(id<VLChooseBelcantoViewDelegate>)delegate {
+                                withDelegate:(id<VLAudioEffectPickerDelegate>)delegate {
     CGFloat popViewH = 175 + kSafeAreaBottomHeight;
-    VLChooseBelcantoView *belcantoView = [[VLChooseBelcantoView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+    VLAudioEffectPicker *belcantoView = [[VLAudioEffectPicker alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                         withDelegate:delegate];
     belcantoView.selBelcantoModel = belcantoModel;
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:belcantoView
@@ -134,7 +134,7 @@
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
                                       withDelegate:(id<VLsoundEffectViewDelegate>)delegate {
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    VLsoundEffectView* soundEffectView = [[VLsoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+    VLSoundEffectView* soundEffectView = [[VLSoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                                                     withDelegate:delegate];
     
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundEffectView

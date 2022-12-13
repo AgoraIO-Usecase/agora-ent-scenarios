@@ -3,14 +3,14 @@
 //  VoiceOnLine
 //
 
-#import "VLSelectSongTCell.h"
+#import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 @import SDWebImage;
 
-@implementation VLSelectSongTCell
+@implementation VLSelectedSongListCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {

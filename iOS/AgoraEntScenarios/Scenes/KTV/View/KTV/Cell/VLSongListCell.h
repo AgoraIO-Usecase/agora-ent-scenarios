@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @class QMUIButton;
-@interface VLChoosedSongTCell : UITableViewCell
+@interface VLSongListCell : UITableViewCell
 
 @property (nonatomic, strong) UIImageView *picImgView;
 

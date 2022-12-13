@@ -10,13 +10,13 @@
 
 @interface VLStartSoloView ()
 
-@property(nonatomic, weak) id <VLSoloSongViewDelegate>delegate;
+@property(nonatomic, weak) id <VLStartSoloViewDelegate>delegate;
 
 @end
 
 @implementation VLStartSoloView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSoloSongViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLStartSoloViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorClear;
         self.delegate = delegate;

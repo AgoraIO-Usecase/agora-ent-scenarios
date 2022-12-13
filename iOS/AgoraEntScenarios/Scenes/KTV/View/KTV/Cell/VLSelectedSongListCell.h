@@ -7,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLSongItmModel;
-@interface VLSelectSongTCell : UITableViewCell
+@interface VLSelectedSongListCell : UITableViewCell
 
 @property (nonatomic, strong) UIImageView *picImgView;
 

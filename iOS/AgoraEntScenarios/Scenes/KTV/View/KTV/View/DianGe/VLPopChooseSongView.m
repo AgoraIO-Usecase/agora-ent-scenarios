@@ -4,14 +4,14 @@
 //
 
 #import "VLPopChooseSongView.h"
-#import "VLSelectSongView.h"
-#import "VLChoosedSongView.h"
+#import "VLSelectedSongList.h"
+#import "VLSongList.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLPopChooseSongView ()<VLSelectSongViewDelegate,VLChoosedSongViewDelegate>
+@interface VLPopChooseSongView ()<VLSelectedSongListDelegate,VLSongListDelegate>
 
 @property(nonatomic, weak) id <VLPopChooseSongViewDelegate>delegate;
 
@@ -19,8 +19,8 @@
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
 @property (nonatomic, strong) UILabel      *sourceLabel;
-@property (nonatomic, strong) VLSelectSongView *selsectSongView;
-@property (nonatomic, strong) VLChoosedSongView *choosedSongView;
+@property (nonatomic, strong) VLSelectedSongList *selsectSongView;
+@property (nonatomic, strong) VLSongList *choosedSongView;
 
 @property (nonatomic, copy) NSString *roomNo;
 
@@ -138,17 +138,17 @@
     return _sourceLabel;
 }
 
-- (VLSelectSongView *)selsectSongView {
+- (VLSelectedSongList *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSelectSongView alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
         
     }
     return _selsectSongView;
 }
 
-- (VLChoosedSongView *)choosedSongView {
+- (VLSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLChoosedSongView alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self ];
+        _choosedSongView = [[VLSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self ];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;
