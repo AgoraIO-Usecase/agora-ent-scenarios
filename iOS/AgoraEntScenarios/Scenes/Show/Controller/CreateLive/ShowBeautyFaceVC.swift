@@ -91,17 +91,12 @@ class ShowBeautyFaceVC: UIViewController {
             
         case .style:
             if isReset {
-                ByteBeautyManager.shareManager.reset(datas: dataArray)
-                ByteBeautyManager.shareManager.reset(datas: dataArray,
-                                                     key: "Makeup_ALL")
+                ByteBeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
             ByteBeautyManager.shareManager.setStyle(path: model.path,
                                                     key: model.key,
                                                     value: model.value)
-            ByteBeautyManager.shareManager.setStyle(path: model.path,
-                                                    key: "Makeup_ALL",
-                                                    value: model.makupValue)
             
         case .sticker:
             ByteBeautyManager.shareManager.setSticker(path: model.path)
