@@ -224,7 +224,7 @@
 		DD8417B229090C520026B624 /* VLSelectSongTableItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172829090C520026B624 /* VLSelectSongTableItemView.m */; };
 		DD8417B329090C520026B624 /* VLSearchSongResultView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172929090C520026B624 /* VLSearchSongResultView.m */; };
 		DD8417B429090C520026B624 /* VLSearchEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172A29090C520026B624 /* VLSearchEmptyView.m */; };
-		DD8417B529090C520026B624 /* VLPopChooseSongView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172B29090C520026B624 /* VLPopChooseSongView.m */; };
+		DD8417B529090C520026B624 /* VLPopSongList.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84172B29090C520026B624 /* VLPopSongList.m */; };
 		DD8417B829090C520026B624 /* VLKTVTopView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84173C29090C520026B624 /* VLKTVTopView.m */; };
 		DD8417B929090C520026B624 /* VLMicSeatList.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84173D29090C520026B624 /* VLMicSeatList.m */; };
 		DD8417BB29090C520026B624 /* VLJoinChorusView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD84173F29090C520026B624 /* VLJoinChorusView.m */; };
@@ -696,10 +696,10 @@
 		DD84172829090C520026B624 /* VLSelectSongTableItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSelectSongTableItemView.m; sourceTree = "<group>"; };
 		DD84172929090C520026B624 /* VLSearchSongResultView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSearchSongResultView.m; sourceTree = "<group>"; };
 		DD84172A29090C520026B624 /* VLSearchEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSearchEmptyView.m; sourceTree = "<group>"; };
-		DD84172B29090C520026B624 /* VLPopChooseSongView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopChooseSongView.m; sourceTree = "<group>"; };
+		DD84172B29090C520026B624 /* VLPopSongList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopSongList.m; sourceTree = "<group>"; };
 		DD84172C29090C520026B624 /* VLSelectedSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSelectedSongList.h; sourceTree = "<group>"; };
 		DD84172D29090C520026B624 /* VLSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSongList.h; sourceTree = "<group>"; };
-		DD84172E29090C520026B624 /* VLPopChooseSongView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopChooseSongView.h; sourceTree = "<group>"; };
+		DD84172E29090C520026B624 /* VLPopSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopSongList.h; sourceTree = "<group>"; };
 		DD84172F29090C520026B624 /* VLSearchEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSearchEmptyView.h; sourceTree = "<group>"; };
 		DD84173029090C520026B624 /* VLSearchSongResultView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSearchSongResultView.h; sourceTree = "<group>"; };
 		DD84173129090C520026B624 /* VLSelectSongTableItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSelectSongTableItemView.h; sourceTree = "<group>"; };
@@ -1736,8 +1736,8 @@
 			children = (
 				DD84172D29090C520026B624 /* VLSongList.h */,
 				DD84172629090C520026B624 /* VLSongList.m */,
-				DD84172E29090C520026B624 /* VLPopChooseSongView.h */,
-				DD84172B29090C520026B624 /* VLPopChooseSongView.m */,
+				DD84172E29090C520026B624 /* VLPopSongList.h */,
+				DD84172B29090C520026B624 /* VLPopSongList.m */,
 				DD84172F29090C520026B624 /* VLSearchEmptyView.h */,
 				DD84172A29090C520026B624 /* VLSearchEmptyView.m */,
 				DD84173029090C520026B624 /* VLSearchSongResultView.h */,
@@ -2952,7 +2952,7 @@
 				0510B835290B77330063E57A /* VRCreateRoomCardCell.swift in Sources */,
 				057DDA04290B9495001329E6 /* PresentationEnums.swift in Sources */,
 				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
-				DD8417B529090C520026B624 /* VLPopChooseSongView.m in Sources */,
+				DD8417B529090C520026B624 /* VLPopSongList.m in Sources */,
 				DD84179329090C520026B624 /* VLAddRoomModel.m in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,

@@ -12,7 +12,7 @@
 #import "VLDropOnLineView.h"
 #import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
-#import "VLPopChooseSongView.h"
+#import "VLPopSongList.h"
 #import "VLSoundEffectView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopChooseSongViewDelegate>)delegate;
+                                    withDelegate:(id<VLPopSongListDelegate>)delegate;
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
