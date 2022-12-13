@@ -75,7 +75,7 @@ fileprivate let once = VoiceRoomIMManager()
         if AgoraChatClient.shared().isLoggedIn {
             completion(AgoraChatClient.shared().currentUsername ?? "", nil)
         } else {
-            AgoraChatClient.shared().login(withUsername: userName, agoraToken: token, completion: completion)
+            AgoraChatClient.shared().login(withUsername: userName, token: token, completion: completion)
         }
     }
 
