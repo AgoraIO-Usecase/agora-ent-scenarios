@@ -601,7 +601,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showInvitationDialog() {
         val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
-            setTitle(R.string.show_ask_for_link)
+            setTitle(getString(R.string.show_ask_for_link, mRoomInfo.ownerName))
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                 mService.acceptMicSeatInvitation()
                 dialog.dismiss()
@@ -650,9 +650,9 @@ class LiveDetailActivity : AppCompatActivity() {
         mPKDialog.show(ft, "PKDialog")
     }
 
-    private fun showPKInvitationDialog() {
+    private fun showPKInvitationDialog(name: String) {
         val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
-            setTitle(R.string.show_ask_for_pk)
+            setTitle(getString(R.string.show_ask_for_pk, name))
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                 mService.acceptPKInvitation {  }
                 dialog.dismiss()
@@ -779,7 +779,7 @@ class LiveDetailActivity : AppCompatActivity() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
                 if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString()) {
                     isPKCompetition = true
-                    showPKInvitationDialog()
+                    showPKInvitationDialog(info.fromName)
                 }
             } else {
                 if (interactionInfo != null) {
@@ -798,6 +798,9 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun isPKing() = (interactionInfo?.interactStatus ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
+        if (interactionInfo != null) {
+            mService.stopInteraction(interactionInfo!!)
+        }
         mService.leaveRoom()
     }
 
