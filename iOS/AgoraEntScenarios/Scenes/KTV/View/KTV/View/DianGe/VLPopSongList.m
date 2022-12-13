@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLPopChooseSongView.h"
+#import "VLPopSongList.h"
 #import "VLSelectedSongList.h"
 #import "VLSongList.h"
 #import "VLHotSpotBtn.h"
@@ -11,9 +11,9 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLPopChooseSongView ()<VLSelectedSongListDelegate,VLSongListDelegate>
+@interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 
-@property(nonatomic, weak) id <VLPopChooseSongViewDelegate>delegate;
+@property(nonatomic, weak) id <VLPopSongListDelegate>delegate;
 
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
@@ -28,10 +28,10 @@
 
 @end
 
-@implementation VLPopChooseSongView
+@implementation VLPopSongList
 
 - (instancetype)initWithFrame:(CGRect)frame
-                 withDelegate:(id<VLPopChooseSongViewDelegate>)delegate
+                 withDelegate:(id<VLPopSongListDelegate>)delegate
                    withRoomNo:(NSString *)roomNo
                      ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
