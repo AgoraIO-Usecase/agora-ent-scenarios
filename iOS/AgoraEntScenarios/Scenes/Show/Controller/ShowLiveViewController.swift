@@ -527,12 +527,15 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
-            applyView.getAllMicSeatList(autoApply: false)
+//            applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
+            currentInteraction?.ownerMuteAudio = false
+            let canvasView = role == .broadcaster ? nil : UIView()
+            let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
             agoraKitManager.switchRole(role: role,
-                                       uid: interaction.userId,
-                                       canvasView: UIView())
+                                       uid: uid,
+                                       canvasView: canvasView)
             
         default:
             break
@@ -762,12 +765,13 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishCameraTrack = !selected
+        agoraKitManager.agoraKit.updateChannel(with: option)
         if selected {
             agoraKitManager.agoraKit.stopPreview()
-            agoraKitManager.agoraKit.enableLocalVideo(false)
-        }else{
+        } else {
             agoraKitManager.agoraKit.startPreview()
-            agoraKitManager.agoraKit.enableLocalVideo(true)
         }
     }
     
