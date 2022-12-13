@@ -1,10 +1,12 @@
 package io.agora.scene.show
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
@@ -81,6 +83,10 @@ class LiveDetailActivity : AppCompatActivity() {
     private var interactionInfo: ShowInteractionInfo? = null
     private var isPKCompetition: Boolean = false
 
+    private var mLinkInvitationCountDownLatch: CountDownTimer? = null
+    private var mPKInvitationCountDownLatch: CountDownTimer? = null
+    private var mPKCountDownLatch: CountDownTimer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
@@ -94,6 +100,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        releaseCountdown()
         destroyService()
         destroyRtcEngine()
     }
@@ -316,28 +323,59 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun refreshViewDetailLayout(status: Int) {
-        if (status == ShowInteractionStatus.idle.value) {
-            mBinding.videoLinkingLayout.videoContainer.removeAllViews()
-            mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
-            mBinding.videoLinkingLayout.root.isVisible = false
-            mBinding.videoLinkingAudienceLayout.root.isVisible = false
-            mBinding.videoPKLayout.root.isVisible = false
-            mBinding.videoSinglehostLayout.root.isVisible = true
-        } else if (status == ShowInteractionStatus.onSeat.value) {
-            mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
-            mBinding.videoSinglehostLayout.root.isVisible = false
-            mBinding.videoPKLayout.root.isVisible = false
-            mBinding.videoLinkingLayout.root.isVisible = true
-            mBinding.videoLinkingAudienceLayout.root.isVisible = true
-            mBinding.videoLinkingAudienceLayout.root.bringToFront()
-        } else if (status == ShowInteractionStatus.pking.value) {
-            mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
-            mBinding.videoLinkingLayout.videoContainer.removeAllViews()
-            mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
-            mBinding.videoLinkingLayout.root.isVisible = false
-            mBinding.videoLinkingAudienceLayout.root.isVisible = false
-            mBinding.videoSinglehostLayout.root.isVisible = false
-            mBinding.videoPKLayout.root.isVisible = true
+        when (status) {
+            ShowInteractionStatus.idle.value -> {
+                mBinding.videoPKLayout.iBroadcasterAView.removeAllViews()
+                mBinding.videoPKLayout.iBroadcasterBView.removeAllViews()
+                mBinding.videoLinkingLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingLayout.root.isVisible = false
+                mBinding.videoLinkingAudienceLayout.root.isVisible = false
+                mBinding.videoPKLayout.root.isVisible = false
+                mBinding.videoSinglehostLayout.root.isVisible = true
+            }
+            ShowInteractionStatus.onSeat.value -> {
+                mBinding.videoPKLayout.iBroadcasterAView.removeAllViews()
+                mBinding.videoPKLayout.iBroadcasterBView.removeAllViews()
+                mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
+                mBinding.videoSinglehostLayout.root.isVisible = false
+                mBinding.videoPKLayout.root.isVisible = false
+                mBinding.videoLinkingLayout.root.isVisible = true
+                mBinding.videoLinkingAudienceLayout.root.isVisible = true
+            }
+            ShowInteractionStatus.pking.value -> {
+                mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
+                mBinding.videoLinkingLayout.root.isVisible = false
+                mBinding.videoLinkingAudienceLayout.root.isVisible = false
+                mBinding.videoSinglehostLayout.root.isVisible = false
+                mBinding.videoPKLayout.root.isVisible = true
+            }
+        }
+    }
+
+    private fun refreshPKTimeCount() {
+        if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+            if (mPKCountDownLatch != null) {
+                mPKCountDownLatch!!.cancel()
+                mPKCountDownLatch = null
+            }
+            mPKCountDownLatch = object : CountDownTimer(120 * 1000 -1, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    val min : Long = (millisUntilFinished / 1000) / 60
+                    val sec : Long = (millisUntilFinished / 1000) % 60
+                    mBinding.videoPKLayout.iPKTimeText.text = "PK 0$min:$sec"
+                }
+                override fun onFinish() {
+                    mService.stopInteraction(interactionInfo!!)
+                }
+            }.start()
+        } else {
+            if (mPKCountDownLatch != null) {
+                mPKCountDownLatch!!.cancel()
+                mPKCountDownLatch = null
+            }
         }
     }
 
@@ -394,10 +432,10 @@ class LiveDetailActivity : AppCompatActivity() {
         PictureQualityDialog(this).apply {
             setOnQualitySelectListener { _, _, size ->
                 mRtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
-                        CameraCapturerConfiguration.CaptureFormat(size.width,
-                            size.height,
-                            15)
-                    ))
+                    CameraCapturerConfiguration.CaptureFormat(size.width,
+                        size.height,
+                        15)
+                ))
             }
 
             setOnShowListener { parentDialog.dismiss() }
@@ -479,7 +517,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mMusicEffectDialog.show()
     }
 
-    private fun ShowLinkSettingsDialog() {
+    private fun showLinkSettingsDialog() {
         mLinkSettingDialog.apply {
             setAudienceInfo(interactionInfo!!.userName)
             setOnItemActivateChangedListener { _, itemId, activated ->
@@ -558,7 +596,7 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showInvitationDialog() {
-        AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
+        val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
             setTitle(R.string.show_ask_for_link)
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                 mService.acceptMicSeatInvitation()
@@ -568,7 +606,21 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.rejectMicSeatInvitation()
                 dialog.dismiss()
             }
-        }.create().show()
+        }.create()
+        dialog.show()
+        if (mLinkInvitationCountDownLatch != null) {
+            mLinkInvitationCountDownLatch!!.cancel()
+            mLinkInvitationCountDownLatch = null
+        }
+        mLinkInvitationCountDownLatch = object : CountDownTimer(15 * 1000 -1, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text = "取消(" + millisUntilFinished / 1000 + "s)"
+            }
+            override fun onFinish() {
+                mService.rejectMicSeatInvitation()
+                dialog.dismiss()
+            }
+        }.start()
     }
 
     private fun showPKDialog() {
@@ -595,7 +647,7 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showPKInvitationDialog() {
-        AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
+        val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
             setTitle(R.string.show_ask_for_pk)
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
                 mService.acceptPKInvitation {  }
@@ -605,7 +657,21 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.rejectPKInvitation {  }
                 dialog.dismiss()
             }
-        }.create().show()
+        }.create()
+        dialog.show()
+        if (mPKInvitationCountDownLatch != null) {
+            mPKInvitationCountDownLatch!!.cancel()
+            mPKInvitationCountDownLatch = null
+        }
+        mPKInvitationCountDownLatch = object : CountDownTimer(15 * 1000 -1, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).text = "取消(" + millisUntilFinished / 1000 + "s)"
+            }
+            override fun onFinish() {
+                mService.rejectPKInvitation {  }
+                dialog.dismiss()
+            }
+        }.start()
     }
 
     private fun showPKSettingsDialog() {
@@ -645,7 +711,7 @@ class LiveDetailActivity : AppCompatActivity() {
                             user.userName,
                             user.status
                         ))
-                    } else if (user.userId.equals(UserManager.getInstance().user.id.toString())) {
+                    } else if (user.userId == UserManager.getInstance().user.id.toString()) {
                         showInvitationDialog()
                     }
                 } else {
@@ -685,6 +751,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 // RTC
                 updateLinkingMode()
                 updatePKingMode()
+                refreshPKTimeCount()
             } else {
                 // 停止互动
                 // UI
@@ -696,6 +763,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 updateIdleMode()
                 interactionInfo = null
                 refreshBottomLayout()
+                refreshPKTimeCount()
             }
         }
 
@@ -929,18 +997,22 @@ class LiveDetailActivity : AppCompatActivity() {
         // 开始连麦
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.onSeat.value) return
-        val boardcasterVideoView = TextureView(this)
+        val broadcasterVideoView = TextureView(this)
         val audienceVideoView = TextureView(this)
 
-        mBinding.videoLinkingLayout.videoContainer.addView(boardcasterVideoView)
+        mBinding.videoLinkingLayout.videoContainer.addView(broadcasterVideoView)
         mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
+        mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
+        mBinding.videoLinkingAudienceLayout.userName.bringToFront()
+        mBinding.videoLinkingAudienceLayout.userMicOnView.bringToFront()
+        mBinding.videoLinkingAudienceLayout.userMicOffView.bringToFront()
+        audienceVideoView.setOnClickListener {
+            // 主播弹出view
+            showLinkSettingsDialog()
+        }
         if (isRoomOwner) {
             // 连麦主播视角
-            audienceVideoView.setOnClickListener {
-                // 主播弹出view
-                ShowLinkSettingsDialog()
-            }
-            mRtcEngine.setupLocalVideo(VideoCanvas(boardcasterVideoView))
+            mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
             mRtcEngine.setupRemoteVideo(
                 VideoCanvas(
                     audienceVideoView,
@@ -963,7 +1035,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
                 mRtcEngine.setupRemoteVideo(
                     VideoCanvas(
-                        boardcasterVideoView,
+                        broadcasterVideoView,
                         Constants.RENDER_MODE_HIDDEN,
                         mRoomInfo.ownerId.toInt()
                     )
@@ -979,7 +1051,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 )
                 mRtcEngine.setupRemoteVideo(
                     VideoCanvas(
-                        boardcasterVideoView,
+                        broadcasterVideoView,
                         Constants.RENDER_MODE_HIDDEN,
                         mRoomInfo.ownerId.toInt()
                     )
@@ -992,14 +1064,19 @@ class LiveDetailActivity : AppCompatActivity() {
         // 开始pk
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
+        val view = TextureView(this)
+        val competitorView = TextureView(this)
+        mBinding.videoPKLayout.iBroadcasterAView.addView(view)
+        mBinding.videoPKLayout.iBroadcasterBView.addView(competitorView)
+        mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
+        mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
+        mBinding.videoPKLayout.userNameA.bringToFront()
+        mBinding.videoPKLayout.userNameB.bringToFront()
         if (isRoomOwner) {
             // pk 主播
             mBinding.videoPKLayout.iBroadcasterBView.setOnClickListener {
                 showPKSettingsDialog()
             }
-
-            val view = mBinding.videoPKLayout.iBroadcasterAView
-            val competitorView = mBinding.videoPKLayout.iBroadcasterBView
             mRtcEngine.setupLocalVideo(VideoCanvas(view))
 
             val channelMediaOptions = ChannelMediaOptions()
@@ -1040,9 +1117,6 @@ class LiveDetailActivity : AppCompatActivity() {
                 })
         } else {
             // 观众
-            val view = mBinding.videoPKLayout.iBroadcasterAView
-            val competitorView = mBinding.videoPKLayout.iBroadcasterBView
-
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = false
@@ -1104,5 +1178,20 @@ class LiveDetailActivity : AppCompatActivity() {
             },
             force
         )
+    }
+
+    private fun releaseCountdown() {
+        if (mLinkInvitationCountDownLatch != null) {
+            mLinkInvitationCountDownLatch!!.cancel()
+            mLinkInvitationCountDownLatch = null
+        }
+        if (mPKInvitationCountDownLatch != null) {
+            mPKInvitationCountDownLatch!!.cancel()
+            mPKInvitationCountDownLatch = null
+        }
+        if (mPKCountDownLatch != null) {
+            mPKCountDownLatch!!.cancel()
+            mPKCountDownLatch = null
+        }
     }
 }

@@ -29,19 +29,94 @@
             android:orientation="horizontal"
             android:layout_gravity="center">
 
-            <TextureView
+            <FrameLayout
                 android:id="@+id/iBroadcasterAView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1">
-            </TextureView>
 
-            <TextureView
+                <TextView
+                    android:id="@+id/userNameA"
+                    android:layout_width="69dp"
+                    android:layout_height="17dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="51dp"
+                    android:layout_marginEnd="67.5dp"
+                    android:gravity="center"
+                    android:text="@string/show_pk"
+                    android:textSize="12sp"
+                    android:textColor="@color/white">
+                </TextView>
+
+                <ImageView
+                    android:id="@+id/userMicOnViewA"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginBottom="11dp"
+                    android:layout_marginStart="120dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@mipmap/show_mic_bg">
+                </ImageView>
+
+                <ImageView
+                    android:id="@+id/userMicOffViewA"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="120dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="11dp"
+                    android:background="@mipmap/show_mic_off_bg"
+                    android:visibility="invisible">
+                </ImageView>
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:id="@+id/iBroadcasterBView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1">
-            </TextureView>
+
+                <TextView
+                    android:id="@+id/userNameB"
+                    android:layout_width="69dp"
+                    android:layout_height="17dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="51dp"
+                    android:layout_marginEnd="67.5dp"
+                    android:gravity="center"
+                    android:text="@string/show_pk"
+                    android:textSize="12sp"
+                    android:textColor="@color/white">
+                </TextView>
+
+                <ImageView
+                    android:id="@+id/userMicOnViewB"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginBottom="11dp"
+                    android:layout_marginStart="120dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@mipmap/show_mic_bg">
+                </ImageView>
+
+                <ImageView
+                    android:id="@+id/userMicOffViewB"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="120dp"
+                    android:layout_marginTop="250dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="11dp"
+                    android:background="@mipmap/show_mic_off_bg"
+                    android:visibility="invisible">
+                </ImageView>
+            </FrameLayout>
 
         </LinearLayout>
 
