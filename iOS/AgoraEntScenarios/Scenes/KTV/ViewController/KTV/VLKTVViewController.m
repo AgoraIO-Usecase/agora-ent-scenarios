@@ -469,7 +469,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
         [[model chorusNo] isEqualToString:VLUserCenter.user.userNo] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
     KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
-    KTVSongConfiguration* config = [KTVSongConfiguration new];
+    KTVSongConfiguration* config = [KTVSongConfiguration configWithSongCode:[[model songNo] integerValue]];
     
     config.type = type;
     config.role = role;

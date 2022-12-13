@@ -36,9 +36,11 @@ typedef enum : NSUInteger {
 
 @property(nonatomic, assign)KTVSongType type;
 @property(nonatomic, assign)KTVSingRole role;
+@property(nonatomic, assign)NSInteger songCode;
 @property(nonatomic, assign)NSInteger mainSingerUid;
 @property(nonatomic, assign)NSInteger coSingerUid;
 
++(KTVSongConfiguration*)configWithSongCode:(NSInteger)songCode;
 
 @end
 

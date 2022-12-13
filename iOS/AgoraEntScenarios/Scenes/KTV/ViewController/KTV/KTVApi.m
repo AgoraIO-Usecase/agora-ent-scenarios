@@ -18,6 +18,14 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 
 @implementation KTVSongConfiguration
+
++(KTVSongConfiguration*)configWithSongCode:(NSInteger)songCode
+{
+    KTVSongConfiguration* configs = [KTVSongConfiguration new];
+    configs.songCode = songCode;
+    return configs;
+}
+
 @end
 
 @interface KTVApi ()<
@@ -31,7 +39,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property(nonatomic, weak)AgoraRtcEngineKit* engine;
 @property(nonatomic, weak)AgoraMusicContentCenter* musicCenter;
 @property(nonatomic, weak)id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
-@property(nonatomic, assign)NSInteger openedSongCode;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LyricCallback>* lyricCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, LoadMusicCallback>* musicCallbacks;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSNumber*>* loadDict;
@@ -192,7 +199,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     KTVSongType type = self.config.type;
     if(type == KTVSongTypeSolo) {
         if(role == KTVSingRoleMainSinger) {
-            self.openedSongCode = songCode;
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -209,7 +215,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         }
     } else {
         if(role == KTVSingRoleMainSinger) {
-            self.openedSongCode = songCode;
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -219,7 +224,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
         } else if(role == KTVSingRoleCoSinger) {
-            self.openedSongCode = songCode;
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -251,11 +255,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 -(void)stopSong
 {
     [self.rtcMediaPlayer stop];
-    self.openedSongCode = -1;
     [self cancelAsyncTasks];
     if(self.config.type == KTVSongTypeChorus) {
         [self leaveChorus2ndChannel];
     }
+    self.config = nil;
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -298,10 +302,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                 }
             }
         }
-        [self.delegate controller:self song:self.openedSongCode config:self.config didChangedToPosition:position local:NO];
+        [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
         NSInteger state = [dict[@"state"] integerValue];
-        [self.delegate controller:self song:self.openedSongCode didChangedToState:state local:NO];
+        [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
     }
@@ -329,7 +333,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         self.localPlayerPosition = 0;
     }
     [self syncPlayState:state];
-    [self.delegate controller:self song:self.openedSongCode didChangedToState:state local:YES];
+    [self.delegate controller:self song:self.config.songCode didChangedToState:state local:YES];
 }
 
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
@@ -348,7 +352,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self sendStreamMessageWithDict:dict success:nil];
     }
     
-    [self.delegate controller:self song:self.openedSongCode config:self.config didChangedToPosition:position local:YES];
+    [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:YES];
 }
 
 
