@@ -57,7 +57,7 @@ VLPopMoreSelViewDelegate,
 VLDropOnLineViewDelegate,
 VLAudienceIndicatorDelegate,
 VLAudioEffectPickerDelegate,
-VLPopChooseSongViewDelegate,
+VLPopSongListDelegate,
 VLsoundEffectViewDelegate,
 VLKTVSettingViewDelegate,
 VLBadNetWorkViewDelegate,
@@ -76,7 +76,7 @@ KTVApiDelegate
 @property (nonatomic, strong) VLKTVSettingView *settingView;
 @property (nonatomic, strong) VLMicSeatList *roomPersonView; //房间麦位视图
 @property (nonatomic, strong) VLAudienceIndicator *requestOnLineView;//空位上麦
-@property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
+@property (nonatomic, strong) VLPopSongList *chooseSongView; //点歌视图
 @property (nonatomic, strong) VLSoundEffectView *soundEffectView; // 音效视图
 
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
@@ -340,7 +340,7 @@ KTVApiDelegate
                                        withRoomNo:self.roomModel.roomNo
                                      withDelegate:self];
     
-    self.chooseSongView = (VLPopChooseSongView*)popChooseSongView.currCustomView;
+    self.chooseSongView = (VLPopSongList*)popChooseSongView.currCustomView;
 }
 
 //弹出音效
@@ -944,7 +944,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark VLPopChooseSongViewDelegate
-- (void)chooseSongView:(VLPopChooseSongView*)view tabbarDidClick:(NSUInteger)tabIndex {
+- (void)chooseSongView:(VLPopSongList*)view tabbarDidClick:(NSUInteger)tabIndex {
     if (tabIndex != 1) {
         return;
     }

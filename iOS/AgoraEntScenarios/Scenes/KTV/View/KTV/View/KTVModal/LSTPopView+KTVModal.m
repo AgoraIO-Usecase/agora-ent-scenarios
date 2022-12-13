@@ -113,9 +113,9 @@
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
-                                    withDelegate:(id<VLPopChooseSongViewDelegate>)delegate {
+                                    withDelegate:(id<VLPopSongListDelegate>)delegate {
     CGFloat popViewH = SCREEN_HEIGHT * 0.7;
-    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]
+    VLPopSongList *chooseSongView = [[VLPopSongList alloc]
                                            initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
                                            withDelegate:delegate
                                            withRoomNo:roomNo
