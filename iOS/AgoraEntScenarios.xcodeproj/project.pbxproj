@@ -1679,7 +1679,7 @@
 		DD84170429090C520026B624 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				DD84172529090C520026B624 /* DianGe */,
+				DD84172529090C520026B624 /* KTVSongGallery */,
 				7F6BE3D52919ED4900F6714D /* KTVModal */,
 				DD84170E29090C520026B624 /* KTVSettingView */,
 				DD84173229090C520026B624 /* VLBadNetWorkView.h */,
@@ -1731,7 +1731,7 @@
 			path = KTVSettingView;
 			sourceTree = "<group>";
 		};
-		DD84172529090C520026B624 /* DianGe */ = {
+		DD84172529090C520026B624 /* KTVSongGallery */ = {
 			isa = PBXGroup;
 			children = (
 				DD84172D29090C520026B624 /* VLSongList.h */,
@@ -1747,7 +1747,7 @@
 				DD84172C29090C520026B624 /* VLSelectedSongList.h */,
 				DD84172729090C520026B624 /* VLSelectedSongList.m */,
 			);
-			path = DianGe;
+			path = KTVSongGallery;
 			sourceTree = "<group>";
 		};
 		DD84174829090C520026B624 /* Service */ = {
