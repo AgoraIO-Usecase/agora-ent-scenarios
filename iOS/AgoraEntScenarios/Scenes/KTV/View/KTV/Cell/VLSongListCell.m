@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLChoosedSongTCell.h"
+#import "VLSongListCell.h"
 #import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "AgoraEntScenarios-Swift.h"
@@ -12,7 +12,7 @@
 @import YYCategories;
 @import SDWebImage;
 
-@implementation VLChoosedSongTCell
+@implementation VLSongListCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {

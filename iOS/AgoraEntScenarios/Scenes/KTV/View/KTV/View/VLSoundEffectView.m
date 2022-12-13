@@ -12,7 +12,7 @@
 @import YYCategories;
 @import ChameleonFramework;
 
-@interface VLsoundEffectView ()
+@interface VLSoundEffectView ()
 
 @property(nonatomic, weak) id <VLsoundEffectViewDelegate>delegate;
 @property (nonatomic, strong) ZQTCustomSwitch *openSwitch;
@@ -32,7 +32,7 @@
 @end
 
 
-@implementation VLsoundEffectView
+@implementation VLSoundEffectView
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLsoundEffectViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {

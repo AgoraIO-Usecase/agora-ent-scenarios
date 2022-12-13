@@ -6,10 +6,10 @@
 #import "VLKTVViewController.h"
 #import "VLKTVTopView.h"
 #import "VLKTVMVView.h"
-#import "VLRoomPersonView.h"
-#import "VLKTVBottomView.h"
-#import "VLTouristOnLineView.h"
-#import "VLNoBodyOnLineView.h"
+#import "VLMicSeatList.h"
+#import "VLKTVBottomToolbar.h"
+#import "VLAudienceIndicator.h"
+#import "VLKTVMVIdleView.h"
 #import "VLOnLineListVC.h"
 
 #import "VLKTVSettingView.h"
@@ -50,13 +50,13 @@ typedef void (^ChorusCallback)(void);
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
 VLKTVMVViewDelegate,
-VLRoomPersonViewDelegate,
-VLKTVBottomViewDelegate,
+VLMicSeatListDelegate,
+VLKTVBottomToolbarDelegate,
 VLPopSelBgViewDelegate,
 VLPopMoreSelViewDelegate,
 VLDropOnLineViewDelegate,
-VLTouristOnLineViewDelegate,
-VLChooseBelcantoViewDelegate,
+VLAudienceIndicatorDelegate,
+VLAudioEffectPickerDelegate,
 VLPopChooseSongViewDelegate,
 VLsoundEffectViewDelegate,
 VLKTVSettingViewDelegate,
@@ -69,15 +69,15 @@ KTVApiDelegate
 
 @property (nonatomic, strong) VLKTVMVView *MVView;
 @property (nonatomic, strong) VLKTVSelBgModel *choosedBgModel;
-@property (nonatomic, strong) VLKTVBottomView *bottomView;
+@property (nonatomic, strong) VLKTVBottomToolbar *bottomView;
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
-@property (nonatomic, strong) VLNoBodyOnLineView *noBodyOnLineView; // mv空页面
+@property (nonatomic, strong) VLKTVMVIdleView *noBodyOnLineView; // mv空页面
 @property (nonatomic, strong) VLKTVTopView *topView;
 @property (nonatomic, strong) VLKTVSettingView *settingView;
-@property (nonatomic, strong) VLRoomPersonView *roomPersonView; //房间麦位视图
-@property (nonatomic, strong) VLTouristOnLineView *requestOnLineView;//空位上麦
+@property (nonatomic, strong) VLMicSeatList *roomPersonView; //房间麦位视图
+@property (nonatomic, strong) VLAudienceIndicator *requestOnLineView;//空位上麦
 @property (nonatomic, strong) VLPopChooseSongView *chooseSongView; //点歌视图
-@property (nonatomic, strong) VLsoundEffectView *soundEffectView; // 音效视图
+@property (nonatomic, strong) VLSoundEffectView *soundEffectView; // 音效视图
 
 @property (nonatomic, strong) id<AgoraMusicPlayerProtocol> rtcMediaPlayer;
 @property (nonatomic, strong) AgoraMusicContentCenter *AgoraMcc;
@@ -132,19 +132,19 @@ KTVApiDelegate
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
-    VLRoomPersonView *personView = [[VLRoomPersonView alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26) withDelegate:self withRTCkit:self.RTCkit];
+    VLMicSeatList *personView = [[VLMicSeatList alloc]initWithFrame:CGRectMake(0, self.MVView.bottom+42, SCREEN_WIDTH, (VLREALVALUE_WIDTH(54)+20)*2+26) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
     
     //底部按钮视图
-    VLKTVBottomView *bottomView = [[VLKTVBottomView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
     self.bottomView = bottomView;
     bottomView.backgroundColor = UIColorClear;
     [self.view addSubview:bottomView];
     
     //空位上麦视图
-    VLTouristOnLineView *requestOnLineView = [[VLTouristOnLineView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
+    VLAudienceIndicator *requestOnLineView = [[VLAudienceIndicator alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
     self.requestOnLineView = requestOnLineView;
     [self.view addSubview:requestOnLineView];
     
@@ -847,7 +847,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - VLKTVBottomViewDelegate
-- (void)onVLKTVBottomView:(VLKTVBottomView *)view
+- (void)onVLKTVBottomView:(VLKTVBottomToolbar *)view
                 btnTapped:(id)sender
                withValues:(VLKTVBottomBtnClickType)typeValue {
     switch (typeValue) {
@@ -879,7 +879,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - VLRoomPersonViewDelegate
-- (void)onVLRoomPersonView:(VLRoomPersonView *)view
+- (void)onVLRoomPersonView:(VLMicSeatList *)view
    seatItemTappedWithModel:(VLRoomSeatModel *)model
                    atIndex:(NSInteger)seatIndex {
     if(VLUserCenter.user.ifMaster) {
@@ -908,7 +908,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)onVLRoomPersonView:(VLRoomPersonView *)view onRenderVideo:(VLRoomSeatModel *)model inView:(UIView *)videoView atIndex:(NSInteger)seatIndex
+- (void)onVLRoomPersonView:(VLMicSeatList *)view onRenderVideo:(VLRoomSeatModel *)model inView:(UIView *)videoView atIndex:(NSInteger)seatIndex
 {
     AgoraRtcVideoCanvas *videoCanvas = [[AgoraRtcVideoCanvas alloc] init];
     videoCanvas.uid = [model.rtcUid unsignedIntegerValue];
@@ -953,7 +953,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 #pragma mark - VLChooseBelcantoViewDelegate
-- (void)onVLChooseBelcantoView:(VLChooseBelcantoView *)view
+- (void)onVLChooseBelcantoView:(VLAudioEffectPicker *)view
                     itemTapped:(VLBelcantoModel *)model
                      withIndex:(NSInteger)index {
     self.selBelcantoModel = model;

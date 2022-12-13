@@ -3,8 +3,8 @@
 //  VoiceOnLine
 //
 
-#import "VLChoosedSongView.h"
-#import "VLChoosedSongTCell.h"
+#import "VLSongList.h"
+#import "VLSongListCell.h"
 #import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
@@ -13,17 +13,17 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLChoosedSongView ()<UITableViewDataSource,UITableViewDelegate>
+@interface VLSongList ()<UITableViewDataSource,UITableViewDelegate>
 
-@property(nonatomic, weak) id <VLChoosedSongViewDelegate>delegate;
+@property(nonatomic, weak) id <VLSongListDelegate>delegate;
 
 @property (nonatomic, strong) UITableView  *tableView;
 
 @end
 
-@implementation VLChoosedSongView
+@implementation VLSongList
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLChoosedSongViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSongListDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -50,9 +50,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     VL(weakSelf);
     static NSString *reuseCell = @"reuse";
-    VLChoosedSongTCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseCell];
+    VLSongListCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseCell];
     if (cell == nil) {
-        cell = [[VLChoosedSongTCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
+        cell = [[VLSongListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
     }
     cell.selSongModel = self.selSongsArray[indexPath.row];
     cell.numberLabel.text = [NSString stringWithFormat:@"%d",(int)(indexPath.row+1)];

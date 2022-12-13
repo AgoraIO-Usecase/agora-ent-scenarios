@@ -10,13 +10,13 @@
 
 @interface VLJoinChorusView ()
 
-@property(nonatomic, weak) id <VLRobMicrophoneViewDelegate>delegate;
+@property(nonatomic, weak) id <VLJoinChorusViewDelegate>delegate;
 
 @end
 
 @implementation VLJoinChorusView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLRobMicrophoneViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLJoinChorusViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorClear;
         self.delegate = delegate;

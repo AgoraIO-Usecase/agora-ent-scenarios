@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLSelectSongView.h"
+#import "VLSelectedSongList.h"
 #import <JXCategoryView/JXCategoryView.h>
 #import "VLSelectSongTableItemView.h"
 #import "VLSearchSongResultView.h"
@@ -14,14 +14,14 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLSelectSongView ()<
+@interface VLSelectedSongList ()<
 JXCategoryViewDelegate,
 JXCategoryListContainerViewDelegate,
 VLSearchSongResultViewDelegate,
 UITextFieldDelegate
 >
 
-@property(nonatomic, weak) id <VLSelectSongViewDelegate>delegate;
+@property(nonatomic, weak) id <VLSelectedSongListDelegate>delegate;
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UITextField *searchTF;
 @property (nonatomic, strong) VLHotSpotBtn *cancelButton;
@@ -36,10 +36,10 @@ UITextFieldDelegate
 
 @end
 
-@implementation VLSelectSongView
+@implementation VLSelectedSongList
 
 - (instancetype)initWithFrame:(CGRect)frame
-                 withDelegate:(id<VLSelectSongViewDelegate>)delegate
+                 withDelegate:(id<VLSelectedSongListDelegate>)delegate
                    withRoomNo:(NSString *)roomNo
                      ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {

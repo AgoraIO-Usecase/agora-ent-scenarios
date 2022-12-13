@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLChooseBelcantoView.h"
+#import "VLAudioEffectPicker.h"
 #import "VLBelcantoModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
@@ -12,9 +12,9 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLChooseBelcantoView ()<UICollectionViewDataSource,UICollectionViewDelegate>
+@interface VLAudioEffectPicker ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
-@property(nonatomic, weak) id <VLChooseBelcantoViewDelegate>delegate;
+@property(nonatomic, weak) id <VLAudioEffectPickerDelegate>delegate;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray *itemsArray;
 @property (nonatomic, strong) NSArray *itemsModelArray;
@@ -23,9 +23,9 @@
 @end
 
 
-@implementation VLChooseBelcantoView
+@implementation VLAudioEffectPicker
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLChooseBelcantoViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLAudioEffectPickerDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
@@ -70,7 +70,7 @@
     if (@available(iOS 11, *)) {
         self.collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }
-    [self.collectionView registerClass:[VLKTVBelcantoCell class] forCellWithReuseIdentifier:[VLKTVBelcantoCell className]];
+    [self.collectionView registerClass:[VLKTVAudioEffectCell class] forCellWithReuseIdentifier:[VLKTVAudioEffectCell className]];
     [self addSubview:self.collectionView];
     
 }
@@ -90,7 +90,7 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    VLKTVBelcantoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLKTVBelcantoCell className] forIndexPath:indexPath];
+    VLKTVAudioEffectCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[VLKTVAudioEffectCell className] forIndexPath:indexPath];
     cell.selBelcantoModel = self.itemsModelArray[indexPath.item];
     return cell;
 }
@@ -137,7 +137,7 @@
 
 @end
 
-@implementation VLKTVBelcantoCell
+@implementation VLKTVAudioEffectCell
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
