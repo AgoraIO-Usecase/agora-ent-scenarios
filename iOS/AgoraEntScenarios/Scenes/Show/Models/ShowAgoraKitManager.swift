@@ -99,6 +99,26 @@ class ShowAgoraKitManager: NSObject {
         print("setupContentInspectConfig: \(ret)")
     }
     
+    /// 语音审核
+    private func moderationAudio(channelName: String, role: AgoraClientRole) {
+        guard role == .broadcaster else { return }
+        let userInfo = ["userId": VLUserCenter.user.id,
+                        "userName": VLUserCenter.user.name]
+        let parasm: [String: Any] = ["appId": KeyCenter.AppId,
+                                     "channelName": channelName,
+                                     "channelType": rtcEngineConfig.channelProfile.rawValue,
+                                     "traceId": UUID().uuid16string(),
+                                     "src": "iOS",
+                                     "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
+        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+                                          params: parasm) { response in
+            print("response === \(response)")
+        } failure: { errr in
+            print(errr)
+        }
+    }
+    
+    
     /// 初始化并预览
     /// - Parameter canvasView: 画布
     func startPreview(canvasView: UIView) {
@@ -231,6 +251,7 @@ class ShowAgoraKitManager: NSObject {
             canvas.uid = UInt(ownerId) ?? 0
             agoraKit.setupRemoteVideo(canvas)
         }
+        moderationAudio(channelName: channelName, role: role)
         return ret
     }
 }
