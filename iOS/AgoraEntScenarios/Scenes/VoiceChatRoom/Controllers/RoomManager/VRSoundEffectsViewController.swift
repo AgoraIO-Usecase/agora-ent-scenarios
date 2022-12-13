@@ -73,7 +73,7 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     @objc private func entryRoom() {
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.show(withStatus: "Loading".localized())
-        self.toLive.isUserInteractionEnabled = false
+        self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
         ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
@@ -96,15 +96,14 @@ public class VRSoundEffectsViewController: VRBaseViewController {
                         if let room = room {
                             SVProgressHUD.showSuccess(withStatus: "Room Created".localized())
                             self.entryRoom(room: room)
-                            self.toLive.isUserInteractionEnabled = true
                         } else {
-                            self.toLive.isUserInteractionEnabled = true
+                            self.view.window?.isUserInteractionEnabled = true
                             SVProgressHUD.showError(withStatus: "Create failed!".localized())
                         }
                     }
                 } else {
+                    self.view.window?.isUserInteractionEnabled = true
                     SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
-                    self.toLive.isUserInteractionEnabled = true
                 }
             })
             
