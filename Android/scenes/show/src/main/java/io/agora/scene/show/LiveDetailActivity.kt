@@ -1036,7 +1036,7 @@ class LiveDetailActivity : AppCompatActivity() {
                         mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
                         mRtcEngine.setupRemoteVideo(
                             VideoCanvas(
-                                boardcasterVideoView,
+                                broadcasterVideoView,
                                 Constants.RENDER_MODE_HIDDEN,
                                 mRoomInfo.ownerId.toInt()
                             )
