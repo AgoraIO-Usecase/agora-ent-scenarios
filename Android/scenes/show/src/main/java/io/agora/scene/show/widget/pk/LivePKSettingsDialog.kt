@@ -139,18 +139,7 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
         setBottomView(mBinding.root)
         mBinding.recycleView.adapter = mAdapter
         mAdapter.resetAll(mHostItemList)
-    }
-
-    fun setItemActivated(@ItemId itemId: Int, activate: Boolean){
-        for (i in 0 .. mAdapter.itemCount){
-            mAdapter.getItem(i)?.let {
-                if (it.itemId == itemId) {
-                    it.activated = activate
-                    mAdapter.notifyItemChanged(i)
-                    return
-                }
-            }
-        }
+        mBinding.userName.setText(R.string.show_pk)
     }
 
     fun setOnItemActivateChangedListener(listener: (dialog: LivePKSettingsDialog, itemId: Int, activated: Boolean)->Unit) {

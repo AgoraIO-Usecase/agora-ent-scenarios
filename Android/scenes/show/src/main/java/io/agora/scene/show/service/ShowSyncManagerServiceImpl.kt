@@ -631,9 +631,9 @@ class ShowSyncManagerServiceImpl(
 
         // pk
         if (interaction.interactStatus == ShowInteractionStatus.pking.value) {
-            if (interaction.userId == UserManager.getInstance().user.id.toString()) {
+            if (pKCompetitorInvitationList.isEmpty()) {
                 // pk 对象
-                val invitation = pKInvitationList.filter { it.userId == interaction.userId }.getOrNull(0)
+                val invitation = pKInvitationList.filter { it.fromUserId == interaction.userId }.getOrNull(0)
                 if (invitation != null) {
                     val index = pKInvitationList.indexOf(invitation)
                     pKInvitationList.removeAt(index)
@@ -1188,7 +1188,6 @@ class ShowSyncManagerServiceImpl(
                 Sync.Instance().joinScene(
                     roomId, object : Sync.JoinSceneCallback {
                         override fun onSuccess(sceneReference: SceneReference?) {
-                            //this@ShowSyncManagerServiceImpl.currPKSceneReference = sceneReference!!
                             sceneReferenceMap[roomId] = sceneReference!!
                             sceneReferenceMap[roomId]?.collection(kCollectionIdPKInvitation)?.get(object : Sync.DataListCallback {
                                 override fun onSuccess(result: MutableList<IObject>?) {
@@ -1201,7 +1200,7 @@ class ShowSyncManagerServiceImpl(
                                     }
                                     pKCompetitorInvitationList.addAll(ret)
                                     objIdOfPKCompetitorInvitation.addAll(retObjId)
-                                    innerSubscribePKInvitationChanged(roomId)
+                                    innerSubscribeCompetitorPKInvitationChanged(roomId)
                                     runOnMainThread { success.invoke(ret) }
                                 }
 
@@ -1305,42 +1304,15 @@ class ShowSyncManagerServiceImpl(
 
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowPKInvitation::class.java) ?: return
-
-                if (info.fromUserId == UserManager.getInstance().user.id.toString()) {
-                    // pk发起者
-                    val list = pKCompetitorInvitationList.filter { it.userId == info.userId }
-                    if (list.isEmpty()) {
-                        pKCompetitorInvitationList.add(info)
-                        objIdOfPKCompetitorInvitation.add(item.id)
-                    } else {
-                        val indexOf = pKCompetitorInvitationList.indexOf(list[0])
-                        pKCompetitorInvitationList[indexOf] = info
-                        objIdOfPKCompetitorInvitation[indexOf] = item.id
-                    }
-
-                    if (info.status == ShowRoomRequestStatus.accepted.value) {
-                        val interaction = ShowInteractionInfo(
-                            info.userId,
-                            info.userName,
-                            info.roomId,
-                            ShowInteractionStatus.pking.value,
-                            muteAudio = false,
-                            ownerMuteAudio = false,
-                            createdAt = info.createAt
-                        )
-                        innerCreateInteraction(interaction, null, null)
-                    }
-                } else if (info.userId == UserManager.getInstance().user.id.toString()) {
-                    // pk对象
-                    val list = pKInvitationList.filter { it.userId == info.userId }
-                    if (list.isEmpty()) {
-                        pKInvitationList.add(info)
-                        objIdOfPKInvitation.add(item.id)
-                    } else {
-                        val indexOf = pKInvitationList.indexOf(list[0])
-                        pKInvitationList[indexOf] = info
-                        objIdOfPKInvitation[indexOf] = item.id
-                    }
+                // pk对象
+                val list = pKInvitationList.filter { it.userId == info.userId }
+                if (list.isEmpty()) {
+                    pKInvitationList.add(info)
+                    objIdOfPKInvitation.add(item.id)
+                } else {
+                    val indexOf = pKInvitationList.indexOf(list[0])
+                    pKInvitationList[indexOf] = info
+                    objIdOfPKInvitation[indexOf] = item.id
                 }
 
                 runOnMainThread {
@@ -1352,7 +1324,77 @@ class ShowSyncManagerServiceImpl(
             }
 
             override fun onDeleted(item: IObject?) {
-                // TODO leaveSence
+                val objId = item!!.id
+                val index = objIdOfPKInvitation.indexOf(objId)
+                objIdOfPKInvitation.removeAt(index)
+                pKInvitationList.removeAt(index)
+
+                runOnMainThread {
+                    micPKInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                        null
+                    )
+                }
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException?) {
+            }
+        }
+        currEventListeners.add(listener)
+        sceneReference.collection(kCollectionIdPKInvitation).subscribe(listener)
+    }
+
+    private fun innerSubscribeCompetitorPKInvitationChanged(roomId: String) {
+        val sceneReference = sceneReferenceMap[roomId] ?: return
+        val listener = object : EventListener {
+            override fun onCreated(item: IObject?) {
+                // do Nothing
+            }
+
+            override fun onUpdated(item: IObject?) {
+                val info = item?.toObject(ShowPKInvitation::class.java) ?: return
+
+                val list = pKCompetitorInvitationList.filter { it.userId == info.userId }
+                if (list.isEmpty()) {
+                    pKCompetitorInvitationList.add(info)
+                    objIdOfPKCompetitorInvitation.add(item.id)
+                } else {
+                    val indexOf = pKCompetitorInvitationList.indexOf(list[0])
+                    pKCompetitorInvitationList[indexOf] = info
+                    objIdOfPKCompetitorInvitation[indexOf] = item.id
+                }
+
+                if (info.status == ShowRoomRequestStatus.accepted.value) {
+                    val interaction = ShowInteractionInfo(
+                        info.userId,
+                        info.userName,
+                        info.roomId,
+                        ShowInteractionStatus.pking.value,
+                        muteAudio = false,
+                        ownerMuteAudio = false,
+                        createdAt = info.createAt
+                    )
+                    innerCreateInteraction(interaction, null, null)
+                }
+
+                runOnMainThread {
+                    micPKInvitationSubscriber?.invoke(
+                        ShowServiceProtocol.ShowSubscribeStatus.updated,
+                        info
+                    )
+                }
+            }
+
+            override fun onDeleted(item: IObject?) {
+                val objId = item!!.id
+                val index = objIdOfPKCompetitorInvitation.indexOf(objId)
+                val invitation = pKCompetitorInvitationList[index]
+
+                val sceneReference = sceneReferenceMap[invitation.roomId] ?: return
+                sceneReference.unsubscribe(this)
+                sceneReferenceMap.remove(invitation.roomId)
+                objIdOfPKCompetitorInvitation.clear()
+                pKCompetitorInvitationList.clear()
                 runOnMainThread {
                     micPKInvitationSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
@@ -1387,8 +1429,6 @@ class ShowSyncManagerServiceImpl(
                 objIdOfInteractionInfo.clear()
                 objIdOfInteractionInfo.addAll(retObjId)
 
-                //按照创建时间顺序排序
-                //ret.sortBy { it.createdAt }
                 runOnMainThread { success?.invoke(ret) }
             }
 
