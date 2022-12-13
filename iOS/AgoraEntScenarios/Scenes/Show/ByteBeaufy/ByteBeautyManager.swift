@@ -20,6 +20,7 @@ class ByteBeautyManager {
             processor.updateComposerNodes(beautyNodes)
         }
     }
+    private var stylePath: String?
     
     private static var _sharedManager: ByteBeautyManager?
     static var shareManager: ByteBeautyManager {
@@ -47,13 +48,17 @@ class ByteBeautyManager {
     }
     
     func setStyle(path: String?, key: String?, value: CGFloat) {
-        guard let path = path, let key = key else { return }
-        if !path.isEmpty, !beautyNodes.contains(path) {
+        guard let path = path, !path.isEmpty, let key = key else { return }
+        if let stylePath = stylePath, let index = beautyNodes.firstIndex(of: stylePath) {
+            beautyNodes.remove(at: index)
+        }
+        if !beautyNodes.contains(path) {
             beautyNodes.append(path)
         }
         processor.updateComposerNodeIntensity(path,
                                               key: key,
                                               intensity: value)
+        stylePath = path
     }
     
     func setFilter(path: String?, value: CGFloat) {
@@ -70,14 +75,28 @@ class ByteBeautyManager {
         processor.setCameraPosition(isFront)
     }
     
-    func reset(datas: [ByteBeautyModel], key: String? = nil) {
+    func reset(datas: [ByteBeautyModel]) {
         datas.forEach({
-            $0.isSelected = $0.path == nil || $0.key == "smooth"
+            $0.isSelected = $0.key == "smooth"
             guard $0.path != nil else { return }
             processor.updateComposerNodeIntensity($0.path,
-                                                  key: key ?? $0.key,
+                                                  key: $0.key,
                                                   intensity: 0)
         })
+    }
+    
+    func resetStyle(datas: [ByteBeautyModel]) {
+        datas.forEach({
+            $0.isSelected = $0.path == nil
+            guard $0.path != nil else { return }
+            processor.updateComposerNodeIntensity($0.path,
+                                                  key: $0.key,
+                                                  intensity: 0)
+            if let index = beautyNodes.firstIndex(of: $0.path ?? "") {
+                beautyNodes.remove(at: index)
+            }
+        })
+        stylePath = nil
     }
     
     func resetFilter(datas: [ByteBeautyModel]) {
@@ -105,7 +124,7 @@ class ByteBeautyManager {
     func destroy() {
         ByteBeautyManager._sharedManager = nil
         reset(datas: ShowBeautyFaceVC.beautyData)
-        reset(datas: ShowBeautyFaceVC.styleData)
+        resetStyle(datas: ShowBeautyFaceVC.styleData)
         resetSticker(datas: ShowBeautyFaceVC.stickerData)
         resetFilter(datas: ShowBeautyFaceVC.filterData)
     }

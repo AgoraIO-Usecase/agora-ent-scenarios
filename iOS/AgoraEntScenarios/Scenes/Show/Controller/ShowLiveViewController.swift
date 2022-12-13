@@ -352,9 +352,19 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 let imp = AppContext.showServiceImp
                 switch result {
                 case .accept:
-                    AppContext.showServiceImp.acceptMicSeatInvitation { error in
+                    ToastView.showWait(text: "...")
+                    AppContext.showServiceImp.getAllInterationList { _, list in
+                        ToastView.hidden()
+                        guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+                        let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
+                        if isLink {
+                            AppContext.showServiceImp.rejectMicSeatInvitation { _ in }
+                            ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
+                            return
+                        }
+                        AppContext.showServiceImp.acceptMicSeatInvitation { error in }
                     }
-                    break
+
                 default:
                     imp.rejectMicSeatInvitation { error in
                     }
@@ -527,14 +537,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         case .onSeat:
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
-            applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
-            if interaction.userId == VLUserCenter.user.id {
-                agoraKitManager.switchRole(role: .audience,
-                                           uid: interaction.userId,
-                                           canvasView: UIView())
-            }
+            currentInteraction?.ownerMuteAudio = false
+            let canvasView = role == .broadcaster ? nil : UIView()
+            let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
+            agoraKitManager.switchRole(role: role,
+                                       uid: uid,
+                                       canvasView: canvasView)
             
         default:
             break
@@ -764,12 +774,13 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishCameraTrack = !selected
+        agoraKitManager.agoraKit.updateChannel(with: option)
         if selected {
             agoraKitManager.agoraKit.stopPreview()
-            agoraKitManager.agoraKit.enableLocalVideo(false)
-        }else{
+        } else {
             agoraKitManager.agoraKit.startPreview()
-            agoraKitManager.agoraKit.enableLocalVideo(true)
         }
     }
     

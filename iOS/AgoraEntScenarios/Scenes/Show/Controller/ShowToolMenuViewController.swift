@@ -28,7 +28,7 @@ class ShowToolMenuViewController: UIViewController {
     var type: ShowMenuType = .idle_audience {
         didSet {
             //TODO(pengpeng):
-//            if type == oldValue { return }
+            if type == oldValue { return }
             updateLayoutForType(type)
         }
     }
