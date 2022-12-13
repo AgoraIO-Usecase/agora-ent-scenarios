@@ -39,7 +39,7 @@ import KakaJSON
     public var rtc_uid: Int? = 0
     public var use_robot: Bool? = false
     public var robot_volume: UInt?
-    public var sound_effect: Int = 0
+    public var sound_effect: Int = 1
 
     override public required init() {}
 

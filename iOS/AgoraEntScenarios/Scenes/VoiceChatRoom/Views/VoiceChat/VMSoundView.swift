@@ -24,7 +24,7 @@ class VMSoundView: UIView {
     private var iconBgView: UIView = .init()
     private var lineImgView: UIImageView = .init()
 
-    private var soundEffect: Int = 0
+    private var soundEffect: Int = 1
     private var typeStr: String = ""
     private var detailStr: String = ""
     private var images = [["wangyi", "momo", "pipi", "yinyu"], ["wangyi", "jiamian", "yinyu", "paipaivoice", "wanba", "qingtian", "skr", "soul"], ["yalla-ludo", "jiamian"], ["qingmang", "cowLive", "yuwan", "weibo"]]
@@ -86,11 +86,11 @@ class VMSoundView: UIView {
         }
         var basetag = 0
         switch soundEffect {
-        case 0:
-            basetag = 110
         case 1:
-            basetag = 120
+            basetag = 110
         case 2:
+            basetag = 120
+        case 3:
             basetag = 130
         default:
             basetag = 140
@@ -130,15 +130,15 @@ class VMSoundView: UIView {
     private func setSoundEffect(_ effect: Int) {
         soundEffect = effect
         switch effect {
-        case 0:
+        case 1:
             detailStr = "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat.".localized()
             iconImgs = images[0]
             typeStr = "Social Chat".localized()
-        case 1:
+        case 2:
             detailStr = "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful.".localized()
             iconImgs = images[1]
             typeStr = "Karaoke".localized()
-        case 2:
+        case 3:
             detailStr = "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. ".localized()
             iconImgs = images[2]
             typeStr = "Gaming Buddy".localized()

@@ -10,7 +10,7 @@ import UIKit
 import ZSwiftBaseLib
 
 public class VRSoundEffectsList: UITableView, UITableViewDelegate, UITableViewDataSource {
-    var type: Int = 0
+    var type: Int = 1
 
     static var heightMap = [String: CGFloat]()
 

@@ -44,6 +44,7 @@ class NetworkManager {
     static let shared = NetworkManager()
     private init() {}
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
+    private let baseServerUrl: String = KeyCenter.onlineBaseServerUrl ?? ""
     
     /// get tokens
     /// - Parameters:
@@ -98,8 +99,8 @@ class NetworkManager {
                       "uid": uid] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
-        "https://toolbox.bj2.agoralab.co/v1/token006/generate"
-        : "https://toolbox.bj2.agoralab.co/v1/token/generate"
+        "\(baseServerUrl)token006/generate"
+        : "\(baseServerUrl)token/generate"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
@@ -150,14 +151,21 @@ class NetworkManager {
             "nickname": nickName,
         ]
         
+        let imConfig = [
+            "appKey":KeyCenter.IMAppKey,
+            "clientId":KeyCenter.IMClientId,
+            "clientSecret":KeyCenter.IMClientSecret,
+        ]
+        
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
-                      "AppCertificate": KeyCenter.Certificate as Any,
                       "src": "iOS",
+                      "im": imConfig,
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
+        print("\(baseServerUrl)webdemo/im/chat/create")
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
             let data = response["data"] as? [String: String]
@@ -182,7 +190,7 @@ class NetworkManager {
                       "channelType": channelType,
                       "src": "iOS",
                       "traceId": NSString.withUUID().md5] as [String: Any]
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
                                           params: params,
                                           success: { response in
             let code = response["code"] as? Int

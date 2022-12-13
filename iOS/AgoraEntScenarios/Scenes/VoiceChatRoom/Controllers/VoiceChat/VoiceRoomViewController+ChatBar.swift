@@ -68,7 +68,7 @@ extension VoiceRoomViewController {
                 self?.showExitRoomView()
                 return
             }
-            self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 0) ?? .social)
+            self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 1) ?? .social)
         }
         preView.eqView.soundBlock = { [weak self] index in
             if self?.isOwner == false {
