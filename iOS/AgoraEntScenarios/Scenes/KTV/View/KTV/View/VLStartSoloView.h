@@ -7,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLSoloSongViewDelegate <NSObject>
+@protocol VLStartSoloViewDelegate <NSObject>
 
 @optional
 - (void)onStartSoloBtn;
@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLStartSoloView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSoloSongViewDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLStartSoloViewDelegate>)delegate;
 
 @property (nonatomic, strong) UILabel *musicLabel;
 @property (nonatomic, strong) UILabel *countDownLabel;

@@ -3,20 +3,20 @@
 //  VoiceOnLine
 //
 
-#import "VLTouristOnLineView.h"
+#import "VLAudienceIndicator.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLTouristOnLineView ()
+@interface VLAudienceIndicator ()
 
-@property(nonatomic, weak) id <VLTouristOnLineViewDelegate>delegate;
+@property(nonatomic, weak) id <VLAudienceIndicatorDelegate>delegate;
 
 @end
 
-@implementation VLTouristOnLineView
+@implementation VLAudienceIndicator
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLTouristOnLineViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLAudienceIndicatorDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorClear;
         self.delegate = delegate;

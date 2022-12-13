@@ -4,7 +4,7 @@
 //
 
 #import "VLSearchSongResultView.h"
-#import "VLSelectSongTCell.h"
+#import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
@@ -154,9 +154,9 @@ AgoraMusicContentCenterEventDelegate
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     VL(weakSelf);
     static NSString *reuseCell = @"reuse";
-    VLSelectSongTCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseCell];
+    VLSelectedSongListCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseCell];
     if (cell == nil) {
-        cell = [[VLSelectSongTCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
+        cell = [[VLSelectedSongListCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
     }
     cell.songItemModel = self.songsMuArray[indexPath.row];
     cell.dianGeBtnClickBlock = ^(VLSongItmModel * _Nonnull model) {

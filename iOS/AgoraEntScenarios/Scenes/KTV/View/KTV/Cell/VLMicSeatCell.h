@@ -6,7 +6,7 @@
 #import <UIKit/UIKit.h>
 @import QMUIKit;
 NS_ASSUME_NONNULL_BEGIN
-@interface VLRoomPersonIteimCCell : UICollectionViewCell
+@interface VLMicSeatCell : UICollectionViewCell
 
 @property (nonatomic, strong) UIImageView *avatarImgView;
 @property (nonatomic, strong) UIImageView *roomerImgView;

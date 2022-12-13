@@ -3,20 +3,20 @@
 //  VoiceOnLine
 //
 
-#import "VLNoBodyOnLineView.h"
+#import "VLKTVMVIdleView.h"
 #import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLNoBodyOnLineView ()
+@interface VLKTVMVIdleView ()
 
-@property(nonatomic, weak) id <VLNoBodyOnLineViewDelegate>delegate;
+@property(nonatomic, weak) id <VLKTVMVIdleViewDelegate>delegate;
 
 @end
 
-@implementation VLNoBodyOnLineView
+@implementation VLKTVMVIdleView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLNoBodyOnLineViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVIdleViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;

@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLRoomPersonIteimCCell.h"
+#import "VLMicSeatCell.h"
 #import "VLRoomSeatModel.h"
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
@@ -11,13 +11,13 @@
 @import QMUIKit;
 @import YYCategories;
 
-@interface VLRoomPersonIteimCCell()
+@interface VLMicSeatCell()
 
 //@property (nonatomic, strong) AgoraRtcChannelMediaOptions *mediaOption;
 
 @end
 
-@implementation VLRoomPersonIteimCCell
+@implementation VLMicSeatCell
 
 - (instancetype)initWithFrame:(CGRect)frame {
     

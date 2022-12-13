@@ -17,16 +17,16 @@ typedef enum : NSUInteger {
 } VLKTVBottomBtnClickType;
 
 NS_ASSUME_NONNULL_BEGIN
-@class VLKTVBottomView;
-@protocol VLKTVBottomViewDelegate <NSObject>
+@class VLKTVBottomToolbar;
+@protocol VLKTVBottomToolbarDelegate <NSObject>
 
-- (void)onVLKTVBottomView:(VLKTVBottomView*)view btnTapped:(id)sender withValues:(VLKTVBottomBtnClickType)typeValue;
+- (void)onVLKTVBottomView:(VLKTVBottomToolbar*)view btnTapped:(id)sender withValues:(VLKTVBottomBtnClickType)typeValue;
 
 @end
 
-@interface VLKTVBottomView : UIView
+@interface VLKTVBottomToolbar : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVBottomViewDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLRoomSeatModel *> *)seatsArray;
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVBottomToolbarDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLRoomSeatModel *> *)seatsArray;
 
 - (void)updateAudioBtn:(BOOL)audioMuted;
 - (void)updateVideoBtn:(BOOL)videoMuted;

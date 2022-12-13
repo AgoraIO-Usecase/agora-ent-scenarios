@@ -3,7 +3,7 @@
 //  VoiceOnLine
 //
 
-#import "VLKTVBottomView.h"
+#import "VLKTVBottomToolbar.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
 #import "VLURLPathConfig.h"
@@ -15,9 +15,9 @@
 
 typedef void (^actionSuccess)(BOOL ifSuccess);
 
-@interface VLKTVBottomView ()
+@interface VLKTVBottomToolbar ()
 
-@property(nonatomic, weak) id <VLKTVBottomViewDelegate>delegate;
+@property(nonatomic, weak) id <VLKTVBottomToolbarDelegate>delegate;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, strong) NSArray <VLRoomSeatModel *> *seatsArray;
 @property (nonatomic, assign) NSInteger isSelfMuted;
@@ -26,9 +26,9 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
 @property (nonatomic, strong)VLHotSpotBtn *videoBtn;
 @end
 
-@implementation VLKTVBottomView
+@implementation VLKTVBottomToolbar
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVBottomViewDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLRoomSeatModel *> *)seatsArray{
+- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVBottomToolbarDelegate>)delegate withRoomNo:(NSString *)roomNo withData:(NSArray <VLRoomSeatModel *> *)seatsArray{
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         self.roomNo = roomNo;

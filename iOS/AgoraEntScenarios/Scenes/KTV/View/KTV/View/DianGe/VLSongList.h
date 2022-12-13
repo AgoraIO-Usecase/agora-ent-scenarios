@@ -8,25 +8,25 @@
 #import "KTVServiceProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@class VLChoosedSongView;
+@class VLSongList;
 
 typedef enum : NSUInteger {
     VLChoosedSongViewActionTypeDelegate,
     VLChoosedSongViewActionTypeTop,
 } VLChoosedSongViewActionType;
 
-@protocol VLChoosedSongViewDelegate <NSObject>
+@protocol VLSongListDelegate <NSObject>
 
 @optional
 
 @end
 
-@interface VLChoosedSongView : UIView
+@interface VLSongList : UIView
 
 @property (nonatomic, readonly) NSArray *selSongsArray;
 
 - (instancetype)initWithFrame:(CGRect)frame
-                 withDelegate:(id<VLChoosedSongViewDelegate>)delegate;
+                 withDelegate:(id<VLSongListDelegate>)delegate;
 
 - (void)setSelSongsUIWithArray:(NSArray *)selSongsArray;
 

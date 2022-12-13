@@ -10,10 +10,10 @@
 #import "VLPopSelBgView.h"
 #import "VLRoomSeatModel.h"
 #import "VLDropOnLineView.h"
-#import "VLChooseBelcantoView.h"
+#import "VLAudioEffectPicker.h"
 #import "VLBadNetWorkView.h"
 #import "VLPopChooseSongView.h"
-#import "VLsoundEffectView.h"
+#import "VLSoundEffectView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 //弹出美声视图
 + (LSTPopView*)popBelcantoViewWithParentView:(UIView*)parentView
                            withBelcantoModel:(VLBelcantoModel *)belcantoModel
-                                withDelegate:(id<VLChooseBelcantoViewDelegate>)delegate;
+                                withDelegate:(id<VLAudioEffectPickerDelegate>)delegate;
 
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
