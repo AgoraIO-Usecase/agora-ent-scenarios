@@ -40,7 +40,7 @@ class PresetDialog(context: Context) : BottomFullDialog(context) {
             dismiss()
         }
         groupItems(
-            {},
+            {}, 0,
             mBinding.showChooseItemLowDevice,
             mBinding.showChooseItemMediumDevice,
             mBinding.showChooseItemHighDevice
@@ -58,9 +58,11 @@ class PresetDialog(context: Context) : BottomFullDialog(context) {
 
     private fun groupItems(
         onSelectChanged: (Int) -> Unit,
+        activateIndex: Int,
         vararg itemViews: View
     ) {
         itemViews.forEachIndexed { index, view ->
+            view.isActivated = activateIndex == index
             view.setOnClickListener {
                 if (view.isActivated) {
                     return@setOnClickListener

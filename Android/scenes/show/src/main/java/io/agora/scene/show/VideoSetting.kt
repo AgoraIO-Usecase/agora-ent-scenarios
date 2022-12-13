@@ -118,7 +118,7 @@ object VideoSetting {
 
         val MediumDevice1v1 = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = false,
+                H265 = true,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
@@ -132,7 +132,7 @@ object VideoSetting {
 
         val HighDevice1v1 = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = false,
+                H265 = true,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
@@ -151,23 +151,23 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_540P,
+                resolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1500
+                bitRate = 700
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val MediumDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = false,
+                H265 = true,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_720P,
+                resolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1800
+                bitRate = 800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -179,9 +179,9 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_720P,
+                resolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1800
+                bitRate = 800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -193,6 +193,10 @@ object VideoSetting {
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
+
+    fun updateAudienceSetting(){
+        updateRTCAudioSetting(currAudienceSetting.video.SR)
+    }
 
     fun updateAudioSetting(
         SR: Boolean? = null
@@ -331,7 +335,6 @@ object VideoSetting {
         SR: Boolean? = null
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
-        // 超分
         SR?.let { rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${it}, \"mode\": 2}}") }
     }
 
@@ -366,7 +369,8 @@ object VideoSetting {
             rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions())
         }
         PVC?.let {
-            rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
+            // RTC 4.0.0.9版本 不支持
+            // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         resolution?.let {
             videoEncoderConfiguration.dimensions =
