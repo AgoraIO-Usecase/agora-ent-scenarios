@@ -9,17 +9,14 @@ import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
+import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
 
 class LiveLinkAudienceFragment : BaseFragment() {
-    private val mBinding by lazy {
-        ShowLiveLinkAudienceBinding.inflate(
-            LayoutInflater.from(
-                context
-            )
-        )}
+    private var mBinding : ShowLiveLinkAudienceBinding? = null
+    private val binding get() = mBinding!!
     private val linkRequestViewAdapter : LiveLinkRequestViewAdapter = LiveLinkRequestViewAdapter()
     private var mListener : Listener? = null
 
@@ -29,79 +26,83 @@ class LiveLinkAudienceFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return mBinding.root
+        mBinding = ShowLiveLinkAudienceBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.textLinking.setText(R.string.show_can_apply)
-        mBinding.linkRequestList.adapter = linkRequestViewAdapter
-        mBinding.iBtnStopLink.setOnClickListener {
+        binding.textLinking.setText(R.string.show_can_apply)
+        binding.linkRequestList.adapter = linkRequestViewAdapter
+        binding.iBtnStopLink.setOnClickListener {
             // 观众停止连麦
             mListener?.onStopLinkingChosen()
         }
-        mBinding.iBtnCancelApply.setOnClickListener {
+        binding.iBtnCancelApply.setOnClickListener {
             // 观众撤回申请
             mListener?.onStopApplyingChosen()
-            mBinding.iBtnStopLink.isVisible = false
-            mBinding.iBtnCancelApply.isVisible = false
-            mBinding.iBtnStopLinkText.isVisible = false
-            mBinding.iBtnCancelApplyText.isVisible = false
+            binding.iBtnStopLink.isVisible = false
+            binding.iBtnCancelApply.isVisible = false
+            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnCancelApplyText.isVisible = false
         }
-        mBinding.smartRefreshLayout.setOnRefreshListener {
+        binding.smartRefreshLayout.setOnRefreshListener {
             mListener?.onRequestRefreshing()
         }
-        mBinding.smartRefreshLayout.autoRefresh()
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     /**
      * 设置当前麦上状态
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
+        if (mBinding == null) return
         if (status == ShowInteractionStatus.onSeat.value) {
             if (userName == UserManager.getInstance().user.name) {
-                mBinding.iBtnCancelApply.isVisible = false
-                mBinding.iBtnCancelApplyText.isVisible = false
-                mBinding.iBtnStopLinkText.isVisible = true
-                mBinding.iBtnStopLink.isVisible = true
-                mBinding.textLinking.setText(R.string.show_linking)
+                binding.iBtnCancelApply.isVisible = false
+                binding.iBtnCancelApplyText.isVisible = false
+                binding.iBtnStopLinkText.isVisible = true
+                binding.iBtnStopLink.isVisible = true
+                binding.textLinking.setText(R.string.show_linking)
             }
         } else if (status == null) {
-            mBinding.iBtnStopLink.isVisible = false
-            mBinding.iBtnStopLinkText.isVisible = false
-            mBinding.iBtnCancelApplyText.isVisible = false
-            mBinding.textLinking.setText(R.string.show_can_apply)
+            binding.iBtnStopLink.isVisible = false
+            binding.iBtnStopLinkText.isVisible = false
+            binding.iBtnCancelApplyText.isVisible = false
+            binding.textLinking.setText(R.string.show_can_apply)
         }
     }
 
     fun setOnApplySuccess() {
-        mBinding.iBtnCancelApply.isVisible = true
-        mBinding.iBtnCancelApplyText.isVisible = true
+        if (mBinding == null) return
+        binding.iBtnCancelApply.isVisible = true
+        binding.iBtnCancelApplyText.isVisible = true
     }
 
     /**
      * 设置连麦申请列表
      */
     fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
+        if (mBinding == null) return
         if (list.isEmpty()) {
-            mBinding.linkRequestListEmptyImg.visibility = View.VISIBLE
-            mBinding.linkRequestListEmpty.visibility = View.VISIBLE
+            binding.linkRequestListEmptyImg.visibility = View.VISIBLE
+            binding.linkRequestListEmpty.visibility = View.VISIBLE
         } else {
-            mBinding.linkRequestListEmptyImg.visibility = View.GONE
-            mBinding.linkRequestListEmpty.visibility = View.GONE
+            binding.linkRequestListEmptyImg.visibility = View.GONE
+            binding.linkRequestListEmpty.visibility = View.GONE
         }
 
         if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&
             interactionInfo.userId == UserManager.getInstance().user.id.toString()
         ) {
-            mBinding.iBtnCancelApply.isVisible = false
-            mBinding.iBtnCancelApplyText.isVisible = false
-            mBinding.iBtnStopLinkText.isVisible = true
-            mBinding.iBtnStopLink.isVisible = true
-            mBinding.textLinking.setText(R.string.show_linking)
+            binding.iBtnCancelApply.isVisible = false
+            binding.iBtnCancelApplyText.isVisible = false
+            binding.iBtnStopLinkText.isVisible = true
+            binding.iBtnStopLink.isVisible = true
+            binding.textLinking.setText(R.string.show_linking)
         }
         linkRequestViewAdapter.resetAll(list)
-        mBinding.smartRefreshLayout.finishRefresh()
+        binding.smartRefreshLayout.finishRefresh()
     }
 
     fun setListener(listener : Listener) {
