@@ -1699,6 +1699,7 @@ extension ShowSyncManagerServiceImp {
                     return
                 }
                 self.subscribeDelegate?.onInterationEnded(interaction: _invitation)
+                self.cancelMicSeatApply { _ in }
             }, onSubscribed: {
             }, fail: { error in
                 agoraPrint("imp interaction subscribe fail \(error.message)...")
