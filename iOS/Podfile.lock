@@ -18,7 +18,27 @@ PODS:
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.0.8.6):
     - Zip
-  - AgoraRtcEngine_Special_iOS (4.0.0.9)
+  - AgoraRtcEngine_Special_iOS (4.0.1.4.full):
+    - AgoraRtcEngine_Special_iOS/AINS (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/AudioBeauty (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/ClearVision (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/ContentInspect (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/PVC (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/ReplayKit (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/RtcBasic (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/SpatialAudio (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/SuperResolution (= 4.0.1.4.full)
+    - AgoraRtcEngine_Special_iOS/VirtualBackground (= 4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/AINS (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/AudioBeauty (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/ClearVision (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/ContentInspect (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/PVC (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/ReplayKit (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/RtcBasic (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/SpatialAudio (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/SuperResolution (4.0.1.4.full)
+  - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
   - AgoraRtm_iOS (1.5.1)
   - Bugly (2.5.93)
   - bytedEffect (4.3.0):
@@ -374,7 +394,7 @@ DEPENDENCIES:
   - Agora-Scene-Utils (~> 1.1.0)
   - Agora_Chat_iOS
   - AgoraLyricsScore (~> 1.0.8.6)
-  - AgoraRtcEngine_Special_iOS (= 4.0.0.9)
+  - AgoraRtcEngine_Special_iOS (= 4.0.1.4.full)
   - AgoraRtm_iOS
   - Bugly
   - bytedEffect (from `bytedEffect.podspec`)
@@ -454,7 +474,7 @@ SPEC CHECKSUMS:
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: ee80fe4f33fec56b3cdd53e28383fbb4d82c743d
-  AgoraRtcEngine_Special_iOS: c109da5fbdeafc63b337112586a4098804fbd587
+  AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 38b05fb3c272a050021efb7b322aff795e329825
@@ -489,6 +509,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: 530a2b687167a054eb421cebf9908451e0ae5ebc
+PODFILE CHECKSUM: 50b2cafa46fcb2237f83a0f723264f0fa8e4ce35
 
 COCOAPODS: 1.11.3
