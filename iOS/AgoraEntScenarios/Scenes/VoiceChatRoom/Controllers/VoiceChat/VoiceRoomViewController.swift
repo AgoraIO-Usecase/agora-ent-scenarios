@@ -239,10 +239,12 @@ extension VoiceRoomViewController {
     }
     
     func fetchDetailError() {
-        self.notifySeverLeave()
-        self.rtckit.leaveChannel()
-        self.leaveRoom()
-        self.isOwner ? self.ownerBack():self.backAction()
+        DispatchQueue.main.async {
+            self.notifySeverLeave()
+            self.rtckit.leaveChannel()
+            self.leaveRoom()
+            self.isOwner ? self.ownerBack():self.backAction()
+        }
     }
 
     func requestRankList() {
