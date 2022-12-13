@@ -110,15 +110,14 @@
 
                     <TextView
                         android:id="@+id/showLowDeviceDes"
-                        android:layout_width="wrap_content"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:drawableStart="@mipmap/show_setting_preset_ic_android"
                         android:drawablePadding="5dp"
-                        android:gravity="center"
+                        android:gravity="center_vertical"
                         android:text="@string/show_setting_preset_device_low_des"
                         android:textColor="#6D7291"
-                        android:visibility="gone"
                         android:textSize="12sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -166,15 +165,14 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:drawableStart="@mipmap/show_setting_preset_ic_android"
                         android:drawablePadding="5dp"
-                        android:gravity="center"
+                        android:gravity="center_vertical"
                         android:text="@string/show_setting_preset_device_medium_des"
                         android:textColor="#6D7291"
-                        android:visibility="gone"
                         android:textSize="12sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -206,16 +204,15 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:drawableStart="@mipmap/show_setting_preset_ic_android"
                         android:drawablePadding="5dp"
-                        android:gravity="center"
+                        android:gravity="center_vertical"
                         android:text="@string/show_setting_preset_device_high_des"
                         android:textColor="#6D7291"
                         android:textSize="12sp"
-                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

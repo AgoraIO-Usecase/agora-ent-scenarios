@@ -96,13 +96,13 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             R.string.show_setting_statistic,
             R.string.show_setting_statistic
         ),
-        SettingItem(
-            ITEM_ID_QUALITY,
-            R.mipmap.show_setting_ic_quality,
-            R.mipmap.show_setting_ic_quality,
-            R.string.show_setting_quality,
-            R.string.show_setting_quality
-        ),
+//        SettingItem(
+//            ITEM_ID_QUALITY,
+//            R.mipmap.show_setting_ic_quality,
+//            R.mipmap.show_setting_ic_quality,
+//            R.string.show_setting_quality,
+//            R.string.show_setting_quality
+//        ),
         SettingItem(
             ITEM_ID_SETTING,
             R.mipmap.show_setting_ic_setting,

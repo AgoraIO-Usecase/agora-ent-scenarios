@@ -159,9 +159,9 @@
     <string name="show_setting_preset_device_low">低端机</string>
     <string name="show_setting_preset_device_medium">中端机</string>
     <string name="show_setting_preset_device_high">高端机</string>
-    <string name="show_setting_preset_device_low_des">CPU高通400及以下</string>
-    <string name="show_setting_preset_device_medium_des">CPU高通700及以下</string>
-    <string name="show_setting_preset_device_high_des">CPU高通800及以上</string>
+    <string name="show_setting_preset_device_low_des">2500元及以下  </string>
+    <string name="show_setting_preset_device_medium_des">2501元到4000元</string>
+    <string name="show_setting_preset_device_high_des">4001元以上    </string>
     <string name="show_setting_preset_recommend">推荐</string>
     <string name="show_setting_preset_no_choise_tip">请选择预设模式</string>
     <string name="show_tip">提示</string>
