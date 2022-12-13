@@ -52,12 +52,6 @@ UITextFieldDelegate
     return self;
 }
 
-//TODO: test
-- (void)_makeSearchViewHidden {
-    self.bgView.hidden = YES;
-    self.bgView.frame = CGRectMake(20, 0, self.width-40, 0);
-}
-
 - (void)setupView{
     UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(20, 0, self.width-40, 40)];
     bgView.layer.cornerRadius = 20;
@@ -108,8 +102,6 @@ UITextFieldDelegate
                      action:@selector(cancelBtnClickEvent)
            forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
-    
-    [self _makeSearchViewHidden];
     
     self.categoryView = [[JXCategoryTitleView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, 40)];
     self.categoryView.delegate = self;
