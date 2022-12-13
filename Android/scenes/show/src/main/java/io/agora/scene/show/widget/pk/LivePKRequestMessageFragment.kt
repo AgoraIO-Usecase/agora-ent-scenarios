@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageListBinding
+import io.agora.scene.show.service.ShowInteractionInfo
+import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowRoomDetailModel
 
 class LivePKRequestMessageFragment : BaseFragment() {
@@ -33,13 +36,16 @@ class LivePKRequestMessageFragment : BaseFragment() {
         binding.smartRefreshLayout.setOnRefreshListener {
             mListener.onRequestRefreshing()
         }
+        binding.iBtnStopPK.setOnClickListener {
+            mListener.onStopPKingChosen()
+        }
         binding.smartRefreshLayout.autoRefresh()
     }
 
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBroadcasterList(roomList : List<ShowRoomDetailModel>) {
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<ShowRoomDetailModel>) {
         if (mBinding == null) return
         if (roomList.isEmpty()) {
             binding.linkRequestListEmptyImg.visibility = View.VISIBLE
@@ -48,6 +54,11 @@ class LivePKRequestMessageFragment : BaseFragment() {
             binding.linkRequestListEmptyImg.visibility = View.GONE
             binding.linkRequestListEmpty.visibility = View.GONE
         }
+        if (interactionInfo == null) {
+            updateUI("", null)
+        } else {
+            updateUI(interactionInfo.userName, interactionInfo.interactStatus)
+        }
         linkPKViewAdapter.resetAll(roomList)
         binding.smartRefreshLayout.finishRefresh()
     }
@@ -55,9 +66,9 @@ class LivePKRequestMessageFragment : BaseFragment() {
     /**
      * pk-更新item选中状态
      */
-    fun setPKInvitationItemStatus(roomItem: ShowRoomDetailModel, isInvited: Boolean) {
+    fun setPKInvitationItemStatus(userName: String, status: Int?) {
         if (mBinding == null) return
-        binding.textPking.text = "与主播" + roomItem.roomName + "连麦中"
+        updateUI(userName, status)
     }
 
     fun setListener(listener : Listener) {
@@ -67,5 +78,19 @@ class LivePKRequestMessageFragment : BaseFragment() {
     interface Listener {
         fun onAcceptMicSeatItemChosen(roomItem: ShowRoomDetailModel)
         fun onRequestRefreshing()
+        fun onStopPKingChosen()
+    }
+
+    private fun updateUI(userName: String, status: Int?) {
+        if (status == ShowInteractionStatus.pking.value) {
+            binding.textPking.isVisible = true
+            binding.iBtnStopPKText.isVisible = true
+            binding.iBtnStopPK.isVisible = true
+            binding.textPking.text = "与观众 $userName 连麦中"
+        } else if (status == null) {
+            binding.iBtnStopPKText.isVisible = false
+            binding.iBtnStopPK.isVisible = false
+            binding.textPking.isVisible = false
+        }
     }
 }

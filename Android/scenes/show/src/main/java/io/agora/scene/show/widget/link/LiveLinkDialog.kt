@@ -121,10 +121,6 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
                     linkDialogListener?.onRequestMessageRefreshing(this@LiveLinkDialog)
                 }
 
-                override fun onApplyOnSeat() {
-                    linkDialogListener?.onApplyOnSeat(this@LiveLinkDialog)
-                }
-
                 override fun onStopLinkingChosen() {
                     linkDialogListener?.onStopLinkingChosen(this@LiveLinkDialog)
                 }
@@ -192,6 +188,10 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
             val waitList = list.filter { it.status == ShowRoomRequestStatus.waitting.value }
             audienceFragment.setSeatApplyList(interactionInfo, waitList)
         }
+    }
+
+    fun setOnApplySuccess() {
+        audienceFragment.setOnApplySuccess()
     }
 
     /**

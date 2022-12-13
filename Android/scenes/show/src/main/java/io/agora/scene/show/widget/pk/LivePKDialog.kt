@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLivePkDialogBinding
+import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowRoomDetailModel
 
 class LivePKDialog : BottomSheetDialogFragment() {
@@ -55,6 +56,10 @@ class LivePKDialog : BottomSheetDialogFragment() {
             override fun onRequestRefreshing() {
                 pkDialogListener.onRequestMessageRefreshing(this@LivePKDialog)
             }
+
+            override fun onStopPKingChosen() {
+                pkDialogListener.onStopPKingChosen(this@LivePKDialog)
+            }
         })
 
         binding.pager.isSaveEnabled = false
@@ -85,14 +90,14 @@ class LivePKDialog : BottomSheetDialogFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBroadcasterList(roomItem : List<ShowRoomDetailModel>) {
-        pkFragment.setOnlineBroadcasterList(roomItem)
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomItem : List<ShowRoomDetailModel>) {
+        pkFragment.setOnlineBroadcasterList(interactionInfo, roomItem)
     }
 
     /**
      * pk-更新item选中状态
      */
-    fun setPKInvitationItemStatus(roomItem: ShowRoomDetailModel, isInvited: Boolean) {
-        pkFragment.setPKInvitationItemStatus(roomItem, isInvited)
+    fun setPKInvitationItemStatus(userName: String, status: Int?) {
+        pkFragment.setPKInvitationItemStatus(userName, status)
     }
 }

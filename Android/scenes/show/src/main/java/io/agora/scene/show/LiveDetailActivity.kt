@@ -153,6 +153,15 @@ class LiveDetailActivity : AppCompatActivity() {
         }
         bottomLayout.ivLinking.setOnClickListener {
             bottomLayout.vLinkingDot.isVisible = false
+            if (!isRoomOwner) {
+                // 观众发送连麦申请
+                if (!(interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString())) {
+                    mService.createMicSeatApply({
+                        // success
+                        mLinkDialog.setOnApplySuccess()
+                    })
+                }
+            }
             showLinkingDialog()
         }
         bottomLayout.flPK.setOnClickListener {
@@ -537,15 +546,6 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
             }
 
-            // 观众发送连麦申请
-            override fun onApplyOnSeat(dialog: LiveLinkDialog) {
-                if (interactionInfo != null && interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
-                    ToastUtils.showToast(R.string.show_cannot_apply)
-                    return
-                }
-                mService.createMicSeatApply {  }
-            }
-
             // 观众撤回连麦申请
             override fun onStopApplyingChosen(dialog: LiveLinkDialog) {
                 mService.cancelMicSeatApply {  }
@@ -575,7 +575,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mPKDialog.setLinkDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
                 mService.getAllPKUserList({
-                    mPKDialog.setOnlineBroadcasterList(it)
+                    mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
                 })
             }
 
@@ -583,6 +583,10 @@ class LiveDetailActivity : AppCompatActivity() {
                 if (isRoomOwner) {
                     mService.createPKInvitation(roomItem)
                 }
+            }
+
+            override fun onStopPKingChosen(dialog: LivePKDialog) {
+                mService.stopInteraction(interactionInfo!!)
             }
         })
         val ft = supportFragmentManager.beginTransaction()
@@ -677,6 +681,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 refreshBottomLayout()
                 refreshViewDetailLayout(info.interactStatus)
                 mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
                 // RTC
                 updateLinkingMode()
                 updatePKingMode()
@@ -686,6 +691,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 refreshViewDetailLayout(ShowInteractionStatus.idle.value)
                 updateVideoSetting()
                 mLinkDialog.setOnSeatStatus("", null)
+                mPKDialog.setPKInvitationItemStatus("", null)
                 // RTC
                 updateIdleMode()
                 interactionInfo = null
@@ -695,6 +701,9 @@ class LiveDetailActivity : AppCompatActivity() {
 
         mService.sendChatMessage(getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged { status, info ->
+            mService.getAllPKUserList({
+                mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
+            })
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
                 if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString()) {
                     isPKCompetition = true

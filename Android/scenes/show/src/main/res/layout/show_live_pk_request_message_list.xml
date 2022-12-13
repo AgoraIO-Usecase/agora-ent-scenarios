@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/iBtnStopLinkText"
+        android:id="@+id/iBtnStopPKText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="6dp"
@@ -44,8 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="@mipmap/close"
-        android:src="@mipmap/ic_close"
+        android:background="@mipmap/show_stop_link_or_pk_btn"
+        android:src="@mipmap/show_stop_link_or_pk_btn"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textPking"
         app:layout_constraintEnd_toEndOf="@id/textPking"
