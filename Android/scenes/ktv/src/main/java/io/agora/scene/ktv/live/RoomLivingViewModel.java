@@ -278,6 +278,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onFinish() {
                 ToastUtils.showToast("体验时间已耗尽，自动离开房间");
                 exitRoom();
+                roomDeleteLiveData.postValue(false);
             }
         }.start();
     }
@@ -1038,7 +1039,7 @@ public class RoomLivingViewModel extends ViewModel {
                         if (mPlayer == null) return;
                         long position = jsonMsg.getLong("position");
                         mPlayer.seek(position);
-                    } else if (jsonMsg.getString("cmd").equals("SyncPitch")) {
+                    } else if (jsonMsg.getString("cmd").equals("setVoicePitch")) {
                         // 伴唱收到原唱seek指令
                         if (mPlayer == null) return;
                         double pitch = jsonMsg.getDouble("pitch");
@@ -1906,7 +1907,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             private void sendSyncPitch(double pitch) {
                 Map<String, Object> msg = new HashMap<>();
-                msg.put("cmd", "SyncPitch");
+                msg.put("cmd", "setVoicePitch");
                 msg.put("pitch", pitch);
                 JSONObject jsonMsg = new JSONObject(msg);
 
