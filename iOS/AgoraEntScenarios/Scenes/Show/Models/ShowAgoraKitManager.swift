@@ -119,7 +119,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 切换连麦角色
-    func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView) {
+    func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView?) {
         let options = AgoraRtcChannelMediaOptions()
         options.clientRoleType = role
         options.publishMicrophoneTrack = role == .broadcaster
@@ -130,8 +130,9 @@ class ShowAgoraKitManager: NSObject {
         videoCanvas.uid = UInt(uid ?? "0") ?? 0
         videoCanvas.renderMode = .hidden
         videoCanvas.view = canvasView
-        if uid == VLUserCenter.user.id {
+        if uid == VLUserCenter.user.id && canvasView != nil {
             agoraKit.setupLocalVideo(videoCanvas)
+            agoraKit.startPreview()
         } else {
             agoraKit.setupRemoteVideo(videoCanvas)
         }
