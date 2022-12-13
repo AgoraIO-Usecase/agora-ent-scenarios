@@ -530,11 +530,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             applyView.getAllMicSeatList(autoApply: false)
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
-            if interaction.userId == VLUserCenter.user.id {
-                agoraKitManager.switchRole(role: .audience,
-                                           uid: interaction.userId,
-                                           canvasView: UIView())
-            }
+            agoraKitManager.switchRole(role: role,
+                                       uid: interaction.userId,
+                                       canvasView: UIView())
             
         default:
             break
