@@ -93,6 +93,16 @@ class ShowLiveViewController: UIViewController {
 //        return interactionList?.filter({ $0.interactStatus != .idle }).first?.interactStatus ?? .idle
     }
     
+    private var seatInteraction: ShowInteractionInfo? {
+        get {
+            if currentInteraction?.interactStatus == .onSeat {
+                return currentInteraction
+            }
+            
+            return nil
+        }
+    }
+    
     private var currentInteraction: ShowInteractionInfo? {
         didSet {
             //update audio status
@@ -111,6 +121,20 @@ class ShowLiveViewController: UIViewController {
                 }
             }
             
+            //update menu
+            if role == .broadcaster {
+                applyAndInviteView.seatMicModel = seatInteraction
+                applyView.interactionModel = nil
+            } else {
+                if currentInteraction?.userId == VLUserCenter.user.id {
+                    applyView.interactionModel = seatInteraction
+                } else {
+                    applyView.interactionModel = nil
+                }
+                applyAndInviteView.seatMicModel = nil
+            }
+            
+            //stop or start interaction
             if currentInteraction == oldValue {
                 return
             }
@@ -448,7 +472,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         //recv invitation
 //        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did accept")
         _refreshPKUserList()
-        _refreshInteractionList()
     }
     
     func onPKInvitationRejected(invitation: ShowPKInvitation) {
@@ -465,7 +488,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //        ToastView.show(text: "pk invitation \(invitation.roomId ?? "") did reject")
         //TODO:
         _refreshPKUserList()
-        _refreshInteractionList()
     }
     
     func onInterationUpdated(interaction: ShowInteractionInfo) {
@@ -719,7 +741,6 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickPKButton(_ button: ShowRedDotButton) {
         AlertManager.show(view: pkInviteView, alertPostion: .bottom)
         _refreshPKUserList()
-        _refreshInteractionList()
     }
     
     func onClickLinkButton(_ button: ShowRedDotButton) {
