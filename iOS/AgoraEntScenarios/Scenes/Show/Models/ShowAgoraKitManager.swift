@@ -83,7 +83,10 @@ class ShowAgoraKitManager: NSObject {
     //MARK: private
     private func setupContentInspectConfig() {
         let config = AgoraContentInspectConfig()
-        let dic: [String: String] = [ "userNo": VLUserCenter.user.id ]
+        let dic: [String: String] = [
+            "userNo": VLUserCenter.user.id,
+            "sceneName": "show"
+        ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
             print("setupContentInspectConfig fail")
