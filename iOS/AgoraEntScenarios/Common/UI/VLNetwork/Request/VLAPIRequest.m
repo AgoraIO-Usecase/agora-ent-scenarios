@@ -10,6 +10,7 @@
 #import "VLToast.h"
 #import "VLUserCenter.h"
 #import "NSString+Helper.h"
+#import "MenuUtils.h"
 @import AFNetworking;
 @import YYModel;
 @import MBProgressHUD;
@@ -300,7 +301,7 @@ static AFHTTPSessionManager *_sessionManager;
 
 #pragma mark - 处理token失效后切换登录界面
 + (void)setLoginVC {
-    [VLToast toast:NSLocalizedString(@"Token已失效，请重新登录", nil)];
+    [VLToast toast:AGLocalizedString(@"Token已失效，请重新登录")];
     // TODO: goto login page
     [[VLUserCenter center] logout];
     [[UIApplication sharedApplication].delegate.window configRootViewController];
