@@ -128,6 +128,7 @@
     <string name="show_cannot_apply">正在互动， 请互动结束后再申请连麦</string>
     <string name="show_ask_for_link">主播 %s 邀请你加入连麦</string>
     <string name="show_ask_for_pk">主播 %s 邀请你视频连线</string>
+    <string name="show_count_time_for_pk">PK 0%s:%s</string>
 
     <string name="show_setting_advance_video_setting">视频设置</string>
     <string name="show_setting_advance_audio_setting">音频设置</string>
