@@ -175,12 +175,12 @@ class ShowLiveViewController: UIViewController {
     private func joinChannel() {
         agoraKitManager.delegate = self
 //        agoraKitManager.defaultSetting()
-        // 观众端模式设置
-        if role == .audience, let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .signle)
-        }
         guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
             return
+        }
+        // 观众端模式设置
+        if role == .audience, let type = audiencePresetType {
+            agoraKitManager.updatePresetForType(type, mode: .signle,uid: UInt(ownerId))
         }
         let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
         if ret == 0 {
@@ -624,6 +624,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
+        print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height), type  = \(stats.superResolutionType)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
