@@ -157,10 +157,22 @@ class NetworkManager {
             "clientSecret":KeyCenter.IMClientSecret,
         ]
         
+        let dic: [String: Any] = [
+            "userNo": VLUserCenter.user.id,     //用户id
+            "sceneName": "voice_chat"                 //场景名称，如果是秀场直播
+        ]
+                 
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            print("setupContentInspectConfig fail")
+            return
+        }
+        let payload = String(data: jsonData, encoding: .utf8)
+        
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
                       "im": imConfig,
+                      "payload": payload,
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
         ToastView.showWait(text: "loading...", view: nil)
