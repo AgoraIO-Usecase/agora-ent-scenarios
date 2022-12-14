@@ -78,6 +78,13 @@ class ShowCreateLiveVC: UIViewController {
         beautyVC.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
+        
+        // 创建默认美颜效果
+        ShowBeautyFaceVC.beautyData.forEach({
+            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
+                                                     key: $0.key,
+                                                     value: $0.value)
+        })
     }
     
     private func showPreset() {

@@ -22,15 +22,13 @@ class ByteBeautyModel: ByteBaseModel {
     var key: String?
     /// 特效强度 （0~1）
     var value: CGFloat = 0
-    /// 美妆
-    var makupValue: CGFloat = 0
     
     static func createBeautyData() -> [ByteBeautyModel] {
         var dataArray = [ByteBeautyModel]()
         var model = ByteBeautyModel()
         model.name = "无"
         model.icon = "show_beauty_none"
-        model.isSelected = true
+        model.path = ""
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -39,6 +37,7 @@ class ByteBeautyModel: ByteBaseModel {
         model.value = 0.3
         model.name = "磨皮".show_localized
         model.icon = "meiyan_icon_mopi"
+        model.isSelected = true
         dataArray.append(model)
         
         model = ByteBeautyModel()
@@ -142,36 +141,32 @@ class ByteBeautyModel: ByteBaseModel {
         
         model = ByteBeautyModel()
         model.path = "/style_makeup/baixi"
-        model.key = "Filter_ALL"
-        model.value = 0.5
-        model.makupValue = 0.6
+        model.key = "Makeup_ALL"
+        model.value = 0.6
         model.name = "白皙".show_localized
         model.icon = "meiyan_fgz_baixi"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "/style_makeup/tianmei"
-        model.key = "Filter_ALL"
-        model.value = 0.5
-        model.makupValue = 0.6
+        model.key = "Makeup_ALL"
+        model.value = 0.6
         model.name = "甜美".show_localized
         model.icon = "meiyan_fgz_tianmei"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "/style_makeup/cwei"
-        model.key = "Filter_ALL"
-        model.value = 0.5
-        model.makupValue = 0.6
+        model.key = "Makeup_ALL"
+        model.value = 0.6
         model.name = "C位".show_localized
         model.icon = "meiyan_fgz_cwei"
         dataArray.append(model)
         
         model = ByteBeautyModel()
         model.path = "/style_makeup/yuanqi"
-        model.key = "Filter_ALL"
-        model.value = 0.5
-        model.makupValue = 0.6
+        model.key = "Makeup_ALL"
+        model.value = 0.6
         model.name = "元气".show_localized
         model.icon = "meiyan_fgz_yuanqi"
         dataArray.append(model)

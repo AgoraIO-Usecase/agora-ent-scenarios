@@ -101,7 +101,7 @@ class ShowApplyView: UIView {
                 AppContext.showServiceImp.createMicSeatApply { _ in
                     DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
                         self.getAllMicSeatList(autoApply: autoApply)
-                    }
+                    } 
                 }
                 self.revokeutton.setTitle("撤回申请".show_localized, for: .normal)
                 self.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
