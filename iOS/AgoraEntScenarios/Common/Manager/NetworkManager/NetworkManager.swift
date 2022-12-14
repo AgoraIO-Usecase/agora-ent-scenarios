@@ -158,7 +158,7 @@ class NetworkManager {
         ]
         
         let dic: [String: Any] = [
-            "userNo": VLUserCenter.user.id,     //用户id
+            "id": VLUserCenter.user.id,     //用户id
             "sceneName": "voice_chat"                 //场景名称，如果是秀场直播
         ]
                  
