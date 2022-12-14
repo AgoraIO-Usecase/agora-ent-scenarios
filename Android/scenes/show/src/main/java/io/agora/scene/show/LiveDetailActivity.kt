@@ -25,6 +25,7 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -870,8 +871,8 @@ class LiveDetailActivity : AppCompatActivity() {
         val contentInspectConfig = ContentInspectConfig()
         try {
             val jsonObject = JSONObject()
-            jsonObject.put("userNo", UserManager.getInstance().user.userNo)
-            jsonObject.put("userId", UserManager.getInstance().user.id)
+            jsonObject.put("sceneName", "show")
+            jsonObject.put("id", UserManager.getInstance().user.id)
             contentInspectConfig.extraInfo = jsonObject.toString()
             val module1 = ContentInspectModule()
             module1.interval = 30
@@ -915,6 +916,8 @@ class LiveDetailActivity : AppCompatActivity() {
                     uid.toInt(),
                     channelMediaOptions
                 )
+                AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.broadcast, "show", {
+                })
 
                 mService.getAllInterationList ({
                     val interactionInfo = it.getOrNull(0)
