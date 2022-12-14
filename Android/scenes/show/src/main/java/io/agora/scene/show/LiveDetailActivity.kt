@@ -815,7 +815,9 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun isPKing() = (interactionInfo?.interactStatus ?: ShowInteractionStatus.idle.value) == ShowInteractionStatus.pking.value
 
     private fun destroyService() {
-        if (interactionInfo != null) {
+        if (interactionInfo != null &&
+            (((interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) && (isRoomOwner || interactionInfo!!.userId == UserManager.getInstance().user.id.toString()))
+                    || ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner))) {
             mService.stopInteraction(interactionInfo!!)
         }
         mService.leaveRoom()
@@ -1023,12 +1025,11 @@ class LiveDetailActivity : AppCompatActivity() {
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
         mBinding.videoLinkingAudienceLayout.userName.isActivated = interactionInfo?.muteAudio?.not() ?: false
-        audienceVideoView.setOnClickListener {
-            // 主播弹出view
-            showLinkSettingsDialog()
-        }
         if (isRoomOwner) {
             // 连麦主播视角
+            audienceVideoView.setOnClickListener {
+                showLinkSettingsDialog()
+            }
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
             mRtcEngine.setupRemoteVideo(
                 VideoCanvas(
@@ -1040,6 +1041,9 @@ class LiveDetailActivity : AppCompatActivity() {
         } else {
             // 连麦观众视角
             if (interactionInfo?.userId.equals(UserManager.getInstance().user.id.toString())) {
+                audienceVideoView.setOnClickListener {
+                    showLinkSettingsDialog()
+                }
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
                 channelMediaOptions.publishMicrophoneTrack = true
