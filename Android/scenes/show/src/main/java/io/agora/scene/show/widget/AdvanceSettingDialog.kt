@@ -89,7 +89,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         )
         put(
             ITEM_ID_SELECTOR_RESOLUTION,
-            VideoSetting.getCurrBroadcastSetting().video.resolution.toIndex()
+            VideoSetting.getCurrBroadcastSetting().video.encodeResolution.toIndex()
         )
         put(
             ITEM_ID_SELECTOR_FRAME_RATE,
@@ -391,7 +391,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
 
     private fun onSelectorChanged(itemId: Int, index: Int) {
         when (itemId) {
-            ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(resolution = VideoSetting.ResolutionList[index])
+            ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(encoderResolution = VideoSetting.ResolutionList[index])
             ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(frameRate = VideoSetting.FrameRateList[index])
         }
     }

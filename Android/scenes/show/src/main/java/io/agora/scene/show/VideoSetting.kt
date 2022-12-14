@@ -1,11 +1,22 @@
 package io.agora.scene.show
 
-import io.agora.rtc2.video.ColorEnhanceOptions
-import io.agora.rtc2.video.LowLightEnhanceOptions
-import io.agora.rtc2.video.VideoDenoiserOptions
-import io.agora.rtc2.video.VideoEncoderConfiguration
+import io.agora.rtc2.video.*
 
 object VideoSetting {
+
+    enum class SuperResolution(val value:Int){
+        //1倍：     n=6
+        //1.33倍:  n=7
+        //1.5倍：  n=8
+        //2倍：     n=3
+        //锐化：    n=10(android是10，iOS是11)
+        SR_1(6),
+        SR_1_33(7),
+        SR_1_5(8),
+        SR_2(3),
+        SR_SHARP(10),
+        SR_NONE(0)
+    }
 
     enum class Resolution(val width: Int, val height: Int) {
         V_1080P(1920, 1080),
@@ -17,7 +28,6 @@ object VideoSetting {
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
-
 
     val ResolutionList = listOf(
         Resolution.V_180P,
@@ -68,7 +78,7 @@ object VideoSetting {
         val video: Video
     ) {
         data class Video(
-            val SR: Boolean // 超分
+            val SR: SuperResolution // 超分
         )
     }
 
@@ -85,7 +95,8 @@ object VideoSetting {
             val lowLightEnhance: Boolean, // 暗光增强
             val videoDenoiser: Boolean, // 视频降噪
             val PVC: Boolean, // 码率节省
-            val resolution: Resolution, // 分辨率
+            val captureResolution: Resolution, // 采集分辨率
+            val encodeResolution: Resolution, // 编码分辨率
             val frameRate: FrameRate, // 帧率
             val bitRate: Int // 码率
         )
@@ -109,7 +120,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_540P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 1500
             ),
@@ -123,7 +135,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_720P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 1800
             ),
@@ -137,7 +150,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_720P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 1800
             ),
@@ -151,7 +165,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_360P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 700
             ),
@@ -165,7 +180,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_540P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 800
             ),
@@ -179,7 +195,8 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                resolution = Resolution.V_540P,
+                captureResolution = Resolution.V_720P,
+                encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
                 bitRate = 800
             ),
@@ -188,29 +205,33 @@ object VideoSetting {
 
     }
 
-    private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(false))
+    private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
     private var currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
 
-    fun updateAudienceSetting(){
-        updateRTCAudioSetting(currAudienceSetting.video.SR)
+    fun updateAudienceSetting(
+        isJoinedRoom: Boolean = true,
+    ) {
+        updateRTCAudioSetting(
+            isJoinedRoom
+        )
     }
 
     fun updateAudioSetting(
-        SR: Boolean? = null
+        isJoinedRoom: Boolean = false,
+        SR: SuperResolution? = null
     ) {
         currAudienceSetting = AudienceSetting(
             AudienceSetting.Video(
                 SR ?: currAudienceSetting.video.SR
             )
         )
-
-        updateRTCAudioSetting(SR)
+        updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
-    fun updateBroadcastSetting(deviceLevel: DeviceLevel) {
+    fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false) {
         val liveMode = when (currBroadcastSetting) {
             RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
             RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
@@ -229,11 +250,12 @@ object VideoSetting {
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
                 }
-            }
+            },
+            isJoinedRoom
         )
     }
 
-    fun updateBroadcastSetting(liveMode: LiveMode) {
+    fun updateBroadcastSetting(liveMode: LiveMode, isJoinedRoom: Boolean = true) {
         val deviceLevel = when (currBroadcastSetting) {
             RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.LowDevicePK -> DeviceLevel.Low
             RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.MediumDevicePK -> DeviceLevel.Medium
@@ -253,19 +275,22 @@ object VideoSetting {
                     DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevicePK
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
                 }
-            }
+            },
+            isJoinedRoom
         )
     }
 
-    private fun updateBroadcastSetting(recommendSetting: BroadcastSetting) {
+    private fun updateBroadcastSetting(recommendSetting: BroadcastSetting, isJoinedRoom: Boolean) {
         currBroadcastSetting = recommendSetting
         updateRTCBroadcastSetting(
+            isJoinedRoom,
             currBroadcastSetting.video.H265,
             currBroadcastSetting.video.colorEnhance,
             currBroadcastSetting.video.lowLightEnhance,
             currBroadcastSetting.video.videoDenoiser,
             currBroadcastSetting.video.PVC,
-            currBroadcastSetting.video.resolution,
+            currBroadcastSetting.video.captureResolution,
+            currBroadcastSetting.video.encodeResolution,
             currBroadcastSetting.video.frameRate,
             currBroadcastSetting.video.bitRate,
 
@@ -276,12 +301,15 @@ object VideoSetting {
     }
 
     fun updateBroadcastSetting(
+        isJoinedRoom: Boolean = true,
+
         h265: Boolean? = null,
         colorEnhance: Boolean? = null,
         lowLightEnhance: Boolean? = null,
         videoDenoiser: Boolean? = null,
         PVC: Boolean? = null,
-        resolution: Resolution? = null,
+        captureResolution: Resolution? = null,
+        encoderResolution: Resolution? = null,
         frameRate: FrameRate? = null,
         bitRate: Int? = null,
 
@@ -296,7 +324,8 @@ object VideoSetting {
                 lowLightEnhance ?: currBroadcastSetting.video.lowLightEnhance,
                 videoDenoiser ?: currBroadcastSetting.video.videoDenoiser,
                 PVC ?: currBroadcastSetting.video.PVC,
-                resolution ?: currBroadcastSetting.video.resolution,
+                captureResolution ?: currBroadcastSetting.video.captureResolution,
+                encoderResolution ?: currBroadcastSetting.video.encodeResolution,
                 frameRate ?: currBroadcastSetting.video.frameRate,
                 bitRate ?: currBroadcastSetting.video.bitRate
             ),
@@ -308,12 +337,14 @@ object VideoSetting {
         )
 
         updateRTCBroadcastSetting(
+            isJoinedRoom,
             h265,
             colorEnhance,
             lowLightEnhance,
             videoDenoiser,
             PVC,
-            resolution,
+            captureResolution,
+            encoderResolution,
             frameRate,
             bitRate,
             inEarMonitoring
@@ -332,20 +363,43 @@ object VideoSetting {
 
 
     private fun updateRTCAudioSetting(
-        SR: Boolean? = null
+        isJoinedRoom: Boolean,
+        SR: SuperResolution? = null
     ) {
         val rtcEngine = RtcEngineInstance.rtcEngine
-        SR?.let { rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${it}, \"mode\": 2}}") }
+        SR?.let {
+            if (!isJoinedRoom) {
+                // 超分，只能在加入频道前配置
+                val open = SR != SuperResolution.SR_NONE
+                // 超分开关
+                rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${open}, \"mode\": 2}}")
+                if(open){
+                    // 设置最大分辨率
+                    rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600")
+                    //超分倍数选项
+                    //1倍：     n=6
+                    //1.33倍:  n=7
+                    //1.5倍：  n=8
+                    //2倍：     n=3
+                    //锐化：    n=10(android是10，iOS是11)
+                    val n = SR.value
+                    rtcEngine.setParameters("{\"rtc.video.sr_type\":${n}")
+                }
+            }
+        }
     }
 
 
     private fun updateRTCBroadcastSetting(
+        isJoinedRoom: Boolean,
+
         h265: Boolean? = null,
         colorEnhance: Boolean? = null,
         lowLightEnhance: Boolean? = null,
         videoDenoiser: Boolean? = null,
         PVC: Boolean? = null,
-        resolution: Resolution? = null,
+        captureResolution: Resolution? = null,
+        encoderResolution: Resolution? = null,
         frameRate: FrameRate? = null,
         bitRate: Int? = null,
 
@@ -356,8 +410,11 @@ object VideoSetting {
         val rtcEngine = RtcEngineInstance.rtcEngine
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
         h265?.let {
-            rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":${it}}")
-            rtcEngine.setParameters("{\"engine.video.codec_type\":\"${if (it) 3 else 2}\"}")
+            if (!isJoinedRoom) {
+                // 只能在加入房间前设置，否则rtc sdk会崩溃
+                rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":${it}}")
+                rtcEngine.setParameters("{\"engine.video.codec_type\":\"${if (it) 3 else 2}\"}")
+            }
         }
         colorEnhance?.let {
             rtcEngine.setColorEnhanceOptions(it, ColorEnhanceOptions())
@@ -369,10 +426,10 @@ object VideoSetting {
             rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions())
         }
         PVC?.let {
-            // RTC 4.0.0.9版本 不支持
+            // RTC 4.0.0.9版本 不支持，强行设置rtc sdk会崩溃
             // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
-        resolution?.let {
+        encoderResolution?.let {
             videoEncoderConfiguration.dimensions =
                 VideoEncoderConfiguration.VideoDimensions(it.width, it.height)
             rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
@@ -384,6 +441,11 @@ object VideoSetting {
         bitRate?.let {
             videoEncoderConfiguration.bitrate = it
             rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
+        }
+        captureResolution?.let {
+            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, 15)
+            ))
         }
 
         inEarMonitoring?.let {
