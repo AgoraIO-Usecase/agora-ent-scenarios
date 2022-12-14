@@ -65,7 +65,17 @@ class ShowApplyView: UIView {
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
-    private var interactionModel: ShowInteractionInfo?
+    var interactionModel: ShowInteractionInfo? {
+        didSet {
+            self.revokeutton.setTitle("结束".show_localized, for: .normal)
+            self.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_end"),
+                                      for: .normal,
+                                      postion: .right,
+                                      spacing: 5)
+            self.revokeutton.tag = 1
+            self.revokeutton.isHidden = interactionModel == nil ? true : false
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -77,23 +87,6 @@ class ShowApplyView: UIView {
     }
     
     func getAllMicSeatList(autoApply: Bool) {
-        AppContext.showServiceImp.getAllInterationList { _, list in
-            guard let list = list?.filterDuplicates({ $0.userId }) else { return }
-            self.interactionModel = list.filter({ $0.interactStatus == .onSeat }).first
-            if self.interactionModel?.userId == VLUserCenter.user.id {
-                self.revokeutton.setTitle("结束".show_localized, for: .normal)
-                self.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_end"),
-                                          for: .normal,
-                                          postion: .right,
-                                          spacing: 5)
-                self.revokeutton.tag = 1
-                self.revokeutton.isHidden = false
-            }
-            self.getMicSeatList(autoApply: autoApply)
-        }
-    }
-    
-    private func getMicSeatList(autoApply: Bool) {
         AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
             guard let list = list?.filter({ $0.userId != self.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
@@ -179,7 +172,7 @@ class ShowApplyView: UIView {
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
-            revokeutton.isHidden = true
+//            revokeutton.isHidden = true
             AppContext.showServiceImp.cancelMicSeatApply { _ in }
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
