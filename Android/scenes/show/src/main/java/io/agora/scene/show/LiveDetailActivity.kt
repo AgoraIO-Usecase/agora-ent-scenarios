@@ -365,7 +365,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 override fun onTick(millisUntilFinished: Long) {
                     val min : Long = (millisUntilFinished / 1000) / 60
                     val sec : Long = (millisUntilFinished / 1000) % 60
-                    mBinding.videoPKLayout.iPKTimeText.text = "PK 0$min:$sec"
+                    mBinding.videoPKLayout.iPKTimeText.text = getString(R.string.show_count_time_for_pk, min, sec)
                 }
                 override fun onFinish() {
                     mService.stopInteraction(interactionInfo!!)
@@ -1090,7 +1090,7 @@ class LiveDetailActivity : AppCompatActivity() {
             channelMediaOptions.publishCustomAudioTrack = false
             channelMediaOptions.enableAudioRecordingOrPlayout = true
             channelMediaOptions.autoSubscribeVideo = true
-            channelMediaOptions.autoSubscribeAudio = true
+            channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
             TokenGenerator.generateTokens(
                 interactionInfo!!.roomId,
@@ -1128,7 +1128,7 @@ class LiveDetailActivity : AppCompatActivity() {
             channelMediaOptions.publishCustomAudioTrack = false
             channelMediaOptions.enableAudioRecordingOrPlayout = true
             channelMediaOptions.autoSubscribeVideo = true
-            channelMediaOptions.autoSubscribeAudio = true
+            channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             TokenGenerator.generateTokens(
                 interactionInfo!!.roomId,
