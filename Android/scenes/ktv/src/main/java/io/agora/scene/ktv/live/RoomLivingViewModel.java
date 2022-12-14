@@ -466,6 +466,7 @@ public class RoomLivingViewModel extends ViewModel {
                         mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                         mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                     }
+                    toggleMic(false);
                 } else {
                     // failure
                     Log.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
