@@ -93,11 +93,11 @@ public class VRSoundEffectsViewController: VRBaseViewController {
                 if error == nil {
                     ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
                         SVProgressHUD.dismiss()
+                        self.view.window?.isUserInteractionEnabled = true
                         if let room = room {
                             SVProgressHUD.showSuccess(withStatus: "Room Created".localized())
                             self.entryRoom(room: room)
                         } else {
-                            self.view.window?.isUserInteractionEnabled = true
                             SVProgressHUD.showError(withStatus: "Create failed!".localized())
                         }
                     }
