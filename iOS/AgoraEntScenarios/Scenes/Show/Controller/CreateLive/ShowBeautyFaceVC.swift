@@ -91,17 +91,12 @@ class ShowBeautyFaceVC: UIViewController {
             
         case .style:
             if isReset {
-                ByteBeautyManager.shareManager.reset(datas: dataArray)
-                ByteBeautyManager.shareManager.reset(datas: dataArray,
-                                                     key: "Makeup_ALL")
+                ByteBeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
             ByteBeautyManager.shareManager.setStyle(path: model.path,
                                                     key: model.key,
                                                     value: model.value)
-            ByteBeautyManager.shareManager.setStyle(path: model.path,
-                                                    key: "Makeup_ALL",
-                                                    value: model.makupValue)
             
         case .sticker:
             ByteBeautyManager.shareManager.setSticker(path: model.path)
@@ -142,7 +137,8 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.path == nil)
+            selectedItemClosure?(model.value, model.key == nil)
+            defalutSelectIndex = indexPath.item
         }
         return cell
     }
@@ -155,7 +151,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         
         defalutSelectIndex = indexPath.item
         let model = dataArray[indexPath.item]
-        setBeautyHandler(value: model.value, isReset: model.path == nil)
+        setBeautyHandler(value: model.value, isReset: model.key == nil)
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
