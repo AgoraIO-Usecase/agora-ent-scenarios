@@ -13,6 +13,7 @@
             android:exported="false"
             android:keepScreenOn="true"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/voice_Theme.AgoraScenesChatroom" />
 
         <activity

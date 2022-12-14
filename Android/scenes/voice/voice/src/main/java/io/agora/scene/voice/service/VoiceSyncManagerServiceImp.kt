@@ -6,16 +6,16 @@ import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.adapter.EMAError
 import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.model.*
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
+import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.*
-import kotlin.collections.HashMap
 
 /**
  * @author create by zhangwei03
@@ -196,8 +196,9 @@ class VoiceSyncManagerServiceImp(
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
                     if (roomMap[roomId] == null){
-                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE, false)
                         " room is not existent ".logE()
+                        return
                     }
                     val curRoomInfo = roomMap[roomId]?: return
                     curRoomInfo.memberCount = curRoomInfo.memberCount + 1
@@ -214,7 +215,6 @@ class VoiceSyncManagerServiceImp(
                             "syncManager update onFail ${exception?.message}".logE()
                         }
                     })
-                    innerSubscribeRoomChanged()
                     completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                 }
 
@@ -661,11 +661,46 @@ class VoiceSyncManagerServiceImp(
             ),
             object : Sync.Callback {
                 override fun onSuccess() {
-                    syncUtilsInit = true
-                    ThreadManager.getInstance().runOnMainThread {
-                        "SyncManager init success".logD()
-                        complete.invoke()
-                    }
+                    Sync.Instance().joinScene(voiceSceneId, object: JoinSceneCallback{
+                        override fun onSuccess(sceneReference: SceneReference?) {
+                            sceneReference?.subscribe(object:Sync.EventListener{
+                                override fun onCreated(item: IObject?) {
+
+                                }
+
+                                override fun onUpdated(item: IObject?) {
+                                    item ?: return
+                                    val roomInfo = item.toObject(VoiceRoomModel::class.java)
+                                    roomMap[roomInfo.roomId] = roomInfo
+                                    "syncManager RoomChanged onUpdated:${roomInfo.roomId}".logD()
+                                }
+
+                                override fun onDeleted(item: IObject?) {
+                                    item ?: return
+                                    val roomInfo = roomMap[item.id] ?: return
+                                    resetCacheInfo(roomInfo.roomId, true)
+                                    "syncManager RoomChanged onDeleted:${roomInfo.roomId}".logD()
+                                }
+
+                                override fun onSubscribeError(ex: SyncManagerException?) {
+                                    errorHandler?.invoke(ex)
+                                }
+
+                            })
+                            syncUtilsInit = true
+                            ThreadManager.getInstance().runOnMainThread {
+                                "SyncManager init success".logD()
+                                complete.invoke()
+                            }
+                        }
+
+                        override fun onFail(exception: SyncManagerException?) {
+                            ThreadManager.getInstance().runOnMainThread {
+                                "SyncManager init error: ${exception?.message}".logE()
+                                errorHandler?.invoke(exception)
+                            }
+                        }
+                    })
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -676,36 +711,7 @@ class VoiceSyncManagerServiceImp(
                 }
             }
         )
-    }
 
-    /**订阅房间变化*/
-    private fun innerSubscribeRoomChanged() {
-        val listener = object : Sync.EventListener {
-            override fun onCreated(item: IObject?) {
-
-            }
-
-            override fun onUpdated(item: IObject?) {
-                item ?: return
-                val roomInfo = item.toObject(VoiceRoomModel::class.java)
-                roomMap[roomInfo.roomId] = roomInfo
-                "syncManager onUpdated:${roomInfo.roomId}".logD()
-            }
-
-            override fun onDeleted(item: IObject?) {
-                item ?: return
-                val roomInfo = roomMap[item.id] ?: return
-                resetCacheInfo(roomInfo.roomId, true)
-                "syncManager onDeleted:${roomInfo.roomId}".logD()
-            }
-
-            override fun onSubscribeError(ex: SyncManagerException?) {
-                "syncManager onSubscribeError:${ex.toString()}".logE()
-            }
-
-        }
-        mSceneReference?.subscribe(listener)
-        roomSubscribeListener.add(listener)
     }
 
     private fun resetCacheInfo(roomId: String, isRoomDestroyed: Boolean = false) {

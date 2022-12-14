@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -15,35 +14,35 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
+import io.agora.scene.voice.R
+import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
-import io.agora.voice.common.ui.BaseUiActivity
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
-import io.agora.scene.voice.R
-import io.agora.voice.common.utils.LogTools.logE
-import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
-import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
+import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.Resource
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
 import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
+import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 
@@ -397,17 +396,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomObservableDelegate.onRoomModel(voiceRoomModel)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
-
-                if (roomKitBean.isOwner) {
-                    roomObservableDelegate.onExitRoom(
-                        getString(R.string.voice_chatroom_end_live),
-                        getString(R.string.voice_chatroom_end_live_tips), finishBack = {
-                            finish()
-                        })
-                } else {
-                    roomObservableDelegate.checkUserLeaveMic()
-                    finish()
-                }
+                onBackPressed()
             }
 
             override fun onClickRank(view: View) {
@@ -479,11 +468,20 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         })
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
-            return false
+    override fun onBackPressed() {
+        if (binding.chatBottom.showNormalLayout()) {
+            return
         }
-        return super.onKeyDown(keyCode, event)
+        if (roomKitBean.isOwner) {
+            roomObservableDelegate.onExitRoom(
+                getString(R.string.voice_chatroom_end_live),
+                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
+                    finish()
+                })
+        } else {
+            roomObservableDelegate.checkUserLeaveMic()
+            finish()
+        }
     }
 
     override fun finish() {
