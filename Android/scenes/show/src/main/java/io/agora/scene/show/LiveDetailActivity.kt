@@ -326,8 +326,16 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun refreshViewDetailLayout(status: Int) {
         when (status) {
             ShowInteractionStatus.idle.value -> {
-                mBinding.videoPKLayout.iBroadcasterAView.removeAllViews()
-                mBinding.videoPKLayout.iBroadcasterBView.removeAllViews()
+                mBinding.videoPKLayout.iBroadcasterAView.apply {
+                    if(childCount > 1){
+                        removeViewAt(0)
+                    }
+                }
+                mBinding.videoPKLayout.iBroadcasterBView.apply {
+                    if(childCount > 1){
+                        removeViewAt(0)
+                    }
+                }
                 mBinding.videoLinkingLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingLayout.root.isVisible = false
@@ -336,8 +344,16 @@ class LiveDetailActivity : AppCompatActivity() {
                 mBinding.videoSinglehostLayout.root.isVisible = true
             }
             ShowInteractionStatus.onSeat.value -> {
-                mBinding.videoPKLayout.iBroadcasterAView.removeAllViews()
-                mBinding.videoPKLayout.iBroadcasterBView.removeAllViews()
+                mBinding.videoPKLayout.iBroadcasterAView.apply {
+                    if(childCount > 1){
+                        removeViewAt(0)
+                    }
+                }
+                mBinding.videoPKLayout.iBroadcasterBView.apply {
+                    if(childCount > 1){
+                        removeViewAt(0)
+                    }
+                }
                 mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
                 mBinding.videoSinglehostLayout.root.isVisible = false
                 mBinding.videoPKLayout.root.isVisible = false
@@ -1006,8 +1022,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userMicOnView.bringToFront()
-        mBinding.videoLinkingAudienceLayout.userMicOffView.bringToFront()
+        mBinding.videoLinkingAudienceLayout.userName.isActivated = interactionInfo?.muteAudio?.not() ?: false
         audienceVideoView.setOnClickListener {
             // 主播弹出view
             showLinkSettingsDialog()
@@ -1074,12 +1089,12 @@ class LiveDetailActivity : AppCompatActivity() {
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
         val view = TextureView(this)
         val competitorView = TextureView(this)
-        mBinding.videoPKLayout.iBroadcasterAView.addView(view)
-        mBinding.videoPKLayout.iBroadcasterBView.addView(competitorView)
+        mBinding.videoPKLayout.iBroadcasterAView.addView(view, 0)
+        mBinding.videoPKLayout.iBroadcasterBView.addView(competitorView, 0)
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
+        mBinding.videoPKLayout.userNameA.isActivated = interactionInfo!!.ownerMuteAudio.not()
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
-        mBinding.videoPKLayout.userNameA.bringToFront()
-        mBinding.videoPKLayout.userNameB.bringToFront()
+        mBinding.videoPKLayout.userNameB.isActivated = interactionInfo!!.muteAudio.not()
         if (isRoomOwner) {
             // pk 主播
             mBinding.videoPKLayout.iBroadcasterBView.setOnClickListener {
