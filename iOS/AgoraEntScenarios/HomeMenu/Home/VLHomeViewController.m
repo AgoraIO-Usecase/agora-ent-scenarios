@@ -7,7 +7,7 @@
 #import "VLHomeView.h"
 #import "VLOnLineListVC.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "MenuUtils.h"
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 
@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:NSLocalizedString(@"声网", nil)];
+    [self setNaviTitleName:AGLocalizedString(@"声网")];
     
     [self setUpUI];
 }

@@ -7,7 +7,7 @@
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "MenuUtils.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -82,10 +82,27 @@
     if (!_itemsArray) {
         _itemsArray = @[
 //            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"语聊房",@"subTitleStr":@""},
-            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"在线K歌房",@"subTitleStr":@""},
-            @{@"bgImgStr":@"home_live_bg",@"iconImgStr":@"home_live_icon",@"titleStr":@"元直播",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)},
-            @{@"bgImgStr":@"home_talk_bg",@"iconImgStr":@"home_talk_icon",@"titleStr":@"元语聊",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)},
-            @{@"bgImgStr":@"home_game_bg",@"iconImgStr":@"home_game_icon",@"titleStr":@"互动游戏",@"subTitleStr":NSLocalizedString(@"敬请期待", nil)}
+            @{
+                @"bgImgStr":@"home_KTV_bg",
+                @"iconImgStr":@"home_KTV_icon",
+                @"titleStr":AGLocalizedString(@"在线K歌房"),
+                @"subTitleStr":@""
+            }, @{
+                @"bgImgStr":@"home_live_bg",
+                @"iconImgStr":@"home_live_icon",
+                @"titleStr":AGLocalizedString(@"元直播"),
+                @"subTitleStr":AGLocalizedString(@"敬请期待")
+            }, @{
+                @"bgImgStr":@"home_talk_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"元语聊"),
+                @"subTitleStr":AGLocalizedString(@"敬请期待")
+            }, @{
+                @"bgImgStr":@"home_game_bg",
+                @"iconImgStr":@"home_game_icon",
+                @"titleStr":AGLocalizedString(@"互动游戏"),
+                @"subTitleStr":AGLocalizedString(@"敬请期待")
+            }
         ];
     }
     return _itemsArray;
