@@ -13,24 +13,24 @@ import io.agora.CallBack
 import io.agora.chat.adapter.EMAError
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
-import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.ui.adapter.VoiceRoomListAdapter
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
+import io.agora.scene.voice.ui.widget.recyclerview.EmptyRecyclerView
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
-import io.agora.scene.voice.ui.widget.recyclerview.EmptyRecyclerView
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.utils.FastClickTools
 
 class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>(),
     SwipeRefreshLayout.OnRefreshListener {
@@ -130,6 +130,14 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
                     dismissLoading()
+                    if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
+                        ToastTools.show(
+                            requireActivity(),
+                            getString(R.string.voice_room_unavailable_tip)
+                        )
+                    } else {
+                        ToastTools.show(requireActivity(), message ?: "")
+                    }
                 }
             })
         }
