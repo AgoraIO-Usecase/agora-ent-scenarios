@@ -183,21 +183,25 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                 //                    refreshHandsUp(status: status)
                 //                }
                 //将userList中的上麦用户做标记，便于后续过滤
-                let micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
-                    $0.chat_uid ?? "" == first.member?.chat_uid ?? ""
+                var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
+                    $0.chat_uid ?? "" == fromId
                 })
                 if status == -1 {
                     micUser?.mic_index = -1
+                } else {
+                    micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
+                        $0.chat_uid ?? "" == first.member?.chat_uid ?? ""
+                    })
+                    if micUser != nil {
+                        micUser?.mic_index = mic_index
+                    }
                 }
-                if micUser != nil {
-                    micUser?.mic_index = mic_index
-                }
-                var state: VoiceRoomChatBarState = .unSelected
-                if status == 0 || status != -1 {
-                    state = .selected
-                }
-                self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                 if !isOwner {
+                    var state: VoiceRoomChatBarState = .selected
+                    if status == 0 || status != -1 {
+                        state = .unSelected
+                    }
+                    self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
                     }
