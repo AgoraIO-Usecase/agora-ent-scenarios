@@ -514,6 +514,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                             canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
+            AlertManager.hiddenView()
             
         default:
             break

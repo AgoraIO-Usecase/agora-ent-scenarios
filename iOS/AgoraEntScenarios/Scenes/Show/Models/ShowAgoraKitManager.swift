@@ -146,11 +146,12 @@ class ShowAgoraKitManager: NSObject {
         options.publishCameraTrack = role == .broadcaster
         agoraKit.updateChannel(with: options)
         agoraKit.setClientRole(role)
+        guard canvasView != nil else { return }
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = UInt(uid ?? "0") ?? 0
         videoCanvas.renderMode = .hidden
         videoCanvas.view = canvasView
-        if uid == VLUserCenter.user.id && canvasView != nil {
+        if uid == VLUserCenter.user.id {
             agoraKit.setupLocalVideo(videoCanvas)
             agoraKit.startPreview()
         } else {
