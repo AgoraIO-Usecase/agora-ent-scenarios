@@ -946,6 +946,7 @@
 		DDBF7890291A45120001855B /* KTVMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
 		DDBF7891291BCECE0001855B /* LEEAlert+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LEEAlert+KTVModal.h"; sourceTree = "<group>"; };
 		DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LEEAlert+KTVModal.m"; sourceTree = "<group>"; };
+		DDD5992C2949E09400DA1544 /* MenuUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -1429,6 +1430,7 @@
 		DD8416A629090C520026B624 /* HomeMenu */ = {
 			isa = PBXGroup;
 			children = (
+				DDD5992C2949E09400DA1544 /* MenuUtils.h */,
 				DD8416CF29090C520026B624 /* UIWindow+Router.h */,
 				DD8416B029090C520026B624 /* UIWindow+Router.m */,
 				DD8416A729090C520026B624 /* Home */,

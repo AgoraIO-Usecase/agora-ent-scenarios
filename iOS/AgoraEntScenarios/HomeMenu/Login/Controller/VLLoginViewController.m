@@ -21,6 +21,7 @@
 #import "VLLoginModel.h"
 #import "VLUserCenter.h"
 #import "VLGlobalHelper.h"
+#import "MenuUtils.h"
 @import YYText;
 @import Masonry;
 @import LEEAlert;
@@ -48,7 +49,7 @@
     _policyAgreed = NO;
     
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:NSLocalizedString(@"声网", nil)];
+    [self setNaviTitleName:AGLocalizedString(@"声网")];
     [self setupViews];
     [self setupLayout];
 }
@@ -117,7 +118,7 @@
     .LeeMaxHeight(380)
     .LeeHeaderColor([UIColor whiteColor])
     .LeeAddTitle(^(UILabel * _Nonnull label) {
-        label.text = NSLocalizedString(@"个人信息保护指引", nil);
+        label.text = AGLocalizedString(@"个人信息保护指引");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = VLUIFontMake(16);
     })
@@ -217,7 +218,7 @@
 -(BOOL)checkVerifyCode {
     
     if (_verifyView.isVerifyCodeSent == NO || [_verifyView.verifyCode isEqualToString:@""] || !_verifyView.verifyCode) {
-        [VLToast toast:NSLocalizedString(@"请输入验证码", nil)];
+        [VLToast toast:AGLocalizedString(@"请输入验证码")];
         return NO;
     }
     return YES;
@@ -225,7 +226,7 @@
 
 -(BOOL)checkPrivacyAgree {
     if (!self.agreeButton.selected) {
-        [VLToast toast:NSLocalizedString(@"请您认真阅读用户协议及隐私政策的条款内容，同意后可开始使用我们的服务", nil)];
+        [VLToast toast:AGLocalizedString(@"请您认真阅读用户协议及隐私政策的条款内容，同意后可开始使用我们的服务")];
         return NO;
     }
     return YES;
@@ -233,12 +234,12 @@
 
 -(BOOL)checkPhoneNo {
     if ([_phoneView.phoneNo isEqualToString:@""] || !_phoneView.phoneNo) {
-        [VLToast toast:NSLocalizedString(@"请输入手机号", nil)];
+        [VLToast toast:AGLocalizedString(@"请输入手机号")];
         return NO;
     }
     
     if (![NSString isValidateTelNumber:_phoneView.phoneNo]) {
-        [VLToast toast:NSLocalizedString(@"手机号码格式错误", nil)];
+        [VLToast toast:AGLocalizedString(@"手机号码格式错误")];
         return NO;
     }
     
@@ -301,12 +302,12 @@
         }
         else {
             dispatch_main_async_safe(^{
-                [VLToast toast:NSLocalizedString(@"验证码校验失败，请重试", nil)];
+                [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
             })
         }
     } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
         dispatch_main_async_safe(^{
-            [VLToast toast:NSLocalizedString(@"验证码校验失败，请重试", nil)];
+            [VLToast toast:AGLocalizedString(@"验证码校验失败，请重试")];
         })
     }];
 }
@@ -318,7 +319,7 @@
         _appNameLabel = [[UILabel alloc] init];
         _appNameLabel.font = VLUIFontBoldMake(26);
         _appNameLabel.textColor = UIColorMakeWithHex(@"#040925");
-        _appNameLabel.text = NSLocalizedString(@"欢迎体验声网服务", nil);
+        _appNameLabel.text = AGLocalizedString(@"欢迎体验声网服务");
     }
     return _appNameLabel;
 }
@@ -355,9 +356,9 @@
     _privacyLabel.numberOfLines = 0;
     _privacyLabel.preferredMaxLayoutWidth = kScreenWidth - 30 * 2;
     
-    NSString *_str4Total = NSLocalizedString(@"我已阅读并同意 用户协议 及 隐私政策 ", nil);
-    NSString *_str4Highlight1 = NSLocalizedString(@"用户协议", nil);
-    NSString *_str4Highlight2 = NSLocalizedString(@"隐私政策", nil);
+    NSString *_str4Total = AGLocalizedString(@"我已阅读并同意 用户协议 及 隐私政策 ");
+    NSString *_str4Highlight1 = AGLocalizedString(@"用户协议");
+    NSString *_str4Highlight2 = AGLocalizedString(@"隐私政策");
     NSMutableAttributedString *_mattrStr = [NSMutableAttributedString new];
     
     [_mattrStr appendAttributedString:[[NSAttributedString alloc] initWithString:_str4Total attributes:@{NSFontAttributeName : VLUIFontMake(12), NSForegroundColorAttributeName : UIColorMakeWithHex(@"#6C7192")}]];
@@ -386,7 +387,7 @@
 - (UIButton *)loginButton {
     if (!_loginButton) {
         _loginButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_loginButton setTitle:NSLocalizedString(@"登录", nil) forState:UIControlStateNormal];
+        [_loginButton setTitle:AGLocalizedString(@"登录") forState:UIControlStateNormal];
         [_loginButton addTarget:self action:@selector(loginClick:) forControlEvents:UIControlEventTouchUpInside];
         [_loginButton setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
         CAGradientLayer *gl = [CAGradientLayer layer];

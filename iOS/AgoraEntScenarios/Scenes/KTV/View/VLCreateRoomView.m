@@ -11,6 +11,7 @@
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "KTVMacro.h"
+#import "MenuUtils.h"
 @import CRBoxInputView;
 @import QMUIKit;
 @import YYCategories;
@@ -54,7 +55,7 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = @"房间标题";
+    roomTitleLabel.text = AGLocalizedString(@"房间标题");
     [self addSubview:roomTitleLabel];
     
     QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
