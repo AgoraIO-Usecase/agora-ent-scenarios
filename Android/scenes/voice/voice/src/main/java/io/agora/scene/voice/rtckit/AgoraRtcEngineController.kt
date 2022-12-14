@@ -5,6 +5,7 @@ import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
+import io.agora.scene.base.AudioModeration
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
@@ -51,6 +52,10 @@ class AgoraRtcEngineController {
         this.joinCallback = joinCallback
         VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
+
+        // 语音鉴定
+        AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
+            AudioModeration.AgoraChannelType.broadcast, "voice", {})
     }
 
     private fun initRtcEngine(context: Context): Boolean {
