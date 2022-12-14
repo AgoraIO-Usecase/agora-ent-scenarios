@@ -9,7 +9,7 @@ import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
+import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -87,7 +87,7 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun showAudioSetting(){
-        AdvanceSettingAudienceDialog(this)
+        PresetAudienceDialog(this)
             .show()
     }
 

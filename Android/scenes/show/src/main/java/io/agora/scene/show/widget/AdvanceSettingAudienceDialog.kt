@@ -9,7 +9,6 @@ import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingAdvanceDialogAudienceBinding
 import io.agora.scene.show.databinding.ShowSettingAdvanceItemSwitchBinding
-import io.agora.scene.show.utils.toInt
 
 /**
  * 高级设置弹窗
@@ -33,7 +32,7 @@ class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context)
     private val defaultItemValues = mutableMapOf<Int, Int>().apply {
         put(
             ITEM_ID_SWITCH_QUALITY_ENHANCE,
-            VideoSetting.getCurrAudienceSetting().video.SR.toInt()
+            VideoSetting.getCurrAudienceSetting().video.SR.value
         )
     }
 
@@ -69,7 +68,7 @@ class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context)
 
     private fun onSwitchChanged(itemId: Int, isChecked: Boolean) {
         when (itemId) {
-            ITEM_ID_SWITCH_QUALITY_ENHANCE -> VideoSetting.updateAudioSetting(SR = isChecked)
+            ITEM_ID_SWITCH_QUALITY_ENHANCE -> VideoSetting.updateAudioSetting(SR = if(isChecked) VideoSetting.SuperResolution.SR_1_5 else VideoSetting.SuperResolution.SR_NONE)
         }
     }
 
