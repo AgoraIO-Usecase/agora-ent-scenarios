@@ -199,12 +199,12 @@ class ShowLiveViewController: UIViewController {
     private func joinChannel() {
         agoraKitManager.delegate = self
 //        agoraKitManager.defaultSetting()
-        // 观众端模式设置
-        if role == .audience, let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .signle)
-        }
         guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
             return
+        }
+        // 观众端模式设置
+        if role == .audience, let type = audiencePresetType {
+            agoraKitManager.updatePresetForType(type, mode: .signle,uid: UInt(ownerId))
         }
         let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
         if ret == 0 {
@@ -536,6 +536,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                             canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
+            AlertManager.hiddenView()
             
         default:
             break
@@ -646,6 +647,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
+        print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height), type  = \(stats.superResolutionType)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
@@ -663,49 +665,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
         print("contentInspectResult: \(result.rawValue)")
         guard result == .porn else { return }
-        /*
-         toast
-         单主播直主播端违规
-         * 主播端toast 因内容违规已结束你的直播
-         * 观众端toast 此内容因违规已提前结束
-
-         PK主播A违规
-         * 主播A toast 因内容违规已结束你的直播
-         * 主播B toast 主播已离开，PK结束
-
-         1V1主播违规
-         * 主播 toast 因内容违规已结束你的直播
-         * 麦上观众 toast 主播已离开，连麦结束
-
-         1v1麦上观众违规
-         * 主播toast 观众X已离开，连麦结束
-         * 麦上观众 toast 因内容违规已结束你的连麦
-         */
-        
-        guard let interaction = currentInteraction else {
-            if role == .broadcaster {
-                ToastView.show(text: "因内容违规已结束你的直播")
-                leaveRoom()
-            } else {
-                //TODO: unused?
-                ToastView.show(text: "此内容因违规已提前结束")
-            }
-            return
-        }
-        
-        if role == .broadcaster {
-            ToastView.show(text: "因内容违规已结束你的直播")
-            leaveRoom()
-        } else {
-            if interaction.interactStatus == .pking {
-                //TODO: unused?
-                ToastView.show(text: "主播已离开，连麦结束")
-                _stopInteraction(interaction: interaction)
-            } else {
-                ToastView.show(text: "因内容违规已结束你的连麦")
-                _stopInteraction(interaction: interaction)
-            }
-        }
+        ToastView.show(text: "监测到当前内容存在违规行为")
     }
 }
 
