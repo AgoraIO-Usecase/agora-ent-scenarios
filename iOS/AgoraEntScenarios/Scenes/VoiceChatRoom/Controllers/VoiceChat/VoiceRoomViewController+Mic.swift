@@ -71,6 +71,7 @@ extension VoiceRoomViewController {
                 self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .selected, asCreator: self.isOwner)
             }
         }
         
@@ -177,6 +178,7 @@ extension VoiceRoomViewController {
                 self.local_index = mic.mic_index
                 self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
             }
         })
     }
