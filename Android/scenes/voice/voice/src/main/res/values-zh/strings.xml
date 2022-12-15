@@ -222,5 +222,5 @@
     <string name="voice_room_input_chat_title">⼀起语聊吧</string>
     <string name="voice_room_system_msg_member_add">加入</string>
     <string name="voice_room_login_exception">登录异常</string>
-    <string name="voice_room_room_not_exist">房间不存在，请刷新列表重试</string>
+    <string name="voice_room_unavailable_tip">房间不存在，请刷新列表重试</string>
 </resources>

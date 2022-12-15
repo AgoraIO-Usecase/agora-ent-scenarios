@@ -136,14 +136,15 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    if (code == VoiceServiceProtocol.ERR_ROOM_NOT_EXIST){
-                        activity?.let {
-                            ToastTools.show(
-                                it, getString(R.string.voice_room_room_not_exist)
-                            )
-                        }
-                    }
                     dismissLoading()
+                    if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
+                        ToastTools.show(
+                            requireActivity(),
+                            getString(R.string.voice_room_unavailable_tip)
+                        )
+                    } else {
+                        ToastTools.show(requireActivity(), message ?: "")
+                    }
                 }
             })
         }
