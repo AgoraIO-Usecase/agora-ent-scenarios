@@ -20,12 +20,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.agora.entfulldemo.BuildConfig;
 import com.agora.entfulldemo.R;
-import com.agora.entfulldemo.databinding.FragmentHomeMineBinding;
+import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding;
 
 import java.io.File;
 
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.GlideApp;
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -40,7 +40,7 @@ import io.agora.scene.widget.dialog.SelectPhotoFromDialog;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.ImageCompressUtil;
 
-public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBinding> {
+public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMineBinding> {
     private CommonDialog logoutDialog;
     private CommonDialog logoffAccountDialog;
     private MainViewModel mainViewModel;
@@ -49,8 +49,8 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
 
     @NonNull
     @Override
-    protected FragmentHomeMineBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentHomeMineBinding.inflate(inflater);
+    protected AppFragmentHomeMineBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return AppFragmentHomeMineBinding.inflate(inflater);
     }
 
 
@@ -68,14 +68,14 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
     @Override
     public void initListener() {
         mainViewModel.setISingleCallback((type, o) -> {
-            if (type == KtvConstant.CALLBACK_TYPE_USER_INFO_CHANGE) {
+            if (type == Constant.CALLBACK_TYPE_USER_INFO_CHANGE) {
                 User user = UserManager.getInstance().getUser();
                 GlideApp.with(this).load(user.headUrl).error(R.mipmap.userimage)
                         .transform(new CenterCropRoundCornerTransform(100))
                         .into(getBinding().ivUserAvatar);
                 getBinding().tvUserID.setText(getString(R.string.id_is_, user.userNo));
                 getBinding().tvUserMobile.setText(user.name);
-            } else if (type == KtvConstant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
+            } else if (type == Constant.CALLBACK_TYPE_USER_CANCEL_ACCOUNTS) {
                 UserManager.getInstance().logout();
                 requireActivity().finish();
                 PagePilotManager.pageWelcome();
@@ -202,17 +202,17 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
             logoffAccountDialog = new CommonDialog(requireContext());
             logoffAccountDialog.setDialogTitle("确定注销账号？");
             logoffAccountDialog.setDescText("注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？");
-            logoffAccountDialog.setDialogBtnText(getString(R.string.logoff), getString(R.string.cancel));
+            logoffAccountDialog.setDialogBtnText(getString(R.string.app_logoff), getString(R.string.cancel));
             logoffAccountDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
-                    SPUtil.putBoolean(KtvConstant.IS_AGREE, false);
+                    SPUtil.putBoolean(Constant.IS_AGREE, false);
                     mainViewModel.requestCancellation(UserManager.getInstance().getUser().userNo);
                 }
 
                 @Override
                 public void onRightButtonClick() {
-
+                    SPUtil.putBoolean(Constant.IS_AGREE, true);
                 }
             });
         }
@@ -224,11 +224,11 @@ public class HomeMineFragment extends BaseViewBindingFragment<FragmentHomeMineBi
             logoutDialog = new CommonDialog(requireContext());
             logoutDialog.setDialogTitle("确定退出登录吗？");
             logoutDialog.setDescText("退出登录后，我们还会继续保留您的账户数据，记得再来体验哦～");
-            logoutDialog.setDialogBtnText(getString(R.string.exit), getString(R.string.cancel));
+            logoutDialog.setDialogBtnText(getString(R.string.app_exit), getString(R.string.cancel));
             logoutDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
                 public void onLeftButtonClick() {
-                    SPUtil.putBoolean(KtvConstant.IS_AGREE, false);
+                    SPUtil.putBoolean(Constant.IS_AGREE, false);
                     UserManager.getInstance().logout();
                     requireActivity().finish();
                     PagePilotManager.pageWelcome();
