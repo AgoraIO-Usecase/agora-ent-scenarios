@@ -82,12 +82,11 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             entity.owner?.chat_uid = uid
             VLUserCenter.user.im_token = im_token
             VLUserCenter.user.chat_uid = uid
-            SVProgressHUD.dismiss()
             if im_token.isEmpty || uid.isEmpty {
+                SVProgressHUD.dismiss()
                 SVProgressHUD.showError(withStatus: "Fetch IMConfig failed!")
                 return
             }
-            SVProgressHUD.show(withStatus: "Loading".localized())
             VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
                 SVProgressHUD.dismiss()
                 if error == nil {
