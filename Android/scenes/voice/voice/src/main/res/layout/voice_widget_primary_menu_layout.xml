@@ -125,7 +125,6 @@
             android:gravity="center"
             android:textColor="@color/voice_white"
             android:textSize="@dimen/voice_sp_16"
-            android:text="Send"
             android:layout_width="67dp"
             android:layout_height="36dp"/>
 

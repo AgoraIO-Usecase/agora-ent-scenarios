@@ -464,6 +464,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
                             override fun onError(code: Int, error: String?) {
                                 "onSendMessage onError  $code $error".logE(TAG)
+                                binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED){
                                     ToastTools.show(this@ChatroomLiveActivity,
                                         getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
