@@ -120,7 +120,7 @@
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = @"取消";
+        action.title = AGLocalizedString(@"Cancel");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.cornerRadius = 20;
@@ -135,7 +135,7 @@
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"确认");
+        action.title = AGLocalizedString(@"Confirm");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
