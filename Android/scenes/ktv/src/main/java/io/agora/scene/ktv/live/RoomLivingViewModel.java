@@ -69,7 +69,6 @@ import io.agora.scene.ktv.service.OutSeatInputModel;
 import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
-import io.agora.scene.ktv.service.UpdateSingingScoreInputModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import kotlin.Unit;
@@ -278,7 +277,6 @@ public class RoomLivingViewModel extends ViewModel {
             public void onFinish() {
                 ToastUtils.showToast("体验时间已耗尽，自动离开房间");
                 exitRoom();
-                roomDeleteLiveData.postValue(false);
             }
         }.start();
     }
@@ -1064,7 +1062,6 @@ public class RoomLivingViewModel extends ViewModel {
                         || Objects.equals(songPlaying.getChorusNo(), UserManager.getInstance().getUser().userNo)) {
                     for (AudioVolumeInfo info : speakers) {
                         if (info.uid == 0 && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                            ktvServiceProtocol.updateSingingScore(new UpdateSingingScoreInputModel(info.voicePitch));
                             if (mPlayer != null && mPlayer.getState() == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                                 playerPitchLiveData.postValue(info.voicePitch);
                                 pitch = info.voicePitch;
