@@ -59,7 +59,10 @@ class VoiceSyncManagerServiceImp(
     }
 
     override fun reset() {
-        syncUtilsInit = false
+        if(syncUtilsInit){
+            Sync.Instance().destroy()
+            syncUtilsInit = false
+        }
     }
 
     /**
