@@ -157,6 +157,7 @@ class ShowLiveViewController: UIViewController {
     
     deinit {
         print("----ShowLiveViewController-销毁了------")
+        agoraKitManager.destory()
     }
     
     override func viewDidLoad() {
@@ -376,17 +377,20 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 let imp = AppContext.showServiceImp
                 switch result {
                 case .accept:
-                    ToastView.showWait(text: "...")
-                    AppContext.showServiceImp.getAllInterationList { _, list in
-                        ToastView.hidden()
-                        guard let list = list?.filterDuplicates({ $0.userId }) else { return }
-                        let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
-                        if isLink {
-                            AppContext.showServiceImp.rejectMicSeatInvitation { _ in }
-                            ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
-                            return
+                    ToastView.showWait(text: "连麦中...".show_localized)
+                    // 解决多人同时点击同意连麦导致的问题, 正常项目应该由后台处理
+                    DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.1...2.0)) {
+                        AppContext.showServiceImp.getAllInterationList { _, list in
+                            ToastView.hidden()
+                            guard let list = list?.filterDuplicates({ $0.userId }) else { return }
+                            let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
+                            if isLink {
+                                AppContext.showServiceImp.rejectMicSeatInvitation { _ in }
+                                ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
+                                return
+                            }
+                            AppContext.showServiceImp.acceptMicSeatInvitation { error in }
                         }
-                        AppContext.showServiceImp.acceptMicSeatInvitation { error in }
                     }
 
                 default:
@@ -792,10 +796,13 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 麦克风开关
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        guard let info = currentInteraction else { return }
         let options = AgoraRtcChannelMediaOptions()
+        options.publishMicrophoneTrack = !selected
+        if role == .broadcaster {
+            agoraKitManager.agoraKit.updateChannel(with: options)
+        }
+        guard let info = currentInteraction else { return }
         if info.userId == VLUserCenter.user.id {
-            options.publishMicrophoneTrack = selected
             agoraKitManager.agoraKit.updateChannel(with: options)
         }
 //        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
