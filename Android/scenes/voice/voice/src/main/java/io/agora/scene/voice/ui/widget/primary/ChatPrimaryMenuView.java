@@ -86,6 +86,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         normalLayout = findViewById(R.id.normal_layout);
         expressionView = findViewById(R.id.expression_view);
         mKeyboardBg = findViewById(R.id.vKeyboardBg);
+        mSend.setText(R.string.voice_room_send_tip);
         if (window != null)
             rootView = window.getDecorView().findViewById(android.R.id.content);
 

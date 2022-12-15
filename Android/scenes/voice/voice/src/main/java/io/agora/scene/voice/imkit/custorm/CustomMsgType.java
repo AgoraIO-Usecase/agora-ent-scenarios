@@ -16,12 +16,12 @@ public enum CustomMsgType {
     /**
      * 申请消息
      */
-    CHATROOM_APPLY_SITE("chatroom_applySiteNotify"),
+    CHATROOM_APPLY_SITE("chatroom_submitApplySiteNotify"),
 
     /**
      * 取消申请消息
      */
-    CHATROOM_CANCEL_APPLY_SITE("chatroom_cancelApplySiteNotify"),
+    CHATROOM_CANCEL_APPLY_SITE("chatroom_submitApplySiteNotifyCancel"),
 
     /**
      * 拒绝申请消息 （暂无此功能）
@@ -42,11 +42,6 @@ public enum CustomMsgType {
      * 系统消息 成员加入
      */
     CHATROOM_SYSTEM("chatroom_join"),
-
-    /**
-     * 机器人音量更新
-     */
-    CHATROOM_UPDATE_ROBOT_VOLUME("chatroom_updateRobotVolume"),
     ;
 
     private String name;

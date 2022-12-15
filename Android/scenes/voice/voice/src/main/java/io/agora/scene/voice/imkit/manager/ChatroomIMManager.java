@@ -142,7 +142,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
             @Override
             public void onError(int i, String s) {
-                callBack.onError(message.getMsgId(), i, s);
+                callBack.onError( i, s);
             }
 
             @Override
