@@ -21,12 +21,12 @@ import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
+import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.MsgConstant;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.model.VoiceGiftModel;
 import io.agora.scene.voice.model.VoiceMemberModel;
@@ -420,7 +420,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     public void login(String uid,String token,CallBack callBack){
-        ChatClient.getInstance().loginWithAgoraToken(uid, token, new CallBack() {
+        ChatClient.getInstance().loginWithToken(uid, token, new CallBack() {
             @Override
             public void onSuccess() {
                 ThreadManager.getInstance().runOnMainThread(new Runnable() {

@@ -163,6 +163,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                 }else {
                     if (!isShowEmoji){
                         lp.height = DeviceTools.dp2px(activity,55);
+                        showNormalLayout();
                     }
                 }
                 mKeyboardBg.setLayoutParams(lp);
@@ -420,12 +421,20 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     public void sendMessage(){
         if (null != clickListener)
             clickListener.onSendMessage(edContent.getText().toString().trim());
-        edContent.setText("");
         hideKeyboard();
-        showInput();
-        normalLayout.setVisibility(View.VISIBLE);
-        menuLayout.setVisibility(View.VISIBLE);
-        hideExpressionView(false);
+        showNormalLayout();
+    }
+
+    public boolean showNormalLayout(){
+        if(inputLayout.getVisibility() != View.VISIBLE){
+            edContent.setText("");
+            showInput();
+            normalLayout.setVisibility(View.VISIBLE);
+            menuLayout.setVisibility(View.VISIBLE);
+            hideExpressionView(false);
+            return true;
+        }
+        return false;
     }
 
     public static class MenuItemModel{
