@@ -23,7 +23,6 @@ public abstract class OnMsgCallBack implements CallBack {
      * @param code
      * @param error
      */
-    @Deprecated
     @Override
     public void onError(int code, String error) {
 
