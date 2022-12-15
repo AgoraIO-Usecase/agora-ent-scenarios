@@ -222,5 +222,5 @@
     <string name="voice_room_input_chat_title">Let\'s Chat</string>
     <string name="voice_room_system_msg_member_add">Joined</string>
     <string name="voice_room_login_exception">Login exception</string>
-    <string name="voice_room_room_not_exist">The room does not exist, refresh and try again</string>
+    <string name="voice_room_unavailable_tip">The room does not exist, refresh and try again</string>
 </resources>

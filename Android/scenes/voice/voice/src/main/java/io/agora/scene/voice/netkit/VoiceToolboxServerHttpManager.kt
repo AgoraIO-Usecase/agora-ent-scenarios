@@ -5,8 +5,8 @@ import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.callback.VRHttpCallback
 import io.agora.voice.common.net.VRHttpClientManager
+import io.agora.voice.common.net.callback.VRHttpCallback
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
@@ -150,6 +150,12 @@ class VoiceToolboxServerHttpManager {
             requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
             requestUser.putOpt("password", "12345678")
             requestBody.putOpt("user", requestUser)
+
+            val requestIM = JSONObject()
+            requestIM.putOpt("appKey", io.agora.scene.voice.BuildConfig.im_app_key)
+            requestIM.putOpt("clientId", io.agora.scene.voice.BuildConfig.im_client_id)
+            requestIM.putOpt("clientSecret", io.agora.scene.voice.BuildConfig.im_client_secret)
+            requestBody.putOpt("im", requestIM)
         } catch (e: JSONException) {
             e.printStackTrace()
         }

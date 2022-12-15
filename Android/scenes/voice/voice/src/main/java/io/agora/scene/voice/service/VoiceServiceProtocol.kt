@@ -17,7 +17,7 @@ interface VoiceServiceProtocol {
         const val ERR_FAILED = 1
         const val ERR_LOGIN_ERROR = 2
         const val ERR_LOGIN_SUCCESS = 3
-        const val ERR_ROOM_NOT_EXIST = 4
+        const val ERR_ROOM_UNAVAILABLE = 4
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
@@ -39,6 +39,8 @@ interface VoiceServiceProtocol {
      *  取消订阅
      */
     fun unsubscribeEvent()
+
+    fun reset()
 
     fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>
 
