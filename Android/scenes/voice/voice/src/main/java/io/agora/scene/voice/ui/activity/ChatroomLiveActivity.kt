@@ -8,12 +8,14 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
+import io.agora.Error
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
@@ -462,6 +464,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
                             override fun onError(code: Int, error: String?) {
                                 "onSendMessage onError  $code $error".logE(TAG)
+                                if (code == Error.MODERATION_FAILED){
+                                    ToastTools.show(this@ChatroomLiveActivity,
+                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
+                                    )
+                                }
                             }
                         })
             }
