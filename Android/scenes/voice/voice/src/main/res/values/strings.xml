@@ -90,7 +90,7 @@
     <string name="voice_chatroom_mic_cancel_apply_fail">Cancel apply failed!</string>
 
     <!-- mic -->
-    <string name="voice_chatroom_mic_submit_sent">Your request has been sent,%n please wait for reply</string>
+    <string name="voice_chatroom_mic_submit_sent">Your request has been sent,please wait for reply</string>
     <string name="voice_chatroom_open_bot_to_sound_effect">Add bot to listen to sound effect?</string>
     <string name="voice_chatroom_end_live">End Live?</string>
     <string name="voice_chatroom_end_live_tips">The room will close after you leave.</string>
@@ -223,4 +223,5 @@
     <string name="voice_room_system_msg_member_add">Joined</string>
     <string name="voice_room_login_exception">Login exception</string>
     <string name="voice_room_unavailable_tip">The room does not exist, refresh and try again</string>
+    <string name="voice_room_content_prohibited">Content prohibited</string>
 </resources>
