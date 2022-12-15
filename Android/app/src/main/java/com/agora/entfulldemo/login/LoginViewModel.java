@@ -3,7 +3,7 @@ package com.agora.entfulldemo.login;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.ApiSubscriber;
@@ -25,7 +25,7 @@ public class LoginViewModel extends BaseRequestViewModel {
      */
     public void requestLogin(String account, String vCode) {
         if (!account.equals(phone)) {
-            getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL, null);
+            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL, null);
             ToastUtils.showToast("验证码错误");
             return;
         }
@@ -42,7 +42,7 @@ public class LoginViewModel extends BaseRequestViewModel {
                         ToastUtils.showToast("登录成功");
                         ApiManager.token = (data.getData().token);
                         UserManager.getInstance().saveUserInfo(data.getData());
-                        getISingleCallback().onSingleCallback(KtvConstant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
                     }
 
                     @Override

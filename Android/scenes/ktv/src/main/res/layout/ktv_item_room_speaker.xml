@@ -64,7 +64,7 @@
         android:layout_marginTop="2dp"
         android:drawableStart="@mipmap/ic_zc"
         android:drawablePadding="2dp"
-        android:text="@string/zc"
+        android:text="@string/ktv_zc"
         android:textColor="@color/white"
         android:textSize="8sp"
         android:visibility="gone"
@@ -72,4 +72,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUserName"
         tools:ignore="SmallSp" />
+
+    <FrameLayout
+        android:id="@+id/flVideoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ktv_roundStyle"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

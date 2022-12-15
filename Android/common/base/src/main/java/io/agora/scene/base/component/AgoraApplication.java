@@ -9,9 +9,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.elvishew.xlog.XLog;
 
 import io.agora.scene.base.BuildConfig;
-import io.agora.scene.base.data.provider.DataRepository;
-import io.agora.scene.base.provider.DataRepositoryImpl2;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.LogUtils;
 import io.reactivex.plugins.RxJavaPlugins;
 import me.jessyan.autosize.AutoSizeConfig;
 import me.jessyan.autosize.onAdaptListener;
@@ -30,10 +28,8 @@ public class AgoraApplication extends MultiDexApplication {
         sInstance = this;
         initARouter();
         initAutoSize();
-        RxJavaPlugins.setErrorHandler(KTVUtil::logE);
+        RxJavaPlugins.setErrorHandler(throwable -> LogUtils.INSTANCE.e("AgoraApplication", throwable.toString()));
         XLog.init();
-
-        DataRepository.Instance().setDataRepositoryImpl(new DataRepositoryImpl2());
     }
 
     private void initARouter() {
