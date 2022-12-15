@@ -266,8 +266,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         guard let userName = VoiceRoomUserInfo.shared.user?.name else { return }
         showMessage(message: AgoraChatMessage(conversationID: roomId, body: AgoraChatTextMessageBody(text: text), ext: ["userName": VoiceRoomUserInfo.shared.user?.name ?? ""]))
         VoiceRoomIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
-            if error == nil, message != nil {
-            } else {
+            if error != nil,error?.code == .moderationFailed {
                 self.view.makeToast("\(error?.errorDescription ?? "")", point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
         }
