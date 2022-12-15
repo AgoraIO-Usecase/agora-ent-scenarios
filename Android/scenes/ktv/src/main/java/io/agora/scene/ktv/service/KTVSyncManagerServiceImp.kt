@@ -667,7 +667,7 @@ class KTVSyncManagerServiceImp(
     // ===================== 打分相关 =====================
 
     override fun updateSingingScore(inputModel: UpdateSingingScoreInputModel) {
-        innerUpdateSingingScore(inputModel)
+        //innerUpdateSingingScore(inputModel)
     }
 
 
