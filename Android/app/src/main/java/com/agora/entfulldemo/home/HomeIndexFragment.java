@@ -6,17 +6,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.agora.entfulldemo.databinding.FragmentHomeIndexBinding;
+import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.manager.PagePilotManager;
 
-public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndexBinding> {
+public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
 
     @NonNull
     @Override
-    protected FragmentHomeIndexBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentHomeIndexBinding.inflate(inflater);
+    protected AppFragmentHomeIndexBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return AppFragmentHomeIndexBinding.inflate(inflater);
     }
 
     @Override
@@ -25,6 +25,6 @@ public class HomeIndexFragment extends BaseViewBindingFragment<FragmentHomeIndex
 
     @Override
     public void initListener() {
-        getBinding().bgGoKTV.setOnClickListener(view -> PagePilotManager.pageRoomList());
+        getBinding().bgGoKTV.setOnClickListener(view -> PagePilotManager.pageKTVRoomList());
     }
 }

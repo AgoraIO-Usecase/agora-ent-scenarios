@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.ViewCommonTitleBinding;
 import io.agora.scene.widget.utils.NotchUtils;
 import kotlin.jvm.JvmOverloads;
@@ -40,7 +40,7 @@ public final class CommonTitleView extends ConstraintLayout {
                     throw new NullPointerException("null cannot be cast to non-null type android.app.Activity");
                 } else {
                     if (!NotchUtils.hasNotchInScreen((Activity) var10000)) {
-                        CommonTitleView.this.setPadding(0, KTVUtil.dp2px(16), 0, 0);
+                        CommonTitleView.this.setPadding(0, UiUtil.dp2px(16), 0, 0);
                     }
 
                 }

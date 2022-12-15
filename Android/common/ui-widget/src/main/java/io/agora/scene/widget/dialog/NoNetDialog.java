@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogNoNetBinding;
 
 public class NoNetDialog extends BaseDialog<DialogNoNetBinding> {
@@ -32,8 +32,8 @@ public class NoNetDialog extends BaseDialog<DialogNoNetBinding> {
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(295),
-                KTVUtil.dp2px(276)
+                UiUtil.dp2px(295),
+                UiUtil.dp2px(276)
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;
     }
