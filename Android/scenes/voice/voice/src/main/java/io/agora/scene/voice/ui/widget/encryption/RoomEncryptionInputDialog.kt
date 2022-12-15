@@ -89,7 +89,7 @@ class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceDialogEn
             when (msg.what) {
                 BOND -> {
                     val inputMethodManager =
-                        context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
                 }
             }

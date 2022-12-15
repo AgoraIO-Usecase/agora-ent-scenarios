@@ -98,10 +98,16 @@ class VoiceCreateRepository : BaseRepository() {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
                 voiceServiceProtocol.joinRoom(roomId, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error, "")
+                    when (error) {
+                        VoiceServiceProtocol.ERR_OK -> {
+                            callBack.onSuccess(createLiveData(result))
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE -> {
+                            callBack.onError(error, "room is not existent")
+                        }
+                        else -> {
+                            callBack.onError(error, "")
+                        }
                     }
                 })
             }

@@ -70,8 +70,15 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
         recyclerView.setEmptyView(binding?.voiceNoData?.root)
     }
 
-    private fun voiceRoomObservable() {
+    override fun onResume() {
+        super.onResume()
         voiceRoomViewModel.getRoomList(0)
+        "apex ：onResume}".logD()
+    }
+
+    private fun voiceRoomObservable() {
+        "apex ：voiceRoomObservable".logD()
+//        voiceRoomViewModel.getRoomList(0)
         voiceRoomViewModel.roomListObservable().observe(requireActivity()) { response: Resource<List<VoiceRoomModel>> ->
             parseResource(response, object : OnResourceParseCallback<List<VoiceRoomModel>>() {
                 override fun onSuccess(dataList: List<VoiceRoomModel>?) {
