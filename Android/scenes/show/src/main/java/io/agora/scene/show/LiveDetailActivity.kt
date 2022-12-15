@@ -151,7 +151,11 @@ class LiveDetailActivity : AppCompatActivity() {
             showMessageInputDialog()
         }
         bottomLayout.ivSetting.setOnClickListener {
-            showSettingDialog()
+            if (interactionInfo != null && interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value && isRoomOwner) {
+                showPKSettingsDialog()
+            } else {
+                showSettingDialog()
+            }
         }
         bottomLayout.ivBeauty.setOnClickListener{
             showBeautyDialog()
@@ -396,6 +400,16 @@ class LiveDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun refreshMicMuteStatus() {
+        if (interactionInfo == null) return
+        if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
+            mBinding.videoLinkingAudienceLayout.userName.isActivated = !interactionInfo!!.muteAudio
+        } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+            mBinding.videoPKLayout.userNameA.isActivated = !interactionInfo!!.ownerMuteAudio
+            mBinding.videoPKLayout.userNameB.isActivated = !interactionInfo!!.muteAudio
+        }
+    }
+
     private fun showPermissionLeakDialog(yes: () -> Unit, no: (()->Unit)? = null) {
         AlertDialog.Builder(this).apply {
             setMessage(R.string.show_live_perms_leak_tip)
@@ -541,9 +555,12 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun showLinkSettingsDialog() {
         mLinkSettingDialog.apply {
             setAudienceInfo(interactionInfo!!.userName)
+            resetSettingsItem(interactionInfo!!.muteAudio)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
+                    LiveLinkAudienceSettingsDialog.ITEM_ID_MIC -> {
+                        mService.muteAudio(!activated, interactionInfo!!.userId)
+                    }
                     LiveLinkAudienceSettingsDialog.ITEM_ID_STOP_LINK -> {
                         if (interactionInfo != null) {
                             mService.stopInteraction(interactionInfo!!, {
@@ -697,12 +714,15 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun showPKSettingsDialog() {
         mPKSettingsDialog.apply {
+            resetSettingsItem(interactionInfo!!.ownerMuteAudio)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.enableLocalVideo(activated)
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
-                    LivePKSettingsDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
-                    LivePKSettingsDialog.ITEM_ID_STOP_LINK -> {
+                    LivePKSettingsDialog.ITEM_ID_MIC -> {
+                        mService.muteAudio(!activated, mRoomInfo.ownerId)
+                    }
+                    LivePKSettingsDialog.ITEM_ID_STOP_PK -> {
                         if (interactionInfo != null) {
                             mService.stopInteraction(interactionInfo!!, {
                                 // success
@@ -762,17 +782,24 @@ class LiveDetailActivity : AppCompatActivity() {
         mService.subscribeInteractionChanged { status, info ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
                 // 开始互动
-                interactionInfo = info
-                // UI
-                updateVideoSetting()
-                refreshBottomLayout()
-                refreshViewDetailLayout(info.interactStatus)
-                mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
-                mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
-                // RTC
-                updateLinkingMode()
-                updatePKingMode()
-                refreshPKTimeCount()
+                if (interactionInfo == null) {
+                    interactionInfo = info
+                    // UI
+                    updateVideoSetting()
+                    refreshBottomLayout()
+                    refreshViewDetailLayout(info.interactStatus)
+                    mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
+                    mPKDialog.setPKInvitationItemStatus(info.userName, info.interactStatus)
+                    // RTC
+                    updateLinkingMode()
+                    updatePKingMode()
+                    refreshPKTimeCount()
+                } else {
+                    // 互动中状态更新
+                    interactionInfo = info
+                    updateAudioMuteStatus()
+                    refreshMicMuteStatus()
+                }
             } else {
                 // 停止互动
                 // UI
@@ -980,6 +1007,19 @@ class LiveDetailActivity : AppCompatActivity() {
             )
         } else {
             VideoSetting.updateAudienceSetting()
+        }
+    }
+
+    private fun updateAudioMuteStatus() {
+        if (interactionInfo == null) return
+        if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
+            if (interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
+                mRtcEngine.enableLocalAudio(!interactionInfo!!.muteAudio)
+            }
+        } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+            if (isRoomOwner) {
+                mRtcEngine.enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
+            }
         }
     }
 

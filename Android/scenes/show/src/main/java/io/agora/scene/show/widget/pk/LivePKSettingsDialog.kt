@@ -9,6 +9,7 @@ import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetLinkSettingsDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogItemBinding
 import io.agora.scene.show.widget.BottomDarkDialog
+import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
@@ -18,13 +19,13 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
         const val ITEM_ID_SWITCH_CAMERA = 1
         const val ITEM_ID_CAMERA = 2
         const val ITEM_ID_MIC = 3
-        const val ITEM_ID_STOP_LINK = 4
+        const val ITEM_ID_STOP_PK = 4
 
         @IntDef(
             ITEM_ID_SWITCH_CAMERA,
             ITEM_ID_CAMERA,
             ITEM_ID_MIC,
-            ITEM_ID_STOP_LINK
+            ITEM_ID_STOP_PK
         )
         @Retention(AnnotationRetention.RUNTIME)
         @Target(
@@ -73,9 +74,9 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
             true
         ),
         SettingItem(
-            ITEM_ID_STOP_LINK,
-            R.mipmap.show_setting_ic_statistic,
-            R.mipmap.show_setting_ic_statistic,
+            ITEM_ID_STOP_PK,
+            R.mipmap.show_stop_link,
+            R.mipmap.show_stop_link,
             R.string.show_stop_linking,
             R.string.show_stop_linking
         )
@@ -140,6 +141,42 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
         mBinding.recycleView.adapter = mAdapter
         mAdapter.resetAll(mHostItemList)
         mBinding.userName.setText(R.string.show_pk)
+    }
+
+    fun resetSettingsItem(mute: Boolean) {
+        val itemList = listOf(
+            SettingItem(
+                ITEM_ID_SWITCH_CAMERA,
+                R.mipmap.show_setting_ic_camera,
+                R.mipmap.show_setting_ic_camera,
+                R.string.show_setting_switch_camera,
+                R.string.show_setting_switch_camera
+            ),
+            SettingItem(
+                ITEM_ID_CAMERA,
+                R.mipmap.show_setting_ic_video_off,
+                R.mipmap.show_setting_ic_video_on,
+                R.string.show_setting_video_off,
+                R.string.show_setting_video_on,
+                true
+            ),
+            SettingItem(
+                ITEM_ID_MIC,
+                R.mipmap.show_setting_ic_mic_off,
+                R.mipmap.show_setting_ic_mic_on,
+                R.string.show_setting_mic_off,
+                R.string.show_setting_mic_on,
+                !mute
+            ),
+            SettingItem(
+                ITEM_ID_STOP_PK,
+                R.mipmap.show_stop_link,
+                R.mipmap.show_stop_link,
+                R.string.show_stop_linking,
+                R.string.show_stop_linking
+            )
+        )
+        mAdapter.resetAll(itemList)
     }
 
     fun setOnItemActivateChangedListener(listener: (dialog: LivePKSettingsDialog, itemId: Int, activated: Boolean)->Unit) {

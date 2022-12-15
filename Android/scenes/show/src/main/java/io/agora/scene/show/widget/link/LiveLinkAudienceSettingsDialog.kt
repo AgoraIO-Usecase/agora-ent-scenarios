@@ -121,6 +121,26 @@ class LiveLinkAudienceSettingsDialog(context: Context) : BottomDarkDialog(contex
         mAdapter.resetAll(mHostItemList)
     }
 
+    fun resetSettingsItem(mute: Boolean) {
+        val itemList = listOf(
+            SettingItem(
+                ITEM_ID_MIC,
+                R.mipmap.show_setting_ic_mic_off,
+                R.mipmap.show_setting_ic_mic_on,
+                R.string.show_setting_mic_off,
+                R.string.show_setting_mic_on,
+                !mute
+            ),
+            SettingItem(
+                ITEM_ID_STOP_LINK,
+                R.mipmap.show_stop_link,
+                R.mipmap.show_stop_link,
+                R.string.show_stop_linking,
+                R.string.show_stop_linking
+            ))
+        mAdapter.resetAll(itemList)
+    }
+
     fun setAudienceInfo(userName : String) {
         mBinding.userName.text = "对观众$userName"
     }

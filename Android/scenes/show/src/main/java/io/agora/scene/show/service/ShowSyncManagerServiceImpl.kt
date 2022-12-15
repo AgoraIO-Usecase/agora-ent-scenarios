@@ -552,7 +552,7 @@ class ShowSyncManagerServiceImpl(
 
         val indexOf = pKInvitationList.indexOf(targetInvitation)
         pKInvitationList[indexOf] = invitation
-        innerUpdatePKInvitation(objIdOfPKInvitation[indexOf], invitation, success, error)
+        innerUpdatePKInvitation(currRoomNo, objIdOfPKInvitation[indexOf], invitation, success, error)
 
         val interaction = ShowInteractionInfo(
             invitation.fromUserId,
@@ -592,7 +592,7 @@ class ShowSyncManagerServiceImpl(
 
         val indexOf = pKInvitationList.indexOf(targetInvitation)
         pKInvitationList[indexOf] = invitation
-        innerUpdatePKInvitation(objIdOfPKInvitation[indexOf], invitation, success, error)
+        innerUpdatePKInvitation(currRoomNo, objIdOfPKInvitation[indexOf], invitation, success, error)
     }
 
     override fun getAllInterationList(
@@ -662,6 +662,74 @@ class ShowSyncManagerServiceImpl(
                 ShowRoomRequestStatus.idle.value,
             )
             innerUpdateUserRoomRequestStatus(userItem, {}, {})
+        }
+    }
+
+    override fun muteAudio(
+        mute: Boolean,
+        userId: String,
+        success: (() -> Unit)?,
+        error: ((Exception) -> Unit)?
+    ) {
+        // 连麦
+        val oldInteraction = interactionInfoList.filter { it.userId == userId }.getOrNull(0)
+        if (oldInteraction != null) {
+            val indexOf = interactionInfoList.indexOf(oldInteraction)
+            val objId = objIdOfInteractionInfo[indexOf]
+
+            val interaction = ShowInteractionInfo(
+                oldInteraction.userId,
+                oldInteraction.userName,
+                oldInteraction.roomId,
+                oldInteraction.interactStatus,
+                mute,
+                oldInteraction.ownerMuteAudio,
+                oldInteraction.createdAt
+            )
+            innerUpdateInteraction(objId, interaction, null, null)
+        }
+
+        // pk
+        if (pKCompetitorInvitationList.isEmpty()) {
+            // pk 对象
+            val invitation = pKInvitationList.filter { it.userId == userId }.getOrNull(0)
+            if (invitation != null) {
+                val index = pKInvitationList.indexOf(invitation)
+                val invitation = ShowPKInvitation(
+                    invitation.userId,
+                    invitation.userName,
+                    invitation.roomId,
+                    invitation.fromUserId,
+                    invitation.fromName,
+                    invitation.fromRoomId,
+                    invitation.status,
+                    mute,
+                    invitation.fromUserMuteAudio,
+                    invitation.createAt
+                )
+                val objId = objIdOfPKInvitation[index]
+                innerUpdatePKInvitation(currRoomNo, objId, invitation, null, null)
+            }
+        } else {
+            // pk 发起者
+            val invitation = pKCompetitorInvitationList.filter { it.fromUserId == userId }.getOrNull(0)
+            if (invitation != null) {
+                val index = pKCompetitorInvitationList.indexOf(invitation)
+                val objId = objIdOfPKCompetitorInvitation[index]
+                val invitation = ShowPKInvitation(
+                    invitation.userId,
+                    invitation.userName,
+                    invitation.roomId,
+                    invitation.fromUserId,
+                    invitation.fromName,
+                    invitation.fromRoomId,
+                    invitation.status,
+                    invitation.userMuteAudio,
+                    mute,
+                    invitation.createAt
+                )
+                innerUpdatePKInvitation(invitation.roomId, objId, invitation, null, null)
+            }
         }
     }
 
@@ -1260,12 +1328,13 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun innerUpdatePKInvitation(
+        roomId: String,
         objectId: String,
         pkInvitation: ShowPKInvitation,
         success: (() -> Unit)?,
         error: ((Exception) -> Unit)?
     ) {
-        sceneReferenceMap[currRoomNo]?.collection(kCollectionIdPKInvitation)
+        sceneReferenceMap[roomId]?.collection(kCollectionIdPKInvitation)
             ?.update(objectId, pkInvitation, object : Sync.Callback {
                 override fun onSuccess() {
                     runOnMainThread { success?.invoke() }
@@ -1313,6 +1382,25 @@ class ShowSyncManagerServiceImpl(
                     val indexOf = pKInvitationList.indexOf(list[0])
                     pKInvitationList[indexOf] = info
                     objIdOfPKInvitation[indexOf] = item.id
+                }
+
+                if (interactionInfoList.isNotEmpty()) {
+                    val oldInteraction = interactionInfoList.filter { it.userId == info.fromUserId }.getOrNull(0)
+                    if (oldInteraction != null) {
+                        val indexOf = interactionInfoList.indexOf(oldInteraction)
+                        val objId = objIdOfInteractionInfo[indexOf]
+
+                        val interaction = ShowInteractionInfo(
+                            oldInteraction.userId,
+                            oldInteraction.userName,
+                            oldInteraction.roomId,
+                            oldInteraction.interactStatus,
+                            info.fromUserMuteAudio,
+                            info.userMuteAudio,
+                            oldInteraction.createdAt
+                        )
+                        innerUpdateInteraction(objId, interaction, null, null)
+                    }
                 }
 
                 runOnMainThread {
@@ -1364,7 +1452,8 @@ class ShowSyncManagerServiceImpl(
                     objIdOfPKCompetitorInvitation[indexOf] = item.id
                 }
 
-                if (info.status == ShowRoomRequestStatus.accepted.value) {
+                if (interactionInfoList.isEmpty() && info.status == ShowRoomRequestStatus.accepted.value) {
+                    // 当前未互动
                     val interaction = ShowInteractionInfo(
                         info.userId,
                         info.userName,
@@ -1375,6 +1464,23 @@ class ShowSyncManagerServiceImpl(
                         createdAt = info.createAt
                     )
                     innerCreateInteraction(interaction, null, null)
+                } else {
+                    val oldInteraction = interactionInfoList.filter { it.userId == info.userId }.getOrNull(0)
+                    if (oldInteraction != null) {
+                        val indexOf = interactionInfoList.indexOf(oldInteraction)
+                        val objId = objIdOfInteractionInfo[indexOf]
+
+                        val interaction = ShowInteractionInfo(
+                            oldInteraction.userId,
+                            oldInteraction.userName,
+                            oldInteraction.roomId,
+                            oldInteraction.interactStatus,
+                            info.userMuteAudio,
+                            info.fromUserMuteAudio,
+                            oldInteraction.createdAt
+                        )
+                        innerUpdateInteraction(objId, interaction, null, null)
+                    }
                 }
 
                 runOnMainThread {
@@ -1528,16 +1634,11 @@ class ShowSyncManagerServiceImpl(
 
             override fun onDeleted(item: IObject?) {
                 Log.d(TAG, "innerSubscribeInteractionChanged onDeleted")
-//                val info = item?.toObject(ShowInteractionInfo::class.java) ?: return
-//                val apply = micSeatApplyList.filter { it.userId == info.userId }.getOrNull(0) ?: return
-//                val index = micSeatApplyList.indexOf(apply)
-//                innerRemoveSeatApply(objIdOfSeatApply[index], {}, {})
-//                val list = interactionInfoList.filter { it.userId == info.userId }
-//                if (!list.isEmpty()) {
-//                    val indexOf = interactionInfoList.indexOf(list[0])
-//                    interactionInfoList.removeAt(indexOf)
-//                    objIdOfInteractionInfo.removeAt(indexOf)
-//                }
+                val objId = item!!.id
+                val index = objIdOfInteractionInfo.indexOf(objId)
+                objIdOfInteractionInfo.removeAt(index)
+                interactionInfoList.removeAt(index)
+
                 runOnMainThread {
                     micInteractionInfoSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
