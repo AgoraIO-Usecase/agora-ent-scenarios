@@ -1,27 +1,32 @@
 package io.agora.scene.ktv.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ContentFrameLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 
-import io.agora.lrcview.LrcView;
-import io.agora.lrcview.PitchView;
+import io.agora.lyrics_view.LrcView;
+import io.agora.lyrics_view.PitchView;
+import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
-import io.agora.scene.ktv.manager.RoomManager;
-import io.agora.scene.ktv.service.VLRoomSelSongModel;
+import io.agora.scene.ktv.service.RoomSelSongModel;
 
 /**
  * 歌词控制View
@@ -45,7 +50,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
 
     public enum Role {
-        Singer, Listener
+        Singer, Listener, Partner
     }
 
     private Role mRole = Role.Listener;
@@ -76,6 +81,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) getLayoutParams();
+
+        float heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        if (heightPixels > 1280 * 2) { // 2K/Slim screen
+            params.bottomMargin = (int) (120 * density);
+            setLayoutParams(params);
+        }
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mBinding = null;
@@ -99,11 +118,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setOnLrcClickListener(OnLrcActionListener mOnLrcActionListener) {
         this.mOnLrcActionListener = mOnLrcActionListener;
-        mBinding.ilActive.lrcView.setActionListener(this.mOnLrcActionListener);
+        mBinding.ilActive.lrcView.setSeekListener(mOnLrcActionListener);
     }
 
-    public void setPitchViewOnActionListener(PitchView.OnActionListener onActionListener) {
-        mBinding.ilActive.pitchView.onActionListener = onActionListener;
+    public void setPitchViewOnActionListener(PitchView.OnSingScoreListener onActionListener) {
+        mBinding.ilActive.pitchView.setSingScoreListener(onActionListener);
     }
 
     private CountDownTimer mCountDownLatch;
@@ -169,17 +188,13 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         stopTimer();
     }
 
-    public void onPrepareStatus() {
+    public void onPrepareStatus(boolean isMineOwner) {
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
-//        if (RoomManager.getInstance().mMusicModel != null
-//                && RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-//            this.mRole = Role.Singer;
-//        }
         if (this.mRole == Role.Singer) {
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
@@ -191,28 +206,25 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
         }
-        if (RoomManager.mMine.isMaster) {
+        if (isMineOwner) {
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             if (this.mRole != Role.Singer) {
-                mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
-                mBinding.ilActive.switchOriginal.setVisibility(View.GONE);
-                mBinding.ilActive.ivMusicMenu.setVisibility(View.GONE);
+                mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
             }
         }
-//        else if (RoomManager.getInstance().mMusicModel == null || !RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)) {
-//            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
-//        }
         stopTimer();
     }
 
-    public void onPlayStatus() {
+    public void onPlayStatus(RoomSelSongModel songPlaying) {
         stopTimer();
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
-        setScoreControlView();
+        setScoreControlView(songPlaying);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setBackgroundResource(backgroundResId);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
@@ -220,16 +232,17 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivMusicStart.setImageResource(R.mipmap.ktv_ic_pause);
     }
 
-    public void setScoreControlView() {
-        if (RoomManager.getInstance().mMusicModel != null && RoomManager.getInstance().mMusicModel.isChorus) {
-            if (RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userNo)
-                    || RoomManager.mMine.userNo.equals(RoomManager.getInstance().mMusicModel.userId)) {
+    public void setScoreControlView(RoomSelSongModel songPlaying) {
+        if (songPlaying != null && songPlaying.isChorus()) {
+            if (UserManager.getInstance().getUser().userNo.equals(songPlaying.getUserNo())) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
+                mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
             } else {
                 mBinding.scoreControlView.setVisibility(GONE);
             }
-        } else if (RoomManager.getInstance().mMusicModel != null && !RoomManager.getInstance().mMusicModel.isJoin) {
+        } else if (songPlaying != null && !songPlaying.isChorus()) {
             mBinding.scoreControlView.setVisibility(VISIBLE);
+            mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
         } else {
             mBinding.scoreControlView.setVisibility(GONE);
         }
@@ -263,13 +276,19 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.lrcView.setEnableDrag(true);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(true);
+        } else if (this.mRole == Role.Partner) {
+            mBinding.ilActive.lrcView.setEnableDrag(false);
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
-            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);
         }
     }
 
-    public void setMusic(@NonNull VLRoomSelSongModel mMusic) {
+    public void setMusic(@NonNull RoomSelSongModel mMusic) {
         mBinding.ilActive.lrcView.reset();
         mBinding.ilActive.pitchView.setLrcData(null);
 
@@ -306,7 +325,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void updateScore(double score) {
-        mBinding.scoreControlView.setText(getContext().getString(R.string.score_formatter, score));
+        mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, score));
     }
 
     @Override
@@ -332,7 +351,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.switchOriginal.setChecked(checked);
     }
 
-    public interface OnLrcActionListener extends LrcView.OnActionListener {
+    public interface OnLrcActionListener extends LrcView.OnLyricsSeekListener {
         default void onSwitchOriginalClick() {
         }
 

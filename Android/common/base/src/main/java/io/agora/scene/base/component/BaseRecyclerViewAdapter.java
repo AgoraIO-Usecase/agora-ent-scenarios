@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 
 /**
  * 基础RecyclerView adapter
@@ -106,7 +106,7 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
     public B getViewBindingByReflect(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         ensureBindingClass();
         try {
-            return KTVUtil.getViewBinding(bindingClass, inflater, container);
+            return UiUtil.getViewBinding(bindingClass, inflater, container);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -207,7 +207,7 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
     //</editor-fold>
     public void ensureBindingClass() {
         if (bindingClass == null)
-            bindingClass = KTVUtil.getGenericClass(viewHolderClass, 0);
+            bindingClass = UiUtil.getGenericClass(viewHolderClass, 0);
     }
 
     public static abstract class BaseViewHolder<B extends ViewBinding, T> extends RecyclerView.ViewHolder {
