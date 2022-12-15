@@ -84,7 +84,7 @@ class ShowAgoraKitManager: NSObject {
     private func setupContentInspectConfig() {
         let config = AgoraContentInspectConfig()
         let dic: [String: String] = [
-            "userNo": VLUserCenter.user.id,
+            "id": VLUserCenter.user.id,
             "sceneName": "show"
         ]
         
@@ -105,7 +105,8 @@ class ShowAgoraKitManager: NSObject {
     /// 语音审核
     private func moderationAudio(channelName: String, role: AgoraClientRole) {
         guard role == .broadcaster else { return }
-        let userInfo = ["userId": VLUserCenter.user.id,
+        let userInfo = ["id": VLUserCenter.user.id,
+                        "sceneName": "show",
                         "userName": VLUserCenter.user.name]
         let parasm: [String: Any] = ["appId": KeyCenter.AppId,
                                      "channelName": channelName,
