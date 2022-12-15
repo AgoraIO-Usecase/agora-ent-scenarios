@@ -192,7 +192,7 @@ class VoiceSyncManagerServiceImp(
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
                     if (roomMap[roomId] == null){
-                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_NOT_EXIST, false)
                         " room is not existent ".logE()
                     }
                     val curRoomInfo = roomMap[roomId]?: return
