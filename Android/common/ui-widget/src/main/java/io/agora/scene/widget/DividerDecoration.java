@@ -6,7 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 
 /**
  * 分割线
@@ -20,14 +20,14 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
     private final int spanCount;
 
     public DividerDecoration(int spanCount) {
-        gapHorizontal = (int) KTVUtil.dp2px(16);
+        gapHorizontal = (int) UiUtil.dp2px(16);
         gapVertical = gapHorizontal;
         this.spanCount = spanCount;
     }
 
     public DividerDecoration(int spanCount, int gapHorizontal, int gapHeight) {
-        this.gapHorizontal = (int) KTVUtil.dp2px(gapHorizontal);
-        this.gapVertical = (int) KTVUtil.dp2px(gapHeight);
+        this.gapHorizontal = (int) UiUtil.dp2px(gapHorizontal);
+        this.gapVertical = (int) UiUtil.dp2px(gapHeight);
         this.spanCount = spanCount;
     }
 

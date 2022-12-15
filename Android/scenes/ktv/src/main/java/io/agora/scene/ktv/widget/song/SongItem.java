@@ -5,20 +5,24 @@ public class SongItem {
     public String songNo;// 歌曲的唯一标识
     public String songName;
     public String imageUrl; // 歌曲封面
+    public String singer; // 歌手名
 
     // 已点歌曲信息
     public String chooser; // 点歌人
     public boolean isChosen; // 是否已被点
     public boolean isChorus; // 是否是合唱
 
-    public SongItem(String songNo, String songName, String imageUrl) {
-        this(songNo, songName, imageUrl, "", false, false);
+    public SongItem(String songNo, String songName, String imageUrl, String singer) {
+        this(songNo, songName, imageUrl, singer, "", false, false);
     }
 
-    public SongItem(String songNo, String songName, String imageUrl, String chooser, boolean isChosen, boolean isChorus) {
+    public SongItem(String songNo, String songName,
+                    String imageUrl, String singer,
+                    String chooser, boolean isChosen, boolean isChorus) {
         this.songNo = songNo;
         this.songName = songName;
         this.imageUrl = imageUrl;
+        this.singer = singer;
         this.chooser = chooser;
         this.isChosen = isChosen;
         this.isChorus = isChorus;
