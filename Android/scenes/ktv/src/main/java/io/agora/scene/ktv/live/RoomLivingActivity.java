@@ -114,6 +114,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             roomLivingViewModel.haveSeat(position);
+                            getBinding().cbMic.setChecked(false);
                             requestRecordPermission();
                         }
                     }
