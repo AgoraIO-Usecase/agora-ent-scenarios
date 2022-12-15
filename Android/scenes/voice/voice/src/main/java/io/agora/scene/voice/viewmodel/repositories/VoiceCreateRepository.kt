@@ -102,7 +102,7 @@ class VoiceCreateRepository : BaseRepository() {
                         VoiceServiceProtocol.ERR_OK -> {
                             callBack.onSuccess(createLiveData(result))
                         }
-                        VoiceServiceProtocol.ERR_ROOM_NOT_EXIST -> {
+                        VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE -> {
                             callBack.onError(error, "room is not existent")
                         }
                         else -> {
