@@ -178,4 +178,12 @@ interface ShowServiceProtocol {
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
+
+    // 静音设置
+    fun muteAudio(
+        mute: Boolean,
+        userId: String,
+        success: (() -> Unit)? = null,
+        error: ((Exception) -> Unit)? = null
+    )
 }
