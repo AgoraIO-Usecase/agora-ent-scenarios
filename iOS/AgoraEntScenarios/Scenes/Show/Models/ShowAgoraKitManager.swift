@@ -268,6 +268,10 @@ extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
         return true
     }
     
+    func onRenderVideoFrame(_ videoFrame: AgoraOutputVideoFrame, uid: UInt, channelId: String) -> Bool {
+        true
+    }
+    
     func getVideoFormatPreference() -> AgoraVideoFormat {
         .cvPixelBGRA
     }
