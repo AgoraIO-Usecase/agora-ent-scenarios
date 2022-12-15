@@ -25,8 +25,11 @@ abstract class SongChooseViewAdapter extends BindingSingleAdapter<SongItem, KtvI
             v.setSelected(!v.isSelected());
             return true;
         });
+        binding.tvSinger.setText(data.singer);
         binding.coverItemSongList.setVisibility(View.VISIBLE);
         GlideApp.with(binding.coverItemSongList).load(data.imageUrl)
+                .fallback(R.mipmap.ktv_ic_song_default)
+                .error(R.mipmap.ktv_ic_song_default)
                 .transform(new CenterCropRoundCornerTransform(10))
                 .into(binding.coverItemSongList);
         if (data.isChosen) {

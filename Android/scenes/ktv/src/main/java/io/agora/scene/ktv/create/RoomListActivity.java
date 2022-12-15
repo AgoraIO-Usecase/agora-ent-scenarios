@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.create;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,28 +12,24 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import io.agora.scene.base.KtvConstant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.manager.PagePilotManager;
-import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.SPUtil;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
 import io.agora.scene.ktv.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
-import io.agora.scene.ktv.service.VLRoomListModel;
+import io.agora.scene.ktv.service.RoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 
 /**
  * 房间列表
  */
-@Route(path = PagePathConstant.pageRoomList)
+@Route(path = PagePathConstant.pageKTVRoomList)
 public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBinding> {
-    private BaseRecyclerViewAdapter<ItemRoomListBinding, VLRoomListModel, RoomHolder> mAdapter;
+    private BaseRecyclerViewAdapter<ItemRoomListBinding, RoomListModel, RoomHolder> mAdapter;
     private RoomCreateViewModel roomCreateViewModel;
     private InputPasswordDialog inputPasswordDialog;
 
@@ -49,17 +46,16 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     }
 
     private void loadRoomList() {
-        SPUtil.putBoolean(KtvConstant.IS_AGREE, true);
         roomCreateViewModel.loadRooms();
     }
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
         roomCreateViewModel = new ViewModelProvider(this).get(RoomCreateViewModel.class);
-        mAdapter = new BaseRecyclerViewAdapter<>(null, new OnItemClickListener<VLRoomListModel>() {
+        mAdapter = new BaseRecyclerViewAdapter<>(null, new OnItemClickListener<RoomListModel>() {
             @Override
-            public void onItemClick(@NonNull VLRoomListModel data, View view, int position, long viewType) {
-                if (data.isPrivate() && !UserManager.getInstance().getUser().userNo.equals(data.getCreatorNo())) {
+            public void onItemClick(@NonNull RoomListModel data, View view, int position, long viewType) {
+                if (data.isPrivate()) {
                     showInputPwdDialog(data);
                 } else {
                     // RoomManager.getInstance().setAgoraRoom(data);
@@ -75,15 +71,15 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
     @Override
     public void initListener() {
         getBinding().btnCreateRoom.setOnClickListener(view -> {
-            PagePilotManager.pageCreateRoomStep1();
+            startActivity(new Intent(this, RoomCreateActivity.class));
         });
         getBinding().btnCreateRoom2.setOnClickListener(view -> {
-            PagePilotManager.pageCreateRoomStep1();
+            startActivity(new Intent(this, RoomCreateActivity.class));
         });
         roomCreateViewModel.roomModelList.observe(this, vlRoomListModels -> {
             hideLoadingView();
             getBinding().smartRefreshLayout.finishRefresh();
-            if (vlRoomListModels == null) {
+            if (vlRoomListModels == null || vlRoomListModels.isEmpty()) {
                 getBinding().rvRooms.setVisibility(View.GONE);
                 getBinding().btnCreateRoom.setVisibility(View.GONE);
                 getBinding().tvTips1.setVisibility(View.VISIBLE);
@@ -100,7 +96,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         });
         roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
             if (ktvJoinRoomOutputModel == null) {
-                ToastUtils.showToast("密码不正确");
                 setDarkStatusIcon(isBlackDarkStatus());
             } else {
                 RoomLivingActivity.launch(RoomListActivity.this, ktvJoinRoomOutputModel);
@@ -111,14 +106,12 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         });
     }
 
-    private void showInputPwdDialog(VLRoomListModel data) {
+    private void showInputPwdDialog(RoomListModel data) {
         if (inputPasswordDialog == null) {
             inputPasswordDialog = new InputPasswordDialog(this);
         }
         inputPasswordDialog.clearContent();
         inputPasswordDialog.iSingleCallback = (type, o) -> {
-            data.setPassword((String) o);
-            // RoomManager.getInstance().setAgoraRoom(data);
             roomCreateViewModel.joinRoom(data.getRoomNo(), (String) o);
         };
         inputPasswordDialog.show();
