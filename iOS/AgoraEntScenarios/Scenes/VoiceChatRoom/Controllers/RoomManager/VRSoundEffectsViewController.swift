@@ -71,44 +71,42 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     }
 
     @objc private func entryRoom() {
-            AgoraChatClient.shared().logout(false)
-            SVProgressHUD.show(withStatus: "Loading".localized())
-            self.view.window?.isUserInteractionEnabled = false
-            let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-            let entity = self.createEntity()
-            ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
-                entity.chatroom_id = room_id
-                entity.owner = VoiceRoomUserInfo.shared.user
-                entity.owner?.chat_uid = uid
-                VLUserCenter.user.im_token = im_token
-                VLUserCenter.user.chat_uid = uid
-                if im_token.isEmpty || uid.isEmpty {
-                    SVProgressHUD.dismiss()
-                    SVProgressHUD.showError(withStatus: "Fetch IMConfig failed!")
-                    return
-                }
-                VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
-                    SVProgressHUD.dismiss()
-                    if error == nil {
-                        ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
-                            SVProgressHUD.dismiss()
-                            self.view.window?.isUserInteractionEnabled = true
-                            if let room = room {
-                                SVProgressHUD.showSuccess(withStatus: "Room Created".localized())
-                                self.entryRoom(room: room)
-                            } else {
-                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
-                            }
-                        }
-                    } else {
-                        self.view.window?.isUserInteractionEnabled = true
-                        SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
-                    }
-                })
-                
+        AgoraChatClient.shared().logout(false)
+        SVProgressHUD.show(withStatus: "Loading".localized())
+        self.view.window?.isUserInteractionEnabled = false
+        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+        let entity = self.createEntity()
+        ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+            entity.chatroom_id = room_id
+            entity.owner = VoiceRoomUserInfo.shared.user
+            entity.owner?.chat_uid = uid
+            VLUserCenter.user.im_token = im_token
+            VLUserCenter.user.chat_uid = uid
+            if im_token.isEmpty || uid.isEmpty {
+                SVProgressHUD.dismiss()
+                SVProgressHUD.showError(withStatus: "Fetch IMConfig failed!")
+                return
             }
-            
+            VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
+                SVProgressHUD.dismiss()
+                if error == nil {
+                    ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
+                        SVProgressHUD.dismiss()
+                        self.view.window?.isUserInteractionEnabled = true
+                        if let room = room,error == nil {
+                            self.entryRoom(room: room)
+                        } else {
+                            SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                        }
+                    }
+                }else {
+                    self.view.window?.isUserInteractionEnabled = true
+                    SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
+                }
+                
+            })
         }
+    }
     
     private func createEntity() -> VRRoomEntity {
         let entity: VRRoomEntity = VRRoomEntity()
