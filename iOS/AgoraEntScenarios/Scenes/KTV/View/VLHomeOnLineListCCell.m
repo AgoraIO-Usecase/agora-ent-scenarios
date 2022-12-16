@@ -8,7 +8,7 @@
 #import "VLHotSpotBtn.h"
 #import "VLMacroDefine.h"
 #import "VLFontUtils.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import QMUIKit;
 @import YYCategories;
@@ -73,7 +73,7 @@
     self.joinBtn.layer.cornerRadius = 12;
     [self.joinBtn setBackgroundColor:UIColorWhite];
     self.joinBtn.layer.masksToBounds = YES;
-    [self.joinBtn setTitle:NSLocalizedString(@"加入", nil) forState:UIControlStateNormal];
+    [self.joinBtn setTitle:KTVLocalizedString(@"加入") forState:UIControlStateNormal];
     [self.joinBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.joinBtn.titleLabel.font = VLUIFontMake(12);
     [self.joinBtn addTarget:self action:@selector(joinBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
@@ -87,15 +87,15 @@
 - (void)setListModel:(VLRoomListModel *)listModel {
     _listModel = listModel;
     self.bgImgView.image = [UIImage sceneImageWithName:@"online_list_itemBgIcon"];
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%d",[listModel.icon intValue]]];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%d.jpg", [listModel.icon intValue] + 1];
+    self.iconImgView.image = [UIImage sceneImageWithName:iconName];
     if (listModel.isPrivate) {
         self.lockImgView.hidden = NO;
-    }else{
+    } else {
         self.lockImgView.hidden = YES;
     }
     self.titleLabel.text = listModel.name;
-    self.countLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@人", nil),listModel.roomPeopleNum];
-    
+    self.countLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%@人"),listModel.roomPeopleNum];
 }
 
 @end

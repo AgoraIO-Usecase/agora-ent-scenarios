@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.AgoraKTV" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="app_Theme.AgoraKTV" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -16,7 +16,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
     </style>
 
-    <style name="tv_mine_style">
+    <style name="app_tv_mine_style">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textSize">14sp</item>
