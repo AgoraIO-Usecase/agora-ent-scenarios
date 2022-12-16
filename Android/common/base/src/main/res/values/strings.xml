@@ -3,6 +3,5 @@
     <string name="try_again_to_exit">Try again to exit</string>
     <string name="permission_leak_tip">The required permissions should be open firstly.</string>
 
-    <string name="ktv_lrc_load_fail">加载失败</string>
     <string name="id_is_">ID:%s</string>
 </resources>
