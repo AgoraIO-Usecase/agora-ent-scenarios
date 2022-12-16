@@ -152,15 +152,18 @@ static const bool USE_PIPELINE = YES;
         [self loadResource:-1];
     }
 #endif
-    bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
-    CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret);
-    ret = bef_effect_ai_set_orientation(_handle, rotate);
-    CHECK_RET_AND_RETURN(bef_effect_ai_set_orientation, ret);
-    ret = bef_effect_ai_algorithm_texture(_handle, texture, timeStamp);
-    CHECK_RET_AND_RETURN(bef_effect_ai_algorithm_texture, ret);
-    ret = bef_effect_ai_process_texture(_handle, texture, outputTexture, timeStamp);
-    CHECK_RET_AND_RETURN(bef_effect_ai_process_texture, ret);
-    return ret;
+    if (_handle) {
+        bef_effect_result_t ret = bef_effect_ai_set_width_height(_handle, width, height);
+        CHECK_RET_AND_RETURN(bef_effect_ai_set_width_height, ret);
+        ret = bef_effect_ai_set_orientation(_handle, rotate);
+        CHECK_RET_AND_RETURN(bef_effect_ai_set_orientation, ret);
+        ret = bef_effect_ai_algorithm_texture(_handle, texture, timeStamp);
+        CHECK_RET_AND_RETURN(bef_effect_ai_algorithm_texture, ret);
+        ret = bef_effect_ai_process_texture(_handle, texture, outputTexture, timeStamp);
+        CHECK_RET_AND_RETURN(bef_effect_ai_process_texture, ret);
+        return ret;
+    }
+    return 0;
 }
 
 - (void) setFilterPath:(NSString *)path {
@@ -657,7 +660,9 @@ static const bool USE_PIPELINE = YES;
 }
 
 - (void)loadResource:(int)timeout {
-    bef_effect_ai_load_resource_with_timeout(_handle, timeout);
+    if (_handle && timeout > 0) {
+        bef_effect_ai_load_resource_with_timeout(_handle, timeout);
+    }
 }
 
 - (void)addMsgHandler:(id<RenderMsgDelegate>)handler
