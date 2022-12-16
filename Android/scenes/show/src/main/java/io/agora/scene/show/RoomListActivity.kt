@@ -30,7 +30,7 @@ class RoomListActivity : AppCompatActivity() {
     private fun initView() {
         mBinding.titleView.setLeftClick { finish() }
         mBinding.titleView.setRightIconClick {
-            showAudienceSetenting()
+            showAudienceSetting()
         }
         mRoomAdapter = object : BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>() {
             override fun onBindViewHolder(
@@ -86,7 +86,7 @@ class RoomListActivity : AppCompatActivity() {
         })
     }
 
-    private fun showAudienceSetenting(){
+    private fun showAudienceSetting(){
         PresetAudienceDialog(this)
             .show()
     }
