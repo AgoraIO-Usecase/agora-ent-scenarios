@@ -18,6 +18,7 @@ class ShowLiveViewController: UIViewController {
     
     var audiencePresetType: ShowPresetType?
     
+    //TODO: remove
     private lazy var settingMenuVC: ShowToolMenuViewController = {
         let settingMenuVC = ShowToolMenuViewController()
         settingMenuVC.type = ShowMenuType.idle_audience
@@ -48,6 +49,9 @@ class ShowLiveViewController: UIViewController {
     private var role: AgoraClientRole {
         return room?.ownerId == VLUserCenter.user.id ? .broadcaster : .audience
     }
+    
+    //TODO:
+    let channelOptions:AgoraRtcChannelMediaOptions = AgoraRtcChannelMediaOptions()
     
     // 音乐
     private lazy var musicManager: ShowMusicManager? = {
@@ -110,14 +114,16 @@ class ShowLiveViewController: UIViewController {
                 liveView.canvasView.isLocalMuteMic = interaction.ownerMuteAudio
                 liveView.canvasView.isRemoteMuteMic = interaction.muteAudio
                 
-                let options = AgoraRtcChannelMediaOptions()
+//                let options = self.channelOptions
                 if role == .broadcaster {
-                    options.publishMicrophoneTrack = !interaction.ownerMuteAudio
-                    agoraKitManager.agoraKit.updateChannel(with: options)
+//                    options.publishMicrophoneTrack = !interaction.ownerMuteAudio
+//                    agoraKitManager.agoraKit.updateChannel(with: options)
+                    self.muteLocalAudio = interaction.ownerMuteAudio
                     
                 } else if interaction.userId == VLUserCenter.user.id {
-                    options.publishMicrophoneTrack = !interaction.muteAudio
-                    agoraKitManager.agoraKit.updateChannel(with: options)
+//                    options.publishMicrophoneTrack = !interaction.muteAudio
+//                    agoraKitManager.agoraKit.updateChannel(with: options)
+                    self.muteLocalAudio = interaction.muteAudio
                 }
             }
             
@@ -149,8 +155,16 @@ class ShowLiveViewController: UIViewController {
     
     private var muteLocalAudio: Bool = false {
         didSet {
-            let options = AgoraRtcChannelMediaOptions()
+            let options = self.channelOptions
             options.publishMicrophoneTrack = !muteLocalAudio
+            agoraKitManager.agoraKit.updateChannel(with: options)
+        }
+    }
+    
+    private var muteLocalVideo: Bool = false {
+        didSet {
+            let options = self.channelOptions
+            options.publishCameraTrack = !muteLocalVideo
             agoraKitManager.agoraKit.updateChannel(with: options)
         }
     }
@@ -218,6 +232,8 @@ class ShowLiveViewController: UIViewController {
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
         
         sendMessageWithText("join_live_room".show_localized)
+        self.muteLocalVideo = false
+        self.muteLocalAudio = false
     }
     
     private func sendMessageWithText(_ text: String) {
@@ -524,6 +540,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             if room?.roomId != interaction.roomId {
                 agoraKitManager.joinChannelEx(channelName: interaction.roomId,
                                               ownerId: interaction.userId,
+                                              options: self.channelOptions,
                                               view: liveView.canvasView.remoteView,
                                               role: role)
                 liveView.canvasView.canvasType = .pk
@@ -536,8 +553,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             agoraKitManager.switchRole(role: (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience,
-                                            uid: interaction.userId,
-                                            canvasView: liveView.canvasView.remoteView)
+                                       options: self.channelOptions,
+                                       uid: interaction.userId,
+                                       canvasView: liveView.canvasView.remoteView)
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
@@ -553,14 +571,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             agoraKitManager.leaveChannelEx()
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
-            if interaction.userId == VLUserCenter.user.id {
-                let options = AgoraRtcChannelMediaOptions()
-                options.publishCameraTrack = false
-                options.publishMicrophoneTrack = false
-                options.clientRoleType = .audience
-                agoraKitManager.agoraKit.updateChannel(with: options)
-            }
-            
+//            if interaction.userId == VLUserCenter.user.id {
+//                let options = self.channelOptions
+//                options.publishCameraTrack = false
+//                options.publishMicrophoneTrack = false
+//                options.clientRoleType = .audience
+//                agoraKitManager.agoraKit.updateChannel(with: options)
+//                self.muteLocalVideo = true
+//            }
         case .onSeat:
             liveView.canvasView.setRemoteUserInfo(name: "")
             liveView.canvasView.canvasType = .none
@@ -570,6 +588,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             let canvasView = role == .broadcaster ? nil : UIView()
             let uid = role == .broadcaster ? VLUserCenter.user.id : interaction.userId
             agoraKitManager.switchRole(role: role,
+                                       options: self.channelOptions,
                                        uid: uid,
                                        canvasView: canvasView)
             
@@ -729,11 +748,11 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     }
     
     func onClickSettingButton() {
+        var muteAudio: Bool = self.muteLocalAudio
         if let info = currentInteraction, info.userId == VLUserCenter.user.id {
-            settingMenuVC.selectedMap = [.mute_mic: info.muteAudio]
-        } else {
-            settingMenuVC.selectedMap.removeAll()
+            muteAudio = info.muteAudio
         }
+        settingMenuVC.selectedMap = [.camera: self.muteLocalVideo, .mic: muteAudio, .mute_mic: muteAudio]
         
         if interactionStatus == .idle {
             settingMenuVC.type = role == .broadcaster ? .idle_broadcaster : .idle_audience
@@ -759,9 +778,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 开关摄像头
     func onClickCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        let option = AgoraRtcChannelMediaOptions()
-        option.publishCameraTrack = !selected
-        agoraKitManager.agoraKit.updateChannel(with: option)
+//        let option = self.channelOptions
+//        option.publishCameraTrack = !selected
+//        agoraKitManager.agoraKit.updateChannel(with: option)
+        self.muteLocalVideo = selected
         if selected {
             agoraKitManager.agoraKit.stopPreview()
         } else {
@@ -796,17 +816,19 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     
     // 麦克风开关
     func onClickMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        let options = AgoraRtcChannelMediaOptions()
-        options.publishMicrophoneTrack = !selected
-        if role == .broadcaster {
-            agoraKitManager.agoraKit.updateChannel(with: options)
-        }
-        guard let info = currentInteraction else { return }
-        if info.userId == VLUserCenter.user.id {
-            agoraKitManager.agoraKit.updateChannel(with: options)
-        }
-//        AppContext.showServiceImp.muteAudio(mute: selected, userId: VLUserCenter.user.id) { err in
+//        let options = self.channelOptions
+//        options.publishMicrophoneTrack = !selected
+//        if role == .broadcaster {
+//            agoraKitManager.agoraKit.updateChannel(with: options)
 //        }
+//        guard let info = currentInteraction else { return }
+//        if info.userId == VLUserCenter.user.id {
+//            agoraKitManager.agoraKit.updateChannel(with: options)
+//        }
+        let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
+        AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
+        }
+        self.muteLocalAudio = selected
     }
     
     // 静音

@@ -147,11 +147,14 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 切换连麦角色
-    func switchRole(role: AgoraClientRole, uid: String?, canvasView: UIView?) {
-        let options = AgoraRtcChannelMediaOptions()
+    func switchRole(role: AgoraClientRole,
+                    options:AgoraRtcChannelMediaOptions,
+                    uid: String?,
+                    canvasView: UIView?) {
+//        let options = AgoraRtcChannelMediaOptions()
         options.clientRoleType = role
-        options.publishMicrophoneTrack = role == .broadcaster
-        options.publishCameraTrack = role == .broadcaster
+//        options.publishMicrophoneTrack = role == .broadcaster
+//        options.publishCameraTrack = role == .broadcaster
         agoraKit.updateChannel(with: options)
         agoraKit.setClientRole(role)
         guard canvasView != nil else { return }
@@ -202,6 +205,7 @@ class ShowAgoraKitManager: NSObject {
     
     func joinChannelEx(channelName: String?,
                        ownerId: String?,
+                       options:AgoraRtcChannelMediaOptions,
                        view: UIView,
                        role: AgoraClientRole) {
         
@@ -209,7 +213,7 @@ class ShowAgoraKitManager: NSObject {
         mediaOptions.autoSubscribeAudio = true
         mediaOptions.autoSubscribeVideo = true
         mediaOptions.publishCameraTrack = false
-        mediaOptions.publishMicrophoneTrack = role == .broadcaster
+        mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
         mediaOptions.clientRoleType = role
     
         let connection = AgoraRtcConnection()
