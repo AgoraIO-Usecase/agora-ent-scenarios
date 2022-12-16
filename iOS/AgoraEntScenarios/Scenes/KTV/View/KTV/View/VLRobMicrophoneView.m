@@ -4,7 +4,7 @@
 //
 
 #import "VLRobMicrophoneView.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -40,7 +40,7 @@
     [self addSubview:self.musicLabel];
     
     UILabel *tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.width*0.5-45, musicIcon.bottom+5, 75, 20)];
-    tipsLabel.text = NSLocalizedString(@"抢麦倒计时", nil);
+    tipsLabel.text = KTVLocalizedString(@"抢麦倒计时");
     tipsLabel.font = UIFontMake(14);
     tipsLabel.textColor = UIColorMakeWithHex(@"#FFFFFF");
     [self addSubview:tipsLabel];
@@ -55,7 +55,7 @@
     joinBtn.layer.masksToBounds = YES;
     [joinBtn addTarget:self action:@selector(joinBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [joinBtn setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
-    [joinBtn setTitle:NSLocalizedString(@"加入合唱", nil) forState:UIControlStateNormal];
+    [joinBtn setTitle:KTVLocalizedString(@"加入合唱") forState:UIControlStateNormal];
     [joinBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
     joinBtn.titleLabel.font = UIFontBoldMake(14);
     [self addSubview:joinBtn];

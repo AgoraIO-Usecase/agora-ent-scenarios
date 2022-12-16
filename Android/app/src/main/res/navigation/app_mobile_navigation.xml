@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.agora.entfulldemo.home.HomeIndexFragment"
+        android:label="@string/app_title_home"
+        tools:layout="@layout/app_fragment_home_index" />
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.agora.entfulldemo.home.HomeFindFragment"
+        android:label="@string/app_title_find"
+        tools:layout="@layout/app_fragment_home_find" />
+
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="com.agora.entfulldemo.home.HomeMineFragment"
+        android:label="@string/app_title_mine"
+        tools:layout="@layout/app_fragment_home_mine" />
+</navigation>

@@ -7,6 +7,7 @@
 
 import Foundation
 
+public typealias ConnectBlockState = (SocketConnectState) -> Void
 public typealias SuccessBlockInt = (Int) -> Void
 public typealias SuccessBlock = ([IObject]) -> Void
 public typealias SuccessBlockVoid = () -> Void
