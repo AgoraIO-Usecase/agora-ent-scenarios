@@ -79,6 +79,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     private weak var subscribeDelegate: ShowSubscribeServiceProtocol?
     
+    private var userMuteLocalAudio:Bool = false
+    
     private var createPkInvitationClosure: ((NSError?) -> Void)?
     
     //create pk invitation map
@@ -147,6 +149,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         pkInvitationList = [ShowPKInvitation]()
         interactionList = [ShowInteractionInfo]()
         pkCreatedInvitationMap = [String: ShowPKInvitation]()
+        userMuteLocalAudio = false
     }
     
     private func _checkRoomExpire() {
@@ -374,6 +377,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         interaction.userName = apply.userName
         interaction.roomId = getRoomId()
         interaction.interactStatus = .onSeat
+        interaction.ownerMuteAudio = self.userMuteLocalAudio
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
         }
@@ -434,6 +438,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             interaction.userName = user.userName
             interaction.roomId = self.getRoomId()
             interaction.interactStatus = .onSeat
+            interaction.muteAudio = self.userMuteLocalAudio
             interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
             self._addInteraction(interaction: interaction) { error in
             }
@@ -516,6 +521,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 _invitation.fromName = VLUserCenter.user.name
                 _invitation.fromRoomId = self.roomId
                 _invitation.status = .waitting
+                _invitation.fromUserMuteAudio = self.userMuteLocalAudio
                 _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
                 self.pkCreatedInvitationMap[_invitation.roomId!] = _invitation
                 self._addPKInvitation(invitation: _invitation, completion: completion)
@@ -546,12 +552,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             }
             
             invitation.status = .accepted
+            invitation.userMuteAudio = self.userMuteLocalAudio
             self._updatePKInvitation(invitation: invitation, completion: completion)
             
             let interaction = ShowInteractionInfo()
             interaction.userId = invitation.fromUserId
             interaction.userName = invitation.fromName
             interaction.roomId = invitation.fromRoomId
+            interaction.muteAudio = invitation.fromUserMuteAudio
+            interaction.ownerMuteAudio = self.userMuteLocalAudio
             interaction.interactStatus = .pking
             interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
             self._addInteraction(interaction: interaction) { error in
@@ -615,6 +624,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func muteAudio(mute:Bool, userId: String, completion: @escaping (NSError?) -> Void) {
         let isCurrentUser = userId == room?.ownerId ? true : false
+        if isCurrentUser {
+            self.userMuteLocalAudio = mute
+        }
         if let interaction = self.interactionList.filter({ $0.userId == userId}).first, interaction.interactStatus == .onSeat {
             //is on seat
             if isCurrentUser {
@@ -1535,6 +1547,8 @@ extension ShowSyncManagerServiceImp {
         interaction.userName = invitation.userName
         interaction.roomId = invitation.roomId
         interaction.interactStatus = .pking
+        interaction.muteAudio = invitation.userMuteAudio
+        interaction.ownerMuteAudio = self.userMuteLocalAudio
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
         }
