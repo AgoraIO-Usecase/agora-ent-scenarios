@@ -20,12 +20,13 @@ class ShowRoomListVC: UIViewController {
     
     deinit {
         AppContext.unloadShowServiceImp()
-        print("---ShowRoomListVC 销毁了---")
+        print("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         hidesBottomBarWhenPushed = true
+        print("init-- ShowRoomListVC")
     }
     
     required init?(coder: NSCoder) {

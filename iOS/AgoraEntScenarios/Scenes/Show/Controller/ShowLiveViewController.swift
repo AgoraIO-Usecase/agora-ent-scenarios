@@ -170,8 +170,17 @@ class ShowLiveViewController: UIViewController {
     }
     
     deinit {
-        print("----ShowLiveViewController-销毁了------")
+        print("deinit-- ShowLiveViewController")
         agoraKitManager.destory()
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        print("init-- ShowLiveViewController")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -191,9 +200,9 @@ class ShowLiveViewController: UIViewController {
     private func setupUI(){
         navigationController?.isNavigationBarHidden = true
         liveView.room = room
-        if role == .audience {
-            liveView.roomUserCount += 1
-        }
+//        if role == .audience {
+//            liveView.roomUserCount += 1
+//        }
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -416,7 +425,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 }
             }
         }
-        if invitation.status == .ended {
+        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
             ToastView.show(text: "连麦已断开哦".show_localized)
         }
     }
@@ -446,7 +455,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onPKInvitationUpdated(invitation: ShowPKInvitation) {
-        if invitation.status == .ended {
+        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
             ToastView.show(text: "PK已断开哦".show_localized)
         }
         if invitation.fromRoomId == room?.roomId {

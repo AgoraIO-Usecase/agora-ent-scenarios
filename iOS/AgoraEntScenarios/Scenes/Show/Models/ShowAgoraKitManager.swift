@@ -71,13 +71,14 @@ class ShowAgoraKitManager: NSObject {
     
     deinit {
         AgoraRtcEngineKit.destroy()
-        print("--ShowAgoraKitManager deinit--AgoraRtcEngineKit.destroy----")
+        print("deinit-- ShowAgoraKitManager")
     }
     
     override init() {
         super.init()
         agoraKit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
         setupContentInspectConfig()
+        print("init-- ShowAgoraKitManager")
     }
     
     //MARK: private

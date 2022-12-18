@@ -24,7 +24,20 @@ class ShowCreateLiveVC: UIViewController {
     }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
-
+    
+    deinit {
+        print("deinit-- ShowCreateLiveVC")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        print("init-- ShowCreateLiveVC")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
