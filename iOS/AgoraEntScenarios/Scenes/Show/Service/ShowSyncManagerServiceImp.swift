@@ -627,12 +627,16 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         if isCurrentUser {
             self.userMuteLocalAudio = mute
         }
-        if let interaction = self.interactionList.filter({ $0.userId == userId}).first, interaction.interactStatus == .onSeat {
+        if let interaction = self.interactionList.first,
+            interaction.interactStatus == .onSeat {
             //is on seat
             if isCurrentUser {
                 interaction.ownerMuteAudio = mute
-            } else {
+            } else if interaction.userId == VLUserCenter.user.id {
                 interaction.muteAudio = mute
+            } else {
+                agoraPrint("other co-mic interaction")
+                return
             }
             _updateInteraction(interaction: interaction) { err in
             }
