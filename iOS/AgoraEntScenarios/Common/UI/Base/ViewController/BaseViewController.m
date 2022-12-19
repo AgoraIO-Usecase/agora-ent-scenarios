@@ -163,7 +163,7 @@
 
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
-        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((self.view.width-200)*0.5, kStatusBarHeight+20, 200, 20)];
+        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((self.view.width-200)*0.5, kStatusBarHeight, 200, 40)];
         _titleLabel.textAlignment = NSTextAlignmentCenter;
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC" size:18];
         _titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
@@ -174,7 +174,7 @@
 
 - (VLHotSpotBtn *)backBtn {
     if (!_backBtn) {
-        _backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(16,kStatusBarHeight+20, 24, 24)];
+        _backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, 44, 44)];
         [_backBtn setImage:UIImageMake(@"back") forState:UIControlStateNormal];
         [_backBtn addTarget:self action:@selector(backBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     }
