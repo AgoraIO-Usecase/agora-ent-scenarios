@@ -6,8 +6,6 @@
 #import "VLSelectSongTCell.h"
 #import "VLSongItmModel.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 @import SDWebImage;
 
 @implementation VLSelectSongTCell

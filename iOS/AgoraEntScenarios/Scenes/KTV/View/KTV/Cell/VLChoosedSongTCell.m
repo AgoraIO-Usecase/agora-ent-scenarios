@@ -8,8 +8,6 @@
 #import "VLUserCenter.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 @import SDWebImage;
 
 @implementation VLChoosedSongTCell
@@ -73,11 +71,14 @@
     [self.sortBtn addTarget:self action:@selector(sortBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.sortBtn];
     
-    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
-                                                       title:KTVLocalizedString(@"演唱中")];
+//    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_singing_icon"]
+//                                                       title:KTVLocalizedString(@"演唱中")];
+    self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.singingBtn setTitle:KTVLocalizedString(@"演唱中") forState:UIControlStateNormal];
+    [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
-    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
-    self.singingBtn.spacingBetweenImageAndTitle = 4;
+//    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    self.singingBtn.spacingBetweenImageAndTitle = 4;
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.singingBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.singingBtn.titleLabel.font = UIFontMake(14.0);

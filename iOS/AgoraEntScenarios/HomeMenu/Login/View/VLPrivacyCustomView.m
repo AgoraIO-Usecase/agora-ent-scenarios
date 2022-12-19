@@ -9,7 +9,7 @@
 #import "MenuUtils.h"
 @import YYText;
 @import Masonry;
-@import QMUIKit;
+#import "KTVMacro.h"
 
 @interface VLPrivacyCustomView()
 

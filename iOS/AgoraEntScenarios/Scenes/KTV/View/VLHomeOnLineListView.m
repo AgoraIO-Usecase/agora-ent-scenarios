@@ -11,16 +11,14 @@
 #import "VLURLPathConfig.h"
 #import "KTVMacro.h"
 #import "AppContext+KTV.h"
-@import QMUIKit;
 @import MJRefresh;
-@import YYCategories;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
 @property(nonatomic, weak) id <VLHomeOnLineListViewDelegate>delegate;
 
 @property (nonatomic, strong) NSMutableArray *roomListModeArray;
-@property (nonatomic, strong) QMUIButton *createBtn;
+@property (nonatomic, strong) UIButton *createBtn;
 //@property (nonatomic, strong) NSArray *roomListArray;
 
 @property (nonatomic, assign) NSInteger        page;
@@ -158,20 +156,23 @@
     return _listCollectionView;
 }
 
-- (QMUIButton *)createBtn {
+- (UIButton *)createBtn {
     if (!_createBtn) {
         
-        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
-                                                      title:KTVLocalizedString(@"创建房间")];
+//        _createBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_list_addIcon"]
+//                                                      title:KTVLocalizedString(@"创建房间")];
+        _createBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_createBtn setTitle:KTVLocalizedString(@"创建房间") forState:UIControlStateNormal];
+        [_createBtn setImage:[UIImage sceneImageWithName:@"online_list_addIcon"] forState:UIControlStateNormal];
         _createBtn.frame = CGRectMake((SCREEN_WIDTH-195)*0.5, SCREEN_HEIGHT-34-kSafeAreaBottomHeight-48-kTopNavHeight, 195, 48);
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;
-        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
-        _createBtn.spacingBetweenImageAndTitle = 7;
+//        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
+//        _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
         _createBtn.titleLabel.font = UIFontBoldMake(16.0);
-        _createBtn.adjustsButtonWhenHighlighted = NO;
+//        _createBtn.adjustsButtonWhenHighlighted = NO;
         [_createBtn addTarget:self action:@selector(createBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
         _createBtn.backgroundColor = UIColorMakeWithHex(@"#2753FF");
     }

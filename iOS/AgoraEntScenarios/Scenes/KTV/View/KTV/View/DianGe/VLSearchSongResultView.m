@@ -12,9 +12,7 @@
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-@import QMUIKit;
 @import MJRefresh;
-@import YYCategories;
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,

@@ -10,8 +10,7 @@
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
-@import QMUIKit;
-@import YYCategories;
+#import "KTVMacro.h"
 
 @interface VLChoosedSongView ()<UITableViewDataSource,UITableViewDelegate>
 

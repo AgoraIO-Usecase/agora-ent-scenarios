@@ -19,6 +19,7 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
 @import Masonry;
 @import LEEAlert;
 

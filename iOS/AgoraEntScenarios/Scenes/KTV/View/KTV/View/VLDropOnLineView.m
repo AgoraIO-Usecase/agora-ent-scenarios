@@ -6,8 +6,6 @@
 #import "VLDropOnLineView.h"
 #import "VLRoomSeatModel.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 @import SDWebImage;
 
 @interface VLDropOnLineView ()

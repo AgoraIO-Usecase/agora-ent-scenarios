@@ -15,12 +15,8 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
-
-@import QMUIKit;
-@import YYCategories;
 @import Masonry;
 
-@class QMUIButton;
 @interface VLKTVMVView () <VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
@@ -32,7 +28,7 @@
 
 @property (nonatomic, strong) VLHotSpotBtn *pauseBtn; /// 暂停播放
 @property (nonatomic, strong) VLHotSpotBtn *nextButton; /// 下一首
-@property (nonatomic, strong) QMUIButton *originBtn;  /// 原唱按钮
+@property (nonatomic, strong) UIButton *originBtn;  /// 原唱按钮
 @property (nonatomic, strong) VLHotSpotBtn *subtitleBtn; /// 设置参数按钮
 @property (nonatomic, strong) VLRobMicrophoneView *robMicrophoneView; // 合唱倒计时视图
 @property (nonatomic, strong) VLSoloSongView *soloSongView; // 独唱倒计时视图
@@ -548,11 +544,13 @@
     return _nextButton;
 }
 
-- (QMUIButton *)originBtn {
+- (UIButton *)originBtn {
     if (!_originBtn) {
-        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
-        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
-        _originBtn.spacingBetweenImageAndTitle = 2;
+//        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
+//        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
+//        _originBtn.spacingBetweenImageAndTitle = 2;
+        _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
         [_originBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         _originBtn.titleLabel.font = UIFontMake(10.0);

@@ -11,8 +11,6 @@
 #import "VLSongItmModel.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLSelectSongView ()<
 JXCategoryViewDelegate,
