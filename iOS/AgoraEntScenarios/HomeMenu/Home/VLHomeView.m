@@ -8,7 +8,7 @@
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-@import QMUIKit;
+#import "KTVMacro.h"
 @import YYCategories;
 
 @interface VLHomeView ()<UICollectionViewDelegate,UICollectionViewDataSource>

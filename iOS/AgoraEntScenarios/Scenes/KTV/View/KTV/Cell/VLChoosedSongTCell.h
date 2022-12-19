@@ -8,7 +8,6 @@
 #import "VLRoomSelSongModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@class QMUIButton;
 @interface VLChoosedSongTCell : UITableViewCell
 
 @property (nonatomic, strong) UIImageView *picImgView;
@@ -20,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UILabel *chooserLabel;
 @property (nonatomic, strong) VLHotSpotBtn *deleteBtn;
 @property (nonatomic, strong) VLHotSpotBtn *sortBtn;
-@property (nonatomic, strong) QMUIButton *singingBtn;
+@property (nonatomic, strong) UIButton *singingBtn;
 @property (nonatomic, strong) UIView *bottomLine;
 
 @property (nonatomic, strong) VLRoomSelSongModel *selSongModel;

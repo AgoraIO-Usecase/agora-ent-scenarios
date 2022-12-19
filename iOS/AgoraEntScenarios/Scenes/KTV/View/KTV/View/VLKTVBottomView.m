@@ -10,8 +10,7 @@
 #import "AgoraEntScenarios-Swift.h"
 #import "AppContext+KTV.h"
 #import "VLMacroDefine.h"
-@import QMUIKit;
-@import YYCategories;
+#import "KTVMacro.h"
 
 typedef void (^actionSuccess)(BOOL ifSuccess);
 

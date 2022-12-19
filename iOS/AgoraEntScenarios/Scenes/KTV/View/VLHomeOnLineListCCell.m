@@ -10,8 +10,6 @@
 #import "VLFontUtils.h"
 #import "KTVMacro.h"
 @import Masonry;
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLHomeOnLineListCCell()
 

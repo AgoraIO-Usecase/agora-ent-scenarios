@@ -6,8 +6,6 @@
 #import "VLBadNetWorkView.h"
 #import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLBadNetWorkView ()
 

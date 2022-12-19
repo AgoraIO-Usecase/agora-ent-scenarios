@@ -8,6 +8,7 @@
 #import "VLOnLineListVC.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
 
 @interface VLHomeViewController ()<VLHomeViewDelegate>
 

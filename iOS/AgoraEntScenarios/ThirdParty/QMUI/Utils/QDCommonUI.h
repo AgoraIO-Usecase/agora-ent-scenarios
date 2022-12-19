@@ -55,19 +55,19 @@ extern NSString *const QDThemeIdentifierDark;
 #define IsUITest NSProcessInfo.processInfo.environment[@"isUITest"].boolValue
 
 /// QMUIButton 系列 Demo 里的一行高度
-extern const CGFloat QDButtonSpacingHeight;
-
-@interface QDCommonUI : NSObject
-
-+ (void)renderGlobalAppearances;
-@end
-
-@interface QDCommonUI (ThemeColor)
-
-+ (UIColor *)randomThemeColor;
-@end
-
-@interface QDCommonUI (Layer)
-
-+ (CALayer *)generateSeparatorLayer;
-@end
+//extern const CGFloat QDButtonSpacingHeight;
+//
+//@interface QDCommonUI : NSObject
+//
+//+ (void)renderGlobalAppearances;
+//@end
+//
+//@interface QDCommonUI (ThemeColor)
+//
+//+ (UIColor *)randomThemeColor;
+//@end
+//
+//@interface QDCommonUI (Layer)
+//
+//+ (CALayer *)generateSeparatorLayer;
+//@end

@@ -11,7 +11,6 @@
 #import "VLFontUtils.h"
 #import "KTVMacro.h"
 @import Masonry;
-@import QMUIKit;
 
 @interface VLKTVSettingView() <VLKTVSwitcherViewDelegate, VLKTVSliderViewDelegate, VLKTVKindsViewDelegate, VLKTVTonesViewDelegate>
 

@@ -8,7 +8,6 @@
 #import "VLMacroDefine.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "KTVMacro.h"
-@import QMUIKit;
 @import YYCategories;
 
 @interface VLRoomPersonIteimCCell()
@@ -70,13 +69,14 @@
     self.muteImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.muteImgView];
     
-    self.singingBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"]
-                                                       title: KTVLocalizedString(@"主唱")];
+    self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] forState:UIControlStateNormal];
+    [self.singingBtn setTitle:KTVLocalizedString(@"主唱") forState:UIControlStateNormal];
     self.singingBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
-    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
-    self.singingBtn.spacingBetweenImageAndTitle = 2;
+//    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    self.singingBtn.spacingBetweenImageAndTitle = 2;
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [self.singingBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.singingBtn.titleLabel.font = UIFontMake(8);
@@ -85,13 +85,15 @@
     self.singingBtn.alpha = 0.6;
     [self.contentView addSubview:self.singingBtn];
 
-    self.joinChorusBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"]
-                                                          title:KTVLocalizedString(@"合唱")];
+    
+    self.joinChorusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.joinChorusBtn setImage:[UIImage sceneImageWithName:@"ktv_seatsinging_icon"] forState:UIControlStateNormal];
+    [self.joinChorusBtn setTitle:KTVLocalizedString(@"合唱") forState:UIControlStateNormal];
     self.joinChorusBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.joinChorusBtn.layer.cornerRadius = 6;
     self.joinChorusBtn.layer.masksToBounds = YES;
-    self.joinChorusBtn.imagePosition = QMUIButtonImagePositionLeft;
-    self.joinChorusBtn.spacingBetweenImageAndTitle = 2;
+//    self.joinChorusBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    self.joinChorusBtn.spacingBetweenImageAndTitle = 2;
     self.joinChorusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [self.joinChorusBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.joinChorusBtn.titleLabel.font = UIFontMake(8);
