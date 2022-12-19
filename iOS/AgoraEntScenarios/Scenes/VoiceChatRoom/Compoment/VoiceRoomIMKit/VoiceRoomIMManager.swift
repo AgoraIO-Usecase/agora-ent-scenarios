@@ -60,7 +60,7 @@ fileprivate let once = VoiceRoomIMManager()
 
     @objc public weak var delegate: VoiceRoomIMDelegate?
 
-    @objc public func configIM(appkey: String) {
+    @objc public func configIM(appkey: String) -> AgoraChatError? {
         let options = AgoraChatOptions(appkey: appkey.isEmpty ? "easemob-demo#easeim" : appkey)
         options.enableConsoleLog = true
         options.isAutoLogin = false
@@ -68,7 +68,7 @@ fileprivate let once = VoiceRoomIMManager()
 //        options.setValue(6717, forKeyPath: "chatPort")
 //        options.setValue("https://a1.chat.agora.io", forKeyPath: "chatServer")
         options.setValue("https://a1.chat.agora.io", forKeyPath: "restServer")
-        AgoraChatClient.shared().initializeSDK(with: options)
+        return AgoraChatClient.shared().initializeSDK(with: options)
     }
 
     @objc public func loginIM(userName: String, token: String, completion: @escaping (String, AgoraChatError?) -> Void) {
