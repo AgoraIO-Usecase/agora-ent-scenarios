@@ -63,7 +63,7 @@
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
     randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-50, roomTitleLabel.top, 50, 20);
 //    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    randomBtn.spacingBetweenImageAndTitle = 3;
+    randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [randomBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     randomBtn.titleLabel.font = UIFontMake(14.0);
@@ -99,7 +99,7 @@
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
 //    publicBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    publicBtn.spacingBetweenImageAndTitle = 3;
+    publicBtn.spacingBetweenImageAndTitle = 3;
     publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [publicBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     publicBtn.titleLabel.font = UIFontMake(14.0);
@@ -120,7 +120,7 @@
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
 //    screatBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    screatBtn.spacingBetweenImageAndTitle = 3;
+    screatBtn.spacingBetweenImageAndTitle = 3;
     screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [screatBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     screatBtn.titleLabel.font = UIFontMake(14.0);

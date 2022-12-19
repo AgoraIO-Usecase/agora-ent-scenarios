@@ -135,6 +135,7 @@
 		7F6BE3E4291A2B6600F6714D /* VLTouristOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */; };
 		88B6C0E8C6D3719B198B65E2 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D87E99E1A4B0C221B6D0731E /* Pods_AgoraEntScenarios.framework */; };
 		DD0260262926736700D88B68 /* KTVLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0260252926736700D88B68 /* KTVLog.swift */; };
+		DD0328C62950918000AA156F /* UIButton+EntLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0328C52950918000AA156F /* UIButton+EntLayout.swift */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -557,6 +558,7 @@
 		7F6BE3E3291A2B6600F6714D /* VLTouristOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLTouristOnLineView.m; sourceTree = "<group>"; };
 		D87E99E1A4B0C221B6D0731E /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD0260252926736700D88B68 /* KTVLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVLog.swift; sourceTree = "<group>"; };
+		DD0328C52950918000AA156F /* UIButton+EntLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+EntLayout.swift"; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -1992,6 +1994,7 @@
 				DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */,
 				DDA1991B28FFE579009D3E61 /* UIImage+Color.swift */,
 				DDA1991C28FFE579009D3E61 /* Array+Extension.swift */,
+				DD0328C52950918000AA156F /* UIButton+EntLayout.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -2976,6 +2979,7 @@
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				DDA19A5128FFE57A009D3E61 /* EKAttributes+Scroll.swift in Sources */,
 				DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */,
+				DD0328C62950918000AA156F /* UIButton+EntLayout.swift in Sources */,
 				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				057DD9F2290B9495001329E6 /* UIButtonLayoutExtension.swift in Sources */,
 				DD84179B29090C520026B624 /* VLRoomSelSongModel.m in Sources */,

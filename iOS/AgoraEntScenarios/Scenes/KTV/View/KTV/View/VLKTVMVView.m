@@ -548,7 +548,7 @@
     if (!_originBtn) {
 //        _originBtn = [[QMUIButton alloc] qmui_initWithImage:nil title:KTVLocalizedString(@"原唱")];
 //        _originBtn.imagePosition = QMUIButtonImagePositionLeft;
-//        _originBtn.spacingBetweenImageAndTitle = 2;
+        _originBtn.spacingBetweenImageAndTitle = 2;
         _originBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         _originBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;

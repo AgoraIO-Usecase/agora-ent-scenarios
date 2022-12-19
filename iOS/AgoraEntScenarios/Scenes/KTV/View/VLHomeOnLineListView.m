@@ -168,7 +168,7 @@
         _createBtn.layer.cornerRadius = 24;
         _createBtn.layer.masksToBounds = YES;
 //        _createBtn.imagePosition = QMUIButtonImagePositionLeft;
-//        _createBtn.spacingBetweenImageAndTitle = 7;
+        _createBtn.spacingBetweenImageAndTitle = 7;
         _createBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_createBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
         _createBtn.titleLabel.font = UIFontBoldMake(16.0);
