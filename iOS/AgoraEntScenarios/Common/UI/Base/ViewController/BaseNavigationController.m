@@ -15,6 +15,7 @@
 #pragma mark - Life Cycle Methods
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationBar.hidden = YES;
 }
 #pragma mark - Intial Methods
 
@@ -44,12 +45,12 @@
         return;
     }
 
-    if (self.viewControllers.count != 0) {
-        viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"]
-                                                                                           style:UIBarButtonItemStyleDone
-                                                                                          target:viewController
-                                                                                          action:@selector(leftButtonDidClickAction)];
-    }
+//    if (self.viewControllers.count != 0) {
+//        viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"]
+//                                                                                           style:UIBarButtonItemStyleDone
+//                                                                                          target:viewController
+//                                                                                          action:@selector(leftButtonDidClickAction)];
+//    }
     [super pushViewController:viewController animated:animated];
 }
 
