@@ -318,11 +318,6 @@
 		DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997628FFE579009D3E61 /* Models.swift */; };
 		DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997728FFE579009D3E61 /* SyncError.swift */; };
 		DDA19A2628FFE57A009D3E61 /* AgoraSyncManager.podspec in Resources */ = {isa = PBXBuildFile; fileRef = DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */; };
-		DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997C28FFE579009D3E61 /* QDThemeManager.m */; };
-		DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998028FFE579009D3E61 /* QMUIConfigurationTemplate.m */; };
-		DDA19A2928FFE57A009D3E61 /* QDUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998428FFE579009D3E61 /* QDUIHelper.m */; };
-		DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998528FFE579009D3E61 /* UIImageEffects.m */; };
-		DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998628FFE579009D3E61 /* QDCommonUI.m */; };
 		DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998B28FFE579009D3E61 /* EKRootViewController.swift */; };
 		DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998C28FFE579009D3E61 /* EKEntryView.swift */; };
 		DDA19A2E28FFE57A009D3E61 /* EKWindowProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998D28FFE579009D3E61 /* EKWindowProvider.swift */; };
@@ -861,17 +856,6 @@
 		DDA1997628FFE579009D3E61 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		DDA1997728FFE579009D3E61 /* SyncError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncError.swift; sourceTree = "<group>"; };
 		DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManager.podspec; sourceTree = "<group>"; };
-		DDA1997C28FFE579009D3E61 /* QDThemeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDThemeManager.m; sourceTree = "<group>"; };
-		DDA1997D28FFE579009D3E61 /* QMUIConfigurationTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfigurationTemplate.h; sourceTree = "<group>"; };
-		DDA1997E28FFE579009D3E61 /* QDThemeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDThemeProtocol.h; sourceTree = "<group>"; };
-		DDA1997F28FFE579009D3E61 /* QDThemeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDThemeManager.h; sourceTree = "<group>"; };
-		DDA1998028FFE579009D3E61 /* QMUIConfigurationTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIConfigurationTemplate.m; sourceTree = "<group>"; };
-		DDA1998228FFE579009D3E61 /* UIImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageEffects.h; sourceTree = "<group>"; };
-		DDA1998328FFE579009D3E61 /* QDCommonUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDCommonUI.h; sourceTree = "<group>"; };
-		DDA1998428FFE579009D3E61 /* QDUIHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDUIHelper.m; sourceTree = "<group>"; };
-		DDA1998528FFE579009D3E61 /* UIImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageEffects.m; sourceTree = "<group>"; };
-		DDA1998628FFE579009D3E61 /* QDCommonUI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDCommonUI.m; sourceTree = "<group>"; };
-		DDA1998728FFE579009D3E61 /* QDUIHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDUIHelper.h; sourceTree = "<group>"; };
 		DDA1998B28FFE579009D3E61 /* EKRootViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRootViewController.swift; sourceTree = "<group>"; };
 		DDA1998C28FFE579009D3E61 /* EKEntryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKEntryView.swift; sourceTree = "<group>"; };
 		DDA1998D28FFE579009D3E61 /* EKWindowProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKWindowProvider.swift; sourceTree = "<group>"; };
@@ -2288,35 +2272,8 @@
 				DDB1912F294AF37A00836AE0 /* QMUIConfigurationMacros.h */,
 				DDB19130294AF37A00836AE0 /* QMUIHelper.h */,
 				DDB19131294AF37A00836AE0 /* QMUIHelper.m */,
-				DDA1997B28FFE579009D3E61 /* Configuration */,
-				DDA1998128FFE579009D3E61 /* Utils */,
 			);
 			path = QMUI;
-			sourceTree = "<group>";
-		};
-		DDA1997B28FFE579009D3E61 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1997C28FFE579009D3E61 /* QDThemeManager.m */,
-				DDA1997D28FFE579009D3E61 /* QMUIConfigurationTemplate.h */,
-				DDA1997E28FFE579009D3E61 /* QDThemeProtocol.h */,
-				DDA1997F28FFE579009D3E61 /* QDThemeManager.h */,
-				DDA1998028FFE579009D3E61 /* QMUIConfigurationTemplate.m */,
-			);
-			path = Configuration;
-			sourceTree = "<group>";
-		};
-		DDA1998128FFE579009D3E61 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1998228FFE579009D3E61 /* UIImageEffects.h */,
-				DDA1998328FFE579009D3E61 /* QDCommonUI.h */,
-				DDA1998428FFE579009D3E61 /* QDUIHelper.m */,
-				DDA1998528FFE579009D3E61 /* UIImageEffects.m */,
-				DDA1998628FFE579009D3E61 /* QDCommonUI.m */,
-				DDA1998728FFE579009D3E61 /* QDUIHelper.h */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 		DDA1998828FFE579009D3E61 /* Displayer */ = {
@@ -2780,7 +2737,6 @@
 				05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */,
 				DD8417BC29090C520026B624 /* VLNoBodyOnLineView.m in Sources */,
 				05FFE710290F706C0024D22F /* PopTip+Draw.swift in Sources */,
-				DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */,
 				DDA19A5B28FFE57A009D3E61 /* EKAlertMessage.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
@@ -2833,7 +2789,6 @@
 				0510B857290B799E0063E57A /* VRRoomListView.swift in Sources */,
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
 				DDA19A5C28FFE57A009D3E61 /* EKRatingMessage.swift in Sources */,
-				DDA19A2928FFE57A009D3E61 /* QDUIHelper.m in Sources */,
 				DD8417A329090C520026B624 /* VLSoloSongView.m in Sources */,
 				DD8417A129090C520026B624 /* VLBadNetWorkView.m in Sources */,
 				DDA19A3B28FFE57A009D3E61 /* UIRectCorner+Short.swift in Sources */,
@@ -2871,7 +2826,6 @@
 				057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */,
 				057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */,
 				05FFE6FF290F706C0024D22F /* VMSwitchTableViewCell.swift in Sources */,
-				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
 				0510B855290B799E0063E57A /* BaseNavigationView.swift in Sources */,
 				0510B854290B799E0063E57A /* VREmptyView.swift in Sources */,
 				DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */,
@@ -2901,12 +2855,10 @@
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */,
 				DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */,
-				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
 				DDA19A1128FFE579009D3E61 /* Log.swift in Sources */,
 				0510B84F290B799E0063E57A /* VRSoundTypeCard.swift in Sources */,
 				DD8417B329090C520026B624 /* VLSearchSongResultView.m in Sources */,
 				DD8417A529090C520026B624 /* VLKTVSettingView.m in Sources */,
-				DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */,
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
 				DD8417AA29090C520026B624 /* VLKTVKindsView.m in Sources */,
 				0510B856290B799E0063E57A /* VRRoomCreateView.swift in Sources */,
