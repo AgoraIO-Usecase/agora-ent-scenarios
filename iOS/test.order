@@ -1,0 +1,157 @@
+-[QMUIConfigurationTemplate shouldApplyTemplateAutomatically]
+-[QMUIConfigurationTemplate applyConfigurationTemplate]
+_UIEdgeInsetsMake
+_CGSizeMake
+_CGPointMake
++[AgoraRtm load]
+_$s17AgoraEntScenarios10AppContextC6sharedACvgZTo
+_$s17AgoraEntScenarios10AppContextC6sharedACvgZ
+_$s17AgoraEntScenarios10AppContextC6sharedACvau
+_$s17AgoraEntScenarios10AppContextC6shared_WZ
+_$s17AgoraEntScenarios10AppContextCMa
+_$s17AgoraEntScenarios10AppContextCACycfC
+_$s17AgoraEntScenarios10AppContextCACycfcTo
+_$s17AgoraEntScenarios10AppContextCACycfc
+_$s17AgoraEntScenarios10AppContextC10setupBugly33_1A81531739B655528A499E7E8A23CF56LLyyF
+_$s17AgoraEntScenarios10AppContextC5appIdSSyFTo
+_$s17AgoraEntScenarios10AppContextC5appIdSSyF
+_$s17AgoraEntScenarios9KeyCenterV5AppIdSSvau
+_$s17AgoraEntScenarios9KeyCenterV5AppId_WZ
++[VLAPIRequest load]
++[VLAPIRequest initialize]
++[QDCommonUI load]
+___18+[QDCommonUI load]_block_invoke
+_OverrideImplementation
+_HasOverrideSuperclassMethod
+___18+[QDCommonUI load]_block_invoke_2
+___copy_helper_block_e8_32b
++[UILabel(Font) load]
++[UITextField(Font) load]
++[UIButton(Font) load]
+__ZNSt3__14pairIKNS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEES6_ED2Ev
+__ZNSt3__111char_traitsIcE6lengthEPKc
+_main
+_$s17AgoraEntScenarios11AppDelegateCMa
+_$s17AgoraEntScenarios11AppDelegateC5$mainyyFZ
+_$s17AgoraEntScenarios11AppDelegateCACycfcTo
+_$s17AgoraEntScenarios11AppDelegateCACycfc
+_$s17AgoraEntScenarios14ViewControllerC5coderACSgSo7NSCoderC_tcfcTo
+_$s17AgoraEntScenarios14ViewControllerC5coderACSgSo7NSCoderC_tcfc
+_$s17AgoraEntScenarios14ViewControllerCMa
+_$s17AgoraEntScenarios11AppDelegateC6windowSo8UIWindowCSgvgTo
+_$s17AgoraEntScenarios11AppDelegateC6windowSo8UIWindowCSgvg
+_$s17AgoraEntScenarios11AppDelegateC6windowSo8UIWindowCSgvsTo
+_$s17AgoraEntScenarios11AppDelegateC6windowSo8UIWindowCSgvs
+_$s17AgoraEntScenarios11AppDelegateC11application_29didFinishLaunchingWithOptionsSbSo13UIApplicationC_SDySo0l6LaunchK3KeyaypGSgtFTo
+_$s17AgoraEntScenarios11AppDelegateC11application_29didFinishLaunchingWithOptionsSbSo13UIApplicationC_SDySo0l6LaunchK3KeyaypGSgtF
+_$sSo8UIWindowCSgWOh
+-[UIWindow(Router) configRootViewController]
+___44-[UIWindow(Router) configRootViewController]_block_invoke
+-[UIWindow(Router) configurationQMUITemplate]
+___45-[UIWindow(Router) configurationQMUITemplate]_block_invoke
++[QDThemeManager currentTheme]
++[QDCommonUI renderGlobalAppearances]
++[QDUIHelper(QMUIMoreOperationAppearance) customMoreOperationAppearance]
++[UIColor(QDTheme) qd_tintColor]
++[QDThemeManager sharedInstance]
+___32+[QDThemeManager sharedInstance]_block_invoke
+-[QDThemeManager init]
+-[QDThemeManager setQd_backgroundColor:]
+-[QDThemeManager setQd_backgroundColorLighten:]
+-[QDThemeManager setQd_backgroundColorHighlighted:]
+-[QDThemeManager setQd_tintColor:]
+-[QDThemeManager setQd_titleTextColor:]
+-[QDThemeManager setQd_mainTextColor:]
+-[QDThemeManager setQd_descriptionTextColor:]
+-[QDThemeManager setQd_placeholderColor:]
+-[QDThemeManager setQd_codeColor:]
+-[QDThemeManager setQd_separatorColor:]
+-[QDThemeManager setQd_gridItemTintColor:]
+-[QDThemeManager setQd_navigationBarBackgroundImage:]
+-[QDThemeManager setQd_navigationBarBackIndicatorImage:]
+-[QDThemeManager setQd_navigationBarCloseImage:]
+-[QDThemeManager setQd_navigationBarDisclosureIndicatorImage:]
+-[QDThemeManager setQd_tableViewCellDisclosureIndicatorImage:]
+___copy_helper_block_e8_32s
+-[QDThemeManager setQd_tableViewCellCheckmarkImage:]
+-[QDThemeManager setQd_tableViewCellDetailButtonImage:]
+-[QDThemeManager setQd_searchBarTextFieldBackgroundImage:]
+-[QDThemeManager setQd_searchBarBackgroundImage:]
+-[QDThemeManager setQd_standardBlueEffect:]
+-[QDThemeManager qd_tintColor]
++[QDUIHelper(QMUIAlertControllerAppearance) customAlertControllerAppearance]
++[QDUIHelper(QMUIDialogViewControllerAppearance) customDialogViewControllerAppearance]
++[QDUIHelper(QMUIImagePicker) customImagePickerAppearance]
++[QDUIHelper(QMUIEmotionView) customEmotionViewAppearance]
+_UIOffsetMake
+-[UIWindow(Router) configureKeyboard]
++[VLUserCenter center]
+___22+[VLUserCenter center]_block_invoke
+-[VLUserCenter isLogin]
++[VLCache system]
+-[VLCache setYy:]
+-[VLCache objectForKey:]
+-[VLCache yy]
+-[VLBaseModel initWithCoder:]
+-[VLLoginModel setStatus:]
+-[VLLoginModel setOpenId:]
+-[VLLoginModel setSex:]
+-[VLLoginModel setAgoraRTMToken:]
+-[VLLoginModel setIfMaster:]
+-[VLLoginModel setName:]
+-[VLLoginModel setAgoraPlayerRTCToken:]
+-[VLLoginModel setHeadUrl:]
+-[VLLoginModel setId:]
+-[VLLoginModel setHasVoiceRoomUserInfo:]
+-[VLLoginModel setUserNo:]
+-[VLLoginModel setIm_token:]
+-[VLLoginModel setAgoraRTCToken:]
+-[VLLoginModel setMobile:]
+-[VLLoginModel setChat_uid:]
+-[VLLoginModel setAuthorization:]
+-[VLLoginModel setRtc_uid:]
+-[VLLoginModel setToken:]
+-[VLLoginModel setObjectId:]
+-[VLLoginModel setChannel_id:]
+-[UIWindow(Router) vj_configureTabBarController]
+-[VLMainRootViewController viewDidLoad]
+-[VLMainRootViewController createNewTabBar]
+-[VLMainRootViewController createNewTabBarWithContext:]
+-[VLMainTabBarController initWithContext:]
+-[VLMainTabBarController viewControllers]
+-[BaseViewController didInitialize]
+-[BaseNavigationController pushViewController:animated:]
+-[BaseNavigationController viewDidLoad]
+-[VLMainTabBarController tabBarItemsAttributesForController]
+-[VLMainTabBarController viewDidLoad]
+-[VLMainTabBarController customizeTabBarAppearanceWithTitlePositionAdjustment:]
+-[VLMainTabBarController tabBarController:didSelectControl:]
+-[BaseViewController prefersHomeIndicatorAutoHidden]
+-[BaseViewController dealloc]
+-[BaseViewController hideVLEmptyView]
+-[VLMineViewController .cxx_destruct]
+-[BaseViewController .cxx_destruct]
+-[VLDiscoveryViewController dealloc]
+-[VLDiscoveryViewController progressView]
+-[VLDiscoveryViewController .cxx_destruct]
+-[VLHomeViewController viewDidLoad]
+-[BaseViewController viewDidLoad]
+-[BaseViewController initSubviews]
+-[BaseViewController setBackgroundImage:]
+-[BaseViewController backGroundImgView]
+_CGRectMake
+-[BaseViewController setNaviTitleName:]
+-[BaseViewController titleLabel]
+-[VLHomeViewController setUpUI]
+-[VLHomeView initWithFrame:withDelegate:]
+-[VLHomeView setDelegate:]
+-[VLHomeView menuList]
+-[VLHomeView flowLayout]
+-[VLHomeViewController viewWillAppear:]
+-[BaseViewController shouldCustomizeNavigationBarTransitionIfHideable]
+-[VLHomeViewController preferredNavigationBarHidden]
+-[BaseViewController qmui_navigationBarBackgroundImage]
+-[BaseViewController setupNavigationItems]
+-[VLHomeViewController configNavigationBar:]
+-[BaseViewController configNavigationBar:]
+-[VLHomeView .cxx_destruct]

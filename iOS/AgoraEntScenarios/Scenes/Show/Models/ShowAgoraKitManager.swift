@@ -123,11 +123,6 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    
-    func  destory() {
-        AgoraRtcEngineKit.destroy()
-    }
-    
     /// 初始化并预览
     /// - Parameter canvasView: 画布
     func startPreview(canvasView: UIView) {
