@@ -32,7 +32,7 @@ class VMAudioSettingView: UIView {
     private let nIdentifier = "normal"
 
     private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／jiqi(1)", "icons／set／jiqi(2)", "icons／set／jiqi(3)", "icons／set／jiqi(4)"]
+    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
 
@@ -163,10 +163,10 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                     guard let volBlock = self?.volBlock else { return }
                     volBlock(vol)
                 }
-                if let volume = roomInfo?.room?.robot_volume {
-                    cell.slider.value = Float(volume) / 100.0
-                    cell.countLabel.text = "\(volume)"
-                }
+                
+                let volume = roomInfo?.room?.robot_volume ?? 50
+                cell.slider.value = Float(volume) / 100.0
+                cell.countLabel.text = "\(volume)"
                 return cell
             }
         } else if indexPath.section == 1 {
@@ -174,7 +174,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.iconView.image = UIImage(settingImage[2 + indexPath.row])
             cell.titleLabel.text = settingName[2 + indexPath.row]
             if indexPath.row == 0 {
-                cell.contentLabel.text = roomInfo?.room?.sound_effect?.localized() ?? ""
+                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
@@ -210,5 +210,22 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
         let lead = NSStringDrawingOptions.usesFontLeading
         let rect = text.boundingRect(with: CGSize(width: 0, height: height), options: [origin, lead], attributes: [NSAttributedString.Key.font: font], context: nil)
         return rect.width
+    }
+    
+    private func getSoundType(with index: Int) -> String {
+        var soundType: String = "Social Chat".localized()
+        switch index {
+        case 0:
+            soundType = "Social Chat".localized()
+        case 1:
+            soundType = "Karaoke".localized()
+        case 2:
+            soundType = "Gaming Buddy".localized()
+        case 3:
+            soundType = "Professional Podcaster".localized()
+        default:
+            soundType = "Social Chat".localized()
+        }
+        return soundType
     }
 }

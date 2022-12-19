@@ -43,6 +43,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
+    private let baseServerUrl: String = KeyCenter.onlineBaseServerUrl ?? ""
     
     /// get tokens
     /// - Parameters:
@@ -98,8 +99,8 @@ class NetworkManager:NSObject {
                       "uid": uid] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
-        "https://toolbox.bj2.agoralab.co/v1/token006/generate"
-        : "https://toolbox.bj2.agoralab.co/v1/token/generate"
+        "\(baseServerUrl)token006/generate"
+        : "\(baseServerUrl)token/generate"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
@@ -124,42 +125,90 @@ class NetworkManager:NSObject {
     ///   - success: success description {roomid, uid}
     func generateIMConfig(channelName: String,
                           nickName: String,
+                          chatId: String?,
+                          imUid: String?,
                           password: String,
                           uid: String,
-                          success: @escaping (String?, String?) -> Void) {
+                          success: @escaping (String?, String?, String?) -> Void) {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil, nil)
+            success(nil, nil, nil)
             return
         }
-        let chatParams = [
+        var chatParams = [
             "name": channelName,
             "description": "test",
             "owner": uid,
         ]
+        
+        if let chatId = chatId {
+            chatParams.updateValue(chatId, forKey: "id")
+        }
+        
         let userParams = [
             "username": uid,
             "password": password,
             "nickname": nickName,
         ]
+        
+        let imConfig = [
+            "appKey":KeyCenter.IMAppKey,
+            "clientId":KeyCenter.IMClientId,
+            "clientSecret":KeyCenter.IMClientSecret,
+        ]
+        
+        let dic: [String: Any] = [
+            "id": VLUserCenter.user.id,     //用户id
+            "sceneName": "voice_chat"                 //场景名称，如果是秀场直播
+        ]
+                 
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
+            print("setupContentInspectConfig fail")
+            return
+        }
+        let payload: String = String(data: jsonData, encoding: .utf8) ?? ""
+        
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
+                      "im": imConfig,
+                      "payload": payload,
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
-        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
             let data = response["data"] as? [String: String]
-            let roomId = data?["chatId"]
-            let userName = data?["userName"]
+            let uid = data?["userName"]
+            let chatId = data?["chatId"]
+            let token = data?["chatToken"]
             print(response)
-            success(roomId, userName)
+            success(uid, chatId, token)
 //            ToastView.hidden()
         }, failure: { error in
             print(error)
-            success(nil, nil)
+            success(nil, nil, nil)
 //            ToastView.hidden()
+        })
+    }
+    
+    func voiceIdentify(channelName: String,
+                       channelType: Int,
+                       success: @escaping (String?) -> Void) {
+        let params = ["appId": KeyCenter.AppId,
+                      "channelName": channelName,
+                      "channelType": channelType,
+                      "src": "iOS",
+                      "traceId": NSString.withUUID().md5] as [String: Any]
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
         })
     }
 
