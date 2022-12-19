@@ -22,10 +22,10 @@
 #import "VLUserCenter.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
 @import YYText;
 @import Masonry;
 @import LEEAlert;
-@import YYCategories;
 @import SDWebImage;
 
 @interface VLLoginViewController () <VLLoginInputVerifyCodeViewDelegate, VLPrivacyCustomViewDelegate,VLPopImageVerifyViewDelegate>

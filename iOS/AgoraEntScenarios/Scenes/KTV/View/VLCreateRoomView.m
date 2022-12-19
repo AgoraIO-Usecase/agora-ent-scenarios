@@ -13,8 +13,6 @@
 #import "KTVMacro.h"
 #import "MenuUtils.h"
 @import CRBoxInputView;
-@import QMUIKit;
-@import YYCategories;
 @import IQKeyboardManager;
 
 @interface VLCreateRoomView ()
@@ -24,8 +22,8 @@
 @property (nonatomic, strong) UIView *screatView;
 @property (nonatomic, strong) UIImageView *iconImgView;
 @property(nonatomic, strong) CRBoxInputView *boxInputView;
-@property (nonatomic, strong) QMUIButton *publicBtn;
-@property (nonatomic, strong) QMUIButton *screatBtn;
+@property (nonatomic, strong) UIButton *publicBtn;
+@property (nonatomic, strong) UIButton *screatBtn;
 @property (nonatomic, strong) VLAddRoomModel *addRoomModel;
 
 @property (nonatomic, strong) NSArray *titlesArray;
@@ -58,16 +56,18 @@
     roomTitleLabel.text = AGLocalizedString(@"房间标题");
     [self addSubview:roomTitleLabel];
     
-    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
-                                                             title:KTVLocalizedString(@"随机")];
-    [randomBtn sizeToFit];
-    randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-randomBtn.width, roomTitleLabel.top, randomBtn.width, 20);
-    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
-    randomBtn.spacingBetweenImageAndTitle = 3;
+//    QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
+//                                                             title:KTVLocalizedString(@"随机")];
+    UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [randomBtn setTitle:KTVLocalizedString(@"随机") forState:UIControlStateNormal];
+    [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
+    randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-50, roomTitleLabel.top, 50, 20);
+//    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [randomBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     randomBtn.titleLabel.font = UIFontMake(14.0);
-    randomBtn.adjustsButtonWhenHighlighted = NO;
+//    randomBtn.adjustsButtonWhenHighlighted = NO;
     [randomBtn addTarget:self action:@selector(randomBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:randomBtn];
     
@@ -92,15 +92,18 @@
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
     
-    QMUIButton *publicBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
-                                                             title:KTVLocalizedString(@"公开")];
+//    QMUIButton *publicBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
+//                                                             title:KTVLocalizedString(@"公开")];
+    UIButton *publicBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [publicBtn setTitle:KTVLocalizedString(@"公开") forState:UIControlStateNormal];
+    [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
-    publicBtn.imagePosition = QMUIButtonImagePositionLeft;
-    publicBtn.spacingBetweenImageAndTitle = 3;
+//    publicBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    publicBtn.spacingBetweenImageAndTitle = 3;
     publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [publicBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     publicBtn.titleLabel.font = UIFontMake(14.0);
-    publicBtn.adjustsButtonWhenHighlighted = NO;
+//    publicBtn.adjustsButtonWhenHighlighted = NO;
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
     publicBtn.tag = 0;
@@ -110,15 +113,18 @@
     [self addSubview:publicBtn];
     [publicBtn sizeToFit];
     
-    QMUIButton *screatBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
-                                                             title:KTVLocalizedString(@"加密")];
+//    QMUIButton *screatBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
+//                                                             title:KTVLocalizedString(@"加密")];
+    UIButton *screatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [screatBtn setTitle:KTVLocalizedString(@"加密") forState:UIControlStateNormal];
+    [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
-    screatBtn.imagePosition = QMUIButtonImagePositionLeft;
-    screatBtn.spacingBetweenImageAndTitle = 3;
+//    screatBtn.imagePosition = QMUIButtonImagePositionLeft;
+//    screatBtn.spacingBetweenImageAndTitle = 3;
     screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [screatBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     screatBtn.titleLabel.font = UIFontMake(14.0);
-    screatBtn.adjustsButtonWhenHighlighted = NO;
+//    screatBtn.adjustsButtonWhenHighlighted = NO;
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
     screatBtn.tag = 1;
@@ -223,7 +229,7 @@
     self.addRoomModel.icon = [NSString stringWithFormat:@"%d",bgValue];
 }
 
-- (void)itemBtnClickEvent:(QMUIButton *)sender {
+- (void)itemBtnClickEvent:(UIButton *)sender {
     if (sender.tag == 0) {
 //        self.publicBtn.selected = !self.publicBtn.selected;
         self.screatBtn.selected = NO;

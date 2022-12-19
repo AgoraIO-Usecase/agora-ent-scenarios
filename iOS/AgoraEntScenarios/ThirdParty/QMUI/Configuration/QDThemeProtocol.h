@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "KTVMacro.h"
 @import UIKit;
-@import QMUIKit;
 
 /// 所有主题均应实现这个协议，规定了 QMUI Demo 里常用的几个关键外观属性
 @protocol QDThemeProtocol <QMUIConfigurationTemplateProtocol>

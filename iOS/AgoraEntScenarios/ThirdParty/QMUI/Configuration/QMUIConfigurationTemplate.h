@@ -23,6 +23,6 @@
  *  @warning 配置表的 class 名必须以 QMUIConfigurationTemplate 开头，并且实现 <QMUIConfigurationTemplateProtocol>，因为这两者是 QMUI 识别该 NSObject 是否为一份配置表的条件。
  *  @warning QMUI 2.3.0 之后，配置表改为自动运行，不需要再在某个地方手动运行了。
  */
-@interface QMUIConfigurationTemplate : NSObject <QMUIConfigurationTemplateProtocol>
-
-@end
+//@interface QMUIConfigurationTemplate : NSObject <QMUIConfigurationTemplateProtocol>
+//
+//@end

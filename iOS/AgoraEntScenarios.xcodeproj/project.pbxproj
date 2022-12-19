@@ -394,6 +394,8 @@
 		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
 		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
 		DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */; };
+		DDB19133294AF37A00836AE0 /* QMUIConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB1912E294AF37A00836AE0 /* QMUIConfiguration.m */; };
+		DDB19134294AF37A00836AE0 /* QMUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB19131294AF37A00836AE0 /* QMUIHelper.m */; };
 		DDBF7893291BCECE0001855B /* LEEAlert+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
@@ -943,6 +945,12 @@
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
 		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
+		DDB1912D294AF37A00836AE0 /* QMUICommonDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUICommonDefines.h; sourceTree = "<group>"; };
+		DDB1912E294AF37A00836AE0 /* QMUIConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIConfiguration.m; sourceTree = "<group>"; };
+		DDB1912F294AF37A00836AE0 /* QMUIConfigurationMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfigurationMacros.h; sourceTree = "<group>"; };
+		DDB19130294AF37A00836AE0 /* QMUIHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIHelper.h; sourceTree = "<group>"; };
+		DDB19131294AF37A00836AE0 /* QMUIHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIHelper.m; sourceTree = "<group>"; };
+		DDB19132294AF37A00836AE0 /* QMUIConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfiguration.h; sourceTree = "<group>"; };
 		DDBF7890291A45120001855B /* KTVMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVMacro.h; sourceTree = "<group>"; };
 		DDBF7891291BCECE0001855B /* LEEAlert+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LEEAlert+KTVModal.h"; sourceTree = "<group>"; };
 		DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LEEAlert+KTVModal.m"; sourceTree = "<group>"; };
@@ -2274,6 +2282,12 @@
 		DDA1997A28FFE579009D3E61 /* QMUI */ = {
 			isa = PBXGroup;
 			children = (
+				DDB1912D294AF37A00836AE0 /* QMUICommonDefines.h */,
+				DDB19132294AF37A00836AE0 /* QMUIConfiguration.h */,
+				DDB1912E294AF37A00836AE0 /* QMUIConfiguration.m */,
+				DDB1912F294AF37A00836AE0 /* QMUIConfigurationMacros.h */,
+				DDB19130294AF37A00836AE0 /* QMUIHelper.h */,
+				DDB19131294AF37A00836AE0 /* QMUIHelper.m */,
 				DDA1997B28FFE579009D3E61 /* Configuration */,
 				DDA1998128FFE579009D3E61 /* Utils */,
 			);
@@ -2955,6 +2969,7 @@
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				05FFE73C290F74EE0024D22F /* VMPresentView.swift in Sources */,
 				0510B853290B799E0063E57A /* VRCreateRoomInputView.swift in Sources */,
+				DDB19134294AF37A00836AE0 /* QMUIHelper.m in Sources */,
 				DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */,
 				0510B823290B72FC0063E57A /* VRRoomEntity.swift in Sources */,
 				DD8417AD29090C520026B624 /* VLKTVMVView.m in Sources */,
@@ -3047,6 +3062,7 @@
 				05FFE704290F706C0024D22F /* VoiceRoomInviteCell.swift in Sources */,
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
+				DDB19133294AF37A00836AE0 /* QMUIConfiguration.m in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				E333F65129150ECB0031B35F /* ChatRoomServiceProtocol.swift in Sources */,

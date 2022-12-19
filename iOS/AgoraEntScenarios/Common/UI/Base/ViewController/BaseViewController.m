@@ -6,8 +6,7 @@
 #import "BaseViewController.h"
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
-#import "AgoraEntScenarios-Swift.h"
-@import YYCategories;
+#import "KTVMacro.h"
 
 @interface BaseViewController ()
 
@@ -24,13 +23,31 @@
     VLLog(@"控制器%@被销毁",self.class);
 }
 
+- (void)updateNavigationBarAppearance {
+    
+    UINavigationBar *navigationBar = self.navigationController.navigationBar;
+    if (!navigationBar) return;
+    
+    [navigationBar setBackgroundColor:[UIColor whiteColor]];
+    navigationBar.barTintColor = [UIColor whiteColor];
+    navigationBar.barStyle = UIBarStyleDefault;
+    navigationBar.tintColor = [UIColor blackColor];
+//    self.titleView.tintColor = [UIColor blackColor];
+}
+
 #pragma mark - Life Cycle Methods
 - (void)viewDidLoad {
     [super viewDidLoad];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+//    [self updateNavigationBarAppearance];
+}
+
 #pragma mark - Intial Methods
 - (void)initSubviews {
-    [super initSubviews];
+//    [super initSubviews];
     [self.view setBackgroundColor:UIColorMakeWithHex(@"#FFFFFF")];
 }
 #pragma mark - Events
@@ -74,7 +91,7 @@
 }
 #pragma mark - Private Method
 - (void)setupNavigationItems {
-    [super setupNavigationItems];
+//    [super setupNavigationItems];
     [self configNavigationBar:self.navigationController.navigationBar];
 }
 - (void)accordingWithNaviBarBtn:(VLNavigationBarStatus)btnStatus
@@ -102,7 +119,7 @@
 
 - (UIImage *)navigationBarShadowImage {
 
-    return [self navigationBarCuttingLine] ? UIImageMake(@"nav_line") : [UIImage qmui_imageWithColor:[UIColor clearColor] size:CGSizeMake(SCREEN_WIDTH, 1) cornerRadius:0];
+    return [self navigationBarCuttingLine] ? UIImageMake(@"nav_line") : [UIImage imageWithColor:[UIColor clearColor]];
 }
 - (BOOL)navigationBarCuttingLine {
     return false;
@@ -131,8 +148,8 @@
 
 //MARK: 屏幕
 - (void)didInitialize {
-    [super didInitialize];
-    self.supportedOrientationMask = UIInterfaceOrientationMaskPortrait;
+//    [super didInitialize];
+//    self.supportedOrientationMask = UIInterfaceOrientationMaskPortrait;
 }
 
 #pragma mark – Getters and Setters

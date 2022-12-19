@@ -9,6 +9,7 @@
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
 #import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
 
 @interface VLLocalWebViewController ()<WKNavigationDelegate, WKUIDelegate>
 

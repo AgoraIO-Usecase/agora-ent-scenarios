@@ -5,8 +5,8 @@
 
 #import "VLKTVItemBaseView.h"
 #import "VLFontUtils.h"
+#import "KTVMacro.h"
 @import Masonry;
-@import QMUIKit;
 
 @interface VLKTVItemBaseView()
 

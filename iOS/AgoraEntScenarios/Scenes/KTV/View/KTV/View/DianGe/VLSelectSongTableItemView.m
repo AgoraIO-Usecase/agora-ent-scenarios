@@ -13,7 +13,6 @@
 #import "VLToast.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-@import QMUIKit;
 @import MJRefresh;
 
 @interface VLSelectSongTableItemView ()<

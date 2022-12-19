@@ -6,7 +6,8 @@
 #import "VLDeviceUtils.h"
 #import <sys/utsname.h>
 #import <objc/runtime.h>
-@import QMUIKit;
+#import "QMUICommonDefines.h"
+#import "KTVMacro.h"
 
 @implementation VLDeviceUtils
 

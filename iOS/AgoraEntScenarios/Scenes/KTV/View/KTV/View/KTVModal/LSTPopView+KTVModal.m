@@ -7,7 +7,7 @@
 
 #import "LSTPopView+KTVModal.h"
 #import "VLMacroDefine.h"
-@import QMUIKit;
+#import "KTVMacro.h"
 
 @implementation LSTPopView (KTVModal)
 

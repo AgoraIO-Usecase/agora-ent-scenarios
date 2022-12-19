@@ -9,8 +9,6 @@
 #import "VLFontUtils.h"
 #import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLChooseBelcantoView ()<UICollectionViewDataSource,UICollectionViewDelegate>
 

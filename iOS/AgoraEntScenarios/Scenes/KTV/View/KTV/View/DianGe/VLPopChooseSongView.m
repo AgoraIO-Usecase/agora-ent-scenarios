@@ -8,8 +8,6 @@
 #import "VLChoosedSongView.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
-@import QMUIKit;
-@import YYCategories;
 
 @interface VLPopChooseSongView ()<VLSelectSongViewDelegate,VLChoosedSongViewDelegate>
 
