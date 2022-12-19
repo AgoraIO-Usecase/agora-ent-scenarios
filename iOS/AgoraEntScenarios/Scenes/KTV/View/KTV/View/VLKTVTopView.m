@@ -49,7 +49,7 @@
     [self.networkStatusBtn setImage:[UIImage sceneImageWithName:@"ktv_network_wellIcon"] forState:UIControlStateNormal];
     self.networkStatusBtn.frame = CGRectMake(closeBtn.left-15-75, closeBtn.top, 75, 20);
 //    self.networkStatusBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    self.networkStatusBtn.spacingBetweenImageAndTitle = 4;
+    self.networkStatusBtn.spacingBetweenImageAndTitle = 4;
     self.networkStatusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.networkStatusBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
     self.networkStatusBtn.titleLabel.font = UIFontMake(10.0);

@@ -76,7 +76,7 @@
     self.singingBtn.layer.cornerRadius = 6;
     self.singingBtn.layer.masksToBounds = YES;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    self.singingBtn.spacingBetweenImageAndTitle = 2;
+    self.singingBtn.spacingBetweenImageAndTitle = 2;
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [self.singingBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.singingBtn.titleLabel.font = UIFontMake(8);
@@ -93,7 +93,7 @@
     self.joinChorusBtn.layer.cornerRadius = 6;
     self.joinChorusBtn.layer.masksToBounds = YES;
 //    self.joinChorusBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    self.joinChorusBtn.spacingBetweenImageAndTitle = 2;
+    self.joinChorusBtn.spacingBetweenImageAndTitle = 2;
     self.joinChorusBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [self.joinChorusBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.joinChorusBtn.titleLabel.font = UIFontMake(8);

@@ -78,7 +78,7 @@
     [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    self.singingBtn.spacingBetweenImageAndTitle = 4;
+    self.singingBtn.spacingBetweenImageAndTitle = 4;
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [self.singingBtn setTitleColor:UIColorMakeWithHex(@"#009FFF") forState:UIControlStateNormal];
     self.singingBtn.titleLabel.font = UIFontMake(14.0);

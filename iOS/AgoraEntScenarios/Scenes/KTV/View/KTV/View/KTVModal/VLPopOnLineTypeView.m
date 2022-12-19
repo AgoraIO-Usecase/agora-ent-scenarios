@@ -55,7 +55,7 @@
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
 //    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    audioBtn.spacingBetweenImageAndTitle = 16;
+    audioBtn.spacingBetweenImageAndTitle = 16;
     audioBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [audioBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
     audioBtn.titleLabel.font = UIFontMake(14.0);
@@ -82,7 +82,7 @@
     [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
 //    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
-//    videoBtn.spacingBetweenImageAndTitle = 16;
+    videoBtn.spacingBetweenImageAndTitle = 16;
     videoBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [videoBtn setTitleColor:UIColorMakeWithHex(@"#C6C4DE") forState:UIControlStateNormal];
     videoBtn.titleLabel.font = UIFontMake(14.0);
