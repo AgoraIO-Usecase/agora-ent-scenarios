@@ -243,17 +243,17 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
         if let model = seatApplyModel, sender.tag == 1 {
-            AppContext.showServiceImp.acceptMicSeatApply(apply: model) { _ in
-                self.refreshDataClosure?()
+            AppContext.showServiceImp.acceptMicSeatApply(apply: model) {[weak self] _ in
+                self?.refreshDataClosure?()
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp.createMicSeatInvitation(user: model) { error in
+            AppContext.showServiceImp.createMicSeatInvitation(user: model) {[weak self] error in
                 if let err = error {
                     ToastView.show(text: err.localizedDescription)
                     return
                 }
                 
-                self.refreshDataClosure?()
+                self?.refreshDataClosure?()
             }
         }
     }

@@ -214,8 +214,8 @@ class ShowLiveViewController: UIViewController {
         agoraKitManager.leaveChannel()
         AppContext.showServiceImp.unsubscribeEvent(delegate: self)
         
-        AppContext.showServiceImp.leaveRoom { error in
-            self.dismiss(animated: true) {
+        AppContext.showServiceImp.leaveRoom {[weak self] error in
+            self?.dismiss(animated: true) {
             }
         }
     }
@@ -252,7 +252,7 @@ class ShowLiveViewController: UIViewController {
         showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
-        AppContext.showServiceImp.sendChatMessage(message: showMsg) { error in
+        AppContext.showServiceImp.sendChatMessage(message: showMsg) {[weak self] error in
             print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }

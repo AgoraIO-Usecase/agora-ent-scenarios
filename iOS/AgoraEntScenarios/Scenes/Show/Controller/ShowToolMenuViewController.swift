@@ -37,7 +37,7 @@ class ShowToolMenuViewController: UIViewController {
             self.menuView?.selectedMap = selectedMap
         }
     }
-    var delegate: ShowToolMenuViewControllerDelegate?
+    weak var delegate: ShowToolMenuViewControllerDelegate?
     
     private var menuView: ShowToolMenuView?
     
