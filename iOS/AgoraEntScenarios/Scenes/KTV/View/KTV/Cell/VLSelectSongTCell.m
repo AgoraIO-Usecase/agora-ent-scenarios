@@ -74,7 +74,7 @@
     self.singerLabel.frame = CGRectMake(self.nameLabel.left, self.nameLabel.bottom+8, self.width-20-80, 17);
     
     self.chooseBtn.frame = CGRectMake(self.width-56-25, (self.height-28)*0.5, 56, 28);
-    [self.chooseBtn sizeToFit];
+//    [self.chooseBtn sizeToFit];
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }
 
