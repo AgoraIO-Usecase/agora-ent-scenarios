@@ -9,7 +9,7 @@
 #import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
 @import YYCategories;
-@import ChameleonFramework;
+//@import ChameleonFramework;
 
 @interface VLsoundEffectView ()
 
@@ -64,7 +64,11 @@
     electronicLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:electronicLabel];
     
-    self.openSwitch = [[ZQTCustomSwitch alloc]initWithFrame:CGRectMake(electronicLabel.right+20,electronicLabel.centerY-13, 46, 26) onColor:UIColorMakeWithHex(@"#219BFF") offColor:HexColor(@"#DDDDDD") font:[UIFont systemFontOfSize:9] ballSize:22];
+    self.openSwitch = [[ZQTCustomSwitch alloc]initWithFrame:CGRectMake(electronicLabel.right+20,electronicLabel.centerY-13, 46, 26)
+                                                    onColor:UIColorMakeWithHex(@"#219BFF")
+                                                   offColor:UIColorMakeWithHex(@"#DDDDDD")
+                                                       font:[UIFont systemFontOfSize:9]
+                                                   ballSize:22];
     [self.openSwitch addTarget:self action:@selector(switchPressed:) forControlEvents:UIControlEventValueChanged];
     [self addSubview:self.openSwitch];
     

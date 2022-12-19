@@ -49,19 +49,19 @@
 
 - (NSArray *)tabViewControllers {
     VLHomeViewController *homeViewController = [[VLHomeViewController alloc] init];
-    homeViewController.hidesBottomBarWhenPushed = false;
+    homeViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *homeNavigationController = [[BaseNavigationController alloc]
                                                           initWithRootViewController:homeViewController];
     homeViewController.tabBarItem = [self tabBarItemsWithIndex:0];
     
     VLDiscoveryViewController *discoveryVC = [[VLDiscoveryViewController alloc] init];
-    discoveryVC.hidesBottomBarWhenPushed = false;
+    discoveryVC.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
                                                   initWithRootViewController:discoveryVC];
     discoveryVC.tabBarItem = [self tabBarItemsWithIndex:1];
 
     VLMineViewController *mineViewController = [[VLMineViewController alloc] init];
-    mineViewController.hidesBottomBarWhenPushed = false;
+    mineViewController.hidesBottomBarWhenPushed = NO;
     BaseNavigationController *mineNavigationController = [[BaseNavigationController alloc]
                                                    initWithRootViewController:mineViewController];
     mineViewController.tabBarItem = [self tabBarItemsWithIndex:2];
