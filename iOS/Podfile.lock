@@ -41,14 +41,8 @@ PODS:
   - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
   - AgoraRtm_iOS (1.5.1)
   - Bugly (2.5.93)
-  - ChameleonFramework (2.1.0):
-    - ChameleonFramework/Default (= 2.1.0)
-  - ChameleonFramework/Default (2.1.0)
   - CRBoxInputView (1.2.2):
     - Masonry
-  - CYLTabBarController (1.29.2):
-    - CYLTabBarController/Core (= 1.29.2)
-  - CYLTabBarController/Core (1.29.2)
   - HWPanModal (0.8.9)
   - HWWeakTimer (1.0)
   - InputKit (1.1.15)
@@ -99,9 +93,7 @@ DEPENDENCIES:
   - AgoraRtcEngine_Special_iOS (= 4.0.1.4.full)
   - AgoraRtm_iOS
   - Bugly
-  - ChameleonFramework
   - CRBoxInputView
-  - CYLTabBarController
   - HWPanModal (~> 0.8.9)
   - HWWeakTimer
   - InputKit
@@ -134,9 +126,7 @@ SPEC REPOS:
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - Bugly
-    - ChameleonFramework
     - CRBoxInputView
-    - CYLTabBarController
     - HWPanModal
     - HWWeakTimer
     - InputKit
@@ -172,9 +162,7 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
-  CYLTabBarController: db44b5901a28693a8a4279e4721b3aafdd36c178
   HWPanModal: 259f6916c706b3f63003a325ad1bdfbe913b0fdc
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   InputKit: b82938c2c684d285909cac9de150739aa4814d10
@@ -202,6 +190,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: 529bd29b76d3e9abf70c1c1d4c8f974e516b8655
+PODFILE CHECKSUM: 3fdf159304a51842a6dab648b1b6b3066d7db720
 
 COCOAPODS: 1.11.3
