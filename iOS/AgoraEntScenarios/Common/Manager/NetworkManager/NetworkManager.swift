@@ -165,7 +165,7 @@ class NetworkManager:NSObject {
             print("setupContentInspectConfig fail")
             return
         }
-        let payload = String(data: jsonData, encoding: .utf8)
+        let payload: String = String(data: jsonData, encoding: .utf8) ?? ""
         
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
