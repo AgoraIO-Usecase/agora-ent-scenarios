@@ -11,7 +11,7 @@ import UIKit
 var expandSizeKey = "expandSizeKey"
 
 extension UIButton {
-    open func vm_expandSize(size: CGFloat) {
+    public func vm_expandSize(size: CGFloat) {
         objc_setAssociatedObject(self, &expandSizeKey, size, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY)
     }
 

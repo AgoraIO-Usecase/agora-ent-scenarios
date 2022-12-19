@@ -69,7 +69,6 @@ import io.agora.scene.ktv.service.OutSeatInputModel;
 import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
-import io.agora.scene.ktv.service.UpdateSingingScoreInputModel;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import kotlin.Unit;
@@ -465,6 +464,7 @@ public class RoomLivingViewModel extends ViewModel {
                         mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
                         mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                     }
+                    toggleMic(false);
                 } else {
                     // failure
                     Log.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
@@ -1038,7 +1038,7 @@ public class RoomLivingViewModel extends ViewModel {
                         if (mPlayer == null) return;
                         long position = jsonMsg.getLong("position");
                         mPlayer.seek(position);
-                    } else if (jsonMsg.getString("cmd").equals("SyncPitch")) {
+                    } else if (jsonMsg.getString("cmd").equals("setVoicePitch")) {
                         // 伴唱收到原唱seek指令
                         if (mPlayer == null) return;
                         double pitch = jsonMsg.getDouble("pitch");
@@ -1062,7 +1062,6 @@ public class RoomLivingViewModel extends ViewModel {
                         || Objects.equals(songPlaying.getChorusNo(), UserManager.getInstance().getUser().userNo)) {
                     for (AudioVolumeInfo info : speakers) {
                         if (info.uid == 0 && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                            ktvServiceProtocol.updateSingingScore(new UpdateSingingScoreInputModel(info.voicePitch));
                             if (mPlayer != null && mPlayer.getState() == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                                 playerPitchLiveData.postValue(info.voicePitch);
                                 pitch = info.voicePitch;
@@ -1906,7 +1905,7 @@ public class RoomLivingViewModel extends ViewModel {
 
             private void sendSyncPitch(double pitch) {
                 Map<String, Object> msg = new HashMap<>();
-                msg.put("cmd", "SyncPitch");
+                msg.put("cmd", "setVoicePitch");
                 msg.put("pitch", pitch);
                 JSONObject jsonMsg = new JSONObject(msg);
 

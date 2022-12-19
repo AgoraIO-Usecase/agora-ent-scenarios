@@ -69,11 +69,10 @@ def all_pods
   pod 'SnapKit'
   pod 'SVGAPlayer'
   pod 'KakaJSON'
-  pod 'Agora_Chat_iOS'
+  pod 'Agora_Chat_iOS','1.0.8'
   
-  
-  # debug
-  pod 'Bugly'
+  #bugly
+  pod 'Bugly','2.5.93'
 end
 
 target 'AgoraEntScenarios' do
