@@ -171,7 +171,6 @@ class ShowLiveViewController: UIViewController {
     
     deinit {
         print("deinit-- ShowLiveViewController")
-        agoraKitManager.destory()
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
