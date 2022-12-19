@@ -17,10 +17,13 @@ class ShowCreateLiveVC: UIViewController {
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
+    private let liveVC = ShowLiveViewController()
+    
     lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
-        return manager
+//        let manager = ShowAgoraKitManager()
+//        manager.defaultSetting()
+//        return manager
+        return liveVC.agoraKitManager
     }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
@@ -170,11 +173,12 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
                                              thumbnailId: createView.roomBg) { [weak self] err, detailModel in
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self else { return }
-            let liveVC = ShowLiveViewController()
-            liveVC.room = detailModel
-            liveVC.selectedResolution = wSelf.selectedResolution
-            liveVC.agoraKitManager = wSelf.agoraKitManager
-            wSelf.navigationController?.pushViewController(liveVC, animated: false)
+//            let liveVC = ShowLiveViewController()
+            wSelf.liveVC.room = detailModel
+            wSelf.liveVC.selectedResolution = wSelf.selectedResolution
+//            liveVC.agoraKitManager = wSelf.agoraKitManager
+            
+            wSelf.navigationController?.pushViewController(wSelf.liveVC, animated: false)
         }
     }
 }

@@ -131,22 +131,22 @@ class ShowApplyAndInviteView: UIView {
     }
     
     private func getApplyList() {
-        AppContext.showServiceImp.getAllMicSeatApplyList { _, list in
+        AppContext.showServiceImp.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
-            self.tableView.dataArray = list.filter({ $0.status == .waitting })
+            self?.tableView.dataArray = list.filter({ $0.status == .waitting })
         }
     }
     private func getInviteList() {
-        AppContext.showServiceImp.getAllUserList { _, list in
+        AppContext.showServiceImp.getAllUserList {[weak self] _, list in
             guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
-            self.tableView.dataArray = list.filter({ $0.status != .accepted })
+            self?.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
     
     private func getApplyPKInfo() {
-        AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) { roomModel in
-            self.tipsContainerView.isHidden = roomModel == nil
-            self.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
+        AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
+            self?.tipsContainerView.isHidden = roomModel == nil
+            self?.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
         }
     }
     private func getApplyLinkInfo() {
