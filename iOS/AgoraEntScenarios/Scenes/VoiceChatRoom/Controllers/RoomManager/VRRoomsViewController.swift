@@ -8,6 +8,7 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
+import AgoraChat
 
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
@@ -35,10 +36,12 @@ let page_size = 15
 
     private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
     
+    private var initialError: AgoraChatError?
+    
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
-        VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
+        self.initialError = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
         mapUser(user: user)
         self.showContent()
     }
@@ -123,7 +126,7 @@ extension VRRoomsViewController {
         SVProgressHUD.show(withStatus: "Loading".localized())
         ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
             SVProgressHUD.dismiss()
-            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty {
+            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
                 SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
                 return
             }
