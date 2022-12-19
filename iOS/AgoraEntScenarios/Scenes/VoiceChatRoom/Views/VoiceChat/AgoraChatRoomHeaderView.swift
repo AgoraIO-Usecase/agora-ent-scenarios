@@ -319,16 +319,24 @@ class AgoraChatRoomHeaderView: UIView {
             if rankList.count == 0 { return }
 
             if let fImg: String = rankList[0].portrait {
-                rankFBtn.setImage(getImage(with: fImg), for: .normal)
+                
                 rankFBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
-                    make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
+                    make.right.equalTo(totalCountLabel.snp.left).offset(-10)
                 }
+                var img_first: UIImage?
+                getImage(with: fImg) { img in
+                    img_first = img
+                    DispatchQueue.main.async {[weak self] in
+                        self?.rankFBtn.setImage(img_first, for: .normal)
+                    }
+                }
+                
             }
 
             if rankList.count < 2 { return }
             if let sImg = rankList[1].portrait {
-                rankSBtn.setImage(getImage(with: sImg), for: .normal)
+                
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
                 rankFBtn.snp.updateConstraints { make in
@@ -337,11 +345,20 @@ class AgoraChatRoomHeaderView: UIView {
                 rankSBtn.snp.updateConstraints { make in
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
                 }
+                
+                var img_second: UIImage?
+                getImage(with: sImg) { img in
+                    img_second = img
+                    DispatchQueue.main.async {[weak self] in
+                        self?.rankSBtn.setImage(img_second, for: .normal)
+                    }
+                }
+
             }
 
             if rankList.count < 3 { return }
             if let tImg = rankList[2].portrait {
-                rankTBtn.setImage(getImage(with: tImg), for: .normal)
+                
                 rankFBtn.isHidden = false
                 rankSBtn.isHidden = false
                 rankTBtn.isHidden = false
@@ -353,6 +370,14 @@ class AgoraChatRoomHeaderView: UIView {
                 }
                 rankTBtn.snp.updateConstraints { make in
                     make.right.equalTo(self.totalCountLabel.snp.left).offset(-10)
+                }
+                
+                var img_third: UIImage?
+                getImage(with: tImg) { img in
+                    img_third = img
+                    DispatchQueue.main.async {[weak self] in
+                        self?.rankTBtn.setImage(img_third, for: .normal)
+                    }
                 }
             }
         } else {
@@ -379,15 +404,21 @@ class AgoraChatRoomHeaderView: UIView {
         return soundType
     }
     
-    func getImage(with url: String) -> UIImage? {
-        if let img_url: URL = URL(string: url) {
-            if let data: Data = try? Data(contentsOf: img_url) {
-                if let img: UIImage = UIImage(data: data) {
-                    return img
+    func getImage(with url: String,  completion:(@escaping (UIImage?) -> Void)){
+        DispatchQueue.global().async{
+            if let img_url: URL = URL(string: url) {
+                if let data: Data = try? Data(contentsOf: img_url) {
+                    if let img: UIImage = UIImage(data: data) {
+                        completion(img)
+                    } else {
+                        completion(nil)
+                    }
+                } else {
+                    completion(nil)
                 }
+            } else {
+                completion(nil)
             }
-            
         }
-        return nil
     }
 }
