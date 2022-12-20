@@ -18,6 +18,7 @@ interface VoiceServiceProtocol {
         const val ERR_LOGIN_ERROR = 2
         const val ERR_LOGIN_SUCCESS = 3
         const val ERR_ROOM_UNAVAILABLE = 4
+        const val ERR_ROOM_NAME_INCORRECT = 5
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->

@@ -225,4 +225,5 @@
     <string name="voice_room_unavailable_tip">房间不存在，请刷新列表重试</string>
     <string name="voice_room_content_prohibited">内容禁止发送</string>
     <string name="voice_room_send_tip">发送</string>
+    <string name="voice_room_name_rule">房间名不合规</string>
 </resources>
