@@ -7,13 +7,13 @@
 
 import UIKit
 
-public protocol HorizontalCardsDataSource {
+@objc public protocol HorizontalCardsDataSource: NSObjectProtocol {
     func horizontalCardsViewNumberOfItems(_: HorizontalCardsView) -> Int
 
     func horizontalCardsView(_: HorizontalCardsView, viewForIndex index: Int) -> HorizontalCardView
 }
 
-public protocol HorizontalCardsDelegate {
+@objc public protocol HorizontalCardsDelegate: NSObjectProtocol {
     func horizontalCardsView(_: HorizontalCardsView, didSelectItemAtIndex index: Int)
 
     func horizontalCardsView(_: HorizontalCardsView, scrollIndex: Int)
@@ -26,12 +26,12 @@ public class HorizontalCardsView: UIView, UICollectionViewDelegate, UICollection
 
     private var indexOfCellBeforeDragging = 0
 
-    public var dataSource: HorizontalCardsDataSource!
+    public weak var dataSource: HorizontalCardsDataSource?
 
-    public var delegate: HorizontalCardsDelegate?
+    public weak var delegate: HorizontalCardsDelegate?
 
     private var viewsCount: Int {
-        dataSource.horizontalCardsViewNumberOfItems(self)
+        dataSource?.horizontalCardsViewNumberOfItems(self) ?? 0
     }
 
     private var cardSize: CGSize {
@@ -105,7 +105,7 @@ public class HorizontalCardsView: UIView, UICollectionViewDelegate, UICollection
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! HorizontalCardCell
-        let view = dataSource.horizontalCardsView(self, viewForIndex: indexPath.row)
+        guard let view = dataSource?.horizontalCardsView(self, viewForIndex: indexPath.row) else { return cell }
         cell.embedView(view)
         return cell
     }
