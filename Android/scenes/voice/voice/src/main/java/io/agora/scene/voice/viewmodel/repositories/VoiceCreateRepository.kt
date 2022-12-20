@@ -79,10 +79,16 @@ class VoiceCreateRepository : BaseRepository() {
                     roomType = roomType
                 )
                 voiceServiceProtocol.createRoom(voiceCreateRoomModel, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error, "")
+                    when (error) {
+                        VoiceServiceProtocol.ERR_OK -> {
+                            callBack.onSuccess(createLiveData(result))
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
+                            callBack.onError(error, "")
+                        }
+                        else -> {
+                            callBack.onError(error, "")
+                        }
                     }
                 })
             }
