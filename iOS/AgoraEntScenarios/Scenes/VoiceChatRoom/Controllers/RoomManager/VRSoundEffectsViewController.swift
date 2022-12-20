@@ -58,18 +58,6 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         }
     }
 
-    private func createRoom() {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .createRoom(()), params: ["name": name, "is_private":!code.isEmpty, "password": code, "type": type, "sound_effect": effects.type, "allow_free_join_mic": false], classType: VRRoomInfo.self) { info, error in
-            if error == nil, info != nil {
-                self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-                let vc = VoiceRoomViewController(info: info!)
-                self.navigationController?.pushViewController(vc, animated: true)
-            } else {
-                self.view.makeToast("Create failed!".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-            }
-        }
-    }
-
     @objc private func entryRoom() {
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.show(withStatus: "Loading".localized())
