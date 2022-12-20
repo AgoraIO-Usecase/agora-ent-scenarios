@@ -195,6 +195,9 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     }
 
     private void updateNodeByCache() {
+        if (mEffectManager == null) {
+            return;
+        }
         mEffectManager.updateComposerNodeIntensity(BEAUTY_NODE, "smooth", BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));// 磨皮
         mEffectManager.updateComposerNodeIntensity(BEAUTY_NODE, "whiten", BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_WHITEN));// 美白
         mEffectManager.updateComposerNodeIntensity(RESHARP_LITE_NODE, "Internal_Deform_Overall", BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));//瘦脸
@@ -237,7 +240,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     protected void setFaceBeautifyAfterCached(int itemId, float intensity) {
-        if (isReleased) {
+        if (isReleased || mEffectManager == null) {
             return;
         }
         updateNodeByCache();
@@ -247,7 +250,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     protected void setEffectAfterCached(int itemId, float intensity) {
-        if (isReleased) {
+        if (isReleased || mEffectManager == null) {
             return;
         }
         updateNodeByCache();
@@ -255,7 +258,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     protected void setFilterAfterCached(int itemId, float intensity) {
-        if (isReleased) {
+        if (isReleased || mEffectManager == null) {
             return;
         }
         if (itemId == ITEM_ID_FILTER_NONE) {
@@ -369,7 +372,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     @Override
     protected void setStickerAfterCached(int itemId) {
-        if (isReleased) {
+        if (isReleased || mEffectManager == null) {
             return;
         }
         if (itemId == ITEM_ID_STICKER_NONE) {

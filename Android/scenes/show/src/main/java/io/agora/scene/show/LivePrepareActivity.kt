@@ -77,6 +77,7 @@ class LivePrepareActivity : ComponentActivity() {
         }
 
         checkRequirePerms {
+            mBeautyProcessor.reset()
             initRtcEngine()
             showPresetDialog()
         }

@@ -32,6 +32,11 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
         }
     }
 
+    fun reset(){
+        BeautyCache.reset()
+        BeautyCache.restoreByOperation(this)
+    }
+
     fun setEnable(enable: Boolean){
         isEnable = enable
     }
