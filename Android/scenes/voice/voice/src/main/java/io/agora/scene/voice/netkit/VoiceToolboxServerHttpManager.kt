@@ -241,7 +241,11 @@ class VoiceToolboxServerHttpManager {
 
                 override fun onError(var1: Int, var2: String?) {
                     "SyncToolboxService create room error code:$var1,msg:$var2".logE()
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
+                    if (roomId.isEmpty()){
+                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT, roomId)
+                    }else{
+                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
+                    }
                 }
             })
     }
