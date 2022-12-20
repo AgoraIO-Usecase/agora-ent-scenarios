@@ -60,6 +60,7 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
     }
 
     fun setEffect(itemId: Int, intensity: Float){
+        BeautyCache.resetGroupValue(GROUP_ID_EFFECT)
         BeautyCache.cacheItemValue(GROUP_ID_EFFECT, itemId, intensity)
         BeautyCache.cacheOperation(GROUP_ID_EFFECT, itemId)
         workerExecutor.execute{
