@@ -330,6 +330,12 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun refreshViewDetailLayout(status: Int) {
         when (status) {
             ShowInteractionStatus.idle.value -> {
+                if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
+                    ToastUtils.showToast(R.string.show_link_is_stopped)
+                } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+                    ToastUtils.showToast(R.string.show_pk_is_stopped)
+                }
+
                 mBinding.videoPKLayout.iBroadcasterAView.apply {
                     if(childCount > 1){
                         removeViewAt(0)
@@ -941,6 +947,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mRtcEngine.removeHandler(mRtcEngineHandler)
         mRtcEngine.stopPreview()
         mRtcEngine.leaveChannel()
+        RtcEngineInstance.destroy()
     }
 
     private fun joinChannel() {
@@ -1084,6 +1091,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 audienceVideoView.setOnClickListener {
                     showLinkSettingsDialog()
                 }
+                mRtcEngine.enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
                 channelMediaOptions.publishMicrophoneTrack = true

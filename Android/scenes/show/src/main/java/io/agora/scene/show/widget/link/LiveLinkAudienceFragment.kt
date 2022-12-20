@@ -9,7 +9,6 @@ import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkAudienceBinding
-import io.agora.scene.show.databinding.ShowLiveLinkInvitationMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
 import io.agora.scene.show.service.ShowMicSeatApply
@@ -90,6 +89,11 @@ class LiveLinkAudienceFragment : BaseFragment() {
         } else {
             binding.linkRequestListEmptyImg.visibility = View.GONE
             binding.linkRequestListEmpty.visibility = View.GONE
+
+            val apply = list.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
+            if (apply != null) {
+                setOnApplySuccess()
+            }
         }
 
         if (interactionInfo != null && interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value &&

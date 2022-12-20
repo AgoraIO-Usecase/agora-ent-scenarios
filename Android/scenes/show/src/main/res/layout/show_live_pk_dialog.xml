@@ -17,7 +17,8 @@
         android:layout_marginTop="23dp"
         android:button="@null"
         android:gravity="center"
-        android:text="@string/show_linking_request_message"
+        android:textSize="16sp"
+        android:text="@string/show_pking_request_message"
         android:textColor="@color/black"
         android:textStyle="bold" />
 

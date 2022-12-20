@@ -59,6 +59,29 @@ class ShowSyncManagerServiceImpl(
     private var micPKInvitationSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowPKInvitation?) -> Unit)? = null
     private var micInteractionInfoSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowInteractionInfo?) -> Unit)? = null
 
+    override fun reset() {
+        if (syncInitialized) {
+            Sync.Instance().destroy()
+            syncInitialized = false
+
+            objIdOfUserId.clear()
+            objIdOfSeatApply.clear()
+            objIdOfSeatInvitation.clear()
+            objIdOfPKInvitation.clear()
+            objIdOfInteractionInfo.clear()
+            pKCompetitorInvitationList.clear()
+            objIdOfPKCompetitorInvitation.clear()
+
+            currEventListeners.clear()
+            roomMap.clear()
+            userList.clear()
+            micSeatApplyList.clear()
+            micSeatInvitationList.clear()
+            pKInvitationList.clear()
+            interactionInfoList.clear()
+            currRoomNo = ""
+        }
+    }
 
     override fun getRoomList(
         success: (List<ShowRoomDetailModel>) -> Unit,
@@ -172,6 +195,15 @@ class ShowSyncManagerServiceImpl(
         val roomDetail = roomMap[currRoomNo] ?: return
         val sceneReference = sceneReferenceMap[currRoomNo] ?: return
 
+        // 移除连麦申请
+        val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
+        if (targetApply != null) {
+            val indexOf = micSeatApplyList.indexOf(targetApply)
+            micSeatApplyList.removeAt(indexOf)
+            val removedSeatApplyObjId = objIdOfSeatApply.removeAt(indexOf)
+            innerRemoveSeatApply(removedSeatApplyObjId, null, null)
+        }
+
         currEventListeners.forEach {
             sceneReference.unsubscribe(it)
         }
@@ -270,6 +302,11 @@ class ShowSyncManagerServiceImpl(
     }
 
     override fun createMicSeatApply(success: (() -> Unit)?, error: ((Exception) -> Unit)?) {
+        val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
+        if (targetApply != null) {
+            error?.invoke(RuntimeException("The seat apply found!"))
+            return
+        }
         val apply = ShowMicSeatApply(
             UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.headUrl,
@@ -287,7 +324,7 @@ class ShowSyncManagerServiceImpl(
         }
         val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
         if (targetApply == null) {
-            error?.invoke(RuntimeException("The seat apply found!"))
+            error?.invoke(RuntimeException("The seat apply not found!"))
             return
         }
 
@@ -313,17 +350,10 @@ class ShowSyncManagerServiceImpl(
             return
         }
 
-        val seatApply = ShowMicSeatApply(
-            targetApply.userId,
-            targetApply.avatar,
-            targetApply.userName,
-            ShowRoomRequestStatus.accepted.value,
-            targetApply.createAt
-        )
-
         val indexOf = micSeatApplyList.indexOf(targetApply)
-        micSeatApplyList[indexOf] = seatApply
-        innerUpdateSeatApply(objIdOfSeatApply[indexOf], seatApply, success, error)
+        micSeatApplyList.removeAt(indexOf)
+        val removedSeatApplyObjId = objIdOfSeatApply.removeAt(indexOf)
+        innerRemoveSeatApply(removedSeatApplyObjId, success, error)
 
         val interaction = ShowInteractionInfo(
             apply.userId,
@@ -577,22 +607,10 @@ class ShowSyncManagerServiceImpl(
             return
         }
 
-        val invitation = ShowPKInvitation(
-            targetInvitation.userId,
-            targetInvitation.userName,
-            currRoomNo,
-            targetInvitation.fromUserId,
-            targetInvitation.fromName,
-            targetInvitation.fromRoomId,
-            ShowRoomRequestStatus.rejected.value,
-            false,
-            fromUserMuteAudio = false,
-            createAt = targetInvitation.createAt
-        )
-
         val indexOf = pKInvitationList.indexOf(targetInvitation)
-        pKInvitationList[indexOf] = invitation
-        innerUpdatePKInvitation(currRoomNo, objIdOfPKInvitation[indexOf], invitation, success, error)
+        pKInvitationList.removeAt(indexOf)
+        val removedObjId = objIdOfPKInvitation.removeAt(indexOf)
+        innerRemovePKInvitation(currRoomNo, removedObjId, success, error)
     }
 
     override fun getAllInterationList(
@@ -832,9 +850,10 @@ class ShowSyncManagerServiceImpl(
 
     private fun innerMayAddLocalUser(success: () -> Unit, error: (Exception) -> Unit) {
         val userId = UserManager.getInstance().user.id.toString()
+        val avatarUrl = UserManager.getInstance().user.headUrl
         innerGetUserList({ list ->
             if (list.none { it.userId == it.toString() }) {
-                innerAddUser(ShowUser(userId, "1", UserManager.getInstance().user.name),
+                innerAddUser(ShowUser(userId, avatarUrl, UserManager.getInstance().user.name),
                     {
                         objIdOfUserId[userId] = it
                         innerUpdateRoomUserCount(list.size + 1, {

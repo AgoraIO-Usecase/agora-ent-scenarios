@@ -24,16 +24,24 @@ class LivePKViewAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowLivePkReq
             .error(R.mipmap.show_default_icon)
             .transform(CenterCropRoundCornerTransform(10))
             .into(binding.coverBoardcasterIcon)
-        if (roomItem.interactStatus == ShowInteractionStatus.idle.value) {
-            binding.btnItemRequest.isEnabled = true
-            binding.btnItemRequest.setText(R.string.show_application)
-            binding.btnItemRequest.setOnClickListener {
-                onClickListener.onClick(roomItem, position)
+        when (roomItem.interactStatus) {
+            ShowInteractionStatus.idle.value -> {
+                binding.btnItemRequest.isEnabled = true
+                binding.btnItemRequest.setText(R.string.show_application)
+                binding.btnItemRequest.setOnClickListener {
+                    onClickListener.onClick(roomItem, position)
+                }
             }
-        } else if (roomItem.interactStatus == ShowInteractionStatus.pking.value) {
-            binding.btnItemRequest.isEnabled = false
-            binding.btnItemRequest.setText(R.string.show_pking)
-            binding.btnItemRequest.setOnClickListener(null)
+            ShowInteractionStatus.pking.value -> {
+                binding.btnItemRequest.isEnabled = false
+                binding.btnItemRequest.setText(R.string.show_pking)
+                binding.btnItemRequest.setOnClickListener(null)
+            }
+            ShowInteractionStatus.onSeat.value -> {
+                binding.btnItemRequest.isEnabled = false
+                binding.btnItemRequest.setText(R.string.show_linking)
+                binding.btnItemRequest.setOnClickListener(null)
+            }
         }
     }
 
