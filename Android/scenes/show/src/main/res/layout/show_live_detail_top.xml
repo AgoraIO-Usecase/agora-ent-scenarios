@@ -182,6 +182,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/tlStatistic"
         app:layout_constraintTop_toTopOf="@id/tlStatistic"
+        android:src="@mipmap/close"
         tools:visibility="visible" />
 
 

@@ -91,6 +91,8 @@ class LiveDetailActivity : AppCompatActivity() {
     private var mPKInvitationCountDownLatch: CountDownTimer? = null
     private var mPKCountDownLatch: CountDownTimer? = null
 
+    private var isAudioOnlyMode = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
@@ -330,19 +332,54 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun refreshStatisticInfo(bitrate: Int? = null, fps: Int? = null, delay: Int? = null,
-                                     lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null){
+                                     lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null,
+                                     audioBitrate: Int? = null, audioLossPackage: Int ?= null,
+                                     cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null){
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
         val visible = statisticBinding.isVisible
         if(!visible){
             return
         }
-        bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
-        fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
-        delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-        lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
-        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
-        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
+        if (isRoomOwner) {
+            if(isAudioOnlyMode){
+                delay?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_delay, it.toString()) }
+                audioBitrate?.let { topBinding.tvStatisticFPS.text = "ASend: $it bps" }
+                cpuAppUsage?.let { cpuTotalUsage?.let { topBinding.tvStatisticDelay.text = "CPU: ${cpuAppUsage}%/${cpuTotalUsage}%" } }
+                audioLossPackage?.let { topBinding.tvStatisticLossPackage.text = "ASend Loss: $it" }
+                topBinding.tvStatisticUpNet.isVisible = false
+                topBinding.tvStatisticDownNet.isVisible = false
+            }else{
+                bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+                fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
+                delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
+                lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
+                upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
+                downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
+                topBinding.tvStatisticUpNet.isVisible = true
+                topBinding.tvStatisticDownNet.isVisible = true
+            }
+        } else {
+            if(isAudioOnlyMode){
+                audioBitrate?.let { topBinding.tvStatisticBitrate.text = "ARecv: $it bps" }
+                audioLossPackage?.let { topBinding.tvStatisticDelay.text = "ALoss: $it %" }
+                topBinding.tvStatisticUpNet.isVisible = false
+                topBinding.tvStatisticFPS.isVisible = false
+                topBinding.tvStatisticLossPackage.isVisible = false
+                topBinding.tvStatisticDownNet.isVisible = false
+            }else{
+                bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+                fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
+                delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
+                lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
+                upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
+                downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
+                topBinding.tvStatisticUpNet.isVisible = true
+                topBinding.tvStatisticFPS.isVisible = true
+                topBinding.tvStatisticLossPackage.isVisible = true
+                topBinding.tvStatisticDownNet.isVisible = true
+            }
+        }
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -899,31 +936,113 @@ class LiveDetailActivity : AppCompatActivity() {
                 ToastUtils.showToast(RtcEngine.getErrorDescription(err))
             }
 
+            override fun onLocalVideoStateChanged(
+                source: Constants.VideoSourceType?,
+                state: Int,
+                error: Int
+            ) {
+                super.onLocalVideoStateChanged(source, state, error)
+                if (isRoomOwner) {
+                    isAudioOnlyMode = state == Constants.LOCAL_VIDEO_STREAM_STATE_STOPPED
+                }
+            }
+
+            override fun onRemoteVideoStateChanged(
+                uid: Int,
+                state: Int,
+                reason: Int,
+                elapsed: Int
+            ) {
+                super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+                if (uid == mRoomInfo.ownerId.toInt()) {
+                    isAudioOnlyMode = state == Constants.REMOTE_VIDEO_STATE_STOPPED
+                }
+            }
+
+            override fun onRtcStats(stats: RtcStats?) {
+                super.onRtcStats(stats)
+                if(isRoomOwner){
+                    runOnUiThread {
+                        refreshStatisticInfo(
+                            delay = stats?.lastmileDelay,
+                            cpuAppUsage = stats?.cpuAppUsage,
+                            cpuTotalUsage = stats?.cpuTotalUsage,
+                        )
+                    }
+                }
+            }
+
             override fun onLocalVideoStats(
                 source: Constants.VideoSourceType?,
                 stats: LocalVideoStats?
             ) {
                 super.onLocalVideoStats(source, stats)
-                refreshStatisticInfo(
-                    bitrate = stats?.encodedBitrate,
-                    fps = stats?.encoderOutputFrameRate,
-                    lossPackage = stats?.txPacketLossRate
-                )
+                if(isRoomOwner){
+                    runOnUiThread {
+                        refreshStatisticInfo(
+                            bitrate = stats?.sentBitrate,
+                            fps = stats?.sentFrameRate,
+                            lossPackage = stats?.txPacketLossRate
+                        )
+                    }
+                }
             }
+
+            override fun onLocalAudioStats(stats: LocalAudioStats?) {
+                super.onLocalAudioStats(stats)
+                if(isRoomOwner){
+                    runOnUiThread {
+                        refreshStatisticInfo(
+                            audioBitrate = stats?.sentBitrate,
+                            audioLossPackage = stats?.txPacketLossRate
+                        )
+                    }
+                }
+            }
+
+            override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
+                super.onRemoteVideoStats(stats)
+                if(stats?.uid == mRoomInfo.ownerId.toInt()){
+                    runOnUiThread {
+                        refreshStatisticInfo(
+                            bitrate = stats.receivedBitrate,
+                            fps = stats.decoderOutputFrameRate,
+                            lossPackage = stats.packetLossRate,
+                            delay = stats.delay
+                        )
+                    }
+                }
+            }
+
+            override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
+                super.onRemoteAudioStats(stats)
+                if(stats?.uid == mRoomInfo.ownerId.toInt()){
+                    runOnUiThread {
+                        refreshStatisticInfo(
+                            audioBitrate = stats.receivedBitrate,
+                            audioLossPackage = stats.audioLossRate,
+                        )
+                    }
+                }
+            }
+
 
             override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
                 super.onUplinkNetworkInfoUpdated(info)
-                refreshStatisticInfo(
-                    upLinkBps = info?.video_encoder_target_bitrate_bps
-                )
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        upLinkBps = (info?.video_encoder_target_bitrate_bps ?: 0)/ 1000
+                    )
+                }
             }
 
             override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
                 super.onDownlinkNetworkInfoUpdated(info)
-                refreshStatisticInfo(
-                    downLinkBps = info?.bandwidth_estimation_bps,
-                    delay = info?.lastmile_buffer_delay_time_ms
-                )
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        downLinkBps = info?.bandwidth_estimation_bps
+                    )
+                }
             }
 
             override fun onContentInspectResult(result: Int) {
