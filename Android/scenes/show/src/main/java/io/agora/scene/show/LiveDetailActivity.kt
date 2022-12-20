@@ -299,15 +299,19 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showMessageInputDialog() {
-        TextInputDialog(this).setOnInsertHeightChangeListener {
-            mBinding.messageLayout.root.layoutParams =
-                (mBinding.messageLayout.root.layoutParams as MarginLayoutParams).apply {
-                    bottomMargin = it
-                }
-        }.setOnSentClickListener { dialog, msg ->
-            mService.sendChatMessage(msg)
-            dialog.dismiss()
-        }.show()
+        TextInputDialog(this)
+            .setMaxInput(80)
+            .setOnInsertHeightChangeListener {
+                mBinding.messageLayout.root.layoutParams =
+                    (mBinding.messageLayout.root.layoutParams as MarginLayoutParams).apply {
+                        bottomMargin = it
+                    }
+            }
+            .setOnSentClickListener { dialog, msg ->
+                mService.sendChatMessage(msg)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun refreshTopUserCount(count: Int) =

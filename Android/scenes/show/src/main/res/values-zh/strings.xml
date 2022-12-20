@@ -182,4 +182,5 @@
     <string name="show_setting_preset_audience_enhance_description">针对不同机型适配了对应的画质增强策略</string>
     <string name="show_setting_preset_audience_basic_title">基础模式</string>
     <string name="show_setting_preset_audience_basic_description">基础模式</string>
+    <string name="show_live_prepare_setting">设置</string>
 </resources>
