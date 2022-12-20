@@ -109,7 +109,7 @@ object BeautyCache {
         }
         cacheItemOperation[groupId] = arrayListOf<Int>().apply {
             cacheItemOperation[groupId]?.let {
-                it.removeIf { item -> item == itemId }
+                it.remove(itemId)
                 addAll(it)
             }
             add(itemId)

@@ -306,6 +306,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
         }.setOnSentClickListener { dialog, msg ->
             mService.sendChatMessage(msg)
+            dialog.dismiss()
         }.show()
     }
 
