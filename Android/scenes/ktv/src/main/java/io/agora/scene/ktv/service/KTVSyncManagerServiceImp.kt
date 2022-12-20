@@ -70,6 +70,25 @@ class KTVSyncManagerServiceImp(
     @Volatile
     private var currRoomNo: String = ""
 
+    override fun reset() {
+        if (syncUtilsInited) {
+            Instance().destroy()
+            syncUtilsInited = false
+
+            objIdOfRoomNo.clear()
+            objIdOfSongNo.clear()
+            objIdOfSeatIndex.clear()
+            objIdOfUserNo.clear()
+            objIdOfSingingScore = ""
+
+            roomSubscribeListener.clear()
+            roomMap.clear()
+            userMap.clear()
+            seatMap.clear()
+            songChosenList.clear()
+            currRoomNo = ""
+        }
+    }
 
     // ========= 房间相关 =====================
 

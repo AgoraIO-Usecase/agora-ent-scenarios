@@ -22,6 +22,8 @@ interface KTVServiceProtocol {
         fun getImplInstance(): KTVServiceProtocol = instance
     }
 
+    fun reset()
+
     // ============== 房间相关 ==============
 
     /**
