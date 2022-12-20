@@ -225,4 +225,5 @@
     <string name="voice_room_unavailable_tip">The room does not exist, refresh and try again</string>
     <string name="voice_room_content_prohibited">Content prohibited</string>
     <string name="voice_room_send_tip">Send</string>
+    <string name="voice_room_name_rule">Incorrect room name</string>
 </resources>
