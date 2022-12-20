@@ -770,7 +770,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdUser, listener)
+        mSceneReference?.collection(kCollectionIdUser)?.subscribe(listener)
     }
 
     private fun innerGetUserInfo(completion: (error: Exception?, list: List<VLLoginModel>?) -> Unit) {
@@ -1057,7 +1057,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdSeatInfo, listener)
+        mSceneReference?.collection(kCollectionIdSeatInfo)?.subscribe(listener)
     }
 
     // ------------ Choose song operation ---------------------
@@ -1263,7 +1263,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdChooseSong, listener)
+        mSceneReference?.collection(kCollectionIdChooseSong)?.subscribe(listener)
     }
 
     // ------------ singing score operation ---------------------
