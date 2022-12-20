@@ -21,6 +21,8 @@ interface ShowServiceProtocol {
         fun getImplInstance(): ShowServiceProtocol = instance
     }
 
+    fun reset()
+
     // 获取房间列表
     fun getRoomList(
         success: (List<ShowRoomDetailModel>) -> Unit,

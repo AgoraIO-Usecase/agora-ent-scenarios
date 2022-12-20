@@ -110,8 +110,11 @@
     <string name="show_reject_onseat">已拒绝</string>
     <string name="show_audience_settings">观众设置</string>
     <string name="show_can_apply">可申请连麦</string>
+    <string name="show_link_is_stopped">连麦已断开哦</string>
+
 
     <!-- pk   -->
+    <string name="show_pking_request_message">PK邀请</string>
     <string name="show_online_boardcaster">在线主播</string>
     <string name="show_pking">正在pk</string>
     <string name="show_stop_pking">结束</string>
@@ -120,7 +123,7 @@
     <string name="show_setting_preset">预设</string>
     <string name="show_pk">连线互动</string>
     <string name="show_can_pk">可邀请PK</string>
-
+    <string name="show_pk_is_stopped">PK已断开哦</string>
     <string name="show_content">监测到当前内容存在违规行为</string>
 
     <string name="show_cannot_accept">正在互动， 请互动结束后再接受连麦申请</string>
