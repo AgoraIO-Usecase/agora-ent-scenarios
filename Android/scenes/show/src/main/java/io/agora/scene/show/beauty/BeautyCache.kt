@@ -82,6 +82,14 @@ object BeautyCache {
         }
     }
 
+    internal fun resetGroupValue(groupId: Int){
+        cacheItemValueMap.keys.toList().forEach {
+            if ((it and groupId) > 0) {
+                cacheItemValueMap.remove(it)
+            }
+        }
+    }
+
     internal fun cacheItemValue(groupId: Int, itemId: Int, value: Float) {
         if (itemId == groupId) {
             cacheItemValueMap.keys.toList().forEach {
