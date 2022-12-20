@@ -144,7 +144,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
-        guard let invitation = pkUser else {
+        guard let invitation = pkUser, invitation.interactStatus == .idle else {
             return
         }
 

@@ -1382,10 +1382,8 @@ extension ShowSyncManagerServiceImp {
                 let pkInteraction = self.interactionList.filter({ $0.userId == invitation.fromUserId}).first
                 let pkInvitation = self.pkInvitationList.filter({$0.objectId == invitation.objectId}).first
                 
-                //can not invitation if interaction already
-                if self.interactionList.count > 0,
-                   pkInteraction != nil,
-                   pkInvitation == nil {
+                //can not invitation if interaction already exist
+                if self.interactionList.count > 0, pkInteraction == nil {
                     self._removeInteraction(invitation: invitation) { err in
                     }
                     return
