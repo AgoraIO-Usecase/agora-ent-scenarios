@@ -2,6 +2,7 @@ package io.agora.scene.show.widget
 
 import android.content.Context
 import android.content.DialogInterface
+import android.text.InputFilter.LengthFilter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -78,6 +79,13 @@ class TextInputDialog : BottomSheetDialog {
         }else{
             onSentClickListener?.invoke(this, text)
         }
+    }
+
+    fun setMaxInput(max: Int): TextInputDialog{
+        mBinding.editText.filters = arrayOf(
+            LengthFilter(max)
+        )
+        return this
     }
 
     fun setOnInsertHeightChangeListener(onInsertHeightChanged: (Int) -> Unit): TextInputDialog {
