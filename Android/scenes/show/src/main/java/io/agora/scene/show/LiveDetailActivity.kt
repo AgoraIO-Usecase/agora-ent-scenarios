@@ -104,6 +104,7 @@ class LiveDetailActivity : AppCompatActivity() {
         releaseCountdown()
         destroyService()
         destroyRtcEngine()
+        mBeautyProcessor.reset()
     }
 
     override fun onBackPressed() {

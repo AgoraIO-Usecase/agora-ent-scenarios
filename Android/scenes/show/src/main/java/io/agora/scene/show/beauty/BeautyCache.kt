@@ -32,35 +32,11 @@ object BeautyCache {
         Pair(ITEM_ID_FILTER_S3, 0.4f),
     )
     // key: itemId
-    private val cacheItemValueMap = mutableMapOf<Int, Float>().apply {
-        put(ITEM_ID_BEAUTY_SMOOTH, defaultItemValueMap[ITEM_ID_BEAUTY_SMOOTH] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_WHITEN, defaultItemValueMap[ITEM_ID_BEAUTY_WHITEN] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_OVERALL, defaultItemValueMap[ITEM_ID_BEAUTY_OVERALL] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_CHEEKBONE, defaultItemValueMap[ITEM_ID_BEAUTY_CHEEKBONE] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_JAWBONE, defaultItemValueMap[ITEM_ID_BEAUTY_JAWBONE] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_EYE, defaultItemValueMap[ITEM_ID_BEAUTY_EYE] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_TEETH, defaultItemValueMap[ITEM_ID_BEAUTY_TEETH] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_FOREHEAD, defaultItemValueMap[ITEM_ID_BEAUTY_FOREHEAD] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_NOSE, defaultItemValueMap[ITEM_ID_BEAUTY_NOSE] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_MOUTH, defaultItemValueMap[ITEM_ID_BEAUTY_MOUTH] ?: 0.0f)
-        put(ITEM_ID_BEAUTY_CHIN, defaultItemValueMap[ITEM_ID_BEAUTY_CHIN] ?: 0.0f)
-    }
-    private val cacheItemOperation = mutableMapOf<Int, ArrayList<Int>>().apply {
-        put(
-            GROUP_ID_BEAUTY, arrayListOf(
-                ITEM_ID_BEAUTY_WHITEN,
-                ITEM_ID_BEAUTY_OVERALL,
-                ITEM_ID_BEAUTY_CHEEKBONE,
-                ITEM_ID_BEAUTY_JAWBONE,
-                ITEM_ID_BEAUTY_EYE,
-                ITEM_ID_BEAUTY_TEETH,
-                ITEM_ID_BEAUTY_FOREHEAD,
-                ITEM_ID_BEAUTY_NOSE,
-                ITEM_ID_BEAUTY_MOUTH,
-                ITEM_ID_BEAUTY_CHIN,
-                ITEM_ID_BEAUTY_SMOOTH,
-            )
-        )
+    private val cacheItemValueMap = mutableMapOf<Int, Float>()
+    private val cacheItemOperation = mutableMapOf<Int, ArrayList<Int>>()
+
+    init {
+        reset()
     }
 
     fun getItemValueWithDefault(itemId: Int): Float = cacheItemValueMap[itemId] ?: defaultItemValueMap[itemId] ?: 0.0f
@@ -70,6 +46,41 @@ object BeautyCache {
     }
 
     fun getItemValue(itemId: Int): Float = cacheItemValueMap[itemId] ?: 0.0f
+
+    internal fun reset(){
+        cacheItemValueMap.apply {
+            clear()
+            put(ITEM_ID_BEAUTY_SMOOTH, defaultItemValueMap[ITEM_ID_BEAUTY_SMOOTH] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_WHITEN, defaultItemValueMap[ITEM_ID_BEAUTY_WHITEN] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_OVERALL, defaultItemValueMap[ITEM_ID_BEAUTY_OVERALL] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_CHEEKBONE, defaultItemValueMap[ITEM_ID_BEAUTY_CHEEKBONE] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_JAWBONE, defaultItemValueMap[ITEM_ID_BEAUTY_JAWBONE] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_EYE, defaultItemValueMap[ITEM_ID_BEAUTY_EYE] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_TEETH, defaultItemValueMap[ITEM_ID_BEAUTY_TEETH] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_FOREHEAD, defaultItemValueMap[ITEM_ID_BEAUTY_FOREHEAD] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_NOSE, defaultItemValueMap[ITEM_ID_BEAUTY_NOSE] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_MOUTH, defaultItemValueMap[ITEM_ID_BEAUTY_MOUTH] ?: 0.0f)
+            put(ITEM_ID_BEAUTY_CHIN, defaultItemValueMap[ITEM_ID_BEAUTY_CHIN] ?: 0.0f)
+        }
+        cacheItemOperation.apply {
+            clear()
+            put(
+                GROUP_ID_BEAUTY, arrayListOf(
+                    ITEM_ID_BEAUTY_WHITEN,
+                    ITEM_ID_BEAUTY_OVERALL,
+                    ITEM_ID_BEAUTY_CHEEKBONE,
+                    ITEM_ID_BEAUTY_JAWBONE,
+                    ITEM_ID_BEAUTY_EYE,
+                    ITEM_ID_BEAUTY_TEETH,
+                    ITEM_ID_BEAUTY_FOREHEAD,
+                    ITEM_ID_BEAUTY_NOSE,
+                    ITEM_ID_BEAUTY_MOUTH,
+                    ITEM_ID_BEAUTY_CHIN,
+                    ITEM_ID_BEAUTY_SMOOTH,
+                )
+            )
+        }
+    }
 
     internal fun cacheItemValue(groupId: Int, itemId: Int, value: Float) {
         if (itemId == groupId) {
