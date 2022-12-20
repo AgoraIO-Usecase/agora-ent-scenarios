@@ -155,10 +155,16 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                     super.onError(code, message)
                     binding.bottomNext.isEnabled = true
                     dismissLoading()
-                    if(code == VoiceServiceProtocol.ERR_LOGIN_ERROR){
-                        ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
-                    }else{
-                        ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
+                    when (code) {
+                        VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_name_rule))
+                        }
+                        else -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
+                        }
                     }
                 }
             })
