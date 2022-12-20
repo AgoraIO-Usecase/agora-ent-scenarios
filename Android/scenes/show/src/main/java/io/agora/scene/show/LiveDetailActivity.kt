@@ -501,12 +501,20 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun showSettingDialog() {
         mSettingDialog.apply {
             setHostView(isRoomOwner || isMeLinking())
+            if (isMeLinking()) {
+                resetSettingsItem(interactionInfo!!.muteAudio)
+            }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.enableLocalVideo(activated)
-                    SettingDialog.ITEM_ID_MIC -> mRtcEngine.enableLocalAudio(activated)
+                    SettingDialog.ITEM_ID_MIC -> {
+                        if (!isRoomOwner) {
+                            mService.muteAudio(!activated, interactionInfo!!.userId)
+                        }
+                        mRtcEngine.enableLocalAudio(activated)
+                    }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
                 }
@@ -698,6 +706,10 @@ class LiveDetailActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
             setTitle(getString(R.string.show_ask_for_link, mRoomInfo.ownerName))
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                if (mLinkInvitationCountDownLatch != null) {
+                    mLinkInvitationCountDownLatch!!.cancel()
+                    mLinkInvitationCountDownLatch = null
+                }
                 mService.acceptMicSeatInvitation()
                 dialog.dismiss()
             }
@@ -749,6 +761,10 @@ class LiveDetailActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this, R.style.show_alert_dialog).apply {
             setTitle(getString(R.string.show_ask_for_pk, name))
             setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                if (mPKInvitationCountDownLatch != null) {
+                    mPKInvitationCountDownLatch!!.cancel()
+                    mPKInvitationCountDownLatch = null
+                }
                 mService.acceptPKInvitation {  }
                 dialog.dismiss()
             }
@@ -1181,6 +1197,7 @@ class LiveDetailActivity : AppCompatActivity() {
         val broadcasterVideoView = SurfaceView(this)
         mBinding.videoSinglehostLayout.videoContainer.addView(broadcasterVideoView)
         if (isRoomOwner) {
+            mRtcEngine.enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
         } else {
             val channelMediaOptions = ChannelMediaOptions()
@@ -1295,7 +1312,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 showPKSettingsDialog()
             }
             mRtcEngine.setupLocalVideo(VideoCanvas(view))
-
+            mRtcEngine.enableLocalAudio(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = true

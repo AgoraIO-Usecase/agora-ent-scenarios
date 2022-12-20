@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogItemBinding
+import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
@@ -65,6 +66,9 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
         )
     )
 
+    private var isVideoActivated = true;
+    private var isVoiceActivated = true;
+
     private val mHostItemList = listOf(
         SettingItem(
             ITEM_ID_CAMERA,
@@ -79,7 +83,7 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             R.mipmap.show_setting_ic_video_on,
             R.string.show_setting_video_off,
             R.string.show_setting_video_on,
-            true
+            isVideoActivated
         ),
         SettingItem(
             ITEM_ID_MIC,
@@ -87,7 +91,7 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             R.mipmap.show_setting_ic_mic_on,
             R.string.show_setting_mic_off,
             R.string.show_setting_mic_on,
-            true
+            isVoiceActivated
         ),
         SettingItem(
             ITEM_ID_STATISTIC,
@@ -142,6 +146,11 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
                 holder.binding.text.isActivated = activated
                 holder.binding.text.setOnClickListener {
                     val activate = !it.isActivated
+                    if (item.itemId == ITEM_ID_VIDEO) {
+                        isVideoActivated = activate
+                    } else if (item.itemId == ITEM_ID_MIC) {
+                        isVoiceActivated = activate
+                    }
                     it.isActivated = activate
                     item.activated = activate
 
@@ -198,5 +207,45 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
         this.onItemActivatedChangeListener = listener
     }
 
-
+    fun resetSettingsItem(mute: Boolean) {
+        isVoiceActivated = !mute
+        val itemList = listOf(SettingItem(
+            ITEM_ID_CAMERA,
+            R.mipmap.show_setting_ic_camera,
+            R.mipmap.show_setting_ic_camera,
+            R.string.show_setting_switch_camera,
+            R.string.show_setting_switch_camera
+        ),
+        SettingItem(
+            ITEM_ID_VIDEO,
+            R.mipmap.show_setting_ic_video_off,
+            R.mipmap.show_setting_ic_video_on,
+            R.string.show_setting_video_off,
+            R.string.show_setting_video_on,
+            isVideoActivated
+        ),
+        SettingItem(
+            ITEM_ID_MIC,
+            R.mipmap.show_setting_ic_mic_off,
+            R.mipmap.show_setting_ic_mic_on,
+            R.string.show_setting_mic_off,
+            R.string.show_setting_mic_on,
+            isVoiceActivated
+        ),
+        SettingItem(
+            ITEM_ID_STATISTIC,
+            R.mipmap.show_setting_ic_statistic,
+            R.mipmap.show_setting_ic_statistic,
+            R.string.show_setting_statistic,
+            R.string.show_setting_statistic
+        ),
+        SettingItem(
+            ITEM_ID_SETTING,
+            R.mipmap.show_setting_ic_setting,
+            R.mipmap.show_setting_ic_setting,
+            R.string.show_setting_advance_setting,
+            R.string.show_setting_advance_setting
+        ))
+        mAdapter.resetAll(itemList)
+    }
 }
