@@ -219,10 +219,13 @@ class ShowAgoraKitManager: NSObject {
         NetworkManager.shared.generateToken(channelName: channelName ?? "", 
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
-                                            type: .rtc) { token in
+                                            type: .rtc) {[weak self] token in
+            guard let self = self else { return }
+            //TODO: retain cycle in joinChannelEx
+            let delegate: AgoraRtcEngineDelegate? = nil//self.delegate
             self.agoraKit.joinChannelEx(byToken: token,
                                         connection: connection,
-                                        delegate: self.delegate,
+                                        delegate: delegate,
                                         mediaOptions: mediaOptions,
                                         joinSuccess: nil)
             

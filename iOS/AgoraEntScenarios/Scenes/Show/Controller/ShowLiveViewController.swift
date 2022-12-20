@@ -145,10 +145,10 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             if let info = oldValue {
-                _stopInteraction(interaction: info)
+                _onStopInteraction(interaction: info)
             }
             if let info = currentInteraction {
-                _startInteraction(interaction: info)
+                _onStartInteraction(interaction: info)
             }
         }
     }
@@ -542,7 +542,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         _refreshInteractionList()
     }
     
-    private func _startInteraction(interaction: ShowInteractionInfo) {
+    private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
             if room?.roomId != interaction.roomId {
@@ -573,7 +573,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
     }
     
-    private func _stopInteraction(interaction: ShowInteractionInfo) {
+    private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
             agoraKitManager.leaveChannelEx()
