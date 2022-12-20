@@ -35,16 +35,25 @@ class TextInputDialog : BottomSheetDialog {
 
     private fun init() {
         setContentView(mBinding.root)
-        window?.setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
-                    or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-        );
-        window?.setDecorFitsSystemWindows(false)
+        window?.decorView?.fitsSystemWindows = false
         ViewCompat.setOnApplyWindowInsetsListener(window?.decorView!!){ view: View, insets: WindowInsetsCompat ->
 
             val imeInset = insets.getInsets(WindowInsetsCompat.Type.ime())
             Log.d(TAG, "imeInset: $imeInset")
             onIMEHeightChanged(imeInset.bottom)
+
+            if(imeInset.bottom == 0){
+                window?.setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                            or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+                )
+            }else{
+                window?.setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
+                            or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+                )
+            }
+
             insets
         }
 
