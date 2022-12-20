@@ -31,6 +31,7 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_WOCHAOTIAN;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.opengl.GLES11;
 import android.opengl.GLES11Ext;
 
@@ -38,9 +39,12 @@ import com.bytedance.labcv.core.effect.EffectManager;
 import com.bytedance.labcv.core.util.ImageUtil;
 import com.bytedance.labcv.effectsdk.BytedEffectConstants;
 
+import java.nio.ByteBuffer;
+
 import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
 import io.agora.base.internal.video.EglBase;
+import io.agora.base.internal.video.YuvHelper;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -59,7 +63,8 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     private volatile boolean isReleased = false;
 
     private EffectManager mEffectManager;
-    private ImageUtil mImageUtil;
+    private ImageUtil mDstImageUtil;
+    private ImageUtil mSrcImageUtil;
 
     // sdk 初始化标记，仅用于用来标记SDK的初始化。
     private volatile boolean resourceReady = false;
@@ -71,6 +76,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
     private boolean isFrontCamera = true;
     private EglBase.Context mEglBaseContext;
+    private ByteBuffer mNV21Buffer;
 
     public BeautyByteDanceImpl(Context context) {
         mContext = context;
@@ -83,15 +89,18 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
      */
     private void cvSdkInit() {
         mEffectManager = new EffectManager(mContext, resourcesHelper, resourcesHelper.getLicensePath());
-        mImageUtil = new ImageUtil();
+        mDstImageUtil = new ImageUtil();
+        mSrcImageUtil = new ImageUtil();
     }
 
     private void cvSdkUnInit() {
         if (mEffectManager != null) {
             mEffectManager.destroy();
-            mImageUtil.release();
+            mDstImageUtil.release();
+            mSrcImageUtil.release();
             mEffectManager = null;
-            mImageUtil = null;
+            mDstImageUtil = null;
+            mSrcImageUtil = null;
             sdkIsInit = false;
         }
     }
@@ -116,32 +125,80 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         }
 
         VideoFrame.Buffer buffer = videoFrame.getBuffer();
-        if (!(buffer instanceof VideoFrame.TextureBuffer)) {
-            return true;
-        }
-
-
-        VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
-        if (textureBufferHelper == null) {
-            mEglBaseContext = textureBuffer.getEglBaseContext();
-            textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-            textureBufferHelper.invoke(() -> {
-                cvSdkInit();
-                return null;
+        int texture;
+        Matrix transformMatrix;
+        if (buffer instanceof VideoFrame.TextureBuffer) {
+            VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
+            if (textureBufferHelper == null) {
+                mEglBaseContext = textureBuffer.getEglBaseContext();
+                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
+                textureBufferHelper.invoke(() -> {
+                    cvSdkInit();
+                    return null;
+                });
+            } else if (mEglBaseContext != textureBuffer.getEglBaseContext()) {
+                textureBufferHelper.invoke(() -> {
+                    cvSdkUnInit();
+                    return null;
+                });
+                textureBufferHelper.dispose();
+                textureBufferHelper = null;
+                return true;
+            }
+            texture = textureBufferHelper.invoke(() -> {
+                int texFormat = textureBuffer.getType() == VideoFrame.TextureBuffer.Type.OES ? GLES11Ext.GL_TEXTURE_EXTERNAL_OES : GLES11.GL_TEXTURE_2D;
+                return process(textureBuffer.getTextureId(), texFormat, textureBuffer.getWidth(), textureBuffer.getHeight());
             });
-        }else if(mEglBaseContext != textureBuffer.getEglBaseContext()){
-            textureBufferHelper.invoke(() -> {
-                cvSdkUnInit();
-                return null;
-            });
-            textureBufferHelper.dispose();
-            textureBufferHelper = null;
-            return true;
+            transformMatrix = textureBuffer.getTransformMatrix();
+
+        } else {
+            if (textureBufferHelper == null) {
+                mEglBaseContext = null;
+                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", null);
+                textureBufferHelper.invoke(() -> {
+                    cvSdkInit();
+                    return null;
+                });
+            } else if (mEglBaseContext != null) {
+                textureBufferHelper.invoke(() -> {
+                    cvSdkUnInit();
+                    return null;
+                });
+                textureBufferHelper.dispose();
+                textureBufferHelper = null;
+                return true;
+            }
+
+            VideoFrame.I420Buffer i420Buffer = buffer.toI420();
+            ByteBuffer dataY = i420Buffer.getDataY();
+            ByteBuffer dataV = i420Buffer.getDataV();
+            ByteBuffer dataU = i420Buffer.getDataU();
+            dataY.position(0);
+            dataV.position(0);
+            dataU.position(0);
+
+            // YUV转NV21，NV21后面即为VUVUVU排列
+            int nv21Size = dataY.capacity() + dataV.capacity() + dataU.capacity();
+            if(mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size){
+                mNV21Buffer = ByteBuffer.allocateDirect(nv21Size);
+            }
+            mNV21Buffer.clear();
+            mNV21Buffer.position(0);
+
+            YuvHelper.I420ToNV12(dataY, i420Buffer.getStrideY(),
+                    dataV, i420Buffer.getStrideV(),
+                    dataU, i420Buffer.getStrideV(),
+                    mNV21Buffer,
+                    buffer.getWidth(), buffer.getHeight());
+
+            mNV21Buffer.position(dataY.capacity());
+            dataY.position(0);
+
+            texture = textureBufferHelper.invoke(() -> process(dataY, mNV21Buffer, buffer.getWidth(), buffer.getHeight()));
+
+            i420Buffer.release();
+            transformMatrix = new Matrix();
         }
-        int texture = textureBufferHelper.invoke(() -> {
-            int texFormat = textureBuffer.getType() == VideoFrame.TextureBuffer.Type.OES ? GLES11Ext.GL_TEXTURE_EXTERNAL_OES : GLES11.GL_TEXTURE_2D;
-            return process(textureBuffer.getTextureId(), texFormat, textureBuffer.getWidth(), textureBuffer.getHeight());
-        });
 
         boolean isFront = videoFrame.getRotation() == 270;
         if (isFrontCamera != isFront) {
@@ -154,12 +211,41 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         }
 
         VideoFrame.TextureBuffer newBuffer = textureBufferHelper.wrapTextureBuffer(
-                textureBuffer.getWidth(),
-                textureBuffer.getHeight(),
+                buffer.getWidth(),
+                buffer.getHeight(),
                 VideoFrame.TextureBuffer.Type.RGB,
-                texture, textureBuffer.getTransformMatrix());
+                texture, transformMatrix);
         videoFrame.replaceBuffer(newBuffer, videoFrame.getRotation(), videoFrame.getTimestampNs());
         return true;
+    }
+
+    public int process(ByteBuffer yBuffer, ByteBuffer vuBuffer, int width, int height){
+        if (isReleased) {
+            return -1;
+        }
+        if (!resourceReady) {
+            return -1;
+        }
+        configSdkDefault();
+        // 是否为前置摄像头
+        mEffectManager.setCameraPosition(isFrontCamera);
+        // 生成源承载纹理
+        mSrcImageUtil.prepareTexture(width, height);
+        ImageUtil.Transition transition = new ImageUtil.Transition();
+        transition.scale(1.0f, -1.0f);
+        int texture2d = mSrcImageUtil.transferYUVToTexture(yBuffer, vuBuffer, width, height, transition);
+        // 生成目标承载纹理
+        int dstTexture = mDstImageUtil.prepareTexture(width, height);
+
+        // CV SDK 特效处理
+        boolean process = mEffectManager.process(texture2d, dstTexture, width, height,
+                BytedEffectConstants.Rotation.CLOCKWISE_ROTATE_0,
+                System.currentTimeMillis());
+        if (!process) {
+            return -1;
+        }
+
+        return dstTexture;
     }
 
     public int process(int texId, int texFormat, int width, int height) {
@@ -173,11 +259,11 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         // 是否为前置摄像头
         mEffectManager.setCameraPosition(isFrontCamera);
         // 生成目标承载纹理
-        int dstTexture = mImageUtil.prepareTexture(width, height);
+        int dstTexture = mDstImageUtil.prepareTexture(width, height);
         int texture2d = texId;
         if(texFormat == GLES11Ext.GL_TEXTURE_EXTERNAL_OES){
             // OES 纹理转2D纹理
-            texture2d = mImageUtil.transferTextureToTexture(texId,
+            texture2d = mDstImageUtil.transferTextureToTexture(texId,
                     BytedEffectConstants.TextureFormat.Texture_Oes,
                     BytedEffectConstants.TextureFormat.Texure2D,
                     width, height, new ImageUtil.Transition());
