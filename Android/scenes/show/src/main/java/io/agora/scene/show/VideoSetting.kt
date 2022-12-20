@@ -347,7 +347,9 @@ object VideoSetting {
             encoderResolution,
             frameRate,
             bitRate,
-            inEarMonitoring
+            inEarMonitoring,
+            recordingSignalVolume,
+            audioMixingVolume
         )
 
     }
