@@ -9,6 +9,39 @@ import Foundation
 import AgoraRtcKit
 import UIKit
 
+//TODO: fix retain cycle
+class ShowAgoraExProxy: NSObject, AgoraRtcEngineDelegate {
+    weak var delegate: AgoraRtcEngineDelegate?
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
+        delegate?.rtcEngine?(engine, reportRtcStats: stats)
+    }
+
+    func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
+        delegate?.rtcEngine?(engine, localAudioStats: stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
+        delegate?.rtcEngine?(engine, localVideoStats: stats, sourceType: sourceType)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
+        delegate?.rtcEngine?(engine, remoteVideoStats: stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
+        delegate?.rtcEngine?(engine, remoteAudioStats: stats)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
+        delegate?.rtcEngine?(engine, uplinkNetworkInfoUpdate: networkInfo)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
+        delegate?.rtcEngine?(engine, downlinkNetworkInfoUpdate: networkInfo)
+    }
+}
+
 class ShowAgoraKitManager: NSObject {
     /*
     lazy var musicDataArray: [ShowMusicConfigData] = {
@@ -222,10 +255,11 @@ class ShowAgoraKitManager: NSObject {
                                             type: .rtc) {[weak self] token in
             guard let self = self else { return }
             //TODO: retain cycle in joinChannelEx
-            let delegate: AgoraRtcEngineDelegate? = nil//self.delegate
+            let proxy = ShowAgoraExProxy()
+            proxy.delegate = self.delegate
             self.agoraKit.joinChannelEx(byToken: token,
                                         connection: connection,
-                                        delegate: delegate,
+                                        delegate: proxy,
                                         mediaOptions: mediaOptions,
                                         joinSuccess: nil)
             
