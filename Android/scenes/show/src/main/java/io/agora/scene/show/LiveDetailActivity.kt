@@ -53,6 +53,9 @@ import java.util.*
 class LiveDetailActivity : AppCompatActivity() {
 
     companion object {
+        // 房间存活时间，单位ms
+        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
+
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
         fun launch(context: Context, roomDetail: ShowRoomDetailModel) {
@@ -97,6 +100,15 @@ class LiveDetailActivity : AppCompatActivity() {
         initView()
         initService()
         initRtcEngine()
+
+        if (isRoomOwner) {
+            mBinding.root.postDelayed({
+                releaseCountdown()
+                destroyService()
+                destroyRtcEngine()
+                showLivingEndDialog()
+            }, ROOM_AVAILABLE_DURATION)
+        }
     }
 
     override fun onDestroy() {
@@ -864,6 +876,7 @@ class LiveDetailActivity : AppCompatActivity() {
                     .load(mRoomInfo.ownerAvater)
                     .into(ivAvatar)
             }.root)
+            .setCancelable(false)
             .setPositiveButton(R.string.show_living_end_back_room_list){ dialog, _ ->
                 finish()
                 dialog.dismiss()
@@ -939,12 +952,16 @@ class LiveDetailActivity : AppCompatActivity() {
 
         }
 
+        // 设置token有效期为房间存活时长，到期后关闭并退出房间
+        TokenGenerator.expireSecond = ROOM_AVAILABLE_DURATION / 1000 // 20min
         checkRequirePerms {
             joinChannel()
         }
     }
 
     private fun destroyRtcEngine() {
+        // 重置token有效期，防止影响其他场景
+        TokenGenerator.expireSecond = -1
         mRtcEngine.removeHandler(mRtcEngineHandler)
         mRtcEngine.stopPreview()
         mRtcEngine.leaveChannel()
