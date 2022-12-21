@@ -224,7 +224,6 @@ class ChatroomCacheManager {
         invitationMap.clear()
         invitationList.clear()
         invitationMap.putAll(roomMemberMap)
-        "invitationMap(${invitationMap}) invitationMap".logD(TAG)
         for (entry in getMicInfoMap()?.entries!!) {
             val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
             micInfo?.member?.chatUid.let {
@@ -235,6 +234,7 @@ class ChatroomCacheManager {
         for (entry in invitationMap.entries) {
             invitationList.add(entry.value)
         }
+        "invitationList(${invitationList})".logD(TAG)
         return invitationList
     }
 
