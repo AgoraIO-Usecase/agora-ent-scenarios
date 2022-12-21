@@ -281,6 +281,12 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             })
         }
     }
+    
+    func updateRoomMembers(completion: @escaping (Error?) -> Void) {
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList?.kj.JSONString() ?? ""], completion: { error in
+            completion(self.convertError(error: error))
+        })
+    }
 
     func fetchApplicantsList(completion: @escaping (Error?, [VoiceRoomApply]?) -> Void) {
         completion(nil,self.applicants)
