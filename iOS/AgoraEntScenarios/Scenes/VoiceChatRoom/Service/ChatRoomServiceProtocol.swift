@@ -143,6 +143,9 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     ///
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void)
     
+    /// Description update room members
+    /// - Parameter completion: callback
+    func updateRoomMembers(completion: @escaping (Error?) -> Void)
     
     /// Description 申请列表
     /// - Parameter completion: 回调
