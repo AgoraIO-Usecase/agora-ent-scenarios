@@ -151,6 +151,13 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         })
         self.refreshApplicants(chat_uid: userName)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        if isOwner {
+            ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
+                if error != nil {
+                    self.view.makeToast("\(error?.localizedDescription ?? "")")
+                }
+            }
+        }
     }
     
     func receiveTextMessage(roomId: String, message: VoiceRoomChatEntity) {
