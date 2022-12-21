@@ -199,8 +199,6 @@ public class RoomLivingViewModel extends ViewModel {
             mRtcEngine = null;
         }
         mCountDownLatch = null;
-
-        ktvServiceProtocol.reset();
     }
 
     // ======================= 房间相关 =======================

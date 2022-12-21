@@ -983,8 +983,8 @@ class KTVSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.delete(objectId, object : Callback {
                 override fun onSuccess() {
-                    objIdOfSeatIndex.remove(seatInfo.seatIndex)
-                    seatMap.remove(seatInfo.seatIndex.toString())
+                    // objIdOfSeatIndex.remove(seatInfo.seatIndex)
+                    // seatMap.remove(seatInfo.seatIndex.toString())
                     runOnMainThread { completion.invoke(null) }
                 }
 
