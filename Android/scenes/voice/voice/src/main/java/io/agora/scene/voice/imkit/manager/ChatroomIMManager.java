@@ -781,6 +781,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
+     * 更新用户列表
+     */
+    public void updateRoomMembers(CallBack callBack){
+       delegate.updateRoomMember(cacheManager.getMemberList(),callBack);
+    }
+
+    /**
      * 获取排行榜列表
      */
     public void fetchGiftContribute(ValueCallBack<List<VoiceRankUserModel>> callBack){
