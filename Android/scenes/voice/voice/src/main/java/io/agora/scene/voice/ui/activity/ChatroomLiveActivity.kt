@@ -165,6 +165,18 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             })
         }
+        roomLivingViewModel.updateRoomMemberObservable().observe(this){ response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>(){
+                override fun onSuccess(data: Boolean?) {
+                    "updateRoomMember onSuccess".logD()
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    "updateRoomMember onError $code $message".logE()
+                }
+            })
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View?, insets: WindowInsetsCompat ->
             val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logD(
@@ -271,7 +283,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
-                    chatUid.let { ChatroomIMManager.getInstance().removeMember(it) }
+                    chatUid.let {
+                        ChatroomIMManager.getInstance().removeMember(it)
+                        roomLivingViewModel.updateRoomMember()
+                    }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                 }
