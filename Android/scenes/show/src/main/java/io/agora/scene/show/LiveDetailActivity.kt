@@ -952,6 +952,13 @@ class LiveDetailActivity : AppCompatActivity() {
                 ToastUtils.showToast(RtcEngine.getErrorDescription(err))
             }
 
+            override fun onUserOffline(uid: Int, reason: Int) {
+                super.onUserOffline(uid, reason)
+                if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
+                    mService.stopInteraction(interactionInfo!!)
+                }
+            }
+
             override fun onLocalVideoStateChanged(
                 source: Constants.VideoSourceType?,
                 state: Int,
