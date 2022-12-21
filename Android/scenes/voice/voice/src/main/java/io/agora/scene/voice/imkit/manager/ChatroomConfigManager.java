@@ -186,7 +186,7 @@ public class ChatroomConfigManager {
             }
 
             @Override
-            public void onMemberExited(String roomId, String name, String reason) {
+            public void onMemberExited(String roomId, String reason, String name) {
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onUserLeftRoom(roomId, name);
