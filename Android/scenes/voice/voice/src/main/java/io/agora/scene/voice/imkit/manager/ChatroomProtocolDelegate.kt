@@ -835,6 +835,27 @@ class ChatroomProtocolDelegate constructor(
         })
     }
 
+    /**
+     * 更新成员列表
+     */
+    fun updateRoomMember(memberList:List<VoiceMemberModel>,callback: CallBack){
+        if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
+            val member = GsonTools.beanToString(memberList)
+            roomManager.asyncSetChatroomAttributeForced(roomId,
+                "member_list",member,false,object : CallBack{
+                    override fun onSuccess() {
+                        callback.onSuccess()
+                        "updateRoomMember onSuccess: ".logD(TAG)
+                    }
+
+                    override fun onError(code: Int, error: String?) {
+                        callback.onError(code,error)
+                        "updateRoomMember onError: $code $error".logE(TAG)
+                    }
+                })
+        }
+    }
+
     private fun sendChatroomEvent(
         isSingle: Boolean, chatUid: String?, eventType: CustomMsgType,
         params: MutableMap<String, String>, callback: CallBack

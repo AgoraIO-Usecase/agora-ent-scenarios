@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.ValueCallBack
-import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoom
 import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.global.VoiceBuddyFactory
@@ -76,6 +75,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _leaveSyncRoomObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
+    private val _updateRoomMemberObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
 
     /**房间详情*/
     fun roomDetailsObservable(): LiveData<Resource<VoiceRoomInfo>> = _roomDetailsObservable
@@ -136,6 +137,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**离开syncManager 房间*/
     fun leaveSyncRoomObservable(): LiveData<Resource<Boolean>> = _leaveSyncRoomObservable
+
+    /**更新成员列表*/
+    fun updateRoomMemberObservable():LiveData<Resource<Boolean>> = _updateRoomMemberObservable
 
     /**获取详情*/
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
@@ -285,5 +289,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     fun leaveSyncManagerRoom(roomId: String) {
         _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId))
+    }
+
+    fun updateRoomMember(){
+        _updateRoomMemberObservable.setSource(mRepository.updateRoomMember())
     }
 }
