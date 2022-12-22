@@ -6,6 +6,7 @@
 #import "VLEmptyView.h"
 #import "VLMacroDefine.h"
 #import "NSString+Helper.h"
+#import "MenuUtils.h"
 @import Masonry;
 
 @interface VLEmptyView ()
@@ -84,7 +85,7 @@
     [self.button setTitle:buttonTitle forState:UIControlStateNormal];
 }
 - (void)buttonEvent {
-    if ([self.button.titleLabel.text isEqualToString:NSLocalizedString(@"点击重试", nil)]) {
+    if ([self.button.titleLabel.text isEqualToString:AGLocalizedString(@"点击重试")]) {
         if (self.emptyViewButtonBlock) {
             self.emptyViewButtonBlock();
         }
@@ -108,7 +109,7 @@
 
 - (QMUIButton *)button {
     if (!_button) {
-        _button = [[QMUIButton alloc] qmui_initWithImage:nil title:NSLocalizedString(@"返回", nil)];
+        _button = [[QMUIButton alloc] qmui_initWithImage:nil title:AGLocalizedString(@"返回")];
         _button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_button addTarget:self action:@selector(buttonEvent) forControlEvents:UIControlEventTouchUpInside];
         [_button setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
