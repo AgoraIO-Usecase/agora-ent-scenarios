@@ -60,7 +60,6 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
 
 
     private final Context mContext;
-    private volatile boolean isReleased = false;
 
     private EffectManager mEffectManager;
     private ImageUtil mDstImageUtil;
@@ -69,6 +68,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
     // sdk 初始化标记，仅用于用来标记SDK的初始化。
     private volatile boolean resourceReady = false;
     private volatile boolean sdkIsInit = false;
+    private volatile boolean isReleased = false;
 
     private final ResourcesHelper resourcesHelper;
 
