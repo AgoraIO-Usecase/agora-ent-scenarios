@@ -333,11 +333,26 @@ class VoiceSyncManagerServiceImp(
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         val  memberList = ChatroomIMManager.getInstance().fetchRoomMembers()
-        if (memberList != null && memberList.size > 0){
+        if (memberList != null ){
             completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
         }else{
-            completion.invoke(VoiceServiceProtocol.ERR_FAILED,memberList)
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED,mutableListOf())
         }
+    }
+
+    /**
+     * 更新用户列表
+     */
+    override fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit){
+        ChatroomIMManager.getInstance().updateRoomMembers(object : CallBack{
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+            }
+        })
     }
 
     /**
