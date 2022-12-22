@@ -31,12 +31,19 @@ enum SocketType: String {
     case ping
 }
 
+public enum SocketConnectState: Int {
+    case connecting = 0
+    case open = 1
+    case fail = 2
+    case closed = 3
+}
+
 public class RethinkSyncManager: NSObject {
 //    private let SOCKET_URL: String = "wss://test-rethinkdb-msg.bj2.agoralab.co"
     private let SOCKET_URL: String = "wss://rethinkdb-msg.bj2.agoralab.co"
     private var timer: Timer?
+    private var state: SRReadyState = .CLOSED
     var socket: SRWebSocket?
-    var connectBlock: SuccessBlockInt?
     var onSuccessBlock = [String: SuccessBlock]()
     var onSuccessBlockVoid = [String: SuccessBlockVoid]()
     var onSuccessBlockObjOptional = [String: SuccessBlockObjOptional]()
@@ -45,9 +52,12 @@ public class RethinkSyncManager: NSObject {
     var onCreateBlocks = [String: OnSubscribeBlock]()
     var onUpdatedBlocks = [String: OnSubscribeBlock]()
     var onDeletedBlocks = [String: OnSubscribeBlock]()
+    var connectStateBlock: ConnectBlockState?
     var appId: String = ""
     var channelName: String = ""
     var sceneName: String!
+    
+    private var completeBlock: SuccessBlockInt?
 
     /// init
     /// - Parameters:
@@ -57,10 +67,11 @@ public class RethinkSyncManager: NSObject {
          complete: SuccessBlockInt?)
     {
         super.init()
-        connectBlock = complete
         channelName = config.channelName
         appId = config.appId
         reConnect(isRemove: true)
+        completeBlock = complete
+        complete?(0)
         NotificationCenter.default.addObserver(self, selector: #selector(enterForegroundNotification),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
@@ -79,14 +90,12 @@ public class RethinkSyncManager: NSObject {
                           "requestId": UUID().uuid16string()]
             let data = Utils.toJsonString(dict: params)?.data(using: .utf8)
             try? self?.socket?.send(dataNoCopy: data)
+            
+            //check connect status
+            self?._reConnectIfNeed()
         })
         timer?.fire()
         RunLoop.main.add(timer!, forMode: .common)
-        guard !onUpdatedBlocks.isEmpty else { return }
-        // 重连后重新订阅
-        onUpdatedBlocks.keys.forEach({
-            subscribe(channelName: $0)
-        })
     }
 
     public func disConnect(isRemove: Bool) {
@@ -109,7 +118,7 @@ public class RethinkSyncManager: NSObject {
         guard let dict = try? JSONSerialization.jsonObject(with: jsonData,
                                                            options: .mutableContainers)
         else {
-            Log.errorText(text: "数据转成失败", tag: nil)
+            Log.errorText(text: "data convert fail", tag: nil)
             return
         }
         writeData(channelName: channelName, params: dict, objectId: objectId, type: .send)
@@ -199,16 +208,32 @@ public class RethinkSyncManager: NSObject {
 
     @objc
     private func enterForegroundNotification() {
-        guard socket?.readyState != .OPEN else { return }
+        _reConnectIfNeed()
+    }
+    
+    private func _reConnectIfNeed() {
+        guard socket?.readyState != .OPEN, socket?.readyState != .CONNECTING else { return }
         reConnect()
     }
 }
 
 extension RethinkSyncManager: SRWebSocketDelegate {
     public func webSocketDidOpen(_ webSocket: SRWebSocket) {
-        Log.info(text: "连接状态 status == \(webSocket.readyState.rawValue)", tag: "connect")
-        connectBlock?(webSocket.readyState.rawValue == 1 ? 0 : webSocket.readyState.rawValue)
-        connectBlock = nil
+        Log.info(text: "websocket open: \(webSocket.readyState.rawValue)", tag: "connect")
+        if state != webSocket.readyState {
+            connectStateBlock?(SocketConnectState(rawValue: webSocket.readyState.rawValue) ?? .closed)
+        }
+        state = webSocket.readyState
+        if let complete = completeBlock {
+            complete(state == .OPEN ? 0 : -1)
+            completeBlock = nil
+        }
+        
+        guard socket?.readyState == .OPEN, !onUpdatedBlocks.isEmpty else { return }
+        // 重连成功后重新订阅
+        onUpdatedBlocks.keys.forEach({
+            subscribe(channelName: $0)
+        })
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didReceiveMessage message: Any) {
@@ -220,7 +245,7 @@ extension RethinkSyncManager: SRWebSocketDelegate {
             return
         }
         if let msg = dict?["msg"] as? String, msg == "success" {
-            Log.info(text: "消息发送成功", tag: "socket")
+            Log.info(text: "send msg success: [\(dict?["requestId"] ?? "")]", tag: "socket")
         }
         let params = dict?["data"] as? [String: Any]
         let channelName = dict?["channelName"] as? String ?? ""
@@ -277,16 +302,19 @@ extension RethinkSyncManager: SRWebSocketDelegate {
                 successBlock(attrs ?? [])
             }
         }
-        Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "收到消息")
+        Log.info(text: "channelName == \(channelName) action == \(action.rawValue) realAction == \(realAction.rawValue) props == \(props ?? [:])", tag: "recv_msg")
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didFailWithError error: Error) {
-        Log.errorText(text: error.localizedDescription, tag: "error")
-        connectBlock?(-1)
+        Log.errorText(text: "websocket fail: \(error.localizedDescription)", tag: "error")
+        state = webSocket.readyState
+        connectStateBlock?(.fail)
     }
 
     public func webSocket(_ webSocket: SRWebSocket, didCloseWithCode code: Int, reason: String?, wasClean: Bool) {
-        Log.warning(text: "socket closed == \(reason ?? "")", tag: "closed")
+        Log.warning(text: "websocket closed: \(reason ?? "")", tag: "closed")
+        state = webSocket.readyState
+        connectStateBlock?(.closed)
         reConnect()
     }
 }

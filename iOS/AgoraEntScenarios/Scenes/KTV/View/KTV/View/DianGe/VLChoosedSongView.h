@@ -23,13 +23,12 @@ typedef enum : NSUInteger {
 
 @interface VLChoosedSongView : UIView
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLChoosedSongViewDelegate>)delegate;
+@property (nonatomic, readonly) NSArray *selSongsArray;
 
-- (void)loadChoosedSongWithRoomNo:(NSString *)roomNo;
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLChoosedSongViewDelegate>)delegate;
 
 - (void)setSelSongsUIWithArray:(NSArray *)selSongsArray;
-
-- (NSArray *)getSelSongArray;
 
 @end
 

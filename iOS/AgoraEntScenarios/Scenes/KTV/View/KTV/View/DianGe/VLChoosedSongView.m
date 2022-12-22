@@ -8,7 +8,6 @@
 #import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;
@@ -17,10 +16,8 @@
 @interface VLChoosedSongView ()<UITableViewDataSource,UITableViewDelegate>
 
 @property(nonatomic, weak) id <VLChoosedSongViewDelegate>delegate;
-@property (nonatomic, strong) NSArray *selSongsArray;
 
 @property (nonatomic, strong) UITableView  *tableView;
-@property (nonatomic, copy) NSString *roomNo;
 
 @end
 
@@ -97,92 +94,22 @@
     
     KTVMakeSongTopInputModel* inputModel = [KTVMakeSongTopInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] makeSongTopWithInput:inputModel
-                                          completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-        [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
+    [[AppContext ktvServiceImp] pinSongWithInput:inputModel
+                                      completion:^(NSError * error) {
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : self.roomNo,
-//        @"songNo": model.songNo,
-//        @"sort": model.sort
-//    };
-//    [VLAPIRequest getRequestURL:kURLRoomMakeSongTop parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-////            [self loadChoosedSongWithRoomNo:self.roomNo];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kMakeTopNotification object:nil];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
-}
-
-- (void)loadChoosedSongWithRoomNo:(NSString *)roomNo {
-    self.roomNo = roomNo;
-    
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        weakSelf.selSongsArray = songArray;
-        [weakSelf.tableView reloadData];
-        [[NSNotificationCenter defaultCenter]postNotificationName:kUpdateSelSongArrayNotification object:weakSelf.selSongsArray];
-    }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : roomNo
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLChoosedSongs parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-//            self.selSongsArray = [VLRoomSelSongModel vj_modelArrayWithJson:response.data];
-//            [self.tableView reloadData];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kUpdateSelSongArrayNotification object:self.selSongsArray];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
-}
-
-- (NSArray *)getSelSongArray {
-    return self.selSongsArray;
 }
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {
         if (error != nil) {
             return;
         }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:kDeleteSuccessNotification object:nil];
     }];
-    
-//    NSDictionary *param = @{
-//        @"roomNo" : self.roomNo,
-//        @"songNo": model.songNo,
-//        @"sort":model.sort
-//    };
-//
-//    [VLAPIRequest getRequestURL:kURLDeleteSong parameter:param showHUD:NO success:^(VLResponseDataModel * _Nonnull response) {
-//        if (response.code == 0) {
-////            [self loadChoosedSongWithRoomNo:self.roomNo];
-//            [[NSNotificationCenter defaultCenter]postNotificationName:kDeleteSuccessNotification object:nil];
-//        }
-//    } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//
-//    }];
 }
 
 - (void)setSelSongsUIWithArray:(NSArray *)selSongsArray {

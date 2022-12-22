@@ -5,6 +5,7 @@
 
 #import "VLSelectSongTCell.h"
 #import "VLSongItmModel.h"
+#import "KTVMacro.h"
 @import QMUIKit;
 @import YYCategories;
 @import SDWebImage;
@@ -53,7 +54,7 @@
     self.chooseBtn = [[UIButton alloc]init];
     [self.chooseBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
     self.chooseBtn.titleLabel.font = UIFontMake(12.0);
-    [self.chooseBtn setTitle:@"点歌" forState:UIControlStateNormal];
+    [self.chooseBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
     [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     self.chooseBtn.layer.cornerRadius = 14;
     self.chooseBtn.layer.masksToBounds = YES;
@@ -75,22 +76,24 @@
     self.singerLabel.frame = CGRectMake(self.nameLabel.left, self.nameLabel.bottom+8, self.width-20-80, 17);
     
     self.chooseBtn.frame = CGRectMake(self.width-56-25, (self.height-28)*0.5, 56, 28);
+    [self.chooseBtn sizeToFit];
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }
 
 - (void)setSongItemModel:(VLSongItmModel *)songItemModel {
     _songItemModel = songItemModel;
-    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:songItemModel.imageUrl]];
+    [self.picImgView sd_setImageWithURL:[NSURL URLWithString:songItemModel.imageUrl]
+                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
     self.nameLabel.text = songItemModel.songName;
     self.singerLabel.text = songItemModel.singer;
     
     if (songItemModel.ifChoosed) {
         self.chooseBtn.enabled = NO;
-        [self.chooseBtn setTitle:NSLocalizedString(@"已点", nil) forState:UIControlStateNormal];
+        [self.chooseBtn setTitle:KTVLocalizedString(@"已点") forState:UIControlStateNormal];
         [self.chooseBtn setBackgroundColor:UIColorMakeWithRGBA(0, 0, 0, 0.4)];
     }else{
         self.chooseBtn.enabled = YES;
-        [self.chooseBtn setTitle:NSLocalizedString(@"点歌", nil) forState:UIControlStateNormal];
+        [self.chooseBtn setTitle:KTVLocalizedString(@"点歌") forState:UIControlStateNormal];
         [self.chooseBtn setBackgroundColor:UIColorMakeWithHex(@"#2753FF")];
     }
 

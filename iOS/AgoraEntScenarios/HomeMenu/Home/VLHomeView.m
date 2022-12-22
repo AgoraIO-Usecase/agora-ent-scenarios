@@ -7,7 +7,7 @@
 #import "VLHomeItemView.h"
 #import "VLHomeItemModel.h"
 #import "VLMacroDefine.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "MenuUtils.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -81,8 +81,18 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{@"bgImgStr":@"home_talk_bg",@"iconImgStr":@"home_talk_icon",@"titleStr":@"语聊房",@"subTitleStr":@""},
-            @{@"bgImgStr":@"home_KTV_bg",@"iconImgStr":@"home_KTV_icon",@"titleStr":@"在线K歌房",@"subTitleStr":@""}
+            @{
+                @"bgImgStr":@"home_talk_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"")
+            },
+            @{
+                @"bgImgStr":@"home_KTV_bg",
+                @"iconImgStr":@"home_KTV_icon",
+                @"titleStr":AGLocalizedString(@"在线K歌房"),
+                @"subTitleStr":@""
+            }
         ];
     }
     return _itemsArray;
