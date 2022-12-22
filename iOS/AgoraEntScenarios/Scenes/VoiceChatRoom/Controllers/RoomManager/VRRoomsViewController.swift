@@ -162,7 +162,9 @@ extension VRRoomsViewController {
 
         normal.didSelected = { [weak self] room in
             Throttler.throttle(delay: .seconds(1)) {
-                self?.entryRoom(room: room)
+                DispatchQueue.main.async {
+                    self?.entryRoom(room: room)
+                }
             }
         }
 //        self.normal.totalCountClosure = { [weak self] in
