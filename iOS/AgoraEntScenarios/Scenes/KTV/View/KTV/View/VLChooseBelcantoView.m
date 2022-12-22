@@ -7,7 +7,8 @@
 #import "VLBelcantoModel.h"
 #import "VLHotSpotBtn.h"
 #import "VLFontUtils.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "KTVMacro.h"
+#import "LSTPopView+KTVModal.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -40,11 +41,11 @@
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
     [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
-    [backBtn addTarget:self action:@selector(backBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
-    titleLabel.text = NSLocalizedString(@"美声", nil);
+    titleLabel.text = KTVLocalizedString(@"美声");
     titleLabel.font = VLUIFontMake(16);
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -74,10 +75,13 @@
     
 }
 
-- (void)backBtnClickEvent {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(belcantoBackBtnAction)]) {
-        [self.delegate belcantoBackBtnAction];
+- (void)backBtnClickEvent:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(onVLChooseBelcantoView:backBtnTapped:)]) {
+        [self.delegate onVLChooseBelcantoView:self backBtnTapped:sender];
+        return;
     }
+    
+    [[LSTPopView getPopViewWithCustomView:self] dismiss];
 }
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
@@ -99,8 +103,8 @@
     selBgModel.ifSelect = YES;
     self.indexValue = indexPath.item;
     [self.collectionView reloadData];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(belcantoItemClickAction:withIndx:)]) {
-        [self.delegate belcantoItemClickAction:selBgModel withIndx:indexPath.row];
+    if ([self.delegate respondsToSelector:@selector(onVLChooseBelcantoView:itemTapped:withIndex:)]) {
+        [self.delegate onVLChooseBelcantoView:self itemTapped:selBgModel withIndex:indexPath.row];
     }
 }
 
@@ -122,10 +126,10 @@
     if (!_itemsArray) {
         _itemsArray = @[
         @{@"imageName":@"ktv_belcanto_defaultNo",@"titleStr":@"默认无",@"ifSelect":@(false)},
-                        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":NSLocalizedString(@"大房间(男)", nil), @"ifSelect":@(false)},
-                        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":NSLocalizedString(@"小房间(男)", nil), @"ifSelect":@(false)},
-                        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":NSLocalizedString(@"大房间(女)", nil), @"ifSelect":@(false)},
-                        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":NSLocalizedString(@"小房间(女)", nil), @"ifSelect":@(false)}];
+        @{@"imageName":@"ktv_belcanto_bigRoomMale",@"titleStr":KTVLocalizedString(@"大房间(男)"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomMale",@"titleStr":KTVLocalizedString(@"小房间(男)"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_bigRoomFemale",@"titleStr":KTVLocalizedString(@"大房间(女)"), @"ifSelect":@(false)},
+        @{@"imageName":@"ktv_belcanto_smallRoomFemale",@"titleStr":KTVLocalizedString(@"小房间(女)"), @"ifSelect":@(false)}];
     }
     return _itemsArray;
 }

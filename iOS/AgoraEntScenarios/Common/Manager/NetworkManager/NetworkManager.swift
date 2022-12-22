@@ -6,14 +6,14 @@
 //
 import UIKit
 
-class NetworkManager {
-    
-    public enum TokenGeneratorType: Int {
+@objc
+class NetworkManager:NSObject {
+    @objc public enum TokenGeneratorType: Int {
         case token006 = 0
         case token007 = 1
     }
     
-    public enum AgoraTokenType: Int {
+    @objc public enum AgoraTokenType: Int {
         case rtc = 1
         case rtm = 2
         case chat = 3
@@ -41,8 +41,7 @@ class NetworkManager {
         return config
     }()
 
-    static let shared = NetworkManager()
-    private init() {}
+    @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     private let baseServerUrl: String = KeyCenter.onlineBaseServerUrl ?? ""
     
@@ -79,6 +78,7 @@ class NetworkManager {
         }
     }
 
+    @objc
     func generateToken(channelName: String,
                        uid: String,
                        tokenType: TokenGeneratorType,
@@ -92,12 +92,12 @@ class NetworkManager {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
-                      "expire": 900,
+                      "expire": 1500,
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
+//        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
         "\(baseServerUrl)token006/generate"
         : "\(baseServerUrl)token/generate"
@@ -108,14 +108,13 @@ class NetworkManager {
             let token = data?["token"]
             print(response)
             success(token)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
-    
     
     /// generator easemob im token & uid
     /// - Parameters:
@@ -166,7 +165,7 @@ class NetworkManager {
             print("setupContentInspectConfig fail")
             return
         }
-        let payload = String(data: jsonData, encoding: .utf8)
+        let payload: String = String(data: jsonData, encoding: .utf8) ?? ""
         
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
@@ -175,8 +174,7 @@ class NetworkManager {
                       "payload": payload,
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
-        print("\(baseServerUrl)webdemo/im/chat/create")
+//        ToastView.showWait(text: "loading...", view: nil)
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
@@ -186,11 +184,11 @@ class NetworkManager {
             let token = data?["chatToken"]
             print(response)
             success(uid, chatId, token)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil, nil, nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
     
