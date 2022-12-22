@@ -168,12 +168,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomLivingViewModel.updateRoomMemberObservable().observe(this){ response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>(){
                 override fun onSuccess(data: Boolean?) {
-                    "updateRoomMember onSuccess".logD()
+                    "ChatroomLiveActivity updateRoomMember onSuccess".logD()
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    "updateRoomMember onError $code $message".logE()
+                    "ChatroomLiveActivity updateRoomMember onError $code $message".logE()
                 }
             })
         }
@@ -511,7 +511,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
-        ChatroomIMManager.getInstance().logout(false)
         ChatroomIMManager.getInstance().clearCache()
         if (roomKitBean.isOwner) {
             ChatroomIMManager.getInstance().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
@@ -523,6 +522,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
+        ChatroomIMManager.getInstance().logout(false)
         super.finish()
     }
 
