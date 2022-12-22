@@ -165,6 +165,18 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             })
         }
+        roomLivingViewModel.updateRoomMemberObservable().observe(this){ response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>(){
+                override fun onSuccess(data: Boolean?) {
+                    "ChatroomLiveActivity updateRoomMember onSuccess".logD()
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    "ChatroomLiveActivity updateRoomMember onError $code $message".logE()
+                }
+            })
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View?, insets: WindowInsetsCompat ->
             val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logD(
@@ -271,7 +283,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
-                    chatUid.let { ChatroomIMManager.getInstance().removeMember(it) }
+                    chatUid.let {
+                        ChatroomIMManager.getInstance().removeMember(it)
+                        roomLivingViewModel.updateRoomMember()
+                    }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                 }
@@ -496,7 +511,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
-        ChatroomIMManager.getInstance().logout(false)
         ChatroomIMManager.getInstance().clearCache()
         if (roomKitBean.isOwner) {
             ChatroomIMManager.getInstance().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
@@ -508,6 +522,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         }
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
+        ChatroomIMManager.getInstance().logout(false)
         super.finish()
     }
 
