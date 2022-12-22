@@ -37,7 +37,9 @@ import com.sensetime.stmobile.params.STRotateType;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class STRenderer {
     private static final String TAG = STRenderer.class.getSimpleName();
@@ -548,6 +550,13 @@ public class STRenderer {
         msg.obj = sticker;
 
         mChangeStickerManagerHandler.sendMessage(msg);
+    }
+
+    public void removeStickers(){
+        Set<Map.Entry<Integer, String>> entries = new LinkedHashSet<>(mCurrentStickerMaps.entrySet());
+        for (Map.Entry<Integer, String> entry : entries) {
+            removeSticker(entry.getKey());
+        }
     }
 
     public void removeSticker(String path) {
