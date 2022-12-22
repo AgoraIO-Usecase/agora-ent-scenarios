@@ -521,7 +521,7 @@ class ShowSyncManagerServiceImpl(
         success: (List<ShowPKInvitation>) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        //innerGetPKInvitationList(room, success, error)
+        success.invoke(pKCompetitorInvitationList)
     }
 
     override fun subscribePKInvitationChanged(onPKInvitationChanged: (ShowServiceProtocol.ShowSubscribeStatus, ShowPKInvitation?) -> Unit) {
@@ -537,8 +537,8 @@ class ShowSyncManagerServiceImpl(
             error?.invoke(RuntimeException("InteractionInfoList is not empty, stop interacting first!"))
         }
         innerGetPKInvitationList(room, {
-            val list = it.filter { it.roomId == room.roomId }.getOrNull(0)
-            if (list == null) {
+            val invitation = it.filter { it.roomId == room.roomId }.getOrNull(0)
+            if (invitation == null) {
                 val pkInvitation = ShowPKInvitation(
                     room.ownerId,
                     room.ownerName,
@@ -796,7 +796,7 @@ class ShowSyncManagerServiceImpl(
             roomInfo.roomUserCount,
             roomInfo.thumbnailId,
             roomInfo.ownerId,
-            roomInfo.ownerAvater,
+            roomInfo.ownerAvatar,
             roomInfo.ownerName,
             roomInfo.roomStatus,
             interactStatus,
@@ -829,7 +829,7 @@ class ShowSyncManagerServiceImpl(
             userCount,
             roomInfo.thumbnailId,
             roomInfo.ownerId,
-            roomInfo.ownerAvater,
+            roomInfo.ownerAvatar,
             roomInfo.ownerName,
             roomInfo.roomStatus,
             roomInfo.interactStatus,
@@ -1285,8 +1285,6 @@ class ShowSyncManagerServiceImpl(
                                         ret.add(obj)
                                         retObjId.add(it.id)
                                     }
-                                    pKCompetitorInvitationList.addAll(ret)
-                                    objIdOfPKCompetitorInvitation.addAll(retObjId)
                                     innerSubscribeCompetitorPKInvitationChanged(roomId)
                                     runOnMainThread { success.invoke(ret) }
                                 }
@@ -1461,6 +1459,7 @@ class ShowSyncManagerServiceImpl(
             override fun onUpdated(item: IObject?) {
                 val info = item?.toObject(ShowPKInvitation::class.java) ?: return
 
+                val acceptItem = pKCompetitorInvitationList.filter { it.status == ShowRoomRequestStatus.accepted.value }.getOrNull(0)
                 val list = pKCompetitorInvitationList.filter { it.userId == info.userId }
                 if (list.isEmpty()) {
                     pKCompetitorInvitationList.add(info)
@@ -1472,17 +1471,25 @@ class ShowSyncManagerServiceImpl(
                 }
 
                 if (interactionInfoList.isEmpty() && info.status == ShowRoomRequestStatus.accepted.value) {
-                    // 当前未互动
-                    val interaction = ShowInteractionInfo(
-                        info.userId,
-                        info.userName,
-                        info.roomId,
-                        ShowInteractionStatus.pking.value,
-                        muteAudio = false,
-                        ownerMuteAudio = false,
-                        createdAt = info.createAt
-                    )
-                    innerCreateInteraction(interaction, null, null)
+                    if (acceptItem == null) {
+                        // 当前未互动
+                        val interaction = ShowInteractionInfo(
+                            info.userId,
+                            info.userName,
+                            info.roomId,
+                            ShowInteractionStatus.pking.value,
+                            muteAudio = false,
+                            ownerMuteAudio = false,
+                            createdAt = info.createAt
+                        )
+                        innerCreateInteraction(interaction, null, null)
+                    } else {
+                        // 已有其他主播接受， 删除PK邀请
+                        val index = pKCompetitorInvitationList.indexOf(info)
+                        pKCompetitorInvitationList.removeAt(index)
+                        val objId = objIdOfPKCompetitorInvitation.removeAt(index)
+                        innerRemovePKInvitation(info.roomId, objId, null, null)
+                    }
                 } else {
                     val oldInteraction = interactionInfoList.filter { it.userId == info.userId }.getOrNull(0)
                     if (oldInteraction != null) {
@@ -1518,8 +1525,8 @@ class ShowSyncManagerServiceImpl(
                 val sceneReference = sceneReferenceMap[invitation.roomId] ?: return
                 sceneReference.unsubscribe(this)
                 sceneReferenceMap.remove(invitation.roomId)
-                objIdOfPKCompetitorInvitation.clear()
-                pKCompetitorInvitationList.clear()
+                objIdOfPKCompetitorInvitation.removeAt(index)
+                pKCompetitorInvitationList.removeAt(index)
                 runOnMainThread {
                     micPKInvitationSubscriber?.invoke(
                         ShowServiceProtocol.ShowSubscribeStatus.deleted,

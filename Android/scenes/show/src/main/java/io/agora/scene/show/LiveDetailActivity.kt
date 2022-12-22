@@ -40,6 +40,7 @@ import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
 import io.agora.scene.show.widget.pk.LivePKDialog
 import io.agora.scene.show.widget.pk.LivePKSettingsDialog
+import io.agora.scene.show.widget.pk.LiveRoomConfig
 import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
@@ -140,7 +141,7 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun initTopLayout() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
-            .load(mRoomInfo.ownerAvater)
+            .load(mRoomInfo.ownerAvatar)
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
@@ -735,16 +736,18 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showPKDialog() {
-        mPKDialog.setLinkDialogActionListener(object : OnPKDialogActionListener {
+        mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
-                mService.getAllPKUserList({
-                    mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
+                mService.getAllPKUserList({ roomList ->
+                    mService.getAllPKInvitationList({ invitationList ->
+                        mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
+                    })
                 })
             }
 
-            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: ShowRoomDetailModel) {
+            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: LiveRoomConfig) {
                 if (isRoomOwner) {
-                    mService.createPKInvitation(roomItem)
+                    mService.createPKInvitation(roomItem.convertToShowRoomDetailModel())
                 }
             }
 
@@ -894,8 +897,10 @@ class LiveDetailActivity : AppCompatActivity() {
 
         mService.sendChatMessage(getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged { status, info ->
-            mService.getAllPKUserList({
-                mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
+            mService.getAllPKUserList({ roomList ->
+                mService.getAllPKInvitationList({ invitationList ->
+                    mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
+                })
             })
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
                 if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString()) {
@@ -931,7 +936,7 @@ class LiveDetailActivity : AppCompatActivity() {
         AlertDialog.Builder(this, R.style.show_alert_dialog)
             .setView(ShowLivingEndDialogBinding.inflate(LayoutInflater.from(this)).apply {
                 Glide.with(this@LiveDetailActivity)
-                    .load(mRoomInfo.ownerAvater)
+                    .load(mRoomInfo.ownerAvatar)
                     .into(ivAvatar)
             }.root)
             .setCancelable(false)
