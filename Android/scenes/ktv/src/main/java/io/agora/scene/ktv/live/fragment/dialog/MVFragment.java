@@ -14,7 +14,6 @@ import java.util.List;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.manager.RoomManager;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.FragmentDialogMvBinding;
 import io.agora.scene.ktv.databinding.KtvItemMvBinding;
@@ -68,7 +67,6 @@ public class MVFragment extends BaseViewBindingFragment<FragmentDialogMvBinding>
     @Override
     public void onItemClick(@NonNull Integer data, View view, int position, long viewType) {
         mAdapter.selectedIndex = position;
-        RoomManager.mRoom.bgOption = String.valueOf(position);
         index = position;
         mAdapter.notifyDataSetChanged();
         ((RoomLivingActivity) requireActivity()).setPlayerBg(position);

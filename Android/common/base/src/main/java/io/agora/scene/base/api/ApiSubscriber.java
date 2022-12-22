@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.concurrent.TimeoutException;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.event.UserLogoutEvent;
 import io.agora.scene.base.utils.LogUtils;
@@ -99,7 +99,7 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
                 errorMsg = "登录超时，请重新登录";
                 errorCode = ErrorCode.TOKEN_ERROR;
                 EventBus.getDefault().post(new UserLogoutEvent());
-                SPUtil.putBoolean(KtvConstant.IS_AGREE, false);
+                SPUtil.putBoolean(Constant.IS_AGREE, false);
             } else {
                 errorMsg = "错误 : errorCode = " + ((HttpException) e).code() + " ; errorMsg = " + e.getMessage();
             }

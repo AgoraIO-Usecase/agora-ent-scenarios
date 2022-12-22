@@ -92,14 +92,13 @@ public class VRSoundEffectsViewController: VRBaseViewController {
                             SVProgressHUD.showError(withStatus: "Create failed!".localized())
                         }
                     }
-                } else {
+                }else {
                     self.view.window?.isUserInteractionEnabled = true
                     SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
                 }
+                
             })
-            
         }
-        
     }
     
     private func createEntity() -> VRRoomEntity {

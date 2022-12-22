@@ -6,11 +6,10 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@class VLRoomListModel;
+@class VLRoomListModel, VLKTVTopView;
 @protocol VLKTVTopViewDelegate <NSObject>
 
-@optional
-- (void)closeBtnAction;
+- (void)onVLKTVTopView:(VLKTVTopView*)view closeBtnTapped:(id)sender;
 
 @end
 
