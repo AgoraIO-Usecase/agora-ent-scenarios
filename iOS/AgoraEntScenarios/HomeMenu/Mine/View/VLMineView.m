@@ -9,6 +9,7 @@
 #import "VLLoginModel.h"
 #import "VLMacroDefine.h"
 #import "UIView+VL.h"
+#import "MenuUtils.h"
 @import SDWebImage;
 @import QMUIKit;
 @import YYCategories;
@@ -126,7 +127,7 @@
         _nickNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_avatarImgView.right+15, _avatarImgView.top+5, 120, 23)];
         _nickNameLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
         _nickNameLabel.textColor = UIColorMakeWithHex(@"#040925");
-        _nickNameLabel.text = NSLocalizedString(@"用户名", nil);
+        _nickNameLabel.text = AGLocalizedString(@"用户名");
         _nickNameLabel.userInteractionEnabled = YES;
     }
     return _nickNameLabel;
@@ -172,11 +173,11 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{@"itemImgStr":@"mine_screct_icon",@"titleStr":NSLocalizedString(@"用户协议", nil)},
-            @{@"itemImgStr":@"mine_userRule_icon",@"titleStr":NSLocalizedString(@"隐私政策", nil)},
-            @{@"itemImgStr":@"mine_aboutus_icon",@"titleStr":NSLocalizedString(@"关于我们", nil)},
-            @{@"itemImgStr":@"mine_logout_icon",@"titleStr":NSLocalizedString(@"退出登录", nil)},
-            @{@"itemImgStr":@"mine_quit_icon",@"titleStr":NSLocalizedString(@"注销账号", nil)},
+            @{@"itemImgStr":@"mine_screct_icon",@"titleStr":AGLocalizedString(@"用户协议")},
+            @{@"itemImgStr":@"mine_userRule_icon",@"titleStr":AGLocalizedString(@"隐私政策")},
+            @{@"itemImgStr":@"mine_aboutus_icon",@"titleStr":AGLocalizedString(@"关于我们")},
+            @{@"itemImgStr":@"mine_logout_icon",@"titleStr":AGLocalizedString(@"退出登录")},
+            @{@"itemImgStr":@"mine_quit_icon",@"titleStr":AGLocalizedString(@"注销账号")},
         ];
     }
     return _itemsArray;
