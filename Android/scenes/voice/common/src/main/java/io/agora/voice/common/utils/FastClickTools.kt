@@ -9,9 +9,9 @@ import android.view.View
  * 防玻璃点击
  */
 object FastClickTools {
-    var lastClickTime = SystemClock.elapsedRealtime()
+    private var lastClickTime = -1L
 
-    var lastClickViewId = -1
+    private var lastClickViewId = -1
 
     private const val FAST_CLICK_INTERVAL = 1000
 
