@@ -12,6 +12,7 @@ import KakaJSON
 public let VoiceRoomGift = "chatroom_gift"
 public let VoiceRoomPraise = "chatroom_praise" // like 点赞
 public let VoiceRoomInviteSite = "chatroom_inviteSiteNotify"
+public let VoiceRoomCancelInviteSite = "chatroom_inviteRefusedNotify"
 public let VoiceRoomApplySite = "chatroom_applySiteNotify"
 public let VoiceRoomSubmitApplySite = "chatroom_submitApplySiteNotify"
 public let VoiceRoomCancelApplySite = "chatroom_submitApplySiteNotifyCancel"
@@ -37,7 +38,7 @@ public let VoiceRoomJoinedMember = "chatroom_join"
 
     func receiveInviteSite(roomId: String, meta: [String: String]?)
 
-    func refuseInvite(roomId: String, meta: [String: String]?)
+    func refuseInvite(roomId: String,chat_uid: String, meta: [String: String]?)
 
     func userJoinedRoom(roomId: String, username: String, ext: [String: Any]?)
 
@@ -145,13 +146,13 @@ public extension VoiceRoomIMManager {
                             if chatRoomId != self.currentRoomId {return}
                             self.delegate?.receiveCancelApplySite(roomId: self.currentRoomId,chat_uid: message.from)
                         }
-                    case VoiceRoomApplySite:
+                    case VoiceRoomSubmitApplySite:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.receiveApplySite(roomId:meta:))) {
                             self.delegate?.receiveApplySite(roomId: self.currentRoomId, meta: body.customExt)
                         }
-                    case VoiceRoomDeclineApply:
-                        if delegate!.responds(to: #selector(VoiceRoomIMDelegate.refuseInvite(roomId:meta:))) {
-                            self.delegate?.refuseInvite(roomId: self.currentRoomId, meta: body.customExt)
+                    case VoiceRoomCancelInviteSite:
+                        if delegate!.responds(to: #selector(VoiceRoomIMDelegate.refuseInvite(roomId:chat_uid:meta:))) {
+                            self.delegate?.refuseInvite(roomId: self.currentRoomId, chat_uid: message.from, meta: body.customExt)
                         }
                     case VoiceRoomJoinedMember:
                         if delegate!.responds(to: #selector(VoiceRoomIMDelegate.userJoinedRoom(roomId:username:ext:))) {
