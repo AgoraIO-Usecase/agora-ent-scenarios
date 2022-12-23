@@ -22,7 +22,7 @@ class ShowRoomLiveView: UIView {
     
     var room: ShowRoomListModel? {
         didSet{
-            roomInfoView.setRoomInfo(avatar: room?.ownerAvater, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
+            roomInfoView.setRoomInfo(avatar: room?.ownerAvatar, name: room?.roomName, id: room?.roomId, time: room?.createdAt)
             guard let count = room?.roomUserCount else {
                 roomUserCount = 1
                 return

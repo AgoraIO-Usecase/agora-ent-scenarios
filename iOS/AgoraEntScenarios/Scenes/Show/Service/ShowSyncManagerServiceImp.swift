@@ -197,7 +197,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         room.thumbnailId = thumbnailId
         room.ownerId = VLUserCenter.user.id
         room.ownerName = VLUserCenter.user.name
-        room.ownerAvater = VLUserCenter.user.headUrl
+        room.ownerAvatar = VLUserCenter.user.headUrl
         room.createdAt = Date().millionsecondSince1970()
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
