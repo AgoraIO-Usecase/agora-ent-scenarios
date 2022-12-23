@@ -6,96 +6,8 @@
 	objectVersion = 55;
 	objects = {
 
+/* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
-		057DD9E4290B9495001329E6 /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B5290B9495001329E6 /* VoiceRoomBusinessApi.swift */; };
-		057DD9E5290B9495001329E6 /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B6290B9495001329E6 /* VoiceRoomRequest.swift */; };
-		057DD9E6290B9495001329E6 /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9B7290B9495001329E6 /* VoiceRoomBusinessRequest.swift */; };
-		057DD9EF290B9495001329E6 /* VoiceRoomIMManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C3290B9495001329E6 /* VoiceRoomIMManager.swift */; };
-		057DD9F0290B9495001329E6 /* ASRTCKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C5290B9495001329E6 /* ASRTCKit.swift */; };
-		057DD9F1290B9495001329E6 /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C8290B9495001329E6 /* UIColor+extension.swift */; };
-		057DD9F2290B9495001329E6 /* UIButtonLayoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9C9290B9495001329E6 /* UIButtonLayoutExtension.swift */; };
-		057DD9F3290B9495001329E6 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CA290B9495001329E6 /* UIButton+Extension.swift */; };
-		057DD9F4290B9495001329E6 /* ResourceBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CB290B9495001329E6 /* ResourceBundleExtension.swift */; };
-		057DD9F5290B9495001329E6 /* UIViewToastExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CC290B9495001329E6 /* UIViewToastExtension.swift */; };
-		057DD9F6290B9495001329E6 /* UIImageBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CD290B9495001329E6 /* UIImageBundleExtension.swift */; };
-		057DD9F7290B9495001329E6 /* String + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9CE290B9495001329E6 /* String + Extension.swift */; };
-		057DD9F8290B9495001329E6 /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D0290B9495001329E6 /* PresentationController.swift */; };
-		057DD9F9290B9495001329E6 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D1290B9495001329E6 /* LanguageManager.swift */; };
-		057DD9FA290B9495001329E6 /* VRVerifyCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D2290B9495001329E6 /* VRVerifyCodeView.swift */; };
-		057DD9FB290B9495001329E6 /* UIViewController+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D3290B9495001329E6 /* UIViewController+Presentation.swift */; };
-		057DD9FC290B9495001329E6 /* VoiceRoomEmojiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D4290B9495001329E6 /* VoiceRoomEmojiManager.swift */; };
-		057DD9FD290B9495001329E6 /* PresentationAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D6290B9495001329E6 /* PresentationAnimation.swift */; };
-		057DD9FE290B9495001329E6 /* FlipHorizontalAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D7290B9495001329E6 /* FlipHorizontalAnimation.swift */; };
-		057DD9FF290B9495001329E6 /* CrossZoomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D8290B9495001329E6 /* CrossZoomAnimation.swift */; };
-		057DDA00290B9495001329E6 /* CrossDissolveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9D9290B9495001329E6 /* CrossDissolveAnimation.swift */; };
-		057DDA01290B9495001329E6 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9DA290B9495001329E6 /* Throttle.swift */; };
-		057DDA02290B9495001329E6 /* VoiceRoomPasswordAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9DB290B9495001329E6 /* VoiceRoomPasswordAlert.swift */; };
-		057DDA03290B9495001329E6 /* PresentedViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9DC290B9495001329E6 /* PresentedViewType.swift */; };
-		057DDA04290B9495001329E6 /* PresentationEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9DD290B9495001329E6 /* PresentationEnums.swift */; };
-		057DDA06290B9495001329E6 /* PresentationSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9DF290B9495001329E6 /* PresentationSegue.swift */; };
-		057DDA07290B9496001329E6 /* VRVerifyCodeNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9E0290B9495001329E6 /* VRVerifyCodeNumberView.swift */; };
-		057DDA08290B9496001329E6 /* VRVerifyCodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9E1290B9495001329E6 /* VRVerifyCodeTextView.swift */; };
-		057DDA09290B9496001329E6 /* VoiceRoomPageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9E2290B9495001329E6 /* VoiceRoomPageContainer.swift */; };
-		057DDA0A290B9496001329E6 /* Notification+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DD9E3290B9495001329E6 /* Notification+Presentation.swift */; };
-		057DDA0C290B9778001329E6 /* AgoraSceneConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057DDA0B290B9778001329E6 /* AgoraSceneConfig.swift */; };
-		05FFE6EF290F706C0024D22F /* VMUserListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6CC290F70680024D22F /* VMUserListView.swift */; };
-		05FFE6F0290F706C0024D22F /* VoiceRoomGifterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6CD290F70680024D22F /* VoiceRoomGifterCell.swift */; };
-		05FFE6F1290F706C0024D22F /* PopTip+Transitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6CE290F70680024D22F /* PopTip+Transitions.swift */; };
-		05FFE6F2290F706C0024D22F /* VMManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6CF290F70680024D22F /* VMManagerView.swift */; };
-		05FFE6F3290F706C0024D22F /* VoiceRoomUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D0290F70680024D22F /* VoiceRoomUserView.swift */; };
-		05FFE6F4290F706C0024D22F /* VMANISSUPTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D1290F70690024D22F /* VMANISSUPTableViewCell.swift */; };
-		05FFE6F5290F706C0024D22F /* VoiceRoomSendGiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D2290F70690024D22F /* VoiceRoomSendGiftCell.swift */; };
-		05FFE6F6290F706C0024D22F /* VoiceRoomApplyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D3290F70690024D22F /* VoiceRoomApplyCell.swift */; };
-		05FFE6F7290F706C0024D22F /* VoiceRoomGiftsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D4290F70690024D22F /* VoiceRoomGiftsView.swift */; };
-		05FFE6F8290F706C0024D22F /* VoiceRoomGiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D5290F70690024D22F /* VoiceRoomGiftCell.swift */; };
-		05FFE6F9290F706C0024D22F /* VMMuteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D6290F70690024D22F /* VMMuteView.swift */; };
-		05FFE6FA290F706C0024D22F /* VMNoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D7290F70690024D22F /* VMNoticeView.swift */; };
-		05FFE6FB290F706C0024D22F /* VoiceRoomInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D8290F70690024D22F /* VoiceRoomInputBar.swift */; };
-		05FFE6FC290F706C0024D22F /* VoiceRoomSwitchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6D9290F70690024D22F /* VoiceRoomSwitchBar.swift */; };
-		05FFE6FD290F706C0024D22F /* VMNorSetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DA290F706A0024D22F /* VMNorSetTableViewCell.swift */; };
-		05FFE6FE290F706C0024D22F /* VoiceRoomChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DB290F706A0024D22F /* VoiceRoomChatView.swift */; };
-		05FFE6FF290F706C0024D22F /* VMSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DC290F706A0024D22F /* VMSwitchTableViewCell.swift */; };
-		05FFE700290F706C0024D22F /* VoiceRoomAudienceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DD290F706A0024D22F /* VoiceRoomAudienceCell.swift */; };
-		05FFE701290F706C0024D22F /* VMUpstageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DE290F706A0024D22F /* VMUpstageView.swift */; };
-		05FFE702290F706C0024D22F /* VoiceRoomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6DF290F706A0024D22F /* VoiceRoomChatCell.swift */; };
-		05FFE703290F706C0024D22F /* VoiceRoomEmojiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E0290F706A0024D22F /* VoiceRoomEmojiListView.swift */; };
-		05FFE704290F706C0024D22F /* VoiceRoomInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E1290F706A0024D22F /* VoiceRoomInviteCell.swift */; };
-		05FFE705290F706C0024D22F /* VoiceRoomPopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E2290F706A0024D22F /* VoiceRoomPopView.swift */; };
-		05FFE706290F706C0024D22F /* VoiceRoomGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E3290F706A0024D22F /* VoiceRoomGiftView.swift */; };
-		05FFE707290F706C0024D22F /* VoiceRoomChatBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E4290F706B0024D22F /* VoiceRoomChatBar.swift */; };
-		05FFE708290F706C0024D22F /* VMANISSetTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E5290F706B0024D22F /* VMANISSetTableViewCell.swift */; };
-		05FFE709290F706C0024D22F /* VoiceRoomPraiseEmitterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E6290F706B0024D22F /* VoiceRoomPraiseEmitterView.swift */; };
-		05FFE70A290F706C0024D22F /* VMAudioSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E7290F706B0024D22F /* VMAudioSettingView.swift */; };
-		05FFE70B290F706C0024D22F /* VMSliderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E8290F706B0024D22F /* VMSliderTableViewCell.swift */; };
-		05FFE70C290F706C0024D22F /* VMSoundSelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6E9290F706B0024D22F /* VMSoundSelTableViewCell.swift */; };
-		05FFE70D290F706C0024D22F /* PopTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6EA290F706B0024D22F /* PopTip.swift */; };
-		05FFE70E290F706C0024D22F /* VoiceRoomAlertContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6EB290F706B0024D22F /* VoiceRoomAlertContainer.swift */; };
-		05FFE70F290F706C0024D22F /* VoiceRoomChatBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6EC290F706B0024D22F /* VoiceRoomChatBarCell.swift */; };
-		05FFE710290F706C0024D22F /* PopTip+Draw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6ED290F706B0024D22F /* PopTip+Draw.swift */; };
-		05FFE711290F706C0024D22F /* VoiceRoomApplyAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE6EE290F706B0024D22F /* VoiceRoomApplyAlert.swift */; };
-		05FFE713290F73230024D22F /* SwiftyFitSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE712290F73230024D22F /* SwiftyFitSize.swift */; };
-		05FFE71E290F73670024D22F /* VoiceRoomHelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE715290F73670024D22F /* VoiceRoomHelpViewController.swift */; };
-		05FFE71F290F73670024D22F /* VoiceRoomApplyUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE716290F73670024D22F /* VoiceRoomApplyUsersViewController.swift */; };
-		05FFE720290F73670024D22F /* VoiceRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE717290F73670024D22F /* VoiceRoomViewController.swift */; };
-		05FFE721290F73670024D22F /* VoiceRoomInviteUsersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE718290F73670024D22F /* VoiceRoomInviteUsersController.swift */; };
-		05FFE722290F73670024D22F /* VoiceRoomAudiencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE719290F73670024D22F /* VoiceRoomAudiencesViewController.swift */; };
-		05FFE723290F73670024D22F /* VoiceRoomViewController+ChatBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE71A290F73670024D22F /* VoiceRoomViewController+ChatBar.swift */; };
-		05FFE724290F73670024D22F /* VoiceRoomViewController+IM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE71B290F73670024D22F /* VoiceRoomViewController+IM.swift */; };
-		05FFE725290F73670024D22F /* VoiceRoomGiftersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE71C290F73670024D22F /* VoiceRoomGiftersViewController.swift */; };
-		05FFE730290F74560024D22F /* AgoraChatRoom3DMoveUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE727290F74550024D22F /* AgoraChatRoom3DMoveUserView.swift */; };
-		05FFE731290F74560024D22F /* AgoraMicVolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE728290F74550024D22F /* AgoraMicVolView.swift */; };
-		05FFE732290F74560024D22F /* AgoraChatRoomBaseRtcUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE729290F74550024D22F /* AgoraChatRoomBaseRtcUserView.swift */; };
-		05FFE733290F74560024D22F /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72A290F74550024D22F /* AgoraChatRoom3DUserCollectionViewCell.swift */; };
-		05FFE734290F74560024D22F /* AgoraChatRoom3DRtcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72B290F74560024D22F /* AgoraChatRoom3DRtcView.swift */; };
-		05FFE735290F74560024D22F /* AgoraChatRoomBaseUserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72C290F74560024D22F /* AgoraChatRoomBaseUserCollectionViewCell.swift */; };
-		05FFE736290F74560024D22F /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72D290F74560024D22F /* AgoraChatRoomBaseAlienCollectionViewCell.swift */; };
-		05FFE737290F74560024D22F /* AgoraChatRoomHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72E290F74560024D22F /* AgoraChatRoomHeaderView.swift */; };
-		05FFE738290F74560024D22F /* AgoraChatRoomNormalRtcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE72F290F74560024D22F /* AgoraChatRoomNormalRtcView.swift */; };
-		05FFE73B290F74EE0024D22F /* VMConfirmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE739290F74EE0024D22F /* VMConfirmView.swift */; };
-		05FFE73C290F74EE0024D22F /* VMPresentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73A290F74EE0024D22F /* VMPresentView.swift */; };
-		05FFE740290F752C0024D22F /* VMEQSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73D290F752C0024D22F /* VMEQSettingView.swift */; };
-		05FFE741290F752D0024D22F /* VoiceRoomEndLiveAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73E290F752C0024D22F /* VoiceRoomEndLiveAlert.swift */; };
-		05FFE742290F752D0024D22F /* VMSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FFE73F290F752C0024D22F /* VMSoundView.swift */; };
 		7F6BE3DE2919ED4900F6714D /* VLPopMoreSelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3D72919ED4900F6714D /* VLPopMoreSelView.m */; };
 		7F6BE3DF2919ED4900F6714D /* VLPopScoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DA2919ED4900F6714D /* VLPopScoreView.m */; };
 		7F6BE3E02919ED4900F6714D /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6BE3DB2919ED4900F6714D /* VLPopSelBgView.m */; };
@@ -3337,9 +3249,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 59;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5459N9W32M;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3351,8 +3265,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3361,6 +3274,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = AgoraTest2020;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3377,9 +3291,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 59;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5459N9W32M;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3391,8 +3307,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3401,6 +3316,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = AgoraTest2020;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
