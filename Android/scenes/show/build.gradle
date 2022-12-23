@@ -11,7 +11,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ":scenes:show:aars:effectAAR")
     implementation project(path: ":scenes:show:aars:SenseArSourceManager")
     implementation project(path: ":scenes:show:aars:STMobileJNI")
     implementation project(":common:base")

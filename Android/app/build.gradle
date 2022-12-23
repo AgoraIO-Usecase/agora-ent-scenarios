@@ -6,6 +6,10 @@ android {
         applicationId "io.agora.entfull"
         ndk.abiFilters 'armeabi-v7a'//, 'arm64-v8a'//, 'x86', 'x86-64'
     }
+
+    packagingOptions {
+        pickFirst 'lib/*/libc++_shared.so'
+    }
 }
 
 dependencies {
