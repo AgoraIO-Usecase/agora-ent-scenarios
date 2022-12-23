@@ -57,7 +57,7 @@ class ShowRoomListModel: ShowBaseInfo {
     var roomUserCount: Int = 1                         //房间人数
     var thumbnailId: String?                           //缩略图id
     var ownerId: String?                               //房主user id (rtc uid)
-    var ownerAvater: String?                           //房主头像
+    var ownerAvatar: String?                           //房主头像
     var ownerName: String?                             //房主名
     var roomStatus: ShowRoomStatus = .activity         //直播状态
     var interactStatus: ShowInteractionStatus = .idle  //互动状态
