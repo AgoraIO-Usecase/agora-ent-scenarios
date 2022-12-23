@@ -42,6 +42,15 @@ import Foundation
         case .pking: return "PK已断开哦".show_localized
         }
     }
+    
+    var isInteracting: Bool {
+        switch self {
+        case .onSeat, .pking:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 @objcMembers
