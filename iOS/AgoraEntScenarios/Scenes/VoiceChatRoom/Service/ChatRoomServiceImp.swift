@@ -382,9 +382,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func kickOff(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
+        let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
-        mic.status = -1
-        self.cleanUserMicIndex(mic: mic)
+        mic.status = (oldMic.status == 2 ? 2:-1)
+        self.cleanUserMicIndex(mic: oldMic)
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[mic_index] = mic
@@ -395,9 +396,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func leaveMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
+        let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
-        mic.status = -1
-        self.cleanUserMicIndex(mic: mic)
+        mic.status = oldMic.status == 2 ? 2:-1
+        self.cleanUserMicIndex(mic: self.mics[mic_index])
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
                 self.mics[mic_index] = mic
@@ -587,7 +589,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self.userList?.first(where: { $0.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                                 })?.mic_index = mic_index
                 let currentMic = self.mics[safe: mic_index]
-                if currentMic?.status ?? 0 == -1 {
+                if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
                     self.mics[mic_index]  = mic
                     completion(nil,mic)
                 } else {
