@@ -107,6 +107,7 @@ class VoiceRoomViewController: VRBaseViewController {
     deinit {
         print("\(String(describing: self.swiftClassName)) is destroyed!")
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        VoiceRoomUserInfo.shared.user?.amount = 0
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
     }
@@ -229,6 +230,11 @@ extension VoiceRoomViewController {
         })
         ChatRoomServiceImp.getSharedInstance().mics = mics
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
+        self.roomInfo?.room?.ranking_list = info.room?.ranking_list
+        if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid
+        }) {
+            VoiceRoomUserInfo.shared.user?.amount = first.amount
+        }
     }
     
     func fetchDetailError() {
