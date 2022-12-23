@@ -66,6 +66,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.showInviteMicAlert()
     }
     
+    func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String) {
+        ChatRoomServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == chat_uid
+        })?.mic_index = -1
+    }
+    
     func onUserJoinedRoom(roomId: String, user: VRUser) {
         // 更新用户人数
         let info = roomInfo
