@@ -107,6 +107,7 @@ class VoiceRoomViewController: VRBaseViewController {
     deinit {
         print("\(String(describing: self.swiftClassName)) is destroyed!")
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        VoiceRoomUserInfo.shared.user?.amount = 0
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
     }
