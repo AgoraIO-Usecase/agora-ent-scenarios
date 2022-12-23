@@ -31,6 +31,5 @@ include ':common:ui-widget'
 //include ':scenes:voice:rtckit'
 
 include ':scenes:show'
-include ':scenes:show:aars:effectAAR'
 include ':scenes:show:aars:SenseArSourceManager'
 include ':scenes:show:aars:STMobileJNI'

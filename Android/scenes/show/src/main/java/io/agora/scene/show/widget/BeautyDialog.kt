@@ -159,16 +159,16 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     R.string.show_beauty_item_none,
                     R.mipmap.show_beauty_ic_none
                 ),
-                ItemInfo(
-                    ITEM_ID_EFFECT_BAIXI,
-                    R.string.show_beauty_item_effect_baixi,
-                    R.mipmap.show_beauty_ic_effect_baixi
-                ),
-                ItemInfo(
-                    ITEM_ID_EFFECT_TIANMEI,
-                    R.string.show_beauty_item_effect_tianmei,
-                    R.mipmap.show_beauty_ic_effect_tianmei
-                ),
+//                ItemInfo(
+//                    ITEM_ID_EFFECT_BAIXI,
+//                    R.string.show_beauty_item_effect_baixi,
+//                    R.mipmap.show_beauty_ic_effect_baixi
+//                ),
+//                ItemInfo(
+//                    ITEM_ID_EFFECT_TIANMEI,
+//                    R.string.show_beauty_item_effect_tianmei,
+//                    R.mipmap.show_beauty_ic_effect_tianmei
+//                ),
                 ItemInfo(
                     ITEM_ID_EFFECT_CWEI,
                     R.string.show_beauty_item_effect_cwei,
@@ -193,11 +193,11 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     R.string.show_beauty_item_sticker_huahua,
                     R.mipmap.show_beauty_ic_filter_naiyou
                 ),
-                ItemInfo(
-                    ITEM_ID_STICKER_WOCHAOTIAN,
-                    R.string.show_beauty_item_sticker_wochaotian,
-                    R.mipmap.show_beauty_ic_filter_makalong
-                ),
+//                ItemInfo(
+//                    ITEM_ID_STICKER_WOCHAOTIAN,
+//                    R.string.show_beauty_item_sticker_wochaotian,
+//                    R.mipmap.show_beauty_ic_filter_makalong
+//                ),
             )
         ),
     )

@@ -11,16 +11,14 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_OVERAL
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_SMOOTH;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_TEETH;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_WHITEN;
-import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_BAIXI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_CWEI;
-import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_TIANMEI;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_NONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_EFFECT_YUANQI;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_CREAM;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_MAKALONG;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_FILTER_NONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_HUAHUA;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
-import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_WOCHAOTIAN;
 
 import android.content.Context;
 import android.graphics.Matrix;
@@ -30,7 +28,6 @@ import android.opengl.GLES11Ext;
 import com.sensetime.effects.STRenderer;
 import com.sensetime.effects.utils.FileUtils;
 import com.sensetime.stmobile.STCommonNative;
-import com.sensetime.stmobile.model.STMobileMakeupType;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 
 import java.io.File;
@@ -80,8 +77,8 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         sdkIsInit = false;
     }
 
-    private void initST(){
-        if(sdkIsInit){
+    private void initST() {
+        if (sdkIsInit) {
             return;
         }
         mSTRenderer = new STRenderer(mContext);
@@ -89,8 +86,8 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         restore();
     }
 
-    private void unInitST(){
-        if(!sdkIsInit){
+    private void unInitST() {
+        if (!sdkIsInit) {
             return;
         }
         mSTRenderer.release();
@@ -108,7 +105,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         // 获取NV21数据
         VideoFrame.I420Buffer i420Buffer = buffer.toI420();
         int nv21Size = (buffer.getWidth() * buffer.getHeight() * 3 + 1) / 2;
-        if(mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size){
+        if (mNV21Buffer == null || mNV21Buffer.capacity() != nv21Size) {
             mNV21Buffer = ByteBuffer.allocateDirect(nv21Size);
             mNV21ByteArray = new byte[nv21Size];
         }
@@ -149,8 +146,8 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
                 int texFormat = textureBuffer.getType() == VideoFrame.TextureBuffer.Type.OES ? GLES11Ext.GL_TEXTURE_EXTERNAL_OES : GLES11.GL_TEXTURE_2D;
 
                 return mSTRenderer.preProcess(
-                        textureBuffer.getWidth(), textureBuffer.getHeight(), 0,
-                        mNV21ByteArray,  STCommonNative.ST_PIX_FMT_NV21,
+                        textureBuffer.getWidth(), textureBuffer.getHeight(), videoFrame.getRotation(),
+                        mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21,
                         textureBuffer.getTextureId(), texFormat);
             });
             transformMatrix = textureBuffer.getTransformMatrix();
@@ -174,7 +171,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             }
 
             texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), 0, mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
+                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
             transformMatrix = new Matrix();
         }
 
@@ -221,19 +218,57 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
 
     @Override
     protected void setFilterAfterCached(int itemId, float intensity) {
-        if (!sdkIsInit ||isReleased) {
+        if (!sdkIsInit || isReleased) {
             return;
         }
-        if(itemId == ITEM_ID_FILTER_NONE){
+        if (itemId == ITEM_ID_FILTER_NONE) {
             mSTRenderer.setFilterStyle("", "", "");
-        }else if(itemId == ITEM_ID_FILTER_CREAM){
+        } else if (itemId == ITEM_ID_FILTER_CREAM) {
             setFilterItem("filter_portrait" + File.separator + "filter_style_babypink_1.5.0_v2_origin_20221130_20230228.model", intensity);
-        }else if(itemId == ITEM_ID_FILTER_MAKALONG){
+        } else if (itemId == ITEM_ID_FILTER_MAKALONG) {
             setFilterItem("filter_portrait" + File.separator + "filter_style_ol_1.5.0_v2_origin_20221130_20230228.model", intensity);
         }
     }
 
-    private void setFilterItem(String filterPath, float strength){
+
+    @Override
+    protected void setEffectAfterCached(int itemId, float intensity) {
+        if (!sdkIsInit || isReleased) {
+            return;
+        }
+        if (itemId == ITEM_ID_EFFECT_YUANQI) {
+            setStyleItem("style_lightly" + File.separator + "qise.zip", intensity);
+        } else if (itemId == ITEM_ID_EFFECT_CWEI) {
+            setStyleItem("style_lightly" + File.separator + "wanneng.zip", intensity);
+        } else if (itemId == ITEM_ID_EFFECT_NONE) {
+            mSTRenderer.cleanStyle();
+        }
+    }
+
+    @Override
+    protected void setStickerAfterCached(int itemId) {
+        if (!sdkIsInit || isReleased) {
+            return;
+        }
+
+        if (itemId == ITEM_ID_STICKER_NONE) {
+            mSTRenderer.removeStickers();
+        } else if (itemId == ITEM_ID_STICKER_HUAHUA) {
+            setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
+        }
+    }
+
+
+    private void setStyleItem(String stylePath, float strength) {
+        String[] split = stylePath.split(File.separator);
+        String className = split[0];
+        String fileName = split[1];
+        String path = FileUtils.getFilePath(mContext, className + File.separator + fileName);
+        FileUtils.copyFileIfNeed(mContext, fileName, className);
+        mSTRenderer.setStyle(path, strength, strength);
+    }
+
+    private void setFilterItem(String filterPath, float strength) {
         String[] split = filterPath.split(File.separator);
         String className = split[0];
         String fileName = split[1];
@@ -244,38 +279,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mSTRenderer.setFilterStrength(strength);
     }
 
-    @Override
-    protected void setEffectAfterCached(int itemId, float intensity) {
-        if (!sdkIsInit || isReleased) {
-            return;
-        }
-
-        setMakeUpItem(STMobileMakeupType.ST_MAKEUP_TYPE_LIP, "makeup_lip" + File.separator + "12自然.zip", BeautyCache.INSTANCE.getItemValue(ITEM_ID_EFFECT_BAIXI));
-        setMakeUpItem(STMobileMakeupType.ST_MAKEUP_TYPE_BLUSH, "makeup_blush" + File.separator + "blusha.zip", BeautyCache.INSTANCE.getItemValue(ITEM_ID_EFFECT_TIANMEI));
-        setMakeUpItem(STMobileMakeupType.ST_MAKEUP_TYPE_BROW, "makeup_brow" + File.separator + "browB.zip", BeautyCache.INSTANCE.getItemValue(ITEM_ID_EFFECT_CWEI));
-        setMakeUpItem(STMobileMakeupType.ST_MAKEUP_TYPE_EYELASH, "makeup_eyelash" + File.separator + "eyelashk.zip", BeautyCache.INSTANCE.getItemValue(ITEM_ID_EFFECT_YUANQI));
-
-
-    }
-
-    @Override
-    protected void setStickerAfterCached(int itemId) {
-        if (!sdkIsInit || isReleased) {
-            return;
-        }
-
-        if(itemId == ITEM_ID_STICKER_NONE){
-            mSTRenderer.removeStickers();
-        }
-        else if(itemId == ITEM_ID_STICKER_HUAHUA){
-            setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
-        }
-        else if(itemId == ITEM_ID_STICKER_WOCHAOTIAN){
-            setStickerItem("sticker_face_shape" + File.separator + "lianxingface.zip");
-        }
-    }
-
-    private void setStickerItem(String path){
+    private void setStickerItem(String path) {
         String[] split = path.split(File.separator);
         String className = split[0];
         String fileName = split[1];
@@ -286,7 +290,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         }
     }
 
-    private void setMakeUpItem(int type, String typePath, float strength){
+    private void setMakeUpItem(int type, String typePath, float strength) {
         if (typePath != null) {
             String[] split = typePath.split(File.separator);
             String className = split[0];

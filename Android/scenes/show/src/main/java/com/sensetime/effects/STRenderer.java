@@ -29,6 +29,7 @@ import com.sensetime.stmobile.model.STEffectTexture;
 import com.sensetime.stmobile.model.STFaceMeshList;
 import com.sensetime.stmobile.model.STHumanAction;
 import com.sensetime.stmobile.params.STBeautyParamsType;
+import com.sensetime.stmobile.params.STEffectBeautyGroup;
 import com.sensetime.stmobile.params.STEffectBeautyType;
 import com.sensetime.stmobile.params.STEffectParam;
 import com.sensetime.stmobile.params.STHumanActionParamsType;
@@ -77,6 +78,8 @@ public class STRenderer {
 
     private String mCurrentSticker;
     private final LinkedHashMap<Integer, String> mCurrentStickerMaps = new LinkedHashMap<>();
+
+    private final LinkedHashMap<Integer, String> mCurrentStyleMaps = new LinkedHashMap<>();
 
     private final STEffectParameters mEffectParams = new STEffectParameters();
 
@@ -578,6 +581,23 @@ public class STRenderer {
         if (mCurrentStickerMaps != null && result == 0) {
             mCurrentStickerMaps.remove(packageId);
         }
+    }
+
+    public void cleanStyle(){
+        for (Integer packageId : mCurrentStyleMaps.keySet()) {
+            mSTMobileEffectNative.removeEffect(packageId);
+        }
+        mCurrentStyleMaps.clear();
+    }
+
+    public void setStyle(String stylePath, float filterStrength, float makeupStrength){
+        cleanStyle();
+
+        int packageId = mSTMobileEffectNative.addPackage(stylePath);
+        updateHumanActionDetectConfig();
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_FILTER, filterStrength);
+        setPackageBeautyGroupStrength(packageId, STEffectBeautyGroup.EFFECT_BEAUTY_GROUP_MAKEUP, makeupStrength);
+        mCurrentStyleMaps.put(packageId, stylePath);
     }
 
     public void release() {
