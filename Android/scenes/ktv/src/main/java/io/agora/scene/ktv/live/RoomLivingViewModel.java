@@ -337,7 +337,8 @@ public class RoomLivingViewModel extends ViewModel {
                 seatListLiveData.postValue(value);
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                    seatLocalLiveData.postValue(roomSeatModel);
+                    seatLocalLiveData.setValue(roomSeatModel);
+                    updateVolumeStatus(roomSeatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE());
                 }
 
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
@@ -360,7 +361,8 @@ public class RoomLivingViewModel extends ViewModel {
                     seatListLiveData.postValue(value);
 
                     if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                        seatLocalLiveData.postValue(roomSeatModel);
+                        seatLocalLiveData.setValue(roomSeatModel);
+                        updateVolumeStatus(roomSeatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE());
                     }
                 }
 
@@ -385,6 +387,10 @@ public class RoomLivingViewModel extends ViewModel {
                 }
 
 
+                RoomSelSongModel songPlayingData = songPlayingLiveData.getValue();
+                if(songPlayingData == null){
+                    return null;
+                }
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
                     isOnSeat = false;
                     if (mRtcEngine != null) {
@@ -399,13 +405,13 @@ public class RoomLivingViewModel extends ViewModel {
                     }
 
                     // 合唱相关逻辑
-                    if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getChorusNo())) {
+                    if (UserManager.getInstance().getUser().userNo.equals(songPlayingData.getChorusNo())) {
                         //我是合唱
                         getSongChosenList();
-                    } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getUserNo())) {
+                    } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingData.getUserNo())) {
                         //推送切歌逻辑
                     }
-                } else if (roomSeatModel.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
+                } else if (roomSeatModel.getUserNo().equals(songPlayingData.getUserNo())) {
                     // 被房主下麦克的合唱者
                 }
             }
@@ -1397,7 +1403,8 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     private void setMicVolume(int v) {
-        int isMuted = seatLocalLiveData.getValue().isAudioMuted();
+        RoomSeatModel value = seatLocalLiveData.getValue();
+        int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_FALSE() : value.isAudioMuted();
         if (isMuted == 1) {
             micOldVolume = v;
             Log.d(TAG, "muted! setMicVolume: " + v);

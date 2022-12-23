@@ -411,7 +411,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.name,
                         originSeatInfo.seatIndex,
                         originSeatInfo.joinSing,
-                        if (mute) 1 else 0, // update this
+                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
                         originSeatInfo.isVideoMuted
                     )
                     innerUpdateSeat(seatInfo, completion)
@@ -941,7 +941,7 @@ class KTVSyncManagerServiceImp(
             UserManager.getInstance().user.name,
             seatIndex,
             false,
-            RoomSeatModel.MUTED_VALUE_FALSE,
+            RoomSeatModel.MUTED_VALUE_TRUE,
             RoomSeatModel.MUTED_VALUE_TRUE
         )
     }
@@ -959,10 +959,12 @@ class KTVSyncManagerServiceImp(
             seatMap.forEach {
                 it.value?.let { seat ->
                     outList.add(seat)
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        seat
-                    )
+                    runOnMainThread {
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            seat
+                        )
+                    }
                     if (seat.isMaster) {
                         hasMaster = true
                     }
@@ -976,11 +978,13 @@ class KTVSyncManagerServiceImp(
                         return@innerAddSeatInfo
                     }
                     outList.add(targetSeatInfo)
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        targetSeatInfo
-                    )
-                    completion.invoke(null, outList)
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            targetSeatInfo
+                        )
+                        completion.invoke(null, outList)
+                    }
                 }
             } else {
                 completion.invoke(null, outList)
@@ -1074,16 +1078,20 @@ class KTVSyncManagerServiceImp(
 
                 if (seatMap.containsKey(obj.seatIndex.toString())) {
                     seatMap[obj.seatIndex.toString()] = obj
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                        obj
-                    )
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                            obj
+                        )
+                    }
                 } else {
                     seatMap[obj.seatIndex.toString()] = obj
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        obj
-                    )
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            obj
+                        )
+                    }
                 }
             }
 
@@ -1094,10 +1102,12 @@ class KTVSyncManagerServiceImp(
                     entry.value?.let { seat ->
                         if (objIdOfSeatIndex[seat.seatIndex] == item.id) {
                             seatMap.remove(entry.key)
-                            seatListChangeSubscriber?.invoke(
-                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
-                                seat
-                            )
+                            runOnMainThread{
+                                seatListChangeSubscriber?.invoke(
+                                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                    seat
+                                )
+                            }
                             return
                         }
                     }
