@@ -115,7 +115,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             }
             
             guard let info = pkUser else { return }
-            avatarImageView.sd_setImage(with: URL(string: info.ownerAvater ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: info.ownerAvatar ?? ""),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             nameLabel.text = info.ownerName
         }
