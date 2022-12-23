@@ -76,18 +76,24 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     }
     
     public func receiveInviteSite(roomId: String, meta: [String : String]?) {
-            if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatInvitation(roomId:user:))) {
-                guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
-                guard let user = model(from: map, VRUser.self) else { return }
-                if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "",chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
-                    return
-                }
-                self.roomServiceDelegate?.onReceiveSeatInvitation(roomId: roomId, user: user)
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatInvitation(roomId:user:))) {
+            guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
+            guard let user = model(from: map, VRUser.self) else { return }
+            if VoiceRoomUserInfo.shared.user?.uid ?? "" != user.uid ?? "",chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
+                return
             }
+            self.roomServiceDelegate?.onReceiveSeatInvitation(roomId: roomId, user: user)
         }
+    }
     
-    public func refuseInvite(roomId: String, meta: [String : String]?) {
-        
+    public func refuseInvite(roomId: String, chat_uid: String , meta: [String : String]?) {
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveCancelSeatInvitation(roomId:chat_uid:))) {
+            guard let chatroomId = meta?["chatroomId"] else { return }
+            if VoiceRoomUserInfo.shared.user?.uid ?? "" != chat_uid,chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
+                return
+            }
+            self.roomServiceDelegate?.onReceiveCancelSeatInvitation(roomId: chatroomId, chat_uid: chat_uid)
+        }
     }
     
     public func userJoinedRoom(roomId: String, username: String, ext: [String : Any]?) {
@@ -470,8 +476,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func refuseInvite(completion: @escaping (Error?, Bool) -> Void) {
-        
+    func refuseInvite(chat_uid: String,completion: @escaping (Error?, Bool) -> Void) {
+        VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: chat_uid, event: VoiceRoomCancelInviteSite, customExt: ["chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
+            completion(self.convertError(error: error),error == nil)
+        })
     }
     
     func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
@@ -511,7 +519,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     $0.member?.chat_uid ?? "" == user?.chat_uid ?? ""
                 }
                 let currentMic = self.mics[safe: mic.mic_index]
-                if currentMic?.status ?? 0 == -1 {
+                if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
                     self.mics[mic.mic_index]  = mic
                     completion(nil,mic)
                 } else {
@@ -538,7 +546,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
            } else {
                apply.index = self.findMicIndex()
            }
-           VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomApplySite, customExt: ["user" : apply.kj.JSONString(),"chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
+           VoiceRoomIMManager.shared?.sendChatCustomMessage(to_uid: VoiceRoomUserInfo.shared.currentRoomOwner?.rtc_uid ?? "", event: VoiceRoomSubmitApplySite, customExt: ["user" : apply.kj.JSONString(),"chatroomId":VoiceRoomIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
                completion(self.convertError(error: error),error == nil)
            })
        }
