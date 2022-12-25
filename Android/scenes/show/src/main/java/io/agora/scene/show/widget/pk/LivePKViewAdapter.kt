@@ -39,12 +39,12 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
             }
             ShowInteractionStatus.pking.value -> {
                 binding.btnItemRequest.isEnabled = false
-                binding.btnItemRequest.setText(R.string.show_pking)
+                binding.btnItemRequest.setText(R.string.show_interacting)
                 binding.btnItemRequest.setOnClickListener(null)
             }
             ShowInteractionStatus.onSeat.value -> {
                 binding.btnItemRequest.isEnabled = false
-                binding.btnItemRequest.setText(R.string.show_linking)
+                binding.btnItemRequest.setText(R.string.show_interacting)
                 binding.btnItemRequest.setOnClickListener(null)
             }
         }
