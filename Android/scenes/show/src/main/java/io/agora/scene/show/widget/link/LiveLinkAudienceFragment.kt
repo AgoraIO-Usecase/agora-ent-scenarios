@@ -43,7 +43,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
             binding.iBtnStopLink.isVisible = false
             binding.iBtnCancelApply.isVisible = false
             binding.iBtnStopLinkText.isVisible = false
-            binding.iBtnCancelApplyText.isVisible = false
         }
         binding.smartRefreshLayout.setOnRefreshListener {
             mListener?.onRequestRefreshing()
@@ -59,7 +58,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
         if (status == ShowInteractionStatus.onSeat.value) {
             if (userName == UserManager.getInstance().user.name) {
                 binding.iBtnCancelApply.isVisible = false
-                binding.iBtnCancelApplyText.isVisible = false
                 binding.iBtnStopLinkText.isVisible = true
                 binding.iBtnStopLink.isVisible = true
                 binding.textLinking.setText(R.string.show_linking)
@@ -67,7 +65,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
         } else if (status == null) {
             binding.iBtnStopLink.isVisible = false
             binding.iBtnStopLinkText.isVisible = false
-            binding.iBtnCancelApplyText.isVisible = false
             binding.textLinking.setText(R.string.show_can_apply)
         }
     }
@@ -75,7 +72,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
     fun setOnApplySuccess() {
         if (mBinding == null) return
         binding.iBtnCancelApply.isVisible = true
-        binding.iBtnCancelApplyText.isVisible = true
     }
 
     /**
@@ -100,7 +96,6 @@ class LiveLinkAudienceFragment : BaseFragment() {
             interactionInfo.userId == UserManager.getInstance().user.id.toString()
         ) {
             binding.iBtnCancelApply.isVisible = false
-            binding.iBtnCancelApplyText.isVisible = false
             binding.iBtnStopLinkText.isVisible = true
             binding.iBtnStopLink.isVisible = true
             binding.textLinking.setText(R.string.show_linking)

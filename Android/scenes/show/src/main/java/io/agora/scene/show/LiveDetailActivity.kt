@@ -239,19 +239,22 @@ class LiveDetailActivity : AppCompatActivity() {
             if(isPKing()){
                 // PK状态
                 // 房主一定是PK的一方
-                bottomLayout.flLinking.isVisible = false
+                bottomLayout.ivLinking.isEnabled = false
+                bottomLayout.flPK.isEnabled = true
                 bottomLayout.flPK.isVisible = true
             }
             else if(isLinking()){
                 // 连麦状态
                 // 房主一定是连麦的一方
-                bottomLayout.flPK.isVisible = false
+                bottomLayout.flPK.isEnabled = false
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
             }
             else{
                 // 单主播状态
                 // 房主是主播
+                bottomLayout.flPK.isEnabled = true
+                bottomLayout.ivLinking.isEnabled = true
                 bottomLayout.flPK.isVisible = true
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = ColorStateList.valueOf(getColor(R.color.grey_7e))
@@ -505,6 +508,9 @@ class LiveDetailActivity : AppCompatActivity() {
             if (isMeLinking()) {
                 resetSettingsItem(interactionInfo!!.muteAudio)
             }
+            if (isRoomOwner && !(isLinking() || isPKing())) {
+                resetSettingsItem(false)
+            }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
@@ -513,8 +519,9 @@ class LiveDetailActivity : AppCompatActivity() {
                     SettingDialog.ITEM_ID_MIC -> {
                         if (!isRoomOwner) {
                             mService.muteAudio(!activated, interactionInfo!!.userId)
+                        } else {
+                            mRtcEngine.enableLocalAudio(activated)
                         }
-                        mRtcEngine.enableLocalAudio(activated)
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
@@ -925,11 +932,11 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun destroyService() {
         if (interactionInfo != null &&
-            (((interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) && (isRoomOwner || interactionInfo!!.userId == UserManager.getInstance().user.id.toString()))
-                    || ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner))) {
+             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)) {
             mService.stopInteraction(interactionInfo!!)
         }
         mService.leaveRoom()
+        mService.reset()
     }
 
     private fun showLivingEndDialog() {
@@ -1144,6 +1151,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.getAllInterationList ({
                     val interactionInfo = it.getOrNull(0)
                     this.interactionInfo = interactionInfo
+                    if (interactionInfo != null && isRoomOwner) {
+                        mService.stopInteraction(interactionInfo)
+                    }
                     refreshBottomLayout()
                     updateVideoSetting()
                     if (interactionInfo != null) {
