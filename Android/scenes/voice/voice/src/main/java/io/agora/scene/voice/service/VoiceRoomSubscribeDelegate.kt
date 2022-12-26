@@ -42,9 +42,9 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 接收拒绝邀请消息
-     *  @param conversationId 环信IM 会话id
+     *  @param chatUid
      */
-    fun onReceiveSeatInvitationRejected(conversationId: String, message: ChatMessageData?) {}
+    fun onReceiveSeatInvitationRejected(chatUid: String, message: ChatMessageData?) {}
 
 //    /**
 //     * 接收拒绝申请消息

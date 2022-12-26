@@ -69,7 +69,7 @@ data class VoiceRoomModel constructor(
  * 麦位数据
  */
 data class VoiceMicInfoModel constructor(
-    @SerializedName("mic_index") var micIndex: Int = 0,
+    @SerializedName("mic_index") var micIndex: Int = -1,
     var member: VoiceMemberModel? = null,
     @SerializedName("status") var micStatus: Int = -1, // 座位状态
     @Transient var userStatus: Int = -1, // 用户状态，备用
