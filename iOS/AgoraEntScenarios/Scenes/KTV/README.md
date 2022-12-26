@@ -7,9 +7,11 @@
 ### 场景功能代码根目录：iOS/AgoraEntScenarios/Scenes/KTV
 ### 相关网络请求交互
     - 标准房间内消息管理
-    房间内消息管理包括对房间内的基本交互请求和响应，例如用户的变化、已点歌曲列表的变化，通过Service/KTVServiceProtocol.h来定义协议，通过KTVSyncManagerServiceImp.swift来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码，注意，KTVSyncManagerServiceImp只是用于Demo展示，切勿用于线上生产发布。
+    房间内消息管理包括对房间内的基本交互请求和响应，例如用户的变化、已点歌曲列表的变化，通过Service/KTVServiceProtocol.h来定义协议，通过KTVSyncManagerServiceImp.swift来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+    注意，KTVSyncManagerServiceImp只是用于Demo展示，切勿用于线上生产发布。
     - 歌曲列表管理
-    通过声网AgoraRtcEngine的AgoraMusicContentCenter来获取，可以获取实时的歌曲排行榜列表，可以参考View/DianGe/VLSearchSongResultView里的loadSearchDataWithKeyWord:ifRefresh:
+    通过声网AgoraRtcEngine的AgoraMusicContentCenter来获取，可以获取实时的歌曲排行榜列表。
+    可以参考View/DianGe/VLSearchSongResultView里的loadSearchDataWithKeyWord:ifRefresh:
 ### 房间管理
     - 包含了房间的创建和房间列表的获取
     - 相关代码请参考：
