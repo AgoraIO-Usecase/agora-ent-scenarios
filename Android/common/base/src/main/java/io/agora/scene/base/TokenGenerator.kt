@@ -72,7 +72,7 @@ object TokenGenerator {
         postBody.put("appId", BuildConfig.AGORA_APP_ID)
         postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
         postBody.put("channelName", channelName)
-        postBody.put("expire", 900)
+        postBody.put("expire", 1500)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
         postBody.put("type", tokenType.value)
