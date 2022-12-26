@@ -84,7 +84,7 @@
             @{
                 @"bgImgStr":@"home_talk_bg",
                 @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"titleStr":AGLocalizedString(@"ChatRoom"),
                 @"subTitleStr":@""
             },
             @{
