@@ -29,6 +29,8 @@ class VoiceSyncManagerServiceImp(
 
     private val voiceSceneId = "scene_chatRoom"
 
+    private val roomChecker = RoomChecker(context)
+
     @Volatile
     private var syncUtilsInit = false
 
@@ -194,19 +196,23 @@ class VoiceSyncManagerServiceImp(
      * 加入房间
      * @param roomId 房间id
      */
-    override fun joinRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit) {
         initScene {
             Sync.Instance().joinScene(roomId, object : Sync.JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
                     if (roomMap[roomId] == null){
-                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE, null)
                         " room is not existent ".logE()
                         return
                     }
                     val curRoomInfo = roomMap[roomId]?: return
-                    curRoomInfo.memberCount = curRoomInfo.memberCount + 1
+
+                    if (roomChecker.joinRoom(roomId)) {
+                        curRoomInfo.memberCount = curRoomInfo.memberCount + 1
+                    }
+
                     curRoomInfo.clickCount = curRoomInfo.clickCount + 1
                     " joinRoom memberCount $curRoomInfo".logD()
                     val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
@@ -221,11 +227,11 @@ class VoiceSyncManagerServiceImp(
                             "syncManager update onFail ${exception?.message}".logE()
                         }
                     })
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                     "syncManager joinScene onFail ${exception.toString()}".logD()
                 }
             })
@@ -238,6 +244,7 @@ class VoiceSyncManagerServiceImp(
      */
     override fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
         val cacheRoom = roomMap[roomId] ?: return
+        roomChecker.leaveRoom(roomId)
         // 取消所有订阅
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
@@ -267,6 +274,7 @@ class VoiceSyncManagerServiceImp(
             val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
                 putAll(GsonTools.beanToMap(curRoomInfo))
             }
+            " leaveRoom memberCount $curRoomInfo".logD()
             mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
 
                 override fun onSuccess(result: IObject?) {
@@ -704,14 +712,14 @@ class VoiceSyncManagerServiceImp(
                                         item ?: return
                                         val roomInfo = item.toObject(VoiceRoomModel::class.java)
                                         roomMap[roomInfo.roomId] = roomInfo
-                                        "syncManager RoomChanged onUpdated:${roomInfo.roomId}".logD()
+                                        "syncManager RoomChanged onUpdated:${roomInfo}".logD()
                                     }
 
                                     override fun onDeleted(item: IObject?) {
                                         item ?: return
                                         val roomInfo = roomMap[item.id] ?: return
                                         resetCacheInfo(roomInfo.roomId, true)
-                                        "syncManager RoomChanged onDeleted:${roomInfo.roomId}".logD()
+                                        "syncManager RoomChanged onDeleted:${roomInfo}".logD()
                                     }
 
                                     override fun onSubscribeError(ex: SyncManagerException?) {
