@@ -40,7 +40,7 @@ class PresetDialog(context: Context) : BottomFullDialog(context) {
             dismiss()
         }
         groupItems(
-            {}, 0,
+            {}, -1,
             mBinding.showChooseItemLowDevice,
             mBinding.showChooseItemMediumDevice,
             mBinding.showChooseItemHighDevice

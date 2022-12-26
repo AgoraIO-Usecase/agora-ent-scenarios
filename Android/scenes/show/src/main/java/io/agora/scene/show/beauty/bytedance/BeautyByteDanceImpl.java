@@ -159,14 +159,6 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
                     cvSdkInit();
                     return null;
                 });
-            } else if (mEglBaseContext != null) {
-                textureBufferHelper.invoke(() -> {
-                    cvSdkUnInit();
-                    return null;
-                });
-                textureBufferHelper.dispose();
-                textureBufferHelper = null;
-                return true;
             }
 
             VideoFrame.I420Buffer i420Buffer = buffer.toI420();

@@ -45,7 +45,9 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
         mBinding.smartRefreshLayout.setOnRefreshListener {
-            mService.getRoomList({ runOnUiThread { updateList(it) } })
+            mService.getRoomList(
+                { runOnUiThread { updateList(it) } },
+                { runOnUiThread { updateList(emptyList()) } })
         }
         mBinding.smartRefreshLayout.autoRefresh()
 
