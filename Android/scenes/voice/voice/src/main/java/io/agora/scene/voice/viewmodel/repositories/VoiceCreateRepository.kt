@@ -4,9 +4,9 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.model.VoiceCreateRoomModel
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.scene.voice.service.*
-import io.agora.voice.common.net.callback.ResultCallBack
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
+import io.agora.voice.common.net.callback.ResultCallBack
 import io.agora.voice.common.viewmodel.NetworkOnlyResource
 
 /**
@@ -100,9 +100,9 @@ class VoiceCreateRepository : BaseRepository() {
      * 加入房间
      * @param roomId 房间id
      */
-    fun joinRoom(roomId: String): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+    fun joinRoom(roomId: String): LiveData<Resource<VoiceRoomModel>> {
+        val resource = object : NetworkOnlyResource<VoiceRoomModel>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<VoiceRoomModel>>) {
                 voiceServiceProtocol.joinRoom(roomId, completion = { error, result ->
                     when (error) {
                         VoiceServiceProtocol.ERR_OK -> {

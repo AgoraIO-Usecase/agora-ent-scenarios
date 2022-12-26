@@ -11,11 +11,12 @@ import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
+import io.agora.voice.common.utils.ThreadManager
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.CountDownLatch
 
 /**
  * @author create by zhangwei03
@@ -199,54 +200,66 @@ class VoiceToolboxServerHttpManager {
         chatOwner: String,
         completion: (error: Int, chatroomId: String) -> Unit,
     ) {
-        val generateToken = AtomicBoolean(false)
-        val createImRoom = AtomicBoolean(false)
-        var roomId = chatroomId
-        generateToken(
-            channelId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
-            callBack = object :
-                VRValueCallBack<VRGenerateTokenResponse> {
-                override fun onSuccess(response: VRGenerateTokenResponse?) {
-                    response?.let {
-                        generateToken.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
-                        if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, roomId)
+        ThreadManager.getInstance().runOnIOThread {
+            val latch = CountDownLatch(2)
+            var roomId = chatroomId
+            var code = VoiceServiceProtocol.ERR_FAILED
+            generateToken(
+                channelId,
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
+                callBack = object :
+                    VRValueCallBack<VRGenerateTokenResponse> {
+                    override fun onSuccess(response: VRGenerateTokenResponse?) {
+                        response?.let {
+                            VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(it.token)
+                            code = VoiceServiceProtocol.ERR_OK
                         }
+                        latch.countDown()
                     }
-                }
 
-                override fun onError(var1: Int, var2: String?) {
-                    "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
+                    override fun onError(var1: Int, var2: String?) {
+                        "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
+                        latch.countDown()
+                        code = VoiceServiceProtocol.ERR_FAILED
+                    }
+                })
+            createImRoom(
+                roomName = chatroomName,
+                roomOwner = chatOwner,
+                chatroomId = chatroomId,
+                callBack = object :
+                    VRValueCallBack<VRCreateRoomResponse> {
+                    override fun onSuccess(response: VRCreateRoomResponse?) {
+                        response?.let {
+                            VoiceBuddyFactory.get().getVoiceBuddy()
+                                .setupChatToken(response.chatToken)
+                            if (roomId.isEmpty()) roomId = response.chatId
+                            code = VoiceServiceProtocol.ERR_OK
+                        }
+                        latch.countDown()
+                    }
+
+                    override fun onError(var1: Int, var2: String?) {
+                        "SyncToolboxService create room error code:$var1,msg:$var2".logE()
+                        if (roomId.isEmpty()) {
+                            code = VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT
+                        } else {
+                            code = VoiceServiceProtocol.ERR_FAILED
+                        }
+                        latch.countDown()
+                    }
+                })
+
+            try {
+                latch.await()
+                ThreadManager.getInstance().runOnMainThread {
+                    completion.invoke(code, roomId)
+                }
+            } catch (e: Exception) {
+                ThreadManager.getInstance().runOnMainThread {
                     completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
                 }
-            })
-        createImRoom(
-            roomName = chatroomName,
-            roomOwner = chatOwner,
-            chatroomId = chatroomId,
-            callBack = object :
-                VRValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    response?.let {
-                        createImRoom.set(true)
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(response.chatToken)
-                        if (roomId.isEmpty()) roomId = response.chatId
-                        if (generateToken.get() && createImRoom.get()) {
-                            completion.invoke(VoiceServiceProtocol.ERR_OK, roomId)
-                        }
-                    }
-                }
-
-                override fun onError(var1: Int, var2: String?) {
-                    "SyncToolboxService create room error code:$var1,msg:$var2".logE()
-                    if (roomId.isEmpty()){
-                        completion.invoke(VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT, roomId)
-                    }else{
-                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, roomId)
-                    }
-                }
-            })
+            }
+        }
     }
 }

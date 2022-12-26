@@ -11,25 +11,25 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
-import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
-import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.scene.voice.model.SoundSelectionBean
-import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
+import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
+import io.agora.scene.voice.model.SoundSelectionBean
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
+import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.Resource
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
 
@@ -144,9 +144,10 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
                 }
             })
         }
-        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean?>() {
-                override fun onSuccess(result: Boolean?) {
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
+                override fun onSuccess(result: VoiceRoomModel?) {
+                    curVoiceRoomModel = result ?: return
                     ThreadManager.getInstance().runOnMainThread {
                         goVoiceRoom()
                     }
