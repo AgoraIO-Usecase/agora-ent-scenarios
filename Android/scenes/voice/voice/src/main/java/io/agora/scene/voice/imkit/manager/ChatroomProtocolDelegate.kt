@@ -435,10 +435,7 @@ class ChatroomProtocolDelegate constructor(
      * 用户拒绝上麦邀请
      */
     fun refuseInviteToMic(chatUid: String, callback: CallBack) {
-        // TODO:  ios 没实现 需要确认是否需要实现
         val attributeMap = mutableMapOf<String, String>()
-        val userBeam = ChatroomCacheManager.cacheManager.getMember(chatUid)
-        attributeMap["user"] = GsonTools.beanToString(userBeam).toString()
         attributeMap["chatroomId"] = ChatroomIMManager.getInstance().currentRoomId
         sendChatroomEvent(true, ownerBean.chatUid, CustomMsgType.CHATROOM_INVITE_REFUSED_SITE, attributeMap, callback)
     }

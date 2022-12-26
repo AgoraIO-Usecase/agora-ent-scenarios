@@ -80,7 +80,12 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
     }
 
     public void setInvited(Map<String,Boolean> inviteData){
-        this.checkMap = inviteData;
+        checkMap.putAll(inviteData);
+        notifyDataSetChanged();
+    }
+
+    public void removeInvited(String chatUid){
+        checkMap.remove(chatUid);
         notifyDataSetChanged();
     }
 
