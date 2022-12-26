@@ -162,8 +162,8 @@ class ShowSyncManagerServiceImpl(
                     override fun onSuccess(sceneReference: SceneReference?) {
                         //this@ShowSyncManagerServiceImpl.currSceneReference = sceneReference!!
                         sceneReferenceMap[roomNo] = sceneReference!!
+                        innerSubscribeUserChange()
                         innerMayAddLocalUser({
-                            innerSubscribeUserChange()
                             success.invoke(roomMap[roomNo]!!)
                         }, {
                             error?.invoke(it) ?: errorHandler.invoke(it)
@@ -236,6 +236,7 @@ class ShowSyncManagerServiceImpl(
 
     override fun getAllUserList(success: (List<ShowUser>) -> Unit, error: ((Exception) -> Unit)?) {
         innerGetUserList(success) {
+            innerUpdateRoomUserCount(userList.size, {}, {})
             error?.invoke(it) ?: errorHandler.invoke(it)
         }
     }
@@ -891,7 +892,9 @@ class ShowSyncManagerServiceImpl(
                         ret.add(obj)
                     }
                     userList.addAll(ret)
-                    runOnMainThread { success.invoke(map) }
+                    runOnMainThread {
+                        success.invoke(map)
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {

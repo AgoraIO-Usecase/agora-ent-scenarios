@@ -43,7 +43,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
             dismiss()
         }
         groupItems(
-            {}, 3,
+            {}, -1,
             mBinding.enhanceChooseItemLowDevice,
             mBinding.enhanceChooseItemMediumDevice,
             mBinding.enhanceChooseItemHighDevice,
@@ -83,7 +83,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
         var selectedLevel = level
         if (selectedLevel < 0) {
             // 没有选择默认使用低端机配置
-            selectedLevel = 0
+            selectedLevel = 3
         }
         when (selectedLevel) {
             // 低端机：画质增强

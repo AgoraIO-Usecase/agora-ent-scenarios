@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.TextureView
@@ -52,6 +53,7 @@ import java.util.*
 
 
 class LiveDetailActivity : AppCompatActivity() {
+    private val TAG = this::class.java.simpleName
 
     companion object {
         // 房间存活时间，单位ms
@@ -106,19 +108,21 @@ class LiveDetailActivity : AppCompatActivity() {
 
         if (isRoomOwner) {
             mBinding.root.postDelayed({
-                releaseCountdown()
-                destroyService()
-                destroyRtcEngine()
+                destroy()
                 showLivingEndDialog()
             }, ROOM_AVAILABLE_DURATION)
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun destroy() {
         releaseCountdown()
         destroyService()
         destroyRtcEngine()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        destroy()
         mBeautyProcessor.reset()
     }
 
@@ -150,15 +154,16 @@ class LiveDetailActivity : AppCompatActivity() {
 
         // Start Timer counter
         val dataFormat =
-            SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT+0") }
+            SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
+        Log.d(TAG, "TopTimer curr=${System.currentTimeMillis()}, createAt=${mRoomInfo.createdAt.toLong()}, diff=${System.currentTimeMillis() - mRoomInfo.createdAt.toLong()}, time=${dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))}")
         topLayout.tvTimer.post(object : Runnable {
             override fun run() {
                 topLayout.tvTimer.text =
-                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.createdAt)
+                    dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))
                 topLayout.tvTimer.postDelayed(this, 1000)
+                topLayout.tvTimer.tag = this
             }
         })
-
     }
 
     private fun initBottomLayout() {
@@ -826,6 +831,9 @@ class LiveDetailActivity : AppCompatActivity() {
     //================== Service Operation ===============
 
     private fun initService() {
+        mService.getAllUserList({
+            refreshTopUserCount(it.size)
+        })
         mService.subscribeUser { status, user ->
             mService.getAllUserList({
                 refreshTopUserCount(it.size)
@@ -851,6 +859,7 @@ class LiveDetailActivity : AppCompatActivity() {
                     ))
                 }
             }else if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted && user?.userId == mRoomInfo.ownerId){
+                destroy()
                 showLivingEndDialog()
             }
         }
@@ -1121,10 +1130,12 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun destroyRtcEngine() {
         // 重置token有效期，防止影响其他场景
         TokenGenerator.expireSecond = -1
-        mRtcEngine.removeHandler(mRtcEngineHandler)
-        mRtcEngine.stopPreview()
-        mRtcEngine.leaveChannel()
-        RtcEngineInstance.destroy()
+        mRtcEngineHandler?.let {
+            mRtcEngine.removeHandler(mRtcEngineHandler)
+            mRtcEngine.stopPreview()
+            mRtcEngine.leaveChannel()
+            mRtcEngineHandler = null
+        }
     }
 
     private fun joinChannel() {
@@ -1452,6 +1463,10 @@ class LiveDetailActivity : AppCompatActivity() {
         if (mPKCountDownLatch != null) {
             mPKCountDownLatch!!.cancel()
             mPKCountDownLatch = null
+        }
+        (mBinding.topLayout.tvTimer.tag as? Runnable)?.let {
+            mBinding.topLayout.tvTimer.removeCallbacks(it)
+            mBinding.topLayout.tvTimer.tag = null
         }
     }
 }
