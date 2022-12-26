@@ -74,8 +74,8 @@
     self.singerLabel.frame = CGRectMake(self.nameLabel.left, self.nameLabel.bottom+8, self.width-20-80, 17);
     
     [self.chooseBtn sizeToFit];
-    CGFloat chooseBtnWidth = MAX(self.chooseBtn.width, 56);
-    self.chooseBtn.frame = CGRectMake(self.width-chooseBtnWidth - 25, (self.height-28)*0.5, chooseBtnWidth, 28);
+    CGFloat chooseButtonWidth = MAX(self.chooseBtn.width, 56);
+    self.chooseBtn.frame = CGRectMake(self.width-chooseButtonWidth-25, (self.height-28)*0.5, chooseButtonWidth, 28);
     
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }

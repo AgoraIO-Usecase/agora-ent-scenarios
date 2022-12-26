@@ -92,7 +92,7 @@
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":AGLocalizedString(@"在线K歌房"),
                 @"subTitleStr":@""
-            },
+            }
         ];
     }
     return _itemsArray;
