@@ -54,6 +54,12 @@ public enum updateRoomState {
     ///   - meta: 透传信息
     func onReceiveSeatInvitation(roomId: String, user: VRUser)
     
+    /// Description 收到邀请消息
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - meta: 透传信息
+    func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String)
+    
     /// Description 用户加入聊天室回调，带所有用户信息
     /// - Parameters:
     ///   - roomId: 聊天室id
@@ -143,6 +149,9 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     ///
     func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void)
     
+    /// Description update room members
+    /// - Parameter completion: callback
+    func updateRoomMembers(completion: @escaping (Error?) -> Void)
     
     /// Description 申请列表
     /// - Parameter completion: 回调
@@ -212,7 +221,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 拒绝邀请
     /// - Parameters:
     ///
-    func refuseInvite(completion: @escaping (Error?, Bool) -> Void)
+    func refuseInvite(chat_uid: String,completion: @escaping (Error?, Bool) -> Void)
 
     /// 申请上麦
     /// - Parameters:

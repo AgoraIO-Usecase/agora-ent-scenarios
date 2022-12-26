@@ -107,6 +107,7 @@ class VoiceRoomViewController: VRBaseViewController {
     deinit {
         print("\(String(describing: self.swiftClassName)) is destroyed!")
         VoiceRoomUserInfo.shared.currentRoomOwner = nil
+        VoiceRoomUserInfo.shared.user?.amount = 0
         ChatRoomServiceImp.getSharedInstance().cleanCache()
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
     }
@@ -229,6 +230,11 @@ extension VoiceRoomViewController {
         })
         ChatRoomServiceImp.getSharedInstance().mics = mics
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
+        self.roomInfo?.room?.ranking_list = info.room?.ranking_list
+        if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid
+        }) {
+            VoiceRoomUserInfo.shared.user?.amount = first.amount
+        }
     }
     
     func fetchDetailError() {
@@ -365,8 +371,10 @@ extension VoiceRoomViewController {
                     }
                 } else {
                     if local_index != nil {
-                        Throttler.throttle(delay: .seconds(1)) {[weak self] in
-                            self?.changeMic(from: (self?.local_index)!, to: tag - 200)
+                        Throttler.throttle(delay: .seconds(1)) {
+                            DispatchQueue.main.async {
+                                self.changeMic(from: self.local_index!, to: tag - 200)
+                            }
                         }
                     } else {
                         userApplyAlert(tag - 200)
@@ -382,9 +390,7 @@ extension VoiceRoomViewController {
             ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
         } else {
             ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index!) { error, result in
-                if error == nil {
-                    ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
-                }
+                ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
             }
         }
 
