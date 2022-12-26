@@ -80,24 +80,27 @@ public class VRSoundEffectsViewController: VRBaseViewController {
                 self.view.window?.isUserInteractionEnabled = true
                 return
             }
-            VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
-                SVProgressHUD.dismiss()
-                if error == nil {
-                    ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
-                        SVProgressHUD.dismiss()
-                        self.view.window?.isUserInteractionEnabled = true
-                        if let room = room,error == nil {
-                            self.entryRoom(room: room)
-                        } else {
-                            SVProgressHUD.showError(withStatus: "Create failed!".localized())
+            let error = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
+            if error == nil,VoiceRoomIMManager.shared != nil {
+                VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
+                    SVProgressHUD.dismiss()
+                    if error == nil {
+                        ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
+                            SVProgressHUD.dismiss()
+                            self.view.window?.isUserInteractionEnabled = true
+                            if let room = room,error == nil {
+                                self.entryRoom(room: room)
+                            } else {
+                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                            }
                         }
+                    }else {
+                        self.view.window?.isUserInteractionEnabled = true
+                        SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
                     }
-                }else {
-                    self.view.window?.isUserInteractionEnabled = true
-                    SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
-                }
-                
-            })
+                    
+                })
+            }
         }
     }
     
