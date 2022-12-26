@@ -335,6 +335,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                     roomObservableDelegate.handsUpdate(0)
                                 }
                             }
+                            if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
+                                ThreadManager.getInstance().runOnMainThread {
+                                    //刷新 owner 邀请列表
+                                    roomObservableDelegate.handsUpdate(1)
+                                }
+                            }
                         }
                     }
             }
