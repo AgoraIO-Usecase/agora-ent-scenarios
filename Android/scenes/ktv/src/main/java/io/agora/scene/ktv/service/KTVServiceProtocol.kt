@@ -29,9 +29,7 @@ interface KTVServiceProtocol {
     /**
      * 获取房间列表
      */
-    fun getRoomList(
-        completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
-    )
+    fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 
     /**
      * 创建房间

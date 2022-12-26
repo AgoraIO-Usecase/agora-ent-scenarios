@@ -106,9 +106,10 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 }
             })
         }
-        voiceRoomViewModel.joinRoomObservable().observe(requireActivity()) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean?>() {
-                override fun onSuccess(reslut: Boolean?) {
+        voiceRoomViewModel.joinRoomObservable().observe(requireActivity()) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
+                override fun onSuccess(reslut: VoiceRoomModel?) {
+                    curVoiceRoomModel = reslut ?: return
                     val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice room list chat_username:$chatUsername".logD()

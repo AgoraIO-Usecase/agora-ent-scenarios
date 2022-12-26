@@ -22,20 +22,20 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.voice.R
-import io.agora.scene.voice.model.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
-import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.scene.voice.model.PageBean
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.FastClickTools.isFastClick
 import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.utils.FastClickTools.isFastClick
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
@@ -169,9 +169,10 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                 }
             })
         }
-        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(result: Boolean?) {
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(result: VoiceRoomModel?) {
+                    curVoiceRoomModel = result ?: return
                     ThreadManager.getInstance().runOnMainThread {
                         goVoiceRoom()
                     }

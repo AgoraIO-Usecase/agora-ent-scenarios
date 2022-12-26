@@ -64,7 +64,7 @@ interface VoiceServiceProtocol {
      * 加入房间
      * @param roomId 房间id
      */
-    fun joinRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit)
 
     /**
      * 离开房间

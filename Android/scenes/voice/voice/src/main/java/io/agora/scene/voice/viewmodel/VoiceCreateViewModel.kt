@@ -3,8 +3,8 @@ package io.agora.scene.voice.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import io.agora.scene.voice.viewmodel.repositories.VoiceCreateRepository
 import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.viewmodel.repositories.VoiceCreateRepository
 import io.agora.voice.common.net.Resource
 import io.agora.voice.common.viewmodel.SingleSourceLiveData
 
@@ -26,7 +26,7 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
     private val _createRoomObservable: SingleSourceLiveData<Resource<VoiceRoomModel>> =
         SingleSourceLiveData()
 
-    private val _joinRoomObservable: SingleSourceLiveData<Resource<Boolean>> =
+    private val _joinRoomObservable: SingleSourceLiveData<Resource<VoiceRoomModel>> =
         SingleSourceLiveData()
 
     fun roomListObservable(): LiveData<Resource<List<VoiceRoomModel>>> = _roomListObservable
@@ -35,7 +35,7 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
 
     fun createRoomObservable(): LiveData<Resource<VoiceRoomModel>> = _createRoomObservable
 
-    fun joinRoomObservable(): LiveData<Resource<Boolean>> = _joinRoomObservable
+    fun joinRoomObservable(): LiveData<Resource<VoiceRoomModel>> = _joinRoomObservable
 
     /**
      * 获取房间列表
