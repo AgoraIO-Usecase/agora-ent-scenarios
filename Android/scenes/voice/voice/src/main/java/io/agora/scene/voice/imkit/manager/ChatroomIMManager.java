@@ -862,6 +862,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
+     * 检查邀请列表成员是否已经在麦位上
+     */
+    public boolean checkInvitationMember(String chatUid){
+        return cacheManager.checkInvitationByChatUid(chatUid);
+    }
+
+    /**
      * 从成员列表中移除指定成员( 成员退出回调中调用 )
      */
     public void removeMember(String chatUid){
