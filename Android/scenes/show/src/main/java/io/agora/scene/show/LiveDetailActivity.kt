@@ -831,13 +831,12 @@ class LiveDetailActivity : AppCompatActivity() {
     //================== Service Operation ===============
 
     private fun initService() {
-        mService.getAllUserList({
-            refreshTopUserCount(it.size)
-        })
+        reFetchUserList()
+        mService.subscribeReConnectEvent {
+            reFetchUserList()
+        }
         mService.subscribeUser { status, user ->
-            mService.getAllUserList({
-                refreshTopUserCount(it.size)
-            })
+            reFetchUserList()
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && user != null) {
                 if (user.status == ShowRoomRequestStatus.waitting.value) {
                     if (isRoomOwner) {
@@ -931,6 +930,12 @@ class LiveDetailActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun reFetchUserList(){
+        mService.getAllUserList({
+            refreshTopUserCount(it.size)
+        })
     }
 
     private fun isMeLinking() = isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()

@@ -188,4 +188,8 @@ interface ShowServiceProtocol {
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
+
+    // 订阅重连事件
+    fun subscribeReConnectEvent(onReconnect: () -> Unit)
+
 }

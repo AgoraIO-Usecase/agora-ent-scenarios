@@ -59,6 +59,8 @@ class ShowSyncManagerServiceImpl(
     private var micPKInvitationSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowPKInvitation?) -> Unit)? = null
     private var micInteractionInfoSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowInteractionInfo?) -> Unit)? = null
 
+    private var onReconnectSubscriber: (() -> Unit)?= null
+
     override fun reset() {
         objIdOfUserId.clear()
         objIdOfSeatApply.clear()
@@ -76,6 +78,8 @@ class ShowSyncManagerServiceImpl(
         pKInvitationList.clear()
         interactionInfoList.clear()
         currRoomNo = ""
+
+        onReconnectSubscriber = null
     }
 
     override fun getRoomList(
@@ -754,6 +758,10 @@ class ShowSyncManagerServiceImpl(
         }
     }
 
+    override fun subscribeReConnectEvent(onReconnect: () -> Unit) {
+        onReconnectSubscriber = onReconnect
+    }
+
     // =================================== 内部实现 ===================================
     private fun runOnMainThread(r: Runnable) {
         if (Thread.currentThread() == mainHandler.looper.thread) {
@@ -774,7 +782,7 @@ class ShowSyncManagerServiceImpl(
             mutableMapOf(Pair("appid", BuildConfig.AGORA_APP_ID), Pair("defaultChannel", kSceneId)),
             object : Sync.Callback {
                 override fun onSuccess() {
-                    Handler(Looper.getMainLooper()).post { complete.invoke() }
+                    runOnMainThread { complete.invoke() }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -783,6 +791,29 @@ class ShowSyncManagerServiceImpl(
                 }
             }
         )
+        Sync.Instance().subscribeConnectState {
+            Log.d(TAG, "subscribeConnectState state=$it")
+            if (it == Sync.ConnectionState.open) {
+                runOnMainThread {
+                    // 判断当前房间是否还存在
+                    val oldRoomInfo = roomMap[currRoomNo]
+                    if(oldRoomInfo != null){
+                        getRoomList({
+                            val roomInfo = roomMap[currRoomNo]
+                            if(roomInfo == null){
+                                runOnMainThread{
+                                    currUserChangeSubscriber?.invoke(
+                                        ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                                        ShowUser(oldRoomInfo.ownerId, "", "")
+                                    )
+                                }
+                            }
+                        })
+                    }
+                    onReconnectSubscriber?.invoke()
+                }
+            }
+        }
     }
 
     private fun innerUpdateRoomInteractStatus(
