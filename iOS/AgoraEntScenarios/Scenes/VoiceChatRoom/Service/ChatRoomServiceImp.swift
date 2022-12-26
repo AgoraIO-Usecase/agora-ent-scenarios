@@ -621,11 +621,28 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
 
         SyncUtil.initSyncManager(sceneId: cSceneId) { [weak self] in
+//            guard let self = self else {
+//                return
+//            }
+//            self.syncUtilsInited = true
+//
+//            completion()
+        }
+        
+        SyncUtil.subscribeConnectState { [weak self] (state) in
             guard let self = self else {
                 return
             }
+            
+            print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
+//            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
+            guard state == .open else { return }
+            guard !self.syncUtilsInited else {
+                //TODO: retry get data if restore connection
+                return
+            }
+            
             self.syncUtilsInited = true
-
             completion()
         }
     }
