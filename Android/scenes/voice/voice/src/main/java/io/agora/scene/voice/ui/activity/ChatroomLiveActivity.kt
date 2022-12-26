@@ -328,11 +328,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         val micInfo =
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
-                            if (ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
-                                ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
-                                ThreadManager.getInstance().runOnMainThread {
-                                    //刷新 owner 申请列表
-                                    roomObservableDelegate.handsUpdate(0)
+                            if(it.member?.chatUid != null){
+                                if (ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
+                                    ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
+                                    ThreadManager.getInstance().runOnMainThread {
+                                        //刷新 owner 申请列表
+                                        roomObservableDelegate.handsUpdate(0)
+                                    }
+                                }
+                                if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
+                                    ThreadManager.getInstance().runOnMainThread {
+                                        //刷新 owner 邀请列表
+                                        roomObservableDelegate.handsUpdate(1)
+                                    }
                                 }
                             }
                             if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
@@ -419,7 +427,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             ).setUpInitMicInfoMap()
         }
         binding.cTopView.setTitleMaxWidth()
-        roomObservableDelegate.onRoomModel(voiceRoomModel)
+//        roomObservableDelegate.onRoomModel(voiceRoomModel)
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()

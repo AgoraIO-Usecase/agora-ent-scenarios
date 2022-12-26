@@ -208,6 +208,7 @@ class VoiceSyncManagerServiceImp(
                     val curRoomInfo = roomMap[roomId]?: return
                     curRoomInfo.memberCount = curRoomInfo.memberCount + 1
                     curRoomInfo.clickCount = curRoomInfo.clickCount + 1
+                    " joinRoom memberCount $curRoomInfo".logD()
                     val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
                         putAll(GsonTools.beanToMap(curRoomInfo))
                     }
