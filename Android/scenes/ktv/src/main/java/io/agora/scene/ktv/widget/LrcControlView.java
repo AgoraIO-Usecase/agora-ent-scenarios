@@ -1,17 +1,22 @@
 package io.agora.scene.ktv.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ContentFrameLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 
@@ -73,6 +78,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
 
         initListener();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) getLayoutParams();
+
+        float heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        if (heightPixels > 1280 * 2) { // 2K/Slim screen
+            params.bottomMargin = (int) (120 * density);
+            setLayoutParams(params);
+        }
     }
 
     @Override
@@ -193,9 +212,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
             if (this.mRole != Role.Singer) {
-                mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
-                mBinding.ilActive.switchOriginal.setVisibility(View.GONE);
-                mBinding.ilActive.ivMusicMenu.setVisibility(View.GONE);
+                mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
             }
         }
         stopTimer();
@@ -258,13 +277,14 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(true);
         } else if (this.mRole == Role.Partner) {
-            mBinding.ilActive.lrcView.setEnableDrag(true);
+            mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
-            mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
-            mBinding.ilActive.ivChangeSong.setVisibility(View.GONE);
+            mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.ivChangeSong.setVisibility(View.INVISIBLE);
+            mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Listener) {
             mBinding.ilActive.lrcView.setEnableDrag(false);
-            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.GONE);
+            mBinding.ilActive.rlMusicControlMenu.setVisibility(View.INVISIBLE);
         }
     }
 

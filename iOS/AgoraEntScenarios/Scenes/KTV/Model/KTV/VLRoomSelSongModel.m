@@ -15,6 +15,11 @@
     return NO;
 }
 
+
+- (BOOL)readyToPlay {
+    return !self.isChorus || (self.isChorus && [self.chorusNo length] > 0);
+}
+
 - (BOOL)waittingForChorus {
     return self.isChorus && self.chorusNo.length == 0;
 }

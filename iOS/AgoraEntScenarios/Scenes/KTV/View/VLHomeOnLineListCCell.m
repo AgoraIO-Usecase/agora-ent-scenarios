@@ -87,15 +87,15 @@
 - (void)setListModel:(VLRoomListModel *)listModel {
     _listModel = listModel;
     self.bgImgView.image = [UIImage sceneImageWithName:@"online_list_itemBgIcon"];
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%d",[listModel.icon intValue]]];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%d.jpg", [listModel.icon intValue] + 1];
+    self.iconImgView.image = [UIImage sceneImageWithName:iconName];
     if (listModel.isPrivate) {
         self.lockImgView.hidden = NO;
-    }else{
+    } else {
         self.lockImgView.hidden = YES;
     }
     self.titleLabel.text = listModel.name;
     self.countLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"%@人"),listModel.roomPeopleNum];
-    
 }
 
 @end

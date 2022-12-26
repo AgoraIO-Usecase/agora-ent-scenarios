@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:layout_margin="12dp"
     app:cardBackgroundColor="@android:color/transparent"
-    tools:theme="@style/Theme.MaterialComponents.Light"
-    tools:layout_height="230dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp">
+    app:cardElevation="0dp"
+    tools:layout_height="230dp"
+    tools:theme="@style/Theme.MaterialComponents.Light">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -42,18 +42,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/scoreControlView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="84dp"
-                android:textColor="@android:color/white"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/app_name" />
-
             <ImageView
                 android:id="@+id/ivGood"
                 android:layout_width="wrap_content"
@@ -79,6 +67,18 @@
                 layout="@layout/ktv_layout_lrc_active"
                 android:visibility="gone"
                 tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/scoreControlView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="84dp"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/app_name" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </androidx.cardview.widget.CardView>
