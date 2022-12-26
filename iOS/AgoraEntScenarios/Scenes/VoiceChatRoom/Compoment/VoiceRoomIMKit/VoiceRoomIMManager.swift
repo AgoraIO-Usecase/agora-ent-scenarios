@@ -79,12 +79,17 @@ fileprivate let once = VoiceRoomIMManager()
             AgoraChatClient.shared().login(withUsername: userName, token: token, completion: completion)
         }
     }
+    
+    @objc func logoutIM() {
+        AgoraChatClient.shared().logout(false)
+    }
 
     @objc public func addChatRoomListener() {
         AgoraChatClient.shared().add(self, delegateQueue: .main)
         AgoraChatClient.shared().chatManager?.add(self, delegateQueue: .main)
         AgoraChatClient.shared().roomManager?.add(self, delegateQueue: .main)
     }
+    
 
     @objc public func removeListener() {
         AgoraChatClient.shared().roomManager?.remove(self)
