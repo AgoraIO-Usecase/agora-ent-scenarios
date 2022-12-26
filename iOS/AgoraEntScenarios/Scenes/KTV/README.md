@@ -1,4 +1,4 @@
-# 在线K歌房-iOS-中文
+# 在线K歌房
 # 1.项目介绍
 ## 1.1 概述
 **在线K歌房**项目是声网在线K歌房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动互娱Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
@@ -44,11 +44,11 @@
 
 # 3.快速开始
 
-- 在项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift，并填写需要的账号和token
+- 将项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift
+- 在KeyCenter.swift文件中填写需要的 appId 和 appCertificate (**需要联系销售给 appId 开通 K 歌权限**)
 ```
 AppId：声网appid
 Certificate：声网Certificate
-HostUrl：这个是服务端Url，由服务端确认
 ```
 - 在集成的同时，需要去声网与环信的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
 - 然后pod install成功之后，打开项目即可开始您的体验
@@ -61,10 +61,12 @@ HostUrl：这个是服务端Url，由服务端确认
 ## 4.1 如何获取声网和环信APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
 - 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
-## 4.2 K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
+## 4.2 程序运行后，歌曲列表为空：
+- 需要联系销售给 appId 开通 K 歌权限
+## 4.3 K歌房中的歌曲资源使用的是哪家？是否可以自己选择供应商？
 K歌房的歌曲资源使用的是Agora内容中心服务，暂不支持自行切换供应商，详情请查看https://docs.agora.io/cn/online-ktv/API%20Reference/ios_ng/API/toc_drm.html
 
-## 4.3 集成遇到困难，该如何联系声网获取协助
+## 4.4 集成遇到困难，该如何联系声网获取协助
 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
 
 方案2：发送邮件给support@agora.io咨询
