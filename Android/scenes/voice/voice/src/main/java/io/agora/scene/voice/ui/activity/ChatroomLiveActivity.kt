@@ -246,11 +246,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             }
 
             override fun onReceiveSeatInvitationRejected(
-                conversationId: String,
+                chatUid: String,
                 message: ChatMessageData?
             ) {
-                super.onReceiveSeatInvitationRejected(conversationId, message)
-                "onReceiveSeatInvitationRejected $conversationId ${message?.content}".logD(TAG)
+                super.onReceiveSeatInvitationRejected(chatUid, message)
+                "onReceiveSeatInvitationRejected $chatUid ${message?.content}".logD(TAG)
             }
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
@@ -286,6 +286,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     chatUid.let {
                         ChatroomIMManager.getInstance().removeMember(it)
                         roomLivingViewModel.updateRoomMember()
+                        if (roomKitBean.isOwner){
+                            roomObservableDelegate.checkUserLeaveMic(ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
+                        }
                     }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
@@ -330,6 +333,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                 ThreadManager.getInstance().runOnMainThread {
                                     //刷新 owner 申请列表
                                     roomObservableDelegate.handsUpdate(0)
+                                }
+                            }
+                            if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
+                                ThreadManager.getInstance().runOnMainThread {
+                                    //刷新 owner 邀请列表
+                                    roomObservableDelegate.handsUpdate(1)
                                 }
                             }
                         }
