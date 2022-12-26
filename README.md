@@ -18,9 +18,8 @@
 
 # 2.FAQ
 
-## 2.1 如何获取声网和环信APPID：
+## 2.1 如何获取声网 APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-- 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
 
 ## 2.2 运行或集成遇到困难，该如何联系声网获取协助
 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
