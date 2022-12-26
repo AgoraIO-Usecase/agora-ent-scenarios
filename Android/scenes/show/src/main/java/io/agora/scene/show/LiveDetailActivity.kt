@@ -751,7 +751,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
                 mService.getAllPKUserList({ roomList ->
-                    mService.getAllPKInvitationList({ invitationList ->
+                    mService.getAllPKInvitationList(true, { invitationList ->
                         mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
                     })
                 })
@@ -834,6 +834,7 @@ class LiveDetailActivity : AppCompatActivity() {
         reFetchUserList()
         mService.subscribeReConnectEvent {
             reFetchUserList()
+            reFetchPKInvitationList()
         }
         mService.subscribeUser { status, user ->
             reFetchUserList()
@@ -913,7 +914,7 @@ class LiveDetailActivity : AppCompatActivity() {
         mService.sendChatMessage(getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged { status, info ->
             mService.getAllPKUserList({ roomList ->
-                mService.getAllPKInvitationList({ invitationList ->
+                mService.getAllPKInvitationList(true, { invitationList ->
                     mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
                 })
             })
@@ -935,6 +936,17 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun reFetchUserList(){
         mService.getAllUserList({
             refreshTopUserCount(it.size)
+        })
+    }
+
+    private fun reFetchPKInvitationList() {
+        mService.getAllPKInvitationList(false, { list ->
+            list.forEach {
+                if (it.userId == UserManager.getInstance().user.id.toString()
+                    && it.status == ShowRoomRequestStatus.waitting.value) {
+                    showPKInvitationDialog(it.fromName)
+                }
+            }
         })
     }
 

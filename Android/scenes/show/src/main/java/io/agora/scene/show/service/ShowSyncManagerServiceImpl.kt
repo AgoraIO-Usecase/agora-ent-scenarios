@@ -525,10 +525,15 @@ class ShowSyncManagerServiceImpl(
     }
 
     override fun getAllPKInvitationList(
+        isFromUser: Boolean,
         success: (List<ShowPKInvitation>) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        success.invoke(pKCompetitorInvitationList)
+        if (isFromUser) {
+            success.invoke(pKCompetitorInvitationList)
+        } else {
+            innerGetPKInvitationList(null, success, error)
+        }
     }
 
     override fun subscribePKInvitationChanged(onPKInvitationChanged: (ShowServiceProtocol.ShowSubscribeStatus, ShowPKInvitation?) -> Unit) {
@@ -1300,44 +1305,46 @@ class ShowSyncManagerServiceImpl(
 
     // ----------------------------------- pk邀请 -----------------------------------
     private fun innerGetPKInvitationList(
-        room: ShowRoomDetailModel,
+        room: ShowRoomDetailModel?,
         success: (List<ShowPKInvitation>) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        if (room.roomId == "") return
-        val roomId = room.roomId
-        if (roomId != currRoomNo) {
-            initSync {
-                Sync.Instance().joinScene(
-                    roomId, object : Sync.JoinSceneCallback {
-                        override fun onSuccess(sceneReference: SceneReference?) {
-                            sceneReferenceMap[roomId] = sceneReference!!
-                            sceneReferenceMap[roomId]?.collection(kCollectionIdPKInvitation)?.get(object : Sync.DataListCallback {
-                                override fun onSuccess(result: MutableList<IObject>?) {
-                                    val ret = ArrayList<ShowPKInvitation>()
-                                    val retObjId = ArrayList<String>()
-                                    result?.forEach {
-                                        val obj = it.toObject(ShowPKInvitation::class.java)
-                                        ret.add(obj)
-                                        retObjId.add(it.id)
+        if (room != null) {
+            if (room.roomId == "") return
+            val roomId = room.roomId
+            if (roomId != currRoomNo) {
+                initSync {
+                    Sync.Instance().joinScene(
+                        roomId, object : Sync.JoinSceneCallback {
+                            override fun onSuccess(sceneReference: SceneReference?) {
+                                sceneReferenceMap[roomId] = sceneReference!!
+                                sceneReferenceMap[roomId]?.collection(kCollectionIdPKInvitation)?.get(object : Sync.DataListCallback {
+                                    override fun onSuccess(result: MutableList<IObject>?) {
+                                        val ret = ArrayList<ShowPKInvitation>()
+                                        val retObjId = ArrayList<String>()
+                                        result?.forEach {
+                                            val obj = it.toObject(ShowPKInvitation::class.java)
+                                            ret.add(obj)
+                                            retObjId.add(it.id)
+                                        }
+                                        innerSubscribeCompetitorPKInvitationChanged(roomId)
+                                        runOnMainThread { success.invoke(ret) }
                                     }
-                                    innerSubscribeCompetitorPKInvitationChanged(roomId)
-                                    runOnMainThread { success.invoke(ret) }
-                                }
 
-                                override fun onFail(exception: SyncManagerException?) {
-                                    runOnMainThread { error?.invoke(exception!!) }
-                                }
-                            })
-                        }
+                                    override fun onFail(exception: SyncManagerException?) {
+                                        runOnMainThread { error?.invoke(exception!!) }
+                                    }
+                                })
+                            }
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                            override fun onFail(exception: SyncManagerException?) {
+                                error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                            }
                         }
-                    }
-                )
+                    )
+                }
+                return
             }
-            return
         }
 
         sceneReferenceMap[currRoomNo]?.collection(kCollectionIdPKInvitation)?.get(object : Sync.DataListCallback {

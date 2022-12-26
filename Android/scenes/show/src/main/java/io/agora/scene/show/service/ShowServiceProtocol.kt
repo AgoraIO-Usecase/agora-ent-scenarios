@@ -139,6 +139,7 @@ interface ShowServiceProtocol {
 
     // 获取PK邀请列表
     fun getAllPKInvitationList(
+        isFromUser: Boolean,
         success: ((List<ShowPKInvitation>) -> Unit),
         error: ((Exception) -> Unit)? = null
     )
