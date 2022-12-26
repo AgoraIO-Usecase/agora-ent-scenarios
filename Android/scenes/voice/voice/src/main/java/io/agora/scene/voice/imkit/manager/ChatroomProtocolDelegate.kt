@@ -347,8 +347,8 @@ class ChatroomProtocolDelegate constructor(
      */
     fun startMicSeatApply(micIndex: Int? = null, callback: CallBack) {
         val attributeMap = mutableMapOf<String, String>()
-        var voiceRoomApply = VoiceRoomApply()
-        var memberBean = VoiceMemberModel().apply {
+        val voiceRoomApply = VoiceRoomApply()
+        val memberBean = VoiceMemberModel().apply {
             userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
             chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
@@ -377,7 +377,10 @@ class ChatroomProtocolDelegate constructor(
         }
         ThreadManager.getInstance().runOnIOThread {
             if (checkMemberIsOnMic(memberBean)) return@runOnIOThread
-            updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+            memberBean?.let {
+                updateMicByResult(memberBean,
+                    it.micIndex, MicClickAction.Accept, true, callback)
+            }
         }
     }
 
@@ -450,7 +453,10 @@ class ChatroomProtocolDelegate constructor(
         }
         ThreadManager.getInstance().runOnIOThread {
             if (checkMemberIsOnMic(memberBean)) return@runOnIOThread
-            updateMicByResult(memberBean,micIndex?:getFirstFreeMic(), MicClickAction.Accept, true, callback)
+            memberBean?.let {
+                updateMicByResult(memberBean,
+                    it.micIndex, MicClickAction.Accept, true, callback)
+            }
         }
     }
 
@@ -657,13 +663,11 @@ class ChatroomProtocolDelegate constructor(
             }
             // 接受邀请/接受申请
             MicClickAction.Accept -> {
-                micInfo.micStatus = MicStatus.Normal
                 if (memberBean != null){
                     micInfo.member = memberBean
                 }
             }
             MicClickAction.Invite -> {
-                micInfo.micStatus = MicStatus.Normal
                 if (memberBean != null){
                     micInfo.member = memberBean
                 }
@@ -891,13 +895,16 @@ class ChatroomProtocolDelegate constructor(
      *  按麦位顺序查询空麦位
      */
     private fun getFirstFreeMic(): Int {
-        var indexList: MutableList<Int> = mutableListOf<Int>()
-        var micInfo = ChatroomCacheManager.cacheManager.getMicInfoMap()
+        val indexList: MutableList<Int> = mutableListOf<Int>()
+        val micInfo = ChatroomCacheManager.cacheManager.getMicInfoMap()
         if (micInfo != null) {
             for (mutableEntry in micInfo) {
-                var bean = GsonTools.toBean(mutableEntry.value, VoiceMicInfoModel::class.java)
-                if (bean != null && bean.micStatus == -1) {
-                    indexList.add(bean.micIndex)
+                val bean = GsonTools.toBean(mutableEntry.value, VoiceMicInfoModel::class.java)
+                if (bean != null ) {
+                    "getFirstFreeMic: ${bean.micIndex}  ${bean.micStatus}".logE(TAG)
+                    if(bean.micStatus == -1 || bean.micStatus == 2){
+                        indexList.add(bean.micIndex)
+                    }
                 }
             }
         }
