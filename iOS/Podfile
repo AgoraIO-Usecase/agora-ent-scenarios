@@ -5,6 +5,7 @@ inhibit_all_warnings!
 
 def all_pods
   
+#  use_modular_headers!
   use_frameworks!
   # 网络层
   pod 'AFNetworking', '~> 4.0.1'
@@ -36,7 +37,7 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.9'
+  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 
   #ThirdParty
@@ -46,7 +47,7 @@ def all_pods
 #  pod 'Displayer'
   pod 'YYText'
   pod 'LSTPopView'
-  pod 'QMUIKit'
+  pod 'QMUIKit', '4.5.1'
   pod 'InputKit'
   pod 'CYLTabBarController'
 #  pod 'ZQTCustomSwitch'
@@ -56,7 +57,8 @@ def all_pods
   pod 'Agora-Scene-Utils', '~> 1.0.8'
   
   #歌词组件
-  pod 'AgoraLyricsScore', '~> 1.0.8.2'
+  pod 'AgoraLyricsScore', '~> 1.0.8.6'
+#  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
   
@@ -68,6 +70,10 @@ def all_pods
   pod 'SVGAPlayer'
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS'
+  
+  
+  # debug
+  pod 'Bugly'
 end
 
 target 'AgoraEntScenarios' do

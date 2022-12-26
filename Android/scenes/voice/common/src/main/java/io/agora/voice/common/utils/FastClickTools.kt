@@ -11,7 +11,7 @@ import android.view.View
 object FastClickTools {
     private var lastClickTime = -1L
 
-    var lastClickViewId = -1
+    private var lastClickViewId = -1
 
     private const val FAST_CLICK_INTERVAL = 1000
 

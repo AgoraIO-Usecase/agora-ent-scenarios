@@ -70,6 +70,25 @@ class KTVSyncManagerServiceImp(
     @Volatile
     private var currRoomNo: String = ""
 
+    override fun reset() {
+        if (syncUtilsInited) {
+            Instance().destroy()
+            syncUtilsInited = false
+
+            objIdOfRoomNo.clear()
+            objIdOfSongNo.clear()
+            objIdOfSeatIndex.clear()
+            objIdOfUserNo.clear()
+            objIdOfSingingScore = ""
+
+            roomSubscribeListener.clear()
+            roomMap.clear()
+            userMap.clear()
+            seatMap.clear()
+            songChosenList.clear()
+            currRoomNo = ""
+        }
+    }
 
     // ========= 房间相关 =====================
 
@@ -79,6 +98,7 @@ class KTVSyncManagerServiceImp(
         initSync {
             Instance().getScenes(object : DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
+                    roomMap.clear()
                     val ret = ArrayList<RoomListModel>()
                     result?.forEach {
                         val obj = it.toObject(RoomListModel::class.java)
@@ -174,7 +194,6 @@ class KTVSyncManagerServiceImp(
                         { ret ->
                             val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
                             val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
-                            innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
                             innerSubscribeSingingScore()
                             innerAddUserIfNeed { addUserError, userSize ->
@@ -344,6 +363,12 @@ class KTVSyncManagerServiceImp(
 
     // =================== 麦位相关 ===============================
 
+    override fun getSeatStatusList(
+        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
+    ) {
+        innerGetSeatInfo(completion)
+    }
+
     override fun onSeat(
         inputModel: OnSeatInputModel,
         completion: (error: Exception?) -> Unit
@@ -366,7 +391,7 @@ class KTVSyncManagerServiceImp(
         val seatInfo = seatMap[inputModel.userOnSeat.toString()]
         if (seatInfo != null) {
             // 移除歌曲
-            innerRemoveAllUsersChooseSong()
+            innerRemoveAllUsersChooseSong(seatInfo.userNo)
             // 移除座位
             innerRemoveSeat(seatInfo) {}
         }
@@ -386,7 +411,7 @@ class KTVSyncManagerServiceImp(
                         originSeatInfo.name,
                         originSeatInfo.seatIndex,
                         originSeatInfo.joinSing,
-                        if (mute) 1 else 0, // update this
+                        if (mute) RoomSeatModel.MUTED_VALUE_TRUE else RoomSeatModel.MUTED_VALUE_FALSE, // update this
                         originSeatInfo.isVideoMuted
                     )
                     innerUpdateSeat(seatInfo, completion)
@@ -578,12 +603,12 @@ class KTVSyncManagerServiceImp(
             completion.invoke(RuntimeException("The chosen song list is empty!"))
             return
         }
-        val targetSong = songChosenList[0]
+        val targetSong = innerSortChooseSongList()[0]
+        val indexOf = songChosenList.indexOf(targetSong)
         if (!TextUtils.isEmpty(targetSong.chorusNo)) {
             completion.invoke(RuntimeException("The song has chorus user already!"))
             return
         }
-        songChosenList.remove(targetSong)
         val newSong = RoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
@@ -600,11 +625,11 @@ class KTVSyncManagerServiceImp(
             createAt = targetSong.createAt,
             pinAt = targetSong.pinAt
         )
-        songChosenList.add(0, newSong)
+        songChosenList[indexOf] = newSong
 
         //net request and notify others
         innerUpdateChooseSong(
-            objIdOfSongNo[0],
+            objIdOfSongNo[indexOf],
             newSong
         ) {
             chooseSongSubscriber?.invoke(
@@ -621,8 +646,8 @@ class KTVSyncManagerServiceImp(
             return
         }
 
-        val targetSong = songChosenList[0]
-        songChosenList.remove(targetSong)
+        val targetSong = innerSortChooseSongList()[0]
+        val indexOf = songChosenList.indexOf(targetSong)
         val newSong = RoomSelSongModel(
             targetSong.songName,
             targetSong.songNo,
@@ -638,13 +663,11 @@ class KTVSyncManagerServiceImp(
             createAt = targetSong.createAt,
             pinAt = targetSong.pinAt
         )
-        songChosenList.add(
-            0, newSong
-        )
+        songChosenList[indexOf] = newSong
 
         //net request and notify others
         innerUpdateChooseSong(
-            objIdOfSongNo[0],
+            objIdOfSongNo[indexOf],
             newSong
         ) {
             chooseSongSubscriber?.invoke(
@@ -662,7 +685,7 @@ class KTVSyncManagerServiceImp(
     // ===================== 打分相关 =====================
 
     override fun updateSingingScore(inputModel: UpdateSingingScoreInputModel) {
-        innerUpdateSingingScore(inputModel)
+        //innerUpdateSingingScore(inputModel)
     }
 
 
@@ -696,7 +719,60 @@ class KTVSyncManagerServiceImp(
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true
-                    runOnMainThread { complete.invoke() }
+                    runOnMainThread {
+                        Instance().joinScene(kSceneId, object: JoinSceneCallback{
+                            override fun onSuccess(sceneReference: SceneReference?) {
+                                sceneReference?.subscribe(object: EventListener{
+                                    override fun onCreated(item: IObject?) {
+
+                                    }
+
+                                    override fun onUpdated(item: IObject?) {
+                                        item ?: return
+                                        val roomInfo = item.toObject(RoomListModel::class.java)
+                                        roomMap[roomInfo.roomNo] = roomInfo
+                                        runOnMainThread {
+                                            roomStatusSubscriber?.invoke(
+                                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                                                roomInfo
+                                            )
+                                        }
+                                    }
+
+                                    override fun onDeleted(item: IObject?) {
+                                        item ?: return
+                                        val roomInfo = roomMap[item.id] ?: return
+
+                                        if (item.id != currRoomNo) {
+                                            roomMap.remove(item.id)
+                                            return
+                                        }
+                                        resetCacheInfo(true)
+                                        runOnMainThread {
+                                            roomStatusSubscriber?.invoke(
+                                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                                roomInfo
+                                            )
+                                        }
+                                    }
+
+                                    override fun onSubscribeError(ex: SyncManagerException?) {
+
+                                    }
+                                })
+
+                                runOnMainThread{
+                                    complete.invoke()
+                                }
+
+                            }
+
+                            override fun onFail(exception: SyncManagerException?) {
+                                runOnMainThread { errorHandler?.invoke(exception) }
+                            }
+                        })
+
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -746,7 +822,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdUser, listener)
+        mSceneReference?.collection(kCollectionIdUser)?.subscribe(listener)
     }
 
     private fun innerGetUserInfo(completion: (error: Exception?, list: List<VLLoginModel>?) -> Unit) {
@@ -865,7 +941,7 @@ class KTVSyncManagerServiceImp(
             UserManager.getInstance().user.name,
             seatIndex,
             false,
-            RoomSeatModel.MUTED_VALUE_FALSE,
+            RoomSeatModel.MUTED_VALUE_TRUE,
             RoomSeatModel.MUTED_VALUE_TRUE
         )
     }
@@ -883,10 +959,12 @@ class KTVSyncManagerServiceImp(
             seatMap.forEach {
                 it.value?.let { seat ->
                     outList.add(seat)
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        seat
-                    )
+                    runOnMainThread {
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            seat
+                        )
+                    }
                     if (seat.isMaster) {
                         hasMaster = true
                     }
@@ -900,11 +978,13 @@ class KTVSyncManagerServiceImp(
                         return@innerAddSeatInfo
                     }
                     outList.add(targetSeatInfo)
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        targetSeatInfo
-                    )
-                    completion.invoke(null, outList)
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            targetSeatInfo
+                        )
+                        completion.invoke(null, outList)
+                    }
                 }
             } else {
                 completion.invoke(null, outList)
@@ -959,8 +1039,8 @@ class KTVSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatInfo)
             ?.delete(objectId, object : Callback {
                 override fun onSuccess() {
-                    objIdOfSeatIndex.remove(seatInfo.seatIndex)
-                    seatMap.remove(seatInfo.seatIndex.toString())
+                    // objIdOfSeatIndex.remove(seatInfo.seatIndex)
+                    // seatMap.remove(seatInfo.seatIndex.toString())
                     runOnMainThread { completion.invoke(null) }
                 }
 
@@ -998,16 +1078,20 @@ class KTVSyncManagerServiceImp(
 
                 if (seatMap.containsKey(obj.seatIndex.toString())) {
                     seatMap[obj.seatIndex.toString()] = obj
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                        obj
-                    )
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                            obj
+                        )
+                    }
                 } else {
                     seatMap[obj.seatIndex.toString()] = obj
-                    seatListChangeSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
-                        obj
-                    )
+                    runOnMainThread{
+                        seatListChangeSubscriber?.invoke(
+                            KTVServiceProtocol.KTVSubscribe.KTVSubscribeCreated,
+                            obj
+                        )
+                    }
                 }
             }
 
@@ -1018,10 +1102,12 @@ class KTVSyncManagerServiceImp(
                     entry.value?.let { seat ->
                         if (objIdOfSeatIndex[seat.seatIndex] == item.id) {
                             seatMap.remove(entry.key)
-                            seatListChangeSubscriber?.invoke(
-                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
-                                seat
-                            )
+                            runOnMainThread{
+                                seatListChangeSubscriber?.invoke(
+                                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                    seat
+                                )
+                            }
                             return
                         }
                     }
@@ -1033,7 +1119,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdSeatInfo, listener)
+        mSceneReference?.collection(kCollectionIdSeatInfo)?.subscribe(listener)
     }
 
     // ------------ Choose song operation ---------------------
@@ -1146,8 +1232,8 @@ class KTVSyncManagerServiceImp(
             })
     }
 
-    private fun innerRemoveAllUsersChooseSong() {
-        songChosenList.filter { it.userNo == UserManager.getInstance().user.userNo }
+    private fun innerRemoveAllUsersChooseSong(userNo: String) {
+        songChosenList.filter { it.userNo == userNo }
             .forEach {
                 val indexOf = songChosenList.indexOf(it)
                 songChosenList.removeAt(indexOf)
@@ -1168,50 +1254,6 @@ class KTVSyncManagerServiceImp(
             })
     }
 
-    private fun innerSubscribeRoomChanged() {
-        val listener = object : EventListener {
-            override fun onCreated(item: IObject?) {
-
-            }
-
-            override fun onUpdated(item: IObject?) {
-                item ?: return
-                val roomInfo = item.toObject(RoomListModel::class.java)
-                roomMap[roomInfo.roomNo] = roomInfo
-                runOnMainThread {
-                    roomStatusSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                        roomInfo
-                    )
-                }
-            }
-
-            override fun onDeleted(item: IObject?) {
-                item ?: return
-                val roomInfo = roomMap[item.id] ?: return
-
-                if (item.id != currRoomNo) {
-                    return
-                }
-                resetCacheInfo(true)
-                runOnMainThread {
-                    roomStatusSubscriber?.invoke(
-                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
-                        roomInfo
-                    )
-                }
-
-            }
-
-            override fun onSubscribeError(ex: SyncManagerException?) {
-
-            }
-
-        }
-        roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(listener)
-    }
-
     private fun innerSubscribeChooseSong(completion: () -> Unit) {
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
@@ -1227,7 +1269,7 @@ class KTVSyncManagerServiceImp(
             }
 
             override fun onDeleted(item: IObject?) {
-                item ?: return
+                //item ?: return
                 chooseSongSubscriber?.invoke(
                     KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
                     null
@@ -1239,7 +1281,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         roomSubscribeListener.add(listener)
-        mSceneReference?.subscribe(kCollectionIdChooseSong, listener)
+        mSceneReference?.collection(kCollectionIdChooseSong)?.subscribe(listener)
     }
 
     // ------------ singing score operation ---------------------

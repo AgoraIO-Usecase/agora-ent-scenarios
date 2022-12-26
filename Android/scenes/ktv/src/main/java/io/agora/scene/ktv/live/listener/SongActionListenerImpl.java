@@ -41,11 +41,13 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongRefreshing(@NonNull SongDialog dialog, int index) {
         // 点歌-列表刷新
-        mCurrPage = 0;
+        mCurrPage = 1;
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.getSongList(getSongType(index), mCurrPage),
                 list -> {
-                    dialog.setChooseRefreshingResult(transSongModel(list));
+                    if (dialog.isVisible()) {
+                        dialog.setChooseRefreshingResult(transSongModel(list));
+                    }
                 });
     }
 
@@ -56,8 +58,10 @@ public class SongActionListenerImpl implements OnSongActionListener {
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.getSongList(getSongType(index), mCurrPage),
                 list -> {
-                    dialog.setChooseLoadMoreResult(transSongModel(list),
-                            list.size() > 0);
+                    if (dialog.isVisible()) {
+                        dialog.setChooseLoadMoreResult(transSongModel(list),
+                                list.size() > 0);
+                    }
                 });
     }
 
@@ -67,7 +71,9 @@ public class SongActionListenerImpl implements OnSongActionListener {
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.searchSong(condition),
                 list -> {
-                    dialog.setChooseSearchResult(transSongModel(list));
+                    if (dialog.isVisible()) {
+                        dialog.setChooseSearchResult(transSongModel(list));
+                    }
                 });
     }
 
@@ -78,7 +84,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
         LiveDataUtils.observerThenRemove(mLifecycleOwner,
                 mViewModel.chooseSong(songModel, isChorus),
                 success -> {
-                    if (success) {
+                    if (success && dialog.isVisible()) {
                         dialog.setChooseSongItemStatus(songItem, true);
                     }
                 });
@@ -125,6 +131,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
                         song.getSongNo(),
                         song.getSongName(),
                         song.getImageUrl(),
+                        song.getSinger(),
 
                         song.getName(),
                         !TextUtils.isEmpty(song.getName()),

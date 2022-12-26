@@ -8,7 +8,6 @@
 #import "VLSongItmModel.h"
 #import "VLRoomSelSongModel.h"
 #import "VLMacroDefine.h"
-#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
