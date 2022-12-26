@@ -141,6 +141,7 @@
 //        _IDLabel.backgroundColor = UIColorRed;
         _IDLabel.lineBreakMode = NSLineBreakByWordWrapping | NSLineBreakByCharWrapping;
         _IDLabel.userInteractionEnabled = YES;
+        _IDLabel.hidden = YES;
     }
     return _IDLabel;
 }

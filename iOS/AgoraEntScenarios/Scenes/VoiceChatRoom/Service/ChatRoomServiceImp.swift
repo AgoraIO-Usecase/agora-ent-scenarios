@@ -14,31 +14,18 @@ private let cSceneId = "scene_chatRoom"
 
 class ChatRoomServiceImp: NSObject {
     var roomId: String?
-    var roomList: VRRoomsEntity?
+    var roomList: [VRRoomEntity]?
     var userList: [VRUser]?
     var syncUtilsInited: Bool = false
 }
 
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-        
-    func joinRoom(roomId: String,user: VRUser, completion: @escaping (Error?, Bool) -> Void) {
-        VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
-            completion(self.convertError(error: error),error == nil)
-            VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
-                completion(self.convertError(error: error),error != nil)
-            })
-        })
-    }
-    
+
     func convertError(error: AgoraChatError?) -> Error? {
         let vmError = VoiceRoomError()
         vmError.code = "\(error?.code ?? .chatroomNotJoined)"
         vmError.message = error?.errorDescription
         return vmError
-    }
-    
-    func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
-        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
     }
     
     func fetchRoomDetail(_ roomId: String, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
@@ -235,11 +222,14 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func fetchRoomList(page: Int,
                      completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
         initScene { [weak self] in
-            SyncUtil.fetchAll { results in
+            SyncUtil.fetchAll { [weak self] results in
                 print("result == \(results.compactMap { $0.toJson() })")
-//                let entity = model(from: results.z.toDictionary() ?? [:], type: [VRRoomEntity].self as! any Convertible.Type) as? [VRRoomEntity]?
-//                self.roomList = entity
-//                completion(nil, entity)
+                
+                let dataArray = results.map({ info in
+                    return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                })
+                self?.roomList = dataArray.sorted(by: {$0.created_at! > $1.created_at!})
+                completion(nil, self?.roomList)
             } fail: { error in
                 completion(error, nil)
             }
@@ -250,9 +240,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?) -> Void) {
-        var room_entity: VRRoomEntity = VRRoomEntity()
-        room_entity.rtc_uid = Int(AppContext.shared.appId())
+    func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?, VRRoomEntity?) -> Void) {
+        let room_entity: VRRoomEntity = VRRoomEntity()
+        room_entity.rtc_uid = Int(VLUserCenter.user.id)
         
         let timeInterval: TimeInterval = Date().timeIntervalSince1970
         let millisecond = CLongLong(round(timeInterval*1000))
@@ -261,26 +251,121 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         room_entity.channel_id = String(millisecond)
         room_entity.sound_effect = room.sound_effect ?? "Social_Chat".localized()
         room_entity.is_private = room.is_private
-        room_entity.name = ""
+        room_entity.name = room.name
         room_entity.created_at = UInt(millisecond)
         room_entity.roomPassword = room.roomPassword
-        room_entity.use_robot = false
-        room_entity.robot_volume = 50
+        room_entity.click_count = 1
         
         let owner: VRUser = VRUser()
-        owner.rtc_uid = AppContext.shared.appId()
+        owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        room_entity.owner = owner
+        owner.uid = VLUserCenter.user.userNo
+        owner.mic_index = 0
+        owner.portrait = VLUserCenter.user.headUrl
         
-        
-        if let chatroom_id = room_entity.chatroom_id {
-            VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: chatroom_id, attributes: self.createMics(), completion: { error in
+        initIM(with: room_entity.name ?? "", pwd: room_entity.roomPassword) {[weak self] im_token, uid, room_id in
+            
+            owner.im_token = im_token
+            owner.chat_uid = uid
+            room_entity.chatroom_id = room_id
+            room_entity.owner = owner
+            
+            //更新环信KV
+            VoiceRoomIMManager.shared?.setChatroomAttributes(chatRoomId: room_id, attributes: (self?.createMics())!, completion: { error in
                 if error == nil {
                     
                 }
             })
+
+            if let strongSelf = self {
+                strongSelf.roomList?.append(room_entity)
+                let params = room_entity.kj.JSONObject()
+                strongSelf.initScene {
+                    SyncUtil.joinScene(id: room_entity.room_id ?? "",
+                                       userId: VLUserCenter.user.userNo,
+                                       property: params) { result in
+                        let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                        completion(nil,model)
+                    } fail: { error in
+                        completion(error, nil)
+                    }
+                }
+            }
+        }
+
+    }
+    
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, VRRoomEntity?) -> Void) {
+        
+        /**
+         先拿到对应的房间信息
+         1.修改click_count
+         2.joinRTC + joinIM
+         3.获取房间详情(KV）
+         */
+        if let roomList = self.roomList {
+            for room in roomList {
+                if room.room_id == roomId {
+                    let updateRoom: VRRoomEntity = room
+                    updateRoom.click_count = updateRoom.click_count ?? 0 + 1
+                    let params = updateRoom.kj.JSONObject()
+                    SyncUtil
+                        .scene(id: roomId)?
+                        .update(key: "",
+                                data: params,
+                                success: { obj in
+                            print("updateUserCount success")
+                            completion(nil, updateRoom)
+                        },
+                                fail: { error in
+                            print("updateUserCount fail")
+                            completion(error, nil)
+                        })
+                }
+            }
         }
         
+        VoiceRoomIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
+          //  completion(self.convertError(error: error),error == nil)
+//            VoiceRoomIMManager.shared?.sendCustomMessage(roomId: roomId, event: VoiceRoomJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+//                completion(self.convertError(error: error),error != nil)
+//            })
+        })
+    }
+    
+    func leaveRoom(_ roomId: String, isOwner: Bool, completion: @escaping (Error?, Bool) -> Void) {
+        
+        /**
+         先拿到对应的房间信息
+         1.如果是房主需要销毁房间，普通成员需要click_count - 1. 同时需要退出RTC+IM
+         2.房主需要调用destory
+         */
+        if let roomList = self.roomList {
+            for (index,room) in roomList.enumerated() {
+                if room.room_id == roomId {
+                    if isOwner {
+                        SyncUtil.leaveScene(id: roomId)
+                        self.roomList?.remove(at: index)
+                    } else {
+                        let updateRoom: VRRoomEntity = room
+                        updateRoom.click_count = updateRoom.click_count ?? 0 - 1
+                        let params = updateRoom.kj.JSONObject()
+                        SyncUtil
+                            .scene(id: roomId)?
+                            .update(key: "",
+                                    data: params,
+                                    success: { obj in
+                                print("updateUserCount success")
+                            },
+                                    fail: { error in
+                                print("updateUserCount fail")
+                            })
+                    }
+                }
+            }
+        }
+        
+        VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
     }
     
     func createMics() -> [String:String] {
@@ -317,6 +402,36 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         micsMap["robot_volume"] = "50"
         micsMap["gift_amount"] = "0"
         return micsMap
+    }
+    
+    func initIM(with roomName: String, pwd: String, completion: @escaping (String, String, String) -> Void) {
+
+        let VMGroup = DispatchGroup()
+        let VMQueue = DispatchQueue(label: "com.agora.vm.www")
+        var im_token = ""
+        var im_uid = ""
+        var chatroom_id = ""
+        
+        VMGroup.enter()
+        VMQueue.async {
+            NetworkManager.shared.generateToken(channelName: roomName, uid: VLUserCenter.user.userNo, tokenType: .token007, type: .chat) { token in
+                im_token = token ?? ""
+                VMGroup.leave()
+            }
+        }
+        
+        VMGroup.enter()
+        VMQueue.async {
+            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, password: pwd, uid:  VLUserCenter.user.userNo) { uid, room_id in
+                im_uid = uid ?? ""
+                chatroom_id = room_id ?? ""
+                VMGroup.leave()
+            }
+        }
+        
+        VMGroup.notify(queue: VMQueue) {[weak self] in
+            completion(im_token, im_uid, chatroom_id)
+        }
     }
 }
 

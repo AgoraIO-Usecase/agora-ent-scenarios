@@ -40,7 +40,7 @@
     <string name="ktv_room_no_sing">当前无人演唱\n点击“点歌”一展歌喉</string>
     <string name="ktv_dialog_migu_tip" />
     <string name="ktv_dialog_music_list_empty">未找到相关搜索结果</string>
-    <string name="ktv_dialog_music_list_search_hint">搜索歌曲, 歌手</string>
+    <string name="ktv_dialog_music_list_search_hint">搜索歌曲</string>
     <string name="ktv_lrc_loading">歌曲准备中</string>
     <string name="ktv_lrc_load_fail">加载失败</string>
     <string name="ktv_room_change_music_title">切歌</string>

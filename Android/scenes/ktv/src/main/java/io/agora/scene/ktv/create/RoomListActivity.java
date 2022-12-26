@@ -16,11 +16,11 @@ import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnItemClickListener;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.create.holder.RoomHolder;
 import io.agora.scene.ktv.databinding.ActivityRoomListBinding;
 import io.agora.scene.ktv.databinding.ItemRoomListBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
+import io.agora.scene.ktv.service.KTVServiceProtocol;
 import io.agora.scene.ktv.service.RoomListModel;
 import io.agora.scene.widget.dialog.InputPasswordDialog;
 
@@ -43,6 +43,12 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         super.onResume();
         setDarkStatusIcon(isBlackDarkStatus());
         loadRoomList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        KTVServiceProtocol.Companion.getImplInstance().reset();
     }
 
     private void loadRoomList() {
@@ -96,7 +102,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         });
         roomCreateViewModel.joinRoomResult.observe(this, ktvJoinRoomOutputModel -> {
             if (ktvJoinRoomOutputModel == null) {
-                ToastUtils.showToast("密码不正确");
                 setDarkStatusIcon(isBlackDarkStatus());
             } else {
                 RoomLivingActivity.launch(RoomListActivity.this, ktvJoinRoomOutputModel);
@@ -113,8 +118,6 @@ public class RoomListActivity extends BaseViewBindingActivity<ActivityRoomListBi
         }
         inputPasswordDialog.clearContent();
         inputPasswordDialog.iSingleCallback = (type, o) -> {
-            data.setPassword((String) o);
-            // RoomManager.getInstance().setAgoraRoom(data);
             roomCreateViewModel.joinRoom(data.getRoomNo(), (String) o);
         };
         inputPasswordDialog.show();

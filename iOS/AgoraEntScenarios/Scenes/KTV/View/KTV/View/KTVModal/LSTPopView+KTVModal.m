@@ -108,17 +108,19 @@
     return popView;
 }
 
-
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
                                         isChorus:(BOOL)isChorus
+                                 chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
                                     withDelegate:(id<VLPopChooseSongViewDelegate>)delegate {
     CGFloat popViewH = SCREEN_HEIGHT * 0.7;
-    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                       withDelegate:delegate
-                                                                         withRoomNo:roomNo
-                                                                           ifChorus:isChorus];
+    VLPopChooseSongView *chooseSongView = [[VLPopChooseSongView alloc]
+                                           initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+                                           withDelegate:delegate
+                                           withRoomNo:roomNo
+                                           ifChorus:isChorus];
+    chooseSongView.selSongsArray = chooseSongArray;
     chooseSongView = chooseSongView;
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
                                                           withParentView:parentView];

@@ -21,8 +21,7 @@
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
 @property (nonatomic, strong) VLKTVKindsView *kindsView;
-
-@property (nonatomic, strong) VLKTVSettingModel *setting;
+@property (nonatomic, strong, readonly) VLKTVSettingModel *setting;
 
 @end
 
@@ -41,10 +40,10 @@
 
 - (void)configData:(VLKTVSettingModel *)setting {
     if (!setting) {
-        self.setting = [[VLKTVSettingModel alloc] init];
+        _setting = [[VLKTVSettingModel alloc] init];
         [self.setting setDefaultProperties];
     } else {
-        self.setting = setting;
+        _setting = setting;
     }
     
     self.soundSwitcher.on = self.setting.soundOn;
@@ -203,6 +202,12 @@
         _kindsView.list = [VLKTVKindsModel kinds];
     }
     return _kindsView;
+}
+
+- (void)setIsEarOn:(BOOL)isEarOn
+{
+    self.setting.soundOn = isEarOn;
+    self.soundSwitcher.on = isEarOn;
 }
 
 @end
