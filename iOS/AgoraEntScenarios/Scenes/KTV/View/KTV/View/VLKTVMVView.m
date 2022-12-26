@@ -60,6 +60,14 @@
     [self _refreshOriginButton];
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    [self.originBtn sizeToFit];
+    self.originBtn.frame = CGRectMake(self.width-20-self.originBtn.width, _pauseBtn.top, self.originBtn.width, 24);
+    self.settingBtn.frame = CGRectMake(_originBtn.left-20-24, _pauseBtn.top, 24, 24);
+}
+
 #pragma mark private
 
 - (void)setupView {
@@ -127,11 +135,11 @@
     if (self.originBtn.selected) {
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
+    } else {
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
+    [self setNeedsLayout];
 }
 
 #pragma mark - public
@@ -338,14 +346,7 @@
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type
 {
     _originBtn.selected = type == VLKTVMVViewActionTypeSingOrigin ? YES : NO;
-    if (_originBtn.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
-    }
+    [self _refreshOriginButton];
 }
 
 - (void)originClick:(UIButton *)button {
