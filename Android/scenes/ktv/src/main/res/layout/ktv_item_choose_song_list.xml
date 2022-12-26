@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@color/blue_9F"
     android:layout_marginTop="5dp">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -13,7 +15,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/ktv_cornerNormalStyle" />
+        app:shapeAppearance="@style/ktv_cornerNormalStyle"
+        tools:src="@mipmap/portrait01"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title_item_song_list"
@@ -26,53 +29,22 @@
         android:singleLine="true"
         android:textColor="@android:color/white"
         android:textSize="15sp"
+        tools:text="等你等到我心痛"
         app:layout_constraintEnd_toStartOf="@id/btn_item_song_list"
         app:layout_constraintStart_toEndOf="@+id/cover_item_song_list"
         app:layout_constraintTop_toTopOf="@id/cover_item_song_list" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvOriginalSong"
+        android:id="@+id/tvSinger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:background="@drawable/bg_frame_green_6d"
-        android:paddingHorizontal="3dp"
         android:paddingVertical="0.5dp"
-        android:text="@string/ktv_room_original"
-        android:textColor="@color/green_6d"
-        android:textSize="9sp"
+        tools:text="张芸"
+        android:textColor="@color/grey_d8"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/cover_item_song_list"
         app:layout_constraintStart_toEndOf="@id/cover_item_song_list" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvAccompany"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/bg_frame_orange_e6"
-        android:paddingHorizontal="3dp"
-        android:paddingVertical="0.5dp"
-        android:text="@string/ktv_room_accompany"
-        android:textColor="@color/orange_e6"
-        android:textSize="9sp"
-        app:layout_constraintBottom_toBottomOf="@id/tvOriginalSong"
-        app:layout_constraintStart_toEndOf="@id/tvOriginalSong"
-        app:layout_constraintTop_toTopOf="@id/tvOriginalSong" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvScore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/bg_frame_blue_15"
-        android:paddingHorizontal="3dp"
-        android:paddingVertical="0.5dp"
-        android:text="@string/ktv_score"
-        android:textColor="@color/blue_15"
-        android:textSize="9sp"
-        app:layout_constraintBottom_toBottomOf="@id/tvAccompany"
-        app:layout_constraintStart_toEndOf="@id/tvAccompany"
-        app:layout_constraintTop_toTopOf="@id/tvAccompany" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_item_song_list"
@@ -81,6 +53,7 @@
         android:layout_height="28dp"
         android:layout_marginEnd="25dp"
         android:text="@string/ktv_room_choose_song"
+        android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/cover_item_song_list"

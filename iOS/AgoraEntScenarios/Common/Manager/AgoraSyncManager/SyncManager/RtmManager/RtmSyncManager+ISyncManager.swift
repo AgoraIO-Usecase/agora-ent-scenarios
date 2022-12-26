@@ -9,6 +9,10 @@ import AgoraRtmKit
 import Foundation
 
 extension RtmSyncManager: ISyncManager {
+    func subscribeConnectState(state: @escaping ConnectBlockState) {
+        //TODO(zhaoyongqiang): need implementation
+    }
+    
     public func createScene(scene: Scene,
                             success: SuccessBlockVoid?,
                             fail: FailBlock?)

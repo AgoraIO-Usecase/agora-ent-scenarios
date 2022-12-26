@@ -4,7 +4,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <YYModel/YYModel.h>
+@import YYModel;
 
 NS_ASSUME_NONNULL_BEGIN
 

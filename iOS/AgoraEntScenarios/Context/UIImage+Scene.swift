@@ -38,6 +38,7 @@ extension UIImage {
             let imageName = value > 1 ? "\(pureName)@\(value)x" : pureName
             if let path = bundle.path(forResource: imageName, ofType: suffix) {
                 let image = UIImage(contentsOfFile: path)
+                assert(image != nil, "image == nil \(path)")
                 return image
             }
         }

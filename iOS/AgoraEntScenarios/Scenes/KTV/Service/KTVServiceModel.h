@@ -74,7 +74,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// remove song input parameter
 @interface KTVRemoveSongInputModel : NSObject
 @property (nonatomic, copy) NSString* songNo;
-@property (nonatomic, assign) NSString* sort;
 @property (nonatomic, copy, nullable) NSString* objectId;
 @end
 
