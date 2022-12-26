@@ -10,7 +10,9 @@
 
 NSString* kServiceImpKey = @"ServiceImpKey";
 NSString* kAgoraMusicContentCenterKey = @"AgoraMusicContentCenterKey";
+NSString* kAgoraMediaPlayerKey = @"AgoraMediaPlayerKey";
 NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
+NSString* kAgoraMpkWeakTableKey = @"AgoraMpkWeakTableKey";
 @implementation AppContext (KTV)
 
 #pragma mark mcc
@@ -27,6 +29,14 @@ NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
     return [[AppContext shared].extDic valueForKey:kAgoraMusicContentCenterKey];
 }
 
+- (void)setAgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerDelegate>)agoraRtcMediaPlayer {
+    [[AppContext shared].extDic setValue:agoraRtcMediaPlayer forKey:kAgoraMediaPlayerKey];
+}
+
+- (id<AgoraRtcMediaPlayerDelegate>)agoraRtcMediaPlayer {
+    return [[AppContext shared].extDic valueForKey:kAgoraMediaPlayerKey];
+}
+
 - (NSMapTable*)mccDelegateTable {
     NSMapTable* weakTable = [[AppContext shared].extDic valueForKey:kAgoraMccWeakTableKey];
     if (weakTable == nil) {
@@ -37,8 +47,22 @@ NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
     return weakTable;
 }
 
+- (NSMapTable*)mpkDelegateTable {
+    NSMapTable* weakTable = [[AppContext shared].extDic valueForKey:kAgoraMpkWeakTableKey];
+    if (weakTable == nil) {
+        weakTable = [NSMapTable mapTableWithKeyOptions:NSMapTableCopyIn valueOptions:NSMapTableWeakMemory];
+        [[AppContext shared].extDic setValue:weakTable forKey:kAgoraMpkWeakTableKey];
+    }
+    
+    return weakTable;
+}
+
 - (NSArray<id<AgoraMusicContentCenterEventDelegate>>*)mccDelegateArray {
     return [[[self mccDelegateTable] objectEnumerator] allObjects];
+}
+
+- (NSArray<id<AgoraRtcMediaPlayerDelegate>>*)mpkDelegateArray {
+    return [[[self mpkDelegateTable] objectEnumerator] allObjects];
 }
 
 - (void)registerEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate {
@@ -49,6 +73,16 @@ NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
 - (void)unregisterEventDelegate:(id<AgoraMusicContentCenterEventDelegate>)delegate {
     NSString* key = [NSString stringWithFormat:@"%p", delegate];
     [self.mccDelegateTable removeObjectForKey:key];
+}
+
+- (void)registerPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate {
+    NSString* key = [NSString stringWithFormat:@"%p", delegate];
+    [[self mpkDelegateTable] setObject:delegate forKey:key];
+}
+
+- (void)unregisterPlayerEventDelegate:(id<AgoraRtcMediaPlayerDelegate>)delegate {
+    NSString* key = [NSString stringWithFormat:@"%p", delegate];
+    [self.mpkDelegateTable removeObjectForKey:key];
 }
 
 #pragma mark service
@@ -110,6 +144,21 @@ NSString* kAgoraMccWeakTableKey = @"AgoraMccWeakTableKey";
                      status:status
                         msg:msg
                    lyricUrl:lyricUrl];
+    }];
+}
+
+#pragma mark AgoraRtcMediaPlayerDelegate
+- (void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
+{
+    [[self mpkDelegateArray] enumerateObjectsUsingBlock:^(id<AgoraRtcMediaPlayerDelegate>  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj AgoraRtcMediaPlayer:playerKit didChangedToState:state error:error];
+    }];
+}
+
+-(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
+{
+    [[self mpkDelegateArray] enumerateObjectsUsingBlock:^(id<AgoraRtcMediaPlayerDelegate>  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj AgoraRtcMediaPlayer:playerKit didChangedToPosition:position];
     }];
 }
 @end

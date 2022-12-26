@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// join chorus input parameter
 @interface KTVJoinChorusInputModel : NSObject
-@property (nonatomic, copy) NSString* isChorus;
+@property (nonatomic, assign) BOOL isChorus;
 @property (nonatomic, copy) NSString* songNo;
 @end
 
