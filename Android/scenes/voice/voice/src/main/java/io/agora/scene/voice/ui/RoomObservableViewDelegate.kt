@@ -993,4 +993,10 @@ class RoomObservableViewDelegate constructor(
             roomLivingViewModel.leaveMic(localUserIndex)
         }
     }
+
+    fun checkUserLeaveMic(index:Int){
+        if (index > 0) {
+            roomLivingViewModel.leaveMic(index)
+        }
+    }
 }
