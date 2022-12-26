@@ -9,7 +9,7 @@ import android.view.View
  * 防玻璃点击
  */
 object FastClickTools {
-    var lastClickTime = SystemClock.elapsedRealtime()
+    private var lastClickTime = -1L
 
     var lastClickViewId = -1
 
