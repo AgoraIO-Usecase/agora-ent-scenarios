@@ -41,6 +41,9 @@ let page_size = 15
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
+        if VoiceRoomIMManager.shared == nil {
+            VoiceRoomIMManager.shared = VoiceRoomIMManager()
+        }
         self.initialError = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
         mapUser(user: user)
         self.showContent()
@@ -61,6 +64,7 @@ let page_size = 15
     
     deinit {
         print("\(self.swiftClassName ?? "") is destroyed!")
+        VoiceRoomIMManager.shared?.logoutIM()
         VoiceRoomIMManager.shared = nil
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
