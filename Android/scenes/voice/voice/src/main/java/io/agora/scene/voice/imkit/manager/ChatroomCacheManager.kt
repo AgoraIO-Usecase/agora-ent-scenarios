@@ -252,6 +252,19 @@ class ChatroomCacheManager {
     }
 
     /**
+     * 检查邀请列表成员是否已经在麦位上
+     */
+    fun checkInvitationByChatUid(chatUid:String): Boolean{
+        for (entry in getMicInfoMap()?.entries!!) {
+            val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+            micInfo?.member?.chatUid.let {
+                if (it.equals(chatUid)) return true
+            }
+        }
+        return false
+    }
+
+    /**
      * 从成员列表中移除指定成员( 成员退出回调中调用 )
      */
     fun removeMember(chatUid: String){
