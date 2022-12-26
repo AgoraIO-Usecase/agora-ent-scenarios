@@ -18,11 +18,9 @@ import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.scene.voice.model.SoundSelectionBean
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.net.OnResourceParseCallback
@@ -30,7 +28,6 @@ import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.voice.common.net.Resource
 
@@ -125,6 +122,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
                 override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
                     curVoiceRoomModel = voiceRoomModel
+                    "voiceRoomObservable memberCount: ${voiceRoomModel?.memberCount} ".logD()
                     voiceRoomModel?.let {
                         voiceRoomViewModel.joinRoom(it.roomId)
                     }
