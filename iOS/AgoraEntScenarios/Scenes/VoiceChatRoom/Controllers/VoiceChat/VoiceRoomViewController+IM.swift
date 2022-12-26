@@ -33,6 +33,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         if var gift_amount = self.roomInfo?.room?.gift_amount {
             gift_amount += Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
             self.roomInfo?.room?.gift_amount = gift_amount
+            if self.isOwner {
+                VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["gift_amount":"\(gift_amount)"], completion: { error in })
+            }
         }
         //刷新礼物贡献总数，头部
 //        self.requestRankList()

@@ -140,6 +140,10 @@ extension VoiceRoomViewController {
                     if var room_amount = self.roomInfo?.room?.gift_amount {
                         room_amount += amount
                         self.roomInfo?.room?.gift_amount = room_amount
+                        if self.isOwner {
+                            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["gift_amount":"\(room_amount)"], completion: { error in })
+                            
+                        }
                     }
                     if self.roomInfo?.room?.ranking_list == nil {
                         self.roomInfo?.room?.ranking_list = [VRUser]()
