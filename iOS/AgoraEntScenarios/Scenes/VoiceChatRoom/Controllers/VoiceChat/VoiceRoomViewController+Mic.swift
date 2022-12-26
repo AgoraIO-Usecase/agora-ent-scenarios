@@ -168,7 +168,9 @@ extension VoiceRoomViewController {
     }
 
     func refuse() {
-        ChatRoomServiceImp.getSharedInstance().refuseInvite { error, flag in }
+        ChatRoomServiceImp.getSharedInstance().refuseInvite(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { _, _ in
+            
+        }
     }
 
     func agreeInvite() {
