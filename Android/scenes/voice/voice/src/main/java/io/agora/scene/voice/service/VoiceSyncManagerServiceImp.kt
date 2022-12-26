@@ -1,6 +1,8 @@
 package io.agora.scene.voice.service
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
@@ -672,6 +674,7 @@ class VoiceSyncManagerServiceImp(
             complete.invoke()
             return
         }
+        val handler = Handler(Looper.getMainLooper())
         Sync.Instance().init(context,
             mapOf(
                 Pair("appid", VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()),
@@ -679,46 +682,48 @@ class VoiceSyncManagerServiceImp(
             ),
             object : Sync.Callback {
                 override fun onSuccess() {
-                    Sync.Instance().joinScene(voiceSceneId, object: JoinSceneCallback{
-                        override fun onSuccess(sceneReference: SceneReference?) {
-                            sceneReference?.subscribe(object:Sync.EventListener{
-                                override fun onCreated(item: IObject?) {
+                    handler.post {
+                        Sync.Instance().joinScene(voiceSceneId, object: JoinSceneCallback{
+                            override fun onSuccess(sceneReference: SceneReference?) {
+                                sceneReference?.subscribe(object:Sync.EventListener{
+                                    override fun onCreated(item: IObject?) {
 
+                                    }
+
+                                    override fun onUpdated(item: IObject?) {
+                                        item ?: return
+                                        val roomInfo = item.toObject(VoiceRoomModel::class.java)
+                                        roomMap[roomInfo.roomId] = roomInfo
+                                        "syncManager RoomChanged onUpdated:${roomInfo.roomId}".logD()
+                                    }
+
+                                    override fun onDeleted(item: IObject?) {
+                                        item ?: return
+                                        val roomInfo = roomMap[item.id] ?: return
+                                        resetCacheInfo(roomInfo.roomId, true)
+                                        "syncManager RoomChanged onDeleted:${roomInfo.roomId}".logD()
+                                    }
+
+                                    override fun onSubscribeError(ex: SyncManagerException?) {
+                                        errorHandler?.invoke(ex)
+                                    }
+
+                                })
+                                syncUtilsInit = true
+                                ThreadManager.getInstance().runOnMainThread {
+                                    "SyncManager init success".logD()
+                                    complete.invoke()
                                 }
-
-                                override fun onUpdated(item: IObject?) {
-                                    item ?: return
-                                    val roomInfo = item.toObject(VoiceRoomModel::class.java)
-                                    roomMap[roomInfo.roomId] = roomInfo
-                                    "syncManager RoomChanged onUpdated:${roomInfo.roomId}".logD()
-                                }
-
-                                override fun onDeleted(item: IObject?) {
-                                    item ?: return
-                                    val roomInfo = roomMap[item.id] ?: return
-                                    resetCacheInfo(roomInfo.roomId, true)
-                                    "syncManager RoomChanged onDeleted:${roomInfo.roomId}".logD()
-                                }
-
-                                override fun onSubscribeError(ex: SyncManagerException?) {
-                                    errorHandler?.invoke(ex)
-                                }
-
-                            })
-                            syncUtilsInit = true
-                            ThreadManager.getInstance().runOnMainThread {
-                                "SyncManager init success".logD()
-                                complete.invoke()
                             }
-                        }
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            ThreadManager.getInstance().runOnMainThread {
-                                "SyncManager init error: ${exception?.message}".logE()
-                                errorHandler?.invoke(exception)
+                            override fun onFail(exception: SyncManagerException?) {
+                                ThreadManager.getInstance().runOnMainThread {
+                                    "SyncManager init error: ${exception?.message}".logE()
+                                    errorHandler?.invoke(exception)
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
