@@ -138,6 +138,19 @@ class ChatroomCacheManager {
     }
 
     /**
+     * 根据chatUid获取VoiceMicInfoModel
+     */
+    fun getMicInfoByChatUid(chatUid: String):VoiceMicInfoModel?{
+        for (entry in mMicInfoMap) {
+            val micInfoBean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+            if (micInfoBean?.member?.chatUid.equals(chatUid)){
+                return micInfoBean
+            }
+        }
+        return null
+    }
+
+    /**
      * 设置申请上麦列表
      */
     fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
