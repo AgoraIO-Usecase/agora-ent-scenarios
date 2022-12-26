@@ -706,7 +706,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 拒绝邀请（本期未实现）
+     * 拒绝邀请
      * @param chatUid
      * @param callBack
      */
@@ -862,6 +862,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
+     * 检查邀请列表成员是否已经在麦位上
+     */
+    public boolean checkInvitationMember(String chatUid){
+        return cacheManager.checkInvitationByChatUid(chatUid);
+    }
+
+    /**
      * 从成员列表中移除指定成员( 成员退出回调中调用 )
      */
     public void removeMember(String chatUid){
@@ -880,5 +887,19 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public List<VoiceRankUserModel> getRankList(){
         return cacheManager.getRankList();
+    }
+
+    /**
+     * 根据chatUid获取VoiceMicInfoModel
+     * @param chatUid
+     * @return
+     */
+    public int getMicIndexByChatUid(String chatUid){
+        VoiceMicInfoModel bean = cacheManager.getMicInfoByChatUid(chatUid);
+        if (bean != null){
+            return bean.getMicIndex();
+        }else {
+            return -1;
+        }
     }
 }

@@ -138,6 +138,19 @@ class ChatroomCacheManager {
     }
 
     /**
+     * 根据chatUid获取VoiceMicInfoModel
+     */
+    fun getMicInfoByChatUid(chatUid: String):VoiceMicInfoModel?{
+        for (entry in mMicInfoMap) {
+            val micInfoBean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+            if (micInfoBean?.member?.chatUid.equals(chatUid)){
+                return micInfoBean
+            }
+        }
+        return null
+    }
+
+    /**
      * 设置申请上麦列表
      */
     fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
@@ -236,6 +249,19 @@ class ChatroomCacheManager {
         }
         "invitationList(${invitationList})".logD(TAG)
         return invitationList
+    }
+
+    /**
+     * 检查邀请列表成员是否已经在麦位上
+     */
+    fun checkInvitationByChatUid(chatUid:String): Boolean{
+        for (entry in getMicInfoMap()?.entries!!) {
+            val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
+            micInfo?.member?.chatUid.let {
+                if (it.equals(chatUid)) return true
+            }
+        }
+        return false
     }
 
     /**
