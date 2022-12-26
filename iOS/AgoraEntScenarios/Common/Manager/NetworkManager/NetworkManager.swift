@@ -4,16 +4,16 @@
 //
 //  Created by zhaoyongqiang on 2021/11/19.
 //
-
 import UIKit
 
-class NetworkManager {
-    public enum TokenGeneratorType: Int {
+@objc
+class NetworkManager:NSObject {
+    @objc public enum TokenGeneratorType: Int {
         case token006 = 0
         case token007 = 1
     }
     
-    public enum AgoraTokenType: Int {
+    @objc public enum AgoraTokenType: Int {
         case rtc = 1
         case rtm = 2
         case chat = 3
@@ -41,8 +41,7 @@ class NetworkManager {
         return config
     }()
 
-    static let shared = NetworkManager()
-    private init() {}
+    @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
     
     /// get tokens
@@ -78,6 +77,7 @@ class NetworkManager {
         }
     }
 
+    @objc
     func generateToken(channelName: String,
                        uid: String,
                        tokenType: TokenGeneratorType,
@@ -91,12 +91,12 @@ class NetworkManager {
         let params = ["appCertificate": KeyCenter.Certificate ?? "",
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
-                      "expire": 900,
+                      "expire": 1500,
                       "src": "iOS",
                       "ts": "".timeStamp,
                       "type": type.rawValue,
                       "uid": uid] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
+//        ToastView.showWait(text: "loading...", view: nil)
         let url = tokenType == .token006 ?
         "https://toolbox.bj2.agoralab.co/v1/token006/generate"
         : "https://toolbox.bj2.agoralab.co/v1/token/generate"
@@ -107,14 +107,13 @@ class NetworkManager {
             let token = data?["token"]
             print(response)
             success(token)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
-    
     
     /// generator easemob im token & uid
     /// - Parameters:
@@ -147,7 +146,7 @@ class NetworkManager {
                       "src": "iOS",
                       "traceId": NSString.withUUID().md5,
                       "user": userParams] as [String: Any]
-        ToastView.showWait(text: "loading...", view: nil)
+//        ToastView.showWait(text: "loading...", view: nil)
         NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
@@ -156,11 +155,11 @@ class NetworkManager {
             let userName = data?["userName"]
             print(response)
             success(roomId, userName)
-            ToastView.hidden()
+//            ToastView.hidden()
         }, failure: { error in
             print(error)
             success(nil, nil)
-            ToastView.hidden()
+//            ToastView.hidden()
         })
     }
 

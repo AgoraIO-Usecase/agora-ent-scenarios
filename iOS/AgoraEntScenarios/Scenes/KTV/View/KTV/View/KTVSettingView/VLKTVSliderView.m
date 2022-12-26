@@ -4,6 +4,7 @@
 //
 
 #import "VLKTVSliderView.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
 
 @interface VLKTVSliderView()
@@ -61,8 +62,8 @@
 - (UISlider *)sliderView {
     if (!_sliderView) {
         _sliderView = [[UISlider alloc]init];
-        [_sliderView setThumbImage:[UIImage imageNamed:@"icon_ktv_slider"] forState:UIControlStateNormal];
-        [_sliderView setThumbImage:[UIImage imageNamed:@"icon_ktv_slider"] forState:UIControlStateHighlighted];
+        [_sliderView setThumbImage:[UIImage sceneImageWithName:@"icon_ktv_slider"] forState:UIControlStateNormal];
+        [_sliderView setThumbImage:[UIImage sceneImageWithName:@"icon_ktv_slider"] forState:UIControlStateHighlighted];
         _sliderView.maximumValue = self.max;
         _sliderView.minimumValue = self.min;
         [_sliderView addTarget:self action:@selector(sliderValurChanged:) forControlEvents:UIControlEventValueChanged];

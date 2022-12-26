@@ -49,7 +49,6 @@
     iconImgView.layer.cornerRadius = 20;
     iconImgView.layer.masksToBounds = YES;
     self.iconImgView = iconImgView;
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%@",self.addRoomModel.icon]];
     [self addSubview:iconImgView];
     
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
@@ -78,7 +77,6 @@
 
     self.inputTF = [[TXLimitedTextField alloc] initWithFrame:CGRectMake(30, 9, inputBgView.width-60, 30)];
     self.inputTF.textColor = UIColorMakeWithHex(@"#040925");
-    self.inputTF.text = self.addRoomModel.name;
     self.inputTF.font = UIFontBoldMake(18);
     self.inputTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     self.inputTF.tintColor = UIColorMakeWithHex(@"#345DFF");
@@ -191,13 +189,15 @@
     bottomLabel.text = KTVLocalizedString(@"单次K歌最长20分钟，每个房间最多8人");
     [self addSubview:bottomLabel];
     
+    [self randomBtnClickEvent];
 }
 
 #pragma mark - Event
 - (void)randomBtnClickEvent {
     [self createRandomNumber];
     self.inputTF.text = self.addRoomModel.name;
-    self.iconImgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"icon_room_cover%@",self.addRoomModel.icon]];
+    NSString* iconName = [NSString stringWithFormat:@"icon_room_cover%@.jpg",self.addRoomModel.icon];
+    self.iconImgView.image = [UIImage sceneImageWithName: iconName];
 }
 
 - (void)createBtnClickEvent {

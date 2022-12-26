@@ -7,7 +7,7 @@ data class RoomListModel(
     val name: String = "",
     val icon: String = "",
     val isPrivate: Boolean = false,
-    var password: String = "",
+    val password: String = "",
     val creatorNo: String = "",
     val createdAt: String = System.currentTimeMillis().toString(),
 
