@@ -455,9 +455,18 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 拒绝邀请 (未实现)
+     * 拒绝邀请
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
+        ChatroomIMManager.getInstance().refuseInvite(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), object : CallBack {
+            override fun onSuccess() {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,false)
+            }
+        })
     }
 
     /**
