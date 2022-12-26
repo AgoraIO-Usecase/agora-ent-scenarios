@@ -61,7 +61,6 @@
     UIButton *randomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [randomBtn setTitle:KTVLocalizedString(@"随机") forState:UIControlStateNormal];
     [randomBtn setImage:[UIImage sceneImageWithName:@"online_create_randomIcon"] forState:UIControlStateNormal];
-    randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-50, roomTitleLabel.top, 50, 20);
 //    randomBtn.imagePosition = QMUIButtonImagePositionLeft;
     randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -70,6 +69,8 @@
 //    randomBtn.adjustsButtonWhenHighlighted = NO;
     [randomBtn addTarget:self action:@selector(randomBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:randomBtn];
+    [randomBtn sizeToFit];
+    randomBtn.frame = CGRectMake(SCREEN_WIDTH - randomBtn.width - 50, roomTitleLabel.top, randomBtn.width, 20);
     
     UIView *inputBgView = [[UIView alloc] initWithFrame:CGRectMake(30, roomTitleLabel.bottom+15, SCREEN_WIDTH-60, 48)];
     inputBgView.layer.cornerRadius = 24;
