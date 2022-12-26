@@ -386,11 +386,6 @@ public class RoomLivingViewModel extends ViewModel {
                     seatLocalLiveData.postValue(null);
                 }
 
-
-                RoomSelSongModel songPlayingData = songPlayingLiveData.getValue();
-                if(songPlayingData == null){
-                    return null;
-                }
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
                     isOnSeat = false;
                     if (mRtcEngine != null) {
@@ -403,6 +398,12 @@ public class RoomLivingViewModel extends ViewModel {
                         mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
                         mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                     }
+                    updateVolumeStatus(false);
+
+                    RoomSelSongModel songPlayingData = songPlayingLiveData.getValue();
+                    if(songPlayingData == null){
+                        return null;
+                    }
 
                     // 合唱相关逻辑
                     if (UserManager.getInstance().getUser().userNo.equals(songPlayingData.getChorusNo())) {
@@ -411,8 +412,6 @@ public class RoomLivingViewModel extends ViewModel {
                     } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingData.getUserNo())) {
                         //推送切歌逻辑
                     }
-                } else if (roomSeatModel.getUserNo().equals(songPlayingData.getUserNo())) {
-                    // 被房主下麦克的合唱者
                 }
             }
             return null;
