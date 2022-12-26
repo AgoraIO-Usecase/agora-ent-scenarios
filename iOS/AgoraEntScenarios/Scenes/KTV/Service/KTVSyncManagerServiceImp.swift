@@ -15,8 +15,6 @@ private let kSceneId = "scene_ktv"
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
-//score
-private let SYNC_MANAGER_SINGING_SCORE_INFO = "singing_score"
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -57,6 +55,7 @@ private func _hideLoadingIfNeed() {
     private var songList: [VLRoomSelSongModel] = .init()
 
     private var userListCountDidChanged: ((UInt) -> Void)?
+    private var userDidChanged: ((UInt, VLLoginModel) -> Void)?
     private var seatListDidChanged: ((UInt, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
@@ -201,21 +200,45 @@ private func _hideLoadingIfNeed() {
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
+                
+                let playerRTCUid = arc4random_uniform(1000000) + 10
+                VLUserCenter.user.agoraPlayerRTCUid = playerRTCUid
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: channelName ?? "",
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(playerRTCUid)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
                     guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
                         _hideLoadingIfNeed()
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
                         _hideLoadingIfNeed()
@@ -254,21 +277,45 @@ private func _hideLoadingIfNeed() {
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
+                
+                let playerRTCUid = arc4random_uniform(1000000) + 10
+                VLUserCenter.user.agoraPlayerRTCUid = playerRTCUid
+                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
+                
+                let dispatchGroup = DispatchGroup()
+                dispatchGroup.enter()
                 NetworkManager.shared.generateTokens(channelName: channelName ?? "",
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc, .rtm]) { tokenMap in
+                    tokenMap1 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.enter()
+                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                     uid: "\(playerRTCUid)",
+                                                     tokenGeneratorType: .token006,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    tokenMap2 = tokenMap
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main){
                     guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
+                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
+                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         _hideLoadingIfNeed()
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
                         return
                     }
                     VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
+                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self._autoOnSeatIfNeed { seatArray in
                         _hideLoadingIfNeed()
                         let output = KTVJoinRoomOutputModel()
@@ -399,8 +446,8 @@ private func _hideLoadingIfNeed() {
             return
         }
         //isChorus always true
-        topSong.isChorus = inputModel.isChorus == "1" ? true : false
-        topSong.status = 2
+//        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+        topSong.status = 3
         topSong.chorusNo = VLUserCenter.user.userNo
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
@@ -476,10 +523,14 @@ private func _hideLoadingIfNeed() {
 
     //MARK: subscribe
     func subscribeUserListCountChanged(_ changedBlock: @escaping (UInt) -> Void) {
-        _unsubscribeAll()
+//        _unsubscribeAll()
         userListCountDidChanged = changedBlock
         _subscribeOnlineUsers {
         }
+    }
+    
+    func subscribeUserChanged(_ changedBlock: @escaping (UInt, VLLoginModel) -> Void) {
+        userDidChanged = changedBlock
     }
 
     func subscribeSeatListChanged(_ changedBlock: @escaping (UInt, VLRoomSeatModel) -> Void) {
@@ -676,13 +727,18 @@ extension KTVSyncManagerServiceImp {
                            agoraPrint("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(),
-                                 let model = VLLoginModel.yy_model(withJSON: jsonStr),
-                                 !self.userList.contains(where: { $0.userNo == model.userNo })
+                                 let model = VLLoginModel.yy_model(withJSON: jsonStr)
                            else {
                                return
                            }
+                           if self.userList.contains(where: { $0.userNo == model.userNo }) {
+                               self.userDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                               return
+                           }
+                           
                            self.userList.append(model)
                            agoraPrint("imp user subscribe onUpdated2... \(self.userList.count)")
+                           self.userDidChanged?(KTVSubscribeCreated.rawValue, model)
                            self._updateUserCount { error in
                            }
                        }, onDeleted: {[weak self] object in
@@ -690,6 +746,8 @@ extension KTVSyncManagerServiceImp {
                            guard let self = self, let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else {
                                return
                            }
+                           let model = self.userList[index]
+                           self.userDidChanged?(KTVSubscribeDeleted.rawValue, model)
                            self.userList.remove(at: index)
                            self._updateUserCount { error in
                            }
@@ -1202,7 +1260,7 @@ extension KTVSyncManagerServiceImp {
         }
 
         topSong.isChorus = false
-        topSong.status = 2
+        topSong.status = 3
         _updateChooseSong(songInfo: topSong) { error in
         }
     }
@@ -1261,75 +1319,3 @@ extension KTVSyncManagerServiceImp {
             })
     }
 }
-
-
-//MARK: song score operation
-//extension KTVSyncManagerServiceImp {
-//    private func _addSingingScore(score: Double, finished: @escaping () -> Void) {
-//        guard let channelName = roomNo else {
-////            assert(false, "channelName = nil")
-//            agoraPrint("_addSingingScore channelName = nil")
-//            return
-//        }
-//        
-//        if let publishScore = publishScore, abs(publishScore - score) < 0.01  {
-//            agoraPrint("imp singing score add skip : \(publishScore), \(score)")
-//            return
-//        }
-//        
-//        agoraPrint("imp singing score add ... [\(score)]")
-//
-//        let params = [
-//            "score": score,
-//            "objectId": channelName
-//        ] as [String : Any]
-//        SyncUtil
-//            .scene(id: channelName)?
-//            .collection(className: SYNC_MANAGER_SINGING_SCORE_INFO)
-//            .add(data: params,
-//                 success: { [weak self] _ in
-//                agoraPrint("imp singing score add success...")
-//                self?.publishScore = score
-//                finished()
-//            }, fail: { error in
-//                agoraPrint("imp singing score add fail :\(error.message)...")
-//                agoraPrint(error.message)
-//                finished()
-//            })
-//    }
-//    
-//    private func _subscribeSingScore() {
-//        guard let channelName = roomNo else {
-//            agoraAssert("channelName = nil")
-//            return
-//        }
-//        agoraPrint("imp singing score subscribe...")
-//        SyncUtil
-//            .scene(id: channelName)?
-//            .subscribe(key: SYNC_MANAGER_SINGING_SCORE_INFO,
-//                       onCreated: { [weak self] object in
-//                guard let self = self,
-//                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
-//                else {
-//                    return
-//                }
-//                agoraPrint("imp singing score subscribe onCreated... [\(score)]")
-//                self.singingScoreDidChanged?(score)
-//            }, onUpdated: { [weak self] object in
-//                guard let self = self,
-//                      let score = object.getPropertyWith(key: "score", type: Double.self) as? Double
-//                else {
-//                    return
-//                }
-//                agoraPrint("imp singing score subscribe onUpdated... [\(score)]")
-//                self.singingScoreDidChanged?(score)
-//            }, onDeleted: { object in
-//                agoraPrint("imp singing score subscribe onDeleted...")
-//            }, onSubscribed: {
-////                LogUtils.log(message: "subscribe message", level: .info)
-//            }, fail: { error in
-//                agoraPrint("imp singing score subscribe fail \(error.message)...")
-//                ToastView.show(text: error.message)
-//            })
-//    }
-//}
