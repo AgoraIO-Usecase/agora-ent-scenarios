@@ -563,9 +563,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
-            
-            break
-            
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
@@ -576,7 +573,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
-            
         default:
             break
         }

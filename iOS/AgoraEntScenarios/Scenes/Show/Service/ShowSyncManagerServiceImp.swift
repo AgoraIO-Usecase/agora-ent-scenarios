@@ -372,12 +372,16 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         apply.status = .accepted
         _updateMicSeatApply(apply: apply, completion: completion)
         
+        
+        //reset mute status if start interaction
+        self.userMuteLocalAudio = false
+        
         let interaction = ShowInteractionInfo()
         interaction.userId = apply.userId
         interaction.userName = apply.userName
         interaction.roomId = getRoomId()
         interaction.interactStatus = .onSeat
-        interaction.ownerMuteAudio = self.userMuteLocalAudio
+//        interaction.ownerMuteAudio = self.userMuteLocalAudio
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
         }
@@ -432,13 +436,16 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             }
             user.status = .accepted
             self._updateUserInfo(user: user, completion: completion)
+            
+            //reset mute status if start interaction
+            self.userMuteLocalAudio = false
 
             let interaction = ShowInteractionInfo()
             interaction.userId = user.userId
             interaction.userName = user.userName
             interaction.roomId = self.getRoomId()
             interaction.interactStatus = .onSeat
-            interaction.muteAudio = self.userMuteLocalAudio
+//            interaction.muteAudio = self.userMuteLocalAudio
             interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
             self._addInteraction(interaction: interaction) { error in
             }
@@ -521,7 +528,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 _invitation.fromName = VLUserCenter.user.name
                 _invitation.fromRoomId = self.roomId
                 _invitation.status = .waitting
-                _invitation.fromUserMuteAudio = self.userMuteLocalAudio
+//                _invitation.fromUserMuteAudio = self.userMuteLocalAudio
                 _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
                 self.pkCreatedInvitationMap[_invitation.roomId!] = _invitation
                 self._addPKInvitation(invitation: _invitation, completion: completion)
@@ -551,6 +558,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 return
             }
             
+            
+            //reset mute status if start interaction
+            self.userMuteLocalAudio = false
+            
             invitation.status = .accepted
             invitation.userMuteAudio = self.userMuteLocalAudio
             self._updatePKInvitation(invitation: invitation, completion: completion)
@@ -559,8 +570,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             interaction.userId = invitation.fromUserId
             interaction.userName = invitation.fromName
             interaction.roomId = invitation.fromRoomId
-            interaction.muteAudio = invitation.fromUserMuteAudio
-            interaction.ownerMuteAudio = self.userMuteLocalAudio
+//            interaction.muteAudio = invitation.fromUserMuteAudio
+//            interaction.ownerMuteAudio = self.userMuteLocalAudio
             interaction.interactStatus = .pking
             interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
             self._addInteraction(interaction: interaction) { error in
@@ -1548,13 +1559,16 @@ extension ShowSyncManagerServiceImp {
             return
         }
         
+        //reset mute status if start interaction
+        self.userMuteLocalAudio = false
+        
         let interaction = ShowInteractionInfo()
         interaction.userId = invitation.userId
         interaction.userName = invitation.userName
         interaction.roomId = invitation.roomId
         interaction.interactStatus = .pking
-        interaction.muteAudio = invitation.userMuteAudio
-        interaction.ownerMuteAudio = self.userMuteLocalAudio
+//        interaction.muteAudio = invitation.userMuteAudio
+//        interaction.ownerMuteAudio = self.userMuteLocalAudio
         interaction.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
         _addInteraction(interaction: interaction) { error in
         }
