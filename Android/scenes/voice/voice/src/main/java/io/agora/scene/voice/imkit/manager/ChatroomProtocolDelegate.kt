@@ -663,11 +663,19 @@ class ChatroomProtocolDelegate constructor(
             }
             // 接受邀请/接受申请
             MicClickAction.Accept -> {
+                "MicClickAction.Accept: ${micInfo.micStatus}".logD(TAG)
+                if (micInfo.micStatus == -1){
+                    micInfo.micStatus = MicStatus.Normal
+                }
                 if (memberBean != null){
                     micInfo.member = memberBean
                 }
             }
             MicClickAction.Invite -> {
+                "MicClickAction.Invite: ${micInfo.micStatus}".logD(TAG)
+                if (micInfo.micStatus == -1){
+                    micInfo.micStatus = MicStatus.Normal
+                }
                 if (memberBean != null){
                     micInfo.member = memberBean
                 }
