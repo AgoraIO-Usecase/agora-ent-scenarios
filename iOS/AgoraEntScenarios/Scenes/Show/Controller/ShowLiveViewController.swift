@@ -144,12 +144,18 @@ class ShowLiveViewController: UIViewController {
             if currentInteraction == oldValue {
                 return
             }
+            
+            var toastTitle = ""
             if let info = oldValue {
                 _onStopInteraction(interaction: info)
+                toastTitle = info.interactStatus.toastTitle
             }
             if let info = currentInteraction {
                 _onStartInteraction(interaction: info)
+                return
             }
+            
+            ToastView.show(text: toastTitle)
         }
     }
     
@@ -424,9 +430,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 }
             }
         }
-        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
-            ToastView.show(text: "连麦已断开哦".show_localized)
-        }
+//        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
+//            ToastView.show(text: "连麦已断开哦".show_localized)
+//        }
     }
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
@@ -603,7 +609,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         default:
             break
         }
-        ToastView.show(text: interaction.interactStatus.toastTitle)
     }
 }
 
