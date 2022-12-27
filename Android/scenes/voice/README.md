@@ -1,4 +1,4 @@
-# 声网语聊房
+# 语聊房-Android-中文
 
 ### 1.项目介绍
 
@@ -12,16 +12,16 @@
 声动语聊目前已涵盖以下功能，您可以参考注释按需从代码中调用：
 
 - 房间管理：房间列表管理，创建房间：
-  - 协议路径：https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt
+  - [协议路径](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt)
 - 席位管理：踢人，麦位静音，麦位锁定：
-  - 麦位管理相关功能主要依托于组件Room2DMicLayout
-  - roomObservableDelegate：管理房间头部以及麦位置数据变化代理，支持麦位的上下麦，换麦，静音/解除静音，锁麦/解锁，麦位的单个刷新，音量更新等麦位功能。
-  - 整体操作逻辑请参考 VoiceSyncManagerServiceImp 协议文件
+  - 麦位管理相关功能主要依托于组件[Room2DMicLayout](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/mic/Room2DMicLayout.kt)
+  - 管理房间头部以及麦位置数据变化代理，支持麦位的上下麦，换麦，静音/解除静音，锁麦/解锁，麦位的单个刷新，音量更新等麦位功能参考：[RoomObservableViewDelegate](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/RoomObservableViewDelegate.kt)
+  - 整体操作逻辑请参考 [VoiceSyncManagerServiceImp](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt) 协议文件
 - 互动：弹幕，打赏：
-  - IM相关的弹幕和打赏请参考ChatroomGiftView 和 ChatroomMessagesView
+  - IM相关的弹幕和打赏请参考[ChatroomGiftView](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/gift/ChatroomGiftView.java) 和 [ChatroomMessagesView](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/barrage/ChatroomMessagesView.java)
   - 当前使用的环信IM SDK 1.0.8 版本
 - 音效：声网最佳音效，AI降噪：
-  - 音效、AI降噪参考：AgoraRtcEngineController
+  - 音效、AI降噪参考：[AgoraRtcEngineController](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/rtckit/AgoraRtcEngineController.kt)
   - 该类支持对音效功能的统一处理
 
 ### 2.使用场景
@@ -36,7 +36,6 @@
 
     ```
 	gradle.properties：
-		SERVER_HOST= 这个是服务端Url，由服务端确认
 		AGORA_APP_ID= （从声网console获取）
 		AGORA_APP_CERTIFICATE=（从声网console获取）
     ```
@@ -46,14 +45,12 @@
     ```
 	voice_gradle.properties：(配置参数从环信IM Console获取)
 	isBuildTypesTest=true 开发环境：
-    TOOLBOX_SERVER_HOST_TEST="https://test-toolbox.bj2.agoralab.co"
-	IM_APP_KEY_TEST="开发环境 IM APPKEY"
+		IM_APP_KEY_TEST="开发环境 IM APPKEY"
     IM_APP_CLIENT_ID_TEST="开发环境 IM Client ID"
     IM_APP_CLIENT_SECRET_TEST="开发环境 IM ClientSecret"
 
 	isBuildTypesTest=false 生产环境
-    TOOLBOX_SERVER_HOST_RELEASE="https://toolbox.bj2.agoralab.co"
-	IM_APP_KEY_RELEASE="生产环境 IM APPKEY"	
+		IM_APP_KEY_RELEASE="生产环境 IM APPKEY"	
     IM_APP_CLIENT_ID_RELEASE="生产环境 IM Client ID"
     IM_APP_CLIENT_SECRET_RELEASE="生产环境 IM ClientSecret"
     ```
@@ -76,8 +73,8 @@ IM管理类（包含加入房间、登录、退出登录等）[ChatroomIMManager
 - 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
   声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务。
 - 集成遇到困难，该如何联系声网获取协助
-	方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
-	方案2：发送邮件给support@agora.io咨询。
+  - 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+  - 方案2：发送邮件给support@agora.io咨询。
 
 
 
