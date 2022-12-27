@@ -18,6 +18,8 @@ class ShowLiveViewController: UIViewController {
     
     var audiencePresetType: ShowPresetType?
     
+    private var interruptInteractionReason: String?
+    
     //TODO: remove
     private lazy var settingMenuVC: ShowToolMenuViewController = {
         let settingMenuVC = ShowToolMenuViewController()
@@ -125,6 +127,9 @@ class ShowLiveViewController: UIViewController {
 //                    agoraKitManager.agoraKit.updateChannel(with: options)
                     self.muteLocalAudio = interaction.muteAudio
                 }
+            } else if role == .broadcaster {
+                //unmute if interaction did stop
+                self.muteLocalAudio = false
             }
             
             //update menu
@@ -144,12 +149,19 @@ class ShowLiveViewController: UIViewController {
             if currentInteraction == oldValue {
                 return
             }
+            
+            var toastTitle = ""
             if let info = oldValue {
                 _onStopInteraction(interaction: info)
+                toastTitle = info.interactStatus.toastTitle
             }
             if let info = currentInteraction {
                 _onStartInteraction(interaction: info)
+                return
             }
+            
+            ToastView.show(text: interruptInteractionReason ?? toastTitle)
+            interruptInteractionReason = nil
         }
     }
     
@@ -424,9 +436,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 }
             }
         }
-        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
-            ToastView.show(text: "连麦已断开哦".show_localized)
-        }
+//        if invitation.status == .ended, invitation.userId == VLUserCenter.user.id {
+//            ToastView.show(text: "连麦已断开哦".show_localized)
+//        }
     }
     
     func onMicSeatInvitationDeleted(invitation: ShowMicSeatInvitation) {
@@ -554,9 +566,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
-            
-            break
-            
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
@@ -567,7 +576,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
-            
         default:
             break
         }
@@ -603,7 +611,6 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         default:
             break
         }
-        ToastView.show(text: interaction.interactStatus.toastTitle)
     }
 }
 
@@ -702,6 +709,14 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
+    func onPKDidTimeout() {
+        guard let info = currentInteraction else { return }
+        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+        }
+        
+        interruptInteractionReason = "show_pk_end_timeout".show_localized
+    }
+    
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
         if role == .audience, info.userId != VLUserCenter.user.id {
