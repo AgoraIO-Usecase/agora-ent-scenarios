@@ -33,7 +33,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     AgoraMusicContentCenterEventDelegate,
     AgoraRtcEngineDelegate,
     AgoraLrcViewDelegate,
-    AgoraLrcDownloadDelegate
+    AgoraLrcDownloadDelegate,
+    AgoraAudioFrameDelegate
 >
 
 @property(nonatomic, weak)AgoraRtcEngineKit* engine;
@@ -73,6 +74,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         
         [[AppContext shared] registerEventDelegate:self];
         [[AppContext shared] registerPlayerEventDelegate:self];
+        
+        [engine setDirectExternalAudioSource:true];
+        [engine setRecordingAudioFrameParametersWithSampleRate:48000 channel:2 mode:0 samplesPerCall:960];
+        [engine setAudioFrameDelegate:self];
     }
     return self;
 }
@@ -82,6 +87,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [self cancelAsyncTasks];
     [[AppContext shared] unregisterEventDelegate:self];
     [[AppContext shared] unregisterPlayerEventDelegate:self];
+    [self.engine setAudioFrameDelegate:nil];
 }
 
 -(void)loadSong:(NSInteger)songCode withConfig:(nonnull KTVSongConfiguration *)config withCallback:(void (^ _Nullable)(NSInteger songCode, NSString* lyricUrl, KTVSingRole role, KTVLoadSongState state))block
@@ -322,6 +328,15 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     _lrcView = lrcView;
     lrcView.downloadDelegate = self;
     lrcView.delegate = self;
+}
+
+#pragma mark - AgoraAudioFrameDelegate
+- (BOOL)onRecordAudioFrame:(AgoraAudioFrame *)frame channelId:(NSString *)channelId
+{
+    if(self.subChorusConnection) {
+        [self.engine pushDirectAudioFrameRawData:frame.buffer samples:frame.channels*frame.samplesPerChannel sampleRate:frame.samplesPerSec channels:frame.channels];
+    }
+    return true;
 }
 
 #pragma mark - AgoraRtcMediaPlayerDelegate
