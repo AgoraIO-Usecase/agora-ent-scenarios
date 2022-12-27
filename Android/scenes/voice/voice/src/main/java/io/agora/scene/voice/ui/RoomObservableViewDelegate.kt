@@ -312,6 +312,7 @@ class RoomObservableViewDelegate constructor(
                     override fun onSuccess(data: VoiceMicInfoModel?) {
                         data?.let {
                             // 更新麦位
+                            isLocalAudioMute = it.micStatus == MicStatus.Normal
                             val newMicMap = mutableMapOf(it.micIndex to it)
                             dealMicDataMap(newMicMap)
                             updateViewByMicMap(newMicMap)
