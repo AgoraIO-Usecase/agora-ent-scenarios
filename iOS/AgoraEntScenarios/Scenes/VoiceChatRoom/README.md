@@ -1,4 +1,4 @@
-# 语聊房-iOS-中文
+# 语聊房
 # 1.项目介绍
 ## 1.1 概述
 **声动语聊**项目是声网语聊房场景的开源代码，开发者可以获取并添加到您的APP工程里，本源码会伴随声动语聊Demo同步更新，为了获取更多新的功能和更佳的音效，强烈推荐您下载最新代码集成。
@@ -6,10 +6,10 @@
 
 ### 场景功能代码根目录
 
-**iOS/Scenes/VoiceChatRoom**
+**iOS/AgoraEntScenarios/Scenes/VoiceChatRoom**
 
 ### 相关类restApi网络请求交互
-- 房间管理以及对语聊房内的基本交互请求和响应，例如麦位的变化、消息的变化、礼物收发、定向消息转发、成员变化等，通过[**ChatRoomServiceProtocol**](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_ios_merge/iOS/AgoraEntScenarios/Scenes/VoiceChatRoom/Service/ChatRoomServiceProtocol.swift)来定义协议，通过[**ChatRoomServiceImp**](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_ios_merge/iOS/AgoraEntScenarios/Scenes/VoiceChatRoom/Service/ChatRoomServiceImp.swift)来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+- 房间管理及语聊房内的交互请求和响应，如麦位变化、消息变化、礼物收发、定向消息转发、成员变化等，通过[**ChatRoomServiceProtocol**](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_ios_merge/iOS/AgoraEntScenarios/Scenes/VoiceChatRoom/Service/ChatRoomServiceProtocol.swift)来定义协议，通过[**ChatRoomServiceImp**](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_ios_merge/iOS/AgoraEntScenarios/Scenes/VoiceChatRoom/Service/ChatRoomServiceImp.swift)来实现，您可以通过自己实现的ServiceImp来一键替换，无需改动业务代码。
 
 ### 语聊房场景目前已涵盖以下功能，您可以参考注释按需从代码中调用：
 ### 房间管理：房间列表管理，创建房间
@@ -36,13 +36,13 @@
 
 # 3.快速开始
 
-- 在集成的同时，需要去声网合环信的官网注册好对应的账号，同时开通对应的权限从而快速开始你的体验
+- 在集成的同时，需要去声网合环信的官网注册好对应的账号
+- 将项目的iOS/AgoraEntScenarios/KeyCenter.swift.bak重命名为KeyCenter.swift
+- 在KeyCenter.swift文件中填写需要的声网的 appId 和 appCertificate 及环信的 IMAppKey, IMClientId 和 IMClientSecret
 - 然后pod install成功之后，打开项目即可开始您的体验
-- 在项目的keycenter.swift文件中。需要填写对应的账号和token
 ```
 AppId：声网appid
 Certificate：声网Certificate
-Token：默认为nil，这个会在服务端生成，可以忽略
 IMAppKey：环信appkey
 IMClientId：环信IMClientId
 IMClientSecret：环信IMClientSecret
@@ -54,7 +54,7 @@ IMClientSecret：环信IMClientSecret
 
 ## 4.1 如何获取声网和环信APPID：
 - 声网APPID申请：[https://www.agora.io/cn/](https://www.agora.io/cn/)
-- 环信APPID申请：[https://www.easemob.com/](https://www.easemob.com/)
+- 环信APPKey申请：[https://www.easemob.com/](https://www.easemob.com/)
 ## 4.2 语聊房中的弹幕组件使用的是哪家？是否可以自己选择供应商？
 声动语聊源码使用的是环信AgoraChat的IM和信令服务，您也可以使用自己的服务
 
