@@ -14,8 +14,13 @@ enum ShowLiveCanvasType {
     case joint_broadcasting // 连麦
 }
 
+protocol ShowCanvasViewDelegate: NSObjectProtocol {
+    func onClickRemoteCanvas()
+    func onPKDidTimeout()
+}
+
 class ShowCanvasView: UIView {
-    var onTapRemoteCanvasClosure: (() -> Void)?
+    weak var delegate: ShowCanvasViewDelegate?
     
     lazy var localView = UIView()
     lazy var remoteView: UIView = {
@@ -115,7 +120,13 @@ class ShowCanvasView: UIView {
                 remoteView.cornerRadius(0)
                 timer.scheduledSecondsTimer(withName: "pk", timeInterval: 1, queue: .main) { [weak self] _, duration in
                     guard let self = self else { return }
-                    self.timerView.setTitle("PK "+"".timeFormat(secounds: duration), for: .normal)
+                    var timeLeft = 120 - duration
+                    if timeLeft < 0 {
+                        self.timer.destoryAllTimer()
+                        self.delegate?.onPKDidTimeout()
+                        timeLeft = 0
+                    }
+                    self.timerView.setTitle("PK "+"".timeFormat(secounds: timeLeft), for: .normal)
                 }
                 
             case .joint_broadcasting:
@@ -221,6 +232,6 @@ class ShowCanvasView: UIView {
     
     @objc
     private func onTapRemoteButton() {
-        onTapRemoteCanvasClosure?()
+        delegate?.onClickRemoteCanvas()
     }
 }
