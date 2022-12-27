@@ -9,14 +9,16 @@
 
 ##### 1.2 功能介绍
 
+相关类restApi网络请求交互
+- 房间管理以及对语聊房内的基本交互请求和响应，例如麦位的变化、消息的变化、礼物收发、定向消息转发、成员变化等，通过VoiceServiceProtocol来定义协议，通过VoiceSyncManagerServiceImp来实现，您可以通过自己实现的其他ServiceImp来一键替换，无需改动业务代码。
+
 声动语聊目前已涵盖以下功能，您可以参考注释按需从代码中调用：
 
 - 房间管理：房间列表管理，创建房间：
-  - [协议路径](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt)
+  - 协议文件[VoiceSyncManagerServiceImp](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt)
 - 席位管理：踢人，麦位静音，麦位锁定：
   - 麦位管理相关功能主要依托于组件[Room2DMicLayout](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/mic/Room2DMicLayout.kt)
   - 管理房间头部以及麦位置数据变化代理，支持麦位的上下麦，换麦，静音/解除静音，锁麦/解锁，麦位的单个刷新，音量更新等麦位功能参考：[RoomObservableViewDelegate](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/RoomObservableViewDelegate.kt)
-  - 整体操作逻辑请参考 [VoiceSyncManagerServiceImp](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/service/VoiceSyncManagerServiceImp.kt) 协议文件
 - 互动：弹幕，打赏：
   - IM相关的弹幕和打赏请参考[ChatroomGiftView](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/gift/ChatroomGiftView.java) 和 [ChatroomMessagesView](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/blob/feat/scene/voicechat_android/Android/scenes/voice/voice/src/main/java/io/agora/scene/voice/ui/widget/barrage/ChatroomMessagesView.java)
   - 当前使用的环信IM SDK 1.0.8 版本
