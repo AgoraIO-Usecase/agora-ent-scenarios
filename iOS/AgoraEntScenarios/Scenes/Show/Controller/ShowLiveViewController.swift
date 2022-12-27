@@ -127,6 +127,9 @@ class ShowLiveViewController: UIViewController {
 //                    agoraKitManager.agoraKit.updateChannel(with: options)
                     self.muteLocalAudio = interaction.muteAudio
                 }
+            } else if role == .broadcaster {
+                //unmute if interaction did stop
+                self.muteLocalAudio = false
             }
             
             //update menu
