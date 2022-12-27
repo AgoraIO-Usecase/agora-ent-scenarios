@@ -7,10 +7,9 @@
 
 import UIKit
 
-protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate {
+protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate, ShowCanvasViewDelegate {
     func onClickSendMsgButton(text: String)
     func onClickCloseButton()
-    func onClickRemoteCanvas()
 }
 
 class ShowRoomLiveView: UIView {
@@ -34,13 +33,11 @@ class ShowRoomLiveView: UIView {
     weak var delegate: ShowRoomLiveViewDelegate? {
         didSet{
             bottomBar.delegate = delegate
+            canvasView.delegate = delegate
         }
     }
     lazy var canvasView: ShowCanvasView = {
         let view = ShowCanvasView()
-        view.onTapRemoteCanvasClosure = { [weak self] in
-            self?.delegate?.onClickRemoteCanvas()
-        }
         return view
     }()
     

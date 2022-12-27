@@ -18,6 +18,8 @@ class ShowLiveViewController: UIViewController {
     
     var audiencePresetType: ShowPresetType?
     
+    private var interruptInteractionReason: String?
+    
     //TODO: remove
     private lazy var settingMenuVC: ShowToolMenuViewController = {
         let settingMenuVC = ShowToolMenuViewController()
@@ -155,7 +157,8 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             
-            ToastView.show(text: toastTitle)
+            ToastView.show(text: interruptInteractionReason ?? toastTitle)
+            interruptInteractionReason = nil
         }
     }
     
@@ -707,6 +710,14 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
 
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
+    func onPKDidTimeout() {
+        guard let info = currentInteraction else { return }
+        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+        }
+        
+        interruptInteractionReason = "show_pk_end_timeout".show_localized
+    }
+    
     func onClickRemoteCanvas() {
         guard let info = currentInteraction else { return }
         if role == .audience, info.userId != VLUserCenter.user.id {
