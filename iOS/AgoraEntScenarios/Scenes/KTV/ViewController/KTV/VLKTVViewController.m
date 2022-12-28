@@ -13,7 +13,6 @@
 #import "VLOnLineListVC.h"
 
 #import "VLKTVSettingView.h"
-#import "YGViewDisplayer.h"
 //model
 #import "VLSongItmModel.h"
 #import "VLRoomListModel.h"
@@ -388,17 +387,10 @@ KTVApiDelegate
 }
 
 - (void)showSettingView {
-    [YGViewDisplayer popupBottom:self.settingView setupBlock:^(YGViewDisplayOptions * _Nonnull options) {
-        options.screenInteraction = YGViewDisplayOptionsUserInteractionDismiss;
-        options.safeArea = YGViewDisplayOptionsSafeAreaOverridden;
-        options.backgroundColor = [UIColor clearColor];
-        options.screenBackgroundColor = [UIColor colorWithWhite:0 alpha:0.5];
-    }];
-}
-
-- (void)dismissSettingView {
-    [YGViewDisplayer dismiss:self.settingView completionHandler:^{
-    }];
+    LSTPopView* popView = [LSTPopView popSettingViewWithParentView:self.view
+                                                      withDelegate:self];
+    
+    self.settingView = (VLKTVSettingView*)popView.currCustomView;
 }
 
 - (void)showScoreViewWithScore:(int)score
@@ -1290,6 +1282,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setIsEarOn:(BOOL)isEarOn {
     _isEarOn = isEarOn;
     [self _checkInEarMonitoring];
+    NSAssert(self.settingView != nil, @"self.settingView == nil");
     [self.settingView setIsEarOn:isEarOn];
 }
 
@@ -1346,17 +1339,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setCurrentVoicePitch:(double)currentVoicePitch {
     [self.MVView setVoicePitch:@[@(currentVoicePitch)]];
-}
-
-#pragma mark - lazy getter
-- (VLKTVSettingView *)settingView {
-    if (!_settingView) {
-        _settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
-        _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
-        [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
-        _settingView.delegate = self;
-    }
-    return _settingView;
 }
 
 @end

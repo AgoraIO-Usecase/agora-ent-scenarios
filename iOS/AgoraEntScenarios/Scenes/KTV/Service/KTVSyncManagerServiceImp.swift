@@ -7,7 +7,7 @@
 
 import Foundation
 import YYCategories
-import MBProgressHUD
+import SVProgressHUD
 
 private let kSceneId = "scene_ktv"
 
@@ -35,17 +35,11 @@ private func agoraPrint(_ message: String) {
 }
 
 private func _showLoadingIfNeed() {
-    guard let window = UIApplication.shared.delegate?.window as? UIWindow else {
-        return
-    }
-    MBProgressHUD.showAdded(to: window, animated: true)
+    SVProgressHUD.show()
 }
 
 private func _hideLoadingIfNeed() {
-    guard let window = UIApplication.shared.delegate?.window as? UIWindow else {
-        return
-    }
-    MBProgressHUD.hide(for: window, animated: true)
+    SVProgressHUD.dismiss()
 }
 
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
