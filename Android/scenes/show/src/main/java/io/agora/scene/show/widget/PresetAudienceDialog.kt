@@ -80,35 +80,41 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
     }
 
     private fun onPresetShowModeSelected(level: Int) {
-        var selectedLevel = level
+        val selectedLevel = level
         if (selectedLevel < 0) {
             // 没有选择默认使用低端机配置
-            selectedLevel = 3
+            return
         }
         when (selectedLevel) {
             // 低端机：画质增强
             0 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low)
             }
             // 中端机：画质增强
             1 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1_5)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium)
             }
             // 高端机：画质增强
             2 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_2)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High)
             }
             // 低端机：基础
             3 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low)
             }
             // 中端机：基础
             4 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium)
             }
             // 高端机：基础
             5 -> {
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High)
             }
         }
 
