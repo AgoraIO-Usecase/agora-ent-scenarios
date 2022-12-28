@@ -4,7 +4,7 @@
 //
 
 #import "VLCreateRoomView.h"
-#import "TXLimitedTextField.h"
+//#import "TXLimitedTextField.h"
 #import "CRLineView.h"
 #import "CRSecrectImageView.h"
 #import "VLAddRoomModel.h"
@@ -18,7 +18,7 @@
 @interface VLCreateRoomView ()
 
 @property(nonatomic, weak) id <VLCreateRoomViewDelegate>delegate;
-@property (nonatomic, strong) TXLimitedTextField *inputTF;
+@property (nonatomic, strong) UITextField *inputTF;
 @property (nonatomic, strong) UIView *screatView;
 @property (nonatomic, strong) UIImageView *iconImgView;
 @property(nonatomic, strong) CRBoxInputView *boxInputView;
@@ -78,7 +78,7 @@
     inputBgView.backgroundColor = UIColorMakeWithHex(@"#FFFFFF");
     [self addSubview:inputBgView];
 
-    self.inputTF = [[TXLimitedTextField alloc] initWithFrame:CGRectMake(30, 9, inputBgView.width-60, 30)];
+    self.inputTF = [[UITextField alloc] initWithFrame:CGRectMake(30, 9, inputBgView.width - 60, 30)];
     self.inputTF.textColor = UIColorMakeWithHex(@"#040925");
     self.inputTF.font = UIFontBoldMake(18);
     self.inputTF.clearButtonMode = UITextFieldViewModeWhileEditing;

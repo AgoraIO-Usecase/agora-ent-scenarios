@@ -181,6 +181,7 @@ extension VoiceRoomViewController {
                 self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
+                self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
             }
         })
     }

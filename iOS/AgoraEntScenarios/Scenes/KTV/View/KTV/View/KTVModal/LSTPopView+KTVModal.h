@@ -14,6 +14,7 @@
 #import "VLBadNetWorkView.h"
 #import "VLPopSongList.h"
 #import "VLSoundEffectView.h"
+#import "VLKTVSettingView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 //网络差视图
 + (LSTPopView*)popBadNetWrokTipViewWithParentView:(UIView*)parentView
                                      withDelegate:(id<VLBadNetWorkViewDelegate>)delegate;
+
+
+//控制台
++ (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
 @end
 
 NS_ASSUME_NONNULL_END
