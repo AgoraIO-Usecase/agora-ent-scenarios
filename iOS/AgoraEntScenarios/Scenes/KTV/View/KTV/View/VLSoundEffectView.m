@@ -4,7 +4,7 @@
 //
 
 #import "VLsoundEffectView.h"
-#import "ZQTCustomSwitch.h"
+//#import "ZQTCustomSwitch.h"
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
 #import "LSTPopView+KTVModal.h"
@@ -14,7 +14,7 @@
 @interface VLSoundEffectView ()
 
 @property(nonatomic, weak) id <VLsoundEffectViewDelegate>delegate;
-@property (nonatomic, strong) ZQTCustomSwitch *openSwitch;
+@property (nonatomic, strong) UISwitch *openSwitch;
 @property (nonatomic, strong) UIImageView *rotateImgView;
 @property (nonatomic, strong) UILabel *heFengLabel;
 @property (nonatomic, strong) UIView  *heFengView;
@@ -64,11 +64,14 @@
     electronicLabel.textColor = UIColorMakeWithHex(@"#C6C4DE");
     [self addSubview:electronicLabel];
     
-    self.openSwitch = [[ZQTCustomSwitch alloc]initWithFrame:CGRectMake(electronicLabel.right+20,electronicLabel.centerY-13, 46, 26)
-                                                    onColor:UIColorMakeWithHex(@"#219BFF")
-                                                   offColor:UIColorMakeWithHex(@"#DDDDDD")
-                                                       font:[UIFont systemFontOfSize:9]
-                                                   ballSize:22];
+//    self.openSwitch = [[ZQTCustomSwitch alloc]initWithFrame:CGRectMake(electronicLabel.right+20,electronicLabel.centerY-13, 46, 26)
+//                                                    onColor:UIColorMakeWithHex(@"#219BFF")
+//                                                   offColor:UIColorMakeWithHex(@"#DDDDDD")
+//                                                       font:[UIFont systemFontOfSize:9]
+//                                                   ballSize:22];
+    self.openSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(electronicLabel.right+20,electronicLabel.centerY-13, 46, 26)];
+    self.openSwitch.tintColor = UIColorMakeWithHex(@"#DDDDDD");
+    self.openSwitch.onTintColor = UIColorMakeWithHex(@"#219BFF");
     [self.openSwitch addTarget:self action:@selector(switchPressed:) forControlEvents:UIControlEventValueChanged];
     [self addSubview:self.openSwitch];
     
@@ -153,7 +156,7 @@
 }
 
 
-- (void)switchPressed:(ZQTCustomSwitch *)sender {
+- (void)switchPressed:(UISwitch *)sender {
     if(!self.openSwitch.isOn) {
         [self closeEffect];
     }
