@@ -330,76 +330,6 @@
 		DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997628FFE579009D3E61 /* Models.swift */; };
 		DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997728FFE579009D3E61 /* SyncError.swift */; };
 		DDA19A2628FFE57A009D3E61 /* AgoraSyncManager.podspec in Resources */ = {isa = PBXBuildFile; fileRef = DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */; };
-		DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998B28FFE579009D3E61 /* EKRootViewController.swift */; };
-		DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998C28FFE579009D3E61 /* EKEntryView.swift */; };
-		DDA19A2E28FFE57A009D3E61 /* EKWindowProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998D28FFE579009D3E61 /* EKWindowProvider.swift */; };
-		DDA19A2F28FFE57A009D3E61 /* EKWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998E28FFE579009D3E61 /* EKWindow.swift */; };
-		DDA19A3028FFE57A009D3E61 /* EntryCachingHeuristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998F28FFE579009D3E61 /* EntryCachingHeuristic.swift */; };
-		DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999028FFE579009D3E61 /* EKBackgroundView.swift */; };
-		DDA19A3228FFE57A009D3E61 /* EKWrapperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999128FFE579009D3E61 /* EKWrapperView.swift */; };
-		DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999228FFE579009D3E61 /* EKContentView.swift */; };
-		DDA19A3428FFE57A009D3E61 /* EKStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999328FFE579009D3E61 /* EKStyleView.swift */; };
-		DDA19A3528FFE57A009D3E61 /* UIView+Responder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999528FFE579009D3E61 /* UIView+Responder.swift */; };
-		DDA19A3628FFE57A009D3E61 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999628FFE579009D3E61 /* GradientView.swift */; };
-		DDA19A3728FFE57A009D3E61 /* HapticFeedbackGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999728FFE579009D3E61 /* HapticFeedbackGenerator.swift */; };
-		DDA19A3828FFE57A009D3E61 /* UIView+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999928FFE579009D3E61 /* UIView+Utils.swift */; };
-		DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999A28FFE579009D3E61 /* UIColor+Utils.swift */; };
-		DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999B28FFE579009D3E61 /* UIApplication+EKAppearance.swift */; };
-		DDA19A3B28FFE57A009D3E61 /* UIRectCorner+Short.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999C28FFE579009D3E61 /* UIRectCorner+Short.swift */; };
-		DDA19A3C28FFE57A009D3E61 /* UIView+QuickLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999E28FFE579009D3E61 /* UIView+QuickLayout.swift */; };
-		DDA19A3D28FFE57A009D3E61 /* UIViewArray+QuickLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1999F28FFE579009D3E61 /* UIViewArray+QuickLayout.swift */; };
-		DDA19A3E28FFE57A009D3E61 /* UIView+QLContentWrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A028FFE579009D3E61 /* UIView+QLContentWrap.swift */; };
-		DDA19A3F28FFE57A009D3E61 /* QLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A128FFE579009D3E61 /* QLUtils.swift */; };
-		DDA19A4028FFE57A009D3E61 /* QLCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A228FFE579009D3E61 /* QLCompatibility.swift */; };
-		DDA19A4128FFE57A009D3E61 /* UIEdgeInsets+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A328FFE579009D3E61 /* UIEdgeInsets+Utils.swift */; };
-		DDA19A4228FFE57A009D3E61 /* UIView+Shadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A428FFE579009D3E61 /* UIView+Shadow.swift */; };
-		DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A528FFE579009D3E61 /* SwiftEntryKit.swift */; };
-		DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A728FFE579009D3E61 /* EKProperty.swift */; };
-		DDA19A4528FFE57A009D3E61 /* EKColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199A828FFE579009D3E61 /* EKColor.swift */; };
-		DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AA28FFE579009D3E61 /* EKAttributes+Shadow.swift */; };
-		DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AB28FFE579009D3E61 /* EKAttributes+Position.swift */; };
-		DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AC28FFE579009D3E61 /* EKAttributes.swift */; };
-		DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AD28FFE579009D3E61 /* EKAttributes+UserInteraction.swift */; };
-		DDA19A4A28FFE57A009D3E61 /* EKAttributes+Duration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AE28FFE579009D3E61 /* EKAttributes+Duration.swift */; };
-		DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199AF28FFE579009D3E61 /* EKAttributes+DisplayMode.swift */; };
-		DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B028FFE579009D3E61 /* EKAttributes+Validations.swift */; };
-		DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B128FFE579009D3E61 /* EKAttributes+StatusBar.swift */; };
-		DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B228FFE579009D3E61 /* EKAttributes+PopBehavior.swift */; };
-		DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B328FFE579009D3E61 /* EKAttributes+Animation.swift */; };
-		DDA19A5028FFE57A009D3E61 /* EKAttributes+PositionConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B428FFE579009D3E61 /* EKAttributes+PositionConstraints.swift */; };
-		DDA19A5128FFE57A009D3E61 /* EKAttributes+Scroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B528FFE579009D3E61 /* EKAttributes+Scroll.swift */; };
-		DDA19A5228FFE57A009D3E61 /* EKAttributes+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B628FFE579009D3E61 /* EKAttributes+Presets.swift */; };
-		DDA19A5328FFE57A009D3E61 /* EKAttributes+WindowLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B728FFE579009D3E61 /* EKAttributes+WindowLevel.swift */; };
-		DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B828FFE579009D3E61 /* EKAttributes+BackgroundStyle.swift */; };
-		DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199B928FFE579009D3E61 /* EKAttributes+Precedence.swift */; };
-		DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BA28FFE579009D3E61 /* EKAttributes+HapticFeedback.swift */; };
-		DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BB28FFE579009D3E61 /* EKAttributes+LifecycleActions.swift */; };
-		DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BC28FFE579009D3E61 /* EKAttributes+FrameStyle.swift */; };
-		DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BD28FFE579009D3E61 /* EKSimpleMessage.swift */; };
-		DDA19A5A28FFE57A009D3E61 /* EKPopUpMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BE28FFE579009D3E61 /* EKPopUpMessage.swift */; };
-		DDA19A5B28FFE57A009D3E61 /* EKAlertMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199BF28FFE579009D3E61 /* EKAlertMessage.swift */; };
-		DDA19A5C28FFE57A009D3E61 /* EKRatingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C028FFE579009D3E61 /* EKRatingMessage.swift */; };
-		DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C128FFE579009D3E61 /* EKNotificationMessage.swift */; };
-		DDA19A5E28FFE57A009D3E61 /* EKRatingMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C328FFE579009D3E61 /* EKRatingMessageView.swift */; };
-		DDA19A5F28FFE57A009D3E61 /* EKNotificationMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C428FFE579009D3E61 /* EKNotificationMessageView.swift */; };
-		DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C528FFE579009D3E61 /* EKAlertMessageView.swift */; };
-		DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C628FFE579009D3E61 /* EKSimpleMessageView.swift */; };
-		DDA19A6228FFE57A009D3E61 /* EKImageNoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C828FFE579009D3E61 /* EKImageNoteMessageView.swift */; };
-		DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199C928FFE579009D3E61 /* EKNoteMessageView.swift */; };
-		DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199CA28FFE579009D3E61 /* EKXStatusBarMessageView.swift */; };
-		DDA19A6528FFE57A009D3E61 /* EKAccessoryNoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199CB28FFE579009D3E61 /* EKAccessoryNoteMessageView.swift */; };
-		DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199CC28FFE579009D3E61 /* EKProcessingNoteMessageView.swift */; };
-		DDA19A6728FFE57A009D3E61 /* EKFormMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199CD28FFE579009D3E61 /* EKFormMessageView.swift */; };
-		DDA19A6828FFE57A009D3E61 /* EKTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199CF28FFE579009D3E61 /* EKTextField.swift */; };
-		DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D028FFE579009D3E61 /* EKRatingSymbolView.swift */; };
-		DDA19A6A28FFE57A009D3E61 /* EKButtonBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D128FFE579009D3E61 /* EKButtonBarView.swift */; };
-		DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D228FFE579009D3E61 /* EKButtonView.swift */; };
-		DDA19A6C28FFE57A009D3E61 /* EKRatingSymbolsContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D328FFE579009D3E61 /* EKRatingSymbolsContainerView.swift */; };
-		DDA19A6D28FFE57A009D3E61 /* EntryAppearanceDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D428FFE579009D3E61 /* EntryAppearanceDescriptor.swift */; };
-		DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D528FFE579009D3E61 /* EKPopUpMessageView.swift */; };
-		DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D628FFE579009D3E61 /* EKMessageContentView.swift */; };
-		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
-		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
@@ -878,77 +808,6 @@
 		DDA1997628FFE579009D3E61 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		DDA1997728FFE579009D3E61 /* SyncError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncError.swift; sourceTree = "<group>"; };
 		DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManager.podspec; sourceTree = "<group>"; };
-		DDA1998B28FFE579009D3E61 /* EKRootViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRootViewController.swift; sourceTree = "<group>"; };
-		DDA1998C28FFE579009D3E61 /* EKEntryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKEntryView.swift; sourceTree = "<group>"; };
-		DDA1998D28FFE579009D3E61 /* EKWindowProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKWindowProvider.swift; sourceTree = "<group>"; };
-		DDA1998E28FFE579009D3E61 /* EKWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKWindow.swift; sourceTree = "<group>"; };
-		DDA1998F28FFE579009D3E61 /* EntryCachingHeuristic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryCachingHeuristic.swift; sourceTree = "<group>"; };
-		DDA1999028FFE579009D3E61 /* EKBackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKBackgroundView.swift; sourceTree = "<group>"; };
-		DDA1999128FFE579009D3E61 /* EKWrapperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKWrapperView.swift; sourceTree = "<group>"; };
-		DDA1999228FFE579009D3E61 /* EKContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKContentView.swift; sourceTree = "<group>"; };
-		DDA1999328FFE579009D3E61 /* EKStyleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKStyleView.swift; sourceTree = "<group>"; };
-		DDA1999528FFE579009D3E61 /* UIView+Responder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Responder.swift"; sourceTree = "<group>"; };
-		DDA1999628FFE579009D3E61 /* GradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
-		DDA1999728FFE579009D3E61 /* HapticFeedbackGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HapticFeedbackGenerator.swift; sourceTree = "<group>"; };
-		DDA1999928FFE579009D3E61 /* UIView+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Utils.swift"; sourceTree = "<group>"; };
-		DDA1999A28FFE579009D3E61 /* UIColor+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Utils.swift"; sourceTree = "<group>"; };
-		DDA1999B28FFE579009D3E61 /* UIApplication+EKAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIApplication+EKAppearance.swift"; sourceTree = "<group>"; };
-		DDA1999C28FFE579009D3E61 /* UIRectCorner+Short.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIRectCorner+Short.swift"; sourceTree = "<group>"; };
-		DDA1999E28FFE579009D3E61 /* UIView+QuickLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+QuickLayout.swift"; sourceTree = "<group>"; };
-		DDA1999F28FFE579009D3E61 /* UIViewArray+QuickLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewArray+QuickLayout.swift"; sourceTree = "<group>"; };
-		DDA199A028FFE579009D3E61 /* UIView+QLContentWrap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+QLContentWrap.swift"; sourceTree = "<group>"; };
-		DDA199A128FFE579009D3E61 /* QLUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QLUtils.swift; sourceTree = "<group>"; };
-		DDA199A228FFE579009D3E61 /* QLCompatibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QLCompatibility.swift; sourceTree = "<group>"; };
-		DDA199A328FFE579009D3E61 /* UIEdgeInsets+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Utils.swift"; sourceTree = "<group>"; };
-		DDA199A428FFE579009D3E61 /* UIView+Shadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Shadow.swift"; sourceTree = "<group>"; };
-		DDA199A528FFE579009D3E61 /* SwiftEntryKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftEntryKit.swift; sourceTree = "<group>"; };
-		DDA199A728FFE579009D3E61 /* EKProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKProperty.swift; sourceTree = "<group>"; };
-		DDA199A828FFE579009D3E61 /* EKColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKColor.swift; sourceTree = "<group>"; };
-		DDA199AA28FFE579009D3E61 /* EKAttributes+Shadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Shadow.swift"; sourceTree = "<group>"; };
-		DDA199AB28FFE579009D3E61 /* EKAttributes+Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Position.swift"; sourceTree = "<group>"; };
-		DDA199AC28FFE579009D3E61 /* EKAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKAttributes.swift; sourceTree = "<group>"; };
-		DDA199AD28FFE579009D3E61 /* EKAttributes+UserInteraction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+UserInteraction.swift"; sourceTree = "<group>"; };
-		DDA199AE28FFE579009D3E61 /* EKAttributes+Duration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Duration.swift"; sourceTree = "<group>"; };
-		DDA199AF28FFE579009D3E61 /* EKAttributes+DisplayMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+DisplayMode.swift"; sourceTree = "<group>"; };
-		DDA199B028FFE579009D3E61 /* EKAttributes+Validations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Validations.swift"; sourceTree = "<group>"; };
-		DDA199B128FFE579009D3E61 /* EKAttributes+StatusBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+StatusBar.swift"; sourceTree = "<group>"; };
-		DDA199B228FFE579009D3E61 /* EKAttributes+PopBehavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+PopBehavior.swift"; sourceTree = "<group>"; };
-		DDA199B328FFE579009D3E61 /* EKAttributes+Animation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Animation.swift"; sourceTree = "<group>"; };
-		DDA199B428FFE579009D3E61 /* EKAttributes+PositionConstraints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+PositionConstraints.swift"; sourceTree = "<group>"; };
-		DDA199B528FFE579009D3E61 /* EKAttributes+Scroll.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Scroll.swift"; sourceTree = "<group>"; };
-		DDA199B628FFE579009D3E61 /* EKAttributes+Presets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Presets.swift"; sourceTree = "<group>"; };
-		DDA199B728FFE579009D3E61 /* EKAttributes+WindowLevel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+WindowLevel.swift"; sourceTree = "<group>"; };
-		DDA199B828FFE579009D3E61 /* EKAttributes+BackgroundStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+BackgroundStyle.swift"; sourceTree = "<group>"; };
-		DDA199B928FFE579009D3E61 /* EKAttributes+Precedence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+Precedence.swift"; sourceTree = "<group>"; };
-		DDA199BA28FFE579009D3E61 /* EKAttributes+HapticFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+HapticFeedback.swift"; sourceTree = "<group>"; };
-		DDA199BB28FFE579009D3E61 /* EKAttributes+LifecycleActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+LifecycleActions.swift"; sourceTree = "<group>"; };
-		DDA199BC28FFE579009D3E61 /* EKAttributes+FrameStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EKAttributes+FrameStyle.swift"; sourceTree = "<group>"; };
-		DDA199BD28FFE579009D3E61 /* EKSimpleMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSimpleMessage.swift; sourceTree = "<group>"; };
-		DDA199BE28FFE579009D3E61 /* EKPopUpMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKPopUpMessage.swift; sourceTree = "<group>"; };
-		DDA199BF28FFE579009D3E61 /* EKAlertMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKAlertMessage.swift; sourceTree = "<group>"; };
-		DDA199C028FFE579009D3E61 /* EKRatingMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRatingMessage.swift; sourceTree = "<group>"; };
-		DDA199C128FFE579009D3E61 /* EKNotificationMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKNotificationMessage.swift; sourceTree = "<group>"; };
-		DDA199C328FFE579009D3E61 /* EKRatingMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRatingMessageView.swift; sourceTree = "<group>"; };
-		DDA199C428FFE579009D3E61 /* EKNotificationMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKNotificationMessageView.swift; sourceTree = "<group>"; };
-		DDA199C528FFE579009D3E61 /* EKAlertMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKAlertMessageView.swift; sourceTree = "<group>"; };
-		DDA199C628FFE579009D3E61 /* EKSimpleMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKSimpleMessageView.swift; sourceTree = "<group>"; };
-		DDA199C828FFE579009D3E61 /* EKImageNoteMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKImageNoteMessageView.swift; sourceTree = "<group>"; };
-		DDA199C928FFE579009D3E61 /* EKNoteMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKNoteMessageView.swift; sourceTree = "<group>"; };
-		DDA199CA28FFE579009D3E61 /* EKXStatusBarMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKXStatusBarMessageView.swift; sourceTree = "<group>"; };
-		DDA199CB28FFE579009D3E61 /* EKAccessoryNoteMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKAccessoryNoteMessageView.swift; sourceTree = "<group>"; };
-		DDA199CC28FFE579009D3E61 /* EKProcessingNoteMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKProcessingNoteMessageView.swift; sourceTree = "<group>"; };
-		DDA199CD28FFE579009D3E61 /* EKFormMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKFormMessageView.swift; sourceTree = "<group>"; };
-		DDA199CF28FFE579009D3E61 /* EKTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKTextField.swift; sourceTree = "<group>"; };
-		DDA199D028FFE579009D3E61 /* EKRatingSymbolView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRatingSymbolView.swift; sourceTree = "<group>"; };
-		DDA199D128FFE579009D3E61 /* EKButtonBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKButtonBarView.swift; sourceTree = "<group>"; };
-		DDA199D228FFE579009D3E61 /* EKButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKButtonView.swift; sourceTree = "<group>"; };
-		DDA199D328FFE579009D3E61 /* EKRatingSymbolsContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKRatingSymbolsContainerView.swift; sourceTree = "<group>"; };
-		DDA199D428FFE579009D3E61 /* EntryAppearanceDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryAppearanceDescriptor.swift; sourceTree = "<group>"; };
-		DDA199D528FFE579009D3E61 /* EKPopUpMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKPopUpMessageView.swift; sourceTree = "<group>"; };
-		DDA199D628FFE579009D3E61 /* EKMessageContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EKMessageContentView.swift; sourceTree = "<group>"; };
-		DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YGViewDisplayer.m; sourceTree = "<group>"; };
-		DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _swiftYGViewDisplayer.swift; sourceTree = "<group>"; };
-		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -2297,167 +2156,8 @@
 			isa = PBXGroup;
 			children = (
 				DD220BC2295B48FD00F57F30 /* QMUI */,
-				DDA1998828FFE579009D3E61 /* Displayer */,
 			);
 			path = ThirdParty;
-			sourceTree = "<group>";
-		};
-		DDA1998828FFE579009D3E61 /* Displayer */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1998928FFE579009D3E61 /* SwiftEntryKit */,
-				DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */,
-				DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */,
-				DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */,
-			);
-			path = Displayer;
-			sourceTree = "<group>";
-		};
-		DDA1998928FFE579009D3E61 /* SwiftEntryKit */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1998A28FFE579009D3E61 /* Infra */,
-				DDA1999428FFE579009D3E61 /* Utils */,
-				DDA1999828FFE579009D3E61 /* Extensions */,
-				DDA199A528FFE579009D3E61 /* SwiftEntryKit.swift */,
-				DDA199A628FFE579009D3E61 /* Model */,
-				DDA199C228FFE579009D3E61 /* MessageViews */,
-			);
-			path = SwiftEntryKit;
-			sourceTree = "<group>";
-		};
-		DDA1998A28FFE579009D3E61 /* Infra */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1998B28FFE579009D3E61 /* EKRootViewController.swift */,
-				DDA1998C28FFE579009D3E61 /* EKEntryView.swift */,
-				DDA1998D28FFE579009D3E61 /* EKWindowProvider.swift */,
-				DDA1998E28FFE579009D3E61 /* EKWindow.swift */,
-				DDA1998F28FFE579009D3E61 /* EntryCachingHeuristic.swift */,
-				DDA1999028FFE579009D3E61 /* EKBackgroundView.swift */,
-				DDA1999128FFE579009D3E61 /* EKWrapperView.swift */,
-				DDA1999228FFE579009D3E61 /* EKContentView.swift */,
-				DDA1999328FFE579009D3E61 /* EKStyleView.swift */,
-			);
-			path = Infra;
-			sourceTree = "<group>";
-		};
-		DDA1999428FFE579009D3E61 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1999528FFE579009D3E61 /* UIView+Responder.swift */,
-				DDA1999628FFE579009D3E61 /* GradientView.swift */,
-				DDA1999728FFE579009D3E61 /* HapticFeedbackGenerator.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		DDA1999828FFE579009D3E61 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1999928FFE579009D3E61 /* UIView+Utils.swift */,
-				DDA1999A28FFE579009D3E61 /* UIColor+Utils.swift */,
-				DDA1999B28FFE579009D3E61 /* UIApplication+EKAppearance.swift */,
-				DDA1999C28FFE579009D3E61 /* UIRectCorner+Short.swift */,
-				DDA1999D28FFE579009D3E61 /* QuickLayout */,
-				DDA199A328FFE579009D3E61 /* UIEdgeInsets+Utils.swift */,
-				DDA199A428FFE579009D3E61 /* UIView+Shadow.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		DDA1999D28FFE579009D3E61 /* QuickLayout */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1999E28FFE579009D3E61 /* UIView+QuickLayout.swift */,
-				DDA1999F28FFE579009D3E61 /* UIViewArray+QuickLayout.swift */,
-				DDA199A028FFE579009D3E61 /* UIView+QLContentWrap.swift */,
-				DDA199A128FFE579009D3E61 /* QLUtils.swift */,
-				DDA199A228FFE579009D3E61 /* QLCompatibility.swift */,
-			);
-			path = QuickLayout;
-			sourceTree = "<group>";
-		};
-		DDA199A628FFE579009D3E61 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199A728FFE579009D3E61 /* EKProperty.swift */,
-				DDA199A828FFE579009D3E61 /* EKColor.swift */,
-				DDA199A928FFE579009D3E61 /* EntryAttributes */,
-				DDA199BD28FFE579009D3E61 /* EKSimpleMessage.swift */,
-				DDA199BE28FFE579009D3E61 /* EKPopUpMessage.swift */,
-				DDA199BF28FFE579009D3E61 /* EKAlertMessage.swift */,
-				DDA199C028FFE579009D3E61 /* EKRatingMessage.swift */,
-				DDA199C128FFE579009D3E61 /* EKNotificationMessage.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		DDA199A928FFE579009D3E61 /* EntryAttributes */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199AA28FFE579009D3E61 /* EKAttributes+Shadow.swift */,
-				DDA199AB28FFE579009D3E61 /* EKAttributes+Position.swift */,
-				DDA199AC28FFE579009D3E61 /* EKAttributes.swift */,
-				DDA199AD28FFE579009D3E61 /* EKAttributes+UserInteraction.swift */,
-				DDA199AE28FFE579009D3E61 /* EKAttributes+Duration.swift */,
-				DDA199AF28FFE579009D3E61 /* EKAttributes+DisplayMode.swift */,
-				DDA199B028FFE579009D3E61 /* EKAttributes+Validations.swift */,
-				DDA199B128FFE579009D3E61 /* EKAttributes+StatusBar.swift */,
-				DDA199B228FFE579009D3E61 /* EKAttributes+PopBehavior.swift */,
-				DDA199B328FFE579009D3E61 /* EKAttributes+Animation.swift */,
-				DDA199B428FFE579009D3E61 /* EKAttributes+PositionConstraints.swift */,
-				DDA199B528FFE579009D3E61 /* EKAttributes+Scroll.swift */,
-				DDA199B628FFE579009D3E61 /* EKAttributes+Presets.swift */,
-				DDA199B728FFE579009D3E61 /* EKAttributes+WindowLevel.swift */,
-				DDA199B828FFE579009D3E61 /* EKAttributes+BackgroundStyle.swift */,
-				DDA199B928FFE579009D3E61 /* EKAttributes+Precedence.swift */,
-				DDA199BA28FFE579009D3E61 /* EKAttributes+HapticFeedback.swift */,
-				DDA199BB28FFE579009D3E61 /* EKAttributes+LifecycleActions.swift */,
-				DDA199BC28FFE579009D3E61 /* EKAttributes+FrameStyle.swift */,
-			);
-			path = EntryAttributes;
-			sourceTree = "<group>";
-		};
-		DDA199C228FFE579009D3E61 /* MessageViews */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199C328FFE579009D3E61 /* EKRatingMessageView.swift */,
-				DDA199C428FFE579009D3E61 /* EKNotificationMessageView.swift */,
-				DDA199C528FFE579009D3E61 /* EKAlertMessageView.swift */,
-				DDA199C628FFE579009D3E61 /* EKSimpleMessageView.swift */,
-				DDA199C728FFE579009D3E61 /* Notes */,
-				DDA199CD28FFE579009D3E61 /* EKFormMessageView.swift */,
-				DDA199CE28FFE579009D3E61 /* MessagesUtils */,
-				DDA199D528FFE579009D3E61 /* EKPopUpMessageView.swift */,
-				DDA199D628FFE579009D3E61 /* EKMessageContentView.swift */,
-			);
-			path = MessageViews;
-			sourceTree = "<group>";
-		};
-		DDA199C728FFE579009D3E61 /* Notes */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199C828FFE579009D3E61 /* EKImageNoteMessageView.swift */,
-				DDA199C928FFE579009D3E61 /* EKNoteMessageView.swift */,
-				DDA199CA28FFE579009D3E61 /* EKXStatusBarMessageView.swift */,
-				DDA199CB28FFE579009D3E61 /* EKAccessoryNoteMessageView.swift */,
-				DDA199CC28FFE579009D3E61 /* EKProcessingNoteMessageView.swift */,
-			);
-			path = Notes;
-			sourceTree = "<group>";
-		};
-		DDA199CE28FFE579009D3E61 /* MessagesUtils */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199CF28FFE579009D3E61 /* EKTextField.swift */,
-				DDA199D028FFE579009D3E61 /* EKRatingSymbolView.swift */,
-				DDA199D128FFE579009D3E61 /* EKButtonBarView.swift */,
-				DDA199D228FFE579009D3E61 /* EKButtonView.swift */,
-				DDA199D328FFE579009D3E61 /* EKRatingSymbolsContainerView.swift */,
-				DDA199D428FFE579009D3E61 /* EntryAppearanceDescriptor.swift */,
-			);
-			path = MessagesUtils;
 			sourceTree = "<group>";
 		};
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {
@@ -2692,11 +2392,7 @@
 				DD0292C6295BF0DC00485225 /* AgoraRtm.m in Sources */,
 				DDA19A1628FFE579009D3E61 /* RtmSyncManager+Handle.swift in Sources */,
 				DD220B3E295B332C00F57F30 /* VoiceRoomViewController.swift in Sources */,
-				DDA19A6C28FFE57A009D3E61 /* EKRatingSymbolsContainerView.swift in Sources */,
-				DDA19A6828FFE57A009D3E61 /* EKTextField.swift in Sources */,
 				DDA19A1A28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift in Sources */,
-				DDA19A6728FFE57A009D3E61 /* EKFormMessageView.swift in Sources */,
-				DDA19A3E28FFE57A009D3E61 /* UIView+QLContentWrap.swift in Sources */,
 				DD220B1F295B332C00F57F30 /* Notification+Presentation.swift in Sources */,
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
@@ -2705,7 +2401,6 @@
 				DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */,
 				DD220B79295B332C00F57F30 /* VoiceRoomApplyCell.swift in Sources */,
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
-				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DD220B74295B332C00F57F30 /* VMSwitchTableViewCell.swift in Sources */,
 				DD220B21295B332C00F57F30 /* UIButtonLayoutExtension.swift in Sources */,
 				DD220BCA295B48FD00F57F30 /* QMUIConfiguration.m in Sources */,
@@ -2713,34 +2408,24 @@
 				DD0292F0295BF0DC00485225 /* VLHomeOnLineListView.m in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				DD0292D2295BF0DC00485225 /* VLSearchSongResultView.m in Sources */,
-				DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */,
 				DD220B58295B332C00F57F30 /* VoiceRoomEndLiveAlert.swift in Sources */,
 				DD220B7E295B332C00F57F30 /* VMConfirmView.swift in Sources */,
 				DD220B2D295B332C00F57F30 /* VoiceRoomGiftEntity.swift in Sources */,
-				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
 				DD0292CF295BF0DC00485225 /* VLSelectedSongList.m in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				DD0292E6295BF0DC00485225 /* VLKTVSliderView.m in Sources */,
 				DD220B4C295B332C00F57F30 /* VRRoomMenuBarCell.swift in Sources */,
-				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
 				DD220B6F295B332C00F57F30 /* AgoraChatRoomNormalRtcView.swift in Sources */,
-				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
-				DDA19A5B28FFE57A009D3E61 /* EKAlertMessage.swift in Sources */,
 				DD220B80295B332C00F57F30 /* VREmptyView.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
 				DD220B18295B332C00F57F30 /* PresentedViewType.swift in Sources */,
 				DD0292E5295BF0DC00485225 /* VLKTVKindsCell.m in Sources */,
-				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
 				DD220B26295B332C00F57F30 /* String + Extension.swift in Sources */,
 				DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */,
 				DD220B31295B332C00F57F30 /* VoiceRoomAudiencesEntity.swift in Sources */,
 				DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
 				DD84177C29090C520026B624 /* VLHomeItemView.m in Sources */,
-				DDA19A5F28FFE57A009D3E61 /* EKNotificationMessageView.swift in Sources */,
-				DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */,
-				DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */,
-				DDA19A3028FFE57A009D3E61 /* EntryCachingHeuristic.swift in Sources */,
 				DD220B61295B332C00F57F30 /* VoiceRoomGifterCell.swift in Sources */,
 				DD220B1A295B332C00F57F30 /* PresentationSegue.swift in Sources */,
 				DD220B60295B332C00F57F30 /* PopTip+Draw.swift in Sources */,
@@ -2754,33 +2439,22 @@
 				DD84177D29090C520026B624 /* VLHomeItemModel.m in Sources */,
 				DD220B83295B332C00F57F30 /* HorizontalCardsView.swift in Sources */,
 				DD84178429090C520026B624 /* VLDiscoveryViewController.m in Sources */,
-				DDA19A4128FFE57A009D3E61 /* UIEdgeInsets+Utils.swift in Sources */,
 				DD0292F6295BF0DC00485225 /* KTVApi.m in Sources */,
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
 				DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */,
-				DDA19A3728FFE57A009D3E61 /* HapticFeedbackGenerator.swift in Sources */,
-				DDA19A5028FFE57A009D3E61 /* EKAttributes+PositionConstraints.swift in Sources */,
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
-				DDA19A3D28FFE57A009D3E61 /* UIViewArray+QuickLayout.swift in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
 				DD220B37295B332C00F57F30 /* VRBaseViewController.swift in Sources */,
 				DD220B64295B332C00F57F30 /* AgoraMicVolView.swift in Sources */,
 				DD0292C1295BF0DC00485225 /* KTVLog.swift in Sources */,
-				DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */,
 				DD220B5A295B332C00F57F30 /* VoiceRoomGiftCell.swift in Sources */,
-				DDA19A3528FFE57A009D3E61 /* UIView+Responder.swift in Sources */,
 				DD220B6D295B332C00F57F30 /* VMManagerView.swift in Sources */,
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
-				DDA19A5C28FFE57A009D3E61 /* EKRatingMessage.swift in Sources */,
 				DD220B0B295B332C00F57F30 /* VoiceRoomBusinessRequest.swift in Sources */,
-				DDA19A3B28FFE57A009D3E61 /* UIRectCorner+Short.swift in Sources */,
-				DDA19A4528FFE57A009D3E61 /* EKColor.swift in Sources */,
-				DDA19A5A28FFE57A009D3E61 /* EKPopUpMessage.swift in Sources */,
 				DD0292DF295BF0DC00485225 /* LSTPopView+KTVModal.m in Sources */,
 				DD220B50295B332C00F57F30 /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
 				DD84179129090C520026B624 /* WMZCodeView.m in Sources */,
 				DD220B0D295B332C00F57F30 /* LanguageManager.swift in Sources */,
-				DDA19A5228FFE57A009D3E61 /* EKAttributes+Presets.swift in Sources */,
 				DD220B25295B332C00F57F30 /* UIImageBundleExtension.swift in Sources */,
 				DD220B5D295B332C00F57F30 /* VoiceRoomGiftView.swift in Sources */,
 				DD84178629090C520026B624 /* VLMineView.m in Sources */,
@@ -2795,14 +2469,12 @@
 				DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */,
 				DD84178129090C520026B624 /* VLDiscoveryItemTCell.m in Sources */,
 				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
-				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				DD220B77295B332C00F57F30 /* VMEQSettingView.swift in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
 				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
 				DD0292E0295BF0DC00485225 /* VLAudienceIndicator.m in Sources */,
 				DD220B29295B332C00F57F30 /* AgoraSceneConfig.swift in Sources */,
-				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
 				DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */,
 				DD220B2A295B332C00F57F30 /* VoiceRoomRTCManager.swift in Sources */,
 				DD220B78295B332C00F57F30 /* AgoraChatRoom3DMoveUserView.swift in Sources */,
@@ -2829,28 +2501,20 @@
 				DDA19A1428FFE579009D3E61 /* SyncManager+Info.swift in Sources */,
 				DD220B68295B332C00F57F30 /* VMNoticeView.swift in Sources */,
 				DD220B0A295B332C00F57F30 /* VoiceRoomRequest.swift in Sources */,
-				DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */,
 				DD220B4E295B332C00F57F30 /* VoiceRoomApplyAlert.swift in Sources */,
 				DD0292EC295BF0DC00485225 /* VLStartSoloView.m in Sources */,
-				DDA19A3228FFE57A009D3E61 /* EKWrapperView.swift in Sources */,
 				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DD0292D3295BF0DC00485225 /* VLSearchEmptyView.m in Sources */,
 				DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */,
 				DDA19A1128FFE579009D3E61 /* Log.swift in Sources */,
 				DD220B62295B332C00F57F30 /* VoiceRoomChatBarCell.swift in Sources */,
-				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
-				DDA19A3F28FFE57A009D3E61 /* QLUtils.swift in Sources */,
-				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				DD220B7B295B332C00F57F30 /* VoiceRoomInviteCell.swift in Sources */,
-				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DD0292CA295BF0DC00485225 /* VLRoomSelSongModel.m in Sources */,
 				DD0292EF295BF0DC00485225 /* VLHomeOnLineListCCell.m in Sources */,
 				DD220B48295B332C00F57F30 /* VRSoundEffectsCell.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
 				DD220B5C295B332C00F57F30 /* VMANISSUPTableViewCell.swift in Sources */,
-				DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */,
-				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
 				DD0292E8295BF0DC00485225 /* VLKTVItemBaseView.m in Sources */,
 				DD220B76295B332C00F57F30 /* VoiceRoomAudienceCell.swift in Sources */,
 				DDA19A1E28FFE579009D3E61 /* CollectionReference.swift in Sources */,
@@ -2860,7 +2524,6 @@
 				DD220B24295B332C00F57F30 /* UIViewToastExtension.swift in Sources */,
 				DDA199FA28FFE579009D3E61 /* UIColor+JKWeb.m in Sources */,
 				DD220B3A295B332C00F57F30 /* VoiceRoomViewController+Mic.swift in Sources */,
-				DDA19A3628FFE57A009D3E61 /* GradientView.swift in Sources */,
 				DD220B2F295B332C00F57F30 /* VRRoomEntity.swift in Sources */,
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD220B17295B332C00F57F30 /* VoiceRoomPasswordAlert.swift in Sources */,
@@ -2874,8 +2537,6 @@
 				DD220B4B295B332C00F57F30 /* VRCreateRoomCardCell.swift in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
 				DD220B20295B332C00F57F30 /* UIColor+extension.swift in Sources */,
-				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
-				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
 				DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */,
 				DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */,
@@ -2888,11 +2549,8 @@
 				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
 				DD220B7C295B332C00F57F30 /* VoiceRoomPraiseEmitterView.swift in Sources */,
 				DD0292F2295BF0DC00485225 /* AppContext+KTV.m in Sources */,
-				DDA19A2E28FFE57A009D3E61 /* EKWindowProvider.swift in Sources */,
 				DD220B1D295B332C00F57F30 /* VoiceRoomPageContainer.swift in Sources */,
 				DD220B46295B332C00F57F30 /* VRNormalRoomsViewController.swift in Sources */,
-				DDA19A3828FFE57A009D3E61 /* UIView+Utils.swift in Sources */,
-				DDA19A2F28FFE57A009D3E61 /* EKWindow.swift in Sources */,
 				DD220B43295B332C00F57F30 /* VRRoomsViewController.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */,
@@ -2902,12 +2560,9 @@
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DD220B84295B332C00F57F30 /* VRRoomListView.swift in Sources */,
 				DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */,
-				DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */,
 				DD220B70295B332C00F57F30 /* PopTip+Transitions.swift in Sources */,
 				DD220B2E295B332C00F57F30 /* VoiceServiceModel.swift in Sources */,
-				DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */,
 				DD0292F4295BF0DC00485225 /* VLCreateRoomViewController.m in Sources */,
-				DDA19A5E28FFE57A009D3E61 /* EKRatingMessageView.swift in Sources */,
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
 				DD220B63295B332C00F57F30 /* VoiceRoomInputBar.swift in Sources */,
 				DD0292D8295BF0DC00485225 /* VLMicSeatList.m in Sources */,
@@ -2918,10 +2573,8 @@
 				DD220B2C295B332C00F57F30 /* VRUser.swift in Sources */,
 				DD220B40295B332C00F57F30 /* VoiceRoomAlertViewController.swift in Sources */,
 				DD220B15295B332C00F57F30 /* Throttle.swift in Sources */,
-				DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */,
 				DD0292C7295BF0DC00485225 /* VLRoomListModel.m in Sources */,
 				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
-				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
 				DD220B52295B332C00F57F30 /* VMUserListView.swift in Sources */,
 				DD220B4D295B332C00F57F30 /* BaseNavigationView.swift in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
@@ -2931,28 +2584,17 @@
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
 				DD0292DC295BF0DC00485225 /* VLPopScoreView.m in Sources */,
 				DD220B16295B332C00F57F30 /* SwiftyFitSize.swift in Sources */,
-				DDA19A3C28FFE57A009D3E61 /* UIView+QuickLayout.swift in Sources */,
 				DD220B56295B332C00F57F30 /* AgoraChatRoomBaseUserCollectionViewCell.swift in Sources */,
 				DD220B3F295B332C00F57F30 /* VoiceRoomGiftersViewController.swift in Sources */,
 				DD0292F7295BF0DC00485225 /* VLOnLineListVC.m in Sources */,
 				DDA19A0028FFE579009D3E61 /* NSString+Emoji.m in Sources */,
-				DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
-				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,
-				DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */,
-				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
-				DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */,
 				DD220B0C295B332C00F57F30 /* PresentationController.swift in Sources */,
 				DD220B87295B332C00F57F30 /* VRRoomCreateView.swift in Sources */,
-				DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */,
 				DD220B3C295B332C00F57F30 /* VoiceRoomHelpViewController.swift in Sources */,
 				DD0292F3295BF0DC00485225 /* KTVServiceModel.m in Sources */,
-				DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */,
-				DDA19A4028FFE57A009D3E61 /* QLCompatibility.swift in Sources */,
 				DD0292DE295BF0DC00485225 /* VLPopOnLineTypeView.m in Sources */,
-				DDA19A3428FFE57A009D3E61 /* EKStyleView.swift in Sources */,
 				DD220B12295B332C00F57F30 /* FlipHorizontalAnimation.swift in Sources */,
-				DDA19A4228FFE57A009D3E61 /* UIView+Shadow.swift in Sources */,
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DD220B6E295B332C00F57F30 /* VMNorSetTableViewCell.swift in Sources */,
 				DD0292C8295BF0DC00485225 /* VLBelcantoModel.m in Sources */,
@@ -2965,11 +2607,9 @@
 				DD220B75295B332C00F57F30 /* VMMuteView.swift in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DD0292EB295BF0DC00485225 /* VLJoinChorusView.m in Sources */,
-				DDA19A5328FFE57A009D3E61 /* EKAttributes+WindowLevel.swift in Sources */,
 				DD220B47295B332C00F57F30 /* VRSoundEffectsViewController.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				DD220B09295B332C00F57F30 /* VoiceRoomBusinessApi.swift in Sources */,
-				DDA19A5128FFE57A009D3E61 /* EKAttributes+Scroll.swift in Sources */,
 				DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */,
 				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				DD84178F29090C520026B624 /* VLPrivacyCustomView.m in Sources */,
@@ -2985,11 +2625,8 @@
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
 				DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */,
 				DD0292E4295BF0DC00485225 /* VLKTVSwitcherView.m in Sources */,
-				DDA19A6A28FFE57A009D3E61 /* EKButtonBarView.swift in Sources */,
 				DD84178E29090C520026B624 /* VLLoginInputVerifyCodeView.m in Sources */,
-				DDA19A4A28FFE57A009D3E61 /* EKAttributes+Duration.swift in Sources */,
 				DD220B66295B332C00F57F30 /* VoiceRoomGiftsView.swift in Sources */,
-				DDA19A6228FFE57A009D3E61 /* EKImageNoteMessageView.swift in Sources */,
 				DD0292E7295BF0DC00485225 /* VLKTVKindsView.m in Sources */,
 				DD220B86295B332C00F57F30 /* VRRoomMenuBar.swift in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
@@ -2998,13 +2635,10 @@
 				DD220B10295B332C00F57F30 /* VoiceRoomEmojiManager.swift in Sources */,
 				DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */,
 				DD220B7A295B332C00F57F30 /* VoiceRoomUserView.swift in Sources */,
-				DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
 				DD84178329090C520026B624 /* VLAmusementTCell.m in Sources */,
-				DDA19A6D28FFE57A009D3E61 /* EntryAppearanceDescriptor.swift in Sources */,
 				DDA199F128FFE579009D3E61 /* BaseNavigationController.m in Sources */,
 				DD220B81295B332C00F57F30 /* VRSoundTypeCard.swift in Sources */,
-				DDA19A6528FFE57A009D3E61 /* EKAccessoryNoteMessageView.swift in Sources */,
 				DD220B6C295B332C00F57F30 /* VoiceRoomPopView.swift in Sources */,
 				DD0292C3295BF0DC00485225 /* VLAddRoomModel.m in Sources */,
 				DD220B59295B332C00F57F30 /* VoiceRoomEmojiListView.swift in Sources */,
@@ -3013,7 +2647,6 @@
 				DD220B73295B332C00F57F30 /* AgoraChatRoomHeaderView.swift in Sources */,
 				DD220B3B295B332C00F57F30 /* VoiceRoomApplyUsersViewController.swift in Sources */,
 				DD220B51295B332C00F57F30 /* AgoraChatRoom3DRtcView.swift in Sources */,
-				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				DD220B30295B332C00F57F30 /* VRRoomMenuBarEntity.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
@@ -3022,7 +2655,6 @@
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DD0292CE295BF0DC00485225 /* VLPopSongList.m in Sources */,
 				DD220B41295B332C00F57F30 /* VoiceRoomInviteUsersController.swift in Sources */,
-				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				DD220B14295B332C00F57F30 /* CrossDissolveAnimation.swift in Sources */,
 				DD220B0E295B332C00F57F30 /* VRVerifyCodeView.swift in Sources */,
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
@@ -3034,8 +2666,6 @@
 				DD84178B29090C520026B624 /* VLLoginViewController.m in Sources */,
 				DD220B32295B332C00F57F30 /* VoiceRoomChatModel.swift in Sources */,
 				DD0292EE295BF0DC00485225 /* VLCreateRoomView.m in Sources */,
-				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
-				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 				DD220B34295B332C00F57F30 /* VoiceChatServiceModel.swift in Sources */,
 			);
