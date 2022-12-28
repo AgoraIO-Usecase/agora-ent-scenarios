@@ -254,6 +254,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 bottomLayout.flPK.isEnabled = false
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
+                mSettingDialog.apply {
+                    resetSettingsItem(false)
+                }
             }
             else{
                 // 单主播状态
@@ -263,6 +266,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 bottomLayout.flPK.isVisible = true
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = ColorStateList.valueOf(getColor(R.color.grey_7e))
+                mSettingDialog.apply {
+                    resetSettingsItem(false)
+                }
             }
 
         } else {
@@ -512,9 +518,6 @@ class LiveDetailActivity : AppCompatActivity() {
             setHostView(isRoomOwner || isMeLinking())
             if (isMeLinking()) {
                 resetSettingsItem(interactionInfo!!.muteAudio)
-            }
-            if (isRoomOwner && !(isLinking() || isPKing())) {
-                resetSettingsItem(false)
             }
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
@@ -1285,6 +1288,7 @@ class LiveDetailActivity : AppCompatActivity() {
             audienceVideoView.setOnClickListener {
                 showLinkSettingsDialog()
             }
+            mRtcEngine.enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
             mRtcEngine.setupRemoteVideo(
                 VideoCanvas(
