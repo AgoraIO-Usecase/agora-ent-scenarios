@@ -3,6 +3,7 @@ package io.agora.scene.voice.ui.widget.encryption
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -83,7 +84,7 @@ class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceDialogEn
         this.isCancel = isCancel;
     }
 
-    private val handler: Handler = object : Handler() {
+    private val handler: Handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             when (msg.what) {
@@ -106,5 +107,10 @@ class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceDialogEn
          * 点击取消按钮事件
          */
         fun onCancelClick() {}
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 }
