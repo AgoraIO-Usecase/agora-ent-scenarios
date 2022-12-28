@@ -924,7 +924,7 @@ class LiveDetailActivity : AppCompatActivity() {
                     showPKInvitationDialog(info.fromName)
                 }
             } else {
-                if (interactionInfo != null) {
+                if (interactionInfo != null && info != null && info.userId == UserManager.getInstance().user.id.toString()) {
                     mService.stopInteraction(interactionInfo!!, {
                         // success
                     })
@@ -962,7 +962,6 @@ class LiveDetailActivity : AppCompatActivity() {
             mService.stopInteraction(interactionInfo!!)
         }
         mService.leaveRoom()
-        mService.reset()
     }
 
     private fun showLivingEndDialog() {
