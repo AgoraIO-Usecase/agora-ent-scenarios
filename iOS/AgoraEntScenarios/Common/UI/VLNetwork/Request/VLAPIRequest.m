@@ -13,7 +13,7 @@
 #import "MenuUtils.h"
 @import AFNetworking;
 @import YYModel;
-@import MBProgressHUD;
+@import SVProgressHUD;
 
 #define NSStringFormat(format,...) [NSString stringWithFormat:format,##__VA_ARGS__]
 
@@ -70,14 +70,13 @@ static AFHTTPSessionManager *_sessionManager;
     NSURLSessionDataTask *sessionTask;
 
     [_sessionManager.requestSerializer setValue:[self getToken] forHTTPHeaderField:@"Authorization"];
-    UIWindow *window = [UIApplication sharedApplication].delegate.window;
-    if (show) [MBProgressHUD showHUDAddedTo:window animated:true];
+    if (show) [SVProgressHUD show];
     if (type == VLRequestTypeGet) {
         NSDictionary *paramenter = [self setCommonParamenter:json];
         sessionTask = [_sessionManager GET:url parameters:paramenter headers:@{} progress:^(NSProgress * _Nonnull downloadProgress) {
             [self requestProgress:progressBlock value:downloadProgress];
         } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-            if (show) [MBProgressHUD hideHUDForView:window animated:true];
+            if (show) [SVProgressHUD dismiss];
             NSDictionary *dic = [self dicWithResponseData:responseObject];
             VLResponseDataModel *model = [VLResponseDataModel yy_modelWithDictionary:dic];
             VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应原数据:\n%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,dic);
@@ -85,7 +84,7 @@ static AFHTTPSessionManager *_sessionManager;
             [self requestSuccess:completeBlock object:responseObject method:method task:task];
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应数据:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,error);
-            [MBProgressHUD hideHUDForView:window animated:true];
+            [SVProgressHUD dismiss];
             [self requestError:errorBlock error:error task:task];
             NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)task.response;
             if (urlResponse.statusCode == 401) [self setLoginVC];
@@ -96,7 +95,7 @@ static AFHTTPSessionManager *_sessionManager;
         sessionTask = [_sessionManager POST:url parameters:paramenter headers:@{} progress:^(NSProgress * _Nonnull uploadProgress) {
             [self requestProgress:progressBlock value:uploadProgress];
         } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-            if (show) [MBProgressHUD hideHUDForView:window animated:true];
+            if (show) [SVProgressHUD dismiss];
             NSDictionary *dic = [self dicWithResponseData:responseObject];
             VLResponseDataModel *model = [VLResponseDataModel yy_modelWithDictionary:dic];
             VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应原数据:\n%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,dic);
@@ -104,7 +103,7 @@ static AFHTTPSessionManager *_sessionManager;
             [self requestSuccess:completeBlock object:responseObject method:method task:task];
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应数据:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,error);
-            [MBProgressHUD hideHUDForView:window animated:true];
+            [SVProgressHUD dismiss];
             [self requestError:errorBlock error:error task:task];
             NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)task.response;
             if (urlResponse.statusCode == 401) [self setLoginVC];
@@ -210,7 +209,7 @@ static AFHTTPSessionManager *_sessionManager;
     // 设置公共参数
     NSDictionary *paramenter = [self setCommonParamenter:json];
     UIWindow *window = [UIApplication sharedApplication].delegate.window;
-    if (show) [MBProgressHUD showHUDAddedTo:window animated:true];
+    if (show) [SVProgressHUD show];
     NSURLSessionDataTask *sessionTask = [_sessionManager POST:url parameters:paramenter headers:@{} constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         for (int i = 0; i < images.count; i++) {
             // 图片压缩
@@ -237,13 +236,13 @@ static AFHTTPSessionManager *_sessionManager;
         [self requestProgress:progressBlock value:uploadProgress];
 
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        if (show) [MBProgressHUD hideHUDForView:window animated:true];
+        if (show) [SVProgressHUD dismiss];
         NSString *resultStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         VLResponseDataModel *model = [VLResponseDataModel yy_modelWithJSON:resultStr];
         VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应原数据:\n%@\n响应模型:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,resultStr,[model yy_modelDescription]);
         [self requestSuccess:completeBlock object:responseObject method:method task:task];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        if (show) [MBProgressHUD hideHUDForView:window animated:true];
+        if (show) [SVProgressHUD dismiss];
         VLLog(@"\n完成请求:\n%@\nheader:\n%@\n参数:\n%@\n响应数据:%@",task.currentRequest.URL,_sessionManager.requestSerializer.HTTPRequestHeaders,paramenter,error);
         [self requestError:errorBlock error:error task:task];
 
