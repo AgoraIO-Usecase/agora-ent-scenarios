@@ -11,7 +11,7 @@ def all_pods
   pod 'AFNetworking', '~> 4.0.1'
   # 布局
   pod 'Masonry', '~> 1.1.0'
-  pod 'HWPanModal', '~> 0.8.9'
+#  pod 'HWPanModal', '~> 0.8.9'
   # 刷新
   pod 'MJRefresh', '~> 3.2.0'
   # tips

@@ -43,7 +43,6 @@ PODS:
   - Bugly (2.5.93)
   - CRBoxInputView (1.2.2):
     - Masonry
-  - HWPanModal (0.8.9)
   - HWWeakTimer (1.0)
   - IQKeyboardManager (6.5.10)
   - JXCategoryView (1.6.1)
@@ -93,7 +92,6 @@ DEPENDENCIES:
   - AgoraRtm_iOS
   - Bugly (= 2.5.93)
   - CRBoxInputView
-  - HWPanModal (~> 0.8.9)
   - HWWeakTimer
   - IQKeyboardManager
   - JXCategoryView
@@ -125,7 +123,6 @@ SPEC REPOS:
     - AgoraRtm_iOS
     - Bugly
     - CRBoxInputView
-    - HWPanModal
     - HWWeakTimer
     - IQKeyboardManager
     - JXCategoryView
@@ -160,7 +157,6 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
-  HWPanModal: 259f6916c706b3f63003a325ad1bdfbe913b0fdc
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -186,6 +182,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: f47b225f2b826a36b9901c06b6a21e1ca1847c00
+PODFILE CHECKSUM: 551d696e9d2b8b55296add5072ca8e0cdfa4fefd
 
 COCOAPODS: 1.11.3
