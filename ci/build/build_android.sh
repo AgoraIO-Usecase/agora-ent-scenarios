@@ -116,7 +116,5 @@ cat $voicePropFile
 ./gradlew :app:assembleRelease || exit 1
 
 # Upload apk
-rm -rf ./*.apk
-cp app/build/outputs/apk/release/*.apk .
-python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=*.apk --project
+rm -rf ${WORKSPACE}/*.apk && cp app/build/outputs/apk/release/*.apk ${WORKSPACE}
 
