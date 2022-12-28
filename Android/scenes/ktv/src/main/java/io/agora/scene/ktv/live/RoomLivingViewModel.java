@@ -1363,7 +1363,8 @@ public class RoomLivingViewModel extends ViewModel {
         // ------------------ 初始化音量 ------------------
         mPlayer.adjustPlayoutVolume(40);
         mPlayer.adjustPublishSignalVolume(40);
-        mRtcEngine.adjustRecordingSignalVolume(40);
+        updateVolumeStatus(false);
+
     }
 
     // ======================= settings =======================
@@ -1403,8 +1404,8 @@ public class RoomLivingViewModel extends ViewModel {
 
     private void setMicVolume(int v) {
         RoomSeatModel value = seatLocalLiveData.getValue();
-        int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_FALSE() : value.isAudioMuted();
-        if (isMuted == 1) {
+        int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_TRUE() : value.isAudioMuted();
+        if (isMuted == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
             micOldVolume = v;
             Log.d(TAG, "muted! setMicVolume: " + v);
             return;
