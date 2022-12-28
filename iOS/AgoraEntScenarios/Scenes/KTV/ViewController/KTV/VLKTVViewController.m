@@ -155,8 +155,6 @@ KTVApiDelegate
     
     //start join
     [self joinRTCChannel];
-    self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
-    self.ktvApi.lrcView = self.MVView.lrcView;
     
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -765,15 +763,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                               mirrorMode:AgoraVideoMirrorModeAuto];
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
     
-    KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
-    [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
-                          channelId:self.roomModel.roomNo
-                                uid:[VLUserCenter.user.id integerValue]
-                       mediaOptions:[self channelMediaOptions]
-                        joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - 加入RTC成功");
-       
-    }];
+    
     [self.RTCkit setEnableSpeakerphone:YES];
     
     AgoraDataStreamConfig *config = [AgoraDataStreamConfig new];
@@ -800,6 +790,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.rtcMediaPlayer adjustPlayoutVolume:200];
     // 调节远端用户听到的音量。0-400
     [self.rtcMediaPlayer adjustPublishSignalVolume:200];
+    
+    self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
+    self.ktvApi.lrcView = self.MVView.lrcView;
+    
+    KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
+                          channelId:self.roomModel.roomNo
+                                uid:[VLUserCenter.user.id integerValue]
+                       mediaOptions:[self channelMediaOptions]
+                        joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
+        VLLog(@"Agora - 加入RTC成功");
+       
+    }];
 }
 
 - (void)leaveRTCChannel {
