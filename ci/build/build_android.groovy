@@ -7,7 +7,7 @@ buildUtils = new agora.build.BuildUtils()
 
 compileConfig = [
     "sourceDir": "agora-ent-scenarios",
-    "docker": "hub.agoralab.co/server/apiexample_build_android:latest",
+    "docker": "hub.agoralab.co/server/aes_build_android:latest",
     "non-publish": [
         "command": "./ci/build/build_android.sh",
         "extraArgs": "",
