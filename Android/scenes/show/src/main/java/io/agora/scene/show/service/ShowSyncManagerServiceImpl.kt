@@ -219,6 +219,14 @@ class ShowSyncManagerServiceImpl(
         }
         currEventListeners.clear()
 
+        innerRemoveUser(
+            UserManager.getInstance().user.id.toString(),
+            {},
+            { errorHandler.invoke(it) }
+        )
+
+        innerUpdateRoomUserCount(roomDetail.roomUserCount - 1, {}, { errorHandler.invoke(it) })
+
         if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()) {
             val roomNo = currRoomNo
             sceneReference.delete(object : Sync.Callback {
@@ -232,11 +240,7 @@ class ShowSyncManagerServiceImpl(
             })
         }
 
-        innerRemoveUser(
-            UserManager.getInstance().user.id.toString(),
-            {},
-            { errorHandler.invoke(it) }
-        )
+
 
         sceneReferenceMap.remove(currRoomNo)
         currRoomNo = ""
