@@ -11,16 +11,28 @@
 @import YYCategories;
 #import "AgoraEntScenarios-Swift.h"
 #import "QMUICommonDefines.h"
-#import "QMUIConfiguration.h"
-#import "QMUIConfigurationMacros.h"
 #import "VLDeviceUtils.h"
 #import "QMUIHelper.h"
 
+
+// 基础颜色
+#define UIColorClear                [UIColor clearColor]
+#define UIColorWhite                [UIColor whiteColor]
+#define UIColorBlack                [UIColor blackColor]
+#define UIColorGray                 [UIColor grayColor]
+#define UIColorGrayDarken           [UIColor grayDarkenColor]
+#define UIColorGrayLighten          [UIColor grayLightenColor]
+#define UIColorRed                  [UIColor redColor]
+#define UIColorGreen                [UIColor greenColor]
+#define UIColorBlue                 [UIColor blueColor]
+#define UIColorYellow               [UIColor yellowColor]
+
+
 /// toolBar相关frame
-#define ToolBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 70 : (IOS_VERSION >= 12.0 ? 50 : 44)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(44, 32) : 44) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
+//#define ToolBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 70 : (IOS_VERSION >= 12.0 ? 50 : 44)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(44, 32) : 44) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
 
 /// tabBar相关frame
-#define TabBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 65 : (IOS_VERSION >= 12.0 ? 50 : 49)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(49, 32) : 49) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
+//#define TabBarHeight (IS_IPAD ? (IS_NOTCHED_SCREEN ? 65 : (IOS_VERSION >= 12.0 ? 50 : 49)) : (IS_LANDSCAPE ? PreferredValueForVisualDevice(49, 32) : 49) + SafeAreaInsetsConstantForDeviceWithNotch.bottom)
 
 #define KTVLocalizedString(s) ([s toSceneLocalization])
 
