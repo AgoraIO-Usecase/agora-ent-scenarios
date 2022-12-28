@@ -131,7 +131,7 @@
         
         NSArray *array2 = [_str4Total componentsSeparatedByString:_str4Highlight2];
         d=0;
-        for(int i=0; i<array.count-1; i++) {
+        for(int i=0; i<array2.count-1; i++) {
             NSString *subString = array2[i];
             NSNumber *number = [NSNumber numberWithInt:d += subString.length];
             d += _str4Highlight2.length;
