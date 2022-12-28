@@ -289,10 +289,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         if (roomKitBean.isOwner){
                             roomObservableDelegate.checkUserLeaveMic(ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
                         }
-                        ThreadManager.getInstance().runOnMainThread {
-                            //刷新 owner 邀请列表
-                            roomObservableDelegate.handsUpdate(1)
-                        }
+                        //刷新 owner 邀请列表
+                        roomObservableDelegate.handsUpdate(1)
                     }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
