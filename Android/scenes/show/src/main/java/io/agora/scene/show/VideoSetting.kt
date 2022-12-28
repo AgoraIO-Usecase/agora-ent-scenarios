@@ -211,6 +211,10 @@ object VideoSetting {
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
 
+    fun resetBroadcastSetting() {
+        currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
+    }
+
     fun updateAudienceSetting(
         isJoinedRoom: Boolean = true,
     ) {

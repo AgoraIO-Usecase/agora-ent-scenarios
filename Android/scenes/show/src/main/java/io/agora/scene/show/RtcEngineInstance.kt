@@ -14,9 +14,14 @@ object RtcEngineInstance {
 
     val videoEncoderConfiguration = VideoEncoderConfiguration()
 
-    val beautyProcessor: IBeautyProcessor by lazy {
-        BeautyByteDanceImpl(AgoraApplication.the())
-    }
+    private var innerBeautyProcessor: IBeautyProcessor? = null
+    val beautyProcessor: IBeautyProcessor
+        get() {
+            if (innerBeautyProcessor == null) {
+                innerBeautyProcessor = BeautyByteDanceImpl(AgoraApplication.the())
+            }
+            return innerBeautyProcessor!!
+        }
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
@@ -41,9 +46,14 @@ object RtcEngineInstance {
             return innerRtcEngine!!
         }
 
-    fun destroy(){
-        innerRtcEngine?: return
-        RtcEngine.destroy()
-        innerRtcEngine = null
+    fun destroy() {
+        innerRtcEngine?.let {
+            RtcEngine.destroy()
+            innerRtcEngine = null
+        }
+        innerBeautyProcessor?.let { processor->
+            processor.release()
+            innerBeautyProcessor = null
+        }
     }
 }

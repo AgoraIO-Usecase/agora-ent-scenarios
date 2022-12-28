@@ -117,6 +117,7 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun destroy() {
+        VideoSetting.resetBroadcastSetting()
         mBinding.root.removeCallbacks(timerRoomEndRun)
         releaseCountdown()
         destroyService()
@@ -531,7 +532,7 @@ class LiveDetailActivity : AppCompatActivity() {
                         if (!isRoomOwner) {
                             mService.muteAudio(!activated, interactionInfo!!.userId)
                         } else {
-                            mRtcEngine.enableLocalAudio(activated)
+                            enableLocalAudio(activated)
                         }
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
@@ -1159,7 +1160,17 @@ class LiveDetailActivity : AppCompatActivity() {
             mRtcEngine.removeHandler(mRtcEngineHandler)
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannel()
+            RtcEngineInstance.destroy()
             mRtcEngineHandler = null
+        }
+    }
+
+    private fun enableLocalAudio(enable: Boolean) {
+        mRtcEngine.enableLocalAudio(enable)
+        if (enable) {
+            VideoSetting.updateBroadcastSetting(
+                inEarMonitoring = VideoSetting.getCurrBroadcastSetting().audio.inEarMonitoring
+            )
         }
     }
 
@@ -1237,11 +1248,11 @@ class LiveDetailActivity : AppCompatActivity() {
         if (interactionInfo == null) return
         if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
             if (interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
-                mRtcEngine.enableLocalAudio(!interactionInfo!!.muteAudio)
+                enableLocalAudio(!interactionInfo!!.muteAudio)
             }
         } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
             if (isRoomOwner) {
-                mRtcEngine.enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
+                enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
             }
         }
     }
@@ -1255,7 +1266,7 @@ class LiveDetailActivity : AppCompatActivity() {
         val broadcasterVideoView = SurfaceView(this)
         mBinding.videoSinglehostLayout.videoContainer.addView(broadcasterVideoView)
         if (isRoomOwner) {
-            mRtcEngine.enableLocalAudio(true)
+            enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
         } else {
             val channelMediaOptions = ChannelMediaOptions()
@@ -1294,7 +1305,7 @@ class LiveDetailActivity : AppCompatActivity() {
             audienceVideoView.setOnClickListener {
                 showLinkSettingsDialog()
             }
-            mRtcEngine.enableLocalAudio(true)
+            enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
             mRtcEngine.setupRemoteVideo(
                 VideoCanvas(
@@ -1309,7 +1320,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 audienceVideoView.setOnClickListener {
                     showLinkSettingsDialog()
                 }
-                mRtcEngine.enableLocalAudio(true)
+                enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
                 channelMediaOptions.publishMicrophoneTrack = true
@@ -1371,7 +1382,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 showPKSettingsDialog()
             }
             mRtcEngine.setupLocalVideo(VideoCanvas(view))
-            mRtcEngine.enableLocalAudio(true)
+            enableLocalAudio(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = true
