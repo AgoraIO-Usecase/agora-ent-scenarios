@@ -81,29 +81,25 @@ echo release_version: $release_version
 echo short_version: $short_version
 echo pwd: `pwd`
 
-export ANDROID_NDK_ROOT="${HOME}/Library/Android/android-ndk-r21e"
-ls ~/.gradle || (mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~/.gradle/ln_$(date "+%y%m%d%H") && ls ~/.gradle)
+# enter android project direction
+cd $WORKSPACE/Android
+echo pwd: `pwd`
 
-
-
-# install android sdk
-which java
-java --version
+# config android environment
 source ~/.bashrc
 export ANDROID_HOME=/usr/lib/android_sdk
+ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~/.gradle/ln_$(date "+%y%m%d%H") && ls ~/.gradle
 echo ANDROID_HOME: $ANDROID_HOME
+java --version
 
-# compile apk
-cd Android
-pwd
 
-# config appId
+# config app global properties
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_ID/p' gradle.properties)#AGORA_APP_ID=${APP_ID}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_CERTIFICATE/p' gradle.properties)#AGORA_APP_CERTIFICATE=${APP_CERT}#g" gradle.properties
 cat gradle.properties
 
-# config voice
+# config voice properties
 voicePropFile=scenes/voice/voice/voice_gradle.properties
 rm -f $voicePropFile
 touch $voicePropFile
@@ -116,10 +112,12 @@ echo "IM_APP_CLIENT_ID_RELEASE=\"${IM_CLIENT_ID}\"\n" >> $voicePropFile
 echo "IM_APP_CLIENT_SECRET_RELEASE=\"${IM_CLIENT_SECRET}\"\n" >> $voicePropFile
 cat $voicePropFile
 
-
+# Compile apk
 ./gradlew clean || exit 1
 ./gradlew :app:assembleRelease || exit 1
 
-rm -rf $WORKSPACE/*.apk && cp app/build/outputs/apk/release/*.apk $WORKSPACE && ls $WORKSPACE
-
+# Upload apk
+rm -rf ./*.apk
+cp app/build/outputs/apk/release/*.apk .
+python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=*.apk --project
 
