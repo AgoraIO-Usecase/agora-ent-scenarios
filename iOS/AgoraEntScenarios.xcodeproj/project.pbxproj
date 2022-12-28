@@ -400,7 +400,6 @@
 		DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D628FFE579009D3E61 /* EKMessageContentView.swift */; };
 		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
 		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
-		DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
@@ -950,8 +949,6 @@
 		DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YGViewDisplayer.m; sourceTree = "<group>"; };
 		DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _swiftYGViewDisplayer.swift; sourceTree = "<group>"; };
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
-		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
-		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -2301,7 +2298,6 @@
 			children = (
 				DD220BC2295B48FD00F57F30 /* QMUI */,
 				DDA1998828FFE579009D3E61 /* Displayer */,
-				DDA199DA28FFE579009D3E61 /* ZQTCustomSwitch */,
 			);
 			path = ThirdParty;
 			sourceTree = "<group>";
@@ -2462,15 +2458,6 @@
 				DDA199D428FFE579009D3E61 /* EntryAppearanceDescriptor.swift */,
 			);
 			path = MessagesUtils;
-			sourceTree = "<group>";
-		};
-		DDA199DA28FFE579009D3E61 /* ZQTCustomSwitch */ = {
-			isa = PBXGroup;
-			children = (
-				DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */,
-				DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */,
-			);
-			path = ZQTCustomSwitch;
 			sourceTree = "<group>";
 		};
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {
@@ -2996,7 +2983,6 @@
 				DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */,
 				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
-				DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */,
 				DD0292CD295BF0DC00485225 /* VLMicSeatCell.m in Sources */,
 				DD0292E4295BF0DC00485225 /* VLKTVSwitcherView.m in Sources */,
 				DDA19A6A28FFE57A009D3E61 /* EKButtonBarView.swift in Sources */,
