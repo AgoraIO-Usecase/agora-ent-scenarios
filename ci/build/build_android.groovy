@@ -44,7 +44,7 @@ def doPublish(buildVariables) {
     def archiveInfos = [
         [
           "type": "ARTIFACTORY",
-          "archivePattern": "*.zip",
+          "archivePattern": "*.apk",
           "serverPath": "AES/${shortVersion}/${buildVariables.buildDate}/${env.platform}",
           "serverRepo": "ACCS_repo"
         ]
@@ -56,7 +56,7 @@ def doPublish(buildVariables) {
         writeFile(file: 'package_urls', text: content, encoding: "utf-8")
     }
     archiveArtifacts(artifacts: "package_urls", allowEmptyArchive:true)
-    sh "rm -rf *.zip || true"
+    sh "rm -rf *.apk || true"
 }
 
 pipelineLoad(this, "AES", "build", "android", "aes_android")

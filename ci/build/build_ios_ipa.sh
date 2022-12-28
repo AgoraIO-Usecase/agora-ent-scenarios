@@ -20,6 +20,7 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
+cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
 
 # 打包环境
 CONFIGURATION=Development
