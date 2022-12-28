@@ -50,6 +50,8 @@ class ShowSyncManagerServiceImpl(
     private val sceneReferenceMap = mutableMapOf<String, SceneReference>()
     private val currEventListeners = mutableListOf<EventListener>()
 
+    private var currRoomChangeSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowRoomDetailModel?) -> Unit)? =
+        null
     private var currUserChangeSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowUser?) -> Unit)? =
         null
     private var micSeatApplySubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowMicSeatApply?) -> Unit)? =
@@ -61,7 +63,25 @@ class ShowSyncManagerServiceImpl(
 
     private var onReconnectSubscriber: (() -> Unit)?= null
 
+    override fun destroy() {
+        if(syncInitialized){
+            reset()
+            roomMap.clear()
+            Sync.Instance().destroy()
+            syncInitialized = false
+        }
+    }
+
     private fun reset() {
+        if(currRoomNo.isNotEmpty()){
+            sceneReferenceMap.remove(currRoomNo)?.let { sceneReference ->
+                currEventListeners.forEach {
+                    sceneReference.unsubscribe(it)
+                }
+            }
+            currRoomNo = ""
+        }
+
         objIdOfUserId.clear()
         objIdOfSeatApply.clear()
         objIdOfSeatInvitation.clear()
@@ -75,9 +95,10 @@ class ShowSyncManagerServiceImpl(
         micSeatInvitationList.clear()
         pKInvitationList.clear()
         interactionInfoList.clear()
-        currRoomNo = ""
 
         currEventListeners.clear()
+
+        currRoomChangeSubscriber = null
         currUserChangeSubscriber = null
         onReconnectSubscriber = null
         micInteractionInfoSubscriber = null
@@ -195,8 +216,12 @@ class ShowSyncManagerServiceImpl(
         if (currRoomNo.isEmpty()) {
             return
         }
-        val roomDetail = roomMap[currRoomNo] ?: return
-        val sceneReference = sceneReferenceMap[currRoomNo] ?: return
+        val roomDetail = roomMap[currRoomNo]
+        val sceneReference = sceneReferenceMap[currRoomNo]
+        if(roomDetail == null || sceneReference == null){
+            reset()
+            return
+        }
 
         // 移除连麦申请
         val targetApply = micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }.getOrNull(0)
@@ -214,20 +239,16 @@ class ShowSyncManagerServiceImpl(
         }
         pKCompetitorInvitationList.clear()
 
-        currEventListeners.forEach {
-            sceneReference.unsubscribe(it)
-        }
-        currEventListeners.clear()
-
         innerRemoveUser(
             UserManager.getInstance().user.id.toString(),
             {},
             { errorHandler.invoke(it) }
         )
 
-        innerUpdateRoomUserCount(roomDetail.roomUserCount - 1, {}, { errorHandler.invoke(it) })
-
+        Log.d(TAG, "leaveRoom roomNo=${currRoomNo} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id.toString()}")
         if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()) {
+            Log.d(TAG, "leaveRoom delete room")
+
             val roomNo = currRoomNo
             sceneReference.delete(object : Sync.Callback {
                 override fun onSuccess() {
@@ -240,18 +261,24 @@ class ShowSyncManagerServiceImpl(
             })
         }
 
-
-
-        sceneReferenceMap.remove(currRoomNo)
-        currRoomNo = ""
         reset()
     }
 
+    override fun subscribeCurrRoomEvent(onUpdate: (status: ShowServiceProtocol.ShowSubscribeStatus, roomInfo: ShowRoomDetailModel?) -> Unit) {
+        currRoomChangeSubscriber = onUpdate
+    }
+
     override fun getAllUserList(success: (List<ShowUser>) -> Unit, error: ((Exception) -> Unit)?) {
-        innerGetUserList(success) {
-            innerUpdateRoomUserCount(userList.size, {}, {})
-            error?.invoke(it) ?: errorHandler.invoke(it)
-        }
+        innerGetUserList(
+            {
+                if (roomMap[currRoomNo]?.ownerId == UserManager.getInstance().user.id.toString()) {
+                    innerUpdateRoomUserCount(userList.size, {}, {})
+                }
+                success.invoke(it)
+            },
+            {
+                error?.invoke(it) ?: errorHandler.invoke(it)
+            })
     }
 
     override fun subscribeUser(onUserChange: (ShowServiceProtocol.ShowSubscribeStatus, ShowUser?) -> Unit) {
@@ -792,6 +819,47 @@ class ShowSyncManagerServiceImpl(
                 }
             }
         )
+        Sync.Instance().joinScene(kSceneId, object : Sync.JoinSceneCallback{
+            override fun onSuccess(sceneReference: SceneReference?) {
+                sceneReference?.subscribe(object : EventListener{
+                    override fun onCreated(item: IObject?) {
+
+                    }
+
+                    override fun onUpdated(item: IObject?) {
+                        item?: return
+                        val roomInfo = item.toObject(ShowRoomDetailModel::class.java)
+                        roomMap[item.id] = roomInfo
+                        Log.d(TAG, "Sync Room Update roomNo=${item.id}, roomInfo=${roomInfo}")
+                        if(currRoomNo.isNotEmpty()){
+                            runOnMainThread{
+                                currRoomChangeSubscriber?.invoke(ShowServiceProtocol.ShowSubscribeStatus.updated, roomInfo)
+                            }
+                        }
+                    }
+
+                    override fun onDeleted(item: IObject?) {
+                        item?: return
+                        val roomInfo = roomMap.remove(item.id)
+                        Log.d(TAG, "Sync Room Delete roomNo=${item.id}")
+                        if(currRoomNo.isNotEmpty() && currRoomNo == item.id){
+                            runOnMainThread{
+                                currRoomChangeSubscriber?.invoke(ShowServiceProtocol.ShowSubscribeStatus.deleted, roomInfo)
+                            }
+                        }
+                    }
+
+                    override fun onSubscribeError(ex: SyncManagerException?) {
+                        errorHandler.invoke(ex!!)
+                    }
+                })
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+                errorHandler.invoke(exception!!)
+            }
+
+        })
         Sync.Instance().subscribeConnectState {
             Log.d(TAG, "subscribeConnectState state=$it")
             if (it == Sync.ConnectionState.open) {
@@ -803,9 +871,9 @@ class ShowSyncManagerServiceImpl(
                             val roomInfo = roomMap[currRoomNo]
                             if(roomInfo == null){
                                 runOnMainThread{
-                                    currUserChangeSubscriber?.invoke(
+                                    currRoomChangeSubscriber?.invoke(
                                         ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                                        ShowUser(oldRoomInfo.ownerId, "", "")
+                                        oldRoomInfo
                                     )
                                 }
                             }

@@ -96,6 +96,11 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private var isAudioOnlyMode = false
 
+    private val timerRoomEndRun = Runnable {
+        destroy()
+        showLivingEndDialog()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
@@ -107,14 +112,12 @@ class LiveDetailActivity : AppCompatActivity() {
         initRtcEngine()
 
         if (isRoomOwner) {
-            mBinding.root.postDelayed({
-                destroy()
-                showLivingEndDialog()
-            }, ROOM_AVAILABLE_DURATION)
+            mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
         }
     }
 
     private fun destroy() {
+        mBinding.root.removeCallbacks(timerRoomEndRun)
         releaseCountdown()
         destroyService()
         destroyRtcEngine()
@@ -839,6 +842,12 @@ class LiveDetailActivity : AppCompatActivity() {
             reFetchUserList()
             reFetchPKInvitationList()
         }
+        mService.subscribeCurrRoomEvent { status, _ ->
+            if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted){
+                destroy()
+                showLivingEndDialog()
+            }
+        }
         mService.subscribeUser { status, user ->
             reFetchUserList()
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && user != null) {
@@ -861,9 +870,6 @@ class LiveDetailActivity : AppCompatActivity() {
                         user.status
                     ))
                 }
-            }else if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted && user?.userId == mRoomInfo.ownerId){
-                destroy()
-                showLivingEndDialog()
             }
         }
         mService.subscribeMessage { _, showMessage ->
@@ -1140,7 +1146,7 @@ class LiveDetailActivity : AppCompatActivity() {
         }
 
         // 设置token有效期为房间存活时长，到期后关闭并退出房间
-        TokenGenerator.expireSecond = ROOM_AVAILABLE_DURATION / 1000 // 20min
+        TokenGenerator.expireSecond = ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
         checkRequirePerms {
             joinChannel()
         }

@@ -21,6 +21,8 @@ interface ShowServiceProtocol {
         fun getImplInstance(): ShowServiceProtocol = instance
     }
 
+    fun destroy()
+
     // 获取房间列表
     fun getRoomList(
         success: (List<ShowRoomDetailModel>) -> Unit,
@@ -45,6 +47,9 @@ interface ShowServiceProtocol {
 
     // 离开房间
     fun leaveRoom()
+
+    // 订阅当前加入的房间的更新删除事件
+    fun subscribeCurrRoomEvent(onUpdate: (status: ShowSubscribeStatus, roomInfo: ShowRoomDetailModel?) -> Unit)
 
     // 获取当前房间所有用户
     fun getAllUserList(success: (List<ShowUser>) -> Unit, error: ((Exception) -> Unit)? = null)
