@@ -8,6 +8,7 @@
 #import "LSTPopView+KTVModal.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
+#import "UIView+VL.h"
 
 @implementation LSTPopView (KTVModal)
 
@@ -161,6 +162,23 @@
     popView.cornerRadius = 20;
     popView.isClickFeedback = NO;
     
+    [popView pop];
+    
+    return popView;
+}
+
+//控制台
++ (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                               withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
+    VLKTVSettingView* settingView = [[VLKTVSettingView alloc] initWithSetting:nil];
+    settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
+    settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
+    [settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
+    settingView.delegate = delegate;
+    
+    LSTPopView* popView = [self _createKTVPopContainerWithContentView:settingView
+                                                       withParentView:parentView];
+    popView.isAvoidKeyboard = NO;
     [popView pop];
     
     return popView;
