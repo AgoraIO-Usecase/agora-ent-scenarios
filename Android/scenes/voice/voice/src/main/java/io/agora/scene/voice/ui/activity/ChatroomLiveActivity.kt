@@ -284,9 +284,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     chatUid.let {
-                        ChatroomIMManager.getInstance().removeMember(it)
-                        roomLivingViewModel.updateRoomMember()
                         if (roomKitBean.isOwner){
+                            ChatroomIMManager.getInstance().removeMember(it)
+                            //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
+                            ChatroomIMManager.getInstance().removeSubmitMember(it)
+                            //刷新 owner 邀请列表
+                            roomObservableDelegate.handsUpdate(1)
+                            //刷新 owner 申请列表
+                            roomObservableDelegate.handsUpdate(0)
+                            roomLivingViewModel.updateRoomMember()
                             roomObservableDelegate.checkUserLeaveMic(ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
                         }
                     }
@@ -341,12 +347,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                                         //刷新 owner 邀请列表
                                         roomObservableDelegate.handsUpdate(1)
                                     }
-                                }
-                            }
-                            if (ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
-                                ThreadManager.getInstance().runOnMainThread {
-                                    //刷新 owner 邀请列表
-                                    roomObservableDelegate.handsUpdate(1)
                                 }
                             }
                         }
