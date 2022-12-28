@@ -82,8 +82,7 @@ echo short_version: $short_version
 echo pwd: `pwd`
 
 # enter android project direction
-cd $WORKSPACE/Android
-echo pwd: `pwd`
+cd Android
 
 # config android environment
 source ~/.bashrc
