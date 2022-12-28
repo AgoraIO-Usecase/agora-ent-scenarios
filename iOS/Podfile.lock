@@ -45,7 +45,6 @@ PODS:
     - Masonry
   - HWPanModal (0.8.9)
   - HWWeakTimer (1.0)
-  - InputKit (1.1.15)
   - IQKeyboardManager (6.5.10)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
@@ -96,7 +95,6 @@ DEPENDENCIES:
   - CRBoxInputView
   - HWPanModal (~> 0.8.9)
   - HWWeakTimer
-  - InputKit
   - IQKeyboardManager
   - JXCategoryView
   - KakaJSON
@@ -129,7 +127,6 @@ SPEC REPOS:
     - CRBoxInputView
     - HWPanModal
     - HWWeakTimer
-    - InputKit
     - IQKeyboardManager
     - JXCategoryView
     - KakaJSON
@@ -165,7 +162,6 @@ SPEC CHECKSUMS:
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
   HWPanModal: 259f6916c706b3f63003a325ad1bdfbe913b0fdc
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
-  InputKit: b82938c2c684d285909cac9de150739aa4814d10
   IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -190,6 +186,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: e3d623c5127670ac168e41358c7d034c82edfda4
 
-PODFILE CHECKSUM: cacb171e2ad0e6a068bed2ccef091841fb614223
+PODFILE CHECKSUM: f47b225f2b826a36b9901c06b6a21e1ca1847c00
 
 COCOAPODS: 1.11.3
