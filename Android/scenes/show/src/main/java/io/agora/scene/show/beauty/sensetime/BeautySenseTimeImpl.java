@@ -22,8 +22,6 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_STICKER_NONE;
 
 import android.content.Context;
 import android.graphics.Matrix;
-import android.opengl.GLES11;
-import android.opengl.GLES11Ext;
 
 import com.sensetime.effects.STRenderer;
 import com.sensetime.effects.utils.FileUtils;
@@ -98,6 +96,10 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     @Override
     public boolean onCaptureVideoFrame(VideoFrame videoFrame) {
         if (!isEnable() || isReleased) {
+            if (shouldMirror) {
+                shouldMirror = false;
+                return false;
+            }
             return true;
         }
 
@@ -122,65 +124,24 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mNV21Buffer.get(mNV21ByteArray);
         i420Buffer.release();
 
-
-        int texture;
-        Matrix transformMatrix;
-        if (buffer instanceof VideoFrame.TextureBuffer) {
-            VideoFrame.TextureBuffer textureBuffer = (VideoFrame.TextureBuffer) buffer;
-            if (textureBufferHelper == null) {
-                mEglBaseContext = textureBuffer.getEglBaseContext();
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", mEglBaseContext);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            } else if (mEglBaseContext != textureBuffer.getEglBaseContext()) {
-                textureBufferHelper.invoke(() -> {
-                    unInitST();
-                    return null;
-                });
-                textureBufferHelper.dispose();
-                textureBufferHelper = null;
-                return true;
-            }
-            texture = textureBufferHelper.invoke(() -> {
-                int texFormat = textureBuffer.getType() == VideoFrame.TextureBuffer.Type.OES ? GLES11Ext.GL_TEXTURE_EXTERNAL_OES : GLES11.GL_TEXTURE_2D;
-
-                return mSTRenderer.preProcess(
-                        textureBuffer.getWidth(), textureBuffer.getHeight(), videoFrame.getRotation(),
-                        mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21,
-                        textureBuffer.getTextureId(), texFormat);
+        if (textureBufferHelper == null) {
+            mEglBaseContext = null;
+            textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", null);
+            textureBufferHelper.invoke(() -> {
+                initST();
+                return null;
             });
-            transformMatrix = textureBuffer.getTransformMatrix();
-            shouldMirror = false;
-        } else {
-            if (textureBufferHelper == null) {
-                mEglBaseContext = null;
-                textureBufferHelper = TextureBufferHelper.create("BeautyProcessor", null);
-                textureBufferHelper.invoke(() -> {
-                    initST();
-                    return null;
-                });
-            } else if (mEglBaseContext != null) {
-                textureBufferHelper.invoke(() -> {
-                    unInitST();
-                    return null;
-                });
-                textureBufferHelper.dispose();
-                textureBufferHelper = null;
-                return true;
-            }
-
-            texture = textureBufferHelper.invoke(() ->
-                    mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
-            transformMatrix = new Matrix();
-            shouldMirror = isFrontCamera;
         }
+
+        int texture = textureBufferHelper.invoke(() ->
+                mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
+        Matrix transformMatrix = new Matrix();
+        shouldMirror = true;
 
         boolean isFront = videoFrame.getRotation() == 270;
         if (isFrontCamera != isFront) {
             isFrontCamera = isFront;
-            return true;
+            return false;
         }
 
         if (texture < 0) {
