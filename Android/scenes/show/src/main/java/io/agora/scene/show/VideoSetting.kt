@@ -445,6 +445,13 @@ object VideoSetting {
             // RTC 4.0.0.9版本 不支持，强行设置rtc sdk会崩溃
             // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
+        captureResolution?.let {
+            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
+                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, 15)
+            ).apply {
+                followEncodeDimensionRatio = false
+            })
+        }
         encoderResolution?.let {
             videoEncoderConfiguration.dimensions =
                 VideoEncoderConfiguration.VideoDimensions(it.width, it.height)
@@ -457,11 +464,6 @@ object VideoSetting {
         bitRate?.let {
             videoEncoderConfiguration.bitrate = it
             rtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration)
-        }
-        captureResolution?.let {
-            rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
-                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, 15)
-            ))
         }
 
         inEarMonitoring?.let {
