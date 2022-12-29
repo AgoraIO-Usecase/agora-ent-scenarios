@@ -243,7 +243,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setScoreControlView(RoomSelSongModel songPlaying) {
         if (songPlaying != null && songPlaying.isChorus()) {
-            if (UserManager.getInstance().getUser().userNo.equals(songPlaying.getUserNo())) {
+            if (UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo())) {
                 mBinding.scoreControlView.setVisibility(VISIBLE);
                 mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
             } else {

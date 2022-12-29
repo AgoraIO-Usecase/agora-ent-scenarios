@@ -111,7 +111,7 @@ class KTVSyncManagerServiceImp(
                 icon = inputModel.icon,
                 isPrivate = inputModel.isPrivate != 0,
                 password = inputModel.password,
-                creatorNo = UserManager.getInstance().user.userNo,
+                creatorNo = UserManager.getInstance().user.id.toString(),
                 bgOption = (1..2).random().toString(),
             )
             val scene = Scene()
@@ -230,7 +230,7 @@ class KTVSyncManagerServiceImp(
         }
         roomSubscribeListener.clear()
 
-        if (cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
+        if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
             // 移除房间
             mSceneReference?.delete(object : Callback {
                 override fun onSuccess() {
@@ -268,7 +268,7 @@ class KTVSyncManagerServiceImp(
         if (!isRoomDestroyed) {
             seatMap.forEach {
                 it.value?.let { seat ->
-                    if (seat.userNo == UserManager.getInstance().user.userNo) {
+                    if (seat.userNo == UserManager.getInstance().user.id.toString()) {
                         innerRemoveSeat(seat) {}
                         return@forEach
                     }
@@ -281,7 +281,7 @@ class KTVSyncManagerServiceImp(
         // 删除点歌信息
         if (!isRoomDestroyed) {
             songChosenList.forEachIndexed { index: Int, songModel: RoomSelSongModel ->
-                if (songModel.userNo.equals(UserManager.getInstance().user.userNo)) {
+                if (songModel.userNo.equals(UserManager.getInstance().user.id.toString())) {
                     innerRemoveChooseSong(objIdOfSongNo[index]) {}
                 }
             }
@@ -357,7 +357,7 @@ class KTVSyncManagerServiceImp(
     ) {
         seatMap.forEach {
             it.value?.let { seat ->
-                if (seat.userNo == UserManager.getInstance().user.userNo) {
+                if (seat.userNo == UserManager.getInstance().user.id.toString()) {
                     return
                 }
             }
@@ -382,7 +382,7 @@ class KTVSyncManagerServiceImp(
 
     override fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit) {
         seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.userNo) {
+            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
                     val seatInfo = RoomSeatModel(
@@ -407,7 +407,7 @@ class KTVSyncManagerServiceImp(
         completion: (error: Exception?) -> Unit
     ) {
         seatMap.forEach {
-            if (it.value?.userNo == UserManager.getInstance().user.userNo) {
+            if (it.value?.userNo == UserManager.getInstance().user.id.toString()) {
                 val originSeatInfo = it.value
                 if (originSeatInfo != null) {
                     val seatInfo = RoomSeatModel(
@@ -449,7 +449,7 @@ class KTVSyncManagerServiceImp(
             inputModel.imageUrl,
 
             isChorus = inputModel.isChorus > 0,
-            userNo = UserManager.getInstance().user.userNo,
+            userNo = UserManager.getInstance().user.id.toString(),
             name = UserManager.getInstance().user.name,
 
             status = RoomSelSongModel.STATUS_IDLE,
@@ -601,7 +601,7 @@ class KTVSyncManagerServiceImp(
             userNo = targetSong.userNo,
             name = targetSong.name,
             isOriginal = targetSong.isOriginal,
-            chorusNo = UserManager.getInstance().user.userNo,
+            chorusNo = UserManager.getInstance().user.id.toString(),
 
             status = targetSong.status,
             createAt = targetSong.createAt,
@@ -776,7 +776,7 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerAddUserInfo(completion: () -> Unit) {
-        val localUserInfo = VLLoginModel(UserManager.getInstance().user.userNo)
+        val localUserInfo = VLLoginModel(UserManager.getInstance().user.id.toString())
         mSceneReference?.collection(kCollectionIdUser)
             ?.add(localUserInfo, object : DataItemCallback {
                 override fun onSuccess(result: IObject) {
@@ -790,10 +790,10 @@ class KTVSyncManagerServiceImp(
     }
 
     private fun innerRemoveUser(completion: (error: Exception?) -> Unit) {
-        val objectId = objIdOfUserNo[UserManager.getInstance().user.userNo] ?: return
+        val objectId = objIdOfUserNo[UserManager.getInstance().user.id.toString()] ?: return
         mSceneReference?.collection(kCollectionIdUser)?.delete(objectId, object : Callback {
             override fun onSuccess() {
-                objIdOfUserNo.remove(UserManager.getInstance().user.userNo)
+                objIdOfUserNo.remove(UserManager.getInstance().user.id.toString())
                 runOnMainThread { completion.invoke(null) }
             }
 
@@ -810,7 +810,7 @@ class KTVSyncManagerServiceImp(
                 completion.invoke(error, 0)
                 return@innerGetUserInfo
             }
-            if (!userMap.containsKey(UserManager.getInstance().user.userNo)) {
+            if (!userMap.containsKey(UserManager.getInstance().user.id.toString())) {
                 innerAddUserInfo {
                     innerGetUserInfo { error2, list2 ->
                         if (error2 != null || list2 == null) {
@@ -863,9 +863,9 @@ class KTVSyncManagerServiceImp(
 
     private fun innerGenUserSeatInfo(seatIndex: Int): RoomSeatModel {
         return RoomSeatModel(
-            roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.userNo,
+            roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.headUrl,
-            UserManager.getInstance().user.userNo,
+            UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.name,
             seatIndex,
@@ -897,7 +897,7 @@ class KTVSyncManagerServiceImp(
                     }
                 }
             }
-            if (!hasMaster && cacheRoom.creatorNo == UserManager.getInstance().user.userNo) {
+            if (!hasMaster && cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
                 val targetSeatInfo = innerGenUserSeatInfo(0)
                 innerAddSeatInfo(targetSeatInfo) { error ->
                     if (error != null) {

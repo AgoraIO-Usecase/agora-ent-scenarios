@@ -104,10 +104,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                     if (!isOutSeat) {
                         // 下麦
                         if (roomLivingViewModel.isRoomOwner()) {
-                            if (!item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                            if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 showUserLeaveSeatMenuDialog(item);
                             }
-                        } else if (item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                        } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             showUserLeaveSeatMenuDialog(item);
                         }
                     } else {
@@ -158,7 +158,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
                         binding.flVideoContainer.removeAllViews();
                         SurfaceView surfaceView = fillWithRenderView(binding.flVideoContainer);
-                        if (item.getUserNo().equals(UserManager.getInstance().getUser().userNo)) { // 是本人
+                        if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) { // 是本人
                             roomLivingViewModel.renderLocalCameraVideo(surfaceView);
                         } else {
                             int uid = Integer.parseInt(item.getRtcUid());
@@ -350,8 +350,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, userNo -> {
-            Log.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
-            if (UserManager.getInstance().getUser().userNo.equals(userNo)) {
+            Log.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().id.toString() + " o = " + userNo);
+            if (UserManager.getInstance().getUser().id.toString().equals(userNo)) {
                 Log.d("cwtsw", "计算得分");
                 int score = (int) getBinding().lrcControlView.getPitchView().cumulatedScore;
                 getBinding().tvResultScore.setText(String.valueOf(score));
@@ -364,7 +364,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 } else {
                     getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
                 }
-                if (UserManager.getInstance().getUser().userNo.equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
+                if (UserManager.getInstance().getUser().id.toString().equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
                     getBinding().groupResult.setVisibility(View.VISIBLE);
                     Log.d("cwtsw", "显示得分");
                 }
@@ -485,9 +485,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @SuppressLint("NotifyDataSetChanged")
     private void onMusicChanged(@NonNull RoomSelSongModel music) {
         getBinding().lrcControlView.setMusic(music);
-        if (UserManager.getInstance().getUser().userNo.equals(music.getUserNo())) {
+        if (UserManager.getInstance().getUser().id.toString().equals(music.getUserNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Singer);
-        } else if (UserManager.getInstance().getUser().userNo.equals(music.getChorusNo())) {
+        } else if (UserManager.getInstance().getUser().id.toString().equals(music.getChorusNo())) {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Partner);
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
@@ -659,7 +659,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private void onMemberLeave(@NonNull RoomSeatModel member) {
-        if (member.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+        if (member.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
             getBinding().groupBottomView.setVisibility(View.GONE);
             getBinding().groupEmptyPrompt.setVisibility(View.VISIBLE);
         }
