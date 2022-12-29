@@ -441,6 +441,7 @@ private func _hideLoadingIfNeed() {
         }
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+        topSong.isChorus = true
         topSong.status = 3
         topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
