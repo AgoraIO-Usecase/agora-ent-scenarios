@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.TextureView
@@ -40,6 +41,7 @@ import io.agora.scene.show.widget.link.LiveLinkDialog
 import io.agora.scene.show.widget.link.OnLinkDialogActionListener
 import io.agora.scene.show.widget.pk.LivePKDialog
 import io.agora.scene.show.widget.pk.LivePKSettingsDialog
+import io.agora.scene.show.widget.pk.LiveRoomConfig
 import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
@@ -51,6 +53,7 @@ import java.util.*
 
 
 class LiveDetailActivity : AppCompatActivity() {
+    private val TAG = this::class.java.simpleName
 
     companion object {
         // 房间存活时间，单位ms
@@ -93,6 +96,11 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private var isAudioOnlyMode = false
 
+    private val timerRoomEndRun = Runnable {
+        destroy()
+        showLivingEndDialog()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, false)
@@ -104,20 +112,21 @@ class LiveDetailActivity : AppCompatActivity() {
         initRtcEngine()
 
         if (isRoomOwner) {
-            mBinding.root.postDelayed({
-                releaseCountdown()
-                destroyService()
-                destroyRtcEngine()
-                showLivingEndDialog()
-            }, ROOM_AVAILABLE_DURATION)
+            mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
         }
+    }
+
+    private fun destroy() {
+        VideoSetting.resetBroadcastSetting()
+        mBinding.root.removeCallbacks(timerRoomEndRun)
+        releaseCountdown()
+        destroyService()
+        destroyRtcEngine()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        releaseCountdown()
-        destroyService()
-        destroyRtcEngine()
+        destroy()
         mBeautyProcessor.reset()
     }
 
@@ -140,7 +149,7 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun initTopLayout() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
-            .load(mRoomInfo.ownerAvater)
+            .load(mRoomInfo.ownerAvatar)
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
@@ -149,15 +158,16 @@ class LiveDetailActivity : AppCompatActivity() {
 
         // Start Timer counter
         val dataFormat =
-            SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT+0") }
+            SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
+        Log.d(TAG, "TopTimer curr=${System.currentTimeMillis()}, createAt=${mRoomInfo.createdAt.toLong()}, diff=${System.currentTimeMillis() - mRoomInfo.createdAt.toLong()}, time=${dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))}")
         topLayout.tvTimer.post(object : Runnable {
             override fun run() {
                 topLayout.tvTimer.text =
-                    dataFormat.format(System.currentTimeMillis() - mRoomInfo.createdAt)
+                    dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))
                 topLayout.tvTimer.postDelayed(this, 1000)
+                topLayout.tvTimer.tag = this
             }
         })
-
     }
 
     private fun initBottomLayout() {
@@ -238,22 +248,31 @@ class LiveDetailActivity : AppCompatActivity() {
             if(isPKing()){
                 // PK状态
                 // 房主一定是PK的一方
-                bottomLayout.flLinking.isVisible = false
+                bottomLayout.ivLinking.isEnabled = false
+                bottomLayout.flPK.isEnabled = true
                 bottomLayout.flPK.isVisible = true
             }
             else if(isLinking()){
                 // 连麦状态
                 // 房主一定是连麦的一方
-                bottomLayout.flPK.isVisible = false
+                bottomLayout.flPK.isEnabled = false
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = null
+                mSettingDialog.apply {
+                    resetSettingsItem(false)
+                }
             }
             else{
                 // 单主播状态
                 // 房主是主播
+                bottomLayout.flPK.isEnabled = true
+                bottomLayout.ivLinking.isEnabled = true
                 bottomLayout.flPK.isVisible = true
                 bottomLayout.flLinking.isVisible = true
                 bottomLayout.ivLinking.imageTintList = ColorStateList.valueOf(getColor(R.color.grey_7e))
+                mSettingDialog.apply {
+                    resetSettingsItem(false)
+                }
             }
 
         } else {
@@ -512,8 +531,9 @@ class LiveDetailActivity : AppCompatActivity() {
                     SettingDialog.ITEM_ID_MIC -> {
                         if (!isRoomOwner) {
                             mService.muteAudio(!activated, interactionInfo!!.userId)
+                        } else {
+                            enableLocalAudio(activated)
                         }
-                        mRtcEngine.enableLocalAudio(activated)
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
@@ -735,16 +755,18 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun showPKDialog() {
-        mPKDialog.setLinkDialogActionListener(object : OnPKDialogActionListener {
+        mPKDialog.setPKDialogActionListener(object : OnPKDialogActionListener {
             override fun onRequestMessageRefreshing(dialog: LivePKDialog) {
-                mService.getAllPKUserList({
-                    mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
+                mService.getAllPKUserList({ roomList ->
+                    mService.getAllPKInvitationList(true, { invitationList ->
+                        mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
+                    })
                 })
             }
 
-            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: ShowRoomDetailModel) {
+            override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: LiveRoomConfig) {
                 if (isRoomOwner) {
-                    mService.createPKInvitation(roomItem)
+                    mService.createPKInvitation(roomItem.convertToShowRoomDetailModel())
                 }
             }
 
@@ -816,10 +838,19 @@ class LiveDetailActivity : AppCompatActivity() {
     //================== Service Operation ===============
 
     private fun initService() {
+        reFetchUserList()
+        mService.subscribeReConnectEvent {
+            reFetchUserList()
+            reFetchPKInvitationList()
+        }
+        mService.subscribeCurrRoomEvent { status, _ ->
+            if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted){
+                destroy()
+                showLivingEndDialog()
+            }
+        }
         mService.subscribeUser { status, user ->
-            mService.getAllUserList({
-                refreshTopUserCount(it.size)
-            })
+            reFetchUserList()
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && user != null) {
                 if (user.status == ShowRoomRequestStatus.waitting.value) {
                     if (isRoomOwner) {
@@ -840,8 +871,6 @@ class LiveDetailActivity : AppCompatActivity() {
                         user.status
                     ))
                 }
-            }else if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted && user?.userId == mRoomInfo.ownerId){
-                showLivingEndDialog()
             }
         }
         mService.subscribeMessage { _, showMessage ->
@@ -894,8 +923,10 @@ class LiveDetailActivity : AppCompatActivity() {
 
         mService.sendChatMessage(getString(R.string.show_live_chat_coming))
         mService.subscribePKInvitationChanged { status, info ->
-            mService.getAllPKUserList({
-                mPKDialog.setOnlineBroadcasterList(interactionInfo, it)
+            mService.getAllPKUserList({ roomList ->
+                mService.getAllPKInvitationList(true, { invitationList ->
+                    mPKDialog.setOnlineBroadcasterList(interactionInfo, roomList, invitationList)
+                })
             })
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null) {
                 if (info.status == ShowRoomRequestStatus.waitting.value && info.userId == UserManager.getInstance().user.id.toString()) {
@@ -903,13 +934,30 @@ class LiveDetailActivity : AppCompatActivity() {
                     showPKInvitationDialog(info.fromName)
                 }
             } else {
-                if (interactionInfo != null) {
+                if (interactionInfo != null && info != null && info.userId == UserManager.getInstance().user.id.toString()) {
                     mService.stopInteraction(interactionInfo!!, {
                         // success
                     })
                 }
             }
         }
+    }
+
+    private fun reFetchUserList(){
+        mService.getAllUserList({
+            refreshTopUserCount(it.size)
+        })
+    }
+
+    private fun reFetchPKInvitationList() {
+        mService.getAllPKInvitationList(false, { list ->
+            list.forEach {
+                if (it.userId == UserManager.getInstance().user.id.toString()
+                    && it.status == ShowRoomRequestStatus.waitting.value) {
+                    showPKInvitationDialog(it.fromName)
+                }
+            }
+        })
     }
 
     private fun isMeLinking() = isLinking() && interactionInfo?.userId == UserManager.getInstance().user.id.toString()
@@ -920,8 +968,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     private fun destroyService() {
         if (interactionInfo != null &&
-            (((interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) && (isRoomOwner || interactionInfo!!.userId == UserManager.getInstance().user.id.toString()))
-                    || ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner))) {
+             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)) {
             mService.stopInteraction(interactionInfo!!)
         }
         mService.leaveRoom()
@@ -931,7 +978,7 @@ class LiveDetailActivity : AppCompatActivity() {
         AlertDialog.Builder(this, R.style.show_alert_dialog)
             .setView(ShowLivingEndDialogBinding.inflate(LayoutInflater.from(this)).apply {
                 Glide.with(this@LiveDetailActivity)
-                    .load(mRoomInfo.ownerAvater)
+                    .load(mRoomInfo.ownerAvatar)
                     .into(ivAvatar)
             }.root)
             .setCancelable(false)
@@ -950,6 +997,13 @@ class LiveDetailActivity : AppCompatActivity() {
             override fun onError(err: Int) {
                 super.onError(err)
                 ToastUtils.showToast(RtcEngine.getErrorDescription(err))
+            }
+
+            override fun onUserOffline(uid: Int, reason: Int) {
+                super.onUserOffline(uid, reason)
+                if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
+                    mService.stopInteraction(interactionInfo!!)
+                }
             }
 
             override fun onLocalVideoStateChanged(
@@ -1093,7 +1147,7 @@ class LiveDetailActivity : AppCompatActivity() {
         }
 
         // 设置token有效期为房间存活时长，到期后关闭并退出房间
-        TokenGenerator.expireSecond = ROOM_AVAILABLE_DURATION / 1000 // 20min
+        TokenGenerator.expireSecond = ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
         checkRequirePerms {
             joinChannel()
         }
@@ -1102,10 +1156,22 @@ class LiveDetailActivity : AppCompatActivity() {
     private fun destroyRtcEngine() {
         // 重置token有效期，防止影响其他场景
         TokenGenerator.expireSecond = -1
-        mRtcEngine.removeHandler(mRtcEngineHandler)
-        mRtcEngine.stopPreview()
-        mRtcEngine.leaveChannel()
-        RtcEngineInstance.destroy()
+        mRtcEngineHandler?.let {
+            mRtcEngine.removeHandler(mRtcEngineHandler)
+            mRtcEngine.stopPreview()
+            mRtcEngine.leaveChannel()
+            RtcEngineInstance.destroy()
+            mRtcEngineHandler = null
+        }
+    }
+
+    private fun enableLocalAudio(enable: Boolean) {
+        mRtcEngine.enableLocalAudio(enable)
+        if (enable) {
+            VideoSetting.updateBroadcastSetting(
+                inEarMonitoring = VideoSetting.getCurrBroadcastSetting().audio.inEarMonitoring
+            )
+        }
     }
 
     private fun joinChannel() {
@@ -1132,6 +1198,9 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.getAllInterationList ({
                     val interactionInfo = it.getOrNull(0)
                     this.interactionInfo = interactionInfo
+                    if (interactionInfo != null && isRoomOwner) {
+                        mService.stopInteraction(interactionInfo)
+                    }
                     refreshBottomLayout()
                     updateVideoSetting()
                     if (interactionInfo != null) {
@@ -1179,11 +1248,11 @@ class LiveDetailActivity : AppCompatActivity() {
         if (interactionInfo == null) return
         if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
             if (interactionInfo!!.userId == UserManager.getInstance().user.id.toString()) {
-                mRtcEngine.enableLocalAudio(!interactionInfo!!.muteAudio)
+                enableLocalAudio(!interactionInfo!!.muteAudio)
             }
         } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
             if (isRoomOwner) {
-                mRtcEngine.enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
+                enableLocalAudio(!interactionInfo!!.ownerMuteAudio)
             }
         }
     }
@@ -1197,7 +1266,7 @@ class LiveDetailActivity : AppCompatActivity() {
         val broadcasterVideoView = SurfaceView(this)
         mBinding.videoSinglehostLayout.videoContainer.addView(broadcasterVideoView)
         if (isRoomOwner) {
-            mRtcEngine.enableLocalAudio(true)
+            enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
         } else {
             val channelMediaOptions = ChannelMediaOptions()
@@ -1236,6 +1305,7 @@ class LiveDetailActivity : AppCompatActivity() {
             audienceVideoView.setOnClickListener {
                 showLinkSettingsDialog()
             }
+            enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
             mRtcEngine.setupRemoteVideo(
                 VideoCanvas(
@@ -1250,7 +1320,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 audienceVideoView.setOnClickListener {
                     showLinkSettingsDialog()
                 }
-                mRtcEngine.enableLocalAudio(true)
+                enableLocalAudio(true)
                 val channelMediaOptions = ChannelMediaOptions()
                 channelMediaOptions.publishCameraTrack = true
                 channelMediaOptions.publishMicrophoneTrack = true
@@ -1312,7 +1382,7 @@ class LiveDetailActivity : AppCompatActivity() {
                 showPKSettingsDialog()
             }
             mRtcEngine.setupLocalVideo(VideoCanvas(view))
-            mRtcEngine.enableLocalAudio(true)
+            enableLocalAudio(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = true
@@ -1430,6 +1500,10 @@ class LiveDetailActivity : AppCompatActivity() {
         if (mPKCountDownLatch != null) {
             mPKCountDownLatch!!.cancel()
             mPKCountDownLatch = null
+        }
+        (mBinding.topLayout.tvTimer.tag as? Runnable)?.let {
+            mBinding.topLayout.tvTimer.removeCallbacks(it)
+            mBinding.topLayout.tvTimer.tag = null
         }
     }
 }

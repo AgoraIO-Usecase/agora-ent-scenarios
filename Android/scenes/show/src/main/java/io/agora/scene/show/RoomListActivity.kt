@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -45,7 +46,9 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
         mBinding.smartRefreshLayout.setOnRefreshListener {
-            mService.getRoomList({ runOnUiThread { updateList(it) } })
+            mService.getRoomList(
+                { runOnUiThread { updateList(it) } },
+                { runOnUiThread { updateList(emptyList()) } })
         }
         mBinding.smartRefreshLayout.autoRefresh()
 
@@ -80,9 +83,11 @@ class RoomListActivity : AppCompatActivity() {
         }
     }
 
-    private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel){
+    private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel) {
         mService.joinRoom(roomInfo.roomId, {
             LiveDetailActivity.launch(this, it)
+        }, {
+            ToastUtils.showToast(it.message)
         })
     }
 
@@ -93,6 +98,7 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mService.destroy()
         RtcEngineInstance.destroy()
     }
 }

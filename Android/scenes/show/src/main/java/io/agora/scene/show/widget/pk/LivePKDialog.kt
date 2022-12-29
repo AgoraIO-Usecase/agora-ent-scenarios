@@ -1,6 +1,5 @@
 package io.agora.scene.show.widget.pk
 
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +13,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLivePkDialogBinding
 import io.agora.scene.show.service.ShowInteractionInfo
+import io.agora.scene.show.service.ShowPKInvitation
 import io.agora.scene.show.service.ShowRoomDetailModel
+import io.agora.scene.show.service.ShowRoomRequestStatus
 
 class LivePKDialog : BottomSheetDialogFragment() {
     private var mBinding : ShowLivePkDialogBinding? = null
@@ -49,7 +50,7 @@ class LivePKDialog : BottomSheetDialogFragment() {
         binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         pkFragment.setListener(object : LivePKRequestMessageFragment.Listener {
-            override fun onAcceptMicSeatItemChosen(roomItem: ShowRoomDetailModel) {
+            override fun onAcceptMicSeatItemChosen(roomItem: LiveRoomConfig) {
                 pkDialogListener.onInviteButtonChosen(this@LivePKDialog, roomItem)
             }
 
@@ -81,17 +82,26 @@ class LivePKDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * 接受连麦-更新连麦Dialog
+     * 接受连麦-更新PK Dialog
      */
-    fun setLinkDialogActionListener(listener : OnPKDialogActionListener) {
+    fun setPKDialogActionListener(listener : OnPKDialogActionListener) {
         pkDialogListener = listener
     }
 
     /**
-     * 设置连麦申请列表
+     * 设置PK申请列表
      */
-    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomItem : List<ShowRoomDetailModel>) {
-        pkFragment.setOnlineBroadcasterList(interactionInfo, roomItem)
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<ShowRoomDetailModel>, invitationList : List<ShowPKInvitation>) {
+        val list = ArrayList<LiveRoomConfig>()
+        roomList.forEach { roomItem ->
+            val invitation = invitationList.filter { it.userId == roomItem.ownerId }.getOrNull(0)
+            if (invitation != null && invitation.status == ShowRoomRequestStatus.waitting.value) {
+                list.add(LiveRoomConfig(roomItem, true))
+            } else {
+                list.add(LiveRoomConfig(roomItem, false))
+            }
+        }
+        pkFragment.setOnlineBroadcasterList(interactionInfo, list)
     }
 
     /**

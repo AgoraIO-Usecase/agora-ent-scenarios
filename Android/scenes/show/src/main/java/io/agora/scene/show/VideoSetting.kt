@@ -207,9 +207,18 @@ object VideoSetting {
 
     private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
     private var currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
+    private var currAudienceDeviceLevel = DeviceLevel.Low
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
+
+    fun resetBroadcastSetting() {
+        currBroadcastSetting = when(currAudienceDeviceLevel){
+            DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
+            DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
+            DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
+        }
+    }
 
     fun updateAudienceSetting(
         isJoinedRoom: Boolean = true,
@@ -231,11 +240,16 @@ object VideoSetting {
         updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
-    fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false) {
-        val liveMode = when (currBroadcastSetting) {
-            RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
-            RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
-            else -> LiveMode.OneVOne
+    fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false, isByAudience: Boolean = false) {
+        var liveMode = LiveMode.OneVOne
+        if (isByAudience) {
+            currAudienceDeviceLevel = deviceLevel
+        }else{
+            liveMode = when (currBroadcastSetting) {
+                RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
+                RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
+                else -> LiveMode.OneVOne
+            }
         }
 
         updateBroadcastSetting(
