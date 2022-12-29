@@ -13,6 +13,9 @@ const val ITEM_ID_BEAUTY_FOREHEAD   = GROUP_ID_BEAUTY + 8 // 额头
 const val ITEM_ID_BEAUTY_NOSE       = GROUP_ID_BEAUTY + 9 // 瘦鼻
 const val ITEM_ID_BEAUTY_MOUTH      = GROUP_ID_BEAUTY + 10 // 嘴形
 const val ITEM_ID_BEAUTY_CHIN       = GROUP_ID_BEAUTY + 11 // 下巴
+const val ITEM_ID_BEAUTY_BRIGHT_EYE       = GROUP_ID_BEAUTY + 12 // 亮眼
+const val ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES       = GROUP_ID_BEAUTY + 13 // 祛黑眼圈
+const val ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS        = GROUP_ID_BEAUTY + 14 // 祛法令纹
 
 
 const val GROUP_ID_FILTER = GROUP_ID_BEAUTY shl 8 // 滤镜
