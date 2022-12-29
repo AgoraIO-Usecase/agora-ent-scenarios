@@ -3,17 +3,10 @@ package io.agora.scene.show.beauty
 object BeautyCache {
 
     private val defaultItemValueMap = mapOf(
-        Pair(ITEM_ID_BEAUTY_SMOOTH, 0.3f),
-        Pair(ITEM_ID_BEAUTY_WHITEN, 0.5f),
-        Pair(ITEM_ID_BEAUTY_OVERALL, 0.15f),
-        Pair(ITEM_ID_BEAUTY_CHEEKBONE, 0.3f),
-        Pair(ITEM_ID_BEAUTY_JAWBONE, 0.46f),
-        Pair(ITEM_ID_BEAUTY_EYE, 0.15f),
-        Pair(ITEM_ID_BEAUTY_TEETH, 0.2f),
-        Pair(ITEM_ID_BEAUTY_FOREHEAD, 0.4f),
-        Pair(ITEM_ID_BEAUTY_NOSE, 0.15f),
-        Pair(ITEM_ID_BEAUTY_MOUTH, 0.16f),
-        Pair(ITEM_ID_BEAUTY_CHIN, 0.46f),
+        Pair(ITEM_ID_BEAUTY_SMOOTH, 0.75f),
+        Pair(ITEM_ID_BEAUTY_WHITEN, 0.2f),
+        Pair(ITEM_ID_BEAUTY_CHEEKBONE, 0.4f),
+        Pair(ITEM_ID_BEAUTY_NOSE, 0.1f),
 
         Pair(ITEM_ID_EFFECT_BAIXI, 0.5f),
         Pair(ITEM_ID_EFFECT_TIANMEI, 0.5f),

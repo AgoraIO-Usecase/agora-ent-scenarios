@@ -55,6 +55,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
 
     private volatile boolean sdkIsInit = false;
     private volatile boolean isReleased = false;
+    private volatile boolean shouldMirror = false;
 
 
     public BeautySenseTimeImpl(Context context) {
@@ -151,7 +152,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
                         textureBuffer.getTextureId(), texFormat);
             });
             transformMatrix = textureBuffer.getTransformMatrix();
-
+            shouldMirror = false;
         } else {
             if (textureBufferHelper == null) {
                 mEglBaseContext = null;
@@ -173,6 +174,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
             texture = textureBufferHelper.invoke(() ->
                     mSTRenderer.preProcess(buffer.getWidth(), buffer.getHeight(), videoFrame.getRotation(), mNV21ByteArray, STCommonNative.ST_PIX_FMT_NV21));
             transformMatrix = new Matrix();
+            shouldMirror = isFrontCamera;
         }
 
         boolean isFront = videoFrame.getRotation() == 270;
@@ -195,22 +197,27 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
     }
 
     @Override
+    public boolean getMirrorApplied() {
+        return shouldMirror;
+    }
+
+    @Override
     protected void setFaceBeautifyAfterCached(int itemId, float intensity) {
         if (!sdkIsInit || isReleased) {
             return;
         }
 
-        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH1_MODE);
+        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, STEffectBeautyType.SMOOTH2_MODE);
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
-        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING1_MODE);
+        mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_WHITEN));
 
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_NARROW_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_SHRINK_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHEEKBONE));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_SHRINK_JAW, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_JAWBONE));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHEEKBONE));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_JAWBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_JAWBONE));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_RESHAPE_ENLARGE_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_EYE));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_WHITE_TEETH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_TEETH));
-        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THINNER_HEAD, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_FOREHEAD));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_HAIRLINE_HEIGHT, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_FOREHEAD));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_NOSE));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_MOUTH));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHIN));
