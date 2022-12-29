@@ -315,9 +315,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
             switch (state) {
                 case AgoraMediaPlayerStatePaused:
-                case AgoraMediaPlayerStateStopped:
-                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
                     [self pausePlay];
+                    break;
+                case AgoraMediaPlayerStateStopped:
+//                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
+                    [self stopSong];
                     break;
                 case AgoraMediaPlayerStatePlaying:
                     [self resumePlay];
