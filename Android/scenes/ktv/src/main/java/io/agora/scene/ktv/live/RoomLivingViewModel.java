@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,7 +17,6 @@ import androidx.lifecycle.ViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,16 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import io.agora.lyrics_view.DownloadManager;
-import io.agora.lyrics_view.LrcLoadUtils;
-import io.agora.lyrics_view.bean.LrcData;
-import io.agora.mediaplayer.IMediaPlayerObserver;
-import io.agora.mediaplayer.data.PlayerUpdatedInfo;
-import io.agora.mediaplayer.data.SrcInfo;
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter;
 import io.agora.musiccontentcenter.IAgoraMusicPlayer;
 import io.agora.musiccontentcenter.IMusicContentCenterEventHandler;
@@ -45,7 +36,6 @@ import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
 import io.agora.rtc2.IRtcEngineEventHandler;
-import io.agora.rtc2.RtcConnection;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.RtcEngineEx;
@@ -56,8 +46,6 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
-import io.agora.scene.base.utils.ZipUtils;
-import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinChorusInputModel;
@@ -69,15 +57,17 @@ import io.agora.scene.ktv.service.OutSeatInputModel;
 import io.agora.scene.ktv.service.RemoveSongInputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.ktv.widget.MusicSettingBean;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
-public class RoomLivingViewModel extends ViewModel {
+public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEventHandler {
 
     private final String TAG = "KTV Scene LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
+    private final KTVApi ktvApiProtocol = new KTVApiImpl();
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -107,8 +97,7 @@ public class RoomLivingViewModel extends ViewModel {
      * Player/RTC信息
      */
     int streamId = 0;
-    boolean mpkNeedStopped = false;
-    boolean mccNeedPreload = false;
+
     enum PlayerMusicStatus {
         ON_PREPARE,
         ON_WAIT_CHORUS,
@@ -120,7 +109,6 @@ public class RoomLivingViewModel extends ViewModel {
         ON_CHANGING_END
     }
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
-    final MutableLiveData<LrcData> playerMusicLrcDataLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
     final MutableLiveData<String> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicPlayPositionChangeLiveData = new MutableLiveData<>();
@@ -180,6 +168,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void release() {
+        ktvApiProtocol.release();
         streamId = 0;
         if (mPlayer != null) {
             mPlayer.stop();
@@ -827,9 +816,6 @@ public class RoomLivingViewModel extends ViewModel {
      */
     public void topUpSong(RoomSelSongModel songModel){
         Log.d(TAG, "RoomLivingViewModel.topUpSong() called, name:" + songModel.getName());
-        if(songModel == null){
-            return;
-        }
         ktvServiceProtocol.makeSongTop(new MakeSongTopInputModel(
                 songModel.getSongNo()
         ), e -> {
@@ -939,19 +925,12 @@ public class RoomLivingViewModel extends ViewModel {
     public void changeMusic() {
         Log.d(TAG, "RoomLivingViewModel.changeMusic() called");
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
-        if (musicModel == null) {
-            return;
-        }
-        if (mPlayer != null) {
-            if (musicModel.isChorus() && musicModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                // 合唱主唱切歌， mpk流离开频道
-                mRtcEngine.muteAllRemoteAudioStreams(false);
-                mRtcEngine.leaveChannelEx(new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)));
-            }
-            mPlayer.stop();
-        }
-        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
+        if (musicModel == null) return;
 
+        ktvApiProtocol.stopSong();
+
+        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
+        stopDisplayLrc();
         _loadingDialogVisible.postValue(true);
         ktvServiceProtocol.removeSong(new RemoveSongInputModel(
                 musicModel.getSongNo()
@@ -970,20 +949,15 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
-    // ======================= 分数相关 =======================
-    private void initSingScore(){
-        ktvServiceProtocol.subscribeSingingScoreChange((ktvSubscribe, aDouble) -> {
-            if (mPlayer == null || mPlayer.getState() != io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-                return null;
-            }
-
-            playerPitchLiveData.postValue(aDouble);
-            return null;
-        });
+    /**
+     * 设置歌词view
+     */
+    public void setLryView(LrcControlView view) {
+        ktvApiProtocol.setLycView(view);
     }
 
     // ======================= Player/RTC/MPK相关 =======================
-    private void initRTCPlayer(){
+    private void initRTCPlayer() {
         if (TextUtils.isEmpty(BuildConfig.AGORA_APP_ID)) {
             throw new NullPointerException("please check \"strings_config.xml\"");
         }
@@ -995,82 +969,21 @@ public class RoomLivingViewModel extends ViewModel {
         config.mAppId = BuildConfig.AGORA_APP_ID;
         config.mEventHandler = new IRtcEngineEventHandler() {
             @Override
-            public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
-                Log.d(TAG, "onJoinChannelSuccess() called, channel: " + channel + " uid: " + uid);
-            }
-
-            @Override
-            public void onLeaveChannel(RtcStats stats) {
-                Log.d(TAG, "onLeaveChannel() called");
-            }
-
-            @Override
             public void onStreamMessage(int uid, int streamId, byte[] data) {
                 JSONObject jsonMsg;
                 try {
                     String strMsg = new String(data);
                     jsonMsg = new JSONObject(strMsg);
-                    if (jsonMsg.getString("cmd").equals("setLrcTime")) {
-                        long position = jsonMsg.getLong("time");
-                        if (position == 0) {
-                            // 伴唱收到歌曲播放指令
-                            mPlayer.play();
-                        } else if (position == -1) {
-                            // 伴唱收到歌曲暂停指令
-                            mPlayer.pause();
-                        } else {
-                            // 观众收到歌词播放状态同步信息
-                            mRecvedPlayPosition = position;
-                            mLastRecvPlayPosTime = System.currentTimeMillis();
-                        }
-                    } else if (jsonMsg.getString("cmd").equals("countdown")) {
+                    if (jsonMsg.getString("cmd").equals("countdown")) {
                         // 各端收到合唱倒计时
                         if (mPlayer == null) return;
                         int time = jsonMsg.getInt("time");
                         playerMusicCountDownLiveData.postValue(time);
-                    } else if (jsonMsg.getString("cmd").equals("TrackMode")) {
-                        // 伴唱收到原唱伴唱调整指令
-                        if (mPlayer == null) return;
-                        int TrackMode = jsonMsg.getInt("mode");
-                        mPlayer.selectAudioTrack(TrackMode);
-                    } else if (jsonMsg.getString("cmd").equals("Seek")) {
-                        // 伴唱收到原唱seek指令
-                        if (mPlayer == null) return;
-                        long position = jsonMsg.getLong("position");
-                        mPlayer.seek(position);
-                    } else if (jsonMsg.getString("cmd").equals("setVoicePitch")) {
-                        // 伴唱收到原唱seek指令
-                        if (mPlayer == null) return;
-                        double pitch = jsonMsg.getDouble("pitch");
-                        if (mPlayer != null && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                            playerPitchLiveData.postValue(pitch);
-                        }
                     }
                 } catch (JSONException exp) {
                     Log.e(TAG, "onStreamMessage:" + exp.toString());
                 }
             }
-
-            @Override
-            public void onAudioVolumeIndication(AudioVolumeInfo[] speakers, int totalVolume) {
-                // VideoPitch回调, 用于同步各端音准
-                RoomSelSongModel songPlaying = songPlayingLiveData.getValue();
-                if (songPlaying == null) {
-                    return;
-                }
-                if (Objects.equals(songPlaying.getUserNo(), UserManager.getInstance().getUser().userNo)
-                        || Objects.equals(songPlaying.getChorusNo(), UserManager.getInstance().getUser().userNo)) {
-                    for (AudioVolumeInfo info : speakers) {
-                        if (info.uid == 0 && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                            if (mPlayer != null && mPlayer.getState() == io.agora.mediaplayer.Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-                                playerPitchLiveData.postValue(info.voicePitch);
-                                pitch = info.voicePitch;
-                            }
-                        }
-                    }
-                }
-            }
-
             @Override
             public void onNetworkQuality(int uid, int txQuality, int rxQuality) {
                 // 网络状态回调, 本地user uid = 0
@@ -1146,156 +1059,9 @@ public class RoomLivingViewModel extends ViewModel {
         contentCenterConfiguration.token = roomInfoLiveData.getValue().getAgoraRTMToken();
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
-        iAgoraMusicContentCenter.registerEventHandler(new IMusicContentCenterEventHandler() {
-            @Override
-            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
-                Log.d(TAG, "onPreLoadEvent percent = " + percent + " status = " + status);
-                if (percent == 100) {
-                    if (mccNeedPreload && mPlayer != null) {
-                        mccNeedPreload = false;
-                        mPlayer.open(songCode, 0);
-                    }
-                }
-            }
-
-            @Override
-            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
-                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-                if(handler != null){
-                   handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
-                    rtcMusicHandlerMap.remove(requestId);
-                }
-            }
-
-            @Override
-            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
-                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-                if(handler != null){
-                    handler.onMusicChartsResult(requestId, status, list);
-                    rtcMusicHandlerMap.remove(requestId);
-                }
-            }
-
-            @Override
-            public void onLyricResult(String requestId, String lyricUrl) {
-                IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
-                if(handler != null){
-                    handler.onLyricResult(requestId, lyricUrl);
-                    rtcMusicHandlerMap.remove(requestId);
-                }
-            }
-        });
 
         // ------------------ 初始化音乐播放器实例 ------------------
         mPlayer = iAgoraMusicContentCenter.createMusicPlayer();
-        mPlayer.registerPlayerObserver(new IMediaPlayerObserver() {
-
-            private ScheduledExecutorService mExecutor = Executors.newSingleThreadScheduledExecutor();
-
-            @Override
-            public void onPlayerStateChanged(io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error) {
-                switch (state) {
-                    case PLAYER_STATE_OPEN_COMPLETED:
-                        Log.d(TAG, "musicPlayer PLAYER_STATE_OPEN_COMPLETED");
-                        playerMusicOpenDurationLiveData.postValue(mPlayer.getDuration());
-                        mPlayer.play();
-                        startDisplayLrc();
-                        break;
-                    case PLAYER_STATE_PLAYING:
-                        Log.d(TAG, "musicPlayer PLAYER_STATE_PLAYING");
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        if (!songPlayingLiveData.getValue().isChorus()) {
-                            startSyncLrc(songPlayingLiveData.getValue().getSongNo(), mPlayer.getDuration());
-                            startSyncPitch();
-                        }
-                        break;
-                    case PLAYER_STATE_PAUSED:
-                        Log.d(TAG, "musicPlayer PLAYER_STATE_PAUSED");
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                        break;
-                    case PLAYER_STATE_STOPPED:
-                        Log.d(TAG, "musicPlayer PLAYER_STATE_STOPPED");
-                        if (mpkNeedStopped && mPlayer != null) {
-                            mpkNeedStopped = false;
-                            String songNo = songPlayingLiveData.getValue().getSongNo();
-                            mPlayer.open(Long.parseLong(songNo), 0);
-                        }
-                        break;
-                    case PLAYER_STATE_FAILED:
-                        Log.e(TAG, "onPlayerStateChanged: failed to play:" + error.toString());
-                        break;
-                    case PLAYER_STATE_PLAYBACK_COMPLETED:
-                    case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
-                        Log.d(TAG, "onMusicCompleted");
-                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                        playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
-                        changeMusic();
-                        break;
-                    default:
-                }
-            }
-
-            @Override
-            public void onPositionChanged(long position_ms) {
-                // 本端获取播放位置，用于歌词播放
-                // Workaround, delay emit for 350ms
-                mExecutor.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                            mLastRecvPlayPosTime = System.currentTimeMillis();
-                            mRecvedPlayPosition = position_ms;
-                        }
-                    }
-                }, 350, TimeUnit.MILLISECONDS);
-            }
-
-            @Override
-            public void onPlayerEvent(io.agora.mediaplayer.Constants.MediaPlayerEvent eventCode, long elapsedTime, String message) {
-
-            }
-
-            @Override
-            public void onMetaData(io.agora.mediaplayer.Constants.MediaPlayerMetadataType type, byte[] data) {
-
-            }
-
-            @Override
-            public void onPlayBufferUpdated(long playCachedBuffer) {
-
-            }
-
-            @Override
-            public void onPreloadEvent(String src, io.agora.mediaplayer.Constants.MediaPlayerPreloadEvent event) {
-
-            }
-
-            @Override
-            public void onAgoraCDNTokenWillExpire() {
-
-            }
-
-            @Override
-            public void onPlayerSrcInfoChanged(SrcInfo from, SrcInfo to) {
-
-            }
-
-            @Override
-            public void onPlayerInfoUpdated(PlayerUpdatedInfo info) {
-
-            }
-
-            @Override
-            public void onAudioVolumeIndication(int volume) {
-
-            }
-
-            @Override
-            protected void finalize() throws Throwable {
-                super.finalize();
-                mExecutor.shutdown();
-            }
-        });
 
         // ------------------ 初始化音乐播放设置面版 ------------------
         mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
@@ -1359,6 +1125,15 @@ public class RoomLivingViewModel extends ViewModel {
         mPlayer.adjustPlayoutVolume(40);
         mPlayer.adjustPublishSignalVolume(40);
         mRtcEngine.adjustRecordingSignalVolume(40);
+
+        if (streamId == 0) {
+            DataStreamConfig cfg = new DataStreamConfig();
+            cfg.syncWithAudio = true;
+            cfg.ordered = true;
+            streamId = mRtcEngine.createDataStream(cfg);
+        }
+
+        ktvApiProtocol.initWithRtcEngine(mRtcEngine, roomInfoLiveData.getValue().getRoomNo(), iAgoraMusicContentCenter, mPlayer, streamId, this);
     }
 
     // ======================= settings =======================
@@ -1411,54 +1186,22 @@ public class RoomLivingViewModel extends ViewModel {
     // ------------------ 原唱/伴奏 ------------------
     protected int mAudioTrackIndex = 1;
     public boolean musicToggleOriginal() {
-        if (mPlayer == null) {
-            return false;
-        }
-        boolean needSendStatus = songPlayingLiveData.getValue().isChorus()
-                && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo);
-
-        if (true) { // 因为咪咕音乐没有音轨，只有左右声道，所以暂定如此
-            if (mAudioTrackIndex == 0) {
-                mAudioTrackIndex = 1;
-                if (needSendStatus) {
-                    // 合唱时 发送状态
-                    sendTrackMode(0);
-                }
-                mPlayer.selectAudioTrack(0);
-            } else {
-                mAudioTrackIndex = 0;
-                if (needSendStatus) {
-                    // 合唱时 发送状态
-                    sendTrackMode(1);
-                }
-                mPlayer.selectAudioTrack(1);
-            }
-            return false;
+        if (mAudioTrackIndex == 1) {
+            ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackAcc);
+            mAudioTrackIndex = 0;
         } else {
-            ToastUtils.showToast(R.string.ktv_error_cut);
-            return true;
+            ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackOrigin);
+            mAudioTrackIndex = 1;
         }
+        return false;
     }
 
     // ------------------ 暂停/播放 ------------------
     public void musicToggleStart() {
-        if (mPlayer == null) {
-            return;
-        }
-        boolean needSendStatus = songPlayingLiveData.getValue().isChorus()
-                && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo);
         if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-            if (needSendStatus) {
-                // 合唱时 发送状态
-                sendPause();
-            }
-            mPlayer.pause();
+            ktvApiProtocol.pausePlay();
         } else if (playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PAUSE) {
-            if (needSendStatus) {
-                // 合唱时 发送状态
-                sendPlay();
-            }
-            mPlayer.resume();
+            ktvApiProtocol.resumePlay();
         }
     }
 
@@ -1477,29 +1220,18 @@ public class RoomLivingViewModel extends ViewModel {
 
     // ------------------ 倒计时 ------------------
     public void musicCountDown(int time) {
-        if (mPlayer != null) {
-            playerMusicCountDownLiveData.postValue(time);
-            Map<String, Object> msg = new HashMap<>();
-            msg.put("cmd", "countdown");
-            msg.put("time", time);
-            JSONObject jsonMsg = new JSONObject(msg);
-
-            if (streamId == 0) {
-                DataStreamConfig cfg = new DataStreamConfig();
-                cfg.syncWithAudio = true;
-                cfg.ordered = true;
-                streamId = mRtcEngine.createDataStream(cfg);
-            }
-            mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        }
+        playerMusicCountDownLiveData.postValue(time);
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("cmd", "countdown");
+        msg.put("time", time);
+        JSONObject jsonMsg = new JSONObject(msg);
+        mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
     }
 
     // ------------------ 歌曲开始播放 ------------------
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
         Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
-        mPlayer.stop();
-        stopSyncPitch();
-        stopSyncLrc();
+        ktvApiProtocol.stopSong();
         stopDisplayLrc();
         mRecvedPlayPosition = 0;
         mLastRecvPlayPosTime = null;
@@ -1507,87 +1239,23 @@ public class RoomLivingViewModel extends ViewModel {
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().userNo);
         boolean isChorus = music.isChorus();
+        Long songCode = Long.parseLong(music.getSongNo());
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-        if (isChorus) {
-            //合唱
-            mRtcEngine.muteAllRemoteAudioStreams(false);
-            if (music.getChorusNo() == null) {
-                // 没有合唱者加入时， 播放等待动画
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_WAIT_CHORUS);
 
-                // 合唱准备
-                mainChannelMediaOption.publishCameraTrack = isCameraOpened;
-                mainChannelMediaOption.publishMicrophoneTrack = true;
-                mainChannelMediaOption.publishCustomAudioTrack = false;
-                mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-                mainChannelMediaOption.autoSubscribeAudio = true;
-                mainChannelMediaOption.autoSubscribeVideo = true;
-                mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
-                mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
-                int ret = mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
-                Log.d(TAG, "RoomLivingViewModel.updateChannelMediaOptions() stop publish mpk called: " + ret);
-                return;
-            } else if (isOwnSong) {
-                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHORUS_JOINED);
-                // 合唱者加入后，点歌者推mpk流
-                ChannelMediaOptions options = new ChannelMediaOptions();
-                options.publishCameraTrack = false;
-                options.publishCustomAudioTrack = false;
-                options.enableAudioRecordingOrPlayout = false;
-                options.publishMicrophoneTrack = false;
-                options.autoSubscribeVideo = false;
-                options.autoSubscribeAudio = false;
-                options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                options.publishMediaPlayerId = mPlayer.getMediaPlayerId();
-                options.publishMediaPlayerAudioTrack = true;
-
-                int ret = mRtcEngine.joinChannelEx(
-                        roomInfoLiveData.getValue().getAgoraRTCToken(),
-                        new RtcConnection(roomInfoLiveData.getValue().getRoomNo(), (int) (UserManager.getInstance().getUser().id * 10 + 1)),
-                        options,
-                        new IRtcEngineEventHandler() {
-                        }
-                );
-                Log.d(TAG, "RoomLivingViewModel.joinChannelEx() called, ret = " + ret);
-                // 合唱状态下mute推的mpk流
-                mRtcEngine.muteRemoteAudioStream((int) (UserManager.getInstance().getUser().id * 10 + 1), true);
-            } else if (music.getChorusNo().equals(UserManager.getInstance().getUser().userNo)) {
-                // 合唱者加入后，合唱者mute 点歌者mpk流
-                List<RoomSeatModel> seatList = seatListLiveData.getValue();
-                RoomSeatModel mainSinger = null;
-                if (seatList != null) {
-                    for (RoomSeatModel model : seatList) {
-                        if (model.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
-                            mainSinger = model;
-                        }
+        KTVSongType type = isChorus ? KTVSongType.KTVSongTypeChorus : KTVSongType.KTVSongTypeSolo;
+        KTVSingRole role = isChorus ? (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleCoSinger) : (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleAudience);
+        ktvApiProtocol.loadSong(songCode, new KTVSongConfiguration(type, role, songCode, UserManager.getInstance().getUser().id.intValue(), 0),
+            (song, lyricUrl, singRole, singState) -> {
+                if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
+                    if (singRole == KTVSingRole.KTVSingRoleAudience) {
+                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                        startDisplayLrc();
                     }
+                    ktvApiProtocol.playSong(song);
                 }
-
-                if (mainSinger != null) {
-                    int ret = mRtcEngine.muteRemoteAudioStream(Integer.parseInt(mainSinger.getRtcUid()) * 10 + 1, true);
-                    Log.d(TAG, "RoomLivingViewModel.muteRemoteAudioStream() called: " + Integer.parseInt(mainSinger.getRtcUid()) * 10 + 1);
-                }
-                // 合唱者开始网络测试
-                // startNetTestTask();
+                return null;
             }
-        } else {
-            // 独唱状态
-            if (isOwnSong) {
-                // 点歌者(演唱者)同时推人声、播放器混流, 停止订阅远端音频流
-                mainChannelMediaOption.publishCameraTrack = isCameraOpened;
-                mainChannelMediaOption.publishMicrophoneTrack = true;
-                mainChannelMediaOption.publishCustomAudioTrack = false;
-                mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-                mainChannelMediaOption.autoSubscribeAudio = true;
-                mainChannelMediaOption.autoSubscribeVideo = true;
-                mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
-                mainChannelMediaOption.publishMediaPlayerAudioTrack = true;
-                int ret = mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
-                Log.d(TAG, "RoomLivingViewModel.updateChannelMediaOptions() publish microphone and mpk mixing called: " + ret);
-            }
-        }
+        );
 
         ktvServiceProtocol.makeSongDidPlay(music, e -> {
             if (e == null) {
@@ -1599,35 +1267,22 @@ public class RoomLivingViewModel extends ViewModel {
             }
             return null;
         });
-
-        // 准备歌词
-        prepareLrc(context, music, isChorus, isOwnSong);
     }
 
     // ------------------ 歌曲seek ------------------
     public void musicSeek(long time) {
-        if (mPlayer != null) {
-            if ( songPlayingLiveData.getValue().isChorus()
-                    && songPlayingLiveData.getValue().getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
-                    sendMusicPlayerPosition(time);
-            }
-            mPlayer.seek(time);
-        }
+        ktvApiProtocol.seek(time);
     }
 
     // ------------------ 歌曲结束播放 ------------------
     public void musicStop() {
-         Log.d(TAG, "RoomLivingViewModel.musicStop() called");
+        Log.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
-        if (mPlayer != null) {
-            mPlayer.stop();
-            stopSyncPitch();
-            stopSyncLrc();
-            stopDisplayLrc();
-            mRecvedPlayPosition = 0;
-            mLastRecvPlayPosTime = null;
-            mAudioTrackIndex = 1;
-        }
+        ktvApiProtocol.stopSong();
+        stopDisplayLrc();
+        mRecvedPlayPosition = 0;
+        mLastRecvPlayPosTime = null;
+        mAudioTrackIndex = 1;
 
         if (isOnSeat) {
             mainChannelMediaOption.publishMicrophoneTrack = true;
@@ -1667,110 +1322,12 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     // ------------------ 歌词播放、同步 ------------------
-    //主唱同步歌词给其他人
-    private boolean mStopSyncLrc = true;
-    private Thread mSyncLrcThread;
-
     //歌词实时刷新
     protected boolean mStopDisplayLrc = true;
     private Thread mDisplayThread;
 
     private static volatile long mRecvedPlayPosition = 0;//播放器播放position，ms
     private static volatile Long mLastRecvPlayPosTime = null;
-
-    // 歌词播放准备
-    private void prepareLrc(Context mContext, @NonNull RoomSelSongModel music, boolean isChorus, boolean isOwnSong) {
-        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
-
-        // lyricType -- 0: xml; 1: lrc
-        String requestId = iAgoraMusicContentCenter.getLyric(Long.parseLong(music.getSongNo()), 0);
-        rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
-            @Override
-            public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
-                // do nothing
-            }
-
-            @Override
-            public void onMusicCollectionResult(String requestId, int status, int page, int pageSize, int total, Music[] list) {
-                // do nothing
-            }
-
-            @Override
-            public void onMusicChartsResult(String requestId, int status, MusicChartInfo[] list) {
-                // do nothing
-            }
-
-            @Override
-            public void onLyricResult(String requestId, String lyricUrl) {
-                if (lyricUrl == null) {
-                    Log.e(TAG, "iAgoraMusicContentCenter.onLyricResult lyricUrl is null");
-                    ToastUtils.showToast("lyricUrl is null");
-                    playerMusicLrcDataLiveData.postValue(null);
-                    preloadMusic(isOwnSong, isChorus, music);
-                    return;
-                }
-                DownloadManager.getInstance().download(mContext, lyricUrl, file -> {
-                    if (file.getName().endsWith(".zip")) {
-                        ZipUtils.unZipAsync(file.getAbsolutePath(),
-                                file.getAbsolutePath().replace(".zip", ""),
-                                new ZipUtils.UnZipCallback() {
-                                    @Override
-                                    public void onFileUnZipped(List<String> unZipFilePaths) {
-                                        String xmlPath = "";
-                                        for (String path : unZipFilePaths) {
-                                            if(path.endsWith(".xml")){
-                                                xmlPath = path;
-                                                break;
-                                            }
-                                        }
-                                        if(TextUtils.isEmpty(xmlPath)){
-                                            ToastUtils.showToast("The xml file not exist!");
-                                            return;
-                                        }
-                                        File xmlFile = new File(xmlPath);
-
-                                        LrcData data = LrcLoadUtils.parse(xmlFile);
-                                        playerMusicLrcDataLiveData.postValue(data);
-                                        preloadMusic(isOwnSong, isChorus, music);
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        ToastUtils.showToast(e.getMessage());
-                                    }
-                                });
-                    } else {
-                        LrcData data = LrcLoadUtils.parse(file);
-                        playerMusicLrcDataLiveData.postValue(data);
-                        // 歌词加载成功后加载音频资源
-                        preloadMusic(isOwnSong, isChorus, music);
-                    }
-                }, exception -> {
-                    ToastUtils.showToast(exception.getMessage());
-                });
-            }
-        });
-    }
-
-    private void preloadMusic(boolean isOwnSong, boolean isChorus, @NonNull RoomSelSongModel music) {
-        if (isOwnSong || isChorus){
-            // 点歌者视角、合唱者视角
-
-            // 加载歌曲
-            if (iAgoraMusicContentCenter.isPreloaded(Long.parseLong(music.getSongNo())) != 0) {
-                mccNeedPreload = true;
-                iAgoraMusicContentCenter.preload(Long.parseLong(music.getSongNo()), null);
-            } else {
-                mccNeedPreload = false;
-                int ret = mPlayer.open(Long.parseLong(music.getSongNo()), 0);
-                mpkNeedStopped = ret != 0;
-            }
-        } else {
-            // 听众视角
-            playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-            startDisplayLrc();
-        }
-    }
 
     // 开始播放歌词
     private void startDisplayLrc() {
@@ -1816,259 +1373,54 @@ public class RoomLivingViewModel extends ViewModel {
         }
     }
 
-    // 开始同步歌词
-    private void startSyncLrc(String lrcId, long duration) {
-        mSyncLrcThread = new Thread(new Runnable() {
+    // ------------------ KTVApiEvent ------------------
 
-            @Override
-            public void run() {
-                mStopSyncLrc = false;
-                while (!mStopSyncLrc /*&& playerMusicStatusLiveData.getValue() >= PlayerMusicStatus.ON_PLAYING*/) {
-                    if (mPlayer == null) {
-                        break;
-                    }
-                    if (mLastRecvPlayPosTime != null && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                        sendSyncLrc(lrcId, duration, mRecvedPlayPosition);
-                    }
-
-                    try {
-                        Thread.sleep(999L);
-                    } catch (InterruptedException exp) {
-                        break;
-                    }
-                }
-            }
-
-            private void sendSyncLrc(String lrcId, long duration, long time) {
-                Map<String, Object> msg = new HashMap<>();
-                msg.put("cmd", "setLrcTime");
-                msg.put("lrcId", lrcId);
-                msg.put("duration", duration);
-                msg.put("time", time);//ms
-                JSONObject jsonMsg = new JSONObject(msg);
-
-                if (streamId == 0) {
-                    DataStreamConfig cfg = new DataStreamConfig();
-                    cfg.syncWithAudio = true;
-                    cfg.ordered = true;
-                    streamId = mRtcEngine.createDataStream(cfg);
-                }
-
-                int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-                if (ret < 0) {
-                    Log.e(TAG, "sendSyncLrc() sendStreamMessage called returned: " + ret);
-                }
-            }
-        });
-        mSyncLrcThread.setName("Thread-SyncLrc");
-        mSyncLrcThread.start();
-    }
-
-    // 停止同步歌词
-    private void stopSyncLrc() {
-        mStopSyncLrc = true;
-        if (mSyncLrcThread != null) {
-            try {
-                mSyncLrcThread.join();
-            } catch (InterruptedException exp) {
-                Log.e(TAG, "stopSyncLrc: " + exp.toString());
-            }
+    @Override
+    public void onPlayerStateChanged(@NonNull KTVApi controller, long songCode, @NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, boolean isLocal) {
+        switch (state) {
+            case PLAYER_STATE_OPEN_COMPLETED:
+                playerMusicOpenDurationLiveData.postValue(mPlayer.getDuration());
+                startDisplayLrc();
+                break;
+            case PLAYER_STATE_PLAYING:
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                break;
+            case PLAYER_STATE_PAUSED:
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
+                break;
+            case PLAYER_STATE_STOPPED:
+                stopDisplayLrc();
+                break;
+            case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
+                playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
+                playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
+                changeMusic();
+                break;
+            default:
         }
     }
 
-    // ------------------ 音高pitch同步 ------------------
-    private Thread mSyncPitchThread;
-    private boolean mStopSyncPitch = true;
-    private double pitch = 0;
-    // 开始同步音高
-    private void startSyncPitch() {
-        mSyncPitchThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                mStopSyncPitch = false;
-                while (!mStopSyncPitch) {
-                    if (mPlayer == null) {
-                        break;
-                    }
-                    if (mLastRecvPlayPosTime != null && playerMusicStatusLiveData.getValue() == PlayerMusicStatus.ON_PLAYING) {
-                        sendSyncPitch(pitch);
-                    }
-
-                    try {
-                        Thread.sleep(999L);
-                    } catch (InterruptedException exp) {
-                        break;
-                    }
-                }
-            }
-
-            private void sendSyncPitch(double pitch) {
-                Map<String, Object> msg = new HashMap<>();
-                msg.put("cmd", "setVoicePitch");
-                msg.put("pitch", pitch);
-                JSONObject jsonMsg = new JSONObject(msg);
-
-                if (streamId == 0) {
-                    DataStreamConfig cfg = new DataStreamConfig();
-                    cfg.syncWithAudio = true;
-                    cfg.ordered = true;
-                    streamId = mRtcEngine.createDataStream(cfg);
-                }
-
-                int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-                if (ret < 0) {
-                    Log.e(TAG, "sendPitch() sendStreamMessage called returned: " + ret);
-                }
-            }
-        });
-        mSyncPitchThread.setName("Thread-SyncPitch");
-        mSyncPitchThread.start();
+    @Override
+    public void onPlayerPositionChanged(@NonNull KTVApi controller, long songCode, @NonNull KTVSongConfiguration configuration, long position, boolean isLocal) {
+        mLastRecvPlayPosTime = System.currentTimeMillis();
+        mRecvedPlayPosition = position;
     }
 
-    // 停止同步歌词
-    private void stopSyncPitch() {
-        mStopSyncPitch = true;
-        pitch = 0;
-        if (mSyncPitchThread != null) {
-            try {
-                mSyncPitchThread.join();
-            } catch (InterruptedException exp) {
-                Log.e(TAG, "stopSyncPitch: " + exp.toString());
-            }
+    @Override
+    public void onMusicCollectionResult(@Nullable String requestId, int status, int page, int pageSize, int total, @Nullable Music[] list) {
+        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+        if(handler != null){
+            handler.onMusicCollectionResult(requestId, status, page, pageSize, total, list);
+            rtcMusicHandlerMap.remove(requestId);
         }
     }
 
-    // ------------------ 合唱网络时间延迟测试(暂未使用) ------------------
-    private long offsetTS = 0;
-    private long netRtt = 0;
-    private long delayWithBrod = 0;
-    private boolean mRunNetTask = false;
-    private Thread mNetTestThread;
-
-    private void startNetTestTask() {
-        mRunNetTask = true;
-        mNetTestThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mRunNetTask) {
-                    sendTestDelay();
-                    try {
-                        Thread.sleep(10 * 1000L);
-                    } catch (InterruptedException exp) {
-                        break;
-                    }
-                }
-            }
-        });
-        mNetTestThread.setName("Thread-NetTest");
-        mNetTestThread.start();
-    }
-
-    private void sendReplyTestDelay(long receiveTime) {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "replyTestDelay");
-        msg.put("testDelayTime", String.valueOf(receiveTime));
-        msg.put("time", String.valueOf(System.currentTimeMillis()));
-        msg.put("position", mPlayer.getPlayPosition());
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendReplyTestDelay() sendStreamMessage called returned: " + ret);
-        }
-    }
-
-    private void sendTestDelay() {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "testDelay");
-        msg.put("time", String.valueOf(System.currentTimeMillis()));
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendTestDelay() sendStreamMessage called returned: " + ret);
-        }
-    }
-
-    // ------------------ 合唱状态同步 ------------------
-    private void sendPause() {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "setLrcTime");
-        msg.put("time", -1);
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        Log.d(TAG, "发送多人暂停消息");
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendPause() sendStreamMessage called returned: " + ret);
-        }
-    }
-
-    private void sendPlay() {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "setLrcTime");
-        msg.put("time", 0);
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        Log.d(TAG, "发送多人恢复");
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendPlay() sendStreamMessage called returned: " + ret);
-        }
-    }
-
-    private void sendTrackMode(int mode) {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "TrackMode");
-        msg.put("mode", mode);
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendTrackMode() sendStreamMessage called returned: " + ret);
-        }
-    }
-
-    private void sendMusicPlayerPosition(long position) {
-        Map<String, Object> msg = new HashMap<>();
-        msg.put("cmd", "Seek");
-        msg.put("position", position);
-        JSONObject jsonMsg = new JSONObject(msg);
-        if (streamId == 0) {
-            DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
-            streamId = mRtcEngine.createDataStream(cfg);
-        }
-        int ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().getBytes());
-        if (ret < 0) {
-            Log.e(TAG, "sendMusicPlayerPosition() sendStreamMessage called returned: " + ret);
+    @Override
+    public void onMusicChartsResult(@Nullable String requestId, int status, @Nullable MusicChartInfo[] list) {
+        IMusicContentCenterEventHandler handler = rtcMusicHandlerMap.get(requestId);
+        if(handler != null){
+            handler.onMusicChartsResult(requestId, status, list);
+            rtcMusicHandlerMap.remove(requestId);
         }
     }
 }
