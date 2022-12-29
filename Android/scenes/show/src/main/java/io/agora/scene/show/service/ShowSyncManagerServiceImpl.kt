@@ -6,6 +6,7 @@ import android.os.Looper
 import android.util.Log
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.EventListener
 
@@ -147,8 +148,8 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.name,
                 ShowRoomStatus.activity.value,
                 ShowInteractionStatus.idle.value,
-                System.currentTimeMillis().toDouble(),
-                System.currentTimeMillis().toDouble()
+                TimeUtils.currentTimeMillis().toDouble(),
+                TimeUtils.currentTimeMillis().toDouble()
             )
             val scene = Scene().apply {
                 id = roomDetail.roomId
@@ -296,7 +297,7 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.id.toString(),
                 UserManager.getInstance().user.name,
                 message,
-                System.currentTimeMillis().toDouble()
+                TimeUtils.currentTimeMillis().toDouble()
             ), object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject?) {
                     success?.invoke()
@@ -355,7 +356,7 @@ class ShowSyncManagerServiceImpl(
             UserManager.getInstance().user.headUrl,
             UserManager.getInstance().user.name,
             ShowRoomRequestStatus.waitting.value,
-            System.currentTimeMillis().toDouble()
+            TimeUtils.currentTimeMillis().toDouble()
         )
         innerCreateSeatApply(apply, success, error)
     }
@@ -581,7 +582,7 @@ class ShowSyncManagerServiceImpl(
                     ShowRoomRequestStatus.waitting.value,
                     userMuteAudio = false,
                     fromUserMuteAudio = false,
-                    createAt = System.currentTimeMillis().toDouble()
+                    createAt = TimeUtils.currentTimeMillis().toDouble()
                 )
                 innerCreatePKInvitation(pkInvitation, null, null)
             }

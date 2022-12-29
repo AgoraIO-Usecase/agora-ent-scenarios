@@ -1,6 +1,7 @@
 package io.agora.scene.show.service
 
 import androidx.annotation.DrawableRes
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.R
 import kotlin.random.Random
 
@@ -63,9 +64,9 @@ data class ShowRoomDetailModel(
 
     companion object{
 
-        fun getRandomRoomId() = (Random(System.currentTimeMillis()).nextInt(10000) + 100000).toString()
+        fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-        fun getRandomThumbnailId() = Random(System.currentTimeMillis()).nextInt(0, 3).toString()
+        fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
         @DrawableRes
         fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {

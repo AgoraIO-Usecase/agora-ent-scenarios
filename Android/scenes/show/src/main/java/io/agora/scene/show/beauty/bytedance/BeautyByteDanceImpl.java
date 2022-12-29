@@ -45,6 +45,7 @@ import io.agora.base.TextureBufferHelper;
 import io.agora.base.VideoFrame;
 import io.agora.base.internal.video.EglBase;
 import io.agora.base.internal.video.YuvHelper;
+import io.agora.scene.base.utils.TimeUtils;
 import io.agora.scene.show.beauty.BeautyCache;
 import io.agora.scene.show.beauty.IBeautyProcessor;
 
@@ -232,7 +233,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         // CV SDK 特效处理
         boolean process = mEffectManager.process(texture2d, dstTexture, width, height,
                 BytedEffectConstants.Rotation.CLOCKWISE_ROTATE_0,
-                System.currentTimeMillis());
+                TimeUtils.currentTimeMillis());
         if (!process) {
             return -1;
         }
@@ -264,7 +265,7 @@ public class BeautyByteDanceImpl extends IBeautyProcessor {
         // CV SDK 特效处理
         boolean process = mEffectManager.process(texture2d, dstTexture, width, height,
                 BytedEffectConstants.Rotation.CLOCKWISE_ROTATE_0,
-                System.currentTimeMillis());
+                TimeUtils.currentTimeMillis());
         if (!process) {
             return -1;
         }

@@ -29,6 +29,7 @@ import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -57,7 +58,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     companion object {
         // 房间存活时间，单位ms
-        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
+        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 1000// 60 * 20 * 1000// 20min
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
@@ -97,8 +98,9 @@ class LiveDetailActivity : AppCompatActivity() {
     private var isAudioOnlyMode = false
 
     private val timerRoomEndRun = Runnable {
-        destroy()
-        showLivingEndDialog()
+        if (destroy()) {
+            showLivingEndDialog()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,15 +115,17 @@ class LiveDetailActivity : AppCompatActivity() {
 
         if (isRoomOwner) {
             mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+        } else {
+            mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()))
         }
     }
 
-    private fun destroy() {
+    private fun destroy(): Boolean {
         VideoSetting.resetBroadcastSetting()
         mBinding.root.removeCallbacks(timerRoomEndRun)
         releaseCountdown()
         destroyService()
-        destroyRtcEngine()
+        return destroyRtcEngine()
     }
 
     override fun onDestroy() {
@@ -159,11 +163,11 @@ class LiveDetailActivity : AppCompatActivity() {
         // Start Timer counter
         val dataFormat =
             SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
-        Log.d(TAG, "TopTimer curr=${System.currentTimeMillis()}, createAt=${mRoomInfo.createdAt.toLong()}, diff=${System.currentTimeMillis() - mRoomInfo.createdAt.toLong()}, time=${dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))}")
+        Log.d(TAG, "TopTimer curr=${TimeUtils.currentTimeMillis()}, createAt=${mRoomInfo.createdAt.toLong()}, diff=${TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()}, time=${dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()))}")
         topLayout.tvTimer.post(object : Runnable {
             override fun run() {
                 topLayout.tvTimer.text =
-                    dataFormat.format(Date(System.currentTimeMillis() - mRoomInfo.createdAt.toLong()))
+                    dataFormat.format(Date(TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()))
                 topLayout.tvTimer.postDelayed(this, 1000)
                 topLayout.tvTimer.tag = this
             }
@@ -844,9 +848,10 @@ class LiveDetailActivity : AppCompatActivity() {
             reFetchPKInvitationList()
         }
         mService.subscribeCurrRoomEvent { status, _ ->
-            if(status == ShowServiceProtocol.ShowSubscribeStatus.deleted){
-                destroy()
-                showLivingEndDialog()
+            if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
+                if (destroy()) {
+                    showLivingEndDialog()
+                }
             }
         }
         mService.subscribeUser { status, user ->
@@ -1153,7 +1158,7 @@ class LiveDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun destroyRtcEngine() {
+    private fun destroyRtcEngine(): Boolean {
         // 重置token有效期，防止影响其他场景
         TokenGenerator.expireSecond = -1
         mRtcEngineHandler?.let {
@@ -1162,7 +1167,9 @@ class LiveDetailActivity : AppCompatActivity() {
             mRtcEngine.leaveChannel()
             RtcEngineInstance.destroy()
             mRtcEngineHandler = null
+            return true
         }
+        return false
     }
 
     private fun enableLocalAudio(enable: Boolean) {
@@ -1502,6 +1509,7 @@ class LiveDetailActivity : AppCompatActivity() {
             mPKCountDownLatch = null
         }
         (mBinding.topLayout.tvTimer.tag as? Runnable)?.let {
+            it.run()
             mBinding.topLayout.tvTimer.removeCallbacks(it)
             mBinding.topLayout.tvTimer.tag = null
         }
