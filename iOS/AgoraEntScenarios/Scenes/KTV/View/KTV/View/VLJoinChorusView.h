@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLJoinChorusViewDelegate>)delegate;
 
-@property (nonatomic, strong) UILabel *musicLabel;
+@property (nonatomic, copy) NSString* musicLabelText;
 @property (nonatomic, strong) UILabel *countDownLabel;
 
 @end

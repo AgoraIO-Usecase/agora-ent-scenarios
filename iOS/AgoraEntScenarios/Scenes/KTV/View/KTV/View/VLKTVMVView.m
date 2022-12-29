@@ -256,7 +256,7 @@
         NSString *songText = [NSString stringWithFormat:@"%@-%@",song.songName,song.singer];
         self.musicTitleLabel.text = songText;
         self.startSoloView.musicLabel.text = songText;
-        self.joinChorusView.musicLabel.text = songText;
+        self.joinChorusView.musicLabelText = songText;
         [self configPlayerControls:song];
     }
     

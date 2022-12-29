@@ -436,6 +436,17 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
 receiveStreamMessageFromUid:(NSUInteger)uid
          streamId:(NSInteger)streamId
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
+    
+    NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
+    VLLog(@"返回数据:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+    if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
+        int leftSecond = [dict[@"time"] intValue];
+        [self.MVView setCoundDown:leftSecond];
+        VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
+        
+        return;
+    }
+    
     [self.ktvApi mainRtcEngine:engine receiveStreamMessageFromUid:uid streamId:streamId data:data];
 }
 
