@@ -184,7 +184,7 @@ public class RoomCreateActivity extends BaseViewBindingActivity<ActivityRoomCrea
             ToastUtils.showToast(R.string.ktv_please_input_room_name);
             return;
         }
-        String userNo = UserManager.getInstance().getUser().userNo;
+        String userNo = UserManager.getInstance().getUser().id.toString();
         int isPrivate;
         if (TextUtils.isEmpty(password)) {
             isPrivate = 0;

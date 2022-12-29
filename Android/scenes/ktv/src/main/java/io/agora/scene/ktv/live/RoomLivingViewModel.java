@@ -152,7 +152,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     public boolean isRoomOwner() {
-        return roomInfoLiveData.getValue().getCreatorNo().equals(UserManager.getInstance().getUser().userNo);
+        return roomInfoLiveData.getValue().getCreatorNo().equals(UserManager.getInstance().getUser().id.toString());
     }
 
     public void init() {
@@ -304,7 +304,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
         if (seatsArray != null) {
             for (RoomSeatModel roomSeatModel : seatsArray) {
-                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.setValue(roomSeatModel);
                     break;
                 }
@@ -325,7 +325,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 value.add(roomSeatModel);
                 seatListLiveData.postValue(value);
 
-                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.postValue(roomSeatModel);
                 }
 
@@ -348,7 +348,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     value.add(index, roomSeatModel);
                     seatListLiveData.postValue(value);
 
-                    if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                    if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                         seatLocalLiveData.postValue(roomSeatModel);
                     }
                 }
@@ -369,12 +369,12 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 }
                 seatListLiveData.postValue(value);
 
-                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.postValue(null);
                 }
 
 
-                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     isOnSeat = false;
                     if (mRtcEngine != null) {
                         mainChannelMediaOption.publishCameraTrack = false;
@@ -388,10 +388,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     }
 
                     // 合唱相关逻辑
-                    if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getChorusNo())) {
+                    if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
                         //我是合唱
                         getSongChosenList();
-                    } else if (UserManager.getInstance().getUser().userNo.equals(songPlayingLiveData.getValue().getUserNo())) {
+                    } else if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getUserNo())) {
                         //推送切歌逻辑
                     }
                 } else if (roomSeatModel.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
@@ -482,7 +482,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         // success
                         Log.d(TAG, "RoomLivingViewModel.leaveSeat() success");
                         if (seatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
-                            if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().userNo)) {
+                            if (seatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 isOnSeat = false;
                                 if (mRtcEngine != null) {
                                     mainChannelMediaOption.publishCameraTrack = false;
@@ -1039,7 +1039,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ContentInspectConfig contentInspectConfig = new ContentInspectConfig();
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("userNo", UserManager.getInstance().getUser().userNo);
+            jsonObject.put("userNo", UserManager.getInstance().getUser().id.toString());
             contentInspectConfig.extraInfo = jsonObject.toString();
             ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
             module.interval = 30;
@@ -1237,14 +1237,16 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mLastRecvPlayPosTime = null;
         mAudioTrackIndex = 1;
 
-        boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().userNo);
+        boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
         boolean isChorus = music.isChorus();
         Long songCode = Long.parseLong(music.getSongNo());
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         KTVSongType type = isChorus ? KTVSongType.KTVSongTypeChorus : KTVSongType.KTVSongTypeSolo;
         KTVSingRole role = isChorus ? (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleCoSinger) : (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleAudience);
-        ktvApiProtocol.loadSong(songCode, new KTVSongConfiguration(type, role, songCode, UserManager.getInstance().getUser().id.intValue(), 0),
+        int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
+        int coSingerUid = music.getChorusNo() == null ? 0 : Integer.parseInt(music.getChorusNo());
+        ktvApiProtocol.loadSong(songCode, new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid),
             (song, lyricUrl, singRole, singState) -> {
                 if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
                     if (singRole == KTVSingRole.KTVSingRoleAudience) {
