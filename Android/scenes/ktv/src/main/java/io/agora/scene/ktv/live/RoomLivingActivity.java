@@ -115,7 +115,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             roomLivingViewModel.haveSeat(position);
-                            getBinding().cbMic.setChecked(false);
                             requestRecordPermission();
                         }
                     }
@@ -219,7 +218,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             roomLivingViewModel.toggleMic(b);
         });
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
-        getBinding().iBtnChorus.setClickable(false);
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
         getBinding().btnOK.setOnClickListener(view -> {
@@ -376,10 +374,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
-        roomLivingViewModel.playerPitchLiveData.observe(this, pitch -> {
-                    getBinding().lrcControlView.getPitchView().updateLocalPitch(pitch.floatValue());
-                }
-        );
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
                 setNetWorkStatus(netWorkStatus.txQuality, netWorkStatus.rxQuality));
     }
