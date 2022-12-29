@@ -9,6 +9,8 @@ import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
+import io.agora.rtc2.Constants.AUDIO_SCENARIO_CHORUS
+import io.agora.rtc2.Constants.AUDIO_SCENARIO_GAME_STREAMING
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.widget.LrcControlView
 import org.json.JSONException
@@ -354,7 +356,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // 合唱
     private fun joinChorus2ndChannel() {
-        if (songConfig == null) return
+        if (songConfig == null || mRtcEngine == null) return
 
         val role = songConfig!!.role
         val channelMediaOption = ChannelMediaOptions()
@@ -363,13 +365,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         channelMediaOption.autoSubscribeAudio = role != KTVSingRole.KTVSingRoleMainSinger
         channelMediaOption.autoSubscribeVideo = false
         channelMediaOption.publishMicrophoneTrack = false
-        channelMediaOption.publishMediaPlayerAudioTrack = false
-        channelMediaOption.clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
-        channelMediaOption.publishDirectCustomAudioTrack = true
+        channelMediaOption.enableAudioRecordingOrPlayout = role != KTVSingRole.KTVSingRoleMainSinger
+        channelMediaOption.clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+        channelMediaOption.publishDirectCustomAudioTrack = role == KTVSingRole.KTVSingRoleMainSinger
 
         val rtcConnection = RtcConnection()
         rtcConnection.channelId = channelName + "_ex"
-        rtcConnection.localUid = UserManager.getInstance().user.id.toInt()
+        rtcConnection.localUid = UserManager.getInstance().user.id.toInt() * 10 + 1
         subChorusConnection = rtcConnection
 
         mRtcEngine!!.joinChannelEx(
@@ -379,9 +381,20 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             object: IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
+                    mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+                }
+
+                override fun onLeaveChannel(stats: RtcStats?) {
+                    super.onLeaveChannel(stats)
+                    mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING);
                 }
             }
         )
+
+        if (songConfig!!.type == KTVSongType.KTVSongTypeChorus &&
+            songConfig!!.role == KTVSingRole.KTVSingRoleCoSinger) {
+            mRtcEngine?.muteRemoteAudioStream(songConfig!!.mainSingerUid, true)
+        }
     }
 
     private fun leaveChorus2ndChannel() {
@@ -445,15 +458,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // ------------------------ AgoraRtcEvent ------------------------
-    override fun onUserJoined(uid: Int, elapsed: Int) {
-        if (songConfig == null) return
-        if (songConfig!!.type == KTVSongType.KTVSongTypeChorus &&
-            songConfig!!.role == KTVSingRole.KTVSingRoleCoSinger &&
-                uid == songConfig!!.mainSingerUid) {
-            mRtcEngine?.muteRemoteAudioStream(uid, true)
-        }
-    }
-
     override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
         super.onStreamMessage(uid, streamId, data)
         val jsonMsg: JSONObject
@@ -480,8 +484,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             mPlayer!!.seek(expectPosition)
                         }
                     }
+                } else {
+                    ktvApiEventHandler?.onPlayerPositionChanged(this, songConfig!!.songCode, songConfig!!, position, false)
                 }
-                ktvApiEventHandler?.onPlayerPositionChanged(this, songConfig!!.songCode, songConfig!!, position, false)
             } else if (jsonMsg.getString("cmd") == "TrackMode") {
                 // 伴唱收到原唱伴唱调整指令
                 if (mPlayer == null || songConfig == null) return
@@ -507,6 +512,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 // 其他端收到原唱seek指令
                 if (mPlayer == null || songConfig == null) return
                 val state = jsonMsg.getInt("state")
+                if (isChorusCoSinger()!!) {
+                    when (Constants.MediaPlayerState.getStateByValue(state)) {
+                        Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+                            mPlayer?.pause()
+                        }
+                        Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                            mPlayer?.resume()
+                        }
+                    }
+                }
                 ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, Constants.MediaPlayerState.getStateByValue(state), false)
             }
         } catch (exp: JSONException) {
@@ -517,14 +532,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
         super.onAudioVolumeIndication(speakers, totalVolume)
         // VideoPitch回调, 用于同步各端音准
-        if (songConfig == null) return
+        if (songConfig == null || mPlayer == null) return
         if (songConfig!!.mainSingerUid.toLong() == UserManager.getInstance().user.id
             || songConfig!!.coSingerUid.toLong() == UserManager.getInstance().user.id
         ) {
             for (info in speakers!!) {
                 if (info.uid == 0) {
                     if (mPlayer != null && mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-                        runOnMainThread { lrcView!!.pitchView.updateLocalPitch(info.voicePitch.toFloat()) }
+                        runOnMainThread { lrcView?.pitchView?.updateLocalPitch(info.voicePitch.toFloat()) }
                         pitch = info.voicePitch
                     }
                 }
