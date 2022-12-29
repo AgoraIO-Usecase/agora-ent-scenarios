@@ -310,7 +310,23 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         }
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
-        NSInteger state = [dict[@"state"] integerValue];
+        AgoraMediaPlayerState state = [dict[@"state"] integerValue];
+        
+        if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
+            switch (state) {
+                case AgoraMediaPlayerStatePaused:
+                case AgoraMediaPlayerStateStopped:
+                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
+                    [self pausePlay];
+                    break;
+                case AgoraMediaPlayerStatePlaying:
+                    [self resumePlay];
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
