@@ -39,12 +39,17 @@
 @import YYCategories;
 @import SDWebImage;
 
+typedef enum : NSUInteger {
+    KTVCoSingerWaitStopTimeOut,
+    KTVCoSingerWaitStopCancel,
+} KTVCoSingerWaitStopReason;
+
 NSInteger ktvApiStreamId = -1;
 NSInteger ktvStreamId = -1;
 
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
-typedef void (^ChorusCallback)(void);
+typedef void (^ChorusCallback)(KTVCoSingerWaitStopReason);
 
 @interface VLKTVViewController ()<
 VLKTVTopViewDelegate,
@@ -561,7 +566,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // for new chorus song, need to wait till co-singer joins or force solo
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
-            [self startCoSingerWaitForSeconds:20 withCallback:^() {
+            [self startCoSingerWaitForSeconds:20 withCallback:^(KTVCoSingerWaitStopReason reason) {
+                if (reason == KTVCoSingerWaitStopCancel) {
+                    return;
+                }
                 [[AppContext ktvServiceImp] enterSoloMode];
             }];
         }
@@ -569,7 +577,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)startCoSingerWaitForSeconds:(NSInteger)seconds withCallback:(void (^ _Nullable)(void))block
+- (void)startCoSingerWaitForSeconds:(NSInteger)seconds withCallback:(void (^ _Nullable)(KTVCoSingerWaitStopReason))block
 {
     if(self.chorusMatchingTimer) {
         //already waiting, ignore
@@ -582,7 +590,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.chorusMatchingTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
         leftSecond -= 1;
         if (leftSecond == 0) {
-            [weakSelf stopCoSingerWait];
+            [weakSelf stopCoSingerWaitWithReason:KTVCoSingerWaitStopTimeOut];
         } else {
             [weakSelf.MVView setCoundDown:leftSecond];
             [weakSelf syncChorusMatchCountDown:leftSecond];
@@ -591,11 +599,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.chorusMatchingTimer fire];
 }
 
-- (void)stopCoSingerWait
+- (void)stopCoSingerWaitWithReason:(KTVCoSingerWaitStopReason)reason
 {
     [self.chorusMatchingTimer invalidate];
     if (self.chorusMatchingCallback) {
-        self.chorusMatchingCallback();
+        self.chorusMatchingCallback(reason);
     }
     self.chorusMatchingTimer = nil;
     self.chorusMatchingCallback = nil;
@@ -1077,7 +1085,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     if (singType == VLKTVMVViewSingActionTypeSolo) { // 独唱
         //发送独唱的消息
         [self.MVView setChorusOptViewHidden];
-        [self stopCoSingerWait];
+        [self stopCoSingerWaitWithReason:KTVCoSingerWaitStopTimeOut];
     } else if (singType == VLKTVMVViewSingActionTypeJoinChorus) { // 加入合唱
         if(!self.isOnMicSeat) {
             [VLToast toast:KTVLocalizedString(@"请先上坐")];
@@ -1328,7 +1336,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         }
         if([updatedTopSong doneChorusMatch]) {
-            [self stopCoSingerWait];
+            [self stopCoSingerWaitWithReason:KTVCoSingerWaitStopCancel];
             [self loadAndPlaySong];
         }
     }
