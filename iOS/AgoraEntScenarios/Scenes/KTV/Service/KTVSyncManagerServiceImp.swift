@@ -175,8 +175,8 @@ private func _hideLoadingIfNeed() {
         roomInfo.name = inputModel.name
         roomInfo.isPrivate = inputModel.isPrivate.boolValue
         roomInfo.password = inputModel.password
-        roomInfo.creator = VLUserCenter.user.userNo
-        roomInfo.creatorNo = VLUserCenter.user.userNo
+        roomInfo.creator = VLUserCenter.user.id
+        roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
@@ -229,7 +229,7 @@ private func _hideLoadingIfNeed() {
                         _hideLoadingIfNeed()
                         return
                     }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
+                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
@@ -306,7 +306,7 @@ private func _hideLoadingIfNeed() {
                         agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
                         return
                     }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.userNo == userId ? true : false
+                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
                     VLUserCenter.user.agoraRTCToken = rtcToken
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
@@ -335,7 +335,7 @@ private func _hideLoadingIfNeed() {
         }
         
         //current user is room owner, remove room
-        if roomInfo.creator == VLUserCenter.user.userNo {
+        if roomInfo.creator == VLUserCenter.user.id {
             _removeRoom(completion: completion)
             return
         }
@@ -396,7 +396,7 @@ private func _hideLoadingIfNeed() {
     func updateSeatAudioMuteStatus(withMuted muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("mute seat not found")
             return
@@ -410,7 +410,7 @@ private func _hideLoadingIfNeed() {
     func updateSeatVideoMuteStatus(withMuted muted: Bool,
                                    completion: @escaping (Error?) -> Void) {
         guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.userNo })
+            .filter({ $0.value.userNo == VLUserCenter.user.id })
             .first?.value else {
             agoraAssert("open video seat not found")
             return
@@ -442,7 +442,7 @@ private func _hideLoadingIfNeed() {
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
         topSong.status = 3
-        topSong.chorusNo = VLUserCenter.user.userNo
+        topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
     }
@@ -465,7 +465,7 @@ private func _hideLoadingIfNeed() {
         songInfo.singer = inputModel.singer
         songInfo.status = 0
         /// 是谁点的歌
-        songInfo.userNo = VLUserCenter.user.userNo
+        songInfo.userNo = VLUserCenter.user.id
 //        songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
@@ -615,7 +615,7 @@ extension KTVSyncManagerServiceImp {
         }
 
         //leave if enter seat
-        if let seat = seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
+        if let seat = seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
             _removeSeat(seatInfo: seat) { error in
             }
         }
@@ -648,7 +648,7 @@ extension KTVSyncManagerServiceImp {
 //        _subscribeOnlineUsers {}
         _getUserInfo { error, userList in
             // current user already add
-            if self.userList.contains(where: { $0.userNo == VLUserCenter.user.userNo }) {
+            if self.userList.contains(where: { $0.userNo == VLUserCenter.user.id }) {
                 return
             }
             self._addUserInfo {
@@ -760,7 +760,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("_removeUser channelName = nil")
             return
         }
-        guard let objectId = userList.filter({ $0.userNo == VLUserCenter.user.userNo }).first?.objectId else {
+        guard let objectId = userList.filter({ $0.userNo == VLUserCenter.user.id }).first?.objectId else {
 //            agoraAssert("_removeUser objectId = nil")
             return
         }
@@ -785,7 +785,7 @@ extension KTVSyncManagerServiceImp {
     private func _updateUserCount(with count: Int) {
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
-              roomInfo.creator == VLUserCenter.user.userNo
+              roomInfo.creator == VLUserCenter.user.id
         else {
 //            assert(false, "channelName = nil")
             agoraPrint("updateUserCount channelName = nil")
@@ -852,7 +852,7 @@ extension KTVSyncManagerServiceImp {
         let seatInfo = VLRoomSeatModel()
         seatInfo.seatIndex = seatIndex
         seatInfo.rtcUid = user.id
-        seatInfo.userNo = user.userNo
+        seatInfo.userNo = user.id
         seatInfo.headUrl = user.headUrl
         seatInfo.name = user.name
         
@@ -899,7 +899,7 @@ extension KTVSyncManagerServiceImp {
             }
 
             // update seat info (user avater/nick name did changed) if seat existed
-            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.userNo }).first?.value {
+            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
                 let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
                 targetSeatInfo.objectId = seat.objectId
                 self._updateSeat(seatInfo: targetSeatInfo) { error in
@@ -1200,7 +1200,7 @@ extension KTVSyncManagerServiceImp {
             })
     }
     
-    private func _removeAllUserChooseSong(userNo: String = VLUserCenter.user.userNo) {
+    private func _removeAllUserChooseSong(userNo: String = VLUserCenter.user.id) {
         let userSongLists = self.songList.filter({ $0.userNo == userNo})
         //reverse delete songs to fix conflicts (user A remove song1 & user B update song1.status = 2)
         userSongLists.reversed().forEach { model in
@@ -1235,7 +1235,7 @@ extension KTVSyncManagerServiceImp {
         guard let topSong = songList.first,
               topSong.status == 0, // ready status
               topSong.isChorus == false,
-              topSong.userNo == VLUserCenter.user.userNo
+              topSong.userNo == VLUserCenter.user.id
         else {
             return
         }
@@ -1248,7 +1248,7 @@ extension KTVSyncManagerServiceImp {
     private func _markSoloSongIfNeed() {
         guard let topSong = songList.first,
               topSong.isChorus == true, // current is chorus
-              topSong.userNo == VLUserCenter.user.userNo
+              topSong.userNo == VLUserCenter.user.id
         else {
             return
         }
