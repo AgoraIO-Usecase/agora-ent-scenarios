@@ -389,7 +389,7 @@ extension VoiceRoomViewController {
         if self.local_index == nil {
             ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
         } else {
-            ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index!) { error, result in
+            ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
                 ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
             }
         }
