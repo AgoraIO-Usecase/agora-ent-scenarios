@@ -1328,6 +1328,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
         }
         if([updatedTopSong doneChorusMatch]) {
+            [self stopCoSingerWait];
             [self loadAndPlaySong];
         }
     }
