@@ -3,6 +3,8 @@ package io.agora.scene.ktv.live
 import io.agora.mediaplayer.Constants
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.IAgoraMusicPlayer
+import io.agora.musiccontentcenter.Music
+import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.RtcEngine
 import io.agora.scene.ktv.widget.LrcControlView
 
@@ -26,13 +28,31 @@ enum class KTVLoadSongState {
 data class KTVSongConfiguration(
     val type: KTVSongType,
     val role: KTVSingRole,
-    val songCode: Int,
+    val songCode: Long,
     val mainSingerUid: Int,
     val coSingerUid: Int
 )
 
 
 interface KTVApi {
+
+    interface KTVApiEventHandler {
+        fun onPlayerStateChanged(controller: KTVApi, songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean)
+        fun onPlayerPositionChanged(controller: KTVApi, songCode: Long, configuration: KTVSongConfiguration, position: Long, isLocal: Boolean)
+        fun onMusicCollectionResult(
+            requestId: String?,
+            status: Int,
+            page: Int,
+            pageSize: Int,
+            total: Int,
+            list: Array<out Music>?
+        )
+        fun onMusicChartsResult(
+            requestId: String?,
+            status: Int,
+            list: Array<out MusicChartInfo>?
+        )
+    }
 
     /**
      * 初始化内部变量/缓存数据，并注册相应的监听
@@ -43,8 +63,7 @@ interface KTVApi {
         musicCenter: IAgoraMusicContentCenter,
         player: IAgoraMusicPlayer,
         streamId: Int,
-        onPlayerStateChanged: (controller: KTVApi, songCode: Int, state: Constants.MediaPlayerState, isLocal: Boolean) -> Unit,
-        onPlayerPositionChanged: (controller: KTVApi, songCode: Int, configuration: KTVSongConfiguration, position: Int, isLocal: Boolean) -> Unit
+        ktvApiEventHandler: KTVApiEventHandler
     )
 
     /**
@@ -56,15 +75,15 @@ interface KTVApi {
      * 加载歌曲
      */
     fun loadSong(
-        songCode: Int,
+        songCode: Long,
         config: KTVSongConfiguration,
-        onLoaded: (songCode: Int, lyricUrl: String, role: KTVSingRole, state: KTVLoadSongState) -> Unit
+        onLoaded: (songCode: Long, lyricUrl: String, role: KTVSingRole, state: KTVLoadSongState) -> Unit
     )
 
     /**
      * 播放歌曲
      */
-    fun playSong(songCode: Int)
+    fun playSong(songCode: Long)
 
     /**
      * 停止播放歌曲
@@ -80,6 +99,11 @@ interface KTVApi {
      * 暂停播放
      */
     fun pausePlay()
+
+    /**
+     * 调整进度
+     */
+    fun seek(time: Long)
 
     /**
      * 选择音轨，原唱、伴唱

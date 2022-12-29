@@ -91,6 +91,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 return (T) new RoomLivingViewModel((JoinRoomOutputModel) getIntent().getSerializableExtra(EXTRA_ROOM_INFO));
             }
         }).get(RoomLivingViewModel.class);
+        roomLivingViewModel.setLryView(getBinding().lrcControlView);
 
         mRoomSpeakerAdapter = new BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding>() {
             @Override
@@ -344,12 +345,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
                 getBinding().lrcControlView.setEnabled(true);
             }
-        });
-        roomLivingViewModel.playerMusicLrcDataLiveData.observe(this, lrcData -> {
-            if (lrcData == null)
-                getBinding().lrcControlView.getLrcView().setLabel(getString(R.string.ktv_no_lrc));
-            getBinding().lrcControlView.getLrcView().setLrcData(lrcData);
-            getBinding().lrcControlView.getPitchView().setLrcData(lrcData);
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
