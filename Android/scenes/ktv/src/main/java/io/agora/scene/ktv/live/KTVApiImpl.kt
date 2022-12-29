@@ -11,14 +11,16 @@ import io.agora.musiccontentcenter.*
 import io.agora.rtc2.*
 import io.agora.rtc2.Constants.AUDIO_SCENARIO_CHORUS
 import io.agora.rtc2.Constants.AUDIO_SCENARIO_GAME_STREAMING
+import io.agora.rtc2.audio.AudioParams
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.widget.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
+import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
 class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver,
-    IRtcEngineEventHandler() {
+    IRtcEngineEventHandler(), IAudioFrameObserver {
     private val TAG: String = "KTV API LOG"
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
@@ -44,6 +46,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // event
     private var ktvApiEventHandler: KTVApi.KTVApiEventHandler? = null
+    private var hasJoinChannelEx: Boolean = false
 
     override fun initWithRtcEngine(
         engine: RtcEngine,
@@ -205,6 +208,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     channelMediaOption.publishMediaPlayerId = mPlayer!!.mediaPlayerId
                     channelMediaOption.publishMediaPlayerAudioTrack = true
                     mRtcEngine!!.updateChannelMediaOptions(channelMediaOption)
+
+                    mRtcEngine!!.setDirectExternalAudioSource(true);
+                    mRtcEngine!!.setRecordingAudioFrameParameters(48000, 2, 0, 960);
+                    mRtcEngine!!.registerAudioFrameObserver(this);
+
                     joinChorus2ndChannel()
                 }
                 KTVSingRole.KTVSingRoleCoSinger -> {
@@ -381,11 +389,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             object: IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
+                    if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = true
                     mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_CHORUS)
                 }
 
                 override fun onLeaveChannel(stats: RtcStats?) {
                     super.onLeaveChannel(stats)
+                    if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = false
                     mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING);
                 }
             }
@@ -648,4 +658,87 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {}
 
     override fun onAudioVolumeIndication(volume: Int) {}
+
+    override fun onRecordAudioFrame(
+        channelId: String?,
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        if (hasJoinChannelEx && mRtcEngine != null) {
+            mRtcEngine!!.pushDirectAudioFrame(buffer, renderTimeMs, 48000, 2)
+        }
+        return true
+    }
+
+    override fun onPlaybackAudioFrame(
+        channelId: String?,
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        return false
+    }
+
+    override fun onMixedAudioFrame(
+        channelId: String?,
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        return false
+    }
+
+    override fun onEarMonitoringAudioFrame(
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        return false
+    }
+
+    override fun onPlaybackAudioFrameBeforeMixing(
+        channelId: String?,
+        userId: Int,
+        type: Int,
+        samplesPerChannel: Int,
+        bytesPerSample: Int,
+        channels: Int,
+        samplesPerSec: Int,
+        buffer: ByteBuffer?,
+        renderTimeMs: Long,
+        avsync_type: Int
+    ): Boolean {
+        return false
+    }
+
+    override fun getObservedAudioFramePosition(): Int { return 0 }
+
+    override fun getRecordAudioParams(): AudioParams? { return null }
+
+    override fun getPlaybackAudioParams(): AudioParams? { return null }
+
+    override fun getMixedAudioParams(): AudioParams? { return null }
+
+    override fun getEarMonitoringAudioParams(): AudioParams? { return null }
 }
