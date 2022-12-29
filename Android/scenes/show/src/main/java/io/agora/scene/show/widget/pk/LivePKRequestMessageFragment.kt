@@ -9,7 +9,6 @@ import io.agora.scene.base.component.BaseFragment
 import io.agora.scene.show.databinding.ShowLivePkRequestMessageListBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowInteractionStatus
-import io.agora.scene.show.service.ShowRoomDetailModel
 
 class LivePKRequestMessageFragment : BaseFragment() {
     private var mBinding : ShowLivePkRequestMessageListBinding? = null
@@ -19,7 +18,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         linkPKViewAdapter.setClickListener(object: LivePKViewAdapter.OnClickListener{
-            override fun onClick(roomItem: ShowRoomDetailModel, position: Int) {
+            override fun onClick(roomItem: LiveRoomConfig, position: Int) {
                 mListener.onAcceptMicSeatItemChosen(roomItem)
             }
         })
@@ -45,7 +44,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     /**
      * 设置连麦申请列表
      */
-    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<ShowRoomDetailModel>) {
+    fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList : List<LiveRoomConfig>) {
         if (mBinding == null) return
         if (roomList.isEmpty()) {
             binding.linkRequestListEmptyImg.visibility = View.VISIBLE
@@ -76,7 +75,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     }
 
     interface Listener {
-        fun onAcceptMicSeatItemChosen(roomItem: ShowRoomDetailModel)
+        fun onAcceptMicSeatItemChosen(roomItem: LiveRoomConfig)
         fun onRequestRefreshing()
         fun onStopPKingChosen()
     }

@@ -40,7 +40,7 @@ class PresetDialog(context: Context) : BottomFullDialog(context) {
             dismiss()
         }
         groupItems(
-            {}, 0,
+            {}, -1,
             mBinding.showChooseItemLowDevice,
             mBinding.showChooseItemMediumDevice,
             mBinding.showChooseItemHighDevice
@@ -74,10 +74,10 @@ class PresetDialog(context: Context) : BottomFullDialog(context) {
     }
 
     private fun onPresetShowModeSelected(level: Int){
-        var selectedLevel = level
+        val selectedLevel = level
         if (selectedLevel < 0) {
             // 没有选择默认使用低端机配置
-            selectedLevel = 0
+            return
         }
         when (selectedLevel) {
             // 低端机

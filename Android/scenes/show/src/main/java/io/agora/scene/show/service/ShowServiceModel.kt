@@ -30,7 +30,7 @@ data class ShowRoomDetailModel(
     val roomUserCount: Int,
     val thumbnailId: String, // 0, 1, 2, 3
     val ownerId: String,
-    val ownerAvater: String,// http url
+    val ownerAvatar: String,// http url
     val ownerName: String,
     val roomStatus: Int = ShowRoomStatus.activity.value,
     val interactStatus: Int = ShowInteractionStatus.idle.value,
@@ -44,7 +44,7 @@ data class ShowRoomDetailModel(
             Pair("roomUserCount", roomUserCount),
             Pair("thumbnailId", thumbnailId),
             Pair("ownerId", ownerId),
-            Pair("ownerAvater", ownerAvater),
+            Pair("ownerAvatar", ownerAvatar),
             Pair("ownerName", ownerName),
             Pair("roomStatus", roomStatus),
             Pair("interactStatus", interactStatus),
