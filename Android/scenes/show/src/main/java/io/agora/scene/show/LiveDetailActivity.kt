@@ -58,7 +58,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
     companion object {
         // 房间存活时间，单位ms
-        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 1000// 60 * 20 * 1000// 20min
+        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
