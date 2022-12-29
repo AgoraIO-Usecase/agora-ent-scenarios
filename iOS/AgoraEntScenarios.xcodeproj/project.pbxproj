@@ -192,7 +192,6 @@
 		DD220B87295B332C00F57F30 /* VRRoomCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A8B295B332C00F57F30 /* VRRoomCreateView.swift */; };
 		DD220B88295B332C00F57F30 /* VRCreateRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A8C295B332C00F57F30 /* VRCreateRoomView.swift */; };
 		DD220BC9295B48FD00F57F30 /* QMUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220BC7295B48FD00F57F30 /* QMUIHelper.m */; };
-		DD220BCA295B48FD00F57F30 /* QMUIConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD220BC8295B48FD00F57F30 /* QMUIConfiguration.m */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
 		DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */; };
 		DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD2A43D028FFCEE7004CEDCF /* Main.storyboard */; };
@@ -597,11 +596,8 @@
 		DD220A8C295B332C00F57F30 /* VRCreateRoomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRCreateRoomView.swift; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD220BC3295B48FD00F57F30 /* QMUICommonDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUICommonDefines.h; sourceTree = "<group>"; };
-		DD220BC4295B48FD00F57F30 /* QMUIConfigurationMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfigurationMacros.h; sourceTree = "<group>"; };
 		DD220BC5295B48FD00F57F30 /* QMUIHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIHelper.h; sourceTree = "<group>"; };
-		DD220BC6295B48FD00F57F30 /* QMUIConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfiguration.h; sourceTree = "<group>"; };
 		DD220BC7295B48FD00F57F30 /* QMUIHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIHelper.m; sourceTree = "<group>"; };
-		DD220BC8295B48FD00F57F30 /* QMUIConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QMUIConfiguration.m; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -1359,11 +1355,8 @@
 			isa = PBXGroup;
 			children = (
 				DD220BC3295B48FD00F57F30 /* QMUICommonDefines.h */,
-				DD220BC4295B48FD00F57F30 /* QMUIConfigurationMacros.h */,
 				DD220BC5295B48FD00F57F30 /* QMUIHelper.h */,
-				DD220BC6295B48FD00F57F30 /* QMUIConfiguration.h */,
 				DD220BC7295B48FD00F57F30 /* QMUIHelper.m */,
-				DD220BC8295B48FD00F57F30 /* QMUIConfiguration.m */,
 			);
 			path = QMUI;
 			sourceTree = "<group>";
@@ -2403,7 +2396,6 @@
 				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
 				DD220B74295B332C00F57F30 /* VMSwitchTableViewCell.swift in Sources */,
 				DD220B21295B332C00F57F30 /* UIButtonLayoutExtension.swift in Sources */,
-				DD220BCA295B48FD00F57F30 /* QMUIConfiguration.m in Sources */,
 				DD220B53295B332C00F57F30 /* PopTip.swift in Sources */,
 				DD0292F0295BF0DC00485225 /* VLHomeOnLineListView.m in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
