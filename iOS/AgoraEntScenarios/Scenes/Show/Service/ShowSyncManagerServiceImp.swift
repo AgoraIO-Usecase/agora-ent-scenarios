@@ -243,38 +243,48 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
         initScene { [weak self] in
-            SyncUtil.joinScene(id: room.roomId!,
-                               userId: room.ownerId!,
-                               property: params) { result in
-                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
-                let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
-                self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
-                    guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
-                    else {
-                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
-                        return
-                    }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = rtcToken
-                    VLUserCenter.user.agoraRTMToken = rtmToken
-                    let output = ShowRoomDetailModel.yy_model(with: params!)
-                    completion(nil, output)
-                    self._startCheckExpire()
-                    self._subscribeAll()
-                    self._addUserIfNeed()
-                    self._getAllPKInvitationList(room: nil) { error, list in
-                    }
+            //TODO: check room vaild
+            self?._getRoomList(page: 0) { [weak self] error, list in
+                guard let _ = list?.filter({ room.objectId == $0.objectId }).first else {
+                    completion(NSError(domain: "Show Service Error", code: 1, userInfo: [ NSLocalizedDescriptionKey : "show_error_room_has_been_destory".show_localized]), nil)
+                    return
                 }
-            } fail: { error in
-                completion(error.toNSError(), nil)
+                
+                SyncUtil.joinScene(id: room.roomId!,
+                                   userId: room.ownerId!,
+                                   property: params) { result in
+                    //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                    let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
+                    let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
+                    self?.roomId = channelName
+                    NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                                                         uid: "\(UserInfo.userId)",
+                                                         tokenGeneratorType: .token006,
+                                                         tokenTypes: [.rtc, .rtm]) { tokenMap in
+                        guard let self = self,
+                              let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
+                              let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                        else {
+                            agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                            return
+                        }
+                        VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
+                        VLUserCenter.user.agoraRTCToken = rtcToken
+                        VLUserCenter.user.agoraRTMToken = rtmToken
+                        let output = ShowRoomDetailModel.yy_model(with: params!)
+                        completion(nil, output)
+                        self._startCheckExpire()
+                        self._subscribeAll()
+                        self._addUserIfNeed()
+                        self._getAllPKInvitationList(room: nil) { error, list in
+                        }
+                    }
+                } fail: { error in
+                    completion(error.toNSError(), nil)
+                }
             }
+            
+            
         }
     }
     
