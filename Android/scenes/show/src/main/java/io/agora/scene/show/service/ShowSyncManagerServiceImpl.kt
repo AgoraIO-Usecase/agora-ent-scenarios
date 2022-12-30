@@ -50,7 +50,7 @@ class ShowSyncManagerServiceImpl(
     private var currRoomNo: String = ""
     private val sceneReferenceMap = mutableMapOf<String, SceneReference>()
     private val currEventListeners = mutableListOf<EventListener>()
-    private var pkCompetitorEventListener : EventListener? = null
+    private val pkCompetitorEventListenerMap = mutableMapOf<String, EventListener>()
 
     private var currRoomChangeSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowRoomDetailModel?) -> Unit)? =
         null
@@ -91,6 +91,7 @@ class ShowSyncManagerServiceImpl(
         objIdOfInteractionInfo.clear()
         pKCompetitorInvitationList.clear()
         objIdOfPKCompetitorInvitation.clear()
+        pkCompetitorEventListenerMap.clear()
 
         userList.clear()
         micSeatApplyList.clear()
@@ -1508,9 +1509,9 @@ class ShowSyncManagerServiceImpl(
                 val invitation = pKCompetitorInvitationList[index]
 
                 val sceneReference = sceneReferenceMap[invitation.roomId] ?: return
-                if (pkCompetitorEventListener != null) {
-                    sceneReference.unsubscribe(pkCompetitorEventListener)
-                }
+                val event = pkCompetitorEventListenerMap[invitation.roomId] ?: return;
+                sceneReference.unsubscribe(event)
+
                 sceneReferenceMap.remove(invitation.roomId)
                 objIdOfPKCompetitorInvitation.removeAt(index)
                 pKCompetitorInvitationList.removeAt(index)
@@ -1525,7 +1526,7 @@ class ShowSyncManagerServiceImpl(
             override fun onSubscribeError(ex: SyncManagerException?) {
             }
         }
-        pkCompetitorEventListener = listener
+        pkCompetitorEventListenerMap[roomId] = listener
         sceneReference.collection(kCollectionIdPKInvitation).subscribe(listener)
     }
 

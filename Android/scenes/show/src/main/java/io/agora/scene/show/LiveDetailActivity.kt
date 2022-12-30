@@ -723,9 +723,11 @@ class LiveDetailActivity : AppCompatActivity() {
             }
         })
 
-        val ft = supportFragmentManager.beginTransaction()
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        mLinkDialog.show(ft, "LinkDialog")
+        if (!mLinkDialog.isVisible) {
+            val ft = supportFragmentManager.beginTransaction()
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            mLinkDialog.show(ft, "LinkDialog")
+        }
     }
 
     private fun showInvitationDialog() {
@@ -780,9 +782,11 @@ class LiveDetailActivity : AppCompatActivity() {
                 mService.stopInteraction(interactionInfo!!)
             }
         })
-        val ft = supportFragmentManager.beginTransaction()
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        mPKDialog.show(ft, "PKDialog")
+        if (!mPKDialog.isVisible) {
+            val ft = supportFragmentManager.beginTransaction()
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            mPKDialog.show(ft, "PKDialog")
+        }
     }
 
     private fun showPKInvitationDialog(name: String) {
