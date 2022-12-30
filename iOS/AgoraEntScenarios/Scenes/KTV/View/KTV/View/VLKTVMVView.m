@@ -460,6 +460,7 @@
         lrcConfig.lrcHighlightFontSize = VLUIFontMake(18);
         lrcConfig.lrcTopAndBottomMargin = 8;
         lrcConfig.isHiddenSeparator = YES;
+        lrcConfig.isDrag = YES;
         lrcConfig.tipsColor = [UIColor whiteColor];
 
         _config.lrcConfig = lrcConfig;
