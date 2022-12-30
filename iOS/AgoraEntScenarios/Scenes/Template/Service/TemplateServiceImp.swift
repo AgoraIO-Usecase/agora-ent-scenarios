@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AgoraSyncManager
 
 class TemplateServiceImp: NSObject {
     var channelName: String?
