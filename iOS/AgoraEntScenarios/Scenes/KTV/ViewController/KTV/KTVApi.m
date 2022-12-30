@@ -337,7 +337,18 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
+    if (self.config.role != KTVSingRoleMainSinger) {
+        return;
+    }
     
+    double pitch = speakers.firstObject.voicePitch;
+    NSDictionary *dict = @{
+        @"cmd":@"setVoicePitch",
+        @"pitch":@(pitch),
+        @"time": @([self.rtcMediaPlayer getPosition])
+    };
+    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
+    }];
 }
 
 #pragma mark - setter
