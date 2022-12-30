@@ -420,12 +420,12 @@ KTVApiDelegate
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
     [self.ktvApi mainRtcEngine:engine reportAudioVolumeIndicationOfSpeakers:speakers totalVolume:totalVolume];
-//    AgoraRtcAudioVolumeInfo* speaker = [speakers firstObject];
-//    if (speaker == nil || ![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-//        return;
-//    }
-//
-//    self.currentVoicePitch = speaker.voicePitch;
+    AgoraRtcAudioVolumeInfo* speaker = [speakers firstObject];
+    if (speaker == nil || ![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
+        return;
+    }
+
+    self.currentVoicePitch = speaker.voicePitch;
     //TODO use stream message
 //    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
 }
@@ -442,6 +442,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView setCoundDown:leftSecond];
         VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
         
+        return;
+    } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
+        int pitch = [dict[@"pitch"] intValue];
+        NSInteger time = [dict[@"time"] integerValue];
+        self.currentVoicePitch = pitch;
+        NSLog(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
         return;
     }
     
