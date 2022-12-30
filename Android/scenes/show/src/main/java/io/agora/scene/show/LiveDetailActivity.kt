@@ -90,6 +90,7 @@ class LiveDetailActivity : AppCompatActivity() {
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
     private var isPKCompetition: Boolean = false
+    private var deletedPKInvitation: ShowPKInvitation? = null
 
     private var mLinkInvitationCountDownLatch: CountDownTimer? = null
     private var mPKInvitationCountDownLatch: CountDownTimer? = null
@@ -406,6 +407,7 @@ class LiveDetailActivity : AppCompatActivity() {
     }
 
     private fun refreshViewDetailLayout(status: Int) {
+        if (interactionInfo == null) return
         when (status) {
             ShowInteractionStatus.idle.value -> {
                 if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
@@ -894,6 +896,13 @@ class LiveDetailActivity : AppCompatActivity() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.updated && info != null ) {
                 // 开始互动
                 if (interactionInfo == null) {
+                    if (deletedPKInvitation != null) {
+                        mService.stopInteraction(info, {
+                            // success
+                        })
+                        deletedPKInvitation = null
+                        return@subscribeInteractionChanged
+                    }
                     interactionInfo = info
                     // UI
                     updateVideoSetting()
@@ -939,10 +948,14 @@ class LiveDetailActivity : AppCompatActivity() {
                     showPKInvitationDialog(info.fromName)
                 }
             } else {
-                if (interactionInfo != null && info != null && info.userId == UserManager.getInstance().user.id.toString()) {
-                    mService.stopInteraction(interactionInfo!!, {
-                        // success
-                    })
+                if (info != null && info.userId == UserManager.getInstance().user.id.toString()) {
+                    deletedPKInvitation = info
+                    if (interactionInfo != null) {
+                        mService.stopInteraction(interactionInfo!!, {
+                            // success
+                        })
+                        deletedPKInvitation = null
+                    }
                 }
             }
         }
@@ -1390,6 +1403,7 @@ class LiveDetailActivity : AppCompatActivity() {
             }
             mRtcEngine.setupLocalVideo(VideoCanvas(view))
             enableLocalAudio(true)
+            mRtcEngine.enableLocalVideo(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = true
