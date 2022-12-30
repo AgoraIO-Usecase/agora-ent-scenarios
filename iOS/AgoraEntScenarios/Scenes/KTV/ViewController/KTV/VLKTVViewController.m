@@ -248,6 +248,7 @@ KTVApiDelegate
             [model resetWithInfo:nil];
             [weakSelf setSeatsArray:weakSelf.seatsArray];
         }
+        [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
         
         //update my seat status
         weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
