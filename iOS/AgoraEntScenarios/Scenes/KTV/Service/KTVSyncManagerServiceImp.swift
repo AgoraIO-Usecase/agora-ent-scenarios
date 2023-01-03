@@ -768,7 +768,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .delete(id: objectId, success: { obj in
+            .delete(id: objectId, success: {
                 agoraPrint("imp user delete success...")
                 completion(nil)
             }, fail: { error in
@@ -890,6 +890,11 @@ extension KTVSyncManagerServiceImp {
         seatMap.removeAll()
         _getSeatInfo { [weak self] (error, list) in
             guard let self = self, let list = list else {
+                return
+            }
+            
+            //TODO: _getSeatInfo will callback if remove seat invoke
+            guard self.seatMap.count == 0 else {
                 return
             }
             
@@ -1019,7 +1024,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .delete(id: objectId, success: { _ in
+            .delete(id: objectId, success: {
                 agoraPrint("imp seat delete success...")
                 finished(nil)
             }, fail: { error in
@@ -1219,7 +1224,7 @@ extension KTVSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
 //            .document(id: objectId)
-            .delete(id: objectId, success: { obj in
+            .delete(id: objectId, success: {
                 completion(nil)
                 agoraPrint("imp song delete success...")
             }, fail: { error in
