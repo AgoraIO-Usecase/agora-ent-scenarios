@@ -283,6 +283,7 @@ KTVApiDelegate
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
+            KTVLogInfo(@"song did updated: %@ ischorus: %d, status: %ld", song.name, songInfo.isChorus, songInfo.status);
             if (song == nil) {
                 NSMutableArray* selSongsArray = [NSMutableArray arrayWithArray:weakSelf.selSongsArray];
                 [selSongsArray appendObject:songInfo];
@@ -509,7 +510,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
-    
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
     
     if(!model){
@@ -574,6 +574,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
             [self startCoSingerWaitForSeconds:20 withCallback:^(KTVCoSingerWaitStopReason reason) {
+                KTVLogInfo(@"startCoSingerWaitForSeconds did stop: %ld", reason);
                 if (reason == KTVCoSingerWaitStopCancel) {
                     return;
                 }
@@ -597,6 +598,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.chorusMatchingTimer = [HWWeakTimer scheduledTimerWithTimeInterval:1.0f block:^(id userInfo) {
         leftSecond -= 1;
         if (leftSecond == 0) {
+            [weakSelf.MVView setChorusOptViewHidden];
             [weakSelf stopCoSingerWaitWithReason:KTVCoSingerWaitStopTimeOut];
         } else {
             [weakSelf.MVView setCoundDown:leftSecond];
@@ -1326,7 +1328,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
     VLRoomSelSongModel* updatedTopSong = [selSongsArray firstObject];
-    
+    KTVLogInfo(@"setSelSongsArray: name: %@ isChorus: %d, status: %ld", updatedTopSong.name, updatedTopSong.isChorus, updatedTopSong.status);
     if(!updatedTopSong.isChorus) {
         //solo
         if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
