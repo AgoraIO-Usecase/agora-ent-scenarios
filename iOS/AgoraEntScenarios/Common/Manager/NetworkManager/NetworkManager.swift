@@ -28,7 +28,7 @@ class NetworkManager:NSObject {
         case show = 0
         case voice = 1
         case ktv = 2
-        
+
         func desc() ->String {
             switch self {
             case .show:
@@ -40,7 +40,7 @@ class NetworkManager:NSObject {
             default:
                 break
             }
-            
+
             return "unknown"
         }
     }
@@ -184,7 +184,7 @@ class NetworkManager:NSObject {
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
-                      "traceId": NSString.withUUID().md5(),
+                      "traceId": NSString.withUUID().md5() as Any,
                       "user": userParams] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
@@ -213,7 +213,7 @@ class NetworkManager:NSObject {
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5(),
+                      "traceId": NSString.withUUID().md5() as Any,
                       "payload": payload] as [String: Any]
                       
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
