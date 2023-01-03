@@ -310,16 +310,53 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         }
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
-        NSInteger state = [dict[@"state"] integerValue];
+        AgoraMediaPlayerState state = [dict[@"state"] integerValue];
+        
+        if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
+            switch (state) {
+                case AgoraMediaPlayerStatePaused:
+                    [self pausePlay];
+                    break;
+                case AgoraMediaPlayerStateStopped:
+//                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
+                    [self stopSong];
+                    break;
+                case AgoraMediaPlayerStatePlaying:
+                    [self resumePlay];
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
+    } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
+        int pitch = [dict[@"pitch"] intValue];
+        NSInteger time = [dict[@"time"] integerValue];
+        [self.lrcView setVoicePitch:@[@(pitch)]];
+        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+        return;
     }
 }
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
+    if (self.config.role != KTVSingRoleMainSinger) {
+        return;
+    }
     
+    double pitch = speakers.firstObject.voicePitch;
+    NSDictionary *dict = @{
+        @"cmd":@"setVoicePitch",
+        @"pitch":@(pitch),
+        @"time": @([self.rtcMediaPlayer getPosition])
+    };
+    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
+    }];
+    
+    [self.lrcView setVoicePitch:@[@(pitch)]];
 }
 
 #pragma mark - setter

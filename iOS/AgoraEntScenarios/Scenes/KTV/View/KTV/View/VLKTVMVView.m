@@ -156,9 +156,9 @@
     }
 }
 
-- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
-    [self.lrcView setVoicePitch:pitch];    
-}
+//- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
+//    [self.lrcView setVoicePitch:pitch];
+//}
 
 #pragma mark - Action
 

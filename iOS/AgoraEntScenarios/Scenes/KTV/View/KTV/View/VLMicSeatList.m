@@ -62,7 +62,11 @@
 
 - (void)setRoomSeatsArray:(NSArray *)roomSeatsArray {
     _roomSeatsArray = [[NSArray alloc]initWithArray:roomSeatsArray];
-    [self.personCollectionView reloadData];
+//    [self.personCollectionView reloadData];
+}
+
+- (void)reloadSeatIndex: (NSUInteger)seatIndex {
+    [self.personCollectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:seatIndex inSection:0]]];
 }
 
 - (void)updateIfNeeded
