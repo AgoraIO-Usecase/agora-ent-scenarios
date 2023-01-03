@@ -727,7 +727,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setupContentInspectConfig {
     AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
     NSDictionary* dic = @{
-        @"userNo": [VLUserCenter user].userNo ? : @"unknown",
+        @"userNo": [VLUserCenter user].id ? : @"unknown",
         @"sceneName": @"ktv"
     };
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
@@ -738,6 +738,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     module.type = AgoraContentInspectTypeModeration;
     config.modules = @[module];
     [self.RTCkit enableContentInspect:YES config:config];
+    
+    //添加音频鉴黄接口
+    [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
+                                              channelType:1
+                                                sceneType:SceneTypeKtv
+                                                  success:^(NSString * msg) {
+        KTVLogInfo(@"voiceIdentify success: %@", msg);
+    }];
 }
 
 - (void)joinRTCChannel {
