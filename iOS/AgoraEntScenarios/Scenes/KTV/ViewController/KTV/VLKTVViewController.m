@@ -99,7 +99,6 @@ KTVApiDelegate
 @property (nonatomic, assign) BOOL isOnMicSeat;
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) KTVPlayerTrackMode trackMode;
-@property (nonatomic, assign) double currentVoicePitch;
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApi* ktvApi;
@@ -422,14 +421,6 @@ KTVApiDelegate
 reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers
       totalVolume:(NSInteger)totalVolume {
     [self.ktvApi mainRtcEngine:engine reportAudioVolumeIndicationOfSpeakers:speakers totalVolume:totalVolume];
-    AgoraRtcAudioVolumeInfo* speaker = [speakers firstObject];
-    if (speaker == nil || ![self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-        return;
-    }
-
-    self.currentVoicePitch = speaker.voicePitch;
-    //TODO use stream message
-//    [[AppContext ktvServiceImp] updateSingingScoreWithScore:speaker.voicePitch];
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
@@ -444,12 +435,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView setCoundDown:leftSecond];
         KTVLogInfo(@"count down: %ds",(int)leftSecond);
         
-        return;
-    } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
-        int pitch = [dict[@"pitch"] intValue];
-        NSInteger time = [dict[@"time"] integerValue];
-        self.currentVoicePitch = pitch;
-        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
         return;
     }
     
@@ -1366,10 +1351,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi selectTrackMode:trackMode];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
-}
-
-- (void)setCurrentVoicePitch:(double)currentVoicePitch {
-    [self.MVView setVoicePitch:@[@(currentVoicePitch)]];
 }
 
 @end
