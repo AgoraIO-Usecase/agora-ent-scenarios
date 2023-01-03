@@ -402,11 +402,11 @@
 		DDB1924B294B636A00836AE0 /* VRRoomCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB191CB294B636A00836AE0 /* VRRoomCreateView.swift */; };
 		DDB1924C294B636A00836AE0 /* VRCreateRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB191CC294B636A00836AE0 /* VRCreateRoomView.swift */; };
 		DDBF7893291BCECE0001855B /* LEEAlert+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */; };
-		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		DDE84336291CB91B009C762C /* LSTPopView+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */; };
+		E36BE96A29640065003FCFBF /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36BE96929640065003FCFBF /* KeyCenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -957,12 +957,12 @@
 		DDBF7891291BCECE0001855B /* LEEAlert+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LEEAlert+KTVModal.h"; sourceTree = "<group>"; };
 		DDBF7892291BCECE0001855B /* LEEAlert+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LEEAlert+KTVModal.m"; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
-		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		DDE84334291CB91B009C762C /* LSTPopView+KTVModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LSTPopView+KTVModal.h"; sourceTree = "<group>"; };
 		DDE84335291CB91B009C762C /* LSTPopView+KTVModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "LSTPopView+KTVModal.m"; sourceTree = "<group>"; };
+		E36BE96929640065003FCFBF /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1060,7 +1060,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
-				DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */,
+				E36BE96929640065003FCFBF /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
 				DDDDDB3228FFD78B005F4E8B /* Context */,
@@ -2860,7 +2860,6 @@
 				DD8417B029090C520026B624 /* VLChoosedSongView.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
-				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
 				DDB1922A294B636A00836AE0 /* VoiceRoomGiftsView.swift in Sources */,
 				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
 				DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */,
@@ -3051,6 +3050,7 @@
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				DDB1923E294B636A00836AE0 /* VoiceRoomUserView.swift in Sources */,
 				DD8417C629090C520026B624 /* VLOnLineListVC.m in Sources */,
+				E36BE96A29640065003FCFBF /* KeyCenter.swift in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DDB191E4294B636A00836AE0 /* UIColor+extension.swift in Sources */,
 				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
