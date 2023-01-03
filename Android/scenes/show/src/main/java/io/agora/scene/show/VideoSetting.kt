@@ -120,10 +120,10 @@ object VideoSetting {
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
-                captureResolution = Resolution.V_720P,
+                captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
-                frameRate = FrameRate.FPS_15,
-                bitRate = 1500
+                frameRate = FrameRate.FPS_24,
+                bitRate = 1462
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -137,8 +137,8 @@ object VideoSetting {
                 PVC = false,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
-                frameRate = FrameRate.FPS_15,
-                bitRate = 1800
+                frameRate = FrameRate.FPS_24,
+                bitRate = 2099
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -152,8 +152,8 @@ object VideoSetting {
                 PVC = false,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
-                frameRate = FrameRate.FPS_15,
-                bitRate = 1800
+                frameRate = FrameRate.FPS_24,
+                bitRate = 2099
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -168,22 +168,22 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 700
+                bitRate = 680
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val MediumDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = true,
+                H265 = false,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
                 captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_540P,
+                encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 800
+                bitRate = 680
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -196,9 +196,9 @@ object VideoSetting {
                 videoDenoiser = false,
                 PVC = false,
                 captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_540P,
+                encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 800
+                bitRate = 680
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
