@@ -9,6 +9,7 @@ import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetLinkSettingsDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetSettingDialogItemBinding
 import io.agora.scene.show.widget.BottomDarkDialog
+import io.agora.scene.show.widget.SettingDialog
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
@@ -112,6 +113,9 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
                 holder.binding.text.isActivated = activated
                 holder.binding.text.setOnClickListener {
                     val activate = !it.isActivated
+                    if (item.itemId == SettingDialog.ITEM_ID_VIDEO) {
+                        isVideoActivated = activate
+                    }
                     it.isActivated = activate
                     item.activated = activate
 
@@ -143,6 +147,7 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
         mBinding.userName.setText(R.string.show_pk)
     }
 
+    private var isVideoActivated = true;
     fun resetSettingsItem(mute: Boolean) {
         val itemList = listOf(
             SettingItem(
@@ -158,7 +163,7 @@ class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
                 R.mipmap.show_setting_ic_video_on,
                 R.string.show_setting_video_off,
                 R.string.show_setting_video_on,
-                true
+                isVideoActivated
             ),
             SettingItem(
                 ITEM_ID_MIC,

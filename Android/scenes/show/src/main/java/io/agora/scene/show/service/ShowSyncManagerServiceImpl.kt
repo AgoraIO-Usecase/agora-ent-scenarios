@@ -6,6 +6,7 @@ import android.os.Looper
 import android.util.Log
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.EventListener
 
@@ -49,6 +50,7 @@ class ShowSyncManagerServiceImpl(
     private var currRoomNo: String = ""
     private val sceneReferenceMap = mutableMapOf<String, SceneReference>()
     private val currEventListeners = mutableListOf<EventListener>()
+    private val pkCompetitorEventListenerMap = mutableMapOf<String, EventListener>()
 
     private var currRoomChangeSubscriber: ((ShowServiceProtocol.ShowSubscribeStatus, ShowRoomDetailModel?) -> Unit)? =
         null
@@ -89,6 +91,7 @@ class ShowSyncManagerServiceImpl(
         objIdOfInteractionInfo.clear()
         pKCompetitorInvitationList.clear()
         objIdOfPKCompetitorInvitation.clear()
+        pkCompetitorEventListenerMap.clear()
 
         userList.clear()
         micSeatApplyList.clear()
@@ -147,8 +150,8 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.name,
                 ShowRoomStatus.activity.value,
                 ShowInteractionStatus.idle.value,
-                System.currentTimeMillis().toDouble(),
-                System.currentTimeMillis().toDouble()
+                TimeUtils.currentTimeMillis().toDouble(),
+                TimeUtils.currentTimeMillis().toDouble()
             )
             val scene = Scene().apply {
                 id = roomDetail.roomId
@@ -296,7 +299,7 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.id.toString(),
                 UserManager.getInstance().user.name,
                 message,
-                System.currentTimeMillis().toDouble()
+                TimeUtils.currentTimeMillis().toDouble()
             ), object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject?) {
                     success?.invoke()
@@ -355,7 +358,7 @@ class ShowSyncManagerServiceImpl(
             UserManager.getInstance().user.headUrl,
             UserManager.getInstance().user.name,
             ShowRoomRequestStatus.waitting.value,
-            System.currentTimeMillis().toDouble()
+            TimeUtils.currentTimeMillis().toDouble()
         )
         innerCreateSeatApply(apply, success, error)
     }
@@ -581,7 +584,7 @@ class ShowSyncManagerServiceImpl(
                     ShowRoomRequestStatus.waitting.value,
                     userMuteAudio = false,
                     fromUserMuteAudio = false,
-                    createAt = System.currentTimeMillis().toDouble()
+                    createAt = TimeUtils.currentTimeMillis().toDouble()
                 )
                 innerCreatePKInvitation(pkInvitation, null, null)
             }
@@ -1506,7 +1509,9 @@ class ShowSyncManagerServiceImpl(
                 val invitation = pKCompetitorInvitationList[index]
 
                 val sceneReference = sceneReferenceMap[invitation.roomId] ?: return
-                sceneReference.unsubscribe(this)
+                val event = pkCompetitorEventListenerMap[invitation.roomId] ?: return;
+                sceneReference.unsubscribe(event)
+
                 sceneReferenceMap.remove(invitation.roomId)
                 objIdOfPKCompetitorInvitation.removeAt(index)
                 pKCompetitorInvitationList.removeAt(index)
@@ -1521,7 +1526,7 @@ class ShowSyncManagerServiceImpl(
             override fun onSubscribeError(ex: SyncManagerException?) {
             }
         }
-        currEventListeners.add(listener)
+        pkCompetitorEventListenerMap[roomId] = listener
         sceneReference.collection(kCollectionIdPKInvitation).subscribe(listener)
     }
 
