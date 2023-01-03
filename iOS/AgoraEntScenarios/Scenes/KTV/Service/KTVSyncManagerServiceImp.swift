@@ -57,8 +57,6 @@ private func _hideLoadingIfNeed() {
 //    private var singingScoreDidChanged: ((Double) -> Void)?
     private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
-    
-    private var publishScore: Double?
 
     private var roomNo: String?
     
@@ -770,8 +768,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: objectId)
-            .delete(success: {_ in 
+            .delete(id: objectId, success: { obj in
                 agoraPrint("imp user delete success...")
                 completion(nil)
             }, fail: { error in
@@ -1022,8 +1019,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .document(id: objectId)
-            .delete(success: {_ in
+            .delete(id: objectId, success: { _ in
                 agoraPrint("imp seat delete success...")
                 finished(nil)
             }, fail: { error in
@@ -1219,12 +1215,11 @@ extension KTVSyncManagerServiceImp {
             return
         }
         agoraPrint("imp song delete... [\(objectId)]")
-        self.publishScore = nil
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-            .document(id: objectId)
-            .delete(success: {_ in
+//            .document(id: objectId)
+            .delete(id: objectId, success: { obj in
                 completion(nil)
                 agoraPrint("imp song delete success...")
             }, fail: { error in
@@ -1252,9 +1247,10 @@ extension KTVSyncManagerServiceImp {
               topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
+            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus ?? false) \(songList.first?.userNo ?? "")")
             return
         }
-
+        
         topSong.isChorus = false
         topSong.status = 3
         _updateChooseSong(songInfo: topSong) { error in
