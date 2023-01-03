@@ -62,7 +62,7 @@
         [self.choosedBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         self.selsectSongView.hidden = NO;
         self.choosedSongView.hidden = YES;
-        
+        [self.dianGeBtn sizeToFit];
     }else{
         self.choosedBtn.titleLabel.font = UIFontBoldMake(16);
         [self.choosedBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
@@ -70,6 +70,7 @@
         [self.dianGeBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
         self.selsectSongView.hidden = YES;
         self.choosedSongView.hidden = NO;
+        [self.choosedBtn sizeToFit];
     }
     
     if ([self.delegate respondsToSelector:@selector(chooseSongView:tabbarDidClick:)]) {
@@ -97,6 +98,7 @@
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
         [_dianGeBtn setTitleColor:UIColorMakeWithHex(@"#FFFFFF") forState:UIControlStateNormal];
+        [_dianGeBtn sizeToFit];
     }
     return _dianGeBtn;
 }
@@ -109,6 +111,7 @@
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;
         [_choosedBtn setTitleColor:UIColorMakeWithHex(@"#979CBB") forState:UIControlStateNormal];
+        [_choosedBtn sizeToFit];
     }
     return _choosedBtn;
 }
