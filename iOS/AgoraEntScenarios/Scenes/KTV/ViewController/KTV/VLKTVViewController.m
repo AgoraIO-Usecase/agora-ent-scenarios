@@ -437,18 +437,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
-    VLLog(@"返回数据:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
     if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         int leftSecond = [dict[@"time"] intValue];
         [self.MVView setCoundDown:leftSecond];
-        VLLog(@"收到倒计时剩余:%d秒",(int)leftSecond);
+        KTVLogInfo(@"count down: %ds",(int)leftSecond);
         
         return;
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
         int pitch = [dict[@"pitch"] intValue];
         NSInteger time = [dict[@"time"] integerValue];
         self.currentVoicePitch = pitch;
-        NSLog(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
         return;
     }
     
@@ -725,7 +725,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)setupContentInspectConfig {
     AgoraContentInspectConfig* config = [AgoraContentInspectConfig new];
     NSDictionary* dic = @{
-        @"userNo": [VLUserCenter user].userNo ? : @"unknown"
+        @"userNo": [VLUserCenter user].userNo ? : @"unknown",
+        @"sceneName": @"ktv"
     };
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
     NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];

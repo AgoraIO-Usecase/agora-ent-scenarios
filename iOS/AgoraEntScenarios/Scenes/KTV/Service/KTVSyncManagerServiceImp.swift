@@ -24,14 +24,15 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     #if DEBUG
     assert(condition, message)
     #else
+    KTVLog.errorText(text: message, tag: "KTVService")
     #endif
 }
 
 private func agoraPrint(_ message: String) {
-    #if DEBUG
-    print(message)
-    #else
-    #endif
+//    #if DEBUG
+    KTVLog.info(text: message, tag: "KTVService")
+//    #else
+//    #endif
 }
 
 private func _showLoadingIfNeed() {
