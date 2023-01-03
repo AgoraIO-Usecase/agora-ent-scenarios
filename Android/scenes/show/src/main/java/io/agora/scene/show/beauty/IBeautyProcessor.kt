@@ -75,6 +75,14 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
         }
     }
 
+    fun setAdjust(itemId: Int, intensity: Float){
+        BeautyCache.cacheItemValue(GROUP_ID_ADJUST, itemId, intensity)
+        BeautyCache.cacheOperation(GROUP_ID_ADJUST, itemId)
+        workerExecutor.execute {
+            setFaceBeautifyAfterCached(itemId, intensity)
+        }
+    }
+
 
     // IVideoFrameObserver implement
 
