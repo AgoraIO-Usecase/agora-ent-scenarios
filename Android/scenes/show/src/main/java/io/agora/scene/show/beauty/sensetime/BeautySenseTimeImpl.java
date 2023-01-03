@@ -1,5 +1,10 @@
 package io.agora.scene.show.beauty.sensetime;
 
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CLARITY;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_CONTRAST;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SATURATION;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_ADJUST_SHARPEN;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_BRIGHT_EYE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_CHEEKBONE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_CHIN;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_EYE;
@@ -8,6 +13,9 @@ import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_JAWBON
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_MOUTH;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_NOSE;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_OVERALL;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_REDDEN;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES;
+import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_SMOOTH;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_TEETH;
 import static io.agora.scene.show.beauty.BeautyConstantsKt.ITEM_ID_BEAUTY_WHITEN;
@@ -172,6 +180,7 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_FACE_SMOOTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_SMOOTH));
         mSTRenderer.setBeautyMode(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, STEffectBeautyType.WHITENING3_MODE);
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_WHITTEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_WHITEN));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_BASE_REDDEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REDDEN));
 
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_THIN_FACE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_OVERALL));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_SHRINK_CHEEKBONE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHEEKBONE));
@@ -182,6 +191,17 @@ public class BeautySenseTimeImpl extends IBeautyProcessor {
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_NARROW_NOSE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_NOSE));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_MOUTH_SIZE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_MOUTH));
         mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_CHIN_LENGTH, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_CHIN));
+
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_BRIGHT_EYE, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_BRIGHT_EYE));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_DARK_CIRCLES, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_DARK_CIRCLES));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_PLASTIC_REMOVE_NASOLABIAL_FOLDS, BeautyCache.INSTANCE.getItemValue(ITEM_ID_BEAUTY_REMOVE_NASOLABIAL_FOLDS));
+
+
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CLEAR, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CLARITY));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SHARPEN, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SHARPEN));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_SATURATION, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_SATURATION));
+        mSTRenderer.setBeautyStrength(STEffectBeautyType.EFFECT_BEAUTY_TONE_CONTRAST, BeautyCache.INSTANCE.getItemValue(ITEM_ID_ADJUST_CONTRAST));
+
     }
 
     @Override
