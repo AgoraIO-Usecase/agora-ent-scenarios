@@ -55,7 +55,7 @@ typedef enum : NSUInteger {
 /// @param state 状态
 - (void)updateMVPlayerState:(VLKTVMVViewActionType)state;
 
-- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
+//- (void)setVoicePitch:(NSArray <NSNumber *> *)pitch;
 
 - (void)setChorusOptViewHidden;
 

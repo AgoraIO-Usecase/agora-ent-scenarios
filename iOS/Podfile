@@ -30,7 +30,8 @@ def all_pods
   #滚动视图
   pod 'JXCategoryView', '1.6.1'
   
-  pod 'AgoraSyncManager', '~> 1.0.7'
+#  pod 'AgoraSyncManager', '~> 1.0.7'
+pod 'AgoraSyncManager', :path=> './AgoraEntScenarios/Common/Manager/AgoraSyncManager'
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
@@ -59,6 +60,8 @@ def all_pods
   pod 'SVGAPlayer', '2.5.7'
   pod 'KakaJSON', '1.1.2'
   pod 'Agora_Chat_iOS','1.0.8'
+  
+  pod 'SwiftyBeaver', '1.9.5'
   
   #bugly
   pod 'Bugly','2.5.93'

@@ -26,6 +26,9 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, strong) NSArray *roomSeatsArray;
 
+
+- (void)reloadSeatIndex:(NSUInteger)seatIndex;
+
 - (void)updateSingBtnWithChoosedSongArray:(NSArray *)choosedSongArray;
 - (void)updateIfNeeded;
 @end
