@@ -332,6 +332,12 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
+    } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
+        int pitch = [dict[@"pitch"] intValue];
+        NSInteger time = [dict[@"time"] integerValue];
+        [self.lrcView setVoicePitch:@[@(pitch)]];
+        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+        return;
     }
 }
 
@@ -349,6 +355,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     };
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
+    
+    [self.lrcView setVoicePitch:@[@(pitch)]];
 }
 
 #pragma mark - setter
