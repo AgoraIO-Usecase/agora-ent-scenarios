@@ -648,7 +648,7 @@ extension KTVSyncManagerServiceImp {
 //        _subscribeOnlineUsers {}
         _getUserInfo { error, userList in
             // current user already add
-            if self.userList.contains(where: { $0.userNo == VLUserCenter.user.id }) {
+            if self.userList.contains(where: { $0.id == VLUserCenter.user.id }) {
                 return
             }
             self._addUserInfo {
@@ -725,7 +725,7 @@ extension KTVSyncManagerServiceImp {
                            else {
                                return
                            }
-                           if self.userList.contains(where: { $0.userNo == model.userNo }) {
+                           if self.userList.contains(where: { $0.id == model.id }) {
                                self.userDidChanged?(KTVSubscribeUpdated.rawValue, model)
                                return
                            }
