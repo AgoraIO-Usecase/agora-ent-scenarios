@@ -58,6 +58,8 @@ object BeautyCache {
             put(ITEM_ID_BEAUTY_NOSE, defaultItemValueMap[ITEM_ID_BEAUTY_NOSE] ?: 0.0f)
             put(ITEM_ID_BEAUTY_MOUTH, defaultItemValueMap[ITEM_ID_BEAUTY_MOUTH] ?: 0.0f)
             put(ITEM_ID_BEAUTY_CHIN, defaultItemValueMap[ITEM_ID_BEAUTY_CHIN] ?: 0.0f)
+            put(ITEM_ID_ADJUST_SHARPEN, defaultItemValueMap[ITEM_ID_ADJUST_SHARPEN] ?: 0.0f)
+            put(ITEM_ID_ADJUST_CLARITY, defaultItemValueMap[ITEM_ID_ADJUST_CLARITY] ?: 0.0f)
         }
         cacheItemOperation.apply {
             clear()
