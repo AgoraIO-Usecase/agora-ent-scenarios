@@ -24,11 +24,26 @@ class NetworkManager:NSObject {
         case POST
     }
     
-    enum SceneType: String {
-        case show = "show"
-        case voice = "voice_chat"
-        case ktv = "ktv"
-    }
+    @objc enum SceneType: Int {
+            case show = 0
+            case voice = 1
+            case ktv = 2
+
+            func desc() ->String {
+                switch self {
+                case .show:
+                    return "show"
+                case .voice:
+                    return "voice_chat"
+                case .ktv:
+                    return "ktv"
+                default:
+                    break
+                }
+
+                return "unknown"
+            }
+        }
 
     var gameToken: String = ""
 
@@ -169,7 +184,7 @@ class NetworkManager:NSObject {
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
-                      "traceId": NSString.withUUID().md5,
+                      "traceId": NSString.withUUID().md5() as Any,
                       "user": userParams] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
@@ -198,7 +213,7 @@ class NetworkManager:NSObject {
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5,
+                      "traceId": NSString.withUUID().md5() as Any,
                       "payload": payload] as [String: Any]
                       
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
@@ -214,9 +229,10 @@ class NetworkManager:NSObject {
     }
     
     func getPlayloadWithSceneType(_ type: SceneType) -> String? {
+    
         let userInfo: [String: Any] = [
             "id": VLUserCenter.user.id,     //用户id
-            "sceneName": type.rawValue
+            "sceneName": type.desc()
         ]
                  
         guard let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted) else {
