@@ -84,6 +84,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        getWindow().getDecorView().setKeepScreenOn(true);
         roomLivingViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override
@@ -115,6 +116,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             roomLivingViewModel.haveSeat(position);
+                            getBinding().cbMic.setChecked(false);
+                            getBinding().cbVideo.setChecked(false);
                             requestRecordPermission();
                         }
                     }

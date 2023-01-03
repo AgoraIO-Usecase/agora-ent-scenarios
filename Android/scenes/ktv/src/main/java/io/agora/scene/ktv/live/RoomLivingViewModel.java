@@ -325,7 +325,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 seatListLiveData.postValue(value);
 
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                    seatLocalLiveData.postValue(roomSeatModel);
+                    seatLocalLiveData.setValue(roomSeatModel);
+                    updateVolumeStatus(roomSeatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE());
                 }
 
             } else if (ktvSubscribe == KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
@@ -348,7 +349,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     seatListLiveData.postValue(value);
 
                     if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
-                        seatLocalLiveData.postValue(roomSeatModel);
+                        seatLocalLiveData.setValue(roomSeatModel);
+                        updateVolumeStatus(roomSeatModel.isAudioMuted() == RoomSeatModel.Companion.getMUTED_VALUE_FALSE());
                     }
                 }
 
@@ -385,6 +387,12 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
                         mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
                     }
+                    updateVolumeStatus(false);
+
+                    RoomSelSongModel songPlayingData = songPlayingLiveData.getValue();
+                    if(songPlayingData == null){
+                        return null;
+                    }
 
                     // 合唱相关逻辑
                     if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
@@ -393,8 +401,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     } else if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getUserNo())) {
                         //推送切歌逻辑
                     }
-                } else if (roomSeatModel.getUserNo().equals(songPlayingLiveData.getValue().getUserNo())) {
-                    // 被房主下麦克的合唱者
                 }
             }
             return null;
@@ -435,27 +441,31 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     public void haveSeat(int onSeatIndex) {
         Log.d(TAG, "RoomLivingViewModel.haveSeat() called: " + onSeatIndex);
-        ktvServiceProtocol.onSeat(new OnSeatInputModel(onSeatIndex), e -> {
-            if (e == null) {
-                // success
-                Log.d(TAG, "RoomLivingViewModel.haveSeat() success");
-                isOnSeat = true;
-                if (mRtcEngine != null) {
-                    mainChannelMediaOption.publishCameraTrack = false;
-                    mainChannelMediaOption.publishMicrophoneTrack = true;
-                    mainChannelMediaOption.publishCustomAudioTrack = false;
-                    mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
-                    mainChannelMediaOption.autoSubscribeVideo = true;
-                    mainChannelMediaOption.autoSubscribeAudio = true;
-                    mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-                    mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+        ktvServiceProtocol.onSeat(new OnSeatInputModel(onSeatIndex), new Function1<Exception, Unit>() {
+            @Override
+            public Unit invoke(Exception e) {
+                if (e == null) {
+                    // success
+                    Log.d(TAG, "RoomLivingViewModel.haveSeat() success");
+                    isOnSeat = true;
+                    if (mRtcEngine != null) {
+                        mainChannelMediaOption.publishCameraTrack = false;
+                        mainChannelMediaOption.publishMicrophoneTrack = true;
+                        mainChannelMediaOption.publishCustomAudioTrack = false;
+                        mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                        mainChannelMediaOption.autoSubscribeVideo = true;
+                        mainChannelMediaOption.autoSubscribeAudio = true;
+                        mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+                    }
+                    toggleMic(false);
+                } else {
+                    // failure
+                    Log.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
+                    ToastUtils.showToast(e.getMessage());
                 }
-            } else {
-                // failure
-                Log.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                return null;
             }
-            return null;
         });
     }
 
@@ -1051,7 +1061,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
         contentCenterConfiguration.mccUid = UserManager.getInstance().getUser().id;
-        contentCenterConfiguration.token = roomInfoLiveData.getValue().getAgoraRTMToken();
+        contentCenterConfiguration.rtmToken = roomInfoLiveData.getValue().getAgoraRTMToken();
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
 
@@ -1119,7 +1129,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         // ------------------ 初始化音量 ------------------
         mPlayer.adjustPlayoutVolume(40);
         mPlayer.adjustPublishSignalVolume(40);
-        mRtcEngine.adjustRecordingSignalVolume(40);
+        updateVolumeStatus(false);
 
         if (streamId == 0) {
             DataStreamConfig cfg = new DataStreamConfig();
@@ -1167,8 +1177,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     private void setMicVolume(int v) {
-        int isMuted = seatLocalLiveData.getValue().isAudioMuted();
-        if (isMuted == 1) {
+        RoomSeatModel value = seatLocalLiveData.getValue();
+        int isMuted = value == null ? RoomSeatModel.Companion.getMUTED_VALUE_TRUE() : value.isAudioMuted();
+        if (isMuted == RoomSeatModel.Companion.getMUTED_VALUE_TRUE()) {
             micOldVolume = v;
             Log.d(TAG, "muted! setMicVolume: " + v);
             return;

@@ -651,6 +651,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {}
 
+    override fun onCompleted() {}
+
     override fun onAgoraCDNTokenWillExpire() {}
 
     override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {}
@@ -704,19 +706,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return false
     }
 
-    override fun onEarMonitoringAudioFrame(
-        type: Int,
-        samplesPerChannel: Int,
-        bytesPerSample: Int,
-        channels: Int,
-        samplesPerSec: Int,
-        buffer: ByteBuffer?,
-        renderTimeMs: Long,
-        avsync_type: Int
-    ): Boolean {
-        return false
-    }
-
     override fun onPlaybackAudioFrameBeforeMixing(
         channelId: String?,
         userId: Int,
@@ -739,6 +728,4 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun getPlaybackAudioParams(): AudioParams? { return null }
 
     override fun getMixedAudioParams(): AudioParams? { return null }
-
-    override fun getEarMonitoringAudioParams(): AudioParams? { return null }
 }
