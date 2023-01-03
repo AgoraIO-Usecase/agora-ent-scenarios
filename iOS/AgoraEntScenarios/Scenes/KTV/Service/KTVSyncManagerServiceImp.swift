@@ -760,7 +760,7 @@ extension KTVSyncManagerServiceImp {
             agoraAssert("_removeUser channelName = nil")
             return
         }
-        guard let objectId = userList.filter({ $0.userNo == VLUserCenter.user.id }).first?.objectId else {
+        guard let objectId = userList.filter({ $0.id == VLUserCenter.user.id }).first?.objectId else {
 //            agoraAssert("_removeUser objectId = nil")
             return
         }
