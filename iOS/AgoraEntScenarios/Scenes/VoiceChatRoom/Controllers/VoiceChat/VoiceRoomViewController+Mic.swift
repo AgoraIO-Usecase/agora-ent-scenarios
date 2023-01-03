@@ -168,7 +168,9 @@ extension VoiceRoomViewController {
     }
 
     func refuse() {
-        ChatRoomServiceImp.getSharedInstance().refuseInvite { error, flag in }
+        ChatRoomServiceImp.getSharedInstance().refuseInvite(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { _, _ in
+            
+        }
     }
 
     func agreeInvite() {
@@ -179,6 +181,7 @@ extension VoiceRoomViewController {
                 self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
+                self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
             }
         })
     }
