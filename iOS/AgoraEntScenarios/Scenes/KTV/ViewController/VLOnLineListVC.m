@@ -161,7 +161,7 @@
     
     KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
     inputModel.roomNo = listModel.roomNo;
-//    inputModel.userNo = VLUserCenter.user.userNo;
+//    inputModel.userNo = VLUserCenter.user.id;
     inputModel.password = inputText;
 
     VL(weakSelf);

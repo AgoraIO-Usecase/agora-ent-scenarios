@@ -9,7 +9,7 @@
 @implementation VLRoomSelSongModel
 
 - (BOOL)isSongOwner {
-    if ([self.userNo isEqualToString:VLUserCenter.user.userNo]) {
+    if ([self.userNo isEqualToString:VLUserCenter.user.id]) {
         return YES;
     }
     return NO;
