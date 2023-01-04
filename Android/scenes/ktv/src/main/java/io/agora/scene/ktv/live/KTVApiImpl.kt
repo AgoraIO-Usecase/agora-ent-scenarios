@@ -12,6 +12,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.Constants.AUDIO_SCENARIO_CHORUS
 import io.agora.rtc2.Constants.AUDIO_SCENARIO_GAME_STREAMING
 import io.agora.rtc2.audio.AudioParams
+import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.widget.LrcControlView
 import org.json.JSONException
@@ -101,6 +102,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 KTVLoadSongState.KTVLoadSongStateInProgress -> {
                     return
                 }
+                else -> {}
             }
         }
 
@@ -209,9 +211,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     channelMediaOption.publishMediaPlayerAudioTrack = true
                     mRtcEngine!!.updateChannelMediaOptions(channelMediaOption)
 
-                    mRtcEngine!!.setDirectExternalAudioSource(true);
-                    mRtcEngine!!.setRecordingAudioFrameParameters(48000, 2, 0, 960);
-                    mRtcEngine!!.registerAudioFrameObserver(this);
+                    mRtcEngine!!.setDirectExternalAudioSource(true)
+                    mRtcEngine!!.setRecordingAudioFrameParameters(48000, 2, 0, 960)
+                    mRtcEngine!!.registerAudioFrameObserver(this)
 
                     joinChorus2ndChannel()
                 }
@@ -379,26 +381,36 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
         val rtcConnection = RtcConnection()
         rtcConnection.channelId = channelName + "_ex"
-        rtcConnection.localUid = UserManager.getInstance().user.id.toInt() * 10 + 1
+        rtcConnection.localUid = UserManager.getInstance().user.id.toInt()
         subChorusConnection = rtcConnection
 
-        mRtcEngine!!.joinChannelEx(
-            UserManager.getInstance().user.token,
-            rtcConnection,
-            channelMediaOption,
-            object: IRtcEngineEventHandler() {
-                override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                    super.onJoinChannelSuccess(channel, uid, elapsed)
-                    if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = true
-                    mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_CHORUS)
-                }
+        TokenGenerator.generateTokens(
+            rtcConnection.channelId,
+            UserManager.getInstance().user.id.toString(),
+            TokenGenerator.TokenGeneratorType.token006,
+            arrayOf(
+                TokenGenerator.AgoraTokenType.rtc),
+            { ret ->
+                val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
+                mRtcEngine!!.joinChannelEx(
+                    rtcToken,
+                    rtcConnection,
+                    channelMediaOption,
+                    object: IRtcEngineEventHandler() {
+                        override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                            super.onJoinChannelSuccess(channel, uid, elapsed)
+                            if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = true
+                            mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+                        }
 
-                override fun onLeaveChannel(stats: RtcStats?) {
-                    super.onLeaveChannel(stats)
-                    if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = false
-                    mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING);
-                }
-            }
+                        override fun onLeaveChannel(stats: RtcStats?) {
+                            super.onLeaveChannel(stats)
+                            if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = false
+                            mRtcEngine?.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+                        }
+                    }
+                )
+            }, {}
         )
 
         if (songConfig!!.type == KTVSongType.KTVSongTypeChorus &&
@@ -530,6 +542,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                             mPlayer?.resume()
                         }
+                        else -> {}
                     }
                 }
                 ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, Constants.MediaPlayerState.getStateByValue(state), false)
@@ -617,6 +630,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 this.localPlayerPosition = 0
                 stopSyncPitch()
             }
+            else -> {}
         }
         syncPlayState(state!!)
         ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, state, true)
