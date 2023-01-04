@@ -250,7 +250,7 @@ KTVApiDelegate
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
         
         //update my seat status
-        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
+//        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -502,7 +502,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self markSongPlaying:model];
     
-    
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
         [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
     KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
@@ -517,6 +516,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
+            weakSelf.isPlayerPublish = !model.isChorus;
         }
     }];
     
@@ -819,6 +819,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (AgoraRtcChannelMediaOptions*)channelMediaOptions {
+    KTVLogInfo(@"channelMediaOptions isBroadcaster: %d, isNowCameraMuted: %d, isPlayerPublish: %d", [self isBroadcaster], self.isNowCameraMuted, self.isPlayerPublish);
     AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
     [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
     [option setPublishCameraTrack:!self.isNowCameraMuted];
@@ -1246,6 +1247,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSeatsArray:(NSArray<VLRoomSeatModel *> *)seatsArray {
     _seatsArray = seatsArray;
+    
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -1351,6 +1353,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi selectTrackMode:trackMode];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
+}
+
+- (void)setIsPlayerPublish:(BOOL)isPlayerPublish {
+    _isPlayerPublish = isPlayerPublish;
+    
+    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
 }
 
 @end
