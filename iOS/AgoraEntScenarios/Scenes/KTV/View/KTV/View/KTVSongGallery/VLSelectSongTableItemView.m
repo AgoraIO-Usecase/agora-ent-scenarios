@@ -13,7 +13,6 @@
 #import "VLToast.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-@import MJRefresh;
 
 @interface VLSelectSongTableItemView ()<
 UITableViewDataSource,
@@ -29,7 +28,7 @@ AgoraMusicContentCenterEventDelegate
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
 
-
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, copy) NSString* requestId;
 @end
 
@@ -62,18 +61,19 @@ AgoraMusicContentCenterEventDelegate
     self.tableView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [self addSubview:self.tableView];
     
-    VL(weakSelf);
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:YES];
-    }];
-    
-    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:NO];
-    }];
+    _refreshControl = [[UIRefreshControl alloc]init];
+    self.tableView.refreshControl = _refreshControl;
+    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+
+}
+
+-(void)loadData {
+    [self.tableView.refreshControl beginRefreshing];
+    [self loadDatasWithIndex:self.pageType ifRefresh:YES];
 }
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
-    [self.tableView.mj_header endRefreshing];
+    [self.tableView.refreshControl endRefreshing];
     if (songList.count == 0) {
         return;
     }
@@ -83,11 +83,6 @@ AgoraMusicContentCenterEventDelegate
     if (ifRefresh) {
         [self.songsMuArray removeAllObjects];
         self.songsMuArray = modelsArray.mutableCopy;
-        if (modelsArray.count > 0) {
-            self.tableView.mj_footer.hidden = NO;
-        }else{
-            self.tableView.mj_footer.hidden = YES;
-        }
     }else{
         for (VLSongItmModel *model in modelsArray) {
             [self.songsMuArray addObject:model];
@@ -103,11 +98,7 @@ AgoraMusicContentCenterEventDelegate
     }
     
     [self.tableView reloadData];
-    if (modelsArray.count < 5) {
-        [self.tableView.mj_footer endRefreshingWithNoMoreData];
-    }else{
-        [self.tableView.mj_footer endRefreshing];
-    }
+
 }
 
 

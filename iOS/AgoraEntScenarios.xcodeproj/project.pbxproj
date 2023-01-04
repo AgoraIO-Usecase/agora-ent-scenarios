@@ -107,8 +107,6 @@
 		DD220B31295B332C00F57F30 /* VoiceRoomAudiencesEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A2D295B332C00F57F30 /* VoiceRoomAudiencesEntity.swift */; };
 		DD220B32295B332C00F57F30 /* VoiceRoomChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A2E295B332C00F57F30 /* VoiceRoomChatModel.swift */; };
 		DD220B33295B332C00F57F30 /* ChatRoomServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A30295B332C00F57F30 /* ChatRoomServiceImp.swift */; };
-		DD220B34295B332C00F57F30 /* VoiceChatServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A31295B332C00F57F30 /* VoiceChatServiceModel.swift */; };
-		DD220B35295B332C00F57F30 /* VoiceServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A32295B332C00F57F30 /* VoiceServiceProtocol.swift */; };
 		DD220B36295B332C00F57F30 /* ChatRoomServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A33295B332C00F57F30 /* ChatRoomServiceProtocol.swift */; };
 		DD220B37295B332C00F57F30 /* VRBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A35295B332C00F57F30 /* VRBaseViewController.swift */; };
 		DD220B38295B332C00F57F30 /* VoiceRoomAudiencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD220A37295B332C00F57F30 /* VoiceRoomAudiencesViewController.swift */; };
@@ -313,6 +311,7 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
+		E36BE99729656C43003FCFBF /* AttributedTV.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTV.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -489,8 +488,6 @@
 		DD220A2D295B332C00F57F30 /* VoiceRoomAudiencesEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomAudiencesEntity.swift; sourceTree = "<group>"; };
 		DD220A2E295B332C00F57F30 /* VoiceRoomChatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomChatModel.swift; sourceTree = "<group>"; };
 		DD220A30295B332C00F57F30 /* ChatRoomServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceImp.swift; sourceTree = "<group>"; };
-		DD220A31295B332C00F57F30 /* VoiceChatServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceChatServiceModel.swift; sourceTree = "<group>"; };
-		DD220A32295B332C00F57F30 /* VoiceServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceServiceProtocol.swift; sourceTree = "<group>"; };
 		DD220A33295B332C00F57F30 /* ChatRoomServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomServiceProtocol.swift; sourceTree = "<group>"; };
 		DD220A35295B332C00F57F30 /* VRBaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VRBaseViewController.swift; sourceTree = "<group>"; };
 		DD220A37295B332C00F57F30 /* VoiceRoomAudiencesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomAudiencesViewController.swift; sourceTree = "<group>"; };
@@ -772,6 +769,8 @@
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		E36BE99529656C43003FCFBF /* AttributedTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTV.h; sourceTree = "<group>"; };
+		E36BE99629656C43003FCFBF /* AttributedTV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTV.m; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1166,8 +1165,6 @@
 			isa = PBXGroup;
 			children = (
 				DD220A30295B332C00F57F30 /* ChatRoomServiceImp.swift */,
-				DD220A31295B332C00F57F30 /* VoiceChatServiceModel.swift */,
-				DD220A32295B332C00F57F30 /* VoiceServiceProtocol.swift */,
 				DD220A33295B332C00F57F30 /* ChatRoomServiceProtocol.swift */,
 			);
 			path = Service;
@@ -1816,6 +1813,8 @@
 				DDA1990D28FFE579009D3E61 /* VLBaseView.h */,
 				DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */,
 				DDA1990F28FFE579009D3E61 /* VLUIView.h */,
+				E36BE99529656C43003FCFBF /* AttributedTV.h */,
+				E36BE99629656C43003FCFBF /* AttributedTV.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2394,6 +2393,7 @@
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD220B17295B332C00F57F30 /* VoiceRoomPasswordAlert.swift in Sources */,
 				DD220B7F295B332C00F57F30 /* HorizontalCardView.swift in Sources */,
+				E36BE99729656C43003FCFBF /* AttributedTV.m in Sources */,
 				DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
 				DD0292ED295BF0DC00485225 /* VLKTVTopView.m in Sources */,
@@ -2463,7 +2463,6 @@
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */,
 				DD220B55295B332C00F57F30 /* VMAudioSettingView.swift in Sources */,
-				DD220B35295B332C00F57F30 /* VoiceServiceProtocol.swift in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DD0292DB295BF0DC00485225 /* LEEAlert+KTVModal.m in Sources */,
 				DD220B75295B332C00F57F30 /* VMMuteView.swift in Sources */,
@@ -2527,7 +2526,6 @@
 				DD220B32295B332C00F57F30 /* VoiceRoomChatModel.swift in Sources */,
 				DD0292EE295BF0DC00485225 /* VLCreateRoomView.m in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
-				DD220B34295B332C00F57F30 /* VoiceChatServiceModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
