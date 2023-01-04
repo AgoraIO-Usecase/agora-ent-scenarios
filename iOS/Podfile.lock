@@ -58,7 +58,6 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - MJExtension (3.4.1)
   - Protobuf (3.21.12)
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
@@ -101,7 +100,6 @@ DEPENDENCIES:
   - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
-  - MJExtension (= 3.4.1)
   - SDWebImage (= 5.0.6)
   - SnapKit (= 5.6.0)
   - SocketRocket (= 0.6.0)
@@ -131,7 +129,6 @@ SPEC REPOS:
     - LSTPopView
     - LSTTimer
     - Masonry
-    - MJExtension
     - Protobuf
     - SDWebImage
     - SnapKit
@@ -168,7 +165,6 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MJExtension: 21c5f6f8c4d5d8844b7ae8fbae08fed0b501f961
   Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
@@ -183,6 +179,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 388e7d85568fccb2671fc1fd0ed5d132c560efc7
+PODFILE CHECKSUM: 817cad2f438dc2b90979e0303888347a256c3c1f
 
 COCOAPODS: 1.11.3

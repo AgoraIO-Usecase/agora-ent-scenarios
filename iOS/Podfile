@@ -20,7 +20,6 @@ def all_pods
   pod 'YYModel', '1.0.4'
   pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
-  pod 'MJExtension', '3.4.1'
   # 键盘
   pod 'IQKeyboardManager', '6.5.10'
   #弹框
