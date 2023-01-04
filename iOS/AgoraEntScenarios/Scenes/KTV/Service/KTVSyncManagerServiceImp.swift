@@ -768,7 +768,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 agoraPrint("imp user delete success...")
                 completion(nil)
             }, fail: { error in
@@ -1024,7 +1025,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 agoraPrint("imp seat delete success...")
                 finished(nil)
             }, fail: { error in
@@ -1145,7 +1147,7 @@ extension KTVSyncManagerServiceImp {
                 guard let self = self else {
                     return
                 }
-                agoraPrint("imp song get success...")
+                agoraPrint("imp song get success... \(list.count)")
                 self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
                 self._sortChooseSongList()
                 let songList = self.songList
@@ -1223,8 +1225,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-//            .document(id: objectId)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 completion(nil)
                 agoraPrint("imp song delete success...")
             }, fail: { error in
@@ -1252,7 +1254,7 @@ extension KTVSyncManagerServiceImp {
               topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus ?? false) \(songList.first?.userNo ?? "")")
+            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus) \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
             return
         }
         
@@ -1278,11 +1280,11 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onCreated... [\(object.getId())]")
                 self.songList.append(model)
                 self._sortChooseSongList()
                 self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
 //                self._markCurrentSongIfNeed()
+                agoraPrint("imp song subscribe onCreated... [\(object.getId())] count: \(self.songList.count)")
             }, onUpdated: { [weak self] object in
                 guard let self = self,
                       let jsonStr = object.toJson(),
@@ -1290,22 +1292,22 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onUpdated... [\(object.getId())]")
                 self.songList = self.songList.filter({ $0.objectId != model.objectId })
                 self.songList.append(model)
                 self._sortChooseSongList()
                 self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
 //                self._markCurrentSongIfNeed()
+                agoraPrint("imp song subscribe onUpdated... [\(object.getId())] count: \(self.songList.count)")
             }, onDeleted: { [weak self] object in
                 guard let self = self,
                       let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onDeleted... [\(object.getId())]")
                 self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                 self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
 //               self._markCurrentSongIfNeed()
+                agoraPrint("imp song subscribe onDeleted... [\(object.getId())] count: \(self.songList.count)")
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                 finished()
