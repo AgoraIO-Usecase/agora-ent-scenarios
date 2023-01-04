@@ -12,7 +12,6 @@
 #import "VLUserCenter.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-@import MJRefresh;
 
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
@@ -30,7 +29,7 @@ AgoraMusicContentCenterEventDelegate
 @property (nonatomic, assign) BOOL ifChorus;
 
 @property (nonatomic, copy) NSString* requestId;
-
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation VLSearchSongResultView
@@ -56,7 +55,7 @@ AgoraMusicContentCenterEventDelegate
 
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
-    [self.tableView.mj_header endRefreshing];
+    [self.tableView.refreshControl endRefreshing];
     if (songList.count == 0) {
         return;
     }
@@ -81,26 +80,17 @@ AgoraMusicContentCenterEventDelegate
     if (ifRefresh) {
         [self.songsMuArray removeAllObjects];
         self.songsMuArray = modelsArray.mutableCopy;
-        if (modelsArray.count > 0) {
-            self.tableView.mj_footer.hidden = NO;
-        }else{
-            self.tableView.mj_footer.hidden = YES;
-        }
     }else{
         for (VLSongItmModel *model in modelsArray) {
             [self.songsMuArray addObject:model];
         }
     }
     [self.tableView reloadData];
-    if (modelsArray.count < 5) {
-        [self.tableView.mj_footer endRefreshingWithNoMoreData];
-    }else{
-        [self.tableView.mj_footer endRefreshing];
-    }
 }
 
 
 - (void)loadSearchDataWithKeyWord:(NSString *)keyWord ifRefresh:(BOOL)ifRefresh {
+    [self.tableView.refreshControl endRefreshing];
     self.page = ifRefresh ? 1 : self.page;
     self.keyWord = keyWord;
     
@@ -134,14 +124,15 @@ AgoraMusicContentCenterEventDelegate
     [self addSubview:self.tableView];
     self.tableView.hidden = NO;
     
-    VL(weakSelf);
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:YES];
-    }];
-    
-    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-        [weakSelf loadSearchDataWithKeyWord:self.keyWord ifRefresh:NO];
-    }];
+    _refreshControl = [[UIRefreshControl alloc]init];
+    self.tableView.refreshControl = _refreshControl;
+    [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
+
+}
+
+-(void)loadData {
+    [self.tableView.refreshControl beginRefreshing];
+    [self loadSearchDataWithKeyWord:self.keyWord ifRefresh:YES];
 }
 
 #pragma mark -- UITableViewDataSource UITableViewDelegate
