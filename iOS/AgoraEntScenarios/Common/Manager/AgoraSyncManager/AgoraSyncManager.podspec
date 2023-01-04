@@ -16,5 +16,5 @@ Pod::Spec.new do |spec|
   spec.swift_versions = "5.0"
   spec.dependency "AgoraRtm_iOS", "1.5.1"
   spec.dependency 'SocketRocket', "0.6.0"
-  spec.dependency 'AgoraRtcEngine_Special_iOS'
+#  spec.dependency 'AgoraRtcEngine_Special_iOS'
 end
