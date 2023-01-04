@@ -8,7 +8,7 @@
 import Foundation
 import SwiftyBeaver
 
-class AgoraEngLog {
+@objc class AgoraEngLog: NSObject {
     static func createLog(moduleName: String) -> SwiftyBeaver.Type {
         let log = SwiftyBeaver.self
         
@@ -17,10 +17,7 @@ class AgoraEngLog {
          // log to Xcode Console
         let file = FileDestination()  // log to default swiftybeaver.log file
         let dateString = NSDate().string(withFormat: "yyyy-MM-dd", timeZone: nil, locale: nil) ?? ""
-        let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory,
-                                                      FileManager.SearchPathDomainMask.userDomainMask, true).first
-        let logDir = "\(dir ?? "")/agora_ent_logs"
-        try? FileManager.default.createDirectory(at: URL(fileURLWithPath: logDir), withIntermediateDirectories: true)
+        let logDir = logsDir()
         file.logFileURL = URL(fileURLWithPath: "\(logDir)/agora_ent_\(moduleName)_ios_\(dateString)_log.txt")
         
         // use custom format and set console output to short time, log level & message
@@ -35,5 +32,14 @@ class AgoraEngLog {
         log.addDestination(file)
 
         return log
+    }
+    
+    @objc static func logsDir() ->String {
+        let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.cachesDirectory,
+                                                      FileManager.SearchPathDomainMask.userDomainMask, true).first
+        let logDir = "\(dir ?? "")/agora_ent_logs"
+        try? FileManager.default.createDirectory(at: URL(fileURLWithPath: logDir), withIntermediateDirectories: true)
+        
+        return logDir
     }
 }
