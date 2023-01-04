@@ -686,7 +686,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.userNo
+        owner.uid = VLUserCenter.user.id
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
@@ -694,7 +694,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId:VLUserCenter.user.userNo,
+                               userId:VLUserCenter.user.id,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
@@ -773,7 +773,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 if room.room_id == roomId {
                     var isOwner = false
                     if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.userNo
+                        isOwner = owner_uid == VLUserCenter.user.id
                     }
                     if isOwner {
                         self.roomList?.remove(at: index)
@@ -807,7 +807,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = 0
         mic.status = 0
         mic.member = VRUser()
-        mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0

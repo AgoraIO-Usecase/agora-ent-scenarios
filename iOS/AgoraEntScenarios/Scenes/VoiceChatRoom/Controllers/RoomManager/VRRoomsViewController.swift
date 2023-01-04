@@ -78,7 +78,7 @@ extension VRRoomsViewController {
         current.chat_uid = user?.chat_uid
         current.rtc_uid = user?.id
         current.channel_id = user?.channel_id
-        current.uid = user?.userNo
+        current.uid = user?.id
         current.name = user?.name
         current.portrait = user?.headUrl
         VoiceRoomUserInfo.shared.user = current
