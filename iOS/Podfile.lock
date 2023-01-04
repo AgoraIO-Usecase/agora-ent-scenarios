@@ -41,7 +41,6 @@ PODS:
   - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
   - AgoraRtm_iOS (1.5.1)
   - AgoraSyncManager (1.0.4):
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS (= 1.5.1)
     - SocketRocket (= 0.6.0)
   - Bugly (2.5.93)
@@ -164,7 +163,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: ee80fe4f33fec56b3cdd53e28383fbb4d82c743d
   AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: efbb6eb01fb00d758bdba74fb5f0b2b8138708e7
+  AgoraSyncManager: fb72addfd2f6ea279526005e6873af3a9728f60b
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
