@@ -45,6 +45,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var remotePlayerPosition: Long = 0
     private var remotePlayerDuration: Long = 0
 
+    //歌词实时刷新
+    private var mStopDisplayLrc = true
+    private var mDisplayThread: Thread? = null
+    private var mReceivedPlayPosition: Long = 0 //播放器播放position，ms
+    private var mLastReceivedPlayPosTime: Long? = null
+
     // event
     private var ktvApiEventHandler: KTVApi.KTVApiEventHandler? = null
     private var hasJoinChannelEx: Boolean = false
@@ -179,6 +185,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun playSong(songCode: Long) {
         if (songConfig == null) return
+        // reset status
+        stopDisplayLrc()
+        this.mLastReceivedPlayPosTime = null
+        this.mReceivedPlayPosition = 0
 
         val role = songConfig!!.role
         val type = songConfig!!.type
@@ -239,12 +249,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun stopSong() {
         stopSyncPitch()
+        stopDisplayLrc()
+        this.mLastReceivedPlayPosTime = null
+        this.mReceivedPlayPosition = 0
         mPlayer?.stop()
-        //[self cancelAsyncTasks];
         if(songConfig?.type == KTVSongType.KTVSongTypeChorus) {
             leaveChorus2ndChannel()
         }
-        //songConfig = null
     }
 
     override fun resumePlay() {
@@ -441,6 +452,50 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         lrcView?.downloadLrcData(lyricUrl)
     }
 
+    // ------------------ 歌词播放、同步 ------------------
+    // 开始播放歌词
+    private fun startDisplayLrc() {
+        Log.d("KTVLiveRoomLog:", "startDisplayLrc")
+        mStopDisplayLrc = false
+        mDisplayThread = Thread {
+            var curTs: Long
+            var curTime: Long
+            var offset: Long
+            while (!mStopDisplayLrc) {
+                if (mLastReceivedPlayPosTime != null) {
+                    curTime = System.currentTimeMillis()
+                    offset = curTime - mLastReceivedPlayPosTime!!
+                    if (offset <= 1000) {
+                        curTs = mReceivedPlayPosition + offset
+                        runOnMainThread {
+                            lrcView?.lrcView?.updateTime(curTs)
+                            lrcView?.pitchView?.updateTime(curTs)
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(50)
+                } catch (exp: InterruptedException) {
+                    break
+                }
+            }
+        }
+        mDisplayThread!!.name = "Thread-Display"
+        mDisplayThread!!.start()
+    }
+
+    // 停止播放歌词
+    private fun stopDisplayLrc() {
+        mStopDisplayLrc = true
+        if (mDisplayThread != null) {
+            try {
+                mDisplayThread!!.join()
+            } catch (exp: InterruptedException) {
+                Log.d(TAG, "stopDisplayLrc: $exp")
+            }
+        }
+    }
+
     private fun loadLyric(songNo: Long, onLoadLyricCallback: (lyricUrl: String?) -> Unit) {
         Log.d(TAG, "loadLyric: $songNo")
         if (mMusicCenter == null) return
@@ -507,7 +562,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                     }
                 } else {
-                    ktvApiEventHandler?.onPlayerPositionChanged(this, songConfig!!.songCode, songConfig!!, position, false)
+                    // 独唱观众
+                    mLastReceivedPlayPosTime = System.currentTimeMillis()
+                    mReceivedPlayPosition = position
                 }
             } else if (jsonMsg.getString("cmd") == "TrackMode") {
                 // 伴唱收到原唱伴唱调整指令
@@ -541,6 +598,19 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                         Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                             mPlayer?.resume()
+                        }
+                        else -> {}
+                    }
+                } else {
+                    // 独唱观众
+                    when (Constants.MediaPlayerState.getStateByValue(state)) {
+                        Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
+                            stopDisplayLrc()
+                            this.mLastReceivedPlayPosTime = null
+                            this.mReceivedPlayPosition = 0
+                        }
+                        Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                            startDisplayLrc()
                         }
                         else -> {}
                     }
@@ -624,11 +694,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mPlayer?.play()
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                startDisplayLrc()
                 startSyncPitch()
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 this.localPlayerPosition = 0
                 stopSyncPitch()
+                stopDisplayLrc()
+                this.mLastReceivedPlayPosTime = null
+                this.mReceivedPlayPosition = 0
             }
             else -> {}
         }
@@ -650,7 +724,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             val jsonMsg = JSONObject(msg)
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }
-        ktvApiEventHandler?.onPlayerPositionChanged(this, songConfig!!.songCode, songConfig!!, position_ms, true)
+        mLastReceivedPlayPosTime = System.currentTimeMillis()
+        mReceivedPlayPosition = position_ms
     }
 
     override fun onPlayerEvent(

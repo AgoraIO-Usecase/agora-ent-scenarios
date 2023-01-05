@@ -111,7 +111,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
     final MutableLiveData<String> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
-    final MutableLiveData<Long> playerMusicPlayPositionChangeLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
@@ -935,7 +934,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ktvApiProtocol.stopSong();
 
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_CHANGING_START);
-        stopDisplayLrc();
         _loadingDialogVisible.postValue(true);
         ktvServiceProtocol.removeSong(new RemoveSongInputModel(
                 musicModel.getSongNo()
@@ -1238,9 +1236,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
         Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         ktvApiProtocol.stopSong();
-        stopDisplayLrc();
-        mRecvedPlayPosition = 0;
-        mLastRecvPlayPosTime = null;
         mAudioTrackIndex = 1;
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
@@ -1267,7 +1262,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
                         if (singRole == KTVSingRole.KTVSingRoleAudience) {
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                            startDisplayLrc();
                         } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         }
@@ -1298,9 +1292,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         Log.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
         ktvApiProtocol.stopSong();
-        stopDisplayLrc();
-        mRecvedPlayPosition = 0;
-        mLastRecvPlayPosTime = null;
         mAudioTrackIndex = 1;
 
         if (isOnSeat) {
@@ -1340,58 +1331,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         }
     }
 
-    // ------------------ 歌词播放、同步 ------------------
-    //歌词实时刷新
-    protected boolean mStopDisplayLrc = true;
-    private Thread mDisplayThread;
-
-    private static volatile long mRecvedPlayPosition = 0;//播放器播放position，ms
-    private static volatile Long mLastRecvPlayPosTime = null;
-
-    // 开始播放歌词
-    private void startDisplayLrc() {
-        Log.d("KTVLiveRoomLog:", "startDisplayLrc");
-        mStopDisplayLrc = false;
-        mDisplayThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                long curTs = 0;
-                long curTime;
-                long offset;
-                while (!mStopDisplayLrc) {
-                    if (mLastRecvPlayPosTime != null) {
-                        curTime = System.currentTimeMillis();
-                        offset = curTime - mLastRecvPlayPosTime;
-                        if (offset <= 1000) {
-                            curTs = mRecvedPlayPosition + offset;
-                            playerMusicPlayPositionChangeLiveData.postValue(curTs);
-                        }
-                    }
-
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException exp) {
-                        break;
-                    }
-                }
-            }
-        });
-        mDisplayThread.setName("Thread-Display");
-        mDisplayThread.start();
-    }
-
-    // 停止播放歌词
-    private void stopDisplayLrc() {
-        mStopDisplayLrc = true;
-        if (mDisplayThread != null) {
-            try {
-                mDisplayThread.join();
-            } catch (InterruptedException exp) {
-                Log.d(TAG, "stopDisplayLrc: " + exp.toString());
-            }
-        }
-    }
-
     // ------------------ KTVApiEvent ------------------
 
     @Override
@@ -1399,16 +1338,12 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         switch (state) {
             case PLAYER_STATE_OPEN_COMPLETED:
                 playerMusicOpenDurationLiveData.postValue(mPlayer.getDuration());
-                startDisplayLrc();
                 break;
             case PLAYER_STATE_PLAYING:
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                 break;
             case PLAYER_STATE_PAUSED:
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PAUSE);
-                break;
-            case PLAYER_STATE_STOPPED:
-                stopDisplayLrc();
                 break;
             case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
@@ -1417,12 +1352,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 break;
             default:
         }
-    }
-
-    @Override
-    public void onPlayerPositionChanged(@NonNull KTVApi controller, long songCode, @NonNull KTVSongConfiguration configuration, long position, boolean isLocal) {
-        mLastRecvPlayPosTime = System.currentTimeMillis();
-        mRecvedPlayPosition = position;
     }
 
     @Override
