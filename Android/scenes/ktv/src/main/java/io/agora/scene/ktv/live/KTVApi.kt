@@ -38,7 +38,6 @@ interface KTVApi {
 
     interface KTVApiEventHandler {
         fun onPlayerStateChanged(controller: KTVApi, songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean)
-        fun onPlayerPositionChanged(controller: KTVApi, songCode: Long, configuration: KTVSongConfiguration, position: Long, isLocal: Boolean)
         fun onMusicCollectionResult(
             requestId: String?,
             status: Int,

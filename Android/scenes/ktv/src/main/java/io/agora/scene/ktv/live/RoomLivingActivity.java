@@ -371,10 +371,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
             }
         });
-        roomLivingViewModel.playerMusicPlayPositionChangeLiveData.observe(this, position -> {
-            getBinding().lrcControlView.getLrcView().updateTime(position);
-            getBinding().lrcControlView.getPitchView().updateTime(position);
-        });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
         roomLivingViewModel.networkStatusLiveData.observe(this, netWorkStatus ->
