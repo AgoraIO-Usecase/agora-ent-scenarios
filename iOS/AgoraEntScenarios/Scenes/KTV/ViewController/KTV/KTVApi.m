@@ -238,6 +238,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            
+            //mute main Singer player audio
+            [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -277,11 +280,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 #pragma mark - rtc delgate proxies
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
-    if(self.config.type == KTVSongTypeChorus &&
-       self.config.role == KTVSingRoleCoSinger &&
-       uid == self.config.mainSingerUid) {
-        [self.engine muteRemoteAudioStream:uid mute:YES];
-    }
+//    if(self.config.type == KTVSongTypeChorus &&
+//       self.config.role == KTVSingRoleCoSinger &&
+//       uid == self.config.mainSingerUid) {
+//        [self.engine muteRemoteAudioStream:uid mute:YES];
+//    }
 }
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine receiveStreamMessageFromUid:(NSUInteger)uid streamId:(NSInteger)streamId data:(NSData *)data
