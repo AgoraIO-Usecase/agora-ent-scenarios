@@ -1,7 +1,6 @@
 package io.agora.voice.common.net;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,7 @@ import io.agora.voice.common.net.callback.VRHttpCallback;
 import io.agora.voice.common.net.model.VRError;
 import io.agora.voice.common.net.model.VRException;
 import io.agora.voice.common.net.model.VRHttpResponse;
+import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 public class VRHttpClientManager {
@@ -98,7 +98,7 @@ public class VRHttpClientManager {
             if(e != null && e.toString() != null){
                 errorMsg = e.toString();
             }
-            Log.d(TAG, errorMsg);
+            LogTools.d(TAG, errorMsg);
             throw new VRException(VRError.GENERAL_ERROR.errCode(),VRError.GENERAL_ERROR.errMsg());
         }
     }
@@ -111,7 +111,7 @@ public class VRHttpClientManager {
             if(e != null && e.toString() != null){
                 errorMsg = e.toString();
             }
-            Log.d(TAG, errorMsg);
+            LogTools.d(TAG, errorMsg);
             throw new VRException(VRError.GENERAL_ERROR.errCode(),VRError.GENERAL_ERROR.errMsg());
         }
     }
@@ -284,10 +284,10 @@ public class VRHttpClientManager {
                     controller.addParams(p.mParams, out);
                 }
                 response = p.getResponse(controller);
-                Log.d(TAG, response.toString());
+                LogTools.d(TAG, response.toString());
 
                 if(response.code==401) {
-                    Log.d(TAG, "Unable to authenticate (OAuth)");
+                    LogTools.d(TAG, "Unable to authenticate (OAuth)");
                 }
                 if(response.code == HttpURLConnection.HTTP_OK) {
                     if (callback != null) {
@@ -299,10 +299,10 @@ public class VRHttpClientManager {
                     }
                 }
             } catch (IOException e) {
-                Log.e(TAG, "error message = "+e.getMessage());
+                LogTools.e(TAG, "error message = "+e.getMessage());
                 throw e;
             } catch (IllegalStateException e) {
-                Log.e(TAG, "error message = "+e.getMessage());
+                LogTools.e(TAG, "error message = "+e.getMessage());
                 throw e;
             }
             return response;
@@ -344,7 +344,7 @@ public class VRHttpClientManager {
                 return response;
             } catch (IOException e) {
                 String message = (e != null && e.getMessage() != null)?e.getMessage():"failed to request";
-                Log.e(TAG, "error execute:" + message);
+                LogTools.e(TAG, "error execute:" + message);
                 if(p.canRetry && p.mRetryTimes > 0) {
                     p.mRetryTimes--;
                     return executeNormal(callback);

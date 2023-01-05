@@ -1,11 +1,12 @@
 package io.agora.scene.voice.ui.widget.recyclerview;
 
 import android.graphics.Rect;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import io.agora.voice.common.utils.LogTools;
 
 /**
  * Created by Sunny on 2019/4/1.
@@ -92,7 +93,7 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
 
 //        pageSize = state.getItemCount() / onePageSize + (state.getItemCount() % onePageSize == 0 ? 0 : 1);
         computePageSize(state);
-        Log.i("zzz", "itemCount=" + getItemCount() + " state itemCount=" + state.getItemCount() + " pageSize=" + pageSize);
+        LogTools.i("zzz", "itemCount=" + getItemCount() + " state itemCount=" + state.getItemCount() + " pageSize=" + pageSize);
         //计算可以横向滚动的最大值
         totalWidth = (pageSize - 1) * getWidth();
 

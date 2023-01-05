@@ -28,6 +28,10 @@ object VoiceConfigManager {
 //        CrashReport.initCrashReport(VoiceBuddyFactory.get().getVoiceBuddy().application(), "baed12f146", false)
     }
 
+    fun unInitMain(){
+        VoiceBuddyFactory.get().getVoiceBuddy().application().unregisterActivityLifecycleCallbacks(mLifecycleCallbacks)
+    }
+
     @JvmStatic
     fun getLifecycleCallbacks(): UserActivityLifecycleCallbacks {
         return mLifecycleCallbacks

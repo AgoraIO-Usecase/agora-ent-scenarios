@@ -8,9 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import io.agora.voice.common.utils.LogTools;
 
 /**
  * 专门用于维护声明周期
@@ -22,18 +24,18 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-        Log.e("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
+        LogTools.e("ActivityLifecycle", "onActivityCreated "+activity.getLocalClassName());
         activityList.add(0, activity);
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        Log.e("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
+        LogTools.e("ActivityLifecycle", "onActivityStarted "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
-        Log.e("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
+        LogTools.e("ActivityLifecycle", "onActivityResumed activity's taskId = "+activity.getTaskId() + " name: "+activity.getLocalClassName());
         if (!resumeActivity.contains(activity)) {
             resumeActivity.add(activity);
             if(resumeActivity.size() == 1) {
@@ -44,23 +46,23 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
 
     @Override
     public void onActivityPaused(Activity activity) {
-        Log.d("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityPaused "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        Log.d("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityStopped "+activity.getLocalClassName());
         resumeActivity.remove(activity);
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        Log.d("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivitySaveInstanceState "+activity.getLocalClassName());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        Log.d("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
+        LogTools.d("ActivityLifecycle", "onActivityDestroyed "+activity.getLocalClassName());
         activityList.remove(activity);
     }
 
@@ -146,7 +148,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
                         taskId = taskInfo.id;
                     }
                     //将任务栈置于前台
-                    Log.e("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
+                    LogTools.e("ActivityLifecycle", "执行moveTaskToFront，current activity:"+activity.getClass().getName());
                     manager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME);
                 }
             }
@@ -154,7 +156,7 @@ public class UserActivityLifecycleCallbacks implements Application.ActivityLifec
     }
 
     private void makeTaskToFront(Activity activity) {
-        Log.e("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
+        LogTools.e("ActivityLifecycle", "makeTaskToFront activity: "+activity.getLocalClassName());
         ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
         manager.moveTaskToFront(activity.getTaskId(), ActivityManager.MOVE_TASK_WITH_HOME);
     }
