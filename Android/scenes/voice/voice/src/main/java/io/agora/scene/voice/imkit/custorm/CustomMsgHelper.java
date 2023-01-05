@@ -1,23 +1,26 @@
 package io.agora.scene.voice.imkit.custorm;
 
 import android.text.TextUtils;
-import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import io.agora.CallBack;
 import io.agora.MessageListener;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
+import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.model.VoiceRoomApply;
 import io.agora.voice.common.utils.GsonTools;
+import io.agora.voice.common.utils.LogTools;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。
@@ -408,12 +411,12 @@ public class CustomMsgHelper implements MessageListener {
         }
 
         Map<String, String> params = getCustomMsgParams(msg);
-        Log.e("getMsgGiftId","getMsgGiftId_1: "+params.toString());
+        LogTools.e("getMsgGiftId","getMsgGiftId_1: "+params.toString());
         if(params.containsKey(MsgConstant.CUSTOM_GIFT_KEY_ID)) {
-            Log.e("getMsgGiftId",params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
+            LogTools.e("getMsgGiftId",params.get(MsgConstant.CUSTOM_GIFT_KEY_ID));
             return params.get(MsgConstant.CUSTOM_GIFT_KEY_ID);
         }
-        Log.e("getMsgGiftId","getMsgGiftId_3");
+        LogTools.e("getMsgGiftId","getMsgGiftId_3");
         return null;
     }
 

@@ -1,18 +1,21 @@
 package io.agora.scene.voice.ui.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import io.agora.scene.voice.R;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.scene.voice.R;
+import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;
@@ -38,7 +41,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
             try {
                 resId = mContext.getResources().getIdentifier(item.getPortrait(), "drawable", mContext.getPackageName());
             }catch (Exception e){
-                Log.e("getResources()", e.getMessage());
+                LogTools.e("getResources()", e.getMessage());
             }
             if (resId != 0){
                 avatar.setImageResource(resId);

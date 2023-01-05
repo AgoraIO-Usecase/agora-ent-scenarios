@@ -1,7 +1,6 @@
 package io.agora.scene.voice.imkit.manager;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -218,7 +217,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 userName = (String) ext.get("userName");
             }
         }
-        Log.e("Helper","getUserName: " + userName);
+        LogTools.e("Helper","getUserName: " + userName);
         return userName;
     }
 
@@ -228,7 +227,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         Map<String,String> params = msg.getCustomParams();
         if (params.containsKey("user")){
             jsonString = params.get("user");
-            Log.e("getSystemUserName","jsonString: " + jsonString);
+            LogTools.e("getSystemUserName","jsonString: " + jsonString);
             if (!TextUtils.isEmpty(jsonString)){
                 try {
                     assert jsonString != null;
@@ -239,7 +238,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 }
             }
         }
-        Log.e("getSystemUserName","userName: " + userName);
+        LogTools.e("getSystemUserName","userName: " + userName);
         return userName;
     }
 
@@ -429,7 +428,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                         callBack.onSuccess();
                     }
                 });
-                Log.d("ChatroomConfigManager","Login success");
+                LogTools.d("ChatroomConfigManager","Login success");
             }
 
             @Override
@@ -440,7 +439,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                         callBack.onError(code,msg);
                     }
                 });
-                Log.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
+                LogTools.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
             }
         });
     }
@@ -449,12 +448,12 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         ChatClient.getInstance().loginWithAgoraToken(uid, token, new CallBack() {
             @Override
             public void onSuccess() {
-                Log.d("ChatroomConfigManager","Login success");
+                LogTools.d("ChatroomConfigManager","Login success");
             }
 
             @Override
             public void onError(int code, String msg) {
-                Log.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
+                LogTools.e("ChatroomConfigManager", "Login onError code:" + code + " desc: " + msg);
             }
         });
     }

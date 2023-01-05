@@ -3,21 +3,24 @@ package io.agora.scene.voice.imkit.manager;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
+
 import androidx.annotation.RequiresApi;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+
+import io.agora.chat.ChatClient;
+import io.agora.chat.ChatOptions;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
-import io.agora.chat.ChatClient;
-import io.agora.chat.ChatOptions;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate;
 import io.agora.scene.voice.service.VoiceServiceProtocol;
 import io.agora.util.EMLog;
+import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomConfigManager {
     private static final String TAG = ChatroomConfigManager.class.getSimpleName();
@@ -42,7 +45,7 @@ public class ChatroomConfigManager {
         this.mContext = context;
         ChatOptions options = initChatOptions(imKey);
         if (!isMainProcess(context)) {
-            Log.e(TAG, "enter the service process!");
+            LogTools.e(TAG, "enter the service process!");
             return;
         }
         ChatClient.getInstance().init(context, options);
@@ -102,7 +105,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveApplySite(ChatMessageData message) {
-                Log.e(TAG,"onReceiveSeatRequest");
+                LogTools.e(TAG,"onReceiveSeatRequest");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatRequest(message);
@@ -114,7 +117,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveCancelApplySite(ChatMessageData message) {
-                Log.e(TAG,"onReceiveSeatRequestRejected");
+                LogTools.e(TAG,"onReceiveSeatRequestRejected");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatRequestRejected(message.getFrom());
@@ -126,7 +129,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteSite(ChatMessageData message) {
-                Log.e(TAG,"onReceiveSeatInvitation");
+                LogTools.e(TAG,"onReceiveSeatInvitation");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatInvitation(message);
@@ -138,7 +141,7 @@ public class ChatroomConfigManager {
 
             @Override
             public void onReceiveInviteRefusedSite(ChatMessageData message) {
-                Log.e(TAG,"onReceiveSeatInvitationRejected");
+                LogTools.e(TAG,"onReceiveSeatInvitationRejected");
                 try {
                     for (VoiceRoomSubscribeDelegate listener : voiceServiceProtocol.getSubscribeDelegates()) {
                         listener.onReceiveSeatInvitationRejected(message.getConversationId(), message);

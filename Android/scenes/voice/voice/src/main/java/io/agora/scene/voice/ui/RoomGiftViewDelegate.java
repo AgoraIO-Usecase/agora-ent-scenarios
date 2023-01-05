@@ -1,27 +1,29 @@
 package io.agora.scene.voice.ui;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
+
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.opensource.svgaplayer.SVGAVideoEntity;
+
 import org.jetbrains.annotations.NotNull;
 
 import io.agora.scene.voice.R;
+import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
-import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
-import io.agora.voice.common.utils.ThreadManager;
 import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
 import io.agora.scene.voice.ui.widget.gift.OnSendClickListener;
+import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
+import io.agora.voice.common.utils.LogTools;
+import io.agora.voice.common.utils.ThreadManager;
 
 public class RoomGiftViewDelegate {
     private FragmentActivity activity;
@@ -50,8 +52,8 @@ public class RoomGiftViewDelegate {
     public void onRoomDetails(String roomId, String owner) {
         this.roomId = roomId;
         this.owner = owner;
-        Log.e("onRoomDetails", "owner: " + owner);
-        Log.e("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
+        LogTools.e("onRoomDetails", "owner: " + owner);
+        LogTools.e("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
     }
 
 
@@ -74,7 +76,7 @@ public class RoomGiftViewDelegate {
     }
 
     private void onSendGiftSuccess(View view, GiftBean giftBean,OnMsgCallBack msgCallBack) {
-        Log.e("sendGift", "Successfully reported");
+        LogTools.e("sendGift", "Successfully reported");
         CustomMsgHelper.getInstance().sendGiftMsg(
                 VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
@@ -82,7 +84,7 @@ public class RoomGiftViewDelegate {
                 new OnMsgCallBack() {
                     @Override
                     public void onSuccess(ChatMessageData message) {
-                        Log.e("MenuItemClick", "item_gift_onSuccess");
+                        LogTools.e("MenuItemClick", "item_gift_onSuccess");
                         ThreadManager.getInstance().runOnMainThread(new Runnable() {
                             @Override
                             public void run() {
@@ -159,7 +161,7 @@ public class RoomGiftViewDelegate {
         svgaParser.decodeFromAssets(name, new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-                Log.e("zzzz", "onComplete: ");
+                LogTools.e("zzzz", "onComplete: ");
                 svgaImageView.setVideoItem(videoItem);
                 svgaImageView.stepToFrame(0, true);
                 startAnimationTask();
@@ -167,7 +169,7 @@ public class RoomGiftViewDelegate {
 
             @Override
             public void onError() {
-                Log.e("zzzz", "onComplete: ");
+                LogTools.e("zzzz", "onComplete: ");
             }
 
         }, null);
@@ -179,11 +181,11 @@ public class RoomGiftViewDelegate {
             public void run() {
                 // 在这里执行具体的任务
                 Animation_time--;
-                Log.e("startActionTask", "Animation_time: " + Animation_time);
+                LogTools.e("startActionTask", "Animation_time: " + Animation_time);
                 // 任务执行完后再次调用postDelayed开启下一次任务
                 if (Animation_time == 0) {
                     stopActionTask();
-                    Log.e("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
+                    LogTools.e("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
                     if (svgaImageView.isAnimating()) {
                         svgaImageView.stopAnimation(true);
                     }

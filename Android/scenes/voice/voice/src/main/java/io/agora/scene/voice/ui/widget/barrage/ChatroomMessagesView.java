@@ -17,7 +17,6 @@ import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -33,17 +33,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import java.util.ArrayList;
 
-import io.agora.scene.voice.ui.widget.expression.SmileUtils;
+import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
-import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.ThreadManager;
-import io.agora.scene.voice.R;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.ui.widget.expression.SmileUtils;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.LogTools;
+import io.agora.voice.common.utils.ThreadManager;
 
 /**
  * MessagesView
@@ -121,7 +121,7 @@ public class ChatroomMessagesView extends RelativeLayout{
                 LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
                 int lastVisibleItemPosition = lm.findLastVisibleItemPosition();
                 int totalCount = lm.getItemCount();
-                Log.e("onScrolled","lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
+                LogTools.e("onScrolled","lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
                 if (lastVisibleItemPosition == totalCount - 1 ) {
                     int findLastVisibleItemPosition = lm.findLastVisibleItemPosition();
                     if (findLastVisibleItemPosition == lm.getItemCount() - 1) {
@@ -152,7 +152,7 @@ public class ChatroomMessagesView extends RelativeLayout{
 
     public void refresh(){
         if(adapter != null){
-            Log.e("refresh","isScrollBottom: " + isScrollBottom);
+            LogTools.e("refresh","isScrollBottom: " + isScrollBottom);
             if (isScrollBottom){
                 refreshSelectLast();
             }else {
@@ -290,7 +290,7 @@ public class ChatroomMessagesView extends RelativeLayout{
         public void refresh(){
             int startPosition = messages.size();
             messages.addAll(startPosition,CustomMsgHelper.getInstance().getNormalData(chatroomId));
-            Log.e("room_refresh",messages.size()+" startPosition" + startPosition);
+            LogTools.e("room_refresh",messages.size()+" startPosition" + startPosition);
 
             if (messages.size() > 0){
                 ((Activity)context).runOnUiThread(new Runnable() {

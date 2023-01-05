@@ -22,15 +22,16 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import java.lang.ref.WeakReference;
 import java.util.Random;
 
 import io.agora.scene.voice.R;
+import io.agora.voice.common.utils.LogTools;
 
 /**
  * like动画
@@ -261,7 +262,7 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
         int i = v.getId();
         if (i == R.id.img) {
             if (onHearLayoutListener != null) {
-                Log.e("setOnHearLayoutListener","onClick");
+                LogTools.e("setOnHearLayoutListener","onClick");
                 onHearLayoutListener.onLikeClick(v);
                 boolean isAdd = onHearLayoutListener.onAddFavor();
                 if (isAdd) addFavor();
