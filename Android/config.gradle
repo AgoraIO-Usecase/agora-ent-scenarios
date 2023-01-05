@@ -43,6 +43,7 @@ ext {
             header_classics   : 'com.scwang.smart:refresh-header-classics:2.0.3',
 
             xlog              : 'com.elvishew:xlog:1.6.1',
+            logger            : 'com.orhanobut:logger:2.2.0',
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
