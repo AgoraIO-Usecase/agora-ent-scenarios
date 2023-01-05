@@ -3,7 +3,6 @@ package io.agora.scene.voice.ui.widget.primary;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +30,7 @@ import io.agora.scene.voice.ui.widget.expression.ExpressionIcon;
 import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.LogTools;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
@@ -97,9 +97,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    Log.d("focus", "focused");
+                    LogTools.d("focus", "focused");
                 } else {
-                    Log.d("focus", "focus lost");
+                    LogTools.d("focus", "focus lost");
                     if (!isShowEmoji)
                         inputView.setVisibility(View.GONE);
                 }
@@ -156,7 +156,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         new KeyboardStatusWatcher(activity, activity, new Function2<Boolean, Integer, Unit>() {
             @Override
             public Unit invoke(Boolean isKeyboardShowed, Integer keyboardHeight) {
-                Log.e("KeyboardStatusWatcher"," isKeyboardShowed: " + isKeyboardShowed + " keyboardHeight: "+ keyboardHeight);
+                LogTools.e("KeyboardStatusWatcher"," isKeyboardShowed: " + isKeyboardShowed + " keyboardHeight: "+ keyboardHeight);
                 ViewGroup.LayoutParams lp = mKeyboardBg.getLayoutParams();
                 if (isKeyboardShowed){
                     lp.height = keyboardHeight;
@@ -181,9 +181,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void SoftShowing(boolean isShowEmoji){
-        Log.e("MenuView","SoftShowing: " + isShowEmoji);
+        LogTools.e("MenuView","SoftShowing: " + isShowEmoji);
         if (isShowEmoji){
-            Log.e("KeyboardStatusWatcher","SoftShowing softKeyHeight: " + softKeyHeight);
+            LogTools.e("KeyboardStatusWatcher","SoftShowing softKeyHeight: " + softKeyHeight);
             setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
             setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
         }else {
@@ -213,7 +213,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void initMenu(int roomType) {
-        Log.e("initMenu","roomType: " + roomType);
+        LogTools.e("initMenu","roomType: " + roomType);
         if (roomType == 0){
             normalLayout.setVisibility(VISIBLE);
             registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
@@ -375,9 +375,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm!=null && activity.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            Log.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+            LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
             if (activity.getCurrentFocus() != null){
-                Log.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+                LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
                 imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }

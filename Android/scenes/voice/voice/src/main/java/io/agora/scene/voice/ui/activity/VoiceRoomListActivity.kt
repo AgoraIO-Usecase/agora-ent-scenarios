@@ -19,15 +19,15 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
-import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
+import io.agora.scene.voice.global.VoiceConfigManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
 import io.agora.voice.common.ui.BaseUiActivity
-import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.DeviceTools
 import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.ResourcesTools
+import io.agora.voice.common.utils.StatusBarCompat
 
 @Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
@@ -51,6 +51,11 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
             voiceServiceProtocol.reset()
             VoiceConfigManager.initMain()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        VoiceConfigManager.unInitMain()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
