@@ -219,7 +219,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
                                                      uid: "\(playerRTCUid)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
@@ -296,7 +296,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
                                                      uid: "\(playerRTCUid)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
