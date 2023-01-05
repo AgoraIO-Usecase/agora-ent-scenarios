@@ -95,7 +95,6 @@ KTVApiDelegate
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
-@property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) KTVPlayerTrackMode trackMode;
@@ -516,7 +515,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
-            weakSelf.isPlayerPublish = !model.isChorus;
         }
     }];
     
@@ -819,7 +817,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (AgoraRtcChannelMediaOptions*)channelMediaOptions {
-    KTVLogInfo(@"channelMediaOptions isBroadcaster: %d, isNowCameraMuted: %d, isPlayerPublish: %d", [self isBroadcaster], self.isNowCameraMuted, self.isPlayerPublish);
     AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
     [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
     [option setPublishCameraTrack:!self.isNowCameraMuted];
@@ -830,7 +827,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
     [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
-    [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -1353,12 +1349,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi selectTrackMode:trackMode];
     
     [self.MVView setOriginBtnState: trackMode == KTVPlayerTrackOrigin ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc];
-}
-
-- (void)setIsPlayerPublish:(BOOL)isPlayerPublish {
-    _isPlayerPublish = isPlayerPublish;
-    
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
 }
 
 @end
