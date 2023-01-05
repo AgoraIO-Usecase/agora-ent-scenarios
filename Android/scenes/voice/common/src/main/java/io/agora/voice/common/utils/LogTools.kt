@@ -1,26 +1,38 @@
 package io.agora.voice.common.utils
 
-import android.util.Log
+import io.agora.scene.base.EntLogger
 
 object LogTools {
+    private val entLogger = EntLogger(EntLogger.Config("Voice"))
+
      @JvmStatic
     fun String.logD(tag: String = "Agora_VoiceChat") {
-        Log.d(tag, this)
+         entLogger.d(tag, this)
     }
 
     @JvmStatic
     fun String.logE(tag: String = "Agora_VoiceChat") {
-        Log.e(tag, this)
+        entLogger.e(tag, this)
+    }
+
+    @JvmStatic
+    fun String.logI(tag: String = "Agora_VoiceChat") {
+        entLogger.i(tag, this)
     }
 
     @JvmStatic
     fun d(tag: String, message: String) {
-        message.logD(tag)
+        entLogger.d(tag, message)
     }
 
     @JvmStatic
     fun e(tag: String, message: String) {
-        message.logE(tag)
+        entLogger.e(tag, message)
+    }
+
+    @JvmStatic
+    fun i(tag: String, message: String) {
+        entLogger.i(tag, message)
     }
 
     /**

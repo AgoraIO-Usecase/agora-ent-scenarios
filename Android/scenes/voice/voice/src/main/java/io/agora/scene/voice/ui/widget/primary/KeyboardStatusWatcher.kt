@@ -2,8 +2,10 @@ package io.agora.scene.voice.ui.widget.primary
 
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.PopupWindow
 import androidx.fragment.app.FragmentActivity
@@ -103,7 +105,7 @@ class KeyboardStatusWatcher(
 //            Log.d(TAG, "isPortrait = ${activity.isPortrait}   ")
             if (activity.hasNavBar && NavigationUtils.hasNavigationBar(activity) && activity.isPortrait) {
                 keyboardHeight -= activity.navBarHeight
-                Log.d(TAG, "keyboardHeight = $keyboardHeight   ")
+                LogTools.d(TAG, "keyboardHeight = $keyboardHeight   ")
             }
         } else {
             //软键盘隐藏时键盘高度为0
