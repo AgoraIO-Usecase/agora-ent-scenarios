@@ -311,7 +311,7 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
-		E36BE99729656C43003FCFBF /* AttributedTV.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTV.m */; };
+		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -769,8 +769,8 @@
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		E36BE99529656C43003FCFBF /* AttributedTV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTV.h; sourceTree = "<group>"; };
-		E36BE99629656C43003FCFBF /* AttributedTV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTV.m; sourceTree = "<group>"; };
+		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
+		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1813,8 +1813,8 @@
 				DDA1990D28FFE579009D3E61 /* VLBaseView.h */,
 				DDA1990E28FFE579009D3E61 /* VLBaseTableView.m */,
 				DDA1990F28FFE579009D3E61 /* VLUIView.h */,
-				E36BE99529656C43003FCFBF /* AttributedTV.h */,
-				E36BE99629656C43003FCFBF /* AttributedTV.m */,
+				E36BE99529656C43003FCFBF /* AttributedTextView.h */,
+				E36BE99629656C43003FCFBF /* AttributedTextView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2393,7 +2393,7 @@
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD220B17295B332C00F57F30 /* VoiceRoomPasswordAlert.swift in Sources */,
 				DD220B7F295B332C00F57F30 /* HorizontalCardView.swift in Sources */,
-				E36BE99729656C43003FCFBF /* AttributedTV.m in Sources */,
+				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
 				DD0292ED295BF0DC00485225 /* VLKTVTopView.m in Sources */,
