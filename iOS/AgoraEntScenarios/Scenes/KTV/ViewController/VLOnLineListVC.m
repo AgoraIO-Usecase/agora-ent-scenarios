@@ -156,6 +156,7 @@
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
     if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
+        [VLToast toast:KTVLocalizedString(@"PasswordError")];
         return;
     }
     
