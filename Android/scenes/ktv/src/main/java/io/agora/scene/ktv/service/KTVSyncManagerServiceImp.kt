@@ -25,7 +25,6 @@ class KTVSyncManagerServiceImp(
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
-    private val kCollectionIdSingingScore = "singing_score"
 
     private data class VLLoginModel(
         val userNo: String,
@@ -47,15 +46,12 @@ class KTVSyncManagerServiceImp(
         null
     private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
         null
-    private var singingScoreSubscriber: ((KTVServiceProtocol.KTVSubscribe, Double?) -> Unit)? =
-        null
 
     // cache objectId
     private val objIdOfRoomNo = HashMap<String, String>() // objectId of room no
     private val objIdOfSongNo = ArrayList<String>() // objectId of song no
     private val objIdOfSeatIndex = HashMap<Int, String>() // objectId of seat index
     private val objIdOfUserNo = HashMap<String, String>() // objectId of user no
-    private var objIdOfSingingScore = ""
 
     // cache data
     private val roomSubscribeListener = mutableListOf<EventListener>()
@@ -76,7 +72,6 @@ class KTVSyncManagerServiceImp(
             objIdOfSongNo.clear()
             objIdOfSeatIndex.clear()
             objIdOfUserNo.clear()
-            objIdOfSingingScore = ""
 
             roomSubscribeListener.clear()
             roomMap.clear()
@@ -175,7 +170,8 @@ class KTVSyncManagerServiceImp(
             return
         }
         initSync {
-            Instance().joinScene(inputModel.roomNo, object : JoinSceneCallback {
+            val isRoomOwner = cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()
+            Instance().joinScene(isRoomOwner, inputModel.roomNo, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
@@ -191,8 +187,8 @@ class KTVSyncManagerServiceImp(
                         { ret ->
                             val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
                             val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
+                            innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
-                            innerSubscribeSingingScore()
                             innerAddUserIfNeed { addUserError, userSize ->
                                 if (addUserError != null) {
                                     completion.invoke(addUserError, null)
@@ -303,9 +299,6 @@ class KTVSyncManagerServiceImp(
         }
         objIdOfSongNo.clear()
         songChosenList.clear()
-
-        // 删除分数信息
-        objIdOfSingingScore = ""
 
         if (isRoomDestroyed) {
             roomMap.remove(currRoomNo)
@@ -674,22 +667,9 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-
     override fun subscribeChooseSong(changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
     }
-
-    // ===================== 打分相关 =====================
-
-    override fun updateSingingScore(inputModel: UpdateSingingScoreInputModel) {
-        //innerUpdateSingingScore(inputModel)
-    }
-
-
-    override fun subscribeSingingScoreChange(changedBlock: (KTVServiceProtocol.KTVSubscribe, Double?) -> Unit) {
-        singingScoreSubscriber = changedBlock
-    }
-
 
     // ===================== 内部实现 =====================
 
@@ -708,63 +688,12 @@ class KTVSyncManagerServiceImp(
         }
 
         Instance().init(
-            RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, "ktv"),
+            RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true
-                    runOnMainThread {
-                        Instance().joinScene(kSceneId, object: JoinSceneCallback{
-                            override fun onSuccess(sceneReference: SceneReference?) {
-                                sceneReference?.subscribe(object: EventListener{
-                                    override fun onCreated(item: IObject?) {
-
-                                    }
-
-                                    override fun onUpdated(item: IObject?) {
-                                        item ?: return
-                                        val roomInfo = item.toObject(RoomListModel::class.java)
-                                        roomMap[roomInfo.roomNo] = roomInfo
-                                        runOnMainThread {
-                                            roomStatusSubscriber?.invoke(
-                                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                                                roomInfo
-                                            )
-                                        }
-                                    }
-
-                                    override fun onDeleted(item: IObject?) {
-                                        item ?: return
-                                        val roomInfo = roomMap[item.id] ?: return
-
-                                        if (item.id != currRoomNo) {
-                                            roomMap.remove(item.id)
-                                            return
-                                        }
-                                        resetCacheInfo(true)
-                                        runOnMainThread {
-                                            roomStatusSubscriber?.invoke(
-                                                KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
-                                                roomInfo
-                                            )
-                                        }
-                                    }
-
-                                    override fun onSubscribeError(ex: SyncManagerException?) {
-
-                                    }
-                                })
-
-                                runOnMainThread{
-                                    complete.invoke()
-                                }
-
-                            }
-
-                            override fun onFail(exception: SyncManagerException?) {
-                                runOnMainThread { errorHandler?.invoke(exception) }
-                            }
-                        })
-
+                    runOnMainThread{
+                        complete.invoke()
                     }
                 }
 
@@ -1277,10 +1206,7 @@ class KTVSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdChooseSong)?.subscribe(listener)
     }
 
-    // ------------ singing score operation ---------------------
-
-    private fun innerSubscribeSingingScore() {
-        val sceneReference = mSceneReference ?: return
+    private fun innerSubscribeRoomChanged() {
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
 
@@ -1288,52 +1214,39 @@ class KTVSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 item ?: return
-                objIdOfSingingScore = item.id
-                val score = item.toObject(UpdateSingingScoreInputModel::class.java)
-                singingScoreSubscriber?.invoke(
-                    KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
-                    score.score
-                )
+                val roomInfo = item.toObject(RoomListModel::class.java)
+                roomMap[roomInfo.roomNo] = roomInfo
+                runOnMainThread {
+                    roomStatusSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeUpdated,
+                        roomInfo
+                    )
+                }
             }
 
             override fun onDeleted(item: IObject?) {
-                objIdOfSingingScore = ""
+                item ?: return
+                val roomInfo = roomMap[item.id] ?: return
+
+                if (item.id != currRoomNo) {
+                    return
+                }
+                resetCacheInfo(true)
+                runOnMainThread {
+                    roomStatusSubscriber?.invoke(
+                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                        roomInfo
+                    )
+                }
+
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
-                errorHandler?.invoke(ex)
+
             }
 
         }
-        sceneReference.collection(kCollectionIdSingingScore).subscribe(listener)
         roomSubscribeListener.add(listener)
+        Instance().subscribeScene(mSceneReference, listener)
     }
-
-    private fun innerUpdateSingingScore(data: Any) {
-        val sceneReference = mSceneReference ?: return
-        if (TextUtils.isEmpty(objIdOfSingingScore)) {
-            sceneReference.collection(kCollectionIdSingingScore)
-                .add(data, object : DataItemCallback {
-                    override fun onSuccess(result: IObject?) {
-                        objIdOfSingingScore = result?.id ?: ""
-                    }
-
-                    override fun onFail(exception: SyncManagerException?) {
-                        errorHandler?.invoke(exception)
-                    }
-                })
-        } else {
-            sceneReference.collection(kCollectionIdSingingScore)
-                .update(objIdOfSingingScore, data, object : Callback {
-                    override fun onSuccess() {
-
-                    }
-
-                    override fun onFail(exception: SyncManagerException?) {
-                        errorHandler?.invoke(exception)
-                    }
-                })
-        }
-    }
-
 }

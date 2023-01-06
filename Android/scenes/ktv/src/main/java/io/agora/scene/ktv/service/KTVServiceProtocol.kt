@@ -174,15 +174,4 @@ interface KTVServiceProtocol {
     fun subscribeChooseSong(
         changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
     )
-
-
-    // ================== 打分相关 ==============================
-
-    /**
-     * 同步唱歌者音量
-     */
-    fun updateSingingScore(inputModel: UpdateSingingScoreInputModel)
-
-    fun subscribeSingingScoreChange(changedBlock: (KTVSubscribe, Double?) -> Unit)
-
 }
