@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -62,6 +63,8 @@ class KTVSyncManagerServiceImp(
 
     @Volatile
     private var currRoomNo: String = ""
+    @Volatile
+    private var roomOwnerNo: String = ""
 
     override fun reset() {
         if (syncUtilsInited) {
@@ -79,6 +82,7 @@ class KTVSyncManagerServiceImp(
             seatMap.clear()
             songChosenList.clear()
             currRoomNo = ""
+            roomOwnerNo = ""
         }
     }
 
@@ -175,6 +179,7 @@ class KTVSyncManagerServiceImp(
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
+                    roomOwnerNo = cacheRoom.creatorNo
 
                     TokenGenerator.generateTokens(
                         currRoomNo,
@@ -732,7 +737,10 @@ class KTVSyncManagerServiceImp(
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserNo.remove(entry.key)
-                        innerUpdateUserCount(userMap.size)
+                        if (roomOwnerNo != removeUserNo) {
+                            // 只有房主才
+                            innerUpdateUserCount(userMap.size)
+                        }
                         return
                     }
                 }
