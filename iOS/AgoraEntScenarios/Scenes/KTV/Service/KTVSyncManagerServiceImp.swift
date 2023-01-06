@@ -451,7 +451,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
         topSong.isChorus = true
-        topSong.status = VLSongPlayStatusMatched
+        topSong.status = VLSongPlayStatusPlaying
         topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
@@ -1253,7 +1253,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         topSong.isChorus = false
-        topSong.status = VLSongPlayStatusMatched
+        topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
     }
