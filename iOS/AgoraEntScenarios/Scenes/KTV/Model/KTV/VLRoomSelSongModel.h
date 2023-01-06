@@ -10,8 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef enum : NSUInteger {
     VLSongPlayStatusIdle = 0,
     VLSongPlayStatusPlayed,
-    VLSongPlayStatusPlaying,
-    VLSongPlayStatusMatched
+    VLSongPlayStatusPlaying
 } VLSongPlayStatus;
 
 @interface VLRoomSelSongModel : VLBaseModel

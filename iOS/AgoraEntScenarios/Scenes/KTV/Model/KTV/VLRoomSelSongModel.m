@@ -25,7 +25,7 @@
 }
 
 - (BOOL)doneChorusMatch {
-    return self.status == VLSongPlayStatusMatched;
+    return self.isChorus && self.chorusNo.length > 0 && self.status == VLSongPlayStatusPlaying;
 }
 
 @end
