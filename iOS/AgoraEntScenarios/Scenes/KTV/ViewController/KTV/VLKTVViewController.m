@@ -192,7 +192,7 @@ KTVApiDelegate
     [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
     
     [AgoraRtcEngineKit destroy];
-    VLLog(@"Agora - destroy RTCEngine");
+    KTVLogInfo(@"Agora - destroy RTCEngine");
     
     self.ktvApi = nil;
     
@@ -398,7 +398,7 @@ KTVApiDelegate
         _scoreView = [[VLPopScoreView alloc] initWithFrame:self.view.bounds withDelegate:self];
         [self.view addSubview:_scoreView];
     }
-    VLLog(@"Avg score for the song: %d", score);
+    KTVLogInfo(@"Avg score for the song: %d", score);
     [_scoreView configScore:score];
     [self.view bringSubviewToFront:_scoreView];
     self.scoreView.hidden = NO;
@@ -406,13 +406,14 @@ KTVApiDelegate
 
 - (void)popScoreViewDidClickConfirm
 {
-    VLLog(@"Using as score view hidding");
+    KTVLogInfo(@"Using as score view hidding");
     self.scoreView = nil;
 }
 
 #pragma mark - rtc callbacks
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
+    KTVLogInfo(@"didJoinedOfUid: %ld", uid);
     [self.ktvApi mainRtcEngine:engine didJoinedOfUid:uid elapsed:elapsed];
 }
 
@@ -744,9 +745,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
     if (code == 0) {
-        VLLog(@"评分回调开启成功\n");
+        KTVLogInfo(@"评分回调开启成功\n");
     } else {
-        VLLog(@"评分回调开启失败：%d\n",code);
+        KTVLogInfo(@"评分回调开启失败：%d\n",code);
     }
     
     [self.RTCkit enableVideo];
@@ -800,19 +801,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.ktvApi.lrcView = self.MVView.lrcView;
     
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    int ret =
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
                        mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - 加入RTC成功");
-       
+        KTVLogInfo(@"Agora - 加入RTC成功");
     }];
+    if (ret != 0) {
+        KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
+    }
 }
 
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
-        VLLog(@"Agora - Leave RTC channel");
+        KTVLogInfo(@"Agora - Leave RTC channel");
     }];
 }
 
@@ -863,7 +867,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.MVView reset];
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
             if(local) {
-                VLLog(@"Playback all loop completed");
+                KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
                     [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
@@ -1169,7 +1173,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (effectType == VLKTVSoundEffectTypeNone) {
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
     }
-    VLLog(@"Agora - Setting effect type to %lu", effectType);
+    KTVLogInfo(@"Agora - Setting effect type to %lu", effectType);
 }
 
 #pragma mark --
