@@ -1051,10 +1051,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
             contentInspectConfig.extraInfo = jsonObject.toString();
             ContentInspectConfig.ContentInspectModule module1 = new ContentInspectConfig.ContentInspectModule();
-            module1.interval = 5;
+            module1.interval = 30;
             module1.type = CONTENT_INSPECT_TYPE_SUPERVISE;
             ContentInspectConfig.ContentInspectModule module2 = new ContentInspectConfig.ContentInspectModule();
-            module2.interval = 5;
+            module2.interval = 30;
             module2.type = CONTENT_INSPECT_TYPE_MODERATION;
             contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module1, module2 };
             contentInspectConfig.moduleCount = 2;
