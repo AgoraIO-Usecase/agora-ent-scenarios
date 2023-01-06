@@ -451,7 +451,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
         topSong.isChorus = true
-        topSong.status = 3
+        topSong.status = VLSongPlayStatusMatched
         topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
@@ -459,7 +459,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
-        inputModel.status = 2
+        inputModel.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
@@ -473,7 +473,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 //        songInfo.songUrl = inputModel.songUrl
         songInfo.imageUrl = inputModel.imageUrl
         songInfo.singer = inputModel.singer
-        songInfo.status = 0
+        songInfo.status = VLSongPlayStatusIdle
         /// 是谁点的歌
         songInfo.userNo = VLUserCenter.user.id
 //        songInfo.userId = UserInfo.userId
@@ -501,7 +501,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         song.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
 
         //if top song is playing status, keep it always on top(_sortChooseSongList)
-        if topSong.objectId != song.objectId, topSong.status != 2 {
+        if topSong.objectId != song.objectId, topSong.status != VLSongPlayStatusPlaying {
             topSong.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
             _updateChooseSong(songInfo: topSong) { error in
             }
@@ -1114,10 +1114,10 @@ extension KTVSyncManagerServiceImp {
 extension KTVSyncManagerServiceImp {
     private func _sortChooseSongList() {
         songList = songList.sorted(by: { model1, model2 in
-            if model1.status == 2 {
+            if model1.status == VLSongPlayStatusPlaying {
                 return true
             }
-            if model2.status == 2 {
+            if model2.status == VLSongPlayStatusPlaying {
                 return false
             }
             if model1.pinAt < 1,  model2.pinAt < 1 {
@@ -1231,14 +1231,14 @@ extension KTVSyncManagerServiceImp {
 
     private func _markCurrentSongIfNeed() {
         guard let topSong = songList.first,
-              topSong.status == 0, // ready status
+              topSong.status == VLSongPlayStatusIdle, // ready status
               topSong.isChorus == false,
               topSong.userNo == VLUserCenter.user.id
         else {
             return
         }
 
-        topSong.status = 2
+        topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
     }
@@ -1253,7 +1253,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         topSong.isChorus = false
-        topSong.status = 3
+        topSong.status = VLSongPlayStatusMatched
         _updateChooseSong(songInfo: topSong) { error in
         }
     }

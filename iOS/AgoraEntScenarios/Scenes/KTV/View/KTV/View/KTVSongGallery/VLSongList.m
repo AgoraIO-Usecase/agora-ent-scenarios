@@ -56,7 +56,7 @@
     cell.selSongModel = self.selSongsArray[indexPath.row];
     cell.numberLabel.text = [NSString stringWithFormat:@"%d",(int)(indexPath.row+1)];
     cell.sortBtnClickBlock = ^(VLRoomSelSongModel * _Nonnull model) {
-        if (model.status == 2) {
+        if (model.status == VLSongPlayStatusPlaying) {
             return;
         }
         if (VLUserCenter.user.ifMaster) {
@@ -64,7 +64,7 @@
         }
     };
     cell.deleteBtnClickBlock = ^(VLRoomSelSongModel * _Nonnull model) {
-        if (model.status == 2) {
+        if (model.status == VLSongPlayStatusPlaying) {
             return;
         }
         if (VLUserCenter.user.ifMaster) {
