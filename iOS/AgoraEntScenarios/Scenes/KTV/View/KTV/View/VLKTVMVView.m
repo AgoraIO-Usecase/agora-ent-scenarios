@@ -211,7 +211,7 @@
 }
 
 - (BOOL)isPlaying:(VLRoomSelSongModel *)song {
-    if (song.status == 2) {
+    if (song.status == VLSongPlayStatusPlaying) {
         return YES;
     }
     return NO;

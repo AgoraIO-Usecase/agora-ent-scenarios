@@ -120,10 +120,10 @@
         self.chooserLabel.text = [NSString stringWithFormat:KTVLocalizedString(@"点唱: %@"), selSongModel.name];
     }
     
-    if (selSongModel.status == 0) {
+    if (selSongModel.status == VLSongPlayStatusIdle) {
         self.sortBtn.hidden = self.deleteBtn.hidden = NO;
         self.singingBtn.hidden = YES;
-    }else if (selSongModel.status == 2){
+    }else if (selSongModel.status == VLSongPlayStatusPlaying){
         self.sortBtn.hidden = self.deleteBtn.hidden = YES;
         self.singingBtn.hidden = NO;
     }

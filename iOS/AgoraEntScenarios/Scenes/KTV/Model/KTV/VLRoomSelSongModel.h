@@ -7,6 +7,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum : NSUInteger {
+    VLSongPlayStatusIdle = 0,
+    VLSongPlayStatusPlayed,
+    VLSongPlayStatusPlaying,
+    VLSongPlayStatusMatched
+} VLSongPlayStatus;
+
 @interface VLRoomSelSongModel : VLBaseModel
 /// 合唱者userNo
 @property (nonatomic, copy) NSString *chorusNo;
@@ -27,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) int64_t pinAt;
 
 ///0 未开始 1.已唱 2.正在唱 3. match完毕
-@property (nonatomic, assign) NSInteger status;
+@property (nonatomic, assign) VLSongPlayStatus status;
 ///是谁点的歌
 @property (nonatomic, copy) NSString *userNo;
 
