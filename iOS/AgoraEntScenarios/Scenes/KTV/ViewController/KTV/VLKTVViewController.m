@@ -553,7 +553,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
+    if(model.isChorus && model.status == VLSongPlayStatusIdle && model.chorusNo.length == 0) {
         // for new chorus song, need to wait till co-singer joins or force solo
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
@@ -617,7 +617,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)markSongPlaying:(VLRoomSelSongModel *)model {
-    if (model.status == 2) {
+    if (model.status == VLSongPlayStatusPlaying) {
         return;
     }
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
