@@ -1255,17 +1255,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
+    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     _isOnMicSeat = isOnMicSeat;
     
-    //start mic once enter seat
-    if(isOnMicSeat) {
-        [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-    } else {
-        [self.RTCkit setClientRole:AgoraClientRoleAudience];
+    if (onMicSeatStatusDidChanged) {
+        //start mic once enter seat
+        AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
+        [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
+        // use audio volume to control mic on/off, so that mic is always on when broadcaster
+        [option setPublishMicrophoneTrack:[self isBroadcaster]];
+        [self.RTCkit updateChannelWithMediaOptions:option];
+        
+        //TODO: isOnMicSeat = NO && is chorus && is co singer
     }
+    
     [self.RTCkit enableLocalAudio:isOnMicSeat];
     [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
-    
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
@@ -1290,7 +1295,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isNowCameraMuted = isNowCameraMuted;
     
     [self.RTCkit enableLocalVideo:!isNowCameraMuted];
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
+    AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
+    [option setPublishCameraTrack:!self.isNowCameraMuted];
+    [self.RTCkit updateChannelWithMediaOptions:option];
     if(oldValue != isNowCameraMuted) {
         [self.bottomView updateVideoBtn:isNowCameraMuted];
     }
