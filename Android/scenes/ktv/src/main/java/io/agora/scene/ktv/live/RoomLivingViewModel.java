@@ -1,5 +1,6 @@
 package io.agora.scene.ktv.live;
 
+import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
 
 import android.content.Context;
@@ -46,6 +47,7 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.service.ChooseSongInputModel;
 import io.agora.scene.ktv.service.JoinChorusInputModel;
@@ -1003,7 +1005,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
             @Override
             public void onContentInspectResult(int result) {
-
+                super.onContentInspectResult(result);
+                if (result > 1) {
+                    ToastUtils.showToast(R.string.ktv_content);
+                }
             }
         };
         config.mChannelProfile = Constants.CHANNEL_PROFILE_LIVE_BROADCASTING;
@@ -1042,13 +1047,17 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ContentInspectConfig contentInspectConfig = new ContentInspectConfig();
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("userNo", UserManager.getInstance().getUser().id.toString());
+            jsonObject.put("sceneName", "ktv");
+            jsonObject.put("id", UserManager.getInstance().getUser().id.toString());
             contentInspectConfig.extraInfo = jsonObject.toString();
-            ContentInspectConfig.ContentInspectModule module = new ContentInspectConfig.ContentInspectModule();
-            module.interval = 30;
-            module.type = CONTENT_INSPECT_TYPE_SUPERVISE;
-            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module };
-            contentInspectConfig.moduleCount = 1;
+            ContentInspectConfig.ContentInspectModule module1 = new ContentInspectConfig.ContentInspectModule();
+            module1.interval = 5;
+            module1.type = CONTENT_INSPECT_TYPE_SUPERVISE;
+            ContentInspectConfig.ContentInspectModule module2 = new ContentInspectConfig.ContentInspectModule();
+            module2.interval = 5;
+            module2.type = CONTENT_INSPECT_TYPE_MODERATION;
+            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module1, module2 };
+            contentInspectConfig.moduleCount = 2;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
