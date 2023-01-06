@@ -189,6 +189,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
+        startDisplayLrc()
 
         val role = songConfig!!.role
         val type = songConfig!!.type
@@ -609,9 +610,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             this.mLastReceivedPlayPosTime = null
                             this.mReceivedPlayPosition = 0
                         }
-                        Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                            startDisplayLrc()
-                        }
                         else -> {}
                     }
                 }
@@ -694,7 +692,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mPlayer?.play()
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                startDisplayLrc()
                 startSyncPitch()
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
