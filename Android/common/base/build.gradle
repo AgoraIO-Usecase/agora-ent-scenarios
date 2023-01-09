@@ -61,12 +61,13 @@ dependencies {
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
-    implementation rootProject.ext.deps.xlog
+    implementation rootProject.ext.deps.logger
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
 
     implementation rootProject.ext.deps.coroutines_android
+    implementation rootProject.ext.deps.bugly
 
     api rootProject.ext.deps.rtc
     api rootProject.ext.deps.rtm
