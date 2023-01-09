@@ -19,6 +19,7 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
+#import "VLAlert.h"
 @import Masonry;
 @import LEEAlert;
 
@@ -101,59 +102,14 @@
 }
 
 - (void)showUpdateNickNameAlert {
-
-//    VL(weakSelf);
-    __block UITextField *TF = nil;
-
-    [LEEAlert alert].config
-    .LeeTitle(AGLocalizedString(@"修改昵称"))
-    .LeeAddTextField(^(UITextField *textField) {
-        textField.placeholder = AGLocalizedString(@"请输入昵称");
-        textField.textColor = UIColorBlack;
-        textField.clearButtonMode=UITextFieldViewModeWhileEditing;
-        textField.font = UIFontMake(15);
-        if (VLUserCenter.user.name.length > 0) {
-            textField.text = VLUserCenter.user.name;
+    NSArray *array = [[NSArray alloc]initWithObjects:AGLocalizedString(@"Cancel"),AGLocalizedString(@"Confirm"), nil];
+    VL(weakSelf);
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:AGLocalizedString(@"修改昵称") message:@"" placeHolder:@"请输入昵称" type:ALERTYPETEXTFIELD buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        if(text && flag == true){
+            [weakSelf loadUpdateNickNameRequest:text];
         }
-        [textField becomeFirstResponder];
-        TF = textField; //赋值
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Cancel");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.clickBlock = ^{
-            
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"Confirm");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
-            [weakSelf loadUpdateNickNameRequest:TF.text];
-        };
-    })
-    .leeShouldActionClickClose(^(NSInteger index){
-        // 是否可以关闭回调, 当即将关闭时会被调用 根据返回值决定是否执行关闭处理
-        // 这里演示了与输入框非空校验结合的例子
-        BOOL result = ![TF.text isEqualToString:@""];
-        result = index == 1 ? result : YES;
-        return result;
-    })
-    .LeeShow();
+        [[VLAlert shared] dismiss];
+    }];
 }
 
 
@@ -201,19 +157,14 @@
 //        action.type = LEEActionTypeDefault;
 //        action.title = AGLocalizedString(@"拍照上传");
 //        action.clickBlock = ^{
-//            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
+//            [weakself requestAuthorizationForCamera];
 //        };
 //    })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
         action.title = AGLocalizedString(@"本地相册上传");
         action.clickBlock = ^{
-            if ([weakself getLibraryAccess] == NO) {
-                [weakself showAlert];
-                return;
-            }
-            
-            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+            [weakself requestAuthorizationForPhotoLibrary];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
@@ -225,6 +176,44 @@
     .LeeShow();
 }
 
+- (void)requestAuthorizationForPhotoLibrary {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status == PHAuthorizationStatusAuthorized) {
+            //操作图片
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentviewcontrollerWithSourceType: UIImagePickerControllerSourceTypePhotoLibrary];
+            });
+        }else{
+            [self showAlertWithMessage:@"相册权限未设置,请开启相册权限"];
+        }
+    }];
+}
+
+- (void)requestAuthorizationForCamera{
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        if(granted == true){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
+            });
+        } else {
+            [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
+        }
+    }];
+}
+
+-(void)showAlertWithMessage:(NSString *)mes {
+    //注，这里一定要回归的主线程操作UI
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示" message:mes preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[UIApplication sharedApplication]openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:nil completionHandler:nil];
+        }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
+        [alertController addAction:cancelAction];
+        [alertController addAction:okAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+    });
+}
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
     if (sourceType == UIImagePickerControllerSourceTypePhotoLibrary && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
@@ -315,25 +304,10 @@
 // 注销账号
 - (void)loadDestoryUserRequest {
     
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定注销账号？");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"注销");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
+    NSArray *array = [[NSArray alloc]initWithObjects:AGLocalizedString(@"注销"),AGLocalizedString(@"取消"), nil];
+    VL(weakSelf);
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:AGLocalizedString(@"确定注销账号？") message:AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？") placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        if(flag == false){
             NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
             [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
                 if (response.code == 0) {
@@ -341,72 +315,112 @@
                 }
             } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
             }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
+        }
+        [[VLAlert shared] dismiss];
+    }];
+    
+//    [LEEAlert alert].config
+//    .LeeAddTitle(^(UILabel *label) {
+//        label.text = AGLocalizedString(@"确定注销账号？");
+//        label.textColor = UIColorMakeWithHex(@"#040925");
+//        label.font = UIFontBoldMake(16);
+//    })
+//    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
+//    .LeeAddAction(^(LEEAction *action) {
+//        VL(weakSelf);
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"注销");
+//        action.titleColor = UIColorMakeWithHex(@"#000000");
+//        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.font = UIFontBoldMake(16);
+//        action.clickBlock = ^{
+//            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
+//            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+//                if (response.code == 0) {
+//                    [weakSelf userLogout];
+//                }
+//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
+//            }];
+//        };
+//    })
+//    .LeeAddAction(^(LEEAction *action) {
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"取消");
+//        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
+//        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.font = UIFontBoldMake(16);
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.borderColor = UIColorMakeWithHex(@"#2753FF");
+//        action.clickBlock = ^{
+//            // 取消点击事件Block
+//        };
+//    })
+//    .LeeShow();
 }
 
 // 退出登录
 - (void)loadLogoutUserRequest {
-    [LEEAlert alert].config
-    .LeeAddTitle(^(UILabel *label) {
-        label.text = AGLocalizedString(@"确定退出登录?");
-        label.textColor = UIColorMakeWithHex(@"#040925");
-        label.font = UIFontBoldMake(16);
-    })
-    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
-    .LeeAddAction(^(LEEAction *action) {
-        VL(weakSelf);
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"退出");
-        action.titleColor = UIColorMakeWithHex(@"#000000");
-        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.font = UIFontBoldMake(16);
-        action.clickBlock = ^{
+    
+    NSArray *array = [[NSArray alloc]initWithObjects:AGLocalizedString(@"退出"),AGLocalizedString(@"取消"), nil];
+    VL(weakSelf);
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:AGLocalizedString(@"确定退出登录?") message:AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～") placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        if(flag == false){
             [weakSelf userLogout];
-            return;
-//            NSDictionary *param = @{@"userNo" : VLUserCenter.user.userNo ?: @""};
-//            [VLAPIRequest getRequestURL:kURLPathLogout parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [self userLogout];
-//                }
-//            } failure:^(NSError * _Nullable error) {
-//            }];
-        };
-    })
-    .LeeAddAction(^(LEEAction *action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
-        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-        action.cornerRadius = 20;
-        action.height = 40;
-        action.font = UIFontBoldMake(16);
-        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-        action.clickBlock = ^{
-            // 取消点击事件Block
-        };
-    })
-    .LeeShow();
+        }
+        [[VLAlert shared] dismiss];
+    }];
+
+//    [LEEAlert alert].config
+//    .LeeAddTitle(^(UILabel *label) {
+//        label.text = AGLocalizedString(@"确定退出登录?");
+//        label.textColor = UIColorMakeWithHex(@"#040925");
+//        label.font = UIFontBoldMake(16);
+//    })
+//    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
+//    .LeeAddAction(^(LEEAction *action) {
+//        VL(weakSelf);
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"退出");
+//        action.titleColor = UIColorMakeWithHex(@"#000000");
+//        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.font = UIFontBoldMake(16);
+//        action.clickBlock = ^{
+//            [weakSelf userLogout];
+//            return;
+////            NSDictionary *param = @{@"userNo" : VLUserCenter.user.userNo ?: @""};
+////            [VLAPIRequest getRequestURL:kURLPathLogout parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
+////                if (response.code == 0) {
+////                    [self userLogout];
+////                }
+////            } failure:^(NSError * _Nullable error) {
+////            }];
+//        };
+//    })
+//    .LeeAddAction(^(LEEAction *action) {
+//        action.type = LEEActionTypeCancel;
+//        action.title = AGLocalizedString(@"取消");
+//        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
+//        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
+//        action.cornerRadius = 20;
+//        action.height = 40;
+//        action.font = UIFontBoldMake(16);
+//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
+//        action.borderColor = UIColorMakeWithHex(@"#2753FF");
+//        action.clickBlock = ^{
+//            // 取消点击事件Block
+//        };
+//    })
+//    .LeeShow();
     
 }
  
