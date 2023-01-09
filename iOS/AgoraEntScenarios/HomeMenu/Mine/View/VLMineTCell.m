@@ -42,9 +42,10 @@
     [super layoutSubviews];
      
     self.iconImgView.frame = CGRectMake(15, (self.height-24)*0.5, 24, 24);
-    self.itemTitleLabel.frame = CGRectMake(self.iconImgView.right+16, (self.height-24)*0.5, 60, 24);
     self.arrowImgView.frame = CGRectMake(self.width-15-16, (self.height-16)*0.5, 16, 16);
-
+    CGFloat left = self.iconImgView.right + 16;
+    CGFloat width = self.arrowImgView.right - 16 - left;
+    self.itemTitleLabel.frame = CGRectMake(left, (self.height-24)*0.5, width, 24);
 }
 
 - (void)setDict:(NSDictionary *)dict {

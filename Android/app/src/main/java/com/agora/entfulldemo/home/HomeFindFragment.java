@@ -11,18 +11,18 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.agora.entfulldemo.databinding.FragmentHomeFindBinding;
+import com.agora.entfulldemo.databinding.AppFragmentHomeFindBinding;
 
 import io.agora.scene.base.component.BaseViewBindingFragment;
 
-public class HomeFindFragment extends BaseViewBindingFragment<FragmentHomeFindBinding> {
+public class HomeFindFragment extends BaseViewBindingFragment<AppFragmentHomeFindBinding> {
     private FrameLayout fullscreenContainer;
     private WebChromeClient.CustomViewCallback customViewCallback;
 
     @NonNull
     @Override
-    protected FragmentHomeFindBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return FragmentHomeFindBinding.inflate(inflater);
+    protected AppFragmentHomeFindBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return AppFragmentHomeFindBinding.inflate(inflater);
     }
 
     @Override

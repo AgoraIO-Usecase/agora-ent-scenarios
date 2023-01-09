@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.KTVUtil;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogCommonBinding;
 
 public class CommonDialog extends BaseDialog<DialogCommonBinding> {
@@ -44,8 +44,8 @@ public class CommonDialog extends BaseDialog<DialogCommonBinding> {
         getBinding().tvDesc.setText(desc);
         getBinding().tvDesc.setVisibility(View.VISIBLE);
         getWindow().setLayout(
-                KTVUtil.dp2px(300),
-                KTVUtil.dp2px(220)
+                UiUtil.dp2px(300),
+                UiUtil.dp2px(220)
         );
     }
 
@@ -61,7 +61,7 @@ public class CommonDialog extends BaseDialog<DialogCommonBinding> {
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                KTVUtil.dp2px(300),
+                UiUtil.dp2px(300),
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;

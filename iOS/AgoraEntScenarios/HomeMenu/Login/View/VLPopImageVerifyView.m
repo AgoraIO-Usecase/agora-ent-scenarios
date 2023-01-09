@@ -7,6 +7,7 @@
 #import "WMZCodeView.h"
 #import "VLMacroDefine.h"
 #import "VLHotSpotBtn.h"
+#import "MenuUtils.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -38,7 +39,7 @@
     [self addSubview:bgView];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 22, 80, 20)];
-    titleLabel.text = NSLocalizedString(@"完成验证", nil);
+    titleLabel.text = AGLocalizedString(@"完成验证");
     titleLabel.font = UIFontMake(14);
     titleLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     [self addSubview:titleLabel];
@@ -49,7 +50,7 @@
     [self addSubview:closeBtn];
     
     UILabel *slideLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, titleLabel.bottom+5, 170, 22)];
-    slideLabel.text = NSLocalizedString(@"拖动下方滑块完成拼图", nil);
+    slideLabel.text = AGLocalizedString(@"拖动下方滑块完成拼图");
     slideLabel.font = UIFontMake(16);
     slideLabel.textColor = UIColorMakeWithHex(@"#040925");
     [self addSubview:slideLabel];

@@ -42,6 +42,11 @@ public abstract class BindingSingleAdapter<Data, Binding extends ViewBinding> ex
         notifyItemInserted(index);
     }
 
+    public void replace(int index, Data item){
+        mDataList.set(index, item);
+        notifyItemChanged(index);
+    }
+
     public void resetAll(List<Data> list){
         if (list == null) {
             list = new ArrayList<>();
@@ -89,7 +94,7 @@ public abstract class BindingSingleAdapter<Data, Binding extends ViewBinding> ex
 
     public Data getItem(int index){
         int itemCount = getItemCount();
-        if (index < 0 || index > itemCount) {
+        if (index < 0 || index >= itemCount) {
             return null;
         }
         return mDataList.get(index);

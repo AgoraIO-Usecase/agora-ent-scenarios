@@ -187,6 +187,7 @@ private func _hideLoadingIfNeed() {
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
         roomInfo.roomPeopleNum = "0"
+        roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
 
         let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
@@ -288,6 +289,7 @@ private func _hideLoadingIfNeed() {
     func leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
             agoraAssert("leaveRoom channelName = nil")
+            completion(nil)
             return
         }
         
@@ -561,6 +563,7 @@ extension KTVSyncManagerServiceImp {
     private func _leaveRoom(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         _removeUser { error in
@@ -584,6 +587,7 @@ extension KTVSyncManagerServiceImp {
     private func _removeRoom(completion: @escaping (Error?) -> Void) {
         guard let channelName = roomNo else {
             agoraAssert("channelName = nil")
+            completion(nil)
             return
         }
         _unsubscribeAll()

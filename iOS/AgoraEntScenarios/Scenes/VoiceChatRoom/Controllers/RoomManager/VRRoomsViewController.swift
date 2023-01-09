@@ -8,6 +8,7 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
+import AgoraChat
 
 let bottomSafeHeight = safeAreaExist ? 33 : 0
 let page_size = 15
@@ -34,20 +35,18 @@ let page_size = 15
     }()
 
     private lazy var create: VRRoomCreateView = .init(frame: CGRect(x: 0, y: self.container.frame.maxY - 50, width: ScreenWidth, height: 72)).image(UIImage("blur")!).backgroundColor(.clear)
-
+    
+    private var initialError: AgoraChatError?
+    
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
-        VoiceRoomIMManager.shared?.configIM(appkey: "52117440#955012")
-
-        // MARK: - you can replace request host call this.
-
-        VoiceRoomBusinessRequest.shared.changeHost(host: "http://a1-test-voiceroom.easemob.com")
-        if user.hasVoiceRoomUserInfo {
-            mapUser(user: user)
-        } else {
-            login()
+        if VoiceRoomIMManager.shared == nil {
+            VoiceRoomIMManager.shared = VoiceRoomIMManager()
         }
+        self.initialError = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
+        mapUser(user: user)
+        self.showContent()
     }
 
     override public func viewDidLoad() {
@@ -62,15 +61,22 @@ let page_size = 15
         viewsAction()
         childViewControllersEvent()
     }
+    
+    deinit {
+        print("\(self.swiftClassName ?? "") is destroyed!")
+        VoiceRoomIMManager.shared?.logoutIM()
+        VoiceRoomIMManager.shared = nil
+        ChatRoomServiceImp._sharedInstance = nil
+        VoiceRoomUserInfo.shared.user = nil
+        VoiceRoomUserInfo.shared.currentRoomOwner = nil
+    }
 }
 
 extension VRRoomsViewController {
     private func mapUser(user: VLLoginModel?) {
         let current = VRUser()
         current.chat_uid = user?.chat_uid
-        current.rtc_uid = user?.rtc_uid
-        current.im_token = user?.im_token
-        current.authorization = user?.authorization
+        current.rtc_uid = user?.id
         current.channel_id = user?.channel_id
         current.uid = user?.userNo
         current.name = user?.name
@@ -78,24 +84,6 @@ extension VRRoomsViewController {
         VoiceRoomUserInfo.shared.user = current
     }
 
-    private func login() {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .login(()), params: ["deviceId": currentUser?.userNo ?? "", "portrait": currentUser?.headUrl ?? "", "name": currentUser?.name ?? ""], classType: VRUser.self) { user, error in
-            if error == nil, user != nil {
-                self.currentUser?.hasVoiceRoomUserInfo = true
-                self.currentUser?.chat_uid = user?.chat_uid ?? ""
-                self.currentUser?.channel_id = user?.channel_id ?? ""
-                self.currentUser?.rtc_uid = user?.rtc_uid ?? ""
-                self.currentUser?.authorization = user?.authorization ?? ""
-                self.currentUser?.im_token = user?.im_token ?? ""
-                print("avatar url: \(self.currentUser?.headUrl ?? "")")
-                VoiceRoomUserInfo.shared.user = user
-                VoiceRoomBusinessRequest.shared.userToken = user?.authorization ?? ""
-                self.showContent()
-            } else {
-                self.view.makeToast("\(error?.localizedDescription ?? "")")
-            }
-        }
-    }
 
     private func viewsAction() {
         create.action = { [weak self] in
@@ -118,8 +106,11 @@ extension VRRoomsViewController {
             presentViewController(vc)
             alert.actionEvents = {
                 if $0 == 31 {
-                    room.roomPassword = alert.code
-                    self.validatePassword(room: room, password: alert.code)
+                    if room.roomPassword == alert.code {
+                        self.loginIMThenPush(room: room)
+                    } else {
+                        self.view.makeToast("Incorrect Password".localized())
+                    }
                 }
                 vc.dismiss(animated: true)
             }
@@ -135,29 +126,32 @@ extension VRRoomsViewController {
         return component
     }
 
-    private func validatePassword(room: VRRoomEntity, password: String) {
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .validatePassWord(roomId: room.room_id ?? ""), params: ["password": password]) { dic, error in
-            if error == nil, let result = dic?["result"] as? Bool, result {
-                self.loginIMThenPush(room: room)
-            } else {
-                self.view.makeToast("Password wrong!")
-            }
-        }
-    }
-
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
+        ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
             SVProgressHUD.dismiss()
-            if error == nil {
-                let info = VRRoomInfo()
-                info.room = room
-                let vc = VoiceRoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
-            } else {
-                self.view.makeToast("Loading failed,please retry or install again!")
+            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
+                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                return
             }
-        })
+            if error == nil, room_entity != nil {
+                VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
+                    if error == nil {
+                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
+                        self.mapUser(user: VLUserCenter.user)
+                        let info: VRRoomInfo = VRRoomInfo()
+                        info.room = room
+                        info.mic_info = nil
+                        let vc = VoiceRoomViewController(info: info)
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    } else {
+                        SVProgressHUD.showError(withStatus: "IM login failed!")
+                    }
+                })
+            } else {
+                SVProgressHUD.showError(withStatus: "Members reach limit!")
+            }
+        }
     }
 
     private func childViewControllersEvent() {
@@ -170,8 +164,12 @@ extension VRRoomsViewController {
 //            self.menuBar.menuList.reloadData()
 //        }
 
-        normal.didSelected = { [weak self] in
-            self?.entryRoom(room: $0)
+        normal.didSelected = { [weak self] room in
+            Throttler.throttle(delay: .seconds(1)) {
+                DispatchQueue.main.async {
+                    self?.entryRoom(room: room)
+                }
+            }
         }
 //        self.normal.totalCountClosure = { [weak self] in
 //            guard let self = self else { return }
