@@ -7,14 +7,14 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
-#import "AttributedTV.h"
+#import "AttributedTextView.h"
 @import Masonry;
 #import "KTVMacro.h"
 
 @interface VLPrivacyCustomView()<UITextViewDelegate>
 @property (nonatomic, strong) UIButton *disButton;
 @property (nonatomic, strong) UIButton *agreeButton;
-@property (nonatomic, strong) AttributedTV *textView;
+@property (nonatomic, strong) AttributedTextView *textView;
 @end
 
 @implementation VLPrivacyCustomView
@@ -73,7 +73,7 @@
 }
 
 #pragma mark - Lazy
--(AttributedTV *)textView {
+-(AttributedTextView *)textView {
     if(!_textView){
         
         NSString *textString = @"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。";
@@ -87,7 +87,7 @@
         [ranges addObject:[NSValue valueWithRange:range2]];
         [ranges addObject:[NSValue valueWithRange:range3]];
         [ranges addObject:[NSValue valueWithRange:range4]];
-        _textView = [[AttributedTV alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+        _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
         _textView .delegate = self;
     }
     return _textView;
