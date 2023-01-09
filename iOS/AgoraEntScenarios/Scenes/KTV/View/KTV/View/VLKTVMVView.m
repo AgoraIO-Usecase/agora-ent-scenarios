@@ -190,7 +190,7 @@
 
 - (void)configLrcViewUIWithCurrentSong:(VLRoomSelSongModel *)song {
     // 是自己点的歌曲
-    if (song.isSongOwner) {
+    if (song.isOwnSong) {
         [self setPlayerViewsHidden:NO nextButtonHidden:NO];
     }
     else if(VLUserCenter.user.ifMaster) {
@@ -298,7 +298,7 @@
         // 歌曲是合唱
         if (song.isChorus) {
             // 歌曲是本人点的 (不等了、独唱)
-            if (song.isSongOwner) {
+            if (song.isOwnSong) {
                 if (self.soloTimer) return;
                 self.soloSongView.hidden = NO;
                 self.robMicrophoneView.hidden = YES;
@@ -430,13 +430,6 @@
     else {
         return (int)(self.totalScore / self.totalLines);
     }
-}
-
-#pragma mark private method
-- (void)_startLrc {
-    [_lrcView start];
-    self.totalLines = 0;
-    self.totalScore = 0.0f;
 }
 
 
