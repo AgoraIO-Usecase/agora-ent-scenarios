@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:background="@mipmap/bg_app_def_white">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivScenesBg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/bg_btn_home1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivScenesIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/ivScenesBg"
+        app:layout_constraintEnd_toEndOf="@id/ivScenesBg"
+        tools:background="@mipmap/bg_btn_home_ktv" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvScenesName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="25dp"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="@id/ivScenesBg"
+        app:layout_constraintTop_toTopOf="@id/ivScenesBg"
+        tools:text="@string/ktv_online" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUnActive"
+        android:layout_width="56dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="59dp"
+        android:background="@drawable/bg_full_black_25_r10"
+        android:gravity="center"
+        android:text="@string/app_coming_soon"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        app:layout_constraintStart_toStartOf="@id/ivScenesBg"
+        app:layout_constraintTop_toTopOf="@id/ivScenesBg" />
+</androidx.constraintlayout.widget.ConstraintLayout>
