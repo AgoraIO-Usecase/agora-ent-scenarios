@@ -695,6 +695,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
                                userId:VLUserCenter.user.id,
+                               isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)

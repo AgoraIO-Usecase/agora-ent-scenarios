@@ -19,6 +19,7 @@ extension TemplateServiceImp: TemplateServiceProtocol {
 
         SyncUtil.joinScene(id: roomInfo.roomId,
                            userId: roomInfo.userId,
+                           isOwner: roomInfo.userId == VLUserCenter.user.id,
                            property: params) { [weak self] result in
 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
             let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
