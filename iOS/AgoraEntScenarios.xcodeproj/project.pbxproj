@@ -13,7 +13,6 @@
 		DD0292C3295BF0DC00485225 /* VLAddRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924B295BF0DC00485225 /* VLAddRoomModel.m */; };
 		DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */; };
 		DD0292C5295BF0DC00485225 /* VLSongItmModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02924F295BF0DC00485225 /* VLSongItmModel.m */; };
-		DD0292C6295BF0DC00485225 /* AgoraRtm.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029254295BF0DC00485225 /* AgoraRtm.m */; };
 		DD0292C7295BF0DC00485225 /* VLRoomListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029257295BF0DC00485225 /* VLRoomListModel.m */; };
 		DD0292C8295BF0DC00485225 /* VLBelcantoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029258295BF0DC00485225 /* VLBelcantoModel.m */; };
 		DD0292C9295BF0DC00485225 /* VLKTVSelBgModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029259295BF0DC00485225 /* VLKTVSelBgModel.m */; };
@@ -341,11 +340,9 @@
 		DD02924D295BF0DC00485225 /* VLRoomListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomListModel.h; sourceTree = "<group>"; };
 		DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomSeatModel.m; sourceTree = "<group>"; };
 		DD02924F295BF0DC00485225 /* VLSongItmModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSongItmModel.m; sourceTree = "<group>"; };
-		DD029250295BF0DC00485225 /* AgoraRtm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgoraRtm.h; sourceTree = "<group>"; };
 		DD029251295BF0DC00485225 /* VLKTVSelBgModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVSelBgModel.h; sourceTree = "<group>"; };
 		DD029252295BF0DC00485225 /* VLBelcantoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLBelcantoModel.h; sourceTree = "<group>"; };
 		DD029253295BF0DC00485225 /* VLRoomSelSongModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSelSongModel.h; sourceTree = "<group>"; };
-		DD029254295BF0DC00485225 /* AgoraRtm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AgoraRtm.m; sourceTree = "<group>"; };
 		DD029255295BF0DC00485225 /* VLSongItmModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSongItmModel.h; sourceTree = "<group>"; };
 		DD029256295BF0DC00485225 /* VLRoomSeatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLRoomSeatModel.h; sourceTree = "<group>"; };
 		DD029257295BF0DC00485225 /* VLRoomListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLRoomListModel.m; sourceTree = "<group>"; };
@@ -863,11 +860,9 @@
 				DD02924D295BF0DC00485225 /* VLRoomListModel.h */,
 				DD02924E295BF0DC00485225 /* VLRoomSeatModel.m */,
 				DD02924F295BF0DC00485225 /* VLSongItmModel.m */,
-				DD029250295BF0DC00485225 /* AgoraRtm.h */,
 				DD029251295BF0DC00485225 /* VLKTVSelBgModel.h */,
 				DD029252295BF0DC00485225 /* VLBelcantoModel.h */,
 				DD029253295BF0DC00485225 /* VLRoomSelSongModel.h */,
-				DD029254295BF0DC00485225 /* AgoraRtm.m */,
 				DD029255295BF0DC00485225 /* VLSongItmModel.h */,
 				DD029256295BF0DC00485225 /* VLRoomSeatModel.h */,
 				DD029257295BF0DC00485225 /* VLRoomListModel.m */,
@@ -2265,7 +2260,6 @@
 				DD220B7D295B332C00F57F30 /* AgoraChatRoomBaseRtcUserView.swift in Sources */,
 				DD220B54295B332C00F57F30 /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,
 				DD220B67295B332C00F57F30 /* VMUpstageView.swift in Sources */,
-				DD0292C6295BF0DC00485225 /* AgoraRtm.m in Sources */,
 				DD220B3E295B332C00F57F30 /* VoiceRoomViewController.swift in Sources */,
 				DD220B1F295B332C00F57F30 /* Notification+Presentation.swift in Sources */,
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
