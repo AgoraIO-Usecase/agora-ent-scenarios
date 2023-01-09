@@ -6,8 +6,9 @@
 //
 
 #import "VLAlert.h"
+#import "AttributedTextView.h"
 
-@interface VLAlert()<UITextFieldDelegate>
+@interface VLAlert()<UITextFieldDelegate, UITextViewDelegate>
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UIView *alertView;
 @property (nonatomic, strong) UILabel *titleLabel;
@@ -15,11 +16,13 @@
 @property (nonatomic, strong) UIButton *confirmBtn;
 @property (nonatomic, strong) UIButton *cancleBtn;
 @property (nonatomic, strong) UIView *textView;
+@property (nonatomic, strong) AttributedTextView *attrView;
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, assign) ALERTYPE alertType;
 @property (nonatomic, strong) NSString *message;
+@property (nonatomic, strong) NSString *attributeMessage;
 @property (nonatomic, copy) OnCallback completion;
-
+@property (nonatomic, copy) linkCallback linkCompletion;
 @end
 
 @implementation VLAlert
@@ -34,20 +37,42 @@ static VLAlert *_alert = nil;
 }
 
 -(void)showAlertWithFrame:(CGRect)frame title:(NSString *)title message:(NSString *)message placeHolder:(NSString *)placeHolder type:(ALERTYPE)type buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion{
-        [self layoutUI];
         self.alertType = type;
         self.message = message;
-        self.completion = completion;
-        self.mesLabel.hidden = type == ALERTYPETEXTFIELD;
-        self.textView.hidden = type == ALERTYPENORMAL;
+        [self layoutUI];
         
+        self.completion = completion;
+        self.mesLabel.hidden = type != ALERTYPENORMAL;
+        self.textView.hidden = type != ALERTYPETEXTFIELD;
+        self.cancleBtn.hidden = type == ALERTYPECONFIRM;
         self.titleLabel.text = title;
         self.mesLabel.text = message;
         
         [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
-        [self.confirmBtn setTitle:buttonTitles[1] forState:UIControlStateNormal];
+        [self.confirmBtn setTitle:buttonTitles[type == ALERTYPECONFIRM ? 0 : 1] forState:UIControlStateNormal];
         
         self.textField.placeholder = placeHolder;
+        [UIApplication.sharedApplication.delegate.window addSubview:self];
+}
+
+-(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString *)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor *)attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion linkCompletion:(linkCallback)linkCompletion{
+        [self layoutUI];
+        self.alertType = ALERTYPEATTRIBUTE;
+        self.completion = completion;
+        self.linkCompletion = linkCompletion;
+        self.textField.hidden = true;
+        self.titleLabel.text = title;
+        self.mesLabel.hidden = true;
+        self.textView.hidden = true;
+        self.attributeMessage = text;
+        
+        self.attrView = [[AttributedTextView alloc]initWithFrame:CGRectZero text:text AttributedStringS:strings ranges:ranges textColor:textColor attributeTextColor:attributeTextColor];
+        [self.alertView addSubview:self.attrView];
+        self.attrView.delegate = self;
+    
+        [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
+        [self.confirmBtn setTitle:buttonTitles[1] forState:UIControlStateNormal];
+
         [UIApplication.sharedApplication.delegate.window addSubview:self];
 }
 
@@ -67,7 +92,7 @@ static VLAlert *_alert = nil;
     [self addSubview:self.alertView];
     
     self.titleLabel = [[UILabel alloc]init];
-    self.titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightBold];
+    self.titleLabel.font = [UIFont systemFontOfSize: self.alertType == ALERTYPECONFIRM ? 16 : 18 weight:UIFontWeightBold];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.alertView addSubview:self.titleLabel];
     
@@ -77,7 +102,7 @@ static VLAlert *_alert = nil;
     self.mesLabel.lineBreakMode = NSLineBreakByCharWrapping;
     self.mesLabel.textAlignment = NSTextAlignmentCenter;
     [self.alertView addSubview:self.mesLabel];
-    
+
     self.cancleBtn = [[UIButton alloc]init];
     [self.cancleBtn setFont:[UIFont systemFontOfSize:16 weight:UIFontWeightBold]];
     [self.cancleBtn setTitleColor:[self colorWithHexString:@"#000000"] forState:UIControlStateNormal];
@@ -128,10 +153,13 @@ static VLAlert *_alert = nil;
     //1.判断是那种alert，然后计算高度
     CGFloat contentHeight = 20 + 22 + 20;
     CGFloat mesHeight = [self heightWithString:self.message];
+    CGFloat attrTVHeight = [self heightWithString:self.attributeMessage] + 20;
     if(self.alertType == ALERTYPENORMAL){
         contentHeight += mesHeight;
-    } else {
+    } else if (self.alertType == ALERTYPETEXTFIELD) {
         contentHeight += 40;
+    } else if (self.alertType == ALERTYPEATTRIBUTE) {
+        contentHeight += attrTVHeight;
     }
     contentHeight += 20;
     contentHeight += 40;
@@ -141,10 +169,11 @@ static VLAlert *_alert = nil;
     self.mesLabel.frame = CGRectMake(20, 62, self.alertView.bounds.size.width - 40, mesHeight);
     self.textView.frame = CGRectMake(20, 62, self.alertView.bounds.size.width - 40, 40);
     self.textField.frame = CGRectMake(10, 0, self.alertView.bounds.size.width - 50, 40);
+    self.attrView.frame = CGRectMake(20, 62, self.alertView.bounds.size.width - 40, attrTVHeight);
     
     CGFloat btnW = (self.alertView.bounds.size.width - 40 - 50) * 0.5;
     self.cancleBtn.frame = CGRectMake(20, contentHeight - 60, btnW, 40);
-    self.confirmBtn.frame = CGRectMake(20 + 50 + btnW, contentHeight - 60, btnW, 40);
+    self.confirmBtn.frame = CGRectMake( self.alertType == ALERTYPECONFIRM ? 20 : 20 + 50 + btnW, contentHeight - 60, self.alertType == ALERTYPECONFIRM ? self.alertView.bounds.size.width - 40 : btnW, 40);
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField{
@@ -165,6 +194,17 @@ static VLAlert *_alert = nil;
         self.frame = CGRectOffset(self.frame, 0, movement);
     }];
 
+}
+
+-(BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange{
+    NSURL *url = [NSURL URLWithString:@"0"];
+    NSURL *url2 = [NSURL URLWithString:@"2"];
+    if([url isEqual:URL] || [url2 isEqual:URL]){
+        self.linkCompletion(@"0");
+    } else {
+        self.linkCompletion(@"1");
+    }
+    return YES;
 }
 
 - (CGFloat)heightWithString:(NSString *)text {
