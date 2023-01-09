@@ -21,9 +21,8 @@ rootProject.name = "AgoraEntFullDemo"
 include ':app'
 include ':common:base'
 include ':common:ui-widget'
-include ':scenes:ktv'
-
-include ':scenes:voice:voice'
-include ':scenes:voice:common'
+// include ':scenes:ktv'
+// include ':scenes:voice:voice'
+// include ':scenes:voice:common'
 include ':scenes:show'
 include ':scenes:show:aars'
