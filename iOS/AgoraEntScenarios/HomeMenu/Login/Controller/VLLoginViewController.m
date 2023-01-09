@@ -23,7 +23,7 @@
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import "KTVMacro.h"
-#import "AttributedTV.h"
+#import "AttributedTextView.h"
 @import Masonry;
 @import LEEAlert;
 @import SDWebImage;
@@ -38,7 +38,7 @@
 @property (nonatomic, strong) UIButton *agreeButton;    // 同意按钮
 @property (nonatomic, strong) LSTPopView *popView;
 @property (nonatomic, assign) bool policyAgreed;
-@property (nonatomic, strong) AttributedTV *textView;
+@property (nonatomic, strong) AttributedTextView *textView;
 @end
 
 @implementation VLLoginViewController
@@ -123,7 +123,7 @@
     NSMutableArray *ranges = [[NSMutableArray alloc]init];
     [ranges addObject:[NSValue valueWithRange:range1]];
     [ranges addObject:[NSValue valueWithRange:range2]];
-    _textView = [[AttributedTV alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
+    _textView = [[AttributedTextView alloc]initWithFrame:CGRectZero text: textString AttributedStringS:array ranges:ranges textColor:UIColorMakeWithHex(@"#6C7192") attributeTextColor:UIColorMakeWithHex(@"#009FFF")];
     _textView .delegate = self;
     [self.view addSubview:_textView];
 }
