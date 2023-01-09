@@ -12,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.agora.entfulldemo.databinding.ActivityPhoneLoginBinding;
+import com.agora.entfulldemo.databinding.AppActivityPhoneLoginBinding;
 import com.agora.entfulldemo.login.LoginViewModel;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import io.agora.scene.base.KtvConstant;
+import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -30,7 +30,7 @@ import io.agora.scene.widget.dialog.SwipeCaptchaDialog;
  * 登录注册
  */
 @Route(path = PagePathConstant.pagePhoneLoginRegister)
-public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<ActivityPhoneLoginBinding> {
+public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<AppActivityPhoneLoginBinding> {
 
     /**
      * 登录模块统一ViewModel
@@ -44,8 +44,8 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<Activity
     private CountDownTimerUtils countDownTimerUtils;
 
     @Override
-    protected ActivityPhoneLoginBinding getViewBinding(@NonNull LayoutInflater inflater) {
-        return ActivityPhoneLoginBinding.inflate(inflater);
+    protected AppActivityPhoneLoginBinding getViewBinding(@NonNull LayoutInflater inflater) {
+        return AppActivityPhoneLoginBinding.inflate(inflater);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PhoneLoginRegisterActivity extends BaseViewBindingActivity<Activity
         phoneLoginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         phoneLoginViewModel.setLifecycleOwner(this);
         phoneLoginViewModel.setISingleCallback((var1, var2) -> {
-            if (var1 == KtvConstant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS) {
+            if (var1 == Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS) {
                 // RoomManager.getInstance().loginOut();
                 PagePilotManager.pageMainHome();
                 finish();

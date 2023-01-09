@@ -33,12 +33,20 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:layout_marginBottom="20dp"
+            android:paddingBottom="50dp"
             android:overScrollMode="never"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_room_list"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:visibility="visible"/>
 
         <com.scwang.smart.refresh.footer.ClassicsFooter
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            tools:visibility="gone"/>
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -49,9 +57,10 @@
         android:drawableStart="@mipmap/icon_create_room"
         android:gravity="center"
         android:paddingHorizontal="50dp"
-        android:text="@string/create_room"
+        android:text="@string/ktv_create_room"
         android:textColor="@color/white"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -64,7 +73,7 @@
         android:layout_marginHorizontal="47dp"
         android:layout_marginTop="60dp"
         android:gravity="center"
-        android:text="@string/create_tips1"
+        android:text="@string/ktv_create_tips1"
         android:textColor="@color/def_text_color_3c4"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +99,7 @@
         android:drawableStart="@mipmap/icon_create_room"
         android:gravity="center"
         android:paddingHorizontal="50dp"
-        android:text="@string/create_room"
+        android:text="@string/ktv_create_room"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

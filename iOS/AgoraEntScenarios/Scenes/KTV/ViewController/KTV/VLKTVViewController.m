@@ -103,6 +103,8 @@ VLPopScoreViewDelegate
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) double currentVoicePitch;
 
+@property (nonatomic, assign) AgoraConnectionChangedReason connectionChangedReason;
+
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 
 @end
@@ -530,6 +532,12 @@ reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)spea
                 @"duration":@([self getTotalTime]),
                 @"time":@(position),
             };
+            
+            if (self.connectionChangedReason != AgoraConnectionChangedReasonJoinSuccess
+                && self.connectionChangedReason != AgoraConnectionChangedReasonRejoinSuccess) {
+                KTVLogInfo(@"didChangedToPosition: ts: %.2f duration: %.2f, songNo: %@ connectionChangedReason: %ld",
+                           self.currentTime, self.currentDuration, self.currentPlayingSongNo, self.connectionChangedReason);
+            }
             [self sendStremMessageWithDict:dict success:^(BOOL success) {
             }];
             
@@ -567,8 +575,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             NSInteger postion = musicLrcMessage.time;
             self.currentTime = postion;
             self.currentDuration = [dict[@"duration"] longValue];
-            NSLog(@"receiveStreamMessageFromUid1 setLrcTime: %ld", postion);
-//            KTVLogInfo(@"setLrcTime: %.2f/%.2f, songNo: %@", self.currentTime, self.currentDuration, self.currentPlayingSongNo);
             [_MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
             if (!_MVView.lrcView.isStart) {
                 [_MVView start];
@@ -647,6 +653,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine contentInspectResult:(AgoraContentInspectResult)result {
     KTVLogInfo(@"contentInspectResult: %ld", result);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine
+connectionChangedToState:(AgoraConnectionState)state
+           reason:(AgoraConnectionChangedReason)reason {
+    self.connectionChangedReason = reason;
+    KTVLogInfo(@"Agora - join RTC channel with connectionChangedToState: %ld, reason: %ld", state, reason);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit * _Nonnull)engine
+ didRejoinChannel:(NSString * _Nonnull)channel
+          withUid:(NSUInteger)uid
+          elapsed:(NSInteger) elapsed {
+    KTVLogInfo(@"Agora - join RTC channel with didRejoinChannel: %@, uid: %ld, elapsed: %ld", channel, uid, elapsed);
 }
 
 #pragma mark AgoraMusicContentCenterEventDelegate
@@ -955,8 +975,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinRTCChannel {
-    [self.RTCkit leaveChannel:nil];
-    [AgoraRtcEngineKit destroy];
+//    [self.RTCkit leaveChannel:nil];
+//    [AgoraRtcEngineKit destroy];
     
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
     //use game streaming in solo mode, chrous profile in chrous mode
@@ -994,18 +1014,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                               mirrorMode:AgoraVideoMirrorModeAuto];
     [self.RTCkit setVideoEncoderConfiguration:encoderConfiguration];
     
-    
-    VLLog(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
-    
-    KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    KTVLogInfo(@"Agora - join RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    int state =
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
                        mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - 加入RTC成功");
-       
+        KTVLogInfo(@"Agora - join RTC channed success: %@ %ld, %ld", channel, uid, elapsed);
     }];
+    KTVLogInfo(@"Agora - join RTC channel state: %d", state);
     [self.RTCkit setEnableSpeakerphone:YES];
     
     VLLog(@"Agora - Creating MCC with RTM token: %@", VLUserCenter.user.agoraRTMToken);
@@ -1021,7 +1039,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
-        VLLog(@"Agora - Leave RTC channel");
+        KTVLogInfo(@"Agora - Leave RTC channel");
     }];
 }
 

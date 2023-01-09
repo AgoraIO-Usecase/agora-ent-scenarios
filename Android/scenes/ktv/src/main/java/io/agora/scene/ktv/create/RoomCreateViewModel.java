@@ -9,19 +9,19 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 import io.agora.scene.base.utils.ToastUtils;
-import io.agora.scene.ktv.service.KTVCreateRoomInputModel;
-import io.agora.scene.ktv.service.KTVCreateRoomOutputModel;
-import io.agora.scene.ktv.service.KTVJoinRoomInputModel;
-import io.agora.scene.ktv.service.KTVJoinRoomOutputModel;
+import io.agora.scene.ktv.service.CreateRoomInputModel;
+import io.agora.scene.ktv.service.CreateRoomOutputModel;
+import io.agora.scene.ktv.service.JoinRoomInputModel;
+import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.KTVServiceProtocol;
-import io.agora.scene.ktv.service.VLRoomListModel;
+import io.agora.scene.ktv.service.RoomListModel;
 
 public class RoomCreateViewModel extends AndroidViewModel {
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
 
-    public final MutableLiveData<List<VLRoomListModel>> roomModelList = new MutableLiveData<>();
-    public final MutableLiveData<KTVJoinRoomOutputModel> joinRoomResult = new MutableLiveData<>();
-    public final MutableLiveData<KTVCreateRoomOutputModel> createRoomResult = new MutableLiveData<>();
+    public final MutableLiveData<List<RoomListModel>> roomModelList = new MutableLiveData<>();
+    public final MutableLiveData<JoinRoomOutputModel> joinRoomResult = new MutableLiveData<>();
+    public final MutableLiveData<CreateRoomOutputModel> createRoomResult = new MutableLiveData<>();
 
     public RoomCreateViewModel(@NonNull Application application) {
         super(application);
@@ -45,12 +45,12 @@ public class RoomCreateViewModel extends AndroidViewModel {
     public void createRoom(int isPrivate,
                            String name, String password,
                            String userNo, String icon) {
-        ktvServiceProtocol.createRoomWithInput(new KTVCreateRoomInputModel(
-                icon, isPrivate, name, password, userNo, "", ""
-        ), (e, ktvCreateRoomOutputModel) -> {
-            if (e == null && ktvCreateRoomOutputModel != null) {
+        ktvServiceProtocol.createRoom(new CreateRoomInputModel(
+                icon, isPrivate, name, password, userNo
+        ), (e, createRoomOutputModel) -> {
+            if (e == null && createRoomOutputModel != null) {
                 // success
-                createRoomResult.postValue(ktvCreateRoomOutputModel);
+                createRoomResult.postValue(createRoomOutputModel);
             } else {
                 // failed
                 if (e != null) {
@@ -63,11 +63,11 @@ public class RoomCreateViewModel extends AndroidViewModel {
     }
 
     public void joinRoom(String roomNo, String password) {
-        ktvServiceProtocol.joinRoomWithInput(new KTVJoinRoomInputModel(roomNo, password),
-                (e, ktvJoinRoomOutputModel) -> {
-                    if (e == null && ktvJoinRoomOutputModel != null) {
+        ktvServiceProtocol.joinRoom(new JoinRoomInputModel(roomNo, password),
+                (e, joinRoomOutputModel) -> {
+                    if (e == null && joinRoomOutputModel != null) {
                         // success
-                        joinRoomResult.postValue(ktvJoinRoomOutputModel);
+                        joinRoomResult.postValue(joinRoomOutputModel);
                     } else {
                         // failed
                         if (e != null) {
