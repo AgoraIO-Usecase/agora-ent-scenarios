@@ -4,15 +4,13 @@
 //
 
 #import "VLCreateRoomView.h"
-//#import "TXLimitedTextField.h"
-#import "CRLineView.h"
-#import "CRSecrectImageView.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "KTVMacro.h"
 #import "MenuUtils.h"
-@import CRBoxInputView;
+#import "AgoraEntScenarios-Swift.h"
+
 @import IQKeyboardManager;
 
 @interface VLCreateRoomView ()
@@ -21,7 +19,6 @@
 @property (nonatomic, strong) UITextField *inputTF;
 @property (nonatomic, strong) UIView *screatView;
 @property (nonatomic, strong) UIImageView *iconImgView;
-@property(nonatomic, strong) CRBoxInputView *boxInputView;
 @property (nonatomic, strong) UIButton *publicBtn;
 @property (nonatomic, strong) UIButton *screatBtn;
 @property (nonatomic, strong) VLAddRoomModel *addRoomModel;
@@ -92,19 +89,15 @@
     secretLabel.text = KTVLocalizedString(@"房间是否加密");
     [secretLabel sizeToFit];
     [self addSubview:secretLabel];
-    
-//    QMUIButton *publicBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
-//                                                             title:KTVLocalizedString(@"公开")];
+
     UIButton *publicBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [publicBtn setTitle:KTVLocalizedString(@"公开") forState:UIControlStateNormal];
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     publicBtn.frame = CGRectMake(secretLabel.left-3, secretLabel.bottom+13, 58, 24);
-//    publicBtn.imagePosition = QMUIButtonImagePositionLeft;
     publicBtn.spacingBetweenImageAndTitle = 3;
     publicBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [publicBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     publicBtn.titleLabel.font = UIFontMake(14.0);
-//    publicBtn.adjustsButtonWhenHighlighted = NO;
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     [publicBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
     publicBtn.tag = 0;
@@ -114,18 +107,14 @@
     [self addSubview:publicBtn];
     [publicBtn sizeToFit];
     
-//    QMUIButton *screatBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
-//                                                             title:KTVLocalizedString(@"加密")];
     UIButton *screatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [screatBtn setTitle:KTVLocalizedString(@"加密") forState:UIControlStateNormal];
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     screatBtn.frame = CGRectMake(publicBtn.right+40, publicBtn.top, 58, 24);
-//    screatBtn.imagePosition = QMUIButtonImagePositionLeft;
     screatBtn.spacingBetweenImageAndTitle = 3;
     screatBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     [screatBtn setTitleColor:UIColorMakeWithHex(@"#3C4267") forState:UIControlStateNormal];
     screatBtn.titleLabel.font = UIFontMake(14.0);
-//    screatBtn.adjustsButtonWhenHighlighted = NO;
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"] forState:UIControlStateNormal];
     [screatBtn setImage:[UIImage sceneImageWithName:@"online_create_screatSelIcon"] forState:UIControlStateSelected];
     screatBtn.tag = 1;
@@ -138,34 +127,17 @@
     self.screatView = [[UIView alloc]initWithFrame:CGRectMake(40, publicBtn.bottom+15, SCREEN_WIDTH-80, 48+12+17)];
     self.screatView.hidden = YES;
     [self addSubview:self.screatView];
-    
-    CRBoxInputCellProperty *cellProperty = [CRBoxInputCellProperty new];
-    cellProperty.cellBgColorNormal = UIColorMakeWithHex(@"#FFFFFF");
-    cellProperty.cellBgColorSelected = UIColorMakeWithHex(@"#FFFFFF");
-    cellProperty.cellCursorColor = UIColorMakeWithHex(@"#009FFF");
-    cellProperty.cellCursorWidth = 1;
-    cellProperty.cellCursorHeight = 20;
-    cellProperty.borderWidth = 0;
-    cellProperty.cornerRadius = 8;
-    cellProperty.cellFont = UIFontBoldMake(18);
-    cellProperty.cellTextColor = UIColorMakeWithHex(@"#040925");
 
-    self.boxInputView = [[CRBoxInputView alloc] initWithCodeLength:4];
-    self.boxInputView.frame = CGRectMake(0, 0, SCREEN_WIDTH-80, 55);
-    self.boxInputView.boxFlowLayout.itemSize = CGSizeMake(62, 48);
-    self.boxInputView.customCellProperty = cellProperty;
-    [self.boxInputView loadAndPrepareViewWithBeginEdit:NO];
-    [self.screatView addSubview:self.boxInputView];
-    self.boxInputView.textDidChangeblock = ^(NSString * _Nullable text, BOOL isFinished) {
-        if (isFinished) {
-            weakSelf.addRoomModel.password = text;
-        }
+    VRVerifyCodeView *pwdView = [[VRVerifyCodeView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-80, 55) codeNumbers:4 space:10 padding:10];
+    pwdView.inputFinish = ^(NSString * _Nonnull pwd) {
+        weakSelf.addRoomModel.password = pwd;
     };
+    [self.screatView addSubview:pwdView];
     
     IQKeyboardManager *iqMagager = [IQKeyboardManager sharedManager];
     iqMagager.keyboardDistanceFromTextField = 85;
 
-    UILabel *setLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, self.boxInputView.bottom+12, 150, 17)];
+    UILabel *setLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 55+12, 150, 17)];
     setLabel.font = UIFontMake(12);
     setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
     setLabel.text = KTVLocalizedString(@"请设置4位数房间密码");
@@ -232,12 +204,10 @@
 
 - (void)itemBtnClickEvent:(UIButton *)sender {
     if (sender.tag == 0) {
-//        self.publicBtn.selected = !self.publicBtn.selected;
         self.screatBtn.selected = NO;
         self.publicBtn.selected = YES;
         self.addRoomModel.isPrivate = NO;
     }else{
-//        self.screatBtn.selected = !self.screatBtn.selected;
         self.publicBtn.selected = NO;
         self.screatBtn.selected = YES;
         self.addRoomModel.isPrivate = YES;
