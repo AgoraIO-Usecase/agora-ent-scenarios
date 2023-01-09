@@ -11,12 +11,14 @@ import SwiftyBeaver
 
 @objc class KTVLog: NSObject {
     fileprivate static let log: SwiftyBeaver.Type = {
-        let log = AgoraEngLog.createLog(moduleName: "KTV")
+        let config = AgoraEntLogConfig()
+        config.sceneName = "KTV"
+        let log = AgoraEntLog.createLog(config: config)
         return log
     }()
 
     @objc static func error(text: String,
-                                tag: String? = nil) {
+                            tag: String? = nil) {
         log.error(text, context: tag)
     }
 
