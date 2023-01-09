@@ -70,6 +70,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private SongDialog mChooseSongDialog;
     private SongDialog mChorusSongDialog;
 
+    // 房间存活时间，单位ms
+    private CommonDialog timeUpExitDialog;
+    private long ROOM_AVAILABLE_DURATION = 20 * 60 * 1000;// 20min
+    private Runnable timerRoomEndRun = () -> {
+        showTimeUpExitDialog();
+    };
+
 
     public static void launch(Context context, JoinRoomOutputModel roomInfo) {
         Intent intent = new Intent(context, RoomLivingActivity.class);
@@ -203,6 +210,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             setPlayerBgFromMsg(0);
         }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+
+        // 定时删除房间
+        if (roomLivingViewModel.isRoomOwner()) {
+            getBinding().getRoot().postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION);
+        }
     }
 
     @Override
@@ -446,6 +458,30 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         return surfaceView;
     }
 
+    private void showTimeUpExitDialog() {
+        if (timeUpExitDialog == null) {
+            timeUpExitDialog = new CommonDialog(this);
+
+            if (roomLivingViewModel.isRoomOwner()) {
+                timeUpExitDialog.setDialogTitle(getString(R.string.exit_room));
+                timeUpExitDialog.setDescText(getString(R.string.time_up_exit_room));
+            } else {
+                timeUpExitDialog.setDialogTitle(getString(R.string.exit_room));
+                timeUpExitDialog.setDescText(getString(R.string.expire_exit_room));
+            }
+            timeUpExitDialog.setDialogBtnText(getString(R.string.ktv_confirm), "");
+            timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
+                @Override
+                public void onLeftButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
+
+                @Override
+                public void onRightButtonClick() {}
+            });
+        }
+        timeUpExitDialog.show();
+    }
 
     private void showExitDialog() {
         if (exitDialog == null) {

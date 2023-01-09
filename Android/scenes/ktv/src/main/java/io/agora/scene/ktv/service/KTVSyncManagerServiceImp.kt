@@ -194,6 +194,7 @@ class KTVSyncManagerServiceImp(
                         { ret ->
                             val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
                             val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
+                            innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
                             innerAddUserIfNeed { addUserError, userSize ->
                                 if (addUserError != null) {

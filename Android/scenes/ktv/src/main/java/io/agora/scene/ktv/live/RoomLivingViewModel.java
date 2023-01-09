@@ -159,7 +159,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void init() {
         if (isRoomOwner()) {
             // 房主开启倒计时，默认为在麦上状态
-            startExitRoomTimer();
             isOnSeat = true;
         }
         initRTCPlayer();
@@ -188,7 +187,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             RtcEngineEx.destroy();
             mRtcEngine = null;
         }
-        mCountDownLatch = null;
     }
 
     // ======================= 房间相关 =======================
@@ -250,25 +248,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             }
             return null;
         });
-    }
-
-    /**
-     * 房主退出房间倒计时（20分钟）
-     */
-    private CountDownTimer mCountDownLatch;
-    public void startExitRoomTimer() {
-        if (mCountDownLatch != null) mCountDownLatch.cancel();
-        mCountDownLatch = new CountDownTimer(20 * 60 * 1000, 20 * 60 * 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                ToastUtils.showToast("体验时间已耗尽，自动离开房间");
-                exitRoom();
-            }
-        }.start();
     }
 
     /**
