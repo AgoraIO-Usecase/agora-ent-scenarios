@@ -1,28 +1,32 @@
 package io.agora.scene.voice.ui.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+
 import java.util.HashMap;
 import java.util.Map;
-import io.agora.voice.baseui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.scene.voice.R;
-import io.agora.voice.network.tools.bean.VMemberBean;
 
-public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBean> {
+import io.agora.scene.voice.R;
+import io.agora.scene.voice.model.VoiceMemberModel;
+import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.voice.common.utils.LogTools;
+
+public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;
     private Map<String,Boolean> checkMap = new HashMap<>();
 
     @Override
-    public RoomBaseRecyclerViewAdapter.ViewHolder<VMemberBean> getViewHolder(ViewGroup parent, int viewType) {
+    public RoomBaseRecyclerViewAdapter.ViewHolder<VoiceMemberModel> getViewHolder(ViewGroup parent, int viewType) {
         return new inviteViewHolder(LayoutInflater.from (parent.getContext()).inflate (R.layout.voice_item_hands_raised, parent, false));
     }
 
-    public class inviteViewHolder extends ViewHolder<VMemberBean> {
+    public class inviteViewHolder extends ViewHolder<VoiceMemberModel> {
         private ShapeableImageView avatar;
         private MaterialTextView name;
         private MaterialTextView action;
@@ -32,25 +36,25 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBe
         }
 
         @Override
-        public void setData(VMemberBean item, int position) {
+        public void setData(VoiceMemberModel item, int position) {
             int resId = 0;
             try {
                 resId = mContext.getResources().getIdentifier(item.getPortrait(), "drawable", mContext.getPackageName());
             }catch (Exception e){
-                Log.e("getResources()", e.getMessage());
+                LogTools.e("getResources()", e.getMessage());
             }
             if (resId != 0){
                 avatar.setImageResource(resId);
             }
-            name.setText(item.getName());
+            name.setText(item.getNickName());
             action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (listener != null)
-                        listener.onItemActionClick(view,position,item.getUid());
+                        listener.onItemActionClick(view,position,item.getChatUid());
                 }
             });
-            if (checkMap.containsKey(item.getUid())){
+            if (checkMap.containsKey(item.getChatUid())){
                 action.setText(mContext.getString(R.string.voice_room_invited));
                 action.setBackgroundResource(R.drawable.voice_bg_rect_radius20_grey);
                 action.setEnabled(false);
@@ -79,7 +83,12 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VMemberBe
     }
 
     public void setInvited(Map<String,Boolean> inviteData){
-        this.checkMap = inviteData;
+        checkMap.putAll(inviteData);
+        notifyDataSetChanged();
+    }
+
+    public void removeInvited(String chatUid){
+        checkMap.remove(chatUid);
         notifyDataSetChanged();
     }
 

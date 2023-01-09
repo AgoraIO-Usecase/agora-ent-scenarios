@@ -31,6 +31,7 @@
     <string name="voice_room_create_ktv_room">KTV</string>
     <string name="voice_room_create_tips">请输入4位数密码</string>
     <string name="voice_room_check_password">密码错误，请重试</string>
+    <string name="voice_room_create_error">创建房间失败</string>
 
     <string name="voice_room_empty_data">暂无房间</string>
     <string name="voice_room_list_title_private">私密</string>
@@ -61,6 +62,7 @@
     <string name="voice_dialog_gift_total_count">贡献总计:%1$s</string>
     <string name="voice_chatroom_gift_title">打赏</string>
     <string name="voice_chatroom_gift_dialog_send">发送</string>
+    <string name="voice_gift_sent">赠送 </string>
 
     <string name="voice_chatroom_send_gift_fail">礼物发送失败</string>
     <string name="voice_chatroom_create_tip1">本应用为测试产品，请勿商用</string>
@@ -219,4 +221,9 @@
 
     <string name="voice_room_input_chat_title">⼀起语聊吧</string>
     <string name="voice_room_system_msg_member_add">加入</string>
+    <string name="voice_room_login_exception">登录异常</string>
+    <string name="voice_room_unavailable_tip">房间不存在，请刷新列表重试</string>
+    <string name="voice_room_content_prohibited">内容禁止发送</string>
+    <string name="voice_room_send_tip">发送</string>
+    <string name="voice_room_name_rule">房间名不合规</string>
 </resources>

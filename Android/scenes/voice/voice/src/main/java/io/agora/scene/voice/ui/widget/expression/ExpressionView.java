@@ -14,7 +14,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 
 import java.util.Arrays;
 
-import io.agora.voice.buddy.tool.DeviceTools;
+import io.agora.voice.common.utils.DeviceTools;
 import io.agora.scene.voice.R;
 
 public class ExpressionView extends LinearLayoutCompat {

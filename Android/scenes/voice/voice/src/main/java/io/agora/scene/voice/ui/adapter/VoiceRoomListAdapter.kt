@@ -4,10 +4,10 @@ import android.content.Context
 import android.view.View
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomItemLayoutBinding
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.buddy.tool.ImageTools
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.utils.ImageTools
 
 class VoiceRoomListAdapter constructor(
     dataList: List<VoiceRoomModel>?,

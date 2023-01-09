@@ -6,7 +6,6 @@
 #import "VLKTVBottomView.h"
 #import "VLHotSpotBtn.h"
 #import "VLUserCenter.h"
-#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "AppContext+KTV.h"
@@ -71,21 +70,22 @@ typedef void (^actionSuccess)(BOOL ifSuccess);
     [heChangeBtn setImage:[UIImage sceneImageWithName:@"ktv_hechang_icon"] forState:UIControlStateNormal];
     [heChangeBtn addTarget:self action:@selector(bottomBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:heChangeBtn];
+    heChangeBtn.enabled = NO;
     
     for (VLRoomSeatModel *info in self.seatsArray) {
         if ([info.rtcUid integerValue] == [VLUserCenter.user.id integerValue]) {
             //is self
             //TODO
-            self.isSelfMuted = info.isSelfMuted;
+            self.isSelfMuted = info.isAudioMuted;
             self.isVideoMuted = info.isVideoMuted;
 
-            if (info.isSelfMuted == 0) {
+            if (!info.isAudioMuted) {
                 [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_audio_icon"] forState:UIControlStateNormal];
             }
             else{
                 [self.audioBtn setImage:[UIImage sceneImageWithName:@"ktv_self_muteIcon"] forState:UIControlStateNormal];
             }
-            if (info.isVideoMuted == 1) {
+            if (!info.isVideoMuted) {
                 [self.videoBtn setImage:[UIImage sceneImageWithName:@"ktv_video_icon"] forState:UIControlStateNormal];
             }
             else{

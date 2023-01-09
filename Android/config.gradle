@@ -12,7 +12,7 @@ ext {
     glide_version = '4.11.0'
     retrofit2_version = '2.6.3'
     deps = [
-            appcompat         : 'androidx.appcompat:appcompat:1.2.0',
+            appcompat         : 'androidx.appcompat:appcompat:1.4.1',
             annotation        : 'androidx.annotation:annotation:1.5.0',
             arouter_kapt      : 'com.alibaba:arouter-compiler:1.5.2',
             arouter           : 'com.alibaba:arouter-api:1.5.2',
@@ -35,13 +35,15 @@ ext {
             okhttp_logger     : 'com.squareup.okhttp3:logging-interceptor:4.10.0',
 
             lifecycle         : 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1',
-            fragment_ktx      : 'androidx.navigation:navigation-fragment-ktx:2.4.2',
-            ui_ktx            : 'androidx.navigation:navigation-ui-ktx:2.4.2',
+            lifecycle_runtime : 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1',
+            fragment_ktx      : 'androidx.navigation:navigation-fragment-ktx:2.4.1',
+            ui_ktx            : 'androidx.navigation:navigation-ui-ktx:2.4.1',
             palette_ktx       : 'androidx.palette:palette-ktx:1.0.0',
             layout_kernel     : 'com.scwang.smart:refresh-layout-kernel:2.0.3',
             header_classics   : 'com.scwang.smart:refresh-header-classics:2.0.3',
 
             xlog              : 'com.elvishew:xlog:1.6.1',
+            logger            : 'com.orhanobut:logger:2.2.0',
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
@@ -50,11 +52,10 @@ ext {
             rtc_screen_sharing: 'io.agora.rtc:full-screen-sharing:4.0.1.4',
             rtm               : 'com.github.agorabuilder:rtm-sdk:1.4.10',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.1.4',
-            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.0.10',
+            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.0.20',
 
             // android native libraries
             core_ktx           : "androidx.core:core-ktx:1.7.0",
-            core               : "androidx.core:core:1.7.0",
             recyclerview       : "androidx.recyclerview:recyclerview:1.2.1",
             databinding_runtime: "androidx.databinding:databinding-runtime:4.2.2",
 
@@ -65,6 +66,7 @@ ext {
             agora_im           : 'io.agora.rtm:rtm-sdk:1.5.0',
             bugly              : 'com.tencent.bugly:crashreport:4.0.4',
             svga_player        : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
+            agora_chat         : 'io.agora.rtc:chat-sdk:1.0.8',
     ]
     android = [
             compileSdkVersion: 31,

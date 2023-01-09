@@ -1,7 +1,6 @@
 package io.agora.scene.voice.ui.widget.gift;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +16,13 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.List;
 
 import io.agora.scene.voice.R;
-import io.agora.scene.voice.bean.GiftBean;
 import io.agora.scene.voice.databinding.VoiceDialogGiftLayoutBinding;
 import io.agora.scene.voice.databinding.VoicePopGiftLayoutBinding;
-import io.agora.voice.baseui.dialog.BaseSheetDialog;
-import io.agora.voice.baseui.popupwindow.CommonPopupWindow;
-import io.agora.voice.buddy.tool.DeviceTools;
+import io.agora.scene.voice.model.GiftBean;
+import io.agora.voice.common.ui.dialog.BaseSheetDialog;
+import io.agora.voice.common.ui.widget.CommonPopupWindow;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.LogTools;
 
 public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBinding> implements View.OnClickListener {
     private int currentIndex = 0;//当前页面,默认首页
@@ -88,7 +88,7 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         binding.send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (giftBean != null && listener != null)
+                if (giftBean != null && listener != null && giftBean.isChecked())
                     listener.SendGift(v, giftBean);
             }
         });
@@ -141,7 +141,7 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
      * @param count        要添加多少个小圆点
      */
     public void addViewPagerDots(LinearLayoutCompat llGuideGroup, int count) {
-        Log.e("addViewPagerDots", "count: " + count);
+        LogTools.e("addViewPagerDots", "count: " + count);
         if (llGuideGroup == null || count < 1 || getContext() == null) return;
         LinearLayoutCompat.LayoutParams lp = new LinearLayoutCompat.LayoutParams(
                 DeviceTools.dp2px(getContext(), 5), DeviceTools.dp2px(getContext(), 5));
@@ -170,13 +170,13 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         itemView.getLocationInWindow(location);
         if (getContext() != null) {
             new CommonPopupWindow.ViewDataBindingBuilder<VoicePopGiftLayoutBinding>()
+                    .viewDataBinding(VoicePopGiftLayoutBinding.inflate(LayoutInflater.from(getContext())))
                     .width(DeviceTools.dp2px(getContext(), 120))
                     .height(DeviceTools.dp2px(getContext(), 186))
                     .outsideTouchable(true)
                     .focusable(true)
                     .clippingEnabled(false)
                     .alpha(0.618f)
-                    .layoutId(getContext(), R.layout.voice_pop_gift_layout)
                     .intercept((popupWindow, view) -> {
                         isShowPop(true);
                         String[] data = {"999", "599", "199", "99", "9", "1"};

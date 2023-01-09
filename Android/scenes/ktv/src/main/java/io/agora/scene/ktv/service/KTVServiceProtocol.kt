@@ -1,8 +1,7 @@
 package io.agora.scene.ktv.service
 
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
-
+import io.agora.scene.ktv.KTVLogger
 
 interface KTVServiceProtocol {
 
@@ -16,21 +15,21 @@ interface KTVServiceProtocol {
         private val instance by lazy {
             // KTVServiceImp()
             KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { ToastUtils.showToast(it) }
+                error?.message?.let { KTVLogger.e("SyncManager", it) }
             }
         }
 
         fun getImplInstance(): KTVServiceProtocol = instance
     }
 
+    fun reset()
+
     // ============== 房间相关 ==============
 
     /**
      * 获取房间列表
      */
-    fun getRoomList(
-        completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
-    )
+    fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 
     /**
      * 创建房间
@@ -78,6 +77,13 @@ interface KTVServiceProtocol {
 
 
     // ===================== 麦位相关 =================================
+
+    /**
+     * 获取麦位列表
+     */
+    fun getSeatStatusList(
+        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
+    )
 
     /**
      * 上麦

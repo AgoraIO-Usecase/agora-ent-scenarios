@@ -2,14 +2,14 @@ package io.agora.scene.voice.ui.adapter
 
 import android.view.View
 import android.widget.ImageView
-import io.agora.voice.buddy.tool.DeviceTools
-import io.agora.voice.buddy.tool.ResourcesTools
-import io.agora.scene.voice.bean.SoundSelectionBean
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.ResourcesTools
+import io.agora.scene.voice.model.SoundSelectionBean
 import androidx.appcompat.widget.LinearLayoutCompat
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemSoundSelectionBinding
-import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.baseui.adapter.OnItemClickListener
+import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 
 class VoiceRoomSoundSelectionAdapter constructor(
     dataList: List<SoundSelectionBean>,

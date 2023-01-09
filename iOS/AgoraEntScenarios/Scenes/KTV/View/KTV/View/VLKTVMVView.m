@@ -21,7 +21,7 @@
 @import Masonry;
 
 @class QMUIButton;
-@interface VLKTVMVView () < AgoraLrcDownloadDelegate,VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () <VLNoBodyOnLineViewDelegate,VLRobMicrophoneViewDelegate,VLSoloSongViewDelegate,AgoraKaraokeScoreDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -42,10 +42,11 @@
 @property (nonatomic, strong) NSTimer *robMicroPhoneTimer; //抢麦倒计时
 
 @property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
-@property (nonatomic, assign) VLKTVMVViewActionType singType;
 @property (nonatomic, assign) int totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) double currentTime;
+
+@property (nonatomic, assign) BOOL isPlayAccompany;
 @end
 
 @implementation VLKTVMVView
@@ -54,11 +55,18 @@
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         [self setupView];
-        self.singType = VLKTVMVViewActionTypeSingOrigin;
         self.currentTime = 0;
     }
     return self;
 }
+
+#pragma setter
+- (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
+    [self.originBtn setSelected:!isPlayAccompany];
+    [self _refreshOriginButton];
+}
+
+#pragma mark private
 
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
@@ -121,6 +129,17 @@
     [self setPlayerViewsHidden:YES nextButtonHidden:YES];
 }
 
+- (void)_refreshOriginButton {
+    if (self.originBtn.selected) {
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
+    }
+    else {
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
+        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
+    }
+}
+
 #pragma mark - public
 
 - (void)updateMVPlayerState:(VLKTVMVViewActionType)state {
@@ -136,10 +155,7 @@
 }
 
 - (void)setVoicePitch:(NSArray <NSNumber *> *)pitch {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.lrcView setVoicePitch:pitch];
-    });
-    
+    [self.lrcView setVoicePitch:pitch];    
 }
 
 #pragma mark - Action
@@ -376,50 +392,12 @@
 
 - (void)originClick:(UIButton *)button {
     button.selected = !button.selected;
-    self.singType = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
-    if (button.selected) {
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"原唱") forState:UIControlStateSelected];
-    }
-    else {
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateNormal];
-        [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
-    }
+    VLKTVMVViewActionType origin = button.selected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+    [self _refreshOriginButton];
     
-    [self validateSingType];
-}
-
-- (void)validateSingType
-{
     if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
-        [self.delegate onKTVMVView:self btnTappedWithActionType:self.singType];
+        [self.delegate onKTVMVView:self btnTappedWithActionType:origin];
     }
-}
-
-#pragma mark - AgoraLrcDownloadDelegate
-
-- (void)beginDownloadLrcWithUrl:(NSString *)url {
-    VLLog(@"\n歌词开始下载\n%@",url);
-}
-
-- (void)downloadLrcFinishedWithUrl:(NSString *)url {
-    VLLog(@"\n歌词下载完成\n%@",url);
-}
-
-- (void)downloadLrcProgressWithUrl:(NSString *)url progress:(double)progress {
-    VLLog(@"\n歌词下载进度\n%@,%f",url,progress);
-}
-
-- (void)downloadLrcErrorWithUrl:(NSString *)url error:(NSError *)error {
-    VLLog(@"\n歌词下载失败\n%@\n%@",url,error);
-}
-
-- (void)beginParseLrc {
-    VLLog(@"歌词开始解析");
-}
-
-- (void)parseLrcFinished {
-    VLLog(@"歌词解析完成");
 }
 
 #pragma mark - AgoraKaraokeScoreDelegate
@@ -463,8 +441,6 @@
 
 - (void)start {
     [_lrcView start];
-    self.totalLines = 0;
-    self.totalScore = 0.0f;
 }
 
 - (void)stop {
@@ -473,6 +449,9 @@
 
 - (void)reset {
     [_lrcView reset];
+    [self setSongScore:0];
+    self.isPlayAccompany = NO;
+    [self cleanMusicText];
 }
 
 - (void)resetTime {
@@ -500,7 +479,7 @@
         // 评分组件配置
         AgoraScoreItemConfigModel *scoreConfig = [[AgoraScoreItemConfigModel alloc] init];
         scoreConfig.tailAnimateColor = [UIColor yellowColor];
-        scoreConfig.scoreViewHeight = 59; // 评分视图高度
+        scoreConfig.scoreViewHeight = 100; // 评分视图高度
         scoreConfig.emitterColors = @[[UIColor purpleColor]];
         scoreConfig.isHiddenSeparatorLine = NO;
         scoreConfig.separatorLineColor = [UIColor whiteColor];
@@ -523,8 +502,8 @@
 
 - (AgoraLrcScoreView *)lrcView {
     if (!_lrcView) {
-        _lrcView = [[AgoraLrcScoreView alloc] initWithDelegate:self];
-        _lrcView.downloadDelegate = self;
+        _lrcView = [[AgoraLrcScoreView alloc] initWithDelegate:_delegate];
+        _lrcView.downloadDelegate = _delegate;
         _lrcView.backgroundColor = [UIColor clearColor];
         _lrcView.scoreDelegate = self;
         _lrcView.clipsToBounds = YES;

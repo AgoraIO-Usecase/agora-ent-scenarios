@@ -1,28 +1,26 @@
 package io.agora.scene.voice.ui.widget.primary;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentActivity;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +29,14 @@ import io.agora.scene.voice.R;
 import io.agora.scene.voice.ui.widget.expression.ExpressionIcon;
 import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.LogTools;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionView.ExpressionClickListener {
 
-    protected Activity activity;
+    protected FragmentActivity activity;
     protected InputMethodManager inputManager;
     private LinearLayoutCompat inputLayout;
     private LinearLayoutCompat menuLayout;
@@ -42,7 +44,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     private Map<Integer, MenuItemModel> itemMap = new HashMap();
     private MenuItemClickListener clickListener;
     private ConstraintLayout inputView;
-    private EditText edContent;
+    private AppCompatEditText edContent;
     private ImageView icon;
     private TextView mSend;
     private boolean isShowEmoji;
@@ -54,6 +56,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     private int mWindowHeight,mExpressionHeight = 0;
     private boolean isSoftShowing;
     private Window window;
+    private View mKeyboardBg;
 
 
     public ChatPrimaryMenuView(Context context) {
@@ -66,7 +69,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public ChatPrimaryMenuView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        activity = (Activity) context;
+        activity = (FragmentActivity) context;
         if (activity !=null) window = activity.getWindow();
         view = LayoutInflater.from(context).inflate(R.layout.voice_widget_primary_menu_layout, this);
         inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -82,8 +85,10 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         mSend = findViewById(R.id.input_send);
         normalLayout = findViewById(R.id.normal_layout);
         expressionView = findViewById(R.id.expression_view);
+        mKeyboardBg = findViewById(R.id.vKeyboardBg);
+        mSend.setText(R.string.voice_room_send_tip);
         if (window != null)
-        rootView = window.getDecorView().findViewById(android.R.id.content);
+            rootView = window.getDecorView().findViewById(android.R.id.content);
 
         expressionView.setExpressionListener(this);
         expressionView.init(7);
@@ -92,24 +97,38 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    Log.d("focus", "focused");
-                    if (null != clickListener)
-                        clickListener.onInputViewFocusChange(true);
+                    LogTools.d("focus", "focused");
                 } else {
-                    Log.d("focus", "focus lost");
-                    if (null != clickListener)
-                        clickListener.onInputViewFocusChange(false);
-                    inputView.setVisibility(View.GONE);
+                    LogTools.d("focus", "focus lost");
+                    if (!isShowEmoji)
+                        inputView.setVisibility(View.GONE);
                 }
             }
         });
+
+        edContent.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                        // done stuff
+                        sendMessage();
+                        break;
+                    case EditorInfo.IME_ACTION_NEXT:
+                        // next stuff
+                        break;
+                }
+                return false;
+            }
+        });
+
         inputLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 inputView.setVisibility(View.VISIBLE);
                 edContent.requestFocus();
                 showInputMethod(edContent);
-                SoftShowing(true);
                 expressionView.setVisibility(View.INVISIBLE);
                 inputLayout.setVisibility(GONE);
                 inputLayout.setEnabled(false);
@@ -125,93 +144,50 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                 isShowEmoji = !isShowEmoji;
                 SoftShowing(isShowEmoji);
                 checkShowExpression(isShowEmoji);
-                if (null != clickListener)
-                    clickListener.onEmojiClick(isShowEmoji);
             }
         });
         mSend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != clickListener)
-                    clickListener.onSendMessage(edContent.getText().toString().trim());
-                edContent.setText("");
-                hideKeyboard();
-                inputView.setVisibility(View.GONE);
-                normalLayout.setVisibility(View.VISIBLE);
-                menuLayout.setVisibility(View.VISIBLE);
-                inputLayout.setVisibility(View.VISIBLE);
-                inputLayout.setEnabled(true);
-                hideExpressionView(false);
-
+                sendMessage();
             }
         });
 
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        new KeyboardStatusWatcher(activity, activity, new Function2<Boolean, Integer, Unit>() {
             @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                //获取当前窗口实际的可见区域
-                rootView.getWindowVisibleDisplayFrame(r);
-                int height = r.height();
-                int rootWidth = r.width();
-                if (mWindowHeight == 0) {
-                    //一般情况下，这是原始的窗口高度
-                    mWindowHeight = height;
-                    setViewLayoutParams(expressionView,rootWidth,0);
-//                    System.out.println("SoftKeyboard height0 = " + 0);
-                } else {
-                    if (softKeyHeight == 0){
-                        softKeyHeight = 765;
-                    }
-//                    Log.e("onGlobalLayout","softKeyHeight: " + softKeyHeight);
-                    if (mWindowHeight != height) {
-                        Log.e("ChatPrimaryMenuView","checkDeviceHasNavigationBar: " +  checkDeviceHasNavigationBar(activity));
-                        Log.e("ChatPrimaryMenuView","getNavigationBarHeight: " + getNavigationBarHeight(activity));
-                        if (checkDeviceHasNavigationBar(activity)){
-                            if (getNavigationBarHeight(activity) > 100){
-                                //两次窗口高度相减，就是软键盘高度
-                                softKeyHeight = mWindowHeight - height - getNavigationBarHeight(activity);
-                            }else {
-                                //两次窗口高度相减，就是软键盘高度
-                                softKeyHeight = mWindowHeight - height;
-                            }
-                            isSoftShowing = true;
-                        }else {
-                            softKeyHeight = 765;
-                        }
-//                        System.out.println("SoftKeyboard height1 = " + softKeyHeight);
-                        setViewLayoutParams(expressionView,rootWidth,softKeyHeight);
-                    }
-                    else {
-                        isSoftShowing = false;
-                        if (!isShowEmoji){
-                            setViewLayoutParams(expressionView,rootWidth,0);
-                        }else {
-                            setViewLayoutParams(expressionView,rootWidth,softKeyHeight);
-                        }
-//                        System.out.println("SoftKeyboard height2 = " + 0);
+            public Unit invoke(Boolean isKeyboardShowed, Integer keyboardHeight) {
+                LogTools.e("KeyboardStatusWatcher"," isKeyboardShowed: " + isKeyboardShowed + " keyboardHeight: "+ keyboardHeight);
+                ViewGroup.LayoutParams lp = mKeyboardBg.getLayoutParams();
+                if (isKeyboardShowed){
+                    lp.height = keyboardHeight;
+                    softKeyHeight = keyboardHeight;
+                }else {
+                    if (!isShowEmoji){
+                        lp.height = DeviceTools.dp2px(activity,55);
+                        showNormalLayout();
                     }
                 }
+                mKeyboardBg.setLayoutParams(lp);
+                return null;
             }
         });
     }
 
     public static void setViewLayoutParams(View view,int width,int height){
         ViewGroup.LayoutParams lp = view.getLayoutParams();
-//        Log.e("setViewLayoutParams","\n lp.height: " + lp.height +  "\n height: "+ height + "\n lp.width" +lp.width + "\n width:" +width );
-        if (lp.height != height || lp.width != width){
-            lp.width = width;
-            lp.height = height;
-            view.setLayoutParams(lp);
-        }
+        lp.width = width;
+        lp.height = height;
+        view.setLayoutParams(lp);
     }
 
     public void SoftShowing(boolean isShowEmoji){
-        Log.e("MenuView","SoftShowing: " + isShowEmoji);
+        LogTools.e("MenuView","SoftShowing: " + isShowEmoji);
         if (isShowEmoji){
+            LogTools.e("KeyboardStatusWatcher","SoftShowing softKeyHeight: " + softKeyHeight);
             setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
+            setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
         }else {
-            setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,0);
+            setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,DeviceTools.dp2px(activity,55));
         }
     }
 
@@ -219,9 +195,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         registerMenuItem(drawableRes,itemId);
         if(!itemMap.containsKey(itemId)) {
             ImageView imageView = new ImageView(activity);
-            imageView.setLayoutParams(new LayoutParams(dp2px(activity,38), dp2px(activity,38)));
-            imageView.setPadding(dp2px(activity,7),dp2px(activity,7)
-                    ,dp2px(activity,7),dp2px(activity,7));
+            imageView.setLayoutParams(new LayoutParams(DeviceTools.dp2px(activity,38), DeviceTools.dp2px(activity,38)));
+            imageView.setPadding(DeviceTools.dp2px(activity,7),DeviceTools.dp2px(activity,7)
+                    ,DeviceTools.dp2px(activity,7),DeviceTools.dp2px(activity,7));
             imageView.setImageResource(drawableRes);
             imageView.setBackgroundResource(R.drawable.voice_bg_primary_menu_item_icon);
             imageView.setId(itemId);
@@ -229,7 +205,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                 @Override
                 public void onClick(View v) {
                     if (null != clickListener)
-                    clickListener.onChatExtendMenuItemClick(v.getId(),v);
+                        clickListener.onChatExtendMenuItemClick(v.getId(),v);
                 }
             });
             menuLayout.addView(imageView);
@@ -237,7 +213,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void initMenu(int roomType) {
-        Log.e("initMenu","roomType: " + roomType);
+        LogTools.e("initMenu","roomType: " + roomType);
         if (roomType == 0){
             normalLayout.setVisibility(VISIBLE);
             registerMenuItem(R.drawable.voice_icon_close_mic,R.id.voice_extend_item_mic);
@@ -259,17 +235,17 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     private void addView(){
         for (MenuItemModel itemModel : itemModels) {
             ImageView imageView = new ImageView(activity);
-            LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(dp2px(activity,38), dp2px(activity,38));
-            marginLayoutParams.leftMargin = dp2px(activity,5);
-            marginLayoutParams.setMarginStart(dp2px(activity,5));
-            imageView.setPadding(dp2px(activity,4),dp2px(activity,7)
-                    ,dp2px(activity,5),dp2px(activity,7));
+            LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(DeviceTools.dp2px(activity,38), DeviceTools.dp2px(activity,38));
+            marginLayoutParams.leftMargin = DeviceTools.dp2px(activity,5);
+            marginLayoutParams.setMarginStart(DeviceTools.dp2px(activity,5));
+            imageView.setPadding(DeviceTools.dp2px(activity,4),DeviceTools.dp2px(activity,7)
+                    ,DeviceTools.dp2px(activity,5),DeviceTools.dp2px(activity,7));
             imageView.setImageResource(itemModel.image);
             imageView.setBackgroundResource(R.drawable.voice_bg_primary_menu_item_icon);
             imageView.setId(itemModel.id);
 
             if (itemModel.id == R.id.voice_extend_item_gift){
-                marginLayoutParams.setMarginEnd(dp2px(activity,0));
+                marginLayoutParams.setMarginEnd(DeviceTools.dp2px(activity,0));
             }
             imageView.setLayoutParams(marginLayoutParams);
             imageView.setOnClickListener(new OnClickListener() {
@@ -281,16 +257,16 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             });
             if (itemModel.id == R.id.voice_extend_item_hand_up){
                 RelativeLayout relativeLayout = new RelativeLayout(activity);
-                relativeLayout.setLayoutParams(new LayoutParams(dp2px(activity,42), dp2px(activity,38)));
+                relativeLayout.setLayoutParams(new LayoutParams(DeviceTools.dp2px(activity,42), DeviceTools.dp2px(activity,38)));
 
                 ImageView status = new ImageView(activity);
                 status.setId(R.id.voice_extend_item_hand_up_status);
                 status.setImageResource(R.drawable.voice_bg_primary_hand_status);
                 status.setVisibility(GONE);
 
-                LayoutParams imgLayout = new LayoutParams(
-                        LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams imgLayout = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
                 imgLayout.addRule(RelativeLayout.ALIGN_PARENT_TOP | ALIGN_PARENT_RIGHT);
                 imgLayout.setMargins(0,18,18,0);
                 relativeLayout.addView(imageView, marginLayoutParams);
@@ -363,13 +339,13 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     /**
-         * register menu item
-         *
-         * @param drawableRes
-         *            background of item
-         * @param itemId
-         *             id
-         */
+     * register menu item
+     *
+     * @param drawableRes
+     * background of item
+     * @param itemId
+     *             id
+     */
     public void registerMenuItem( int drawableRes, int itemId) {
         if(!itemMap.containsKey(itemId)) {
             MenuItemModel item = new MenuItemModel();
@@ -399,9 +375,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm!=null && activity.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            Log.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+            LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
             if (activity.getCurrentFocus() != null){
-                Log.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
+                LogTools.e("MenuView","hideKeyboard" + activity.getCurrentFocus());
                 imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
@@ -433,6 +409,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             expressionView.setVisibility(View.VISIBLE);
         }else {
             expressionView.setVisibility(View.GONE);
+            setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,DeviceTools.dp2px(activity,55));
         }
     }
 
@@ -440,6 +417,25 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         inputView.setVisibility(View.GONE);
         inputLayout.setVisibility(VISIBLE);
         inputLayout.setEnabled(true);
+    }
+
+    public void sendMessage(){
+        if (null != clickListener)
+            clickListener.onSendMessage(edContent.getText().toString().trim());
+        hideKeyboard();
+        showNormalLayout();
+    }
+
+    public boolean showNormalLayout(){
+        if(inputLayout.getVisibility() != View.VISIBLE){
+            edContent.setText("");
+            showInput();
+            normalLayout.setVisibility(View.VISIBLE);
+            menuLayout.setVisibility(View.VISIBLE);
+            hideExpressionView(false);
+            return true;
+        }
+        return false;
     }
 
     public static class MenuItemModel{
@@ -454,64 +450,6 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
 
     public EditText getEdContent(){
         return edContent;
-    }
-
-    public static int dp2px(Context context, float dpValue) {
-        float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-    @SuppressWarnings("unused")
-    public static int sp2px(Context context, float spValue) {
-        float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
-    }
-
-    //获取是否存在NavigationBar
-    public static boolean checkDeviceHasNavigationBar(Context context) {
-        boolean hasNavigationBar = false;
-
-        Resources rs = context.getResources();
-
-        int id = rs.getIdentifier("config_showNavigationBar", "bool", "android");
-
-        if (id > 0) {
-            hasNavigationBar = rs.getBoolean(id);
-
-        }
-
-        try {
-            Class systemPropertiesClass = Class.forName("android.os.SystemProperties");
-
-            Method m = systemPropertiesClass.getMethod("get", String.class);
-
-            String navBarOverride = (String) m.invoke(systemPropertiesClass, "qemu.hw.mainkeys");
-
-            if ("1".equals(navBarOverride)) {
-                hasNavigationBar = false;
-
-            } else if ("0".equals(navBarOverride)) {
-                hasNavigationBar = true;
-
-            }
-
-        } catch (Exception e) {
-        }
-
-        return hasNavigationBar;
-
-    }
-
-    // 获取NavigationBar高度
-    public static int getNavigationBarHeight(Context context) {
-        Resources resources = context.getResources();
-
-        int resourceId = resources.getIdentifier("navigation_bar_height","dimen", "android");
-
-        int height = resources.getDimensionPixelSize(resourceId);
-
-        return height;
-
     }
 
 }

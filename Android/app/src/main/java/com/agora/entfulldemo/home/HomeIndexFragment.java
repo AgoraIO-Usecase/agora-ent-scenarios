@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
+import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.home.constructor.ScenesConstructor;
 import com.agora.entfulldemo.home.constructor.ScenesModel;

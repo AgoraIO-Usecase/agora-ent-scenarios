@@ -10,22 +10,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.agora.scene.voice.bean.RoomKitBean
-import io.agora.scene.voice.model.RoomRankViewModel
-import io.agora.scene.voice.ui.adapter.RoomContributionRankingViewHolder
-import io.agora.voice.baseui.BaseUiFragment
-import io.agora.voice.baseui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.voice.buddy.tool.ResourcesTools
-import io.agora.voice.buddy.tool.ThreadManager
+import io.agora.scene.voice.model.RoomKitBean
+import io.agora.scene.voice.ui.adapter.viewholder.RoomContributionRankingViewHolder
+import io.agora.voice.common.ui.BaseUiFragment
+import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
-import io.agora.voice.network.tools.bean.VRGiftBean
-import io.agora.voice.network.tools.bean.VRankingMemberBean
+import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.voice.common.net.Resource
 
 class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContributionRankingBinding>(),
     OnRefreshListener {
@@ -43,12 +41,10 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
     }
 
     private var roomKitBean: RoomKitBean? = null
-    private var total = 0
-    private var isEnd = false
 
-    private lateinit var roomRankViewModel: RoomRankViewModel
+    private lateinit var roomRankViewModel: VoiceUserListViewModel
 
-    private var contributionAdapter: BaseRecyclerViewAdapter<VoiceItemContributionRankingBinding, VRankingMemberBean, RoomContributionRankingViewHolder>? =
+    private var contributionAdapter: BaseRecyclerViewAdapter<VoiceItemContributionRankingBinding, VoiceRankUserModel, RoomContributionRankingViewHolder>? =
         null
 
 
@@ -61,44 +57,34 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        roomRankViewModel = ViewModelProvider(
-            this,
-            io.agora.scene.voice.model.RoomRankViewModelFactory()
-        )[RoomRankViewModel::class.java]
+        roomRankViewModel = ViewModelProvider(this)[VoiceUserListViewModel::class.java]
 
-        arguments?.apply {
-            roomKitBean = getSerializable(KEY_ROOM_INFO) as RoomKitBean?
-            roomKitBean?.let {
-                roomRankViewModel.getGifts(requireContext(), it.roomId)
-            }
-        }
+        roomKitBean = arguments?.getSerializable(KEY_ROOM_INFO) as RoomKitBean?
         binding?.apply {
             initAdapter(rvContributionRanking)
             slContributionRanking.setOnRefreshListener(this@RoomContributionRankingFragment)
         }
-        roomRankViewModel.giftsObservable().observe(requireActivity()) { response: Resource<VRGiftBean> ->
-            parseResource(response, object : OnResourceParseCallback<VRGiftBean>() {
-                override fun onSuccess(data: VRGiftBean?) {
-                    binding?.slContributionRanking?.isRefreshing = false
-                    total = data?.ranking_list?.size ?: 0
-                    "getGifts total：${total}".logD()
-                    if (data == null) return
-                    isEnd = true
-                    checkEmpty()
-                    if (!data.ranking_list.isNullOrEmpty()) {
-                        contributionAdapter?.submitListAndPurge(data.ranking_list)
+        roomRankViewModel.fetchGiftContribute()
+        roomRankViewModel.contributeListObservable()
+            .observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
+                parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
+                    override fun onSuccess(data: List<VoiceRankUserModel>?) {
+                        binding?.slContributionRanking?.isRefreshing = false
+                        val total = data?.size ?: 0
+                        "getGifts total：$total".logD()
+                        checkEmpty(total)
+                        contributionAdapter?.submitListAndPurge(data ?: mutableListOf())
                     }
-                }
 
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    binding?.slContributionRanking?.isRefreshing = false
-                }
-            })
-        }
+                    override fun onError(code: Int, message: String?) {
+                        super.onError(code, message)
+                        binding?.slContributionRanking?.isRefreshing = false
+                    }
+                })
+            }
     }
 
-    private fun checkEmpty() {
+    private fun checkEmpty(total: Int) {
         binding?.apply {
             if (total == 0) {
                 ivContributionEmpty.isVisible = true
@@ -112,7 +98,11 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
 
     private fun initAdapter(recyclerView: RecyclerView) {
         contributionAdapter =
-            BaseRecyclerViewAdapter(null, null, RoomContributionRankingViewHolder::class.java)
+            BaseRecyclerViewAdapter(
+                null,
+                null,
+                RoomContributionRankingViewHolder::class.java
+            )
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         context?.let {
@@ -129,14 +119,8 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceFragmentContribution
     }
 
     override fun onRefresh() {
-        if (isEnd) {
-            ThreadManager.getInstance().runOnMainThreadDelay({
-                binding?.slContributionRanking?.isRefreshing = false
-            }, 1500)
-        } else {
-            roomKitBean?.let {
-                roomRankViewModel.getGifts(requireContext(), it.roomId)
-            }
+        roomKitBean?.let {
+            roomRankViewModel.fetchGiftContribute()
         }
     }
 }

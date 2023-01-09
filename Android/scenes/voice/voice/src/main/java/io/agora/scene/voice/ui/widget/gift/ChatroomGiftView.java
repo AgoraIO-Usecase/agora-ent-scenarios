@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,12 +28,14 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
-import io.agora.scene.voice.bean.GiftBean;
-import io.agora.voice.imkit.bean.ChatMessageData;
-import io.agora.voice.imkit.custormgift.CustomMsgHelper;
-import io.agora.voice.buddy.tool.DeviceTools;
 import io.agora.scene.voice.R;
-import io.agora.voice.imkit.manager.ChatroomHelper;
+import io.agora.scene.voice.imkit.bean.ChatMessageData;
+import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
+import io.agora.scene.voice.model.GiftBean;
+import io.agora.voice.common.utils.DeviceTools;
+import io.agora.voice.common.utils.ImageTools;
+import io.agora.voice.common.utils.LogTools;
 
 
 public class ChatroomGiftView extends LinearLayout {
@@ -131,7 +132,9 @@ public class ChatroomGiftView extends LinearLayout {
 
     public void refresh() {
         adapter.refresh();
-        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        if (adapter.getItemCount() > 0){
+            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        }
         clearTiming();
     }
 
@@ -179,20 +182,22 @@ public class ChatroomGiftView extends LinearLayout {
         public void show(ShapeableImageView avatar, ImageView icon, TextView name, ChatMessageData message) {
             int resId = 0;
             String gift_id = CustomMsgHelper.getInstance().getMsgGiftId(message);
-            String userName = ChatroomHelper.getInstance().getUserName(message);
-            String userPortrait = ChatroomHelper.getInstance().getUserPortrait(message);
+            String userName = ChatroomIMManager.getInstance().getUserName(message);
+            String userPortrait = ChatroomIMManager.getInstance().getUserPortrait(message);
             GiftBean giftBean = GiftRepository.getGiftById(context, gift_id);
             try {
                 resId = context.getResources().getIdentifier(userPortrait, "drawable", context.getPackageName());
             } catch (Exception ignored) {
-                Log.e("getResources()", ignored.getMessage());
+                LogTools.e("getResources()", ignored.getMessage());
             }
             if (resId != 0) {
                 avatar.setImageResource(resId);
+            }else {
+                ImageTools.loadImage(avatar, userPortrait);
             }
             StringBuilder builder = new StringBuilder();
             if (null != giftBean) {
-                builder.append(!TextUtils.isEmpty(userName) ? userName : message.getFrom()).append(":").append("\n").append("sent ").append(giftBean.getName());
+                builder.append(!TextUtils.isEmpty(userName) ? userName : message.getFrom()).append(":").append("\n").append(context.getString(R.string.voice_gift_sent)).append(" ").append(giftBean.getName());
                 icon.setImageResource(giftBean.getResource());
             }
             SpannableString span = new SpannableString(builder.toString());
@@ -201,8 +206,12 @@ public class ChatroomGiftView extends LinearLayout {
 
         @Override
         public int getItemCount() {
-            Log.e("gift_view", "messages.size()" + messages.size());
-            return messages.size();
+            if (messages != null && messages.size()>0){
+                LogTools.e("gift_view", "messages.size()" + messages.size());
+                return messages.size();
+            }else {
+                return 0;
+            }
         }
 
 
@@ -218,9 +227,9 @@ public class ChatroomGiftView extends LinearLayout {
 
         public void refresh() {
             int positionStart = messages.size();
-            Log.e("room_refresh", "positionStart1 " + positionStart);
+            LogTools.e("room_refresh", "positionStart1 " + positionStart);
             messages.addAll(CustomMsgHelper.getInstance().getGiftData(chatroomId));
-            Log.e("room_refresh", messages.size() + " positionStart: " + positionStart);
+            LogTools.e("room_refresh", messages.size() + " positionStart: " + positionStart);
             if (messages.size() > 0) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override

@@ -1,7 +1,9 @@
 package io.agora.scene.voice.ui.activity
 
-import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
@@ -16,30 +18,28 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.alibaba.android.arouter.launcher.ARouter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
-import io.agora.CallBack
 import io.agora.scene.voice.R
-import io.agora.scene.voice.bean.PageBean
 import io.agora.scene.voice.databinding.VoiceActivityCreateRoomLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterParams
-import io.agora.voice.buddy.config.RouterPath
-import io.agora.voice.buddy.tool.DeviceTools.dp2px
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools.show
-import io.agora.voice.imkit.manager.ChatroomHelper
+import io.agora.scene.voice.model.PageBean
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.FastClickTools.isFastClick
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBinding>() {
@@ -58,7 +58,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     private var roomType = 0
     private var encryption: String = ""
     private var roomName: String = ""
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var curVoiceRoomModel: VoiceRoomModel? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityCreateRoomLayoutBinding {
@@ -68,8 +68,10 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
-        chickPrivate()
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
+        initUi()
+//        binding.edRoomName.filters = arrayOf<InputFilter>(EmojiInputFilter(32))
+        binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         initListener()
         voiceRoomObservable()
         setupWithViewPager()
@@ -85,7 +87,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             } else if (checkedId == R.id.radioButton_public) {
                 isPublic = true
             }
-            chickPrivate()
+            initUi()
         }
         binding.titleBar.setOnBackPressListener {
             onBackPressed()
@@ -97,7 +99,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             }
             encryption = binding.edPwd.text.toString().trim { it <= ' ' }
             roomName = binding.edRoomName.text.toString().trim { it <= ' ' }
-            checkPrivate()
+            if (it?.let { isFastClick(it, 1000) } == false) checkPrivate()
         }
         binding.randomLayout.setOnClickListener {
             binding.edRoomName.setText(randomName())
@@ -107,7 +109,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                 tab.customView?.let {
                     val title = it.findViewById<TextView>(R.id.tab_item_title)
                     val layoutParams = title.layoutParams
-                    layoutParams.height = dp2px(this@VoiceRoomCreateActivity, 26f)
+                    layoutParams.height = DeviceTools.dp2px(this@VoiceRoomCreateActivity, 26f)
                     title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                     title.gravity = Gravity.CENTER
                 }
@@ -145,38 +147,42 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
                 override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
                     curVoiceRoomModel = voiceRoomModel
                     voiceRoomModel?.let {
-                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                        voiceRoomViewModel.joinRoom(it.roomId)
+                    }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    binding.bottomNext.isEnabled = true
+                    dismissLoading()
+                    when (code) {
+                        VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_login_exception))
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_name_rule))
+                        }
+                        else -> {
+                            ToastTools.show(this@VoiceRoomCreateActivity, getString(R.string.voice_room_create_error))
+                        }
                     }
                 }
             })
         }
-        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(result: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice create room chat_username:$chatUsername".logD()
-                    "Voice create room im_token:$chatToken".logD()
-                    if (!ChatroomHelper.getInstance().isLoggedIn) {
-                        ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
-                            override fun onSuccess() {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    goVoiceRoom()
-                                }
-                            }
-
-                            override fun onError(code: Int, desc: String) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    binding.bottomNext.isEnabled = true
-                                    dismissLoading()
-                                }
-                            }
-                        })
-                    } else {
-                        ThreadManager.getInstance().runOnMainThread {
-                            goVoiceRoom()
-                        }
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
+                override fun onSuccess(result: VoiceRoomModel?) {
+                    curVoiceRoomModel = result ?: return
+                    ThreadManager.getInstance().runOnMainThread {
+                        goVoiceRoom()
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    binding.bottomNext.isEnabled = true
+                    dismissLoading()
+                    "VoiceRoomCreateActivity syncJoinRoom fail:$code $message".logD()
                 }
             })
         }
@@ -191,11 +197,11 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
         binding.vpFragment.offscreenPageLimit = 1
         val recyclerView = binding.vpFragment.getChildAt(0)
         if (recyclerView is RecyclerView) {
-            recyclerView.setPadding(dp2px(this, 30f), 0, dp2px(this, 30f), 0)
+            recyclerView.setPadding(DeviceTools.dp2px(this, 30f), 0, DeviceTools.dp2px(this, 30f), 0)
             recyclerView.clipToPadding = false
         }
         val compositePageTransformer = CompositePageTransformer()
-        compositePageTransformer.addTransformer(MarginPageTransformer(dp2px(this, 16f)))
+        compositePageTransformer.addTransformer(MarginPageTransformer(DeviceTools.dp2px(this, 16f)))
         binding.vpFragment.setPageTransformer(compositePageTransformer)
         // set adapter
         binding.vpFragment.adapter = object : RecyclerView.Adapter<ViewHolder>() {
@@ -236,15 +242,12 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             binding.bottomNext.isEnabled = true
             dismissLoading()
             "voice room create joinChatRoom onSuccess".logD()
-            ARouter.getInstance()
-                .build(RouterPath.ChatroomPath)
-                .withSerializable(RouterParams.KEY_VOICE_ROOM_MODEL, it)
-                .navigation()
+            ChatroomLiveActivity.startActivity(this, it)
             finish()
         }
     }
 
-    private fun chickPrivate() {
+    private fun initUi() {
         if (isPublic) {
             binding.edPwd.visibility = View.GONE
             binding.baseLayout.requestFocus()
@@ -263,28 +266,21 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
 
     private fun checkPrivate() {
         if (TextUtils.isEmpty(roomName)) {
-            show(this, getString(R.string.voice_room_create_empty_name), Toast.LENGTH_LONG)
+            ToastTools.show(this, getString(R.string.voice_room_create_empty_name), Toast.LENGTH_LONG)
             binding.bottomNext.isEnabled = true
             dismissLoading()
             return
         }
         if (!isPublic && encryption.length != 4) {
             binding.inputTip.visibility = View.VISIBLE
-            show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
+            ToastTools.show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
             binding.bottomNext.isEnabled = true
             dismissLoading()
             return
         }
         binding.inputTip.visibility = View.GONE
         if (roomType == 0) {
-            val intent = Intent(this, VoiceRoomSoundSelectionActivity::class.java)
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_NAME, roomName)
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_IS_PUBLIC, isPublic)
-            if (!isPublic) {
-                intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_ENCRYPTION, encryption)
-            }
-            intent.putExtra(RouterParams.KEY_CHATROOM_CREATE_ROOM_TYPE, roomType)
-            startActivity(intent)
+            VoiceRoomSoundSelectionActivity.startActivity(this, roomName, isPublic, encryption, roomType)
         } else if (roomType == 1) {
             createSpatialRoom()
         }
@@ -316,6 +312,29 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             mLayout = itemView.findViewById(R.id.item_layout)
             mTitle = itemView.findViewById(R.id.item_title)
             mContent = itemView.findViewById(R.id.item_text)
+        }
+    }
+
+    class EmojiInputFilter(max: Int) : InputFilter.LengthFilter(max) {
+        private var emoji = Pattern.compile(
+            "[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
+            Pattern.UNICODE_CASE or Pattern.CASE_INSENSITIVE
+        )
+
+        override fun filter(
+            source: CharSequence,//即将要输入的字符串
+            start: Int,//source的start
+            end: Int,//source的end
+            dest: Spanned,//输入框中原来的内容
+            dstart: Int,//光标所在位置
+            dend: Int//光标终止位置
+        ): CharSequence {
+            var resultInput = source.toString()
+            val emojiMatcher: Matcher = emoji.matcher(source)
+            if (emojiMatcher.find()) {
+                return ""
+            }
+            return resultInput
         }
     }
 }

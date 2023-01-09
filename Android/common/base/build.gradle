@@ -61,7 +61,7 @@ dependencies {
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
-    implementation rootProject.ext.deps.xlog
+    implementation rootProject.ext.deps.logger
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide

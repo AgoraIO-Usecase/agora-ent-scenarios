@@ -6,13 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.scene.voice.bean.RoomRankUserBean
-import io.agora.voice.buddy.tool.*
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.buddy.tool.DeviceTools.dp
-import io.agora.voice.buddy.tool.DeviceTools.number2K
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.voice.common.utils.DeviceTools.number2K
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
+import io.agora.scene.voice.model.VoiceRankUserModel
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.ImageTools
 
 class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView {
 
@@ -29,7 +31,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         init(context)
     }
 
-    private lateinit var roomInfo: io.agora.scene.voice.bean.RoomInfoBean
+    private lateinit var roomDetailInfo: VoiceRoomModel
 
     private var onLiveTopClickListener: OnLiveTopClickListener? = null
 
@@ -54,21 +56,21 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.llTitle.layoutParams = layoutParams
     }
 
-    override fun onChatroomInfo(chatroomInfo: io.agora.scene.voice.bean.RoomInfoBean) {
-        this.roomInfo = chatroomInfo
+    override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
+        this.roomDetailInfo = voiceRoomModel
         binding.apply {
-            mtChatroomOwnerName.text = chatroomInfo.owner?.username
-            mtChatroomName.text = chatroomInfo.chatroomName
-            val memberText = roomInfo.memberCount.number2K()
+            mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
+            mtChatroomName.text = roomDetailInfo.roomName
+            val memberText = roomDetailInfo.memberCount.number2K()
             mtChatroomMembers.text = memberText
-            val giftText = roomInfo.giftCount.number2K()
+            val giftText = roomDetailInfo.giftAmount.number2K()
             mtChatroomGifts.text = giftText
-            val watchText = roomInfo.watchCount.number2K()
+            val watchText = roomDetailInfo.clickCount.number2K()
             mtChatroomWatch.text = watchText
             // 普通房间显示 最佳音效
-            if (chatroomInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
+            if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
                 mtChatroomAgoraSound.isVisible = true
-                mtChatroomAgoraSound.text = when (chatroomInfo.soundSelection) {
+                mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
                     ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
                     ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
                     ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
@@ -79,31 +81,25 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             }
 
             // 房主头像
-            binding.ivChatroomOwner.setImageResource(
-                ResourcesTools.getDrawableId(
-                    binding.ivChatroomOwner.context,
-                    chatroomInfo.owner?.userAvatar ?: ConfigConstants.DefaultAvatar
-                )
-            )
-            val topGifts = chatroomInfo.topRankUsers
+            ImageTools.loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
+            val topGifts = roomDetailInfo.rankingList
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
             } else {
                 llChatroomMemberRank.isVisible = true
                 topGifts.forEachIndexed { index, audienceBean ->
-                    val resId = ResourcesTools.getDrawableId(llChatroomMemberRank.context, audienceBean.userAvatar)
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            binding.ivChatroomMember1.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            binding.ivChatroomMember2.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            binding.ivChatroomMember3.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
                         else -> {
                             return
@@ -114,26 +110,25 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
-    override fun onRankMember(topGifts: List<RoomRankUserBean>) {
+    override fun onRankMember(topGifts: List<VoiceRankUserModel>) {
         binding.apply {
-            if (topGifts.isNullOrEmpty()) {
+            if (topGifts.isEmpty()) {
                 llChatroomMemberRank.isVisible = false
             } else {
                 llChatroomMemberRank.isVisible = true
                 topGifts.forEachIndexed { index, audienceBean ->
-                    val resId = ResourcesTools.getDrawableId(llChatroomMemberRank.context, audienceBean.userAvatar)
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            binding.ivChatroomMember1.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            binding.ivChatroomMember2.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            binding.ivChatroomMember3.setImageResource(resId)
+                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
                         else -> {
                             return
@@ -141,23 +136,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     }
                 }
             }
-        }
-    }
-
-    override fun subMemberCount() {
-        if (this::roomInfo.isInitialized) {
-            roomInfo.memberCount -= 1
-            val text = roomInfo.memberCount.number2K()
-            binding.mtChatroomMembers.text = text
         }
     }
 
     override fun onUpdateMemberCount(count: Int) {
         super.onUpdateMemberCount(count)
         if (count < 0) return
-        if (this::roomInfo.isInitialized) {
-            roomInfo.memberCount = count
-            val text = roomInfo.memberCount.number2K()
+        if (this::roomDetailInfo.isInitialized) {
+            roomDetailInfo.memberCount = count
+            val text = roomDetailInfo.memberCount.number2K()
             binding.mtChatroomMembers.text = text
         }
     }
@@ -165,9 +152,9 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onUpdateWatchCount(count: Int) {
         super.onUpdateWatchCount(count)
         if (count < 0) return
-        if (this::roomInfo.isInitialized) {
-            roomInfo.watchCount = count
-            val text = roomInfo.watchCount.number2K()
+        if (this::roomDetailInfo.isInitialized) {
+            roomDetailInfo.clickCount = count
+            val text = roomDetailInfo.clickCount.number2K()
             binding.mtChatroomWatch.text = text
         }
     }
@@ -175,9 +162,9 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     override fun onUpdateGiftCount(count: Int) {
         super.onUpdateGiftCount(count)
         if (count < 0) return
-        if (this::roomInfo.isInitialized) {
-            roomInfo.giftCount = count
-            val text = roomInfo.giftCount.number2K()
+        if (this::roomDetailInfo.isInitialized) {
+            roomDetailInfo.giftAmount = count
+            val text = roomDetailInfo.giftAmount.number2K()
             binding.mtChatroomGifts.text = text
         }
     }
