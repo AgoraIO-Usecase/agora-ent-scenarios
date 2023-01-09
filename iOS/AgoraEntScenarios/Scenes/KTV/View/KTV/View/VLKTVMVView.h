@@ -5,7 +5,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLRoomSelSongModel.h"
-#import <AgoraLyricsScore-Swift.h>
+@import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
@@ -27,7 +27,7 @@ typedef enum : NSUInteger {
 } VLKTVMVViewSingActionType;
 
 @class VLKTVMVView;
-@protocol VLKTVMVViewDelegate <NSObject>
+@protocol VLKTVMVViewDelegate <NSObject, AgoraLrcDownloadDelegate, AgoraLrcViewDelegate>
 
 //- (BOOL)ktvIsMyselfOnSeat;
 //
@@ -77,12 +77,10 @@ typedef enum : NSUInteger {
 /// @param song 歌曲信息
 - (void)updateUIWithUserOnSeat:(BOOL)onSeat song:(VLRoomSelSongModel *)song;
 
-- (void)cleanMusicText;
+//- (void)cleanMusicText;
 - (int)getSongScore;
 - (void)setSongScore:(int)score;
 - (int)getAvgSongScore;
-
-- (void)validateSingType;
 
 - (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden;
 

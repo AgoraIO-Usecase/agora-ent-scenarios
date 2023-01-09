@@ -32,9 +32,9 @@
 #define kStrongSelf(object) __strong typeof(weak##object) object = weak##object;
 
 #ifdef DEBUG
-#define VLLog(format, ...)  printf("\n%s",[[NSString stringWithFormat:(format), ##__VA_ARGS__] UTF8String] )
+#define VLLog NSLog
 #else
-#define VLLog(...)
+#define VLLog
 #endif
 
 #endif /* VLMacroDefine_h */
