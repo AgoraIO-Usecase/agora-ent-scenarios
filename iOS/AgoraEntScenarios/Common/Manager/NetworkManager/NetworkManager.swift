@@ -50,7 +50,7 @@ class NetworkManager:NSObject {
     typealias SuccessClosure = ([String: Any]) -> Void
     typealias FailClosure = (String) -> Void
 
-    private lazy var sessionConfig: URLSessionConfiguration = {
+    private var sessionConfig: URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["Content-Type": "application/json",
                                         "X-LC-Id": "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz",

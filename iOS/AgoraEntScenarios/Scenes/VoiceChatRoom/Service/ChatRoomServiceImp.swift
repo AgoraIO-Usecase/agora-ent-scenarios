@@ -694,7 +694,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId:VLUserCenter.user.id,
+                               userId: VLUserCenter.user.id,
+                               isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
@@ -739,18 +740,26 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                         completion(nil, updateRoom)
                     }
                     
-                    initScene{
-                        SyncUtil
-                            .scene(id: roomId)?
-                            .update(key: "",
-                                    data: params,
-                                    success: { obj in
-                                print("updateUserCount success")
-                            },
-                                    fail: { error in
-                                print("updateUserCount fail")
-                                completion(error, nil)
-                            })
+                    initScene {
+                        let isOwner = VLUserCenter.user.id == room.owner?.uid ? true : false
+                        SyncUtil.joinScene(id: room.room_id ?? "",
+                                           userId: VLUserCenter.user.id,
+                                           isOwner: isOwner,
+                                           property: params) { result in
+                            SyncUtil
+                                .scene(id: roomId)?
+                                .update(key: "",
+                                        data: params,
+                                        success: { obj in
+                                    print("updateUserCount success")
+                                },
+                                        fail: { error in
+                                    print("updateUserCount fail")
+                                    completion(error, nil)
+                                })
+                        } fail: { error in
+                            completion(error, nil)
+                        }
                     }
                     break
                 }

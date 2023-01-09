@@ -21,11 +21,11 @@
 }
 
 - (BOOL)waittingForChorusMatch {
-    return self.isChorus && self.chorusNo.length == 0 && self.status == 0;
+    return self.isChorus && self.chorusNo.length == 0 && self.status == VLSongPlayStatusIdle;
 }
 
 - (BOOL)doneChorusMatch {
-    return self.status == 3;
+    return self.isChorus && self.chorusNo.length > 0 && self.status == VLSongPlayStatusPlaying;
 }
 
 @end
