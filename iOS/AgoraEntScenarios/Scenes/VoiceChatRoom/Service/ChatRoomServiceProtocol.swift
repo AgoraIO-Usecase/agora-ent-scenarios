@@ -15,9 +15,116 @@ public enum updateRoomState {
     case robotVoleme
 }
 
-// 房间内部需要用到环信KV
-protocol ChatRoomServiceProtocol: NSObjectProtocol {
+@objc public enum ChatRoomServiceKickedReason: UInt {
+    case removed
+    case destroyed
+    case offLined
+}
+
+@objc public protocol ChatRoomServiceSubscribeDelegate: NSObjectProtocol {
     
+    /// Description token 过期
+    func chatTokenWillExpire()
+    
+    /// Description 收到文本消息
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - message: 消息模型
+    func receiveTextMessage(roomId: String, message: VoiceRoomChatEntity)
+    /// Description 收到礼物消息
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - meta: 透传信息
+    func onReceiveGift(roomId: String, gift: VoiceRoomGiftEntity)
+    /// Description 收到上麦申请消息 替换receiveApplySite
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - meta: 透传信息
+    func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply)
+    
+    /// Description 收到取消上麦申请消息 替换receiveCancelApplySite
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - chat_uid: 环信IMSDK用户id
+    func onReceiveSeatRequestRejected(roomId: String, chat_uid: String)
+    
+    /// Description 收到邀请消息
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - meta: 透传信息
+    func onReceiveSeatInvitation(roomId: String, user: VRUser)
+    
+    /// Description 收到邀请消息
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - meta: 透传信息
+    func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String)
+    
+    /// Description 用户加入聊天室回调，带所有用户信息
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - username: 用户uid或者说用户在环信IMSDK的用户名
+    ///   - ext: 用户jsonobject信息
+    func onUserJoinedRoom(roomId: String, user: VRUser)
+    
+    /// Description 聊天室公告发生变化
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - content: 公告变化内容
+    func onAnnouncementChanged(roomId: String, content: String)
+    
+    /// Description 用户被踢
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - reason: 被踢原因
+    func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason)
+    
+    /// Description 聊天室自定义麦位属性发生变化
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - attributeMap: 变换的属性kv
+    ///   - fromId: 谁操作发生的变化
+    func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String)
+    
+    /// Description 机器人
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - enable: 机器人开关变化
+    ///   - fromId: 操作人userName
+    func onRobotSwitch(roomId: String, enable: Bool, from fromId: String)
+    
+    /// Description 机器人
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - volume: 机器人开关变化
+    ///   - fromId: 操作人userName
+    func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String)
+    
+    /// Description 贡献榜单变化
+    /// - Parameters:
+    ///   - roomId: 聊天室id
+    ///   - ranking_list: 排行榜
+    ///   - fromId: 操作人userName
+    func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String)
+    
+    /// Description 成员离开
+    /// - Parameters:
+    ///   - roomId: 环信IMSDK聊天室id
+    ///   - userName: 离开的环信用户id
+    func onUserLeftRoom(roomId: String, userName: String)
+    
+}
+
+/// 房间内部需要用到环信KV
+protocol ChatRoomServiceProtocol: NSObjectProtocol {
+    /// 注册订阅
+    /// - Parameter delegate: ChatRoomServiceSubscribeDelegate 聊天室内IM回调处理
+    func subscribeEvent(with delegate: ChatRoomServiceSubscribeDelegate)
+        
+    /// 取消订阅
+    /// - Parameter delegate: ChatRoomServiceSubscribeDelegate 聊天室内IM回调处理
+    func unsubscribeEvent()
+
     /// 加入房间
     /// - Parameters:
     ///
@@ -26,135 +133,136 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// 离开房间
     /// - Parameters:
     ///
-    func leaveRoom(_ roomId: String, isOwner: Bool, completion: @escaping (Error?, Bool) -> Void)
+    func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void)
     
     /// 获取房间详情
     /// - Parameters:
     ///
-    func fetchRoomDetail(_ roomId: String,
-                         completion: @escaping (Error?, VRRoomInfo?) -> Void)
-
-    /// 邀请上卖
-    /// - Parameters:
-    ///
-    func inviteUserToMic(_ user: VRUser,
-                         completion: @escaping (Error?, Bool) -> Void)
-    
-    /// 拒绝上卖
-    /// - Parameters:
-    ///
-    func refuseInviteToMic(_ user: VRUser,
-                           completion: @escaping (Error?, Bool) -> Void)
-    
-    /// 发送礼物
-    /// - Parameters:
-    ///
-    func sendGift(_ giftInfo: VoiceRoomGiftEntity,
-                  completion: @escaping (Error?, Bool) -> Void)
+    func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void)
 
     /// 获取礼物列表
     /// - Parameters:
     ///
-    func fetchGiftContribute(_ roomId: String,
-                             completion: @escaping (Error?, VRUsers?) -> Void)
-    
+    func fetchGiftContribute(completion: @escaping (Error?, [VRUser]?) -> Void)
     /// 获取人员列表
     /// - Parameters:
     ///
-    func fetchRoomMembers(chatroom_id: String, completion: @escaping (Error?, VRUsers?) -> Void)
-
-    /// 激活机器人,修改公告，修改机器人音量
-    /// - Parameters:
-    ///
-    func modifyRoomInfo(chatroom_id: String,key: String,value: String,
-                        completion: @escaping (Error?, Bool) -> Void)
+    func fetchRoomMembers(completion: @escaping (Error?, [VRUser]?) -> Void)
+    
+    /// Description update room members
+    /// - Parameter completion: callback
+    func updateRoomMembers(completion: @escaping (Error?) -> Void)
+    
+    /// Description 申请列表
+    /// - Parameter completion: 回调
+    func fetchApplicantsList(completion: @escaping (Error?, [VoiceRoomApply]?) -> Void)
 
     /// 禁言指定麦位
     /// - Parameters:
     ///
-    func forbidMic(chatroom_id: String,mic_index: Int,
-                   completion: @escaping (Error?, Bool) -> Void)
+    func forbidMic(mic_index: Int,
+                   completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 取消禁言指定麦位
     /// - Parameters:
-    /// 
-    func unForbidMic(chatroom_id: String,mic_index: Int,
-                     completion: @escaping (Error?, Bool) -> Void)
+    ///
+    func unForbidMic(mic_index: Int,
+                     completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 锁麦
     /// - Parameters:
     ///
-    func lockMic(chatroom_id: String,mic_index: Int,
-                 completion: @escaping (Error?, Bool) -> Void)
+    func lockMic(mic_index: Int,
+                 completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 取消锁麦
     /// - Parameters:
     ///
-    func unLockMic(chatroom_id: String,mic_index: Int,
-                   completion: @escaping (Error?, Bool) -> Void)
+    func unLockMic(mic_index: Int,
+                   completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 踢用户下麦
     /// - Parameters:
     ///
-    func kickOff(chatroom_id: String,mic_index: Int,
-                 completion: @escaping (Error?, Bool) -> Void)
+    func kickOff(mic_index: Int,
+                 completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 下麦
     /// - Parameters:
     ///
-    func leaveMic(chatroom_id: String,mic_index: Int,
-                  completion: @escaping (Error?, Bool) -> Void)
+    func leaveMic(mic_index: Int,
+                  completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// mute
     /// - Parameters:
     ///
-    func muteLocal(chatroom_id: String,mic_index: Int,completion: @escaping (Error?, Bool) -> Void)
+    func muteLocal(mic_index: Int,completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// unmute
     /// - Parameters:
     ///
-    func unmuteLocal(chatroom_id: String,mic_index: Int, completion: @escaping (Error?, Bool) -> Void)
+    func unmuteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void)
 
     /// 换麦
     /// - Parameters:
     ///
-    func changeMic(user: VRUser,old_index: Int,new_index:Int,completion: @escaping (Error?, Bool) -> Void)
-
-    /// 取消邀请
+    func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, [Int:VRRoomMic]?) -> Void)
+    
+    /// 邀请上卖
     /// - Parameters:
     ///
-    func refuseInvite(_ roomId: String,
-                      completion: @escaping (Error?, Bool) -> Void)
+    func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 接受邀请
     /// - Parameters:
     ///
-    func agreeInvite(_ roomId: String,_ user: VRUser,
-                     completion: @escaping (Error?, Bool) -> Void)
+    func acceptMicSeatInvitation(completion: @escaping (Error?, VRRoomMic?) -> Void)
+    
+    /// 拒绝邀请
+    /// - Parameters:
+    ///
+    func refuseInvite(chat_uid: String,completion: @escaping (Error?, Bool) -> Void)
 
     /// 申请上麦
     /// - Parameters:
     ///
-    func submitApply(chat_user: VRUser,
-                     completion: @escaping (Error?, Bool) -> Void)
+    func startMicSeatApply(index: Int?,completion: @escaping (Error?, Bool) -> Void)
 
     /// 取消上麦
     /// - Parameters:
     ///
-    func cancelApply(chat_uid: String,
+    func cancelMicSeatApply(chat_uid: String,
                      completion: @escaping (Error?, Bool) -> Void)
+    
+    /// Description 同意申请
+    /// - Parameters:
+    ///   - user: VRUser instance
+    ///   - completion: 回调
+    func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void)
 
     /// 获取房间列表
     /// - Parameters:
     ///   - page: 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
     ///   - completion: 完成回调   (错误信息， 房间列表)
-    func fetchRoomList(page: Int,
-                     completion: @escaping (Error?, [VRRoomEntity]?) -> Void)
+    func fetchRoomList(page: Int, completion: @escaping (Error?, [VRRoomEntity]?) -> Void)
     
     /// 创建房间
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-   func createRoom(room: VRRoomEntity,
-                        completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
+    func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
+    
+    /// Description 更新公告
+    /// - Parameters:
+    ///   - content: content
+    ///   - completion: 回调
+    func updateAnnouncement(content: String,completion: @escaping (Bool) -> Void)
+    
+    /// Description 是否启用机器人
+    /// - Parameter enable: true or false
+    func enableRobot(enable: Bool,completion: @escaping (Error?) -> Void)
+    
+    /// Description 更新机器人音量
+    /// - Parameter value: 音量值
+    func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
 }

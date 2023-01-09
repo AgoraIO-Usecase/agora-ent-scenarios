@@ -11,6 +11,7 @@
 #import "VLMacroDefine.h"
 #import "VLToast.h"
 #import "KTVMacro.h"
+#import "MenuUtils.h"
 @import CRBoxInputView;
 @import QMUIKit;
 @import YYCategories;
@@ -54,12 +55,13 @@
     UILabel *roomTitleLabel = [[UILabel alloc]initWithFrame:CGRectMake(40, iconImgView.bottom+VLREALVALUE_WIDTH(40), 70, 20)];
     roomTitleLabel.font = UIFontMake(14);
     roomTitleLabel.textColor = UIColorMakeWithHex(@"#000000");
-    roomTitleLabel.text = @"房间标题";
+    roomTitleLabel.text = AGLocalizedString(@"房间标题");
     [self addSubview:roomTitleLabel];
     
     QMUIButton *randomBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_randomIcon"]
                                                              title:KTVLocalizedString(@"随机")];
-    randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-50, roomTitleLabel.top, 50, 20);
+    [randomBtn sizeToFit];
+    randomBtn.frame = CGRectMake(SCREEN_WIDTH-50-randomBtn.width, roomTitleLabel.top, randomBtn.width, 20);
     randomBtn.imagePosition = QMUIButtonImagePositionLeft;
     randomBtn.spacingBetweenImageAndTitle = 3;
     randomBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
@@ -87,6 +89,7 @@
     secretLabel.font = UIFontMake(14);
     secretLabel.textColor = UIColorMakeWithHex(@"#000000");
     secretLabel.text = KTVLocalizedString(@"房间是否加密");
+    [secretLabel sizeToFit];
     [self addSubview:secretLabel];
     
     QMUIButton *publicBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
@@ -105,6 +108,7 @@
     self.publicBtn = publicBtn;
     [publicBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:publicBtn];
+    [publicBtn sizeToFit];
     
     QMUIButton *screatBtn = [[QMUIButton alloc] qmui_initWithImage:[UIImage sceneImageWithName:@"online_create_screatNormalIcon"]
                                                              title:KTVLocalizedString(@"加密")];
@@ -121,6 +125,7 @@
     self.screatBtn = screatBtn;
     [screatBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:screatBtn];
+    [screatBtn sizeToFit];
     
     
     self.screatView = [[UIView alloc]initWithFrame:CGRectMake(40, publicBtn.bottom+15, SCREEN_WIDTH-80, 48+12+17)];
@@ -157,6 +162,7 @@
     setLabel.font = UIFontMake(12);
     setLabel.textColor = UIColorMakeWithHex(@"#FA396A");
     setLabel.text = KTVLocalizedString(@"请设置4位数房间密码");
+    [setLabel sizeToFit];
     [self.screatView addSubview:setLabel];
     
     UIButton *createBtn = [[UIButton alloc] initWithFrame:CGRectMake(VLREALVALUE_WIDTH(30), SCREEN_HEIGHT-VLREALVALUE_WIDTH(25)-48-kTopNavHeight-kSafeAreaBottomHeight, SCREEN_WIDTH-2*VLREALVALUE_WIDTH(30), 48)];

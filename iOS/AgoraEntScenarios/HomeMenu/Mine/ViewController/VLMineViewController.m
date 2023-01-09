@@ -10,7 +10,6 @@
 #import "VLCommonWebViewController.h"
 #import "VLMineView.h"
 #import "VLUploadImageResModel.h"
-#import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
@@ -18,8 +17,17 @@
 #import "VLToast.h"
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
+#import "MenuUtils.h"
+#import "KTVMacro.h"
+#import <Photos/Photos.h>
+@import AgoraRtcKit;
 @import Masonry;
 @import LEEAlert;
+
+typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
+    photoLibrary = 0,
+    camera = 1,
+};
 
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
@@ -34,7 +42,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setBackgroundImage:@"home_bg_image"];
-    [self setNaviTitleName:NSLocalizedString(@"声网", nil)];
+    [self setNaviTitleName:AGLocalizedString(@"声网")];
     [self setUpUI];
 }
 
@@ -105,9 +113,9 @@
     __block UITextField *TF = nil;
 
     [LEEAlert alert].config
-    .LeeTitle(NSLocalizedString(@"修改昵称", nil))
+    .LeeTitle(AGLocalizedString(@"修改昵称"))
     .LeeAddTextField(^(UITextField *textField) {
-        textField.placeholder = NSLocalizedString(@"请输入昵称", nil);
+        textField.placeholder = AGLocalizedString(@"请输入昵称");
         textField.textColor = UIColorBlack;
         textField.clearButtonMode=UITextFieldViewModeWhileEditing;
         textField.font = UIFontMake(15);
@@ -119,7 +127,7 @@
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = @"取消";
+        action.title = AGLocalizedString(@"Cancel");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.cornerRadius = 20;
@@ -134,7 +142,7 @@
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"确认", nil);
+        action.title = AGLocalizedString(@"Confirm");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -165,15 +173,15 @@
 }
 
 - (void)showAlert {
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"声动互娱”想访问您的相册", nil)
-                                                                message:NSLocalizedString(@"声网需要您开启相册访问功能，读取照片上传头像", nil)
+    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"声动互娱”想访问您的相册")
+                                                                message:AGLocalizedString(@"声网需要您开启相册访问功能，读取照片上传头像")
                                                          preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action1 = [UIAlertAction actionWithTitle:NSLocalizedString(@"不允许", nil)
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"不允许")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:NO];
     }];
-    UIAlertAction *action2 = [UIAlertAction actionWithTitle:NSLocalizedString(@"好", nil)
+    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"好")
                                                       style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
         [self setLibraryAccess:YES];
@@ -191,47 +199,77 @@
     [LEEAlert actionsheet].config
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = NSLocalizedString(@"上传头像", nil);
+        action.title = AGLocalizedString(@"上传头像");
         action.height = 20;
         action.titleColor = [UIColor whiteColor];
         action.font = VLUIFontMake(14);
     })
-//    .LeeAddAction(^(LEEAction * _Nonnull action) {
-//        action.type = LEEActionTypeDefault;
-//        action.title = NSLocalizedString(@"拍照上传", nil);
-//        action.clickBlock = ^{
-//            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
-//        };
-//    })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
-        action.title = NSLocalizedString(@"本地相册上传", nil);
+        action.title = AGLocalizedString(@"拍照上传");
         action.clickBlock = ^{
-            if ([weakself getLibraryAccess] == NO) {
-                [weakself showAlert];
-                return;
-            }
-            
-            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+            [weakself requestAuthorizationForCamera];
+        };
+    })
+    .LeeAddAction(^(LEEAction * _Nonnull action) {
+        action.type = LEEActionTypeDefault;
+        action.title = AGLocalizedString(@"本地相册上传");
+        action.clickBlock = ^{
+            [weakself requestAuthorizationForPhotoLibrary];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"取消", nil);
+        action.title = AGLocalizedString(@"取消");
         action.clickBlock = ^{
         };
     })
     .LeeShow();
 }
 
+- (void)requestAuthorizationForPhotoLibrary {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == PHAuthorizationStatusAuthorized) {
+                //操作图片
+                [self presentviewcontrollerWithSourceType: UIImagePickerControllerSourceTypePhotoLibrary];
+            }else{
+                [self showAlertWithMessage:@"相册权限未设置,请开启相册权限"];
+            }
+        });
+    }];
+}
+
+- (void)requestAuthorizationForCamera{
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(granted == true){
+                [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
+            } else {
+                [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
+            }
+        });
+    }];
+}
+
+-(void)showAlertWithMessage:(NSString *)mes {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示" message:mes preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:nil completionHandler:nil];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:cancelAction];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
     if (sourceType == UIImagePickerControllerSourceTypePhotoLibrary && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [VLToast toast:NSLocalizedString(@"相册不可用", nil)];
+        [VLToast toast:AGLocalizedString(@"相册不可用")];
         return ;
     }
     if (sourceType == UIImagePickerControllerSourceTypeCamera && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [VLToast toast:NSLocalizedString(@"相机不可用", nil)];
+        [VLToast toast:AGLocalizedString(@"相机不可用")];
         return ;
     }
     UIImagePickerController *controller = [[UIImagePickerController alloc]init];
@@ -281,7 +319,7 @@
     
     [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
-            [VLToast toast:NSLocalizedString(@"修改成功", nil)];
+            [VLToast toast:AGLocalizedString(@"修改成功")];
             [self.mineView refreseAvatar:image];
             VLUserCenter.user.headUrl = iconUrl;
             [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
@@ -300,7 +338,7 @@
     };
     [VLAPIRequest postRequestURL:kURLPathUploadUserInfo parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
         if (response.code == 0) {
-            [VLToast toast:NSLocalizedString(@"修改成功", nil)];
+            [VLToast toast:AGLocalizedString(@"修改成功")];
             [self.mineView refreseNickName:nickName];
             VLUserCenter.user.name = nickName;
             [[VLUserCenter center] storeUserInfo:VLUserCenter.user];
@@ -316,15 +354,15 @@
     
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = NSLocalizedString(@"确定注销账号？", nil);
+        label.text = AGLocalizedString(@"确定注销账号？");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(NSLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？", nil))
+    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"注销", nil);
+        action.title = AGLocalizedString(@"注销");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -344,7 +382,7 @@
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"取消", nil);
+        action.title = AGLocalizedString(@"取消");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -363,15 +401,15 @@
 - (void)loadLogoutUserRequest {
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
-        label.text = NSLocalizedString(@"确定退出登录?", nil);
+        label.text = AGLocalizedString(@"确定退出登录?");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
-    .LeeContent(NSLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～", nil))
+    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"退出", nil);
+        action.title = AGLocalizedString(@"退出");
         action.titleColor = UIColorMakeWithHex(@"#000000");
         action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
         action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
@@ -393,7 +431,7 @@
     })
     .LeeAddAction(^(LEEAction *action) {
         action.type = LEEActionTypeCancel;
-        action.title = NSLocalizedString(@"取消", nil);
+        action.title = AGLocalizedString(@"取消");
         action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
         action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
         action.cornerRadius = 20;
@@ -438,7 +476,10 @@
 - (UILabel *)versionLabel {
     if (!_versionLabel) {
         _versionLabel = [[UILabel alloc] init];
-        _versionLabel.text = [NSString stringWithFormat:NSLocalizedString(@"当前版本号 LTS%@(%@) SDK %@", nil),[VLGlobalHelper appVersion], [VLGlobalHelper appBuild], [AgoraRtcEngineKit getSdkVersion]];
+        _versionLabel.text = [NSString stringWithFormat:AGLocalizedString(@"当前版本号 LTS%@(%@) SDK %@"),
+                              [VLGlobalHelper appVersion],
+                              [VLGlobalHelper appBuild],
+                              [AgoraRtcEngineKit getSdkVersion]];
         _versionLabel.font = VLUIFontMake(12);
         _versionLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     }

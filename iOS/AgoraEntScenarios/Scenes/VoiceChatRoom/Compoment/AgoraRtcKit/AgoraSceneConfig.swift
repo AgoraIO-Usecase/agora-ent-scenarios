@@ -9,7 +9,7 @@ import Foundation
 
 public enum AgoraConfig {
     // agoraRtc id and token
-    public static let rtcId: String = "63f1d5b33fd14a7ebc164c0a9920b8d0"
+    public static let rtcId: String = "b792b33fc5f046ffa22776bf8d140e4d"
     public static let rtcToken: String? = nil
     // agoraChat id and token
     public static let chatId: String = ""

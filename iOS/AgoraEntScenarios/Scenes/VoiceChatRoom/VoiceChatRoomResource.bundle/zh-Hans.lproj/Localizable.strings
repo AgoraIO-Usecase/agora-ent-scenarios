@@ -202,3 +202,8 @@
 "Mic Closed" = "麦位已被房主关闭";
 "Create failed!" = "创建失败";
 "This product is for testing only, not for commerce.\nEvery room will be maintained for 10 minutes." = "本应用为测试产品，请勿商用\n单次语聊最长10分钟，过时房间将自动解散";
+"Sent " = "赠送";
+"you have no wheat slots!" = "只有上麦用户才可以设置麦克风";
+"Members reach limit!" = "房间人数超过限制";
+"Content prohibited" = "内容禁止发送";
+"Incorrect room name" = "房间名不合规";
