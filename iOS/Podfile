@@ -27,12 +27,13 @@ def all_pods
   #滚动视图
   pod 'JXCategoryView', '1.6.1'
   
-#  pod 'AgoraSyncManager', '~> 1.0.7'
-  pod 'AgoraSyncManager', :path=> './AgoraEntScenarios/Common/Manager/AgoraSyncManager'
+  pod 'AgoraSyncManager', '1.1.0'
+#  pod 'AgoraSyncManager', :path=> './AgoraEntScenarios/Common/Manager/AgoraSyncManager'
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
   pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+#  pod 'AgoraRtcEngine_iOS', :path => './libs'
 
   #ThirdParty
   pod 'HWWeakTimer', '1.0'
