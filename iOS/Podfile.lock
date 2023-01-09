@@ -44,8 +44,6 @@ PODS:
     - AgoraRtm_iOS (= 1.5.1)
     - SocketRocket (= 0.6.0)
   - Bugly (2.5.93)
-  - CRBoxInputView (1.2.2):
-    - Masonry
   - HWWeakTimer (1.0)
   - IQKeyboardManager (6.5.10)
   - JXCategoryView (1.6.1)
@@ -92,7 +90,6 @@ DEPENDENCIES:
   - AgoraRtm_iOS (= 1.5.1)
   - AgoraSyncManager (from `./AgoraEntScenarios/Common/Manager/AgoraSyncManager`)
   - Bugly (= 2.5.93)
-  - CRBoxInputView (= 1.2.2)
   - HWWeakTimer (= 1.0)
   - IQKeyboardManager (= 6.5.10)
   - JXCategoryView (= 1.6.1)
@@ -120,7 +117,6 @@ SPEC REPOS:
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - Bugly
-    - CRBoxInputView
     - HWWeakTimer
     - IQKeyboardManager
     - JXCategoryView
@@ -156,7 +152,6 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: fb72addfd2f6ea279526005e6873af3a9728f60b
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -179,6 +174,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 817cad2f438dc2b90979e0303888347a256c3c1f
+PODFILE CHECKSUM: 7cb38a8b98928771a7860a6bcdfd0eaf183d44aa
 
 COCOAPODS: 1.11.3
