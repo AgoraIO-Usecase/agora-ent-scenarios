@@ -9,6 +9,7 @@
 #import "VLMineViewController.h"
 #import "VLMacroDefine.h"
 #import "BaseNavigationController.h"
+#import "MenuUtils.h"
 
 @interface VLMainTabBarController ()<CALayerDelegate>
 @property (nonatomic, assign) NSInteger doubleCount;
@@ -109,18 +110,18 @@
 
 - (NSArray *)tabBarItemsAttributesForController {
    NSDictionary *homeTabBarItemsAttributes = @{
-                                                CYLTabBarItemTitle : NSLocalizedString(@"首页", nil),
+                                                CYLTabBarItemTitle : AGLocalizedString(@"首页"),
                                                 CYLTabBarItemImage : @"Tab_home_normal",
                                                 CYLTabBarItemSelectedImage : @"Tab_home_sel",
                                                 };
    NSDictionary *discoveryTabBarItemsAttributes = @{
-                                                 CYLTabBarItemTitle : NSLocalizedString(@"发现", nil),
+                                                 CYLTabBarItemTitle : AGLocalizedString(@"发现"),
                                                  CYLTabBarItemImage : @"Tab_discovery_normal",
                                                  CYLTabBarItemSelectedImage : @"Tab_discovery_sel",
                                                  };
 
     NSDictionary *mineTabBarItemsAttributes = @{
-                                                  CYLTabBarItemTitle : NSLocalizedString(@"我的", nil),
+                                                  CYLTabBarItemTitle : AGLocalizedString(@"我的"),
                                                   CYLTabBarItemImage : @"Tab_mine_normal",
                                                   CYLTabBarItemSelectedImage : @"Tab_mine_sel",
                                                   };
