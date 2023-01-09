@@ -33,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *im_token;
 @property (nonatomic) NSString *authorization;
 @property (nonatomic) BOOL hasVoiceRoomUserInfo;
+
+//给各个场景保留的扩展字段
+@property (nonatomic, strong, readonly) NSMutableDictionary* extraDic;
 @end
 
 NS_ASSUME_NONNULL_END
