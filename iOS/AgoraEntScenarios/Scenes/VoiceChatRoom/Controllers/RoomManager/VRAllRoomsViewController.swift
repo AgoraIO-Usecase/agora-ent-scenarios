@@ -39,20 +39,21 @@ extension VRAllRoomsViewController {
     }
 
     private func fetchRooms(cursor: String) {
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomList(cursor: cursor, pageSize: page_size, type: nil), params: [:], classType: VRRoomsEntity.self) { rooms, error in
+        ChatRoomServiceImp.getSharedInstance().fetchRoomList(page: 0) { error, rooms in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
-                guard let total = rooms?.total else { return }
-                self.fillDataSource(rooms: rooms)
+                guard let rooms = rooms else {return}
+                let roomsEntity: VRRoomsEntity = VRRoomsEntity()
+                roomsEntity.rooms = rooms
+                roomsEntity.total = rooms.count
+                self.fillDataSource(rooms: roomsEntity)
                 self.roomList.reloadData()
-                if self.totalCountClosure != nil {
-                    self.totalCountClosure!(total)
-                }
-                self.empty.isHidden = (total > 0)
+                self.empty.isHidden = (rooms.count > 0)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
         }
+        
     }
 
     private func fillDataSource(rooms: VRRoomsEntity?) {

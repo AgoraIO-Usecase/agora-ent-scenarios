@@ -11,6 +11,6 @@ import Foundation
     var title: String = ""
     var detail: String = ""
     var selected: Bool = false
-    var soundType: String = "Social Chat"
+    var soundType: Int = 0
     var index: Int? = 0
 }

@@ -30,6 +30,10 @@ public final class VRCreateRoomViewController: VRBaseViewController {
             }
         }
     }
+    
+    deinit {
+        SVProgressHUD.dismiss()
+    }
 }
 
 extension VRCreateRoomViewController {
@@ -46,7 +50,7 @@ extension VRCreateRoomViewController {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
         SVProgressHUD.show()
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .createRoom(()), params: ["name": container.roomInput.name, "is_private": container.roomInput.code.isEmpty, "password": container.roomInput.code, "type": container.idx, "allow_free_join_mic": false, "sound_effect": "Social Chat"], classType: VRRoomInfo.self) { info, error in
+        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .createRoom(()), params: ["name": container.roomInput.name, "is_private": container.roomInput.code.isEmpty, "password": container.roomInput.code, "type": container.idx, "allow_free_join_mic": false, "sound_effect": 1], classType: VRRoomInfo.self) { info, error in
             SVProgressHUD.dismiss()
             if error == nil, info != nil {
                 self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
@@ -60,7 +64,7 @@ extension VRCreateRoomViewController {
 
     private func entryRoom() {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VoiceRoomUserInfo.shared.user?.im_token ?? "", completion: { userName, error in
+        VoiceRoomIMManager.shared?.loginIM(userName: VoiceRoomUserInfo.shared.user?.chat_uid ?? "", token: VLUserCenter.user.im_token, completion: { userName, error in
             SVProgressHUD.dismiss()
             if error == nil {
                 Throttler.throttle {

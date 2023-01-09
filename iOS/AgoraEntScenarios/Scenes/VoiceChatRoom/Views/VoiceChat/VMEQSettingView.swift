@@ -38,27 +38,25 @@ class VMEQSettingView: UIView, UITextViewDelegate {
         }
     }
 
-    var soundEffect: String? {
+    var soundEffect: Int = 1 {
         didSet {
-            guard let soundEffect = soundEffect else {
-                return
-            }
+
             let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: bounds.size.width - 80~)
             let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: bounds.size.width - 80~)
             let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: bounds.size.width - 80~)
             let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: bounds.size.width - 80~)
             print("\(soundEffect)-----")
             switch soundEffect {
-            case "Social Chat":
+            case 1:
                 effectHeight = [socialH, ktvH, gameH, anchorH]
                 effectType = [.chat, .karaoke, .game, .anchor]
-            case "Karaoke":
+            case 2:
                 effectHeight = [ktvH, socialH, gameH, anchorH]
                 effectType = [.karaoke, .chat, .game, .anchor]
-            case "Gaming Buddy":
+            case 3:
                 effectHeight = [gameH, socialH, ktvH, anchorH]
                 effectType = [.game, .chat, .karaoke, .anchor]
-            case "Professional podcaster":
+            case 4:
                 effectHeight = [anchorH, socialH, ktvH, gameH]
                 effectType = [.anchor, .chat, .karaoke, .game]
             default:
