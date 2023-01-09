@@ -1,13 +1,13 @@
 //
-//  AttributedTV.m
+//  AttributedTextView.m
 //  text
 //
 //  Created by CP on 2023/1/4.
 //
 
-#import "AttributedTV.h"
+#import "AttributedTextView.h"
 
-@implementation AttributedTV
+@implementation AttributedTextView
 
 -(instancetype)initWithFrame:(CGRect)frame text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor *)attributeTextColor{
     if (self = [super initWithFrame:frame]) {
