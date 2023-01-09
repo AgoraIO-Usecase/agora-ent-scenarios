@@ -103,7 +103,6 @@ UITextFieldDelegate
            forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
     
-    
     self.categoryView = [[JXCategoryTitleView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, 40)];
     self.categoryView.delegate = self;
     [self addSubview:self.categoryView];
@@ -127,7 +126,7 @@ UITextFieldDelegate
     
     self.listContainerView = [[JXCategoryListContainerView alloc] initWithType:JXCategoryListContainerType_ScrollView delegate:self];
     [self addSubview:self.listContainerView];
-    self.listContainerView.frame = CGRectMake(0, 95, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
+    self.listContainerView.frame = CGRectMake(0, self.categoryView.bottom + 10, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
     // 关联到 categoryView
     self.categoryView.listContainer = self.listContainerView;
     

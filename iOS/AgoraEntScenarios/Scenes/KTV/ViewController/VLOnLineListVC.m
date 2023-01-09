@@ -16,7 +16,6 @@
 #import "LSTPopView.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "VLToast.h"
 #import "AppContext+KTV.h"
@@ -59,14 +58,13 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [VLUserCenter clearUserRoomInfo];
+    [self.listView getRoomListIfRefresh:YES];
 }
 
 - (void)setUpUI {
     VLHomeOnLineListView *listView = [[VLHomeOnLineListView alloc]initWithFrame:CGRectMake(0, kTopNavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kTopNavHeight) withDelegate:self];
     self.listView = listView;
     [self.view addSubview:listView];
-    
-    [self.listView getRoomListIfRefresh:YES];
 }
 
 - (BOOL)checkIsLogin {
@@ -157,6 +155,10 @@
 }
 
 - (void)joinInRoomWithModel:(VLRoomListModel *)listModel withInPutText:(NSString *)inputText {
+    if (listModel.isPrivate && ![listModel.password isEqualToString:inputText]) {
+        return;
+    }
+    
     KTVJoinRoomInputModel* inputModel = [KTVJoinRoomInputModel new];
     inputModel.roomNo = listModel.roomNo;
 //    inputModel.userNo = VLUserCenter.user.userNo;
@@ -164,7 +166,7 @@
 
     VL(weakSelf);
     [[AppContext ktvServiceImp] joinRoomWithInput:inputModel
-                        completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
+                                       completion:^(NSError * error, KTVJoinRoomOutputModel * outputModel) {
         if (error != nil) {
             [VLToast toast:error.description];
             return;

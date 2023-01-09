@@ -122,7 +122,15 @@
         KTVLocalizedString(@"空灵"),
         KTVLocalizedString(@"流行"),
         KTVLocalizedString(@"R&B")];
-    NSArray *imagesArray = @[@"ktv_ console_setting1",@"ktv_ console_setting2",@"ktv_ console_setting3",@"ktv_ console_setting4",@"ktv_ console_setting1",@"ktv_ console_setting2",@"ktv_ console_setting3",@"ktv_ console_setting4",@"ktv_ console_setting1"];
+    NSArray *imagesArray = @[@"ktv_console_setting1",
+                             @"ktv_console_setting2",
+                             @"ktv_console_setting3",
+                             @"ktv_console_setting4",
+                             @"ktv_console_setting1",
+                             @"ktv_console_setting2",
+                             @"ktv_console_setting3",
+                             @"ktv_console_setting4",
+                             @"ktv_console_setting1"];
     NSMutableArray *array = [NSMutableArray array];
     for (int i = 0; i <titlesArray.count ; i++) {
         VLKTVKindsModel *model = [[VLKTVKindsModel alloc] init];

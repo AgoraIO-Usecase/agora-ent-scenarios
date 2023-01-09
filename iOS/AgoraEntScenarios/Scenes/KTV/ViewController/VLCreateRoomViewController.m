@@ -9,10 +9,8 @@
 #import "VLKTVViewController.h"
 #import "VLRoomSeatModel.h"
 #import "VLRoomListModel.h"
-//#import "AgoraRtm.h"
 #import "VLAddRoomModel.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
 #import "VLURLPathConfig.h"
@@ -28,18 +26,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    AgoraRtcEngineConfig *config = [[AgoraRtcEngineConfig alloc]init];
-    config.appId = [AppContext.shared appId];
-    config.audioScenario = AgoraAudioScenarioChorus;
-    config.channelProfile = AgoraChannelProfileLiveBroadcasting;
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:config delegate:nil];
-    /// 开启唱歌评分功能
-    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
-    if (code == 0) {
-        VLLog(@"评分回调开启成功\n");
-    } else {
-        VLLog(@"评分回调开启失败：%d\n",code);
-    }
+//    AgoraRtcEngineConfig *config = [[AgoraRtcEngineConfig alloc]init];
+//    config.appId = [AppContext.shared appId];
+//    config.audioScenario = AgoraAudioScenarioChorus;
+//    config.channelProfile = AgoraChannelProfileLiveBroadcasting;
+//    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:config delegate:nil];
+//    /// 开启唱歌评分功能
+//    int code = [self.RTCkit enableAudioVolumeIndication:20 smooth:3 reportVad:YES];
+//    if (code == 0) {
+//        VLLog(@"评分回调开启成功\n");
+//    } else {
+//        VLLog(@"评分回调开启失败：%d\n",code);
+//    }
     [self commonUI];
     [self setUpUI];
     
@@ -60,6 +58,10 @@
 }
 
 - (void)createBtnAction:(VLAddRoomModel *)roomModel {  //房主创建
+    if (roomModel.isPrivate && roomModel.password.length != 4) {
+        return;
+    }
+    
     KTVCreateRoomInputModel* intputModel = [KTVCreateRoomInputModel new];
     intputModel.belCanto = @"0";
     intputModel.icon = [NSString stringWithFormat:@"%@",roomModel.icon];
@@ -68,8 +70,11 @@
     intputModel.password = roomModel.password.length > 0 ? [NSString stringWithFormat:@"%@",roomModel.password] : @"";
     intputModel.soundEffect = @"0";
 //    intputModel.userNo = VLUserCenter.user.userNo;
+    VL(weakSelf);
+    self.view.userInteractionEnabled = NO;
     [[AppContext ktvServiceImp] createRoomWithInput:intputModel
                                          completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+        weakSelf.view.userInteractionEnabled = YES;
         if (error != nil) {
             [VLToast toast:error.description];
             return;
@@ -91,7 +96,7 @@
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
-        [self.navigationController pushViewController:ktvVC animated:YES];
+        [weakSelf.navigationController pushViewController:ktvVC animated:YES];
     }];
 }
 

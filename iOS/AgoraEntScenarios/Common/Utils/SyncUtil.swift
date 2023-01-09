@@ -25,15 +25,15 @@ class SyncUtil: NSObject {
 //        })
         let config = AgoraSyncManager.RethinkConfig(appId: KeyCenter.AppId,
                                                     channelName: sceneId)
-        ToastView.showWait(text: "join Scene...", view: nil)
+//        ToastView.showWait(text: "join Scene...", view: nil)
         manager = AgoraSyncManager(config: config, complete: { code in
-            ToastView.hidden()
+//            ToastView.hidden()
             if code == 0 {
                 print("SyncManager init success")
                 complete()
             } else {
                 print("SyncManager init error")
-                ToastView.show(text: "SyncManager 连接失败")
+//                ToastView.show(text: "SyncManager 连接失败")
             }
         })
     }
@@ -46,8 +46,7 @@ class SyncUtil: NSObject {
     {
         guard let manager = manager else { return }
         let jsonString = JSONObject.toJsonString(dict: property) ?? ""
-        let params = JSONObject.toDictionary(jsonStr: jsonString)
-        let scene = Scene(id: id, userId: userId, property: params)
+        let scene = Scene(id: id, userId: userId, property: property)
         manager.createScene(scene: scene, success: {
             manager.joinScene(sceneId: id) { sceneRef in
                 sceneRefs[id] = sceneRef
@@ -71,5 +70,9 @@ class SyncUtil: NSObject {
 
     class func leaveScene(id: String) {
         sceneRefs.removeValue(forKey: id)
+    }
+    
+    class func subscribeConnectState(state: @escaping ConnectBlockState) {
+        manager?.subscribeConnectState(state: state)
     }
 }

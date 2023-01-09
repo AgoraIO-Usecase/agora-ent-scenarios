@@ -9,7 +9,6 @@
 #import "VLListEmptyView.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "VLAPIRequest.h"
 #import "KTVMacro.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;
@@ -33,7 +32,6 @@
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLHomeOnLineListViewDelegate>)delegate {
     if (self = [super initWithFrame:frame]) {
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(exitRoomEvent) name:kExitRoomNotification object:nil];
         self.delegate = delegate;
         [self setupView];
     }
@@ -99,9 +97,9 @@
     }];
 }
 
-- (void)exitRoomEvent {
-    [self getRoomListIfRefresh:YES];
-}
+//- (void)exitRoomEvent {
+//    [self getRoomListIfRefresh:YES];
+//}
 
 #pragma mark - UITableViewDelegate,UITableViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {

@@ -11,22 +11,11 @@
 @import AgoraRtmKit;
 
 typedef enum : NSUInteger {
-    VLSendMessageTypeOnSeat = 0,         // 上麦
-    VLSendMessageTypeDropSeat = 1,       // 下麦
-    VLSendMessageTypeChooseSong = 2,     // 点歌
-    VLSendMessageTypeChangeSong = 3,     // 切歌
-    VLSendMessageTypeCloseRoom = 4,      // 关闭房间
-    VLSendMessageTypeChangeMVBg = 5,     // 切换MV背景
-
-    VLSendMessageTypeAudioMute= 9,       // 静音
-    VLSendMessageTypeVideoIfOpen = 10,    // 摄像头
-    VLSendMessageTypeTellSingerSomeBodyJoin = 11,     //通知主唱有人加入合唱
-    VLSendMessageTypeTellJoinUID = 12, //通知合唱者 主唱UID
-    VLSendMessageTypeSoloSong = 13,  //独唱
-    VLSendMessageTypeSeeScore = 14,   //观众看到分数
-    
-    VLSendMessageAuditFail = 20,
-} VLSendMessageType;
+    KTVServiceNetworkStatusConnecting = 0,
+    KTVServiceNetworkStatusOpen,
+    KTVServiceNetworkStatusFail,
+    KTVServiceNetworkStatusClosed,
+} KTVServiceNetworkStatus;
 
 
 typedef enum : NSUInteger {
@@ -72,26 +61,26 @@ NS_ASSUME_NONNULL_BEGIN
 /// 上麦
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)onSeatWithInput:(KTVOnSeatInputModel*)inputModel
-             completion:(void(^)(NSError* _Nullable))completion;
+- (void)enterSeatWithInput:(KTVOnSeatInputModel*)inputModel
+                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 下麦
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)outSeatWithInput:(KTVOutSeatInputModel*)inputModel
-              completion:(void(^)(NSError* _Nullable))completion;
+- (void)leaveSeatWithInput:(KTVOutSeatInputModel*)inputModel
+                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 设置麦位声音
-/// @param openStatus YES: 开启声音 NO: 关闭声音
+/// @param muted YES: 关闭声音 NO: 开启声音
 /// @param completion <#completion description#>
-- (void)openAudioStatusWithStatus:(BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)updateSeatAudioMuteStatusWithMuted:(BOOL)muted
+                                completion:(void(^)(NSError* _Nullable))completion;
 
 /// 打开麦位摄像头
-/// @param openStatus YES: 开启摄像头 NO: 关闭摄像头
+/// @param muted YES: 关闭摄像头 NO: 开启摄像头
 /// @param completion <#completion description#>
-- (void)openVideoStatusWithStatus: (BOOL)openStatus
-                       completion:(void(^)(NSError* _Nullable))completion;
+- (void)updateSeatVideoMuteStatusWithMuted:(BOOL)muted
+                                completion:(void(^)(NSError* _Nullable))completion;
 
 
 
@@ -126,8 +115,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 置顶歌曲
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)makeSongTopWithInput:(KTVMakeSongTopInputModel*)inputModel
-                  completion:(void(^)(NSError* _Nullable))completion;
+- (void)pinSongWithInput:(KTVMakeSongTopInputModel*)inputModel
+              completion:(void(^)(NSError* _Nullable))completion;
 
 
 //lyrics
@@ -139,17 +128,17 @@ NS_ASSUME_NONNULL_BEGIN
                  completion:(void(^)(NSError* _Nullable))completion;
 
 /// 当前歌曲合唱改为独唱
-- (void)becomeSolo;
+- (void)enterSoloMode;
 
 /// 切换MV封面
 /// @param inputModel <#inputModel description#>
 /// @param completion <#completion description#>
-- (void)changeMVCoverWithInput:(KTVChangeMVCoverInputModel*)inputModel
+- (void)changeMVCoverWithParams:(KTVChangeMVCoverInputModel*)inputModel
                 completion:(void(^)(NSError* _Nullable))completion;
 
 /// 更新得分
-/// @param totalVolume <#totalVolume description#>
-- (void)updateSingingScoreWithTotalVolume:(double)totalVolume;
+/// @param score <#totalVolume description#>
+//- (void)updateSingingScoreWithScore:(double)score;
 
 
 //subscribe
@@ -169,6 +158,24 @@ NS_ASSUME_NONNULL_BEGIN
 /// 订阅选中歌曲变化
 /// @param changedBlock <#changedBlock description#>
 - (void)subscribeChooseSongChangedWithBlock:(void (^)(NSUInteger, VLRoomSelSongModel*))changedBlock;
+
+/// 订阅歌曲评分变化
+/// @param changedBlock <#changedBlock description#>
+//- (void)subscribeSingingScoreChangedWithBlock:(void(^)(double))changedBlock;
+
+
+/// 订阅网络状态变化
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeNetworkStatusChangedWithBlock:(void(^)(KTVServiceNetworkStatus))changedBlock;
+
+
+
+/// 订阅房间过期
+/// @param changedBlock <#changedBlock description#>
+- (void)subscribeRoomWillExpire:(void(^)(void))changedBlock;
+
+/// 取消全部订阅
+- (void)unsubscribeAll;
 @end
 
 NS_ASSUME_NONNULL_END

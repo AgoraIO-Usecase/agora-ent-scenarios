@@ -6,7 +6,6 @@
 #import "VLSearchSongResultView.h"
 #import "VLSelectSongTCell.h"
 #import "VLSongItmModel.h"
-#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
