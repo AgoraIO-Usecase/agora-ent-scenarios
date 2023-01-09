@@ -21,7 +21,6 @@
 #import "MenuUtils.h"
 #import "VLAlert.h"
 @import Masonry;
-@import LEEAlert;
 
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
@@ -112,68 +111,18 @@
     }];
 }
 
-
-- (BOOL)getLibraryAccess {
-    return [NSUserDefaults.standardUserDefaults boolForKey:@"LibraryAccess"];
-}
-
-- (void)setLibraryAccess:(BOOL)isOpen {
-    [NSUserDefaults.standardUserDefaults setBool:isOpen forKey:@"LibraryAccess"];
-}
-
-- (void)showAlert {
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:AGLocalizedString(@"声动互娱”想访问您的相册")
-                                                                message:AGLocalizedString(@"声网需要您开启相册访问功能，读取照片上传头像")
-                                                         preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action1 = [UIAlertAction actionWithTitle:AGLocalizedString(@"不允许")
-                                                      style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction * _Nonnull action) {
-        [self setLibraryAccess:NO];
-    }];
-    UIAlertAction *action2 = [UIAlertAction actionWithTitle:AGLocalizedString(@"好")
-                                                      style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction * _Nonnull action) {
-        [self setLibraryAccess:YES];
-        [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-    }];
-    [vc addAction:action1];
-    [vc addAction:action2];
-    [self.navigationController presentViewController:vc
-                                            animated:YES
-                                          completion:nil];
-}
-
 - (void)showUploadPicAlter {
     kWeakSelf(self)
-    [LEEAlert actionsheet].config
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"上传头像");
-        action.height = 20;
-        action.titleColor = [UIColor whiteColor];
-        action.font = VLUIFontMake(14);
-    })
-//    .LeeAddAction(^(LEEAction * _Nonnull action) {
-//        action.type = LEEActionTypeDefault;
-//        action.title = AGLocalizedString(@"拍照上传");
-//        action.clickBlock = ^{
-//            [weakself requestAuthorizationForCamera];
-//        };
-//    })
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeDefault;
-        action.title = AGLocalizedString(@"本地相册上传");
-        action.clickBlock = ^{
-            [weakself requestAuthorizationForPhotoLibrary];
-        };
-    })
-    .LeeAddAction(^(LEEAction * _Nonnull action) {
-        action.type = LEEActionTypeCancel;
-        action.title = AGLocalizedString(@"取消");
-        action.clickBlock = ^{
-        };
-    })
-    .LeeShow();
+    UIAlertController *alertSheet = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *upload = [UIAlertAction actionWithTitle:AGLocalizedString(@"本地相册上传") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [weakself requestAuthorizationForPhotoLibrary];
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:AGLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            NSLog(@"点击了取消");
+    }];
+    [alertSheet addAction:upload];
+    [alertSheet addAction:cancel];
+    [self presentViewController:alertSheet animated:YES completion:nil];
 }
 
 - (void)requestAuthorizationForPhotoLibrary {
@@ -191,28 +140,25 @@
 
 - (void)requestAuthorizationForCamera{
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-        if(granted == true){
-            dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(granted == true){
                 [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
-            });
-        } else {
-            [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
-        }
+            } else {
+                [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
+            }
+        });
     }];
 }
 
 -(void)showAlertWithMessage:(NSString *)mes {
-    //注，这里一定要回归的主线程操作UI
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示" message:mes preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[UIApplication sharedApplication]openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:nil completionHandler:nil];
-        }];
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
-        [alertController addAction:cancelAction];
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-    });
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示" message:mes preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:nil completionHandler:nil];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:cancelAction];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
@@ -318,50 +264,6 @@
         }
         [[VLAlert shared] dismiss];
     }];
-    
-//    [LEEAlert alert].config
-//    .LeeAddTitle(^(UILabel *label) {
-//        label.text = AGLocalizedString(@"确定注销账号？");
-//        label.textColor = UIColorMakeWithHex(@"#040925");
-//        label.font = UIFontBoldMake(16);
-//    })
-//    .LeeContent(AGLocalizedString(@"注销账号后，您将暂时无法使用该账号体验我们的服务，真的要注销吗？"))
-//    .LeeAddAction(^(LEEAction *action) {
-//        VL(weakSelf);
-//        action.type = LEEActionTypeCancel;
-//        action.title = AGLocalizedString(@"注销");
-//        action.titleColor = UIColorMakeWithHex(@"#000000");
-//        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-//        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-//        action.cornerRadius = 20;
-//        action.height = 40;
-//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-//        action.font = UIFontBoldMake(16);
-//        action.clickBlock = ^{
-//            NSDictionary *param = @{@"userNo":VLUserCenter.user.userNo ?: @""};
-//            [VLAPIRequest getRequestURL:kURLPathDestroyUser parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-//                if (response.code == 0) {
-//                    [weakSelf userLogout];
-//                }
-//            } failure:^(NSError * _Nullable error, NSURLSessionDataTask * _Nullable task) {
-//            }];
-//        };
-//    })
-//    .LeeAddAction(^(LEEAction *action) {
-//        action.type = LEEActionTypeCancel;
-//        action.title = AGLocalizedString(@"取消");
-//        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-//        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-//        action.cornerRadius = 20;
-//        action.height = 40;
-//        action.font = UIFontBoldMake(16);
-//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-//        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-//        action.clickBlock = ^{
-//            // 取消点击事件Block
-//        };
-//    })
-//    .LeeShow();
 }
 
 // 退出登录
@@ -375,53 +277,6 @@
         }
         [[VLAlert shared] dismiss];
     }];
-
-//    [LEEAlert alert].config
-//    .LeeAddTitle(^(UILabel *label) {
-//        label.text = AGLocalizedString(@"确定退出登录?");
-//        label.textColor = UIColorMakeWithHex(@"#040925");
-//        label.font = UIFontBoldMake(16);
-//    })
-//    .LeeContent(AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～"))
-//    .LeeAddAction(^(LEEAction *action) {
-//        VL(weakSelf);
-//        action.type = LEEActionTypeCancel;
-//        action.title = AGLocalizedString(@"退出");
-//        action.titleColor = UIColorMakeWithHex(@"#000000");
-//        action.backgroundColor = UIColorMakeWithHex(@"#EFF4FF");
-//        action.borderColor = UIColorMakeWithHex(@"#EFF4FF");
-//        action.cornerRadius = 20;
-//        action.height = 40;
-//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-//        action.font = UIFontBoldMake(16);
-//        action.clickBlock = ^{
-//            [weakSelf userLogout];
-//            return;
-////            NSDictionary *param = @{@"userNo" : VLUserCenter.user.userNo ?: @""};
-////            [VLAPIRequest getRequestURL:kURLPathLogout parameter:param showHUD:YES success:^(VLResponseDataModel * _Nonnull response) {
-////                if (response.code == 0) {
-////                    [self userLogout];
-////                }
-////            } failure:^(NSError * _Nullable error) {
-////            }];
-//        };
-//    })
-//    .LeeAddAction(^(LEEAction *action) {
-//        action.type = LEEActionTypeCancel;
-//        action.title = AGLocalizedString(@"取消");
-//        action.titleColor = UIColorMakeWithHex(@"#FFFFFF");
-//        action.backgroundColor = UIColorMakeWithHex(@"#2753FF");
-//        action.cornerRadius = 20;
-//        action.height = 40;
-//        action.font = UIFontBoldMake(16);
-//        action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
-//        action.borderColor = UIColorMakeWithHex(@"#2753FF");
-//        action.clickBlock = ^{
-//            // 取消点击事件Block
-//        };
-//    })
-//    .LeeShow();
-    
 }
  
 /// 上传图片
