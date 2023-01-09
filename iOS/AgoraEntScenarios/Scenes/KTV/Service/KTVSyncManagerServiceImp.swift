@@ -24,7 +24,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
     #if DEBUG
     assert(condition, message)
     #else
-    KTVLog.errorText(text: message, tag: "KTVService")
+    KTVLog.error(text: message, tag: "KTVService")
     #endif
 }
 
@@ -41,6 +41,16 @@ private func _showLoadingIfNeed() {
 
 private func _hideLoadingIfNeed() {
     SVProgressHUD.dismiss()
+}
+
+private func mapConvert(model: NSObject) ->[String: Any] {
+    let params = model.yy_modelToJSONObject() as! [String: Any]
+    //TODO: convert to swift map to fix SyncManager parse NSDictionary bugs
+    var swiftParams = [String: Any]()
+    params.forEach { (key: String, value: Any) in
+        swiftParams[key] = value
+    }
+    return swiftParams
 }
 
 @objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
@@ -182,12 +192,13 @@ private func _hideLoadingIfNeed() {
         roomInfo.icon = inputModel.icon
         roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
 
-        let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
+        let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
+                               isOwner: roomInfo.creator == VLUserCenter.user.id,
                                property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
@@ -209,7 +220,7 @@ private func _hideLoadingIfNeed() {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
                                                      uid: "\(playerRTCUid)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
@@ -259,12 +270,13 @@ private func _hideLoadingIfNeed() {
             return
         }
 
-        let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
+        let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
+                               isOwner: roomInfo.creator == VLUserCenter.user.id,
                                property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
@@ -286,7 +298,7 @@ private func _hideLoadingIfNeed() {
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
                                                      uid: "\(playerRTCUid)",
                                                      tokenGeneratorType: .token006,
                                                      tokenTypes: [.rtc]) { tokenMap in
@@ -352,7 +364,7 @@ private func _hideLoadingIfNeed() {
         roomInfo.bgOption = Int(inputModel.mvIndex)
 //        let objectId = roomInfo.objectId
         let objectId = channelName
-        var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
+        var params = mapConvert(model: roomInfo)
         params["objectId"] = objectId
         agoraPrint("imp room update mv... [\(objectId)]")
         SyncUtil
@@ -441,7 +453,7 @@ private func _hideLoadingIfNeed() {
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
         topSong.isChorus = true
-        topSong.status = 3
+        topSong.status = VLSongPlayStatusPlaying
         topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
@@ -449,7 +461,7 @@ private func _hideLoadingIfNeed() {
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
-        inputModel.status = 2
+        inputModel.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: inputModel, finished: completion)
     }
 
@@ -463,7 +475,7 @@ private func _hideLoadingIfNeed() {
 //        songInfo.songUrl = inputModel.songUrl
         songInfo.imageUrl = inputModel.imageUrl
         songInfo.singer = inputModel.singer
-        songInfo.status = 0
+        songInfo.status = VLSongPlayStatusIdle
         /// 是谁点的歌
         songInfo.userNo = VLUserCenter.user.id
 //        songInfo.userId = UserInfo.userId
@@ -491,7 +503,7 @@ private func _hideLoadingIfNeed() {
         song.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
 
         //if top song is playing status, keep it always on top(_sortChooseSongList)
-        if topSong.objectId != song.objectId, topSong.status != 2 {
+        if topSong.objectId != song.objectId, topSong.status != VLSongPlayStatusPlaying {
             topSong.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
             _updateChooseSong(songInfo: topSong) { error in
             }
@@ -693,7 +705,7 @@ extension KTVSyncManagerServiceImp {
         agoraPrint("imp user add ...")
         let model = VLUserCenter.user
 
-        let params = model.yy_modelToJSONObject() as! [String: Any]
+        let params = mapConvert(model: model)
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
@@ -768,7 +780,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 agoraPrint("imp user delete success...")
                 completion(nil)
             }, fail: { error in
@@ -797,18 +810,7 @@ extension KTVSyncManagerServiceImp {
         }
         roomInfo.updatedAt = Int64(Date().timeIntervalSince1970 * 1000)
         roomInfo.roomPeopleNum = roomPeopleNum
-        var params = roomInfo.yy_modelToJSONObject() as! [String: Any]
-//        SyncUtil
-//            .scene(id: channelName)?
-//            .collection(className: "")
-//            .add(data: params,
-//                 success: { object in
-//                completion(nil)
-//            }, fail: { error in
-//                completion(error)
-//            })
-        
-//        let objectId = roomInfo.objectId
+        var params = mapConvert(model: roomInfo)
         let objectId = channelName
         agoraPrint("imp room update user count... [\(objectId)]")
         params["objectId"] = objectId
@@ -989,17 +991,12 @@ extension KTVSyncManagerServiceImp {
         }
         
         agoraPrint("imp seat update... [\(objectId)]")
-        let params = seatInfo.yy_modelToJSONObject() as! [String: Any]
-        //TODO: convert to swift map to fix SyncManager parse NSDictionary bugs
-        var seatParams = [String: Any]()
-        params.forEach { (key: String, value: Any) in
-            seatParams[key] = value
-        }
+        let params = mapConvert(model: seatInfo)
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
             .update(id: objectId,
-                    data: seatParams,
+                    data: params,
                     success: {
                 agoraPrint("imp seat update success...")
                 finished(nil)
@@ -1024,7 +1021,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 agoraPrint("imp seat delete success...")
                 finished(nil)
             }, fail: { error in
@@ -1043,7 +1041,7 @@ extension KTVSyncManagerServiceImp {
         }
         
         agoraPrint("imp seat add...")
-        let params = seatInfo.yy_modelToJSONObject() as! [String: Any]
+        let params = mapConvert(model: seatInfo)
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_INFO)
@@ -1118,10 +1116,10 @@ extension KTVSyncManagerServiceImp {
 extension KTVSyncManagerServiceImp {
     private func _sortChooseSongList() {
         songList = songList.sorted(by: { model1, model2 in
-            if model1.status == 2 {
+            if model1.status == VLSongPlayStatusPlaying {
                 return true
             }
-            if model2.status == 2 {
+            if model2.status == VLSongPlayStatusPlaying {
                 return false
             }
             if model1.pinAt < 1,  model2.pinAt < 1 {
@@ -1145,7 +1143,7 @@ extension KTVSyncManagerServiceImp {
                 guard let self = self else {
                     return
                 }
-                agoraPrint("imp song get success...")
+                agoraPrint("imp song get success... \(list.count)")
                 self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
                 self._sortChooseSongList()
                 let songList = self.songList
@@ -1165,7 +1163,7 @@ extension KTVSyncManagerServiceImp {
             return
         }
 
-        let params = songInfo.yy_modelToJSONObject() as! [String: Any]
+        let params = mapConvert(model: songInfo)
         agoraPrint("imp song update... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
@@ -1189,7 +1187,7 @@ extension KTVSyncManagerServiceImp {
         }
         agoraPrint("imp song add...")
         songInfo.createAt = Int64(Date().timeIntervalSince1970 * 1000)
-        let params = songInfo.yy_modelToJSONObject() as! [String: Any]
+        let params = mapConvert(model: songInfo)
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
@@ -1223,8 +1221,8 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-//            .document(id: objectId)
-            .delete(id: objectId, success: {
+            .document(id: objectId)
+            .delete(success: {_ in
                 completion(nil)
                 agoraPrint("imp song delete success...")
             }, fail: { error in
@@ -1235,14 +1233,14 @@ extension KTVSyncManagerServiceImp {
 
     private func _markCurrentSongIfNeed() {
         guard let topSong = songList.first,
-              topSong.status == 0, // ready status
+              topSong.status == VLSongPlayStatusIdle, // ready status
               topSong.isChorus == false,
               topSong.userNo == VLUserCenter.user.id
         else {
             return
         }
 
-        topSong.status = 2
+        topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
     }
@@ -1252,12 +1250,12 @@ extension KTVSyncManagerServiceImp {
               topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus ?? false) \(songList.first?.userNo ?? "")")
+            KTVLog.warning(text: "_markSoloSongIfNeed break: \(songList.first?.isChorus) \(songList.first?.status) \(songList.first?.userNo)/\(VLUserCenter.user.id)")
             return
         }
         
         topSong.isChorus = false
-        topSong.status = 3
+        topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
     }
@@ -1271,18 +1269,7 @@ extension KTVSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO,
-                       onCreated: { [weak self] object in
-                guard let self = self,
-                      let jsonStr = object.toJson(),
-                      let model = VLRoomSelSongModel.yy_model(withJSON: jsonStr)
-                else {
-                    return
-                }
-                agoraPrint("imp song subscribe onCreated... [\(object.getId())]")
-                self.songList.append(model)
-                self._sortChooseSongList()
-                self.chooseSongDidChanged?(KTVSubscribeCreated.rawValue, model)
-//                self._markCurrentSongIfNeed()
+                       onCreated: {  _ in
             }, onUpdated: { [weak self] object in
                 guard let self = self,
                       let jsonStr = object.toJson(),
@@ -1290,22 +1277,24 @@ extension KTVSyncManagerServiceImp {
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onUpdated... [\(object.getId())]")
-                self.songList = self.songList.filter({ $0.objectId != model.objectId })
+                let songList = self.songList.filter({ $0.objectId != model.objectId })
+                let type = songList.count == self.songList.count ? KTVSubscribeCreated : KTVSubscribeUpdated
+                self.songList = songList
                 self.songList.append(model)
                 self._sortChooseSongList()
-                self.chooseSongDidChanged?(KTVSubscribeUpdated.rawValue, model)
+                self.chooseSongDidChanged?(type.rawValue, model)
 //                self._markCurrentSongIfNeed()
+                agoraPrint("imp song subscribe onUpdated... [\(object.getId())] count: \(self.songList.count)")
             }, onDeleted: { [weak self] object in
                 guard let self = self,
                       let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
                 else {
                     return
                 }
-                agoraPrint("imp song subscribe onDeleted... [\(object.getId())]")
                 self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
                 self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
 //               self._markCurrentSongIfNeed()
+                agoraPrint("imp song subscribe onDeleted... [\(object.getId())] count: \(self.songList.count)")
             }, onSubscribed: {
 //                LogUtils.log(message: "subscribe message", level: .info)
                 finished()

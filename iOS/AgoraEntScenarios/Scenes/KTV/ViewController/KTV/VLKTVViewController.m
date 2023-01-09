@@ -95,7 +95,6 @@ KTVApiDelegate
 
 @property (nonatomic, assign) BOOL isNowMicMuted;
 @property (nonatomic, assign) BOOL isNowCameraMuted;
-@property (nonatomic, assign) BOOL isPlayerPublish;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 @property (nonatomic, assign) BOOL isEarOn;
 @property (nonatomic, assign) KTVPlayerTrackMode trackMode;
@@ -193,7 +192,7 @@ KTVApiDelegate
     [self.RTCkit destroyMediaPlayer:self.rtcMediaPlayer];
     
     [AgoraRtcEngineKit destroy];
-    VLLog(@"Agora - destroy RTCEngine");
+    KTVLogInfo(@"Agora - destroy RTCEngine");
     
     self.ktvApi = nil;
     
@@ -250,7 +249,7 @@ KTVApiDelegate
         [weakSelf.roomPersonView reloadSeatIndex:model.seatIndex];
         
         //update my seat status
-        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
+//        weakSelf.isOnMicSeat = [weakSelf getCurrentUserSeatInfo] ? YES : NO;
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomStatusChangedWithBlock:^(KTVSubscribe status, VLRoomListModel * roomInfo) {
@@ -399,7 +398,7 @@ KTVApiDelegate
         _scoreView = [[VLPopScoreView alloc] initWithFrame:self.view.bounds withDelegate:self];
         [self.view addSubview:_scoreView];
     }
-    VLLog(@"Avg score for the song: %d", score);
+    KTVLogInfo(@"Avg score for the song: %d", score);
     [_scoreView configScore:score];
     [self.view bringSubviewToFront:_scoreView];
     self.scoreView.hidden = NO;
@@ -407,13 +406,14 @@ KTVApiDelegate
 
 - (void)popScoreViewDidClickConfirm
 {
-    VLLog(@"Using as score view hidding");
+    KTVLogInfo(@"Using as score view hidding");
     self.scoreView = nil;
 }
 
 #pragma mark - rtc callbacks
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
+    KTVLogInfo(@"didJoinedOfUid: %ld", uid);
     [self.ktvApi mainRtcEngine:engine didJoinedOfUid:uid elapsed:elapsed];
 }
 
@@ -502,7 +502,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
     [self markSongPlaying:model];
     
-    
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
         [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
     KTVSongType type = [model isChorus] ? KTVSongTypeChorus : KTVSongTypeSolo;
@@ -554,7 +553,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    if(model.isChorus && model.status == 0 && model.chorusNo.length == 0) {
+    if(model.isChorus && model.status == VLSongPlayStatusIdle && model.chorusNo.length == 0) {
         // for new chorus song, need to wait till co-singer joins or force solo
         if([model isSongOwner]){
             //only song owner setup the timer, audience do nothing
@@ -618,7 +617,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)markSongPlaying:(VLRoomSelSongModel *)model {
-    if (model.status == 2) {
+    if (model.status == VLSongPlayStatusPlaying) {
         return;
     }
     [[AppContext ktvServiceImp] markSongDidPlayWithInput:model
@@ -746,9 +745,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
     if (code == 0) {
-        VLLog(@"评分回调开启成功\n");
+        KTVLogInfo(@"评分回调开启成功\n");
     } else {
-        VLLog(@"评分回调开启失败：%d\n",code);
+        KTVLogInfo(@"评分回调开启失败：%d\n",code);
     }
     
     [self.RTCkit enableVideo];
@@ -802,19 +801,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.ktvApi.lrcView = self.MVView.lrcView;
     
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
+    int ret =
     [self.RTCkit joinChannelByToken:VLUserCenter.user.agoraRTCToken
                           channelId:self.roomModel.roomNo
                                 uid:[VLUserCenter.user.id integerValue]
                        mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
-        VLLog(@"Agora - 加入RTC成功");
-       
+        KTVLogInfo(@"Agora - 加入RTC成功");
     }];
+    if (ret != 0) {
+        KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
+    }
 }
 
 - (void)leaveRTCChannel {
     [self.RTCkit leaveChannel:^(AgoraChannelStats * _Nonnull stat) {
-        VLLog(@"Agora - Leave RTC channel");
+        KTVLogInfo(@"Agora - Leave RTC channel");
     }];
 }
 
@@ -829,7 +831,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [option setAutoSubscribeAudio:YES];
     [option setAutoSubscribeVideo:YES];
     [option setPublishMediaPlayerId:[self.rtcMediaPlayer getMediaPlayerId]];
-    [option setPublishMediaPlayerAudioTrack:self.isPlayerPublish];
     [option setEnableAudioRecordingOrPlayout:YES];
     return option;
 }
@@ -866,7 +867,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self.MVView reset];
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
             if(local) {
-                VLLog(@"Playback all loop completed");
+                KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
                     [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
@@ -1172,7 +1173,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (effectType == VLKTVSoundEffectTypeNone) {
         [self.RTCkit setAudioEffectParameters:AgoraAudioEffectPresetPitchCorrection param1:0 param2:4];
     }
-    VLLog(@"Agora - Setting effect type to %lu", effectType);
+    KTVLogInfo(@"Agora - Setting effect type to %lu", effectType);
 }
 
 #pragma mark --
@@ -1246,6 +1247,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)setSeatsArray:(NSArray<VLRoomSeatModel *> *)seatsArray {
     _seatsArray = seatsArray;
+    
     //update booleans
     self.isOnMicSeat = [self getCurrentUserSeatInfo] == nil ? NO : YES;
     
@@ -1253,17 +1255,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setIsOnMicSeat:(BOOL)isOnMicSeat {
+    BOOL onMicSeatStatusDidChanged = _isOnMicSeat != isOnMicSeat;
     _isOnMicSeat = isOnMicSeat;
     
-    //start mic once enter seat
-    if(isOnMicSeat) {
-        [self.RTCkit setClientRole:AgoraClientRoleBroadcaster];
-    } else {
-        [self.RTCkit setClientRole:AgoraClientRoleAudience];
+    if (onMicSeatStatusDidChanged) {
+        //start mic once enter seat
+        AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
+        [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
+        // use audio volume to control mic on/off, so that mic is always on when broadcaster
+        [option setPublishMicrophoneTrack:[self isBroadcaster]];
+        [self.RTCkit updateChannelWithMediaOptions:option];
+        
+        //TODO: isOnMicSeat = NO && is chorus && is co singer
     }
+    
     [self.RTCkit enableLocalAudio:isOnMicSeat];
     [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
-    
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
@@ -1288,7 +1295,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isNowCameraMuted = isNowCameraMuted;
     
     [self.RTCkit enableLocalVideo:!isNowCameraMuted];
-    [self.RTCkit updateChannelWithMediaOptions:[self channelMediaOptions]];
+    AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
+    [option setPublishCameraTrack:!self.isNowCameraMuted];
+    [self.RTCkit updateChannelWithMediaOptions:option];
     if(oldValue != isNowCameraMuted) {
         [self.bottomView updateVideoBtn:isNowCameraMuted];
     }
