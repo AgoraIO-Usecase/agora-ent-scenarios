@@ -8,7 +8,6 @@
 #import "VLRoomSelSongModel.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
-//#import "VLAPIRequest.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
 @import QMUIKit;
@@ -19,7 +18,6 @@
 @property(nonatomic, weak) id <VLChoosedSongViewDelegate>delegate;
 
 @property (nonatomic, strong) UITableView  *tableView;
-@property (nonatomic, copy) NSString *roomNo;
 
 @end
 
@@ -96,33 +94,15 @@
     
     KTVMakeSongTopInputModel* inputModel = [KTVMakeSongTopInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
-    [[AppContext ktvServiceImp] makeSongTopWithInput:inputModel
-                                          completion:^(NSError * error) {
-        if (error != nil) {
-            return;
-        }
-    }];
-}
-
-- (void)loadChoosedSongWithRoomNo:(NSString *)roomNo {
-    self.roomNo = roomNo;
-    
-    VL(weakSelf);
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        [weakSelf setSelSongsUIWithArray:songArray];
+    [[AppContext ktvServiceImp] pinSongWithInput:inputModel
+                                      completion:^(NSError * error) {
     }];
 }
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
-    inputModel.sort = model.sort;
     inputModel.objectId = model.objectId;
     [[AppContext ktvServiceImp] removeSongWithInput:inputModel
                                          completion:^(NSError * error) {

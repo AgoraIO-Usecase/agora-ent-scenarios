@@ -66,7 +66,7 @@
     [self.contentView addSubview:self.nickNameLabel];
     
     self.muteImgView = [[UIImageView alloc]initWithFrame:CGRectMake(VLREALVALUE_WIDTH(54)/2-12, VLREALVALUE_WIDTH(54)/2-12, 24, 24)];
-    self.muteImgView.image = [UIImage imageNamed:@"ktv_self_seatMute"];
+    self.muteImgView.image = [UIImage sceneImageWithName:@"ktv_self_seatMute"];
     self.muteImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.muteImgView];
     
@@ -99,6 +99,8 @@
     self.joinChorusBtn.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.5);
     self.joinChorusBtn.alpha = 0.6;
     [self.contentView addSubview:self.joinChorusBtn];
+    
+    
 }
 
 @end
