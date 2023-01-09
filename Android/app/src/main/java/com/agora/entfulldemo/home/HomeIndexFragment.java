@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding;
@@ -56,7 +57,7 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
         try {
             startActivity(intent);
         } catch (Exception e) {
-            ToastUtils.showToast(e.getMessage());
+            ToastUtils.showToast(R.string.app_coming_soon);
         }
     }
 
