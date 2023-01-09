@@ -2,7 +2,6 @@ package io.agora.scene.ktv.live
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
@@ -14,6 +13,7 @@ import io.agora.rtc2.Constants.AUDIO_SCENARIO_GAME_STREAMING
 import io.agora.rtc2.audio.AudioParams
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.widget.LrcControlView
 import org.json.JSONException
 import org.json.JSONObject
@@ -295,7 +295,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (ret == 0) {
             success.invoke(true)
         } else {
-            Log.e(TAG, "sendStreamMessageWithJsonObject failed: $ret")
+            KTVLogger.e(TAG, "sendStreamMessageWithJsonObject failed: $ret")
         }
     }
 
@@ -355,7 +355,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val jsonMsg = JSONObject(msg)
                 val ret = mRtcEngine!!.sendStreamMessage(streamId, jsonMsg.toString().toByteArray())
                 if (ret < 0) {
-                    Log.e(TAG, "sendPitch() sendStreamMessage called returned: $ret")
+                    KTVLogger.e(TAG, "sendPitch() sendStreamMessage called returned: $ret")
                 }
             }
         })
@@ -371,7 +371,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             try {
                 mSyncPitchThread!!.join()
             } catch (exp: InterruptedException) {
-                Log.e(TAG, "stopSyncPitch: $exp")
+                KTVLogger.e(TAG, "stopSyncPitch: $exp")
             }
         }
     }
@@ -456,7 +456,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     // ------------------ 歌词播放、同步 ------------------
     // 开始播放歌词
     private fun startDisplayLrc() {
-        Log.d("KTVLiveRoomLog:", "startDisplayLrc")
+        KTVLogger.d("KTVLiveRoomLog:", "startDisplayLrc")
         mStopDisplayLrc = false
         mDisplayThread = Thread {
             var curTs: Long
@@ -492,13 +492,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             try {
                 mDisplayThread!!.join()
             } catch (exp: InterruptedException) {
-                Log.d(TAG, "stopDisplayLrc: $exp")
+                KTVLogger.d(TAG, "stopDisplayLrc: $exp")
             }
         }
     }
 
     private fun loadLyric(songNo: Long, onLoadLyricCallback: (lyricUrl: String?) -> Unit) {
-        Log.d(TAG, "loadLyric: $songNo")
+        KTVLogger.d(TAG, "loadLyric: $songNo")
         if (mMusicCenter == null) return
         val requestId = mMusicCenter!!.getLyric(songNo, 0)
         if (requestId.isEmpty()) {
@@ -509,7 +509,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun loadMusic(songNo: Long, onLoadMusicCallback: (status: Int?) -> Unit) {
-        Log.d(TAG, "loadMusic: $songNo")
+        KTVLogger.d(TAG, "loadMusic: $songNo")
         if (mMusicCenter == null) return
         val ret = mMusicCenter!!.isPreloaded(songNo)
         if (ret == 0) {
@@ -616,7 +616,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, Constants.MediaPlayerState.getStateByValue(state), false)
             }
         } catch (exp: JSONException) {
-            Log.e(TAG, "onStreamMessage:$exp")
+            KTVLogger.e(TAG, "onStreamMessage:$exp")
         }
     }
 
@@ -624,6 +624,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         super.onAudioVolumeIndication(speakers, totalVolume)
         // VideoPitch回调, 用于同步各端音准
         if (songConfig == null || mPlayer == null) return
+        if (mPlayer!!.state != Constants.MediaPlayerState.PLAYER_STATE_PLAYING) return
         if (songConfig!!.mainSingerUid.toLong() == UserManager.getInstance().user.id
             || songConfig!!.coSingerUid.toLong() == UserManager.getInstance().user.id
         ) {
