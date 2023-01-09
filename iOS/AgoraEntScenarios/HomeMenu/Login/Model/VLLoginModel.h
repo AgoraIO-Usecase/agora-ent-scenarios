@@ -9,14 +9,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLLoginModel : VLBaseModel
 @property (nonatomic, copy) NSString *openId;
-@property (nonatomic, copy) NSString *userNo;    //account user id
+@property (nonatomic, copy) NSString *userNo;
 @property (nonatomic, copy) NSString *headUrl;
 @property (nonatomic, copy) NSString *mobile;
 @property (nonatomic, assign) NSInteger status;
 @property (nonatomic, copy) NSString *sex;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *token;
-@property (nonatomic, copy) NSString *id;  //uid (mpk)
+@property (nonatomic, copy) NSString *id;  //uid
 
 //自己是否是房主
 @property (nonatomic, assign) BOOL ifMaster;
@@ -33,6 +33,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *im_token;
 @property (nonatomic) NSString *authorization;
 @property (nonatomic) BOOL hasVoiceRoomUserInfo;
+
+
+
+
+//给各个场景保留的扩展字段
+@property (nonatomic, strong, readonly) NSMutableDictionary* extraDic;
 @end
 
 NS_ASSUME_NONNULL_END
