@@ -12,10 +12,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import io.agora.scene.voice.bean.RoomKitBean
+import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.ui.fragment.RoomContributionRankingFragment
-import io.agora.voice.baseui.dialog.BaseFixedHeightSheetDialog
-import io.agora.voice.buddy.tool.ResourcesTools
+import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
+import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogContributionAndAudienceBinding
 

@@ -11,4 +11,6 @@
 
 #define KTVLocalizedString(s) ([s toSceneLocalization])
 
+#define KTVLogInfo(format, ...)  ([KTVLog infoWithText:[NSString stringWithFormat:(format), ##__VA_ARGS__] tag: nil])
+
 #endif /* KTVMacro_h */

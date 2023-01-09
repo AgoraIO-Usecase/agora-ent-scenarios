@@ -1,5 +1,6 @@
 package io.agora.scene.voice.ui.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -10,32 +11,49 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionConstructor.builderSoundSelectionList
-import io.agora.scene.voice.VoiceConfigManager.getLifecycleCallbacks
-import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
-import io.agora.voice.buddy.config.ConfigConstants
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterParams
-import io.agora.scene.voice.bean.SoundSelectionBean
-import io.agora.scene.voice.service.VoiceRoomModel
-import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
-import io.agora.scene.voice.model.VoiceRoomViewModel
-import io.agora.scene.voice.service.VoiceBuddyFactory
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.adapter.OnItemClickListener
-import io.agora.voice.baseui.general.callback.OnResourceParseCallback
-import io.agora.voice.baseui.general.net.Resource
-import io.agora.voice.buddy.tool.FastClickTools
-import io.agora.voice.buddy.tool.LogTools.logD
-import io.agora.voice.buddy.tool.ThreadManager
-import io.agora.voice.buddy.tool.ToastTools
-import io.agora.voice.imkit.manager.ChatroomHelper
+import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
+import io.agora.scene.voice.model.SoundSelectionBean
+import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
+import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
+import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
+import io.agora.voice.common.constant.ConfigConstants
+import io.agora.voice.common.net.OnResourceParseCallback
+import io.agora.voice.common.net.Resource
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
+import io.agora.voice.common.utils.FastClickTools
+import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.voice.common.utils.ThreadManager
+import io.agora.voice.common.utils.ToastTools
 
 class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelectionLayoutBinding>() {
+
+    companion object {
+        const val KEY_CHATROOM_CREATE_NAME = "chatroom_create_name"
+        const val KEY_CHATROOM_CREATE_IS_PUBLIC = "chatroom_create_is_public"
+        const val KEY_CHATROOM_CREATE_ENCRYPTION = "chatroom_create_encryption"
+        const val KEY_CHATROOM_CREATE_ROOM_TYPE = "chatroom_create_room_type"
+
+        fun startActivity(activity: Activity, roomName: String, isPublic: Boolean, encryption: String, roomType: Int) {
+            val intent = Intent(activity, VoiceRoomSoundSelectionActivity::class.java).apply {
+                putExtra(KEY_CHATROOM_CREATE_NAME, roomName)
+                putExtra(KEY_CHATROOM_CREATE_IS_PUBLIC, isPublic)
+                if (!isPublic) {
+                    putExtra(KEY_CHATROOM_CREATE_ENCRYPTION, encryption)
+                }
+                putExtra(KEY_CHATROOM_CREATE_ROOM_TYPE, roomType)
+            }
+            activity.startActivity(intent)
+        }
+    }
+
     private var soundSelectAdapter: VoiceRoomSoundSelectionAdapter? = null
-    private lateinit var voiceRoomViewModel: VoiceRoomViewModel
+    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
     private var isPublic = true
     private var roomName: String = ""
     private var encryption: String = ""
@@ -50,7 +68,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarCompat.setLightStatusBar(this, true)
         super.onCreate(savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceRoomViewModel::class.java]
+        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         initIntent()
         initAdapter()
         initListener()
@@ -59,10 +77,10 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
 
     private fun initIntent() {
         intent?.let {
-            roomName = it.getStringExtra(RouterParams.KEY_CHATROOM_CREATE_NAME) ?: ""
-            isPublic = it.getBooleanExtra(RouterParams.KEY_CHATROOM_CREATE_IS_PUBLIC, true)
-            encryption = it.getStringExtra(RouterParams.KEY_CHATROOM_CREATE_ENCRYPTION) ?: ""
-            roomType = it.getIntExtra(RouterParams.KEY_CHATROOM_CREATE_ROOM_TYPE, 0)
+            roomName = it.getStringExtra(KEY_CHATROOM_CREATE_NAME) ?: ""
+            isPublic = it.getBooleanExtra(KEY_CHATROOM_CREATE_IS_PUBLIC, true)
+            encryption = it.getStringExtra(KEY_CHATROOM_CREATE_ENCRYPTION) ?: ""
+            roomType = it.getIntExtra(KEY_CHATROOM_CREATE_ROOM_TYPE, 0)
         }
     }
 
@@ -70,7 +88,8 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         val soundSelectionList: List<SoundSelectionBean> =
             builderSoundSelectionList(this, ConfigConstants.SoundSelection.Social_Chat)
         soundSelectAdapter =
-            VoiceRoomSoundSelectionAdapter(soundSelectionList, object : OnItemClickListener<SoundSelectionBean> {
+            VoiceRoomSoundSelectionAdapter(soundSelectionList, object :
+                OnItemClickListener<SoundSelectionBean> {
                 override fun onItemClick(data: SoundSelectionBean, view: View, position: Int, viewType: Long) {
                     soundSelectAdapter?.setSelectedPosition(position)
                     soundEffect = data.soundSelectionType
@@ -90,7 +109,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
         binding.bottomLayout.setOnClickListener {
             if (roomType == 0) {
                 if (FastClickTools.isFastClick(it)) return@setOnClickListener
-                createNormalRoom(soundEffect)
+                checkPrivate(soundEffect)
             }
             //      else {
 //         createSpatialRoom();
@@ -103,45 +122,47 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             parseResource(response, object : OnResourceParseCallback<VoiceRoomModel>() {
                 override fun onSuccess(voiceRoomModel: VoiceRoomModel?) {
                     curVoiceRoomModel = voiceRoomModel
+                    "voiceRoomObservable memberCount: ${voiceRoomModel?.memberCount} ".logD()
                     voiceRoomModel?.let {
-                        voiceRoomViewModel.joinRoom(it.roomId, it.roomPassword)
+                        voiceRoomViewModel.joinRoom(it.roomId)
                     }
                 }
-            })
-        }
-        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean?>() {
-                override fun onSuccess(result: Boolean?) {
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUid()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice create room chat_username:$chatUsername".logD()
-                    "Voice create room im_token:$chatToken".logD()
-                    if (!ChatroomHelper.getInstance().isLoggedIn) {
-                        ChatroomHelper.getInstance().login(chatUsername, chatToken, object : CallBack {
-                            override fun onSuccess() {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    goVoiceRoom()
-                                }
-                            }
 
-                            override fun onError(code: Int, desc: String) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    binding.bottomGoLive.isEnabled = true
-                                    dismissLoading()
-                                }
-                            }
-                        })
-                    } else {
-                        ThreadManager.getInstance().runOnMainThread {
-                            goVoiceRoom()
+                override fun onError(code: Int, message: String?) {
+                    dismissLoading()
+                    when (code) {
+                        VoiceServiceProtocol.ERR_LOGIN_ERROR -> {
+                            ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_login_exception))
+                        }
+                        VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT -> {
+                            ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_name_rule))
+                        }
+                        else -> {
+                            ToastTools.show(this@VoiceRoomSoundSelectionActivity, getString(R.string.voice_room_create_error))
                         }
                     }
                 }
             })
         }
+        voiceRoomViewModel.joinRoomObservable().observe(this) { response: Resource<VoiceRoomModel> ->
+            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
+                override fun onSuccess(result: VoiceRoomModel?) {
+                    curVoiceRoomModel = result ?: return
+                    ThreadManager.getInstance().runOnMainThread {
+                        goVoiceRoom()
+                    }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    dismissLoading()
+                    "SoundSelectionActivity syncJoinRoom fail:$code $message".logD()
+                }
+            })
+        }
     }
 
-    private fun createNormalRoom(sound_effect: Int) {
+    private fun checkPrivate(sound_effect: Int){
         showLoading(false)
         if (isPublic) {
             voiceRoomViewModel.createRoom(roomName, sound_effect, "")
@@ -149,6 +170,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
             if (!TextUtils.isEmpty(encryption) && encryption.length == 4) {
                 voiceRoomViewModel.createRoom(roomName, sound_effect, encryption)
             } else {
+                dismissLoading()
                 ToastTools.show(this, getString(R.string.voice_room_create_tips), Toast.LENGTH_LONG)
             }
         }
@@ -170,10 +192,7 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     private fun goVoiceRoom() {
         curVoiceRoomModel?.let {
             dismissLoading()
-            val intent = Intent(this, ChatroomLiveActivity::class.java).apply {
-                putExtra(RouterParams.KEY_VOICE_ROOM_MODEL, it)
-            }
-            startActivity(intent)
+            ChatroomLiveActivity.startActivity(this, it)
             // todo 优化
             finishCreateActivity()
             finish()

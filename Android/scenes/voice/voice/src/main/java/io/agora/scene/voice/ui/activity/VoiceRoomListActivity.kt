@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -15,24 +16,27 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.PagePathConstant
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
-import io.agora.scene.voice.VoiceConfigManager
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
+import io.agora.scene.voice.global.VoiceConfigManager
+import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
-import io.agora.voice.baseui.BaseUiActivity
-import io.agora.voice.baseui.utils.StatusBarCompat
-import io.agora.voice.buddy.config.RouterPath
-import io.agora.voice.buddy.tool.DeviceTools.dp2px
-import io.agora.voice.buddy.tool.FastClickTools
-import io.agora.voice.buddy.tool.ResourcesTools
+import io.agora.voice.common.ui.BaseUiActivity
+import io.agora.voice.common.utils.DeviceTools
+import io.agora.voice.common.utils.FastClickTools
+import io.agora.voice.common.utils.ResourcesTools
+import io.agora.voice.common.utils.StatusBarCompat
 
-@Route(path = RouterPath.ChatroomListPath)
+@Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
 
     private var title: TextView? = null
     private var index = 0
     private val titles = intArrayOf(R.string.voice_tab_layout_all)
+
+    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
     override fun getViewBinding(inflater: LayoutInflater): VoiceAgoraRoomListLayoutBinding? {
         return VoiceAgoraRoomListLayoutBinding.inflate(inflater)
     }
@@ -43,8 +47,15 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
             // nothing
         }else{
             // library 初始化
+            ResourcesTools.isZh(this)
+            voiceServiceProtocol.reset()
             VoiceConfigManager.initMain()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        VoiceConfigManager.unInitMain()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,12 +64,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // todo zhangwei
-//        ImageTools.loadImage(binding.imageAvatar, VoiceBuddyFactory.get().getVoiceBuddy().headUrl())
     }
 
     private fun initListener() {
@@ -83,8 +88,6 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
         })
         binding.avatarLayout.isVisible = false
         binding.avatarLayout.setOnClickListener {
-            if (FastClickTools.isFastClick(it)) return@setOnClickListener
-            startActivity(Intent(this@VoiceRoomListActivity, ChatroomProfileActivity::class.java))
         }
     }
 
@@ -115,7 +118,7 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
                 fragment.itemCountListener = { count ->
                     title?.let { textView ->
                         val layoutParams = textView.layoutParams
-                        layoutParams.height = dp2px(baseContext, 26f)
+                        layoutParams.height = DeviceTools.dp2px(baseContext, 26f)
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
@@ -149,5 +152,14 @@ class VoiceRoomListActivity : BaseUiActivity<VoiceAgoraRoomListLayoutBinding>(){
             }
         // setup with viewpager2
         mediator.attach()
+    }
+
+    override fun finish() {
+        voiceServiceProtocol.reset()
+        super.finish()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return super.onKeyDown(keyCode, event)
     }
 }

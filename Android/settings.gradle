@@ -21,14 +21,9 @@ rootProject.name = "AgoraEntFullDemo"
 include ':app'
 include ':common:base'
 include ':common:ui-widget'
-//include ':scenes:ktv'
-//
-//include ':scenes:voice:voice'
-//include ':scenes:voice:baseui'
-//include ':scenes:voice:buddy'
-//include ':scenes:voice:network'
-//include ':scenes:voice:imkit'
-//include ':scenes:voice:rtckit'
+include ':scenes:ktv'
 
+include ':scenes:voice:voice'
+include ':scenes:voice:common'
 include ':scenes:show'
 include ':scenes:show:aars'
