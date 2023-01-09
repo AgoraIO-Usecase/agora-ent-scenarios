@@ -65,6 +65,7 @@ class KTVSyncManagerServiceImp(
     private var currRoomNo: String = ""
     @Volatile
     private var roomOwnerNo: String = ""
+    private var joinedRoom = false
 
     override fun reset() {
         if (syncUtilsInited) {
@@ -177,6 +178,7 @@ class KTVSyncManagerServiceImp(
             val isRoomOwner = cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()
             Instance().joinScene(isRoomOwner, inputModel.roomNo, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
+                    joinedRoom = true
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
                     roomOwnerNo = cacheRoom.creatorNo
@@ -240,6 +242,7 @@ class KTVSyncManagerServiceImp(
 
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
         val cacheRoom = roomMap[currRoomNo] ?: return
+        joinedRoom = false
         // 取消所有订阅
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
@@ -737,7 +740,7 @@ class KTVSyncManagerServiceImp(
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserNo.remove(entry.key)
-                        if (roomOwnerNo != removeUserNo) {
+                        if (roomOwnerNo != removeUserNo && joinedRoom) {
                             // 只有房主才
                             innerUpdateUserCount(userMap.size)
                         }
