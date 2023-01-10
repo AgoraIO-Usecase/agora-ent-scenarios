@@ -1267,6 +1267,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit updateChannelWithMediaOptions:option];
         
         //TODO: isOnMicSeat = NO && is chorus && is co singer
+        VLRoomSelSongModel* soong = [self.selSongsArray firstObject];
+        if (!isOnMicSeat && soong.isChorus && soong.chorusNo == VLUserCenter.user.id) {
+            //co singer leave chorus
+            [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
+            }];
+            [self.ktvApi stopSong];
+            [self loadAndPlaySong];
+        }
     }
     
     [self.RTCkit enableLocalAudio:isOnMicSeat];
