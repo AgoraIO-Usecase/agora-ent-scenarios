@@ -10,7 +10,6 @@
 #import "VLCommonWebViewController.h"
 #import "VLMineView.h"
 #import "VLUploadImageResModel.h"
-#import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
@@ -20,7 +19,15 @@
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import "VLAlert.h"
+#import "KTVMacro.h"
+#import <Photos/Photos.h>
+@import AgoraRtcKit;
 @import Masonry;
+
+typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
+    photoLibrary = 0,
+    camera = 1,
+};
 
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
