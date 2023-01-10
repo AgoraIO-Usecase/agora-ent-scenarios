@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtNoiseSuppressionName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_13"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff"
+        tools:text="@string/voice_chatroom_your_ains" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomHigh"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_high"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtChatroomMedium"
+        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomMedium"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginEnd="6dp"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_medium"
+        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomOff"
+        app:layout_constraintEnd_toStartOf="@+id/mtChatroomOff"
+        app:layout_constraintTop_toTopOf="@+id/mtChatroomOff" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomOff"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
+        android:minWidth="38dp"
+        android:text="@string/voice_chatroom_off"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        app:dividerColor="@color/voice_divider_color_1f979797"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
