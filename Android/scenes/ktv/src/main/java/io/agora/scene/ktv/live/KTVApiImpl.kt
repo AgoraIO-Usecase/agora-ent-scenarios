@@ -602,16 +602,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         }
                         else -> {}
                     }
-                } else {
-                    // 独唱观众
-                    when (Constants.MediaPlayerState.getStateByValue(state)) {
-                        Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
-                            stopDisplayLrc()
-                            this.mLastReceivedPlayPosTime = null
-                            this.mReceivedPlayPosition = 0
-                        }
-                        else -> {}
-                    }
                 }
                 ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, Constants.MediaPlayerState.getStateByValue(state), false)
             }
