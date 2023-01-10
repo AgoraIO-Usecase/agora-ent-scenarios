@@ -94,6 +94,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     final MutableLiveData<List<RoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<RoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
+    final MutableLiveData<RoomSelSongModel> choursPlayingLiveData = new MutableLiveData<>();
 
     /**
      * Player/RTC信息
@@ -399,6 +400,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getChorusNo())) {
                         //我是合唱
                         getSongChosenList();
+                        ktvServiceProtocol.leaveChorus();
+
                     } else if (UserManager.getInstance().getUser().id.toString().equals(songPlayingLiveData.getValue().getUserNo())) {
                         //推送切歌逻辑
                     }
@@ -870,6 +873,24 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                 // 加入合唱
                                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
                                 songPlayingLiveData.postValue(songPlaying);
+                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo() == null) {
+                                // 伴唱退出合唱
+                                Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
+                                if (value.getChorusNo().equals(UserManager.getInstance().getUser().id.toString())) {
+                                    ktvApiProtocol.stopSong();
+                                    ktvApiProtocol.loadSong(Long.parseLong(songPlaying.getSongNo()), new KTVSongConfiguration(KTVSongType.KTVSongTypeChorus, KTVSingRole.KTVSingRoleAudience, Long.parseLong(songPlaying.getSongNo()), Integer.parseInt(songPlaying.getUserNo()), 0),
+                                            (song, lyricUrl, singRole, singState) -> {
+                                                if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
+                                                    if (singRole == KTVSingRole.KTVSingRoleAudience) {
+                                                        playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                                    }
+                                                    ktvApiProtocol.playSong(song);
+                                                }
+                                                return null;
+                                            }
+                                    );
+                                }
+                                choursPlayingLiveData.setValue(songPlaying);
                             }
                         }
                     }
@@ -920,7 +941,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     /**
      * 退出合唱
      */
-    public void leaveChorus(Context context) {
+    public void leaveChorus() {
         Log.d(TAG, "RoomLivingViewModel.leaveChorus() called");
         ktvServiceProtocol.becomeSolo();
     }
@@ -1300,6 +1321,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void musicStop() {
         Log.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
+        choursPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackIndex = 1;
 
@@ -1356,7 +1378,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 break;
             case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
+                if (songPlayingLiveData.getValue() != null) {
+                    playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
+                }
                 changeMusic();
                 break;
             default:
