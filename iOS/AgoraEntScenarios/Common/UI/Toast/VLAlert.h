@@ -6,6 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
 typedef  NS_ENUM(NSUInteger, ALERTYPE) {
     ALERTYPENORMAL = 0,
     ALERTYPETEXTFIELD = 1,
@@ -13,13 +15,12 @@ typedef  NS_ENUM(NSUInteger, ALERTYPE) {
     ALERTYPECONFIRM = 3,
 };
 typedef void (^OnCallback)(bool flag, NSString * _Nullable text);
-typedef void (^linkCallback)(NSString *tag);
-NS_ASSUME_NONNULL_BEGIN
+typedef void (^linkCallback)(NSString * _Nullable tag);
 
 @interface VLAlert : UIView
-+ (instancetype)shared;
--(void)showAlertWithFrame:(CGRect)frame title:(NSString *)title message:(NSString *)message placeHolder:(NSString *)placeHolder type:(ALERTYPE)type buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion;
--(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString *)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor *)attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion linkCompletion:(linkCallback)linkCompletion;
++ (instancetype _Nonnull)shared;
+-(void)showAlertWithFrame:(CGRect)frame title:(NSString *)title message:(NSString *_Nullable)message placeHolder:(NSString *_Nullable)placeHolder type:(ALERTYPE)type buttonTitles:(NSArray *)buttonTitles completion:(OnCallback _Nullable)completion;
+-(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString * _Nullable)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor * )attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback _Nullable)completion linkCompletion:(linkCallback _Nullable)linkCompletion;
 -(void)dismiss;
 @end
 

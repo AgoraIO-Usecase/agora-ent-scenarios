@@ -268,7 +268,6 @@
 
 // 退出登录
 - (void)loadLogoutUserRequest {
-    
     NSArray *array = [[NSArray alloc]initWithObjects:AGLocalizedString(@"退出"),AGLocalizedString(@"取消"), nil];
     VL(weakSelf);
     [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:AGLocalizedString(@"确定退出登录?") message:AGLocalizedString(@"退出登陆后，我们还会继续保留您的账户数据，记得再来体验哦～") placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
@@ -317,5 +316,6 @@
     }
     return _versionLabel;
 }
+    
 
 @end

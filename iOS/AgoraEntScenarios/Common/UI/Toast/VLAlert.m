@@ -36,7 +36,7 @@ static VLAlert *_alert = nil;
     return _alert;
 }
 
--(void)showAlertWithFrame:(CGRect)frame title:(NSString *)title message:(NSString *)message placeHolder:(NSString *)placeHolder type:(ALERTYPE)type buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion{
+-(void)showAlertWithFrame:(CGRect)frame title:(NSString *)title message:(NSString *_Nullable)message placeHolder:(NSString *_Nullable)placeHolder type:(ALERTYPE)type buttonTitles:(NSArray *)buttonTitles completion:(OnCallback _Nullable)completion{
         self.alertType = type;
         self.message = message;
         [self layoutUI];
@@ -50,12 +50,11 @@ static VLAlert *_alert = nil;
         
         [self.cancleBtn setTitle:buttonTitles[0] forState:UIControlStateNormal];
         [self.confirmBtn setTitle:buttonTitles[type == ALERTYPECONFIRM ? 0 : 1] forState:UIControlStateNormal];
-        
         self.textField.placeholder = placeHolder;
         [UIApplication.sharedApplication.delegate.window addSubview:self];
 }
 
--(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString *)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor *)attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback)completion linkCompletion:(linkCallback)linkCompletion{
+-(void)showAttributeAlertWithFrame:(CGRect)frame title:(NSString * _Nullable)title text:(NSString *)text AttributedStringS:(NSArray *)strings ranges:(NSArray *)ranges textColor:(UIColor *)textColor attributeTextColor:(UIColor * )attributeTextColor buttonTitles:(NSArray *)buttonTitles completion:(OnCallback _Nullable)completion linkCompletion:(linkCallback _Nullable)linkCompletion{
         [self layoutUI];
         self.alertType = ALERTYPEATTRIBUTE;
         self.completion = completion;

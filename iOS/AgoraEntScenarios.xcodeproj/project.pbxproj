@@ -408,7 +408,7 @@
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE9C42967FD64003FCFBF /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE9C32967FD64003FCFBF /* VLAlert.m */; };
 		E36BE9C7296BBE9D003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE9C6296BBE9D003FCFBF /* AttributedTextView.m */; };
-		E36BE9C9296BBEF2003FCFBF /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36BE9C8296BBEF2003FCFBF /* KeyCenter.swift */; };
+		E36BE9CB296D04A0003FCFBF /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36BE9CA296D04A0003FCFBF /* KeyCenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -970,7 +970,7 @@
 		E36BE9C32967FD64003FCFBF /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
 		E36BE9C5296BBE9D003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE9C6296BBE9D003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
-		E36BE9C8296BBEF2003FCFBF /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
+		E36BE9CA296D04A0003FCFBF /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1531,7 +1531,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
-				E36BE9C8296BBEF2003FCFBF /* KeyCenter.swift */,
+				E36BE9CA296D04A0003FCFBF /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
 				DDDDDB3228FFD78B005F4E8B /* Context */,
@@ -2953,7 +2953,6 @@
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DD220B84295B332C00F57F30 /* VRRoomListView.swift in Sources */,
 				DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */,
-				E36BE9C9296BBEF2003FCFBF /* KeyCenter.swift in Sources */,
 				DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */,
 				DD220B70295B332C00F57F30 /* PopTip+Transitions.swift in Sources */,
 				DD220B2E295B332C00F57F30 /* VoiceServiceModel.swift in Sources */,
@@ -2979,6 +2978,7 @@
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DD220B57295B332C00F57F30 /* VMSoundView.swift in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
+				E36BE9CB296D04A0003FCFBF /* KeyCenter.swift in Sources */,
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
 				DD220BB3295B332C00F57F30 /* VLKTVTopView.m in Sources */,
 				DD220B16295B332C00F57F30 /* SwiftyFitSize.swift in Sources */,
