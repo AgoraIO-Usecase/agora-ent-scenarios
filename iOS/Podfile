@@ -29,8 +29,6 @@ def all_pods
   pod 'IQKeyboardManager'
   # 变色龙
   pod 'ChameleonFramework'
-  #弹框
-  pod 'LEEAlert'
   #滚动视图
   pod 'JXCategoryView'
   
