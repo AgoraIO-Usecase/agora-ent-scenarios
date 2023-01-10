@@ -1,7 +1,6 @@
 package io.agora.scene.base.utils;
 
 import android.content.res.Resources;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -12,24 +11,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import io.agora.scene.base.BuildConfig;
-
 @Keep
 public class UiUtil {
-    public static void logD(String msg) {
-        if (BuildConfig.DEBUG)
-            Log.d("AGORA-KTV", msg);
-    }
-
-    public static void logE(String msg) {
-        if (BuildConfig.DEBUG)
-            Log.e("AGORA-KTV", msg);
-    }
-
-    public static void logE(Throwable e) {
-        if (BuildConfig.DEBUG)
-            Log.e("AGORA-KTV", e.getMessage());
-    }
 
     public static int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
