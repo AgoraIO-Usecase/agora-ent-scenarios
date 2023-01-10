@@ -1,7 +1,7 @@
 package io.agora.scene.ktv.service
 
-import android.util.Log
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.ktv.KTVLogger
 
 interface KTVServiceProtocol {
 
@@ -15,21 +15,21 @@ interface KTVServiceProtocol {
         private val instance by lazy {
             // KTVServiceImp()
             KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { Log.e("SyncManager", it) }
+                error?.message?.let { KTVLogger.e("SyncManager", it) }
             }
         }
 
         fun getImplInstance(): KTVServiceProtocol = instance
     }
 
+    fun reset()
+
     // ============== 房间相关 ==============
 
     /**
      * 获取房间列表
      */
-    fun getRoomList(
-        completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
-    )
+    fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 
     /**
      * 创建房间

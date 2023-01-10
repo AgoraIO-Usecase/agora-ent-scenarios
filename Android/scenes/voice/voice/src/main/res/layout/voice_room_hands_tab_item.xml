@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtTabText"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        android:text="@string/voice_room_raised_hands_title"
+        android:textColor="@color/voice_color_979cbb"
+        android:textSize="@dimen/voice_sp_15"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/tab_bg"
+        android:layout_width="24dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:shapeAppearance="@style/voice_seat_roundStyle"
+        app:layout_constraintEnd_toEndOf="@id/mtTabText"
+        app:layout_constraintStart_toStartOf="@id/mtTabText"
+        app:layout_constraintTop_toBottomOf="@id/mtTabText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="240dp"
+    android:layout_gravity="center"
+    android:background="@drawable/voice_bg_rect_radius20_white"
+    android:paddingTop="30dp"
+    android:paddingBottom="30dp">
+
+    <com.google.android.material.textview.MaterialTextView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/title"
+        android:textSize="@dimen/voice_sp_16"
+        android:textColor="@color/voice_dark_grey_color_040925"
+        android:text="@string/voice_room_create_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputView
+        android:id="@+id/mtContent"
+        android:layout_marginTop="32dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        app:voice_isWaitInput ="true"
+        android:textCursorDrawable="@drawable/voice_bg_edit_cursor"
+        app:voice_round="8dp"
+        app:voice_textSize="@dimen/voice_sp_18"
+        app:voice_isPwd="false"
+        android:inputType="number"
+        app:voice_textColor="@color/voice_dark_grey_color_040925"
+        app:voice_textLength="4"
+        app:voice_defaultColor="#E4E3ED"
+        app:voice_backColor="@color/voice_white"
+        app:voice_checkedColor="#E4E3ED"
+        app:voice_waitInputColor="@color/voice_main_color_009fff"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="10dp"
+        android:paddingHorizontal="22dp"
+        android:paddingVertical="12dp"
+        android:text="@string/voice_room_cancel"
+        android:textAllCaps="false"
+        android:textColor="@color/voice_dark_grey_color_040925"
+        android:textSize="@dimen/voice_sp_14"
+        android:textStyle="bold"
+        app:backgroundTint="@color/voice_dark_grey_color_eff4ff"
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toStartOf="@+id/gl50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtContent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl50"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="25dp"
+        android:paddingHorizontal="22dp"
+        android:paddingVertical="12dp"
+        android:text="@string/voice_room_confirm"
+        android:textAllCaps="false"
+        android:textColor="@color/voice_white"
+        android:textSize="@dimen/voice_sp_14"
+        android:textStyle="bold"
+        app:backgroundTint="@color/voice_main_color_156ef3"
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/gl50"
+        app:layout_constraintTop_toBottomOf="@+id/mtContent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

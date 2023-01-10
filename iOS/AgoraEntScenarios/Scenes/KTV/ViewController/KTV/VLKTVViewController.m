@@ -30,10 +30,10 @@
 #import "UIView+VL.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
-#import "LEEAlert+KTVModal.h"
 #import "LSTPopView+KTVModal.h"
 #import "KTVApi.h"
 #import "HWWeakTimer.h"
+#import "VLAlert.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -373,7 +373,8 @@ KTVApiDelegate
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [LEEAlert popForceLeaveRoomDialogWithCompletion:^{
+    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"确定"), nil];
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"房主已解散房间,请确认离开房间") message:@"" placeHolder:@"" type:ALERTYPECONFIRM buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -381,6 +382,7 @@ KTVApiDelegate
                 [weakSelf.navigationController popToViewController:vc animated:YES];
             }
         }
+        [[VLAlert shared] dismiss];
     }];
 }
 
@@ -886,18 +888,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark -- VLKTVTopViewDelegate
 - (void)onVLKTVTopView:(VLKTVTopView *)view closeBtnTapped:(id)sender {
     VL(weakSelf);
-    if (VLUserCenter.user.ifMaster) { //自己是房主关闭房间
-        [LEEAlert popRemoveRoomDialogWithCancelBlock:nil
-                                       withDoneBlock:^{
+    NSString *title = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"解散房间") : KTVLocalizedString(@"退出房间");
+    NSString *message = VLUserCenter.user.ifMaster ? KTVLocalizedString(@"确定解散该房间吗？") : KTVLocalizedString(@"确定退出该房间吗？");
+    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+        if(flag == true){
             [weakSelf leaveRoom];
-        }];
-    } else {
-        [LEEAlert popLeaveRoomDialogWithCancelBlock:nil
-                                      withDoneBlock:^{
-//            [weakSelf resetChorusStatus:VLUserCenter.user.id];
-            [weakSelf leaveRoom];
-        }];
-    }
+        }
+        [[VLAlert shared] dismiss];
+    }];
 }
 
 #pragma mark - VLPopMoreSelViewDelegate
@@ -1071,12 +1070,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.ktvApi pausePlay];
     } else if (type == VLKTVMVViewActionTypeMVNext) { //切换
         VL(weakSelf);
-        [LEEAlert popSwitchSongDialogWithCancelBlock:nil
-                                       withDoneBlock:^{
-            if (weakSelf.selSongsArray.count >= 1) {
-                [weakSelf.ktvApi stopSong];
-                [weakSelf removeCurrentSongWithSync:YES];
+
+        NSString *title = KTVLocalizedString(@"切换歌曲");
+        NSString *message = KTVLocalizedString(@"切换下一首歌歌曲？");
+        NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"取消"),KTVLocalizedString(@"确定"), nil];
+        [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:title message:message placeHolder:@"" type:ALERTYPENORMAL buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+            if(flag == true){
+                if (weakSelf.selSongsArray.count >= 1) {
+                    [weakSelf.ktvApi stopSong];
+                    [weakSelf removeCurrentSongWithSync:YES];
+                }
             }
+            [[VLAlert shared] dismiss];
         }];
     } else if (type == VLKTVMVViewActionTypeSingOrigin) { // 原唱
         self.trackMode = KTVPlayerTrackOrigin;

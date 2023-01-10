@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/voice_bg_rect_top_radius20_white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/voice_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintBottom_toBottomOf="@+id/mtTitle"
+        app:layout_constraintTop_toTopOf="@+id/ivTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:src="@drawable/voice_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/voice_chatroom_notice"
+        android:textColor="@color/voice_dark_grey_color_040925"
+        android:textSize="@dimen/voice_sp_16"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivTitle"
+        tools:text="Notice" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mbConfirm"
+        style="@style/voice_chatroom_confirm_button_text_style"
+        android:layout_marginEnd="16dp"
+        android:paddingHorizontal="18dp"
+        android:paddingVertical="8dp"
+        android:text="@string/voice_chatroom_notice_post"
+        android:textSize="@dimen/voice_sp_14"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/mtTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtTitle" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:padding="10dp"
+        android:text="@string/voice_room_cancel"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        android:textSize="@dimen/voice_sp_14"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/mtTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtTitle"
+        tools:text="Cancel" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtContent"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="15dp"
+        android:lineSpacingExtra="6dp"
+        android:paddingTop="14dp"
+        android:textColor="@color/voice_color_3c4267"
+        android:textSize="@dimen/voice_sp_14"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/mbEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtTitle"
+        tools:text="@string/voice_voice_voice_chatroom_first_enter_room_notice_tips" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="175dp"
+        android:background="@color/voice_transparent"
+        app:counterEnabled="true"
+        app:boxBackgroundColor="@color/voice_transparent"
+        app:hintEnabled="false"
+        app:boxBackgroundMode="none"
+        app:counterMaxLength="140"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/mbEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtTitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="5dp"
+            android:background="@color/voice_transparent"
+            android:hint="@string/voice_chatroom_notice_edit_hint"
+            android:textColorHint="@color/voice_dark_grey_color_979cbb"
+            android:gravity="top"
+            android:lines="5"
+            android:lineSpacingExtra="5dp"
+            android:maxLength="140"
+            android:paddingTop="14dp"
+            android:textColor="@color/voice_color_3c4267"
+            android:textCursorDrawable="@drawable/voice_color_edit_cursor"
+            android:textSize="@dimen/voice_sp_14" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <!--    <EditText-->
+    <!--        android:id="@+id/etInput"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="180dp"-->
+    <!--        android:layout_marginStart="18dp"-->
+    <!--        android:layout_marginEnd="5dp"-->
+    <!--        android:layout_marginBottom="100dp"-->
+    <!--        android:background="@color/transparent"-->
+    <!--        android:gravity="top"-->
+    <!--        android:hint="@string/chatroom_notice_edit_hint"-->
+    <!--        android:lineSpacingExtra="6dp"-->
+    <!--        android:lines="5"-->
+    <!--        android:maxEms="140"-->
+    <!--        android:maxLength="140"-->
+    <!--        android:paddingTop="14dp"-->
+    <!--        android:textColor="@color/color_3C4267"-->
+    <!--        android:textColorHint="@color/dark_grey_color_979CBB"-->
+    <!--        android:textCursorDrawable="@drawable/color_edit_cursor"-->
+    <!--        android:textSize="@dimen/sp_14"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintBaseline_toBottomOf="@+id/mbEdit"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/mtTitle" />-->
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mbEdit"
+        style="@style/voice_chatroom_confirm_button_text_style"
+        android:layout_width="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="18dp"
+        android:text="@string/voice_chatroom_edit"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

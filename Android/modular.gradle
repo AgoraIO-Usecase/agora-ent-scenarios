@@ -162,7 +162,7 @@ android {
                     outputFileName = new File(rootProject.name + "_" +
                             project.name + "_" +
                             "v" + defaultConfig.versionName + "_" +
-                            new Date().format("yyyy-MM-dd") + "_" +
+                            new Date().format("yyyyMMddHHmm") + "_" +
                             buildType.name + ".apk")
                 }
         }

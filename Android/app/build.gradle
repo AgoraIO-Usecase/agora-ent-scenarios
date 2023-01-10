@@ -15,6 +15,9 @@ dependencies {
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
     }
+    if (isProjectLibrary(':scenes:voice:voice')) {
+        runtimeOnly project(':scenes:voice:voice')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide

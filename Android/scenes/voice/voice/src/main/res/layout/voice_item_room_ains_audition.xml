@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/superLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="15dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomAinsNone"
+        app:layout_constraintEnd_toStartOf="@+id/mtChatroomAins"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtChatroomAinsNone">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtChatroomAinsName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/voice_color_3c4267"
+            android:textSize="@dimen/voice_sp_13"
+            android:textStyle="bold"
+            tools:text="TV Sound" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtChatroomAinsSubName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/voice_dark_grey_color_979cbb"
+            android:textSize="@dimen/voice_sp_10"
+            tools:text="Ex. Bird, car, subway sounds" />
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomAins"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:text="@string/voice_chatroom_ains"
+        android:textColor="@color/voice_color_0a7aff"
+        app:layout_constraintBottom_toBottomOf="@+id/mtChatroomAinsNone"
+        app:layout_constraintEnd_toStartOf="@+id/mtChatroomAinsNone"
+        app:layout_constraintTop_toTopOf="@+id/mtChatroomAinsNone" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomAinsNone"
+        style="@style/voice_bottom_sheet_frame_text_style"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/voice_bg_rect_radius4_grey"
+        android:text="@string/voice_chatroom_none"
+        android:textColor="@color/voice_dark_grey_color_979cbb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:dividerColor="@color/voice_divider_color_1f979797"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

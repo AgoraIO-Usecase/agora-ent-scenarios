@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/voice_bg_app_def_white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <io.agora.scene.voice.ui.widget.titlebar.RoomTitleBar
+        android:id="@+id/title_bar"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:voice_titleBarTitle="@string/voice_room_sound_selection"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        app:layout_constraintTop_toBottomOf="@+id/title_bar"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/voice_bg_room_bottom_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="34dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:onClick="onClick"
+        android:background="@drawable/voice_bg_room_bottom_button"
+        android:layout_width="0dp"
+        android:layout_height="48dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp">
+
+            <TextView
+                android:id="@+id/bottom_go_live"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="@string/voice_room_create_go_live"
+                android:textColor="@color/voice_white"
+                android:textSize="@dimen/voice_sp_16"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

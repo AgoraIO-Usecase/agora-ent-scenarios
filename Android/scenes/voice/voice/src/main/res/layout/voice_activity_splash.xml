@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/voice_bg_room_splash"
+    tools:context=".ui.activity.ChatroomSplashActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/glHorizontal28"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.28" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivChatroomLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/voice_icon_room_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/glHorizontal28" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voice_app_agora_chatroom"
+        android:textColor="@color/voice_main_color_009fff"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/voice_sp_24"
+        android:textStyle="bold"
+        android:letterSpacing="0.42"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivChatroomLogo" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtChatroomCopyRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voice_app_agora_chatroom_copy_right"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        android:layout_marginTop="15dp"
+        android:textSize="@dimen/voice_sp_13"
+        android:letterSpacing="-0.05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="65dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

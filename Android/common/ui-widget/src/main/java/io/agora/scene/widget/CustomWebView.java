@@ -2,7 +2,6 @@ package io.agora.scene.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -55,8 +54,6 @@ public class CustomWebView extends WebView {
                     PagePilotManager.pageWebView(url);
                     return true;
                 }
-                //不处理http, https, ftp的请求
-                Log.d("cwtsw", "web url " + url);
                 return false;
             }
             return true;

@@ -47,7 +47,6 @@ PODS:
   - IQKeyboardManager (6.5.10)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
-  - LEEAlert (1.6.4)
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
     - LSTTimer
@@ -93,7 +92,6 @@ DEPENDENCIES:
   - IQKeyboardManager (= 6.5.10)
   - JXCategoryView (= 1.6.1)
   - KakaJSON (= 1.1.2)
-  - LEEAlert (= 1.6.4)
   - LSTPopView (= 0.3.10)
   - Masonry (= 1.1.0)
   - SDWebImage (= 5.0.6)
@@ -121,7 +119,6 @@ SPEC REPOS:
     - IQKeyboardManager
     - JXCategoryView
     - KakaJSON
-    - LEEAlert
     - LSTPopView
     - LSTTimer
     - Masonry
@@ -152,7 +149,6 @@ SPEC CHECKSUMS:
   IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
-  LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
@@ -170,6 +166,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 7c4061ff012ae5657c81cbc9f54ec1df6f30e94e
+PODFILE CHECKSUM: 41e57c6571fe3c62ccea0b2cc66e8d41a293a7a7
 
 COCOAPODS: 1.11.3

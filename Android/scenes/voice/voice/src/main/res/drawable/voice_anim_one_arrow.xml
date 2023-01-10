@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item
+        android:drawable="@drawable/voice_go_00000"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00002"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00004"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00006"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00008"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00010"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00012"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00014"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00016"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00018"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00020"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00022"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00024"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00026"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00022"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00024"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00026"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00028"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00030"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00032"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00034"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00036"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00038"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00040"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00042"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00044"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/voice_go_00045"
+        android:duration="80" />
+</animation-list>

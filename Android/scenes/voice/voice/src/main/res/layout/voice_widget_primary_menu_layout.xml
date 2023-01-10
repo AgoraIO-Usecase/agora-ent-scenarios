@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/voice_transparent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/normal_layout"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/voice_transparent"
+        android:layout_width="match_parent"
+        android:layout_height="55dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/input_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/voice_bg_primary_bottom"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/voice_icon_input_bg" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:paddingEnd="10dp"
+                android:text="@string/voice_room_input_chat_title"
+                android:textColor="@color/voice_white_80"
+                android:textSize="@dimen/voice_sp_12" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/menu_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="15dp"
+            android:layout_toEndOf="@+id/input_layout"
+            android:gravity="center_vertical|right" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/vKeyboardBg"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/voice_transparent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/input_view"
+        android:visibility="gone"
+        android:background="@color/voice_white"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toTopOf="@+id/vKeyboardBg"
+        android:layout_height="55dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/input_bg"
+            app:layout_constraintRight_toLeftOf="@+id/input_send"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/voice_bg_primary_menu_input_edit"
+            android:layout_width="0dp"
+            android:layout_height="36dp">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/input_edit_view"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/icon_emoji"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="5dp"
+                android:background="@color/voice_white"
+                android:hint="Aa"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:ellipsize="end"
+                android:maxLength="80"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textSize="@dimen/voice_sp_16"
+                android:textColor="@color/voice_color_333333"
+                android:layout_width="0dp"
+                android:layout_height="22dp"/>
+
+            <ImageView
+                android:id="@+id/icon_emoji"
+                android:src="@drawable/voice_icon_face"
+                android:layout_marginEnd="9dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="28dp"
+                android:layout_height="28dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/input_send"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/voice_bg_room_bottom"
+            android:gravity="center"
+            android:textColor="@color/voice_white"
+            android:textSize="@dimen/voice_sp_16"
+            android:layout_width="67dp"
+            android:layout_height="36dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <io.agora.scene.voice.ui.widget.expression.ExpressionView
+        android:layout_below="@+id/normal_layout"
+        android:id="@+id/expression_view"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

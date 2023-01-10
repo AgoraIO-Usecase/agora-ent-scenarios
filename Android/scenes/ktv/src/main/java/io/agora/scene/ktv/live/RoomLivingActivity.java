@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -31,6 +30,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.LiveDataUtils;
+import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
@@ -84,6 +84,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     public void initView(@Nullable Bundle savedInstanceState) {
+        getWindow().getDecorView().setKeepScreenOn(true);
         roomLivingViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override
@@ -115,6 +116,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             roomLivingViewModel.haveSeat(position);
                             getBinding().cbMic.setChecked(false);
+                            getBinding().cbVideo.setChecked(false);
                             requestRecordPermission();
                         }
                     }
@@ -355,9 +357,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, userNo -> {
-            Log.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
+            KTVLogger.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().userNo + " o = " + userNo);
             if (UserManager.getInstance().getUser().userNo.equals(userNo)) {
-                Log.d("cwtsw", "计算得分");
+                KTVLogger.d("cwtsw", "计算得分");
                 int score = (int) getBinding().lrcControlView.getPitchView().cumulatedScore;
                 getBinding().tvResultScore.setText(String.valueOf(score));
                 if (score >= 90) {
@@ -371,7 +373,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 }
                 if (UserManager.getInstance().getUser().userNo.equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
                     getBinding().groupResult.setVisibility(View.VISIBLE);
-                    Log.d("cwtsw", "显示得分");
+                    KTVLogger.d("cwtsw", "显示得分");
                 }
             }
         });
@@ -415,7 +417,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("cwtsw", "onResume() " + isBlackDarkStatus() + " " +
+        KTVLogger.d("cwtsw", "onResume() " + isBlackDarkStatus() + " " +
                 Resources.getSystem().getDisplayMetrics().density + " " +
                 Resources.getSystem().getDisplayMetrics().densityDpi + " " + Resources.getSystem().getDisplayMetrics().heightPixels);
         setDarkStatusIcon(isBlackDarkStatus());
