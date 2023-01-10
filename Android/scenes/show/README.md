@@ -20,17 +20,17 @@
 
 #### 1.2 项目配置
 
-1. 将effectAAR-release.aar放在**scenes/show/aars**目录下
+1. 将effectAAR-release.aar放在[**scenes/show/aars**](aars)目录下
 
-2. 将SDK里的资源文件复制到**scenes/show/src/main/assets** 目录下。这个项目用到的资源文件列举如下： 
+2. 将SDK里的资源文件复制到[**scenes/show/src/main/assets**](src/main/assets) 目录下。这个项目用到的资源文件列举如下： 
 - resource/LicenseBag.bundle : 证书资源
 - resource/ModelResource.bundle : AI等训练模型资源
 - resource/StickerResource.bundle : 贴纸资源
 - resource/ComposeMakeup.bundle : 美妆资源
 - resource/FilterResource.bundle : 滤镜资源
 
-3. 将证书放到**scenes/show/src/main/assets/resource/LicenseBag.bundle**目录下，然后在**
-   scenes/show/src/main/java/com/bytedance/labcv/core/Config.java**配置
+3. 将证书放到[**scenes/show/src/main/assets/resource/LicenseBag.bundle**](src/main/assets/resource/LicenseBag.bundle)目录下，
+   然后在[**scenes/show/src/main/java/com/bytedance/labcv/core/Config.java**](src/main/java/com/bytedance/labcv/core/Config.java)配置证书名
 ```java
 class Config {
     public static final String LICENSE_NAME = "证书文件名";
@@ -38,8 +38,8 @@ class Config {
 ```
 
 ### 2 配置声网
-- 在[**声网官网**](https://www.agora.io/cn/)注册账号并创建项目，获取项目的AppId，如果项目开启了证书认证，还需要获取项目的AppCertificate
-- 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 AppId 和 AppCertificate（如果没有开启证书认证，此字段留空）
+- 在[**声网官网**](https://www.agora.io/cn/)注册账号并创建项目，获取项目的**AppId**，如果项目开启了证书认证，还需要获取项目的**AppCertificate**
+- 在项目根目录的[**gradle.properties**](../../gradle.properties)里填写需要的声网**AppId**和**AppCertificate**（如果没有开启证书认证，此字段留空）
 ```xml
 #rtc rtm SDK app_id
 AGORA_APP_ID=<=YOUR APP ID=>
