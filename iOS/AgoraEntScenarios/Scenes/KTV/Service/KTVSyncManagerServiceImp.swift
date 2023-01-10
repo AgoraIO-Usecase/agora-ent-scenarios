@@ -458,6 +458,18 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
     }
+    
+    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
+        guard let topSong = self.songList.filter({ $0.chorusNo == VLUserCenter.user.id}).first else {
+            agoraAssert("join Chorus fail")
+            return
+        }
+        
+        topSong.isChorus = true
+        topSong.chorusNo = "0"
+        _updateChooseSong(songInfo: topSong,
+                          finished: completion)
+    }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
                          completion: @escaping (Error?) -> Void) {
