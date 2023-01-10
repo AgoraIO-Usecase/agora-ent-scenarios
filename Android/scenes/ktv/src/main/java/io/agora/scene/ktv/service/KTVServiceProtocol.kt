@@ -164,6 +164,11 @@ interface KTVServiceProtocol {
     )
 
     /**
+     * 合唱者离开合唱
+     */
+    fun leaveChorus()
+
+    /**
      * 当前歌曲合唱改为独唱
      */
     fun becomeSolo()
