@@ -47,6 +47,7 @@ class KTVSyncManagerServiceImp(
         null
     private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
         null
+    private var onReconnectSubscriber: (() -> Unit)? = null
 
     // cache objectId
     private val objIdOfRoomNo = HashMap<String, String>() // objectId of room no
@@ -710,6 +711,28 @@ class KTVSyncManagerServiceImp(
                 }
             }
         )
+        Instance().subscribeConnectState {
+            if (it == ConnectionState.open) {
+                runOnMainThread {
+                    // 判断当前房间是否还存在
+                    val oldRoomInfo = roomMap[currRoomNo]
+                    if(oldRoomInfo != null){
+                        getRoomList { _, _ ->
+                            val roomInfo = roomMap[currRoomNo]
+                            if (roomInfo == null) {
+                                runOnMainThread {
+                                    roomStatusSubscriber?.invoke(
+                                        KTVServiceProtocol.KTVSubscribe.KTVSubscribeDeleted,
+                                        oldRoomInfo
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    onReconnectSubscriber?.invoke()
+                }
+            }
+        }
     }
 
 
@@ -1259,5 +1282,21 @@ class KTVSyncManagerServiceImp(
         }
         roomSubscribeListener.add(listener)
         Instance().subscribeScene(mSceneReference, listener)
+    }
+
+    override fun subscribeReConnectEvent(onReconnect: () -> Unit) {
+        onReconnectSubscriber = onReconnect
+    }
+
+    override fun getAllUserList(success: (userNum: Int) -> Unit, error: ((Exception) -> Unit)?) {
+        innerGetUserInfo { err, list ->
+            if (err != null) {
+                error?.invoke(err)
+                return@innerGetUserInfo
+            }
+            if (list != null) {
+                success.invoke(list.size)
+            }
+        }
     }
 }
