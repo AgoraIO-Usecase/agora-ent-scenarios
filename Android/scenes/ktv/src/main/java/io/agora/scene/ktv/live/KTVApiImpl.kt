@@ -275,7 +275,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun selectTrackMode(mode: KTVPlayerTrackMode) {
         val trackMode = if (mode == KTVPlayerTrackMode.KTVPlayerTrackOrigin) 0 else 1
         mPlayer?.selectAudioTrack(trackMode)
-        syncTrackMode(trackMode)
     }
 
     override fun setLycView(view: LrcControlView) {
@@ -303,14 +302,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val msg: MutableMap<String?, Any?> = HashMap()
         msg["cmd"] = "PlayerState"
         msg["state"] = Constants.MediaPlayerState.getValue(state)
-        val jsonMsg = JSONObject(msg)
-        sendStreamMessageWithJsonObject(jsonMsg) {}
-    }
-
-    private fun syncTrackMode(mode: Int) {
-        val msg: MutableMap<String?, Any?> = HashMap()
-        msg["cmd"] = "TrackMode"
-        msg["mode"] = mode
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
@@ -566,13 +557,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     // 独唱观众
                     mLastReceivedPlayPosTime = System.currentTimeMillis()
                     mReceivedPlayPosition = position
-                }
-            } else if (jsonMsg.getString("cmd") == "TrackMode") {
-                // 伴唱收到原唱伴唱调整指令
-                if (mPlayer == null || songConfig == null) return
-                if (isChorusCoSinger()!!) {
-                    val trackMode = jsonMsg.getInt("mode")
-                    mPlayer!!.selectAudioTrack(trackMode)
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
                 // 伴唱收到原唱seek指令
