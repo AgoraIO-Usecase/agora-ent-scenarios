@@ -84,6 +84,7 @@ class ShowRealTimeDataView: UIView {
     
     @objc
     private func onTapCloseButton() {
-        AlertManager.hiddenView()
+//        AlertManager.hiddenView()
+        removeFromSuperview()
     }
 }
