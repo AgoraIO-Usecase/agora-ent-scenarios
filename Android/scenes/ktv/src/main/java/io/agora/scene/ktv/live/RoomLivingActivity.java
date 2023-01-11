@@ -40,6 +40,7 @@ import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.ktv.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.service.RoomSeatModel;
 import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.widget.KtvCommonDialog;
 import io.agora.scene.ktv.widget.LrcControlView;
 import io.agora.scene.ktv.widget.MoreDialog;
 import io.agora.scene.ktv.widget.MusicSettingDialog;
@@ -63,7 +64,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private MoreDialog moreDialog;
     private MusicSettingDialog musicSettingDialog;
     private BindingSingleAdapter<RoomSeatModel, KtvItemRoomSpeakerBinding> mRoomSpeakerAdapter;
-    private CloseRoomDialog creatorExitDialog;
+    private KtvCommonDialog creatorExitDialog;
 
     private CommonDialog exitDialog;
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
@@ -71,10 +72,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     private SongDialog mChorusSongDialog;
 
     // 房间存活时间，单位ms
-    private CommonDialog timeUpExitDialog;
+    private KtvCommonDialog timeUpExitDialog;
     private long ROOM_AVAILABLE_DURATION = 20 * 60 * 1000;// 20min
     private Runnable timerRoomEndRun = () -> {
-        showTimeUpExitDialog();
+        if (roomLivingViewModel.release()) {
+            showTimeUpExitDialog();
+        }
     };
 
 
@@ -212,9 +215,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
 
         // 定时删除房间
-        if (roomLivingViewModel.isRoomOwner()) {
-            getBinding().getRoot().postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION);
-        }
+        getBinding().getRoot().postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION);
     }
 
     @Override
@@ -460,24 +461,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showTimeUpExitDialog() {
         if (timeUpExitDialog == null) {
-            timeUpExitDialog = new CommonDialog(this);
+            timeUpExitDialog = new KtvCommonDialog(this);
 
             if (roomLivingViewModel.isRoomOwner()) {
-                timeUpExitDialog.setDialogTitle(getString(R.string.exit_room));
                 timeUpExitDialog.setDescText(getString(R.string.time_up_exit_room));
             } else {
-                timeUpExitDialog.setDialogTitle(getString(R.string.exit_room));
                 timeUpExitDialog.setDescText(getString(R.string.expire_exit_room));
             }
-            timeUpExitDialog.setDialogBtnText(getString(R.string.ktv_confirm), "");
+            timeUpExitDialog.setDialogBtnText("", getString(R.string.ktv_confirm));
             timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
-                public void onLeftButtonClick() {
-                    roomLivingViewModel.exitRoom();
-                }
+                public void onLeftButtonClick() {}
 
                 @Override
-                public void onRightButtonClick() {}
+                public void onRightButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
             });
         }
         timeUpExitDialog.show();
@@ -700,20 +699,17 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     private void showCreatorExitDialog() {
         if (creatorExitDialog == null) {
-            creatorExitDialog = new CloseRoomDialog(this);
-            creatorExitDialog.setCanceledOnTouchOutside(false);
+            creatorExitDialog = new KtvCommonDialog(this);
+            creatorExitDialog.setDescText(getString(R.string.room_has_close));
+            creatorExitDialog.setDialogBtnText("", getString(R.string.ktv_iknow));
             creatorExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
-                public void onLeftButtonClick() {
-                    setDarkStatusIcon(isBlackDarkStatus());
-                    finish();
-                }
+                public void onLeftButtonClick() {}
 
                 @Override
                 public void onRightButtonClick() {
                     setDarkStatusIcon(isBlackDarkStatus());
                     finish();
-
                 }
             });
         }

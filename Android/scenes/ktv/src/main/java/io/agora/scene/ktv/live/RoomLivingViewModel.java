@@ -158,7 +158,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     public void init() {
         if (isRoomOwner()) {
-            // 房主开启倒计时，默认为在麦上状态
             isOnSeat = true;
         }
         initRTCPlayer();
@@ -167,7 +166,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         initSongs();
     }
 
-    public void release() {
+    public boolean release() {
         ktvApiProtocol.release();
         streamId = 0;
         if (mPlayer != null) {
@@ -186,7 +185,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
+            return true;
         }
+        return false;
     }
 
     // ======================= 房间相关 =======================
