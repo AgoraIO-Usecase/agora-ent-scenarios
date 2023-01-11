@@ -9,7 +9,11 @@ import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.scene.base.utils.FileUtils
 import io.agora.scene.show.R
+import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.*
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogBottomBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
@@ -179,6 +183,30 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                 ),
             )
         ),
+        GroupInfo(
+            GROUP_ID_VIRTUAL_BG, R.string.show_beauty_group_virtual_bg, arrayListOf(
+                ItemInfo(
+                    ITEM_ID_VIRTUAL_BG_NONE,
+                    R.string.show_beauty_item_none,
+                    R.mipmap.show_beauty_ic_none
+                ),
+                ItemInfo(
+                    ITEM_ID_VIRTUAL_BG_BLUR,
+                    R.string.show_beauty_item_virtual_bg_blur,
+                    R.mipmap.show_beauty_ic_virtual_bg_blur
+                ),
+                ItemInfo(
+                    ITEM_ID_VIRTUAL_BG_MITAO,
+                    R.string.show_beauty_item_virtual_bg_mitao,
+                    R.mipmap.show_beauty_ic_virtual_bg_mitao
+                ),
+            ),
+            when(RtcEngineInstance.virtualBackgroundSource.backgroundSourceType){
+                VirtualBackgroundSource.BACKGROUND_BLUR -> 1
+                VirtualBackgroundSource.BACKGROUND_IMG -> 2
+                else -> 0
+            }
+        )
     )
 
     private val mTopBinding by lazy {
@@ -313,8 +341,12 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
 
     private fun refreshTopLayout(groupId: Int, itemId: Int) {
         mTopBinding.slider.clearOnChangeListeners()
+        mTopBinding.slider.clearOnSliderTouchListeners()
 
         when (groupId) {
+            GROUP_ID_VIRTUAL_BG -> {
+                mTopBinding.root.isVisible = false
+            }
             GROUP_ID_BEAUTY -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_BEAUTY_NONE
                 if (itemId != ITEM_ID_BEAUTY_NONE) {
@@ -360,6 +392,42 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
     private fun onItemSelected(groupId: Int, itemId: Int) {
         refreshTopLayout(groupId, itemId)
         when (groupId) {
+            GROUP_ID_VIRTUAL_BG -> {
+                when (itemId) {
+                    ITEM_ID_VIRTUAL_BG_NONE -> {
+                        RtcEngineInstance.rtcEngine.enableVirtualBackground(
+                            false,
+                            RtcEngineInstance.virtualBackgroundSource.apply {
+                                backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
+                            },
+                            SegmentationProperty()
+                        )
+                    }
+                    ITEM_ID_VIRTUAL_BG_BLUR -> {
+                        RtcEngineInstance.rtcEngine.enableVirtualBackground(
+                            true,
+                            RtcEngineInstance.virtualBackgroundSource.apply {
+                                backgroundSourceType = VirtualBackgroundSource.BACKGROUND_BLUR
+                            },
+                            SegmentationProperty()
+                        )
+                    }
+                    ITEM_ID_VIRTUAL_BG_MITAO -> {
+                        RtcEngineInstance.rtcEngine.enableVirtualBackground(
+                            true,
+                            RtcEngineInstance.virtualBackgroundSource.apply {
+                                backgroundSourceType = VirtualBackgroundSource.BACKGROUND_IMG
+                                source = FileUtils.copyFileFromAssets(
+                                    context,
+                                    "virtualbackgroud_mitao.jpg",
+                                    context.externalCacheDir!!.absolutePath
+                                )
+                            },
+                            SegmentationProperty()
+                        )
+                    }
+                }
+            }
             GROUP_ID_BEAUTY -> {
                 if (itemId == ITEM_ID_BEAUTY_NONE) {
                     beautyProcessor?.setFaceBeautify(itemId, 0.0f)
