@@ -386,6 +386,7 @@ KTVApiDelegate
 
 - (void)showSettingView {
     LSTPopView* popView = [LSTPopView popSettingViewWithParentView:self.view
+                                                       settingView:self.settingView
                                                       withDelegate:self];
     
     self.settingView = (VLKTVSettingView*)popView.currCustomView;
@@ -1191,8 +1192,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         //请求歌词和歌曲
         [weakSelf loadAndPlaySong];
     }];
-    
-    //
 }
 
 #pragma mark - getter/handy utils
