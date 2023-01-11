@@ -135,4 +135,5 @@
     <string name="ktv_network_unavailable">未检测到可用网络，确认继续？</string>
     <string name="ktv_no_lrc">暂无歌词 </string>
     <string name="ktv_content">监测到当前内容存在违规行为</string>
+    <string name="ktv_iknow">我知道了</string>
 </resources>
