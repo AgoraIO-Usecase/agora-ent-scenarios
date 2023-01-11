@@ -8,7 +8,7 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
-import io.agora.scene.show.beauty.bytedance.BeautyByteDanceImpl
+import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 
 object RtcEngineInstance {
 
@@ -18,7 +18,7 @@ object RtcEngineInstance {
     val beautyProcessor: IBeautyProcessor
         get() {
             if (innerBeautyProcessor == null) {
-                innerBeautyProcessor = BeautyByteDanceImpl(AgoraApplication.the())
+                innerBeautyProcessor = BeautySenseTimeImpl(AgoraApplication.the())
             }
             return innerBeautyProcessor!!
         }
