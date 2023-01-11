@@ -319,7 +319,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         NSInteger duration = [dict[@"duration"] integerValue];
         NSInteger remoteNtp = [dict[@"ntp"] integerValue];
         AgoraMediaPlayerState state = [dict[@"playerState"] integerValue];
-        
+        KTVLogInfo(@"recv setLrcTime state: %ld", (long)state);
         if (self.playerState != state) {
             self.playerState = state;
             [self updateCosingerPlayerStatusIfNeed];
@@ -345,7 +345,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
         AgoraMediaPlayerState state = [dict[@"state"] integerValue];
-        KTVLogInfo(@"recv PlayerState: %ld", (long)state);
+        KTVLogInfo(@"recv PlayerState: %ld, %@ %@", (long)state, dict[@"userId"], VLUserCenter.user.id);
         self.playerState = state;
         [self updateCosingerPlayerStatusIfNeed];
         
@@ -406,7 +406,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
     }
-    [self syncPlayState:state];
+    if (self.config.role == KTVSingRoleMainSinger) {
+        [self syncPlayState:state];
+    }
     self.playerState = state;
     [self.delegate controller:self song:self.config.songCode didChangedToState:state local:YES];
 }
@@ -542,7 +544,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                                          data:messageData];
     if (code == 0 && success) {
         success(YES);
-    } else{
+    }
+    if (code != 0) {
         KTVLogError(@"sendStreamMessage fail: %d\n",code);
     };
 }
@@ -550,6 +553,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 - (void)syncPlayState:(AgoraMediaPlayerState)state {
     NSDictionary *dict = @{
             @"cmd":@"PlayerState",
+            @"userId": VLUserCenter.user.id,
             @"state": [NSString stringWithFormat:@"%ld", state]
     };
     [self sendStreamMessageWithDict:dict success:nil];

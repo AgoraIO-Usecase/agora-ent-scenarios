@@ -511,7 +511,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     config.role = role;
     config.mainSingerUid = [[model userNo] integerValue];
     config.coSingerUid = [[model chorusNo] integerValue];
-    
+    KTVLogInfo(@"loadSong name: %@, songNo: %@, type: %ld, role: %ld", model.songName, model.songNo, type, role);
     VL(weakSelf);
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
@@ -1352,11 +1352,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray: name: %@ isChorus: %d, status: %ld", updatedTopSong.name, updatedTopSong.isChorus, updatedTopSong.status);
     if(!updatedTopSong.isChorus) {
         //solo
-        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+        if(![updatedTopSong isEqual:originalTopSong]){
             //song changes
-            [self loadAndPlaySong];
-        } else if([updatedTopSong doneChorusMatch]) {
-            //chorus go solo
+            [self.ktvApi stopSong];
             [self loadAndPlaySong];
         }
     } else {
