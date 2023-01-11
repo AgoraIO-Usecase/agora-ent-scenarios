@@ -14,9 +14,9 @@
 
 #### 1.1 准备资源
 
-- 商汤美颜SDK
-- 商汤美颜resource
-- 商汤美颜证书(证书和app的ApplicationId对应)
+- 字节美颜SDK
+- 字节美颜resource
+- 字节美颜证书(证书和app的ApplicationId对应)
 
 #### 1.2 项目配置
 
