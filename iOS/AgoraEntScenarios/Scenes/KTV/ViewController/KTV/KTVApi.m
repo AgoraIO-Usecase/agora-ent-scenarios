@@ -345,6 +345,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
         AgoraMediaPlayerState state = [dict[@"state"] integerValue];
+        KTVLogInfo(@"recv PlayerState: %ld", (long)state);
         self.playerState = state;
         [self updateCosingerPlayerStatusIfNeed];
         
@@ -362,7 +363,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
-    if (self.config.role != KTVSingRoleMainSinger) {
+    if (self.config.role != KTVSingRoleMainSinger
+        || self.playerState != AgoraMediaPlayerStatePlaying) {
         return;
     }
     
@@ -541,7 +543,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     if (code == 0 && success) {
         success(YES);
     } else{
-//        VLLog(@"发送失败-streamId:%ld\n",streamId);
+        KTVLogError(@"sendStreamMessage fail: %d\n",code);
     };
 }
 

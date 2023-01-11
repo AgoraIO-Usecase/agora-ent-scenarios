@@ -653,6 +653,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
     __block VLRoomSelSongModel* removed;
+    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+    
+    if (isTopSong) {
+        [self.ktvApi stopSong];
+    }
+    
     NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         if([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
@@ -677,6 +683,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }];
         }
     }
+    
 }
 
 - (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
@@ -1259,22 +1266,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isOnMicSeat = isOnMicSeat;
     
     if (onMicSeatStatusDidChanged) {
+        VLRoomSelSongModel* song = [self.selSongsArray firstObject];
+        if (!isOnMicSeat) {
+            if (song.isChorus && song.chorusNo == VLUserCenter.user.id) {
+                //co singer leave chorus
+                [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
+                }];
+                [self.ktvApi stopSong];
+                [self loadAndPlaySong];
+            } else if (song.isSongOwner) {
+                [self.ktvApi stopSong];
+                [self removeCurrentSongWithSync:YES];
+            }
+        }
+        
         //start mic once enter seat
         AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
         [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
         // use audio volume to control mic on/off, so that mic is always on when broadcaster
         [option setPublishMicrophoneTrack:[self isBroadcaster]];
         [self.RTCkit updateChannelWithMediaOptions:option];
-        
-        //TODO: isOnMicSeat = NO && is chorus && is co singer
-        VLRoomSelSongModel* soong = [self.selSongsArray firstObject];
-        if (!isOnMicSeat && soong.isChorus && soong.chorusNo == VLUserCenter.user.id) {
-            //co singer leave chorus
-            [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
-            }];
-            [self.ktvApi stopSong];
-            [self loadAndPlaySong];
-        }
     }
     
     [self.RTCkit enableLocalAudio:isOnMicSeat];
