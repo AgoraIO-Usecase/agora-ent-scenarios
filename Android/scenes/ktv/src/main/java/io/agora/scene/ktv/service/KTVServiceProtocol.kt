@@ -174,4 +174,16 @@ interface KTVServiceProtocol {
     fun subscribeChooseSong(
         changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
     )
+
+    // =================== 断网重连相关 =========================
+
+    /**
+     * 订阅重连事件
+     */
+    fun subscribeReConnectEvent(onReconnect: () -> Unit)
+
+    /**
+     * 拉取房间内用户列表
+     */
+    fun getAllUserList(success: (userNum : Int) -> Unit, error: ((Exception) -> Unit)? = null)
 }

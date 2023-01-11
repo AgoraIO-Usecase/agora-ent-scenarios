@@ -337,7 +337,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (mPlayer == null) {
                         break
                     }
-                    if (mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                    if (mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING ||
+                        mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PAUSED) {
                         sendSyncPitch(pitch)
                     }
                     try {
@@ -624,7 +625,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         super.onAudioVolumeIndication(speakers, totalVolume)
         // VideoPitch回调, 用于同步各端音准
         if (songConfig == null || mPlayer == null) return
-        if (mPlayer!!.state != Constants.MediaPlayerState.PLAYER_STATE_PLAYING) return
         if (songConfig!!.mainSingerUid.toLong() == UserManager.getInstance().user.id
             || songConfig!!.coSingerUid.toLong() == UserManager.getInstance().user.id
         ) {
@@ -633,6 +633,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (mPlayer != null && mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                         runOnMainThread { lrcView?.pitchView?.updateLocalPitch(info.voicePitch.toFloat()) }
                         pitch = info.voicePitch
+                    } else {
+                        runOnMainThread { lrcView?.pitchView?.updateLocalPitch(0.0F) }
+                        pitch = 0.0
                     }
                 }
             }

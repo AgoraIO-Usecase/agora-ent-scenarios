@@ -4,7 +4,6 @@ import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODE
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
 
 import android.content.Context;
-import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.view.SurfaceView;
 
@@ -46,7 +45,6 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
-import io.agora.scene.base.utils.ZipUtils;
 import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.service.ChangeMVCoverInputModel;
@@ -164,6 +162,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         initRoom();
         initSeats();
         initSongs();
+        initReConnectEvent();
     }
 
     public boolean release() {
@@ -188,6 +187,41 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             return true;
         }
         return false;
+    }
+
+    // ======================= 断网重连相关 =======================
+
+    public void initReConnectEvent() {
+        ktvServiceProtocol.subscribeReConnectEvent(() -> {
+            reFetchUserNum();
+            reFetchSeatStatus();
+            reFetchSongStatus();
+            return null;
+        });
+    }
+
+    private void reFetchUserNum() {
+        KTVLogger.d(TAG, "reFetchUserNum: call");
+        ktvServiceProtocol.getAllUserList(num -> {
+            roomUserCountLiveData.postValue(num);
+            return null;
+        }, null);
+    }
+
+    private void reFetchSeatStatus() {
+        KTVLogger.d(TAG, "reFetchSeatStatus: call");
+        ktvServiceProtocol.getSeatStatusList((e, data) -> {
+            if (e == null && data != null) {
+                KTVLogger.d(TAG, "getSeatStatusList: return" + data);
+                seatListLiveData.setValue(data);
+            }
+            return null;
+        });
+    }
+
+    private void reFetchSongStatus() {
+        KTVLogger.d(TAG, "reFetchSongStatus: call");
+        getSongChosenList();
     }
 
     // ======================= 房间相关 =======================
@@ -387,35 +421,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             }
             return null;
         });
-    }
-
-    private Thread mReLinkThread;
-    public void getSeatStatus() {
-        mReLinkThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //TODO: workaround 网络重连后等待3s刷新麦位状态， SYNC中添加回调后修改
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                KTVLogger.d(TAG, "getSeatStatusList: call");
-                ktvServiceProtocol.getSeatStatusList((e, data) -> {
-                    if (e == null && data != null) {
-                        KTVLogger.d(TAG, "getSeatStatusList: return" + data);
-                        seatListLiveData.setValue(data);
-                        try {
-                            mReLinkThread.join();
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                    return null;
-                });
-            }
-        });
-        mReLinkThread.start();
     }
 
     /**
@@ -979,12 +984,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 if (uid == 0) {
                     networkStatusLiveData.postValue(new NetWorkEvent(txQuality, rxQuality));
                 }
-            }
-
-            @Override
-            public void onRejoinChannelSuccess(String channel, int uid, int elapsed) {
-                // 断网重连操作，断网重连后刷新麦位状态
-                getSeatStatus();
             }
 
             @Override
