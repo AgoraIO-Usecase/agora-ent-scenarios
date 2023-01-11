@@ -184,4 +184,13 @@
     <string name="show_setting_preset_audience_basic_title">基础模式</string>
     <string name="show_setting_preset_audience_basic_description">基础模式</string>
     <string name="show_live_prepare_setting">设置</string>
+    <string name="show_beauty_group_adjust">调整</string>
+    <string name="show_beauty_item_adjust_contrast">对比度</string>
+    <string name="show_beauty_item_adjust_saturation">饱和度</string>
+    <string name="show_beauty_item_adjust_sharpen">锐化</string>
+    <string name="show_beauty_item_adjust_clarity">清晰度</string>
+    <string name="show_beauty_item_beauty_redden">红润</string>
+    <string name="show_beauty_item_beauty_bright_eye">亮眼</string>
+    <string name="show_beauty_item_beauty_remove_dark_circles">祛黑眼圈</string>
+    <string name="show_beauty_item_beauty_remove_nasolabial_folds">祛法令纹</string>
 </resources>

@@ -3,17 +3,14 @@ package io.agora.scene.show.beauty
 object BeautyCache {
 
     private val defaultItemValueMap = mapOf(
-        Pair(ITEM_ID_BEAUTY_SMOOTH, 0.3f),
-        Pair(ITEM_ID_BEAUTY_WHITEN, 0.5f),
-        Pair(ITEM_ID_BEAUTY_OVERALL, 0.15f),
-        Pair(ITEM_ID_BEAUTY_CHEEKBONE, 0.3f),
-        Pair(ITEM_ID_BEAUTY_JAWBONE, 0.46f),
-        Pair(ITEM_ID_BEAUTY_EYE, 0.15f),
-        Pair(ITEM_ID_BEAUTY_TEETH, 0.2f),
-        Pair(ITEM_ID_BEAUTY_FOREHEAD, 0.4f),
-        Pair(ITEM_ID_BEAUTY_NOSE, 0.15f),
-        Pair(ITEM_ID_BEAUTY_MOUTH, 0.16f),
-        Pair(ITEM_ID_BEAUTY_CHIN, 0.46f),
+
+        Pair(ITEM_ID_ADJUST_SHARPEN, 0.5f),
+        Pair(ITEM_ID_ADJUST_CLARITY, 1.0f),
+
+        Pair(ITEM_ID_BEAUTY_SMOOTH, 0.55f),
+        Pair(ITEM_ID_BEAUTY_WHITEN, 0.2f),
+        Pair(ITEM_ID_BEAUTY_OVERALL, 0.4f),
+        Pair(ITEM_ID_BEAUTY_EYE, 0.3f),
 
         Pair(ITEM_ID_EFFECT_BAIXI, 0.5f),
         Pair(ITEM_ID_EFFECT_TIANMEI, 0.5f),
@@ -61,6 +58,8 @@ object BeautyCache {
             put(ITEM_ID_BEAUTY_NOSE, defaultItemValueMap[ITEM_ID_BEAUTY_NOSE] ?: 0.0f)
             put(ITEM_ID_BEAUTY_MOUTH, defaultItemValueMap[ITEM_ID_BEAUTY_MOUTH] ?: 0.0f)
             put(ITEM_ID_BEAUTY_CHIN, defaultItemValueMap[ITEM_ID_BEAUTY_CHIN] ?: 0.0f)
+            put(ITEM_ID_ADJUST_SHARPEN, defaultItemValueMap[ITEM_ID_ADJUST_SHARPEN] ?: 0.0f)
+            put(ITEM_ID_ADJUST_CLARITY, defaultItemValueMap[ITEM_ID_ADJUST_CLARITY] ?: 0.0f)
         }
         cacheItemOperation.apply {
             clear()
@@ -68,17 +67,15 @@ object BeautyCache {
                 GROUP_ID_BEAUTY, arrayListOf(
                     ITEM_ID_BEAUTY_WHITEN,
                     ITEM_ID_BEAUTY_OVERALL,
-                    ITEM_ID_BEAUTY_CHEEKBONE,
-                    ITEM_ID_BEAUTY_JAWBONE,
                     ITEM_ID_BEAUTY_EYE,
-                    ITEM_ID_BEAUTY_TEETH,
-                    ITEM_ID_BEAUTY_FOREHEAD,
-                    ITEM_ID_BEAUTY_NOSE,
-                    ITEM_ID_BEAUTY_MOUTH,
-                    ITEM_ID_BEAUTY_CHIN,
                     ITEM_ID_BEAUTY_SMOOTH,
                 )
             )
+            put(GROUP_ID_ADJUST, arrayListOf(
+                ITEM_ID_ADJUST_SHARPEN,
+                ITEM_ID_ADJUST_CLARITY,
+                ITEM_ID_ADJUST_CONTRAST,
+            ))
         }
     }
 
@@ -130,6 +127,11 @@ object BeautyCache {
         cacheItemOperation[GROUP_ID_EFFECT]?.let { list ->
             list.lastOrNull()?.let {
                 processor.setEffect(it, getItemValue(it))
+            }
+        }
+        cacheItemOperation[GROUP_ID_ADJUST]?.let { list ->
+            list.lastOrNull()?.let {
+                processor.setAdjust(it, getItemValue(it))
             }
         }
         cacheItemOperation[GROUP_ID_STICKER]?.let { list ->
