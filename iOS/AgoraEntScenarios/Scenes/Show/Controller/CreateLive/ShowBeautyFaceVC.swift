@@ -14,6 +14,12 @@ class ShowBeautyFaceVC: UIViewController {
     
     var defalutSelectIndex = 0
    
+    lazy var agoraKitManager: ShowAgoraKitManager = {
+        let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
+        return manager
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -32,6 +38,7 @@ class ShowBeautyFaceVC: UIViewController {
     static let styleData = ByteBeautyModel.createStyleData()
     static let filterData = ByteBeautyModel.createFilterData()
     static let stickerData = ByteBeautyModel.createStickerData()
+    static let backgroundData = ByteBeautyModel.createBackgroundData()
      
     private lazy var dataArray: [ByteBeautyModel] = {
         switch type {
@@ -39,6 +46,7 @@ class ShowBeautyFaceVC: UIViewController {
         case .style: return ShowBeautyFaceVC.styleData
 //        case .filter: return ShowBeautyFaceVC.filterData
         case .sticker: return ShowBeautyFaceVC.stickerData
+        case .background: return ShowBeautyFaceVC.backgroundData
         }
     }()
     
@@ -100,6 +108,17 @@ class ShowBeautyFaceVC: UIViewController {
             
         case .sticker:
             ByteBeautyManager.shareManager.setSticker(path: model.path)
+            
+        case .background:
+            if model.path == nil {
+                agoraKitManager.enableVirtualBackground(isOn: false)
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
+            } else if model.path == "xuhua" {
+                agoraKitManager.enableVirtualBackground(isOn: true)
+                
+            } else {
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: model.key, isOn: true)
+            }
         }
     }
     
@@ -156,7 +175,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
-        if type == .sticker {
+        if type == .sticker || type == .background {
             selectedItemClosure?(0, true)
             return
         }

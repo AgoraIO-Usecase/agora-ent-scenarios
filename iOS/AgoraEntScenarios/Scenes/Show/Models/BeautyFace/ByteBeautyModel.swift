@@ -277,4 +277,27 @@ class ByteBeautyModel: ByteBaseModel {
         
         return dataArray
     }
+    
+    static func createBackgroundData() -> [ByteBeautyModel] {
+        var dataArray = [ByteBeautyModel]()
+        var model = ByteBeautyModel()
+        model.name = "无"
+        model.icon = "show_beauty_none"
+        model.isSelected = true
+        dataArray.append(model)
+        
+        model = ByteBeautyModel()
+        model.path = "xuhua"
+        model.name = "虚化".show_localized
+        model.icon = "meiyan_lj_naiyou"
+        dataArray.append(model)
+        
+        model = ByteBeautyModel()
+        model.path = "show_live_mritual_bg"
+        model.name = "蜜桃".show_localized
+        model.icon = "meiyan_lj_makalong"
+        dataArray.append(model)
+        
+        return dataArray
+    }
 }

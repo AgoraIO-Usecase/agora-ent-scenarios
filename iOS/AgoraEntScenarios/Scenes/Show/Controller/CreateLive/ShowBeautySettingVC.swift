@@ -13,6 +13,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
 //    case filter
     case style
     case sticker
+    case background
     
     var title: String {
         switch self {
@@ -20,6 +21,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
 //        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
+        case .background: return "背景".show_localized
         }
     }
 }
