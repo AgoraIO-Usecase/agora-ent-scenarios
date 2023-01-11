@@ -85,7 +85,7 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel) {
         mService.joinRoom(roomInfo.roomId, {
-            LiveDetailActivity.launch(this, it)
+            LiveDetailActivity.launch(this, arrayListOf(it, it, it))
         }, {
             ToastUtils.showToast(it.message)
         })
