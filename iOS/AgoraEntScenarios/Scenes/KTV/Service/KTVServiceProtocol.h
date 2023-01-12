@@ -128,6 +128,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)joinChorusWithInput:(KTVJoinChorusInputModel*)inputModel
                  completion:(void(^)(NSError* _Nullable))completion;
 
+
+/// 伴唱取消合唱
+/// @param completion <#completion description#>
+- (void)coSingerLeaveChorusWithCompletion:(void(^)(NSError* _Nullable))completion;
+
 /// 当前歌曲合唱改为独唱
 - (void)enterSoloMode;
 

@@ -58,6 +58,11 @@
 - (void)setIsPlayAccompany:(BOOL)isPlayAccompany {
     [self.originBtn setSelected:!isPlayAccompany];
     [self _refreshOriginButton];
+    
+    VLKTVMVViewActionType targetOrigin = isPlayAccompany ? VLKTVMVViewActionTypeSingAcc : VLKTVMVViewActionTypeSingOrigin;
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:btnTappedWithActionType:)]) {
+        [self.delegate onKTVMVView:self btnTappedWithActionType:targetOrigin];
+    }
 }
 
 - (void)layoutSubviews {
@@ -410,7 +415,7 @@
     [_lrcView stop];
     [_lrcView reset];
     [self setSongScore:0];
-    self.isPlayAccompany = NO;
+    self.isPlayAccompany = YES;
     [_lrcView resetTime];
     [self cleanMusicText];
 }
@@ -515,7 +520,7 @@
         _originBtn.titleLabel.font = UIFontMake(10.0);
         [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateNormal];
         [_originBtn setImage:[UIImage sceneImageWithName:@"ktv_origin_playOn"] forState:UIControlStateSelected];
-        _originBtn.selected = YES;
+        _originBtn.selected = NO;
         [_originBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _originBtn;

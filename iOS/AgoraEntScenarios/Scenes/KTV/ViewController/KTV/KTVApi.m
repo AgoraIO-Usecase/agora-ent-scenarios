@@ -51,9 +51,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, assign) NSInteger localPlayerSystemTime;
 @property (nonatomic, assign) NSInteger remotePlayerPosition;
 @property (nonatomic, assign) NSInteger remotePlayerDuration;
-@property(nonatomic, assign)NSInteger dataStreamId;
-@property(nonatomic, strong)KTVSongConfiguration* config;
+@property (nonatomic, assign) NSInteger dataStreamId;
+@property (nonatomic, strong) KTVSongConfiguration* config;
 
+@property (nonatomic, assign) AgoraMediaPlayerState playerState;
 @end
 
 @implementation KTVApi
@@ -280,6 +281,26 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 //    [self syncTrackMode:mode];
 }
 
+#pragma mark private
+- (void)updateCosingerPlayerStatusIfNeed {
+    if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
+        switch (self.playerState) {
+            case AgoraMediaPlayerStatePaused:
+                [self pausePlay];
+                break;
+            case AgoraMediaPlayerStateStopped:
+//                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
+                [self stopSong];
+                break;
+            case AgoraMediaPlayerStatePlaying:
+                [self resumePlay];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 #pragma mark - rtc delgate proxies
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
@@ -293,11 +314,22 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine receiveStreamMessageFromUid:(NSUInteger)uid streamId:(NSInteger)streamId data:(NSData *)data
 {
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
+    if (self.config.role == KTVSingRoleMainSinger) {
+        KTVLogWarn(@"recv %@ cmd invalid", dict[@"cmd"]);
+        return;
+    }
     if ([dict[@"cmd"] isEqualToString:@"setLrcTime"]) {  //同步歌词
         NSInteger position = [dict[@"time"] integerValue];
         NSInteger duration = [dict[@"duration"] integerValue];
         NSInteger remoteNtp = [dict[@"ntp"] integerValue];
-
+        AgoraMediaPlayerState state = [dict[@"playerState"] integerValue];
+        if (self.playerState != state) {
+            KTVLogInfo(@"recv state with setLrcTime : %ld", (long)state);
+            self.playerState = state;
+            [self updateCosingerPlayerStatusIfNeed];
+            
+            [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
+        }
         
         self.remotePlayerPosition = position;
         self.remotePlayerDuration = duration;
@@ -317,23 +349,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
         AgoraMediaPlayerState state = [dict[@"state"] integerValue];
-        
-        if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
-            switch (state) {
-                case AgoraMediaPlayerStatePaused:
-                    [self pausePlay];
-                    break;
-                case AgoraMediaPlayerStateStopped:
-//                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
-                    [self stopSong];
-                    break;
-                case AgoraMediaPlayerStatePlaying:
-                    [self resumePlay];
-                    break;
-                default:
-                    break;
-            }
-        }
+        KTVLogInfo(@"recv state with PlayerState: %ld, %@ %@", (long)state, dict[@"userId"], VLUserCenter.user.id);
+        self.playerState = state;
+        [self updateCosingerPlayerStatusIfNeed];
         
         [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
@@ -343,13 +361,13 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         NSInteger time = [dict[@"time"] integerValue];
         [self.lrcView setVoicePitch:@[@(pitch)]];
         KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
-        return;
     }
 }
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
-    if (self.config.role != KTVSingRoleMainSinger) {
+    if (self.config.role != KTVSingRoleMainSinger
+        || self.playerState != AgoraMediaPlayerStatePlaying) {
         return;
     }
     
@@ -391,7 +409,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
     }
-    [self syncPlayState:state];
+    if (self.config.role == KTVSingRoleMainSinger) {
+        [self syncPlayState:state];
+    }
+    self.playerState = state;
+    KTVLogInfo(@"recv state with player callback : %ld", (long)state);
     [self.delegate controller:self song:self.config.songCode didChangedToState:state local:YES];
 }
 
@@ -406,7 +428,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
             @"cmd":@"setLrcTime",
             @"duration":@([self.rtcMediaPlayer getDuration]),
             @"time":@(position),
-            @"ntp":@([self.engine getNtpTimeInMs])
+            @"ntp":@([self.engine getNtpTimeInMs]),
+            @"playerState":@(self.playerState)
         };
         [self sendStreamMessageWithDict:dict success:nil];
     }
@@ -525,14 +548,16 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
                                          data:messageData];
     if (code == 0 && success) {
         success(YES);
-    } else{
-//        VLLog(@"发送失败-streamId:%ld\n",streamId);
+    }
+    if (code != 0) {
+        KTVLogError(@"sendStreamMessage fail: %d\n",code);
     };
 }
 
 - (void)syncPlayState:(AgoraMediaPlayerState)state {
     NSDictionary *dict = @{
             @"cmd":@"PlayerState",
+            @"userId": VLUserCenter.user.id,
             @"state": [NSString stringWithFormat:@"%ld", state]
     };
     [self sendStreamMessageWithDict:dict success:nil];

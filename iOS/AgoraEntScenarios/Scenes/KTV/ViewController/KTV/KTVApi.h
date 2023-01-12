@@ -12,10 +12,12 @@
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^sendStreamSuccess)(BOOL ifSuccess);
 typedef enum : NSUInteger {
+    KTVSongTypeUnknown,
     KTVSongTypeSolo,
     KTVSongTypeChorus
 } KTVSongType;
 typedef enum : NSUInteger {
+    KTVSingRoleUnknown,
     KTVSingRoleMainSinger,
     KTVSingRoleCoSinger,
     KTVSingRoleAudience
