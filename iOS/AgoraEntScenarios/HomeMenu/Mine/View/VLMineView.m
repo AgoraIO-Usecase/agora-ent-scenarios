@@ -46,7 +46,7 @@
     [self addSubview:self.mineTable];
 }
 
-- (void)editButtonClickEvent {
+- (void)editButtonClickEvent:(UIButton *)btn {
     if ([self.delegate respondsToSelector:@selector(mineViewDidCickUser:)]) {
         [self.delegate mineViewDidCickUser:VLMineViewUserClickTypeNickName];
     }
@@ -150,7 +150,7 @@
     if (!_editBtn) {
         _editBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(self.width-40-15-20, _nickNameLabel.centerY-10, 20, 20)];
         [_editBtn setImage:UIImageMake(@"mine_edit_icon") forState:UIControlStateNormal];
-        [_editBtn addTarget:self action:@selector(editButtonClickEvent) forControlEvents:UIControlEventTouchUpInside];
+        [_editBtn addTarget:self action:@selector(editButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _editBtn;
 }

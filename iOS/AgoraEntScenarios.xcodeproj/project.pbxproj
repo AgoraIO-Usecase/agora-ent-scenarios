@@ -304,12 +304,13 @@
 		DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995128FFE579009D3E61 /* VLCache.m */; };
 		DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995928FFE579009D3E61 /* VLUserCenter.m */; };
 		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
-		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = DDEAAC31296D3D9E00D23969 /* VLAlert.m */; };
+		E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E33622C8296FBAB0002F9341 /* VLKTVAlert.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
+		E3668FCA296D4CF6000A594F /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3668FC9296D4CF5000A594F /* KeyCenter.swift */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 /* End PBXBuildFile section */
 
@@ -755,17 +756,19 @@
 		DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLGlobalHelper.m; sourceTree = "<group>"; };
 		DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
-		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		DDEAAC30296D3D9E00D23969 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
 		DDEAAC31296D3D9E00D23969 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
+		E33622C7296FBAB0002F9341 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
+		E33622C8296FBAB0002F9341 /* VLKTVAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVAlert.m; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		E3668FC9296D4CF5000A594F /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyCenter.swift; path = "../../../../../Library/Containers/com.tencent.WeWorkMac/Data/Documents/Profiles/D6A2BF2AA7232C81425E612603642430/Caches/Files/2022-12/6a55b14c5ef156c5f0c76631ca969961/KeyCenter.swift"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1334,7 +1337,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
-				DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */,
+				E3668FC9296D4CF5000A594F /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
 				DDDDDB3228FFD78B005F4E8B /* Context */,
@@ -1717,6 +1720,8 @@
 				DDEAAC31296D3D9E00D23969 /* VLAlert.m */,
 				DDA198E828FFE579009D3E61 /* VLToast.h */,
 				DDA198E928FFE579009D3E61 /* VLToast.m */,
+				E33622C7296FBAB0002F9341 /* VLKTVAlert.h */,
+				E33622C8296FBAB0002F9341 /* VLKTVAlert.m */,
 			);
 			path = Toast;
 			sourceTree = "<group>";
@@ -2319,6 +2324,7 @@
 				DD0292DF295BF0DC00485225 /* LSTPopView+KTVModal.m in Sources */,
 				DD220B50295B332C00F57F30 /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
 				DD84179129090C520026B624 /* WMZCodeView.m in Sources */,
+				E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */,
 				DD220B0D295B332C00F57F30 /* LanguageManager.swift in Sources */,
 				DD220B25295B332C00F57F30 /* UIImageBundleExtension.swift in Sources */,
 				DD220B5D295B332C00F57F30 /* VoiceRoomGiftView.swift in Sources */,
@@ -2337,7 +2343,6 @@
 				DD220B77295B332C00F57F30 /* VMEQSettingView.swift in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
-				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
 				DD0292E0295BF0DC00485225 /* VLAudienceIndicator.m in Sources */,
 				DD220B29295B332C00F57F30 /* AgoraSceneConfig.swift in Sources */,
 				DD220B2A295B332C00F57F30 /* VoiceRoomRTCManager.swift in Sources */,
@@ -2413,6 +2418,7 @@
 				DD220B43295B332C00F57F30 /* VRRoomsViewController.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				DD220B4F295B332C00F57F30 /* VoiceRoomSendGiftCell.swift in Sources */,
+				E3668FCA296D4CF6000A594F /* KeyCenter.swift in Sources */,
 				DD0292CB295BF0DC00485225 /* VLSongListCell.m in Sources */,
 				DD220B69295B332C00F57F30 /* VMSoundSelTableViewCell.swift in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
@@ -2724,8 +2730,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2734,11 +2739,14 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -2762,8 +2770,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2772,10 +2779,13 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
