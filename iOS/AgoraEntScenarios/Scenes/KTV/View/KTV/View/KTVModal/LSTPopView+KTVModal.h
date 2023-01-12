@@ -60,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                               settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
 @end
 
