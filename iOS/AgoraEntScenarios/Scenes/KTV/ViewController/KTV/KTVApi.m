@@ -314,13 +314,17 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine receiveStreamMessageFromUid:(NSUInteger)uid streamId:(NSInteger)streamId data:(NSData *)data
 {
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
+    if (self.config.role == KTVSingRoleMainSinger) {
+        KTVLogWarn(@"recv %@ cmd invalid", dict[@"cmd"]);
+        return;
+    }
     if ([dict[@"cmd"] isEqualToString:@"setLrcTime"]) {  //同步歌词
         NSInteger position = [dict[@"time"] integerValue];
         NSInteger duration = [dict[@"duration"] integerValue];
         NSInteger remoteNtp = [dict[@"ntp"] integerValue];
         AgoraMediaPlayerState state = [dict[@"playerState"] integerValue];
-        KTVLogInfo(@"recv setLrcTime state: %ld", (long)state);
         if (self.playerState != state) {
+            KTVLogInfo(@"recv state with setLrcTime : %ld", (long)state);
             self.playerState = state;
             [self updateCosingerPlayerStatusIfNeed];
             
@@ -345,7 +349,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
         AgoraMediaPlayerState state = [dict[@"state"] integerValue];
-        KTVLogInfo(@"recv PlayerState: %ld, %@ %@", (long)state, dict[@"userId"], VLUserCenter.user.id);
+        KTVLogInfo(@"recv state with PlayerState: %ld, %@ %@", (long)state, dict[@"userId"], VLUserCenter.user.id);
         self.playerState = state;
         [self updateCosingerPlayerStatusIfNeed];
         
@@ -357,7 +361,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         NSInteger time = [dict[@"time"] integerValue];
         [self.lrcView setVoicePitch:@[@(pitch)]];
         KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
-        return;
     }
 }
 
@@ -410,6 +413,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self syncPlayState:state];
     }
     self.playerState = state;
+    KTVLogInfo(@"recv state with player callback : %ld", (long)state);
     [self.delegate controller:self song:self.config.songCode didChangedToState:state local:YES];
 }
 
