@@ -33,7 +33,6 @@
 		DD0292D8295BF0DC00485225 /* VLMicSeatList.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029279295BF0DC00485225 /* VLMicSeatList.m */; };
 		DD0292D9295BF0DC00485225 /* VLDropOnLineView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02927E295BF0DC00485225 /* VLDropOnLineView.m */; };
 		DD0292DA295BF0DC00485225 /* VLPopMoreSelView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD02927F295BF0DC00485225 /* VLPopMoreSelView.m */; };
-		DD0292DB295BF0DC00485225 /* LEEAlert+KTVModal.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029283295BF0DC00485225 /* LEEAlert+KTVModal.m */; };
 		DD0292DC295BF0DC00485225 /* VLPopScoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029284295BF0DC00485225 /* VLPopScoreView.m */; };
 		DD0292DD295BF0DC00485225 /* VLPopSelBgView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029286295BF0DC00485225 /* VLPopSelBgView.m */; };
 		DD0292DE295BF0DC00485225 /* VLPopOnLineTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD029288295BF0DC00485225 /* VLPopOnLineTypeView.m */; };
@@ -309,6 +308,7 @@
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
+		DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = DDEAAC31296D3D9E00D23969 /* VLAlert.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 /* End PBXBuildFile section */
@@ -377,13 +377,11 @@
 		DD029279295BF0DC00485225 /* VLMicSeatList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMicSeatList.m; sourceTree = "<group>"; };
 		DD02927A295BF0DC00485225 /* VLJoinChorusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLJoinChorusView.h; sourceTree = "<group>"; };
 		DD02927C295BF0DC00485225 /* VLPopScoreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopScoreView.h; sourceTree = "<group>"; };
-		DD02927D295BF0DC00485225 /* LEEAlert+KTVModal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LEEAlert+KTVModal.h"; sourceTree = "<group>"; };
 		DD02927E295BF0DC00485225 /* VLDropOnLineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLDropOnLineView.m; sourceTree = "<group>"; };
 		DD02927F295BF0DC00485225 /* VLPopMoreSelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopMoreSelView.m; sourceTree = "<group>"; };
 		DD029280295BF0DC00485225 /* VLPopSelBgView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopSelBgView.h; sourceTree = "<group>"; };
 		DD029281295BF0DC00485225 /* LSTPopView+KTVModal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LSTPopView+KTVModal.h"; sourceTree = "<group>"; };
 		DD029282295BF0DC00485225 /* VLPopOnLineTypeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLPopOnLineTypeView.h; sourceTree = "<group>"; };
-		DD029283295BF0DC00485225 /* LEEAlert+KTVModal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LEEAlert+KTVModal.m"; sourceTree = "<group>"; };
 		DD029284295BF0DC00485225 /* VLPopScoreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopScoreView.m; sourceTree = "<group>"; };
 		DD029285295BF0DC00485225 /* VLDropOnLineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLDropOnLineView.h; sourceTree = "<group>"; };
 		DD029286295BF0DC00485225 /* VLPopSelBgView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLPopSelBgView.m; sourceTree = "<group>"; };
@@ -761,6 +759,8 @@
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
 		DDDDDB3428FFD78B005F4E8B /* AppContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContext.swift; sourceTree = "<group>"; };
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
+		DDEAAC30296D3D9E00D23969 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
+		DDEAAC31296D3D9E00D23969 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -966,13 +966,11 @@
 			isa = PBXGroup;
 			children = (
 				DD02927C295BF0DC00485225 /* VLPopScoreView.h */,
-				DD02927D295BF0DC00485225 /* LEEAlert+KTVModal.h */,
 				DD02927E295BF0DC00485225 /* VLDropOnLineView.m */,
 				DD02927F295BF0DC00485225 /* VLPopMoreSelView.m */,
 				DD029280295BF0DC00485225 /* VLPopSelBgView.h */,
 				DD029281295BF0DC00485225 /* LSTPopView+KTVModal.h */,
 				DD029282295BF0DC00485225 /* VLPopOnLineTypeView.h */,
-				DD029283295BF0DC00485225 /* LEEAlert+KTVModal.m */,
 				DD029284295BF0DC00485225 /* VLPopScoreView.m */,
 				DD029285295BF0DC00485225 /* VLDropOnLineView.h */,
 				DD029286295BF0DC00485225 /* VLPopSelBgView.m */,
@@ -1715,6 +1713,8 @@
 		DDA198E728FFE579009D3E61 /* Toast */ = {
 			isa = PBXGroup;
 			children = (
+				DDEAAC30296D3D9E00D23969 /* VLAlert.h */,
+				DDEAAC31296D3D9E00D23969 /* VLAlert.m */,
 				DDA198E828FFE579009D3E61 /* VLToast.h */,
 				DDA198E928FFE579009D3E61 /* VLToast.m */,
 			);
@@ -2458,7 +2458,6 @@
 				DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */,
 				DD220B55295B332C00F57F30 /* VMAudioSettingView.swift in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
-				DD0292DB295BF0DC00485225 /* LEEAlert+KTVModal.m in Sources */,
 				DD220B75295B332C00F57F30 /* VMMuteView.swift in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DD0292EB295BF0DC00485225 /* VLJoinChorusView.m in Sources */,
@@ -2475,6 +2474,7 @@
 				DD0292D9295BF0DC00485225 /* VLDropOnLineView.m in Sources */,
 				DD0292D4295BF0DC00485225 /* VLKTVMVIdleView.m in Sources */,
 				DD220B22295B332C00F57F30 /* UIButton+Extension.swift in Sources */,
+				DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */,
 				DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */,
 				DDA199FB28FFE579009D3E61 /* UIColor+JKGradient.m in Sources */,
 				DD0292D5295BF0DC00485225 /* VLSoundEffectView.m in Sources */,
