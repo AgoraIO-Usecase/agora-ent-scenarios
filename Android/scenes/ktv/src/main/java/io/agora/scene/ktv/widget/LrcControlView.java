@@ -5,18 +5,15 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.ContentFrameLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
@@ -220,10 +217,12 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
-            if (this.mRole != Role.Singer) {
+            if (this.mRole == Role.Listener) {
                 mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
+            } else if (this.mRole == Role.Partner) {
+                mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
             }
         }
         stopTimer();

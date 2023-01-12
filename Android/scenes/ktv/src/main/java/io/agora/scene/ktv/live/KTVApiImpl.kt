@@ -323,6 +323,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         sendStreamMessageWithJsonObject(jsonMsg) {}
     }
 
+    private fun syncSingingScore(score: Float) {
+        val msg: MutableMap<String?, Any?> = HashMap()
+        msg["cmd"] = "SingingScore"
+        msg["score"] = score.toDouble()
+        val jsonMsg = JSONObject(msg)
+        sendStreamMessageWithJsonObject(jsonMsg) {}
+    }
+
     // ------------------ 音高pitch同步 ------------------
     private var mSyncPitchThread: Thread? = null
     private var mStopSyncPitch = true
@@ -615,6 +623,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     }
                 }
                 ktvApiEventHandler?.onPlayerStateChanged(this, songConfig!!.songCode, Constants.MediaPlayerState.getStateByValue(state), false)
+            } else if (jsonMsg.getString("cmd") == "SingingScore") {
+                // 其他端收到原唱seek指令
+                if (mPlayer == null || songConfig == null) return
+                val score = jsonMsg.getDouble("score").toFloat()
+                if (!isChorusCoSinger()!!) {
+                    ktvApiEventHandler?.onSingingScoreResult(score)
+                }
             }
         } catch (exp: JSONException) {
             KTVLogger.e(TAG, "onStreamMessage:$exp")
@@ -704,6 +719,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 stopDisplayLrc()
                 this.mLastReceivedPlayPosTime = null
                 this.mReceivedPlayPosition = 0
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                // 打分 + 同步分数
+                if (lrcView == null || isChorusCoSinger()!!) return
+                val score = lrcView!!.pitchView.cumulatedScore
+                ktvApiEventHandler?.onSingingScoreResult(score)
+                syncSingingScore(score)
             }
             else -> {}
         }

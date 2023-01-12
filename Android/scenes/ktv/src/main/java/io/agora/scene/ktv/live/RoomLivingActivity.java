@@ -49,7 +49,6 @@ import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.widget.DividerDecoration;
 import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
-import io.agora.scene.widget.dialog.CloseRoomDialog;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.utils.CenterCropRoundCornerTransform;
 import io.agora.scene.widget.utils.UiUtils;
@@ -363,26 +362,19 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
         });
-        roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, userNo -> {
-            KTVLogger.d("cwtsw", "得分回调 userNo = " + UserManager.getInstance().getUser().id.toString() + " o = " + userNo);
-            if (UserManager.getInstance().getUser().id.toString().equals(userNo)) {
-                KTVLogger.d("cwtsw", "计算得分");
-                int score = (int) getBinding().lrcControlView.getPitchView().cumulatedScore;
-                getBinding().tvResultScore.setText(String.valueOf(score));
-                if (score >= 90) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
-                } else if (score >= 80) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
-                } else if (score >= 60) {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
-                } else {
-                    getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
-                }
-                if (UserManager.getInstance().getUser().id.toString().equals(roomLivingViewModel.songPlayingLiveData.getValue().getUserNo())) {
-                    getBinding().groupResult.setVisibility(View.VISIBLE);
-                    KTVLogger.d("cwtsw", "显示得分");
-                }
+        roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
+            KTVLogger.d("cwtsw", "计算得分");
+            getBinding().tvResultScore.setText(String.valueOf(score));
+            if (score >= 90) {
+                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
+            } else if (score >= 80) {
+                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
+            } else if (score >= 60) {
+                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
+            } else {
+                getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);
             }
+            getBinding().groupResult.setVisibility(View.VISIBLE);
         });
         roomLivingViewModel.playerMusicCountDownLiveData.observe(this, time ->
                 getBinding().lrcControlView.setCountDown(time));
