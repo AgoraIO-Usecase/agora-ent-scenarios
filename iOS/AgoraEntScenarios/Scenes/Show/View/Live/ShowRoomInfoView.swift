@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import SDWebImage
 
 private let bgViewHeight: CGFloat = 40
 private let imgViewHeight: CGFloat = 32

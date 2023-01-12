@@ -40,6 +40,8 @@ PODS:
   - AgoraRtcEngine_Special_iOS/SuperResolution (4.0.1.4.full)
   - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
   - AgoraRtm_iOS (1.5.1)
+  - AgoraSyncManager (1.1.3):
+    - SocketRocket
   - Bugly (2.5.93)
   - bytedEffect (4.3.0):
     - SSZipArchive
@@ -396,6 +398,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.0.8.8)
   - AgoraRtcEngine_Special_iOS (= 4.0.1.4.full)
   - AgoraRtm_iOS
+  - AgoraSyncManager (= 1.1.3)
   - Bugly (= 2.5.93)
   - bytedEffect (from `bytedEffect.podspec`)
   - ChameleonFramework
@@ -433,6 +436,7 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
+    - AgoraSyncManager
     - Bugly
     - ChameleonFramework
     - CRBoxInputView
@@ -476,6 +480,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
   AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
+  AgoraSyncManager: ee9b8af10559986f82a3c98308fa60603aedfa25
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   bytedEffect: 38b05fb3c272a050021efb7b322aff795e329825
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
@@ -509,6 +514,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: edcd7d0227304786a6c15f381dbdd5b1a8d4c8f4
+PODFILE CHECKSUM: e4c55437e3910f84d26b3f834c8088761ab9af7c
 
 COCOAPODS: 1.11.3
