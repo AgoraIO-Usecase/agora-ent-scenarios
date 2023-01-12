@@ -1218,14 +1218,14 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     // ------------------ 原唱/伴奏 ------------------
-    protected int mAudioTrackIndex = 1;
+    protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
     public boolean musicToggleOriginal() {
-        if (mAudioTrackIndex == 1) {
+        if (mAudioTrackMode == KTVPlayerTrackMode.KTVPlayerTrackOrigin) {
             ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackAcc);
-            mAudioTrackIndex = 0;
+            mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
         } else {
             ktvApiProtocol.selectTrackMode(KTVPlayerTrackMode.KTVPlayerTrackOrigin);
-            mAudioTrackIndex = 1;
+            mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackOrigin;
         }
         return false;
     }
@@ -1266,7 +1266,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
         Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         ktvApiProtocol.stopSong();
-        mAudioTrackIndex = 1;
+        mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
         boolean isChorus = music.isChorus();
@@ -1323,7 +1323,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         // 列表中无歌曲， 还原状态
         choursPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
-        mAudioTrackIndex = 1;
+        mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
 
         if (isOnSeat) {
             mainChannelMediaOption.publishMicrophoneTrack = true;
