@@ -168,9 +168,9 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             return
         }
         
-        AppContext.showServiceImp.createRoom(roomName: roomName,
-                                             roomId: createView.roomNo,
-                                             thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+                                                                roomId: createView.roomNo,
+                                                                thumbnailId: createView.roomBg) { [weak self] err, detailModel in
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
             guard let wSelf = self else { return }
 //            let liveVC = ShowLiveViewController()

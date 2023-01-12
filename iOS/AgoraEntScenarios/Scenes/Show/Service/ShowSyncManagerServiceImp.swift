@@ -65,6 +65,8 @@ private func agoraPrint(_ message: String) {
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
+    fileprivate var syncUtilImp: SyncUtilImp?
+    
     private var roomList: [ShowRoomListModel]?
     private var room: ShowRoomListModel? {
         return self.roomList?.filter({ $0.roomId == roomId}).first
@@ -97,7 +99,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 return
             }
 
-            syncUtilsInited = false
+//            syncUtilsInited = false
         }
     }
     
@@ -117,10 +119,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             return
         }
 
-        SyncUtil.initSyncManager(sceneId: kSceneId) {
+        if let _ = syncUtilImp {
+            return
         }
         
-        SyncUtil.subscribeConnectState {[weak self] state in
+        syncUtilImp = SyncUtilImp()
+        syncUtilImp?.initSyncManager(sceneId: kSceneId) {
+        }
+        
+        syncUtilImp?.subscribeConnectState {[weak self] state in
             guard let self = self else {
                 return
             }
@@ -203,10 +210,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
         initScene { [weak self] in
-            SyncUtil.joinScene(id: room.roomId!,
-                               userId: room.ownerId!,
-                               isOwner: true,
-                               property: params) { result in
+            guard let imp = self?.syncUtilImp else {
+                return
+            }
+            imp.joinScene(id: room.roomId!,
+                          userId: room.ownerId!,
+                          isOwner: true,
+                          property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
@@ -247,15 +257,17 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         initScene { [weak self] in
             //TODO: check room vaild
             self?._getRoomList(page: 0) { [weak self] error, list in
-                guard let _ = list?.filter({ room.objectId == $0.objectId }).first else {
-                    completion(NSError(domain: "Show Service Error", code: 1, userInfo: [ NSLocalizedDescriptionKey : "show_error_room_has_been_destory".show_localized]), nil)
+                guard let _ = list?.filter({ room.objectId == $0.objectId }).first,
+                      let imp = self?.syncUtilImp else {
+                    completion(NSError(domain: "Show Service Error", code: 1,
+                                       userInfo: [ NSLocalizedDescriptionKey : "show_error_room_has_been_destory".show_localized]), nil)
                     return
                 }
                 
-                SyncUtil.joinScene(id: room.roomId!,
-                                   userId: room.ownerId!,
-                                   isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
-                                   property: params) { result in
+                imp.joinScene(id: room.roomId!,
+                              userId: room.ownerId!,
+                              isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
+                              property: params) { result in
                     //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                     let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                     let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
@@ -293,9 +305,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
         defer {
-            self.pkCreatedInvitationMap.values.forEach { invitation in
+            self.pkCreatedInvitationMap.values.forEach {[weak self] invitation in
                 guard let pkRoomId = invitation.roomId else { return }
-                SyncUtil.leaveScene(id: pkRoomId)
+                self?.syncUtilImp?.leaveScene(id: pkRoomId)
             }
             
             cleanCache()
@@ -701,7 +713,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 extension ShowSyncManagerServiceImp {
     func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
         initScene {
-            SyncUtil.fetchAll { results in
+            self.syncUtilImp?.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 let dataArray = results.map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
@@ -730,7 +742,7 @@ extension ShowSyncManagerServiceImp {
         let objectId = channelName
         agoraPrint("imp room update status... [\(objectId)]")
         params["objectId"] = objectId
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .update(key: "",
                     data: params,
@@ -755,7 +767,7 @@ extension ShowSyncManagerServiceImp {
         _removeUser { error in
         }
         
-        SyncUtil.leaveScene(id: channelName)
+        self.syncUtilImp?.leaveScene(id: channelName)
     }
 
     private func _removeRoom(completion: @escaping (NSError?) -> Void) {
@@ -763,7 +775,7 @@ extension ShowSyncManagerServiceImp {
             agoraAssert("channelName = nil")
             return
         }
-        SyncUtil.scene(id: channelName)?.deleteScenes()
+        self.syncUtilImp?.scene(id: channelName)?.deleteScenes()
         roomId = nil
         completion(nil)
     }
@@ -783,7 +795,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp all unsubscribe...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .unsubscribeScene()
     }
@@ -808,7 +820,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp user get...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .get(success: { [weak self] list in
@@ -839,7 +851,7 @@ extension ShowSyncManagerServiceImp {
 
         let params = model.yy_modelToJSONObject() as! [String: Any]
         agoraPrint("imp user add ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .add(data: params, success: { [weak self] object in
@@ -868,7 +880,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp user update...")
 
         let params = user.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .update(id: user.objectId!,
@@ -888,7 +900,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp user subscribe ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
                        onCreated: { _ in
@@ -941,7 +953,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp user delete... [\(objectId)]")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
             .delete(id: objectId,
@@ -975,7 +987,7 @@ extension ShowSyncManagerServiceImp {
         roomInfo.objectId = channelName
         let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
         agoraPrint("imp room update user count... [\(channelName)]")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .update(key: "",
                     data: params,
@@ -1002,7 +1014,7 @@ extension ShowSyncManagerServiceImp {
         roomInfo.objectId = channelName
         let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
         agoraPrint("imp room update status... [\(channelName)]")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .update(key: "",
                     data: params,
@@ -1022,7 +1034,7 @@ extension ShowSyncManagerServiceImp {
     private func _getMessageList(finished: @escaping (NSError?, [ShowMessage]?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp message get...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .get(success: { [weak self] list in
@@ -1043,7 +1055,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp message add ...")
 
         let params = message.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .add(data: params, success: { object in
@@ -1059,7 +1071,7 @@ extension ShowSyncManagerServiceImp {
     private func _subscribeMessageChanged() {
         let channelName = getRoomId()
         agoraPrint("imp message subscribe ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION,
                        onCreated: { _ in
@@ -1089,7 +1101,7 @@ extension ShowSyncManagerServiceImp {
     private func _getAllMicSeatApplyList(completion: @escaping (NSError?, [ShowMicSeatApply]?) -> Void) {
         let channelName = getRoomId()
         agoraPrint("imp seat apply get...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .get(success: { [weak self] list in
@@ -1106,7 +1118,7 @@ extension ShowSyncManagerServiceImp {
     private func _subscribeMicSeatApplyChanged() {
         let channelName = getRoomId()
         agoraPrint("imp seat apply subscribe ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_SEAT_APPLY_COLLECTION,
                        onCreated: { _ in
@@ -1142,7 +1154,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp seat apply add ...")
 
         let params = apply.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .add(data: params, success: { object in
@@ -1158,7 +1170,7 @@ extension ShowSyncManagerServiceImp {
         let channelName = getRoomId()
         agoraPrint("imp seat apply remove...")
 
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .delete(id: apply.objectId!,
@@ -1176,7 +1188,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp seat apply update...")
 
         let params = apply.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_SEAT_APPLY_COLLECTION)
             .update(id: apply.objectId!,
@@ -1334,7 +1346,7 @@ extension ShowSyncManagerServiceImp {
             }
             
             agoraPrint("imp pk invitation get2... \(channelName)")
-            SyncUtil.joinScene(id: channelName,
+            self.syncUtilImp?.joinScene(id: channelName,
                                userId: ownerId,
                                isOwner: false,
                                property: params) { result in
@@ -1356,7 +1368,7 @@ extension ShowSyncManagerServiceImp {
         }
         
         agoraPrint("imp pk invitation get... \(channelName)")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
             .get(success: { [weak self] list in
@@ -1377,7 +1389,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp pk invitation unsubscribe ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .unsubscribeScene()
     }
@@ -1447,7 +1459,7 @@ extension ShowSyncManagerServiceImp {
     private func _subscribePKInvitationChanged(channelName:String,
                                                subscribeClosure: @escaping (ShowSubscribeStatus, ShowPKInvitation) -> Void) {
         agoraPrint("imp pk invitation subscribe ... \(channelName)")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION,
                        onCreated: { object in
@@ -1493,7 +1505,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp pk invitation add... \(channelName)")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
             .add(data: params, success: { object in
@@ -1512,7 +1524,7 @@ extension ShowSyncManagerServiceImp {
         }
         agoraPrint("imp pk invitation remove... \(channelName)")
 
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
             .delete(id: invitation.objectId!,
@@ -1533,7 +1545,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp pk invitation update... \(channelName)")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
             .update(id: invitation.objectId!,
@@ -1550,8 +1562,8 @@ extension ShowSyncManagerServiceImp {
     private func _recvPKRejected(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
-//        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
-        SyncUtil.leaveScene(id: pkRoomId)
+//        self.syncUtilImp?.scene(id: pkRoomId)?.deleteScenes()
+        self.syncUtilImp?.leaveScene(id: pkRoomId)
 //        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else { return }
 //        _removeInteraction(interaction: interaction) { error in
 //        }
@@ -1601,8 +1613,8 @@ extension ShowSyncManagerServiceImp {
     private func _recvPKFinish(invitation: ShowPKInvitation) {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
-//        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
-        SyncUtil.leaveScene(id: pkRoomId)
+//        self.syncUtilImp?.scene(id: pkRoomId)?.deleteScenes()
+        self.syncUtilImp?.leaveScene(id: pkRoomId)
         guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else {
             return
         }
@@ -1677,7 +1689,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp interaction get...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .get(success: { [weak self] list in
@@ -1697,7 +1709,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp interaction subscribe ...")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .subscribe(key: SYNC_MANAGER_INTERACTION_COLLECTION,
                        onCreated: { [weak self] object in
@@ -1768,7 +1780,7 @@ extension ShowSyncManagerServiceImp {
         //add interation immediately to prevent received multi pk invitations at the same time
         interactionList.append(interaction)
         interactionPaddingIdsSet.insert(interaction.userId ?? "")
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .add(data: params, success: { object in
@@ -1801,7 +1813,7 @@ extension ShowSyncManagerServiceImp {
         }
         agoraPrint("imp interaction remove...")
 
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .delete(id: interaction.objectId!,
@@ -1823,7 +1835,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp interaction update...")
 
         let params = interaction.yy_modelToJSONObject() as! [String: Any]
-        SyncUtil
+        self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .update(id: interaction.objectId!,

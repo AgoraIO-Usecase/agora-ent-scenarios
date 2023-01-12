@@ -14,6 +14,17 @@ class ShowLiveViewController: UIViewController {
 
     var room: ShowRoomListModel?
     
+    private var roomId: String {
+        get {
+            guard let roomId = room?.roomId else {
+                assert(false, "room == nil")
+                return ""
+            }
+            
+            return roomId
+        }
+    }
+    
     var selectedResolution = 1
     
     var audiencePresetType: ShowPresetType?
@@ -69,11 +80,11 @@ class ShowLiveViewController: UIViewController {
     
     private lazy var beautyVC = ShowBeautySettingVC()
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
-    private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: room?.roomId)
-    private lazy var applyView = ShowApplyView()
+    private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: roomId)
+    private lazy var applyView = ShowApplyView(roomId: roomId)
     
     //PK popup list view
-    private lazy var pkInviteView = ShowPKInviteView()
+    private lazy var pkInviteView = ShowPKInviteView(roomId: roomId)
     
     //pk user list (room list)
     private var pkUserInvitationList: [ShowPKUserInfo]? {
@@ -223,9 +234,9 @@ class ShowLiveViewController: UIViewController {
     private func leaveRoom(){
         ByteBeautyManager.shareManager.destroy()
         agoraKitManager.leaveChannel()
-        AppContext.showServiceImp.unsubscribeEvent(delegate: self)
+        AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         
-        AppContext.showServiceImp.leaveRoom {[weak self] error in
+        AppContext.showServiceImp(roomId).leaveRoom {[weak self] error in
             self?.dismiss(animated: true) {
             }
         }
@@ -263,7 +274,7 @@ class ShowLiveViewController: UIViewController {
         showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
-        AppContext.showServiceImp.sendChatMessage(message: showMsg) {[weak self] error in
+        AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
             print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }
@@ -283,7 +294,7 @@ extension ShowLiveViewController {
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _subscribeServiceEvent() {
-        let service = AppContext.showServiceImp
+        let service = AppContext.showServiceImp(roomId)
         
         service.subscribeEvent(delegate: self)
         
@@ -297,18 +308,18 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     private func _refreshPKUserList() {
-        AppContext.showServiceImp.getAllPKUserList { [weak self] (error, pkUserList) in
+        AppContext.showServiceImp(roomId).getAllPKUserList { [weak self] (error, pkUserList) in
             self?.pkUserInvitationList = pkUserList
         }
     }
     
     private func _refreshInteractionList() {
-        AppContext.showServiceImp.getAllInterationList { [weak self] (error, interactionList) in
+        AppContext.showServiceImp(roomId).getAllInterationList { [weak self] (error, interactionList) in
             guard let self = self, error == nil else { return }
             if self.interactionList == nil, let interaction = interactionList?.first {
                 // first load
                 if self.role == .broadcaster {
-                    AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                    AppContext.showServiceImp(self.roomId).stopInteraction(interaction: interaction) { err in
                     }
                 } else {
                     self.onInteractionBegan(interaction: interaction)
@@ -409,23 +420,23 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     func onMicSeatInvitationUpdated(invitation: ShowMicSeatInvitation) {
         guard invitation.userId == VLUserCenter.user.id else { return }
         if invitation.status == .waitting {
+            let imp = AppContext.showServiceImp(roomId)
             ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) { result in
-                let imp = AppContext.showServiceImp
                 switch result {
                 case .accept:
                     ToastView.showWait(text: "连麦中...".show_localized)
                     // 解决多人同时点击同意连麦导致的问题, 正常项目应该由后台处理
                     DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.1...2.0)) {
-                        AppContext.showServiceImp.getAllInterationList { _, list in
+                        imp.getAllInterationList { _, list in
                             ToastView.hidden()
                             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
                             let isLink = !list.filter({ $0.interactStatus == .onSeat }).isEmpty
                             if isLink {
-                                AppContext.showServiceImp.rejectMicSeatInvitation { _ in }
+                                imp.rejectMicSeatInvitation { _ in }
                                 ToastView.show(text: "主播已在连麦中, 暂时无法连麦".show_localized)
                                 return
                             }
-                            AppContext.showServiceImp.acceptMicSeatInvitation { error in }
+                            imp.acceptMicSeatInvitation { error in }
                         }
                     }
 
@@ -479,11 +490,11 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         //recv invitation
         if invitation.status == .waitting {
+            let imp = AppContext.showServiceImp(roomId)
             ShowReceivePKAlertVC.present(name: invitation.fromName) { result in
-                let imp = AppContext.showServiceImp
                 switch result {
                 case .accept:
-                    AppContext.showServiceImp.acceptPKInvitation { error in
+                    imp.acceptPKInvitation { error in
                         
                     }
                     break
@@ -661,11 +672,11 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             let roomOwnerExit: Bool = room?.ownerId ?? "" == "\(uid)"
             if roomOwnerExit {
                 //room owner exit
-                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                AppContext.showServiceImp(roomId).stopInteraction(interaction: interaction) { err in
                 }
             } else if isRoomOwner, isInteractionLeave {
                 //room owner found interaction(pk/onseat) user offline
-                AppContext.showServiceImp.stopInteraction(interaction: interaction) { err in
+                AppContext.showServiceImp(roomId).stopInteraction(interaction: interaction) { err in
                 }
             }
         }
@@ -711,7 +722,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onPKDidTimeout() {
         guard let info = currentInteraction else { return }
-        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+        AppContext.showServiceImp(roomId).stopInteraction(interaction: info) { _ in
         }
         
         interruptInteractionReason = "show_pk_end_timeout".show_localized
@@ -833,7 +844,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     // 结束连麦
     func onClickEndPkButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         guard let info = currentInteraction else { return }
-        AppContext.showServiceImp.stopInteraction(interaction: info) { _ in
+        AppContext.showServiceImp(roomId).stopInteraction(interaction: info) { _ in
         }
     }
     
@@ -849,7 +860,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
 //            agoraKitManager.agoraKit.updateChannel(with: options)
 //        }
         let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
-        AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
+        AppContext.showServiceImp(roomId).muteAudio(mute: selected, userId: uid) { err in
         }
         self.muteLocalAudio = selected
     }
@@ -857,7 +868,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     // 静音
     func onClickMuteMicButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         let uid = menu.type == .managerMic ? currentInteraction?.userId ?? "" : VLUserCenter.user.id
-        AppContext.showServiceImp.muteAudio(mute: selected, userId: uid) { err in
+        AppContext.showServiceImp(roomId).muteAudio(mute: selected, userId: uid) { err in
         }
         
         self.muteLocalAudio = selected
