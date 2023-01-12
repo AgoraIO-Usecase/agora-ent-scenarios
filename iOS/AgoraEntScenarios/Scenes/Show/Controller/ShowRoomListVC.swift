@@ -96,7 +96,7 @@ class ShowRoomListVC: UIViewController {
     
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        AppContext.showServiceImp.joinRoom(room: room) {[weak self] error, detailModel in
+        AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
             if let error = error {
                 ToastView.show(text: error.localizedDescription)
                 return
@@ -113,7 +113,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func getRoomList() {
-        AppContext.showServiceImp.getRoomList(page: 1) { [weak self] error, roomList in
+        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
             if let list = roomList {
                 self?.roomListView.roomList = list
                 self?.roomList = list

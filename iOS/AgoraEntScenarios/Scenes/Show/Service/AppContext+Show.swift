@@ -8,17 +8,24 @@
 import Foundation
 
 extension AppContext {
-    static private var _showServiceImp: ShowSyncManagerServiceImp?
+    static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
     
-    static private (set) var showServiceImp: ShowServiceProtocol = {
-        if _showServiceImp == nil {
-            _showServiceImp = ShowSyncManagerServiceImp()
+    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol {
+        let showServiceImp = _showServiceImpMap[roomId]
+        guard let showServiceImp = showServiceImp else {
+            let imp = ShowSyncManagerServiceImp()
+            _showServiceImpMap[roomId] = imp
+            return imp
         }
-        return _showServiceImp!
-    }()
+        return showServiceImp
+    }
+    
+    static func unloadShowServiceImp(_ roomId: String) {
+        _showServiceImpMap[roomId] = nil
+    }
     
     static func unloadShowServiceImp() {
-        _showServiceImp = nil
+        _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
     }
 }
 
