@@ -127,7 +127,7 @@ struct ShowStatisticsInfo {
         let videoSend = "码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
         let lastmile = "延迟".show_localized+": \(info.channelStats.lastmileDelay) ms"
         let uplink = "上行网络".show_localized+": \(uplink) KB/s"
-        let videoSize = "分辨率"+": \(info.videoStats.regulatedCaptureFrameWidth) x \(info.videoStats.regulatedCaptureFrameHeight)"
+        let videoSize = "分辨率"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
         
         let fps = "帧率".show_localized+": \(fps) fps"
         let vSendLoss = "丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"

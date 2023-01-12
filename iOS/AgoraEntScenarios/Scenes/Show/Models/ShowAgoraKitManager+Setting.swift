@@ -43,7 +43,6 @@ extension ShowAgoraKitManager {
         // 默认音量设置
         ShowSettingKey.recordingSignalVolume.writeValue(80)
         ShowSettingKey.musincVolume.writeValue(30)
-//        agoraKit.enableExtension(withVendor: <#T##String#>, extension: <#T##String#>, enabled: <#T##Bool#>)
 //        agoraKit.enableExtension("agora_video_filters_super_resolution", "super_resolution")
         ShowSettingKey.SR.writeValue(false) // 默认关闭sr
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
