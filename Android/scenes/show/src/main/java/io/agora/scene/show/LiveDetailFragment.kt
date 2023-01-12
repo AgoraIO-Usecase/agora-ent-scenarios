@@ -1,6 +1,5 @@
 package io.agora.scene.show
 
-import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,6 +10,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.addCallback
@@ -51,7 +51,7 @@ import java.util.*
 
 
 class LiveDetailFragment : Fragment() {
-    private val TAG = this::class.java.simpleName
+    private val TAG = this.toString()
 
     companion object {
         // 房间存活时间，单位ms
@@ -106,14 +106,27 @@ class LiveDetailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = mBinding.root
+    ) : View {
+        ShowLogger.d(TAG, "Fragment Lifecycle: onCreateView")
+        return mBinding.root
+    }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        ShowLogger.d(TAG, "Fragment Lifecycle: onViewCreated")
         requireActivity().onBackPressedDispatcher.addCallback(enabled = isVisible) {
             onBackPressed()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        ShowLogger.d(TAG, "Fragment Lifecycle: onDestroyView")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ShowLogger.d(TAG, "Fragment Lifecycle: onResume")
 
         initView()
         initService()
@@ -129,11 +142,13 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onPause() {
+        super.onPause()
+        ShowLogger.d(TAG, "Fragment Lifecycle: onPause")
+
         destroy()
-        mBeautyProcessor.reset()
     }
+
 
     private fun destroy(): Boolean {
         VideoSetting.resetBroadcastSetting()
@@ -147,7 +162,7 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             showEndRoomDialog()
         } else {
-            requireActivity().onBackPressed()
+            requireActivity().finish()
         }
     }
 
@@ -351,7 +366,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun refreshTopUserCount(count: Int) =
-        requireActivity().runOnUiThread { mBinding.topLayout.tvUserCount.text = count.toString() }
+        activity?.runOnUiThread { mBinding.topLayout.tvUserCount.text = count.toString() }
 
     private fun changeStatisticVisible() {
         val topBinding = mBinding.topLayout
@@ -573,7 +588,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun insertMessageItem(msg: ShowMessage) = requireActivity().runOnUiThread {
+    private fun insertMessageItem(msg: ShowMessage) = activity?.runOnUiThread {
         mMessageAdapter?.let {
             it.insertLast(msg)
             mBinding.messageLayout.rvMessage.scrollToPosition(it.itemCount - 1)
@@ -1037,6 +1052,24 @@ class LiveDetailFragment : Fragment() {
                 }
             }
         }
+
+        mService.getAllInterationList({
+            val interactionInfo = it.getOrNull(0)
+            this.interactionInfo = interactionInfo
+            if (interactionInfo != null && isRoomOwner) {
+                mService.stopInteraction(interactionInfo)
+            }
+            refreshBottomLayout()
+            updateVideoSetting()
+            if (interactionInfo != null) {
+                refreshViewDetailLayout(interactionInfo.interactStatus)
+                if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value) {
+                    updateLinkingMode()
+                } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking.value) {
+                    updatePKingMode()
+                }
+            }
+        })
     }
 
     private fun reFetchUserList() {
@@ -1133,7 +1166,7 @@ class LiveDetailFragment : Fragment() {
             override fun onRtcStats(stats: RtcStats?) {
                 super.onRtcStats(stats)
                 if (isRoomOwner) {
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
                         refreshStatisticInfo(
                             delay = stats?.lastmileDelay,
                             cpuAppUsage = stats?.cpuAppUsage,
@@ -1149,7 +1182,7 @@ class LiveDetailFragment : Fragment() {
             ) {
                 super.onLocalVideoStats(source, stats)
                 if (isRoomOwner) {
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
                         refreshStatisticInfo(
                             bitrate = stats?.sentBitrate,
                             fps = stats?.sentFrameRate,
@@ -1162,7 +1195,7 @@ class LiveDetailFragment : Fragment() {
             override fun onLocalAudioStats(stats: LocalAudioStats?) {
                 super.onLocalAudioStats(stats)
                 if (isRoomOwner) {
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats?.sentBitrate,
                             audioLossPackage = stats?.txPacketLossRate
@@ -1174,7 +1207,7 @@ class LiveDetailFragment : Fragment() {
             override fun onRemoteVideoStats(stats: RemoteVideoStats?) {
                 super.onRemoteVideoStats(stats)
                 if (stats?.uid == mRoomInfo.ownerId.toInt()) {
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
                         refreshStatisticInfo(
                             bitrate = stats.receivedBitrate,
                             fps = stats.decoderOutputFrameRate,
@@ -1188,7 +1221,7 @@ class LiveDetailFragment : Fragment() {
             override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
                 super.onRemoteAudioStats(stats)
                 if (stats?.uid == mRoomInfo.ownerId.toInt()) {
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
                             audioLossPackage = stats.audioLossRate,
@@ -1200,7 +1233,7 @@ class LiveDetailFragment : Fragment() {
 
             override fun onUplinkNetworkInfoUpdated(info: UplinkNetworkInfo?) {
                 super.onUplinkNetworkInfoUpdated(info)
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     refreshStatisticInfo(
                         upLinkBps = (info?.video_encoder_target_bitrate_bps ?: 0) / 1000
                     )
@@ -1209,7 +1242,7 @@ class LiveDetailFragment : Fragment() {
 
             override fun onDownlinkNetworkInfoUpdated(info: DownlinkNetworkInfo?) {
                 super.onDownlinkNetworkInfoUpdated(info)
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     refreshStatisticInfo(
                         downLinkBps = info?.bandwidth_estimation_bps
                     )
@@ -1262,7 +1295,6 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.removeHandler(mRtcEngineHandler)
             mRtcEngine.stopPreview()
             mRtcEngine.leaveChannel()
-            RtcEngineInstance.destroy()
             mRtcEngineHandler = null
             return true
         }
@@ -1300,27 +1332,7 @@ class LiveDetailFragment : Fragment() {
                     channelName,
                     uid,
                     AudioModeration.AgoraChannelType.broadcast,
-                    "show",
-                    {
-                    })
-
-                mService.getAllInterationList({
-                    val interactionInfo = it.getOrNull(0)
-                    this.interactionInfo = interactionInfo
-                    if (interactionInfo != null && isRoomOwner) {
-                        mService.stopInteraction(interactionInfo)
-                    }
-                    refreshBottomLayout()
-                    updateVideoSetting()
-                    if (interactionInfo != null) {
-                        refreshViewDetailLayout(interactionInfo.interactStatus)
-                        if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value) {
-                            updateLinkingMode()
-                        } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking.value) {
-                            updatePKingMode()
-                        }
-                    }
-                })
+                    "show")
             })
 
         // Render host video

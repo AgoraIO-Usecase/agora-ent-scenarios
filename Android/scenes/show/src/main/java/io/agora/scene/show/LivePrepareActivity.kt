@@ -190,7 +190,7 @@ class LivePrepareActivity : ComponentActivity() {
             mService.joinRoom(it.roomId, { roomDetailInfo ->
                 runOnUiThread {
                     isFinishToLiveDetail = true
-                    LiveDetailActivity.launch(this@LivePrepareActivity, arrayListOf(roomDetailInfo))
+                    LiveDetailActivity.launch(this@LivePrepareActivity, roomDetailInfo)
                     finish()
                 }
             }, { ex ->
