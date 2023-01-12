@@ -10,13 +10,12 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
-    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool) -> Void)?
+    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
    
     lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
         return manager
     }()
     
@@ -111,13 +110,21 @@ class ShowBeautyFaceVC: UIViewController {
             
         case .background:
             if model.path == nil {
+                ShowAgoraKitManager.isOpenGreen = false
+                ShowAgoraKitManager.isBlur = false
                 agoraKitManager.enableVirtualBackground(isOn: false)
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: nil,
+                                                         isOn: false)
             } else if model.path == "xuhua" {
-                agoraKitManager.enableVirtualBackground(isOn: true)
+                ShowAgoraKitManager.isBlur = true
+                agoraKitManager.enableVirtualBackground(isOn: true,
+                                                        greenCapacity: Float(value))
                 
             } else {
-                agoraKitManager.seVirtualtBackgoundImage(imagePath: model.key, isOn: true)
+                ShowAgoraKitManager.isBlur = false
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: model.key,
+                                                         isOn: true,
+                                                         greenCapacity: Float(value))
             }
         }
     }
@@ -156,7 +163,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.key == nil)
+            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0)
             defalutSelectIndex = indexPath.item
         }
         return cell
@@ -175,11 +182,11 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
-        if type == .sticker || type == .background {
-            selectedItemClosure?(0, true)
+        if type == .sticker {
+            selectedItemClosure?(0, true, false)
             return
         }
-        selectedItemClosure?(model.value, model.path == nil)
+        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0)
     }
 }
 
