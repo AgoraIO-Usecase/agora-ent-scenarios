@@ -18,6 +18,8 @@ class ShowRoomListVC: UIViewController {
     // 观众端预设类型
     private var audiencePresetType: ShowPresetType?
     
+    private var firstSetAudience = false
+    
     deinit {
         AppContext.unloadShowServiceImp()
         print("deinit-- ShowRoomListVC")
@@ -41,12 +43,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickSettingButton(){
-        let vc = ShowPresettingVC()
-        vc.isBroadcaster = false
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.audiencePresetType = type
-        }
-        present(vc, animated: true)
+        showPresettingVC()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -69,12 +66,31 @@ class ShowRoomListVC: UIViewController {
             self?.createRoom()
         }
         roomListView.joinRoomAction = { [weak self] room in
-            self?.joinRoom(room)
+            guard let wSelf = self else { return }
+            // 如果是owner是自己 或者已经设置过观众模式
+            if room.ownerId == VLUserCenter.user.id || wSelf.firstSetAudience {
+                wSelf.joinRoom(room)
+            }else{
+                wSelf.showPresettingVC { [weak self] in
+                    self?.joinRoom(room)
+                }
+            }
         }
         view.addSubview(roomListView)
         roomListView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func showPresettingVC(selected:(()->())? = nil) {
+        let vc = ShowPresettingVC()
+        vc.isBroadcaster = false
+        vc.didSelectedPresetType = {[weak self] type, modeName in
+            self?.audiencePresetType = type
+            selected?()
+            self?.firstSetAudience = true
+        }
+        present(vc, animated: true)
     }
     
     private func setUpNaviBar() {
