@@ -496,9 +496,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
-    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    
     if(!model){
+        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
     [self markSongPlaying:model];
@@ -516,6 +515,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VL(weakSelf);
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
+            [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
         }
     }];
