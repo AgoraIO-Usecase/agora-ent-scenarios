@@ -692,6 +692,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["ntp"] = mRtcEngine!!.ntpTimeInMs
             msg["duration"] = mPlayer!!.duration
             msg["time"] = position_ms //ms
+            msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer!!.state)
             val jsonMsg = JSONObject(msg)
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }
