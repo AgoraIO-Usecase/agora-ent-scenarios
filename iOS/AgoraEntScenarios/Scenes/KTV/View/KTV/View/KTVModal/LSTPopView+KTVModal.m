@@ -133,10 +133,11 @@
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
+                                         soundView:(VLSoundEffectView*)soundView
                                       withDelegate:(id<VLsoundEffectViewDelegate>)delegate {
     CGFloat popViewH = 88+17+270+kSafeAreaBottomHeight;
-    VLSoundEffectView* soundEffectView = [[VLSoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                                                    withDelegate:delegate];
+    VLSoundEffectView* soundEffectView = soundView ? soundView : [[VLSoundEffectView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+                                                                                            withDelegate:delegate];
     
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:soundEffectView
                                                        withParentView:parentView];

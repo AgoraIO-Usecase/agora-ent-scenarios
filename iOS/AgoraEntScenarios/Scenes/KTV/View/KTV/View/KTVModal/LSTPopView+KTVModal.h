@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //弹出音效
 + (LSTPopView*)popSetSoundEffectViewWithParentView:(UIView*)parentView
+                                         soundView:(VLSoundEffectView*)soundView
                                       withDelegate:(id<VLsoundEffectViewDelegate>)delegate;
 
 //网络差视图

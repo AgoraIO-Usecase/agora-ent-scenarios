@@ -360,8 +360,11 @@ KTVApiDelegate
 
 //弹出音效
 - (void)popSetSoundEffectView {
+    LSTPopView* popView = 
     [LSTPopView popSetSoundEffectViewWithParentView:self.view
+                                          soundView:self.soundEffectView
                                        withDelegate:self];
+    self.soundEffectView = (VLSoundEffectView*)popView.currCustomView;
 }
 
 //网络差视图
