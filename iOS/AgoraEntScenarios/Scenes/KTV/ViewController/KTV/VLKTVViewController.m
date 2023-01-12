@@ -397,6 +397,7 @@ KTVApiDelegate
 
 - (void)showSettingView {
     LSTPopView* popView = [LSTPopView popSettingViewWithParentView:self.view
+                                                       settingView:self.settingView
                                                       withDelegate:self];
     
     self.settingView = (VLKTVSettingView*)popView.currCustomView;
@@ -506,9 +507,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
     
-    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
-    
     if(!model){
+        [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
     [self markSongPlaying:model];
@@ -522,10 +522,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     config.role = role;
     config.mainSingerUid = [[model userNo] integerValue];
     config.coSingerUid = [[model chorusNo] integerValue];
-    
+    KTVLogInfo(@"loadSong name: %@, songNo: %@, type: %ld, role: %ld", model.songName, model.songNo, type, role);
     VL(weakSelf);
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
+            [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
         }
     }];
@@ -664,6 +665,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
     __block VLRoomSelSongModel* removed;
+    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+    
+    if (isTopSong) {
+        [self.ktvApi stopSong];
+    }
+    
     NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         if([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
@@ -688,6 +695,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }];
         }
     }
+    
 }
 
 - (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
@@ -1198,8 +1206,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         //请求歌词和歌曲
         [weakSelf loadAndPlaySong];
     }];
-    
-    //
 }
 
 #pragma mark - getter/handy utils
@@ -1273,14 +1279,26 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     _isOnMicSeat = isOnMicSeat;
     
     if (onMicSeatStatusDidChanged) {
+        VLRoomSelSongModel* song = [self.selSongsArray firstObject];
+        if (!isOnMicSeat) {
+            if (song.isChorus && song.chorusNo == VLUserCenter.user.id) {
+                //co singer leave chorus
+                [[AppContext ktvServiceImp] coSingerLeaveChorusWithCompletion:^(NSError * err) {
+                }];
+                [self.ktvApi stopSong];
+                [self loadAndPlaySong];
+            } else if (song.isSongOwner) {
+                [self.ktvApi stopSong];
+                [self removeCurrentSongWithSync:YES];
+            }
+        }
+        
         //start mic once enter seat
         AgoraRtcChannelMediaOptions *option = [AgoraRtcChannelMediaOptions new];
         [option setClientRoleType:[self isBroadcaster] ? AgoraClientRoleBroadcaster : AgoraClientRoleAudience];
         // use audio volume to control mic on/off, so that mic is always on when broadcaster
         [option setPublishMicrophoneTrack:[self isBroadcaster]];
         [self.RTCkit updateChannelWithMediaOptions:option];
-        
-        //TODO: isOnMicSeat = NO && is chorus && is co singer
     }
     
     [self.RTCkit enableLocalAudio:isOnMicSeat];
@@ -1347,11 +1365,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"setSelSongsArray: name: %@ isChorus: %d, status: %ld", updatedTopSong.name, updatedTopSong.isChorus, updatedTopSong.status);
     if(!updatedTopSong.isChorus) {
         //solo
-        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+        if(![updatedTopSong isEqual:originalTopSong]){
             //song changes
-            [self loadAndPlaySong];
-        } else if([updatedTopSong doneChorusMatch]) {
-            //chorus go solo
+            [self.ktvApi stopSong];
             [self loadAndPlaySong];
         }
     } else {

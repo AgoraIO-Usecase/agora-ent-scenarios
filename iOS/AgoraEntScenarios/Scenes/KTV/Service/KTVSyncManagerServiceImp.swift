@@ -452,11 +452,33 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
         //isChorus always true
 //        topSong.isChorus = inputModel.isChorus == "1" ? true : false
+        let isChorus = topSong.isChorus
+        let status = topSong.status
+        let chorusNo = topSong.chorusNo
         topSong.isChorus = true
         topSong.status = VLSongPlayStatusPlaying
         topSong.chorusNo = VLUserCenter.user.id
         _updateChooseSong(songInfo: topSong,
                           finished: completion)
+        topSong.isChorus = isChorus
+        topSong.status = status
+        topSong.chorusNo = chorusNo
+    }
+    
+    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
+        guard let topSong = self.songList.filter({ $0.chorusNo == VLUserCenter.user.id}).first else {
+            agoraAssert("join Chorus fail")
+            return
+        }
+        
+        let isChorus = topSong.isChorus
+        let chorusNo = topSong.chorusNo
+        topSong.isChorus = true
+        topSong.chorusNo = "0"
+        _updateChooseSong(songInfo: topSong,
+                          finished: completion)
+        topSong.isChorus = isChorus
+        topSong.chorusNo = chorusNo
     }
 
     func markSongDidPlay(withInput inputModel: VLRoomSelSongModel,
@@ -1255,9 +1277,12 @@ extension KTVSyncManagerServiceImp {
         }
         
         topSong.isChorus = false
+        let status = topSong.status
         topSong.status = VLSongPlayStatusPlaying
         _updateChooseSong(songInfo: topSong) { error in
         }
+        topSong.isChorus = true
+        topSong.status = status
     }
 
     private func _subscribeChooseSong(finished: @escaping () -> Void) {
