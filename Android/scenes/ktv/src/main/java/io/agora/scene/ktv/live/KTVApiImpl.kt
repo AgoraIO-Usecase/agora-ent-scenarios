@@ -667,6 +667,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 startSyncPitch()
+                mPlayer?.selectAudioTrack(1)
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 this.localPlayerPosition = 0
