@@ -34,6 +34,8 @@
 #import "KTVApi.h"
 #import "HWWeakTimer.h"
 #import "VLAlert.h"
+#import "VLKTVAlert.h"
+
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -101,7 +103,8 @@ KTVApiDelegate
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApi* ktvApi;
-
+@property (nonatomic, assign) BOOL isOwner;
+@property (nonatomic, assign) BOOL isExpire;
 @end
 
 @implementation VLKTVViewController
@@ -124,32 +127,32 @@ KTVApiDelegate
     bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
     [self.view addSubview:bgView];
     //头部视图
-    VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight+10, SCREEN_WIDTH, 22+20+14) withDelegate:self];
+    VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
+    topView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
     [self.view addSubview:topView];
     self.topView = topView;
     topView.listModel = self.roomModel;
     
     //底部按钮视图
-    VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-40-kSafeAreaBottomHeight-VLREALVALUE_WIDTH(35), SCREEN_WIDTH, 40) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
+    bottomView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
     self.bottomView = bottomView;
-    bottomView.backgroundColor = UIColorClear;
     [self.view addSubview:bottomView];
     
+    //去掉首尾的高度
+    CGFloat musicHeight = SCREEN_HEIGHT -50 - kSafeAreaBottomHeight - kStatusBarHeight - 60;
+    
+    //MV视图(显示歌词...)
+    CGFloat mvViewTop = topView.bottom;
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.4) withDelegate:self];
+    [self.view addSubview:self.MVView];
+    
     //房间麦位视图
-    CGFloat personViewHeight = (VLREALVALUE_WIDTH(54)+20)*2+26;
-    CGFloat personViewTop = bottomView.top - personViewHeight - 20;
-    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, personViewTop, SCREEN_WIDTH, personViewHeight) withDelegate:self withRTCkit:self.RTCkit];
+    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.6) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
-    
-    
-    //MV视图(显示歌词...)
-    CGFloat mvViewTop = topView.bottom + 13;
-    CGFloat mvViewHeight = personView.top - mvViewTop - 13;
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, mvViewHeight) withDelegate:self];
-    [self.view addSubview:self.MVView];
-    
+
     //空位上麦视图
     VLAudienceIndicator *requestOnLineView = [[VLAudienceIndicator alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-kSafeAreaBottomHeight-56-VLREALVALUE_WIDTH(30), SCREEN_WIDTH, 56) withDelegate:self];
     self.requestOnLineView = requestOnLineView;
@@ -261,6 +264,9 @@ KTVApiDelegate
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
             selBgModel.isSelect = YES;
             weakSelf.choosedBgModel = selBgModel;
+            if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
+                self.isOwner = true;
+            }
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
@@ -293,19 +299,22 @@ KTVApiDelegate
         }
     }];
     
-    
     [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
         if (status != KTVServiceNetworkStatusOpen) {
             [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
-        
         [weakSelf _fetchServiceAllData];
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomWillExpire:^{
-        [VLToast toast:@"room expired"];
-        [weakSelf leaveRoom];
+        if(self.isExpire == true){return;}
+        self.isExpire = true;
+        NSString *mes = self.isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+            [[VLKTVAlert shared]dismiss];
+            [weakSelf leaveRoom];
+        }];
     }];
 }
 
