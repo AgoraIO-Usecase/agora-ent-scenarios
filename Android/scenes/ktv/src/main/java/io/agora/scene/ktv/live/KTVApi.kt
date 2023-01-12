@@ -38,6 +38,7 @@ interface KTVApi {
 
     interface KTVApiEventHandler {
         fun onPlayerStateChanged(controller: KTVApi, songCode: Long, state: Constants.MediaPlayerState, isLocal: Boolean)
+        fun onSingingScoreResult(score: Float)
         fun onMusicCollectionResult(
             requestId: String?,
             status: Int,

@@ -111,7 +111,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
-    final MutableLiveData<String> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
+    final MutableLiveData<Integer> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> playerMusicCountDownLiveData = new MutableLiveData<>();
     final MutableLiveData<NetWorkEvent> networkStatusLiveData = new MutableLiveData<>();
 
@@ -1339,11 +1339,15 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 break;
             case PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED:
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_LRC_RESET);
-                playerMusicPlayCompleteLiveData.postValue(songPlayingLiveData.getValue().getUserNo());
                 changeMusic();
                 break;
             default:
         }
+    }
+
+    @Override
+    public void onSingingScoreResult(float score) {
+        playerMusicPlayCompleteLiveData.postValue((int)score);
     }
 
     @Override
