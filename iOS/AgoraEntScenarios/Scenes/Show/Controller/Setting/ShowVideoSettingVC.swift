@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ZSwiftBaseLib
 
 private let SwitchCellID = "SwitchCellID"
 private let SegmentCellID = "SegmentCellID"

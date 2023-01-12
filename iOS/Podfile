@@ -59,6 +59,9 @@ def all_pods
 #  pod 'Fastboard'
   pod 'Agora-Scene-Utils', '~> 1.1.0'
   
+  pod 'AgoraSyncManager', '1.1.3'
+  
+  
   #歌词组件
   pod 'AgoraLyricsScore', '1.0.8.8'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
