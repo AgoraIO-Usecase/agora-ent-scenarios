@@ -287,15 +287,19 @@ class ByteBeautyModel: ByteBaseModel {
         dataArray.append(model)
         
         model = ByteBeautyModel()
+        model.key = "blur"
         model.path = "xuhua"
+        model.value = 0.5
         model.name = "虚化".show_localized
-        model.icon = "meiyan_lj_naiyou"
+        model.icon = "show_bg_blur"
         dataArray.append(model)
         
         model = ByteBeautyModel()
+        model.key = "show_live_mritual_bg"
         model.path = "show_live_mritual_bg"
         model.name = "蜜桃".show_localized
-        model.icon = "meiyan_lj_makalong"
+        model.icon = "show_bg_peach"
+        model.value = 0.5
         dataArray.append(model)
         
         return dataArray

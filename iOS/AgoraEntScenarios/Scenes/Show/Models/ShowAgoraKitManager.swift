@@ -64,6 +64,10 @@ class ShowAgoraKitManager: NSObject {
     }()
     */
     
+    // 是否开启绿幕功能
+    static var isOpenGreen: Bool = false
+    static var isBlur: Bool = false
+    
     // 预设类型
     var presetType: ShowPresetType?
     
@@ -176,22 +180,34 @@ class ShowAgoraKitManager: NSObject {
     }
     
     /// 开启虚化背景
-    func enableVirtualBackground(isOn: Bool) {
+    func enableVirtualBackground(isOn: Bool, greenCapacity: Float = 0) {
         let source = AgoraVirtualBackgroundSource()
         source.backgroundSourceType = .blur
         source.blurDegree = .high
-        agoraKit.enableVirtualBackground(isOn, backData: source, segData: nil)
+        var seg: AgoraSegmentationProperty?
+        if ShowAgoraKitManager.isOpenGreen {
+            seg = AgoraSegmentationProperty()
+            seg?.modelType = .agoraGreen
+            seg?.greenCapacity = greenCapacity
+        }
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
     }
     
     /// 设置虚拟背景
-    func seVirtualtBackgoundImage(imagePath: String?, isOn: Bool) {
+    func seVirtualtBackgoundImage(imagePath: String?, isOn: Bool, greenCapacity: Float = 0) {
         guard let bundlePath = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
               let bundle = Bundle(path: bundlePath) else { return }
         let imgPath = bundle.path(forResource: imagePath, ofType: "jpg")
         let source = AgoraVirtualBackgroundSource()
         source.backgroundSourceType = .img
         source.source = imgPath
-        agoraKit.enableVirtualBackground(isOn, backData: source, segData: nil)
+        var seg: AgoraSegmentationProperty?
+        if ShowAgoraKitManager.isOpenGreen {
+            seg = AgoraSegmentationProperty()
+            seg?.modelType = .agoraGreen
+            seg?.greenCapacity = greenCapacity
+        }
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
     }
     
     /// 切换连麦角色
