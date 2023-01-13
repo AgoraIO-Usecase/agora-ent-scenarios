@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Join room output parameter
 @interface KTVJoinRoomOutputModel : NSObject
-@property (nonatomic, copy) NSString* creator;
+@property (nonatomic, copy) NSString* creatorNo;
 @property (nonatomic, strong) NSArray<VLRoomSeatModel*>* seatsArray;
 @end
 
