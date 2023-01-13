@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.SystemClock
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
@@ -1126,11 +1127,27 @@ class LiveDetailFragment : Fragment() {
     //================== RTC Operation ===================
 
     private fun initRtcEngine() {
+        val startTime = SystemClock.elapsedRealtime()
         mRtcEngine.addHandler(object : IRtcEngineEventHandler() {
 
             override fun onError(err: Int) {
                 super.onError(err)
                 ToastUtils.showToast(RtcEngine.getErrorDescription(err))
+            }
+
+            override fun onFirstRemoteVideoFrame(uid: Int, width: Int, height: Int, elapsed: Int) {
+                super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
+                ShowLogger.d(TAG, "First Frame Received >> uid=${uid} cost=${SystemClock.elapsedRealtime() - startTime}ms, elapsed=${elapsed}ms")
+            }
+
+            override fun onFirstLocalVideoFrame(
+                source: Constants.VideoSourceType?,
+                width: Int,
+                height: Int,
+                elapsed: Int
+            ) {
+                super.onFirstLocalVideoFrame(source, width, height, elapsed)
+                ShowLogger.d(TAG, "First Frame Received >> local cost=${SystemClock.elapsedRealtime() - startTime}ms, elapsed=${elapsed}ms")
             }
 
             override fun onUserOffline(uid: Int, reason: Int) {
