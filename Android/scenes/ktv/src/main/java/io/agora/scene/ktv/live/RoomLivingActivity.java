@@ -176,7 +176,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setText("主唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else if ((item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo()))
-                            && (roomLivingViewModel.choursPlayingLiveData.getValue() == null)) {
+                            && (roomLivingViewModel.chorusPlayingLiveData.getValue() == null)) {
                             binding.tvZC.setText("合唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {

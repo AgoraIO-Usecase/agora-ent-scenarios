@@ -94,7 +94,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     final MutableLiveData<List<RoomSelSongModel>> songsOrderedLiveData = new MutableLiveData<>();
     final MutableLiveData<RoomSelSongModel> songPlayingLiveData = new MutableLiveData<>();
-    final MutableLiveData<RoomSelSongModel> choursPlayingLiveData = new MutableLiveData<>();
+    final MutableLiveData<RoomSelSongModel> chorusPlayingLiveData = new MutableLiveData<>();
 
     /**
      * Player/RTC信息
@@ -873,7 +873,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                 // 加入合唱
                                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
                                 songPlayingLiveData.postValue(songPlaying);
-                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo() == null) {
+                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo().equals("0")) {
                                 // 伴唱退出合唱
                                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
                                 if (value.getChorusNo().equals(UserManager.getInstance().getUser().id.toString())) {
@@ -890,7 +890,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                             }
                                     );
                                 }
-                                choursPlayingLiveData.setValue(songPlaying);
+                                chorusPlayingLiveData.setValue(songPlaying);
                             }
                         }
                     }
@@ -917,6 +917,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     public void joinChorus() {
         Log.d(TAG, "RoomLivingViewModel.joinChorus() called");
+        if (!isOnSeat) {
+            ToastUtils.showToast(R.string.ktv_onseat_toast);
+            return;
+        }
         RoomSelSongModel musicModel = songPlayingLiveData.getValue();
         if (musicModel == null) {
             return;
@@ -1265,6 +1269,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     // ------------------ 歌曲开始播放 ------------------
     public void musicStartPlay(Context context, @NonNull RoomSelSongModel music) {
         Log.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
+        chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
 
@@ -1321,7 +1326,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     public void musicStop() {
         Log.d(TAG, "RoomLivingViewModel.musicStop() called");
         // 列表中无歌曲， 还原状态
-        choursPlayingLiveData.setValue(null);
+        chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
 

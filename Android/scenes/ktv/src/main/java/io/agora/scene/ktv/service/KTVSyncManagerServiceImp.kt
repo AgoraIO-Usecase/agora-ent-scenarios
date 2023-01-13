@@ -646,7 +646,7 @@ class KTVSyncManagerServiceImp(
 
             isChorus = targetSong.isChorus,
             userNo = targetSong.userNo,
-            chorusNo = null,
+            chorusNo = "0",
             name = targetSong.name,
             isOriginal = targetSong.isOriginal,
 
