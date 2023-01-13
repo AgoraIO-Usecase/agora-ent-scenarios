@@ -262,9 +262,6 @@ KTVApiDelegate
             selBgModel.imageName = [NSString stringWithFormat:@"ktv_mvbg%ld", roomInfo.bgOption];
             selBgModel.isSelect = YES;
             weakSelf.choosedBgModel = selBgModel;
-            if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
-                self.isOwner = true;
-            }
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
