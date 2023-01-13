@@ -103,8 +103,6 @@ KTVApiDelegate
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApi* ktvApi;
-@property (nonatomic, assign) BOOL isOwner;
-@property (nonatomic, assign) BOOL isExpire;
 @end
 
 @implementation VLKTVViewController
@@ -308,9 +306,8 @@ KTVApiDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomWillExpire:^{
-        if(self.isExpire == true){return;}
-        self.isExpire = true;
-        NSString *mes = self.isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
+        bool isOwner = [weakSelf.roomModel.creator isEqualToString:VLUserCenter.user.id];
+        NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
         [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
