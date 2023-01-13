@@ -17,6 +17,7 @@
 //KTV独有
 @property (nonatomic, strong) UIImageView *iconView;
 @property (nonatomic, copy) OnCallback completion;
+@property (nonatomic, assign) bool isShowing;
 @end
 
 @implementation VLKTVAlert
@@ -31,6 +32,7 @@ static VLKTVAlert *_alert = nil;
 }
 
 -(void)showKTVToastWithFrame:(CGRect)frame image:(UIImage *)image message:(NSString *_Nullable)message buttonTitle:(NSString *)buttonTitle completion:(OnCallback _Nullable)completion {
+    if(self.isShowing){return;}
     [self layoutUI];
     self.completion = completion;
     self.message = message;
@@ -38,6 +40,7 @@ static VLKTVAlert *_alert = nil;
     self.mesLabel.text = message;
     [self.confirmBtn setTitle:buttonTitle forState:UIControlStateNormal];
     [UIApplication.sharedApplication.delegate.window addSubview:self];
+    self.isShowing = true;
 }
 
 -(void)layoutUI {
