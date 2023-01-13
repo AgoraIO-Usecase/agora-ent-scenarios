@@ -1,6 +1,7 @@
 package io.agora.scene.base.utils;
 
 import android.os.Looper;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,19 +24,26 @@ public final class ZipUtils {
     private static final Executor wokeExecutor = Executors.newSingleThreadExecutor();
     private static final android.os.Handler mainThreadHandler = new android.os.Handler(Looper.getMainLooper());
 
+    public static void unzipOnlyPlainXmlFilesAsync(String zipFilePath,
+                                                   String targetDirPath,
+                                                   UnZipCallback callback) {
+        // This is for zipped lyrics file, we only need the plain .xml files
+        unZipAsync(zipFilePath, targetDirPath, "^(?!/)[a-zA-Z\\d]+.xml", callback);
+    }
 
     public static void unZipAsync(String zipFilePath,
-                                 String targetDirPath,
-                                 UnZipCallback callback){
+                                  String targetDirPath,
+                                  String filter,
+                                  UnZipCallback callback) {
         wokeExecutor.execute(() -> {
             try {
-                List<String> outPath = unzipSync(zipFilePath, targetDirPath, false);
-                if(callback != null){
+                List<String> outPath = unzipSync(zipFilePath, targetDirPath, filter, false);
+                if (callback != null) {
                     mainThreadHandler.post(() -> callback.onFileUnZipped(outPath));
 
                 }
             } catch (Exception e) {
-                if(callback != null){
+                if (callback != null) {
                     mainThreadHandler.post(() -> callback.onError(e));
                 }
             }
@@ -44,6 +52,7 @@ public final class ZipUtils {
 
     public static List<String> unzipSync(String zipFilePath,
                                          String targetDirPath,
+                                         String filter,
                                          boolean reserve) throws Exception {
         File zipFile = new File(zipFilePath);
         if (!zipFile.exists()) {
@@ -65,7 +74,11 @@ public final class ZipUtils {
         List<String> outPath = new ArrayList<>();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            copyEntry(zzipFile, entry, targetDir, reserve, outPath);
+            if (entry.getName().matches(filter)) {
+                copyEntry(zzipFile, entry, targetDir, reserve, outPath);
+            } else {
+                Log.w(TAG, "Skipping unexpected file: " + entry.getName());
+            }
         }
         return outPath;
     }
@@ -79,9 +92,8 @@ public final class ZipUtils {
         InputStream iStream = null;
         OutputStream oStream = null;
         if (entry.isDirectory()) {
-            if(reserve){
-               // TODO 待实现
-
+            if (reserve) {
+                // TODO 待实现
             }
         } else {
             File oFile = new File(targetDir, entry.getName());
@@ -91,7 +103,7 @@ public final class ZipUtils {
             iStream = zipFile.getInputStream(entry);
             outFilesPath.add(oFile.getAbsolutePath());
         }
-        if(oStream == null || iStream == null){
+        if (oStream == null || iStream == null) {
             return;
         }
         try {
@@ -139,7 +151,7 @@ public final class ZipUtils {
     private ZipUtils() {
     }
 
-    public interface UnZipCallback{
+    public interface UnZipCallback {
         void onFileUnZipped(List<String> unZipFilePaths);
 
         void onError(Exception e);
