@@ -265,6 +265,11 @@ KTVApiDelegate
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
             if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
+                NSString *mes = @"连接超时，房间已解散";
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
+                    [[VLKTVAlert shared]dismiss];
+                    [weakSelf leaveRoom];
+                }];
                 return;
             }
             
@@ -397,8 +402,8 @@ KTVApiDelegate
     self.settingView = (VLKTVSettingView*)popView.currCustomView;
 }
 
-- (void)showScoreViewWithScore:(int)score
-                          song:(VLRoomSelSongModel *)song {
+- (void)showScoreViewWithScore:(int)score {
+                        //  song:(VLRoomSelSongModel *)song {
     if (score < 0) return;
     if(_scoreView == nil) {
         _scoreView = [[VLPopScoreView alloc] initWithFrame:self.view.bounds withDelegate:self];
@@ -441,6 +446,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView setCoundDown:leftSecond];
         KTVLogInfo(@"count down: %ds",(int)leftSecond);
         
+        return;
+    } else if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
+        int score = [dict[@"score"] intValue];
+        [self showScoreViewWithScore:[self.MVView getAvgSongScore]];
+        KTVLogInfo(@"score: %ds",score);
         return;
     }
     
@@ -634,6 +644,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSDictionary *dict = @{
         @"cmd":@"countdown",
         @"time":@(seconds)
+    };
+    [self sendStreamMessageWithDict:dict success:nil];
+}
+
+- (void)syncChoruScore:(NSInteger)score {
+    NSDictionary *dict = @{
+        @"cmd":@"SingingScore",
+        @"score":@(score)
     };
     [self sendStreamMessageWithDict:dict success:nil];
 }
@@ -883,7 +901,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
-                    [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
+                    //将房主实时的分数共享给所有人
+                    [self syncChoruScore:[self.MVView getAvgSongScore]];
+                    [self showScoreViewWithScore: [self.MVView getAvgSongScore]];
                 }
                 [self removeCurrentSongWithSync:YES];
             }
@@ -1068,6 +1088,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 #pragma mark - MVViewDelegate
 // 打分实时回调
 - (void)onKTVMVView:(VLKTVMVView *)view scoreDidUpdate:(int)score {
+    
 }
 
 - (void)onKTVMVView:(VLKTVMVView *)view btnTappedWithActionType:(VLKTVMVViewActionType)type {
