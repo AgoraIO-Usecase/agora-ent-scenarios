@@ -21,6 +21,10 @@
 @property (nonatomic, assign) ALERTYPE alertType;
 @property (nonatomic, strong) NSString *message;
 @property (nonatomic, strong) NSString *attributeMessage;
+
+//KTV独有
+@property (nonatomic, strong) UIImageView *iconView;
+
 @property (nonatomic, copy) OnCallback completion;
 @property (nonatomic, copy) linkCallback linkCompletion;
 @end

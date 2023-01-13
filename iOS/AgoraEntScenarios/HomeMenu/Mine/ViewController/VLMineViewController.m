@@ -121,13 +121,27 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)showUploadPicAlter {
     kWeakSelf(self)
     UIAlertController *alertSheet = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
+    
     UIAlertAction *upload = [UIAlertAction actionWithTitle:AGLocalizedString(@"本地相册上传") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [weakself requestAuthorizationForPhotoLibrary];
     }];
+    [alertSheet addAction:upload];
+    
+    UIAlertAction *ipadCanAction = nil;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        [alertSheet.popoverPresentationController setPermittedArrowDirections:0];//去掉arrow箭头
+        alertSheet.popoverPresentationController.sourceView = self.view;
+        alertSheet.popoverPresentationController.sourceRect = CGRectMake(0, self.view.height, self.view.width, self.view.height);
+        
+        ipadCanAction = [UIAlertAction actionWithTitle:AGLocalizedString(@"取消") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }];
+        [alertSheet addAction:ipadCanAction];
+    }
+
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:AGLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
             NSLog(@"点击了取消");
     }];
-    [alertSheet addAction:upload];
+    
     [alertSheet addAction:cancel];
     [self presentViewController:alertSheet animated:YES completion:nil];
 }
