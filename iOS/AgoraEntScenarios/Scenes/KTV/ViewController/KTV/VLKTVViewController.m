@@ -503,6 +503,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
+    //TODO: fix score view visible problem while owner reopen the room
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
     [self markSongPlaying:model];
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
