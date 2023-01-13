@@ -263,7 +263,7 @@ KTVApiDelegate
             weakSelf.choosedBgModel = selBgModel;
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
-            if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
+            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 return;
             }
             

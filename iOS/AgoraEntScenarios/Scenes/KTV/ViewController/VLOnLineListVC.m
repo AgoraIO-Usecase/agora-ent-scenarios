@@ -173,7 +173,7 @@
             return;
         }
         
-        listModel.creator = outputModel.creator;
+        listModel.creatorNo = outputModel.creatorNo;
         VLKTVViewController *ktvVC = [[VLKTVViewController alloc]init];
         ktvVC.roomModel = listModel;
         ktvVC.seatsArray = outputModel.seatsArray;
