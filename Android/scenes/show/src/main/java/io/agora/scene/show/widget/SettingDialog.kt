@@ -63,6 +63,13 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
             R.mipmap.show_setting_ic_statistic,
             R.string.show_setting_statistic,
             R.string.show_setting_statistic
+        ),
+        SettingItem(
+            ITEM_ID_SETTING,
+            R.mipmap.show_setting_ic_setting,
+            R.mipmap.show_setting_ic_setting,
+            R.string.show_setting_advance_setting,
+            R.string.show_setting_advance_setting
         )
     )
 

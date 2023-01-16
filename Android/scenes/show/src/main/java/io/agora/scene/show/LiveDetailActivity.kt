@@ -542,7 +542,7 @@ class LiveDetailActivity : AppCompatActivity() {
                         }
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
-                    SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
+                    SettingDialog.ITEM_ID_SETTING -> if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
                 }
             }
             show()
