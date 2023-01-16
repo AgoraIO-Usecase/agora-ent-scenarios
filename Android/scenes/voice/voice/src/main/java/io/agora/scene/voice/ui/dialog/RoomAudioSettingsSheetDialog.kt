@@ -69,7 +69,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtBestSoundEffectArrow.text =
                 RoomAudioSettingsConstructor.getSoundEffectName(view.context, audioSettingsInfo.soundSelection)
             mtNoiseSuppressionArrow.text =
-                RoomAudioSettingsConstructor.getAINSName(view.context, audioSettingsInfo.anisMode)
+                RoomAudioSettingsConstructor.getAINSName(view.context, audioSettingsInfo.AINSMode)
             mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
@@ -84,11 +84,23 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
                     ToastTools.showTips(it, getString(R.string.voice_chatroom_only_host_can_change_robot))
                 }
             }
+            mtAINSArrow.setOnClickListener {
+                audioSettingsListener?.onAINS(audioSettingsInfo.AINSMode, audioSettingsInfo.enable)
+            }
+            mtAECArrow.setOnClickListener {
+                audioSettingsListener?.onAIAEC(audioSettingsInfo.isAIAECOn, audioSettingsInfo.enable)
+            }
+            mtAGCArrow.setOnClickListener {
+                audioSettingsListener?.onAGC(audioSettingsInfo.isAGCOn, audioSettingsInfo.enable)
+            }
+            mtVoiceChanger.setOnClickListener {
+                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
+            }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
             }
             mtNoiseSuppressionArrow.setOnClickListener {
-                audioSettingsListener?.onNoiseSuppression(audioSettingsInfo.anisMode, audioSettingsInfo.enable)
+                audioSettingsListener?.onAINS(audioSettingsInfo.AINSMode, audioSettingsInfo.enable)
             }
             mtSpatialAudioArrow.setOnClickListener {
                 audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
@@ -128,6 +140,17 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
     }
 
     interface OnClickAudioSettingsListener {
+        /**AI降噪*/
+        fun onAINS(mode: Int, isEnable: Boolean)
+
+        /**AI回声消除*/
+        fun onAIAEC(isOn: Boolean, isEnable: Boolean)
+
+        /**人声自动增益*/
+        fun onAGC(isOn: Boolean, isEnable: Boolean)
+
+        /**变声*/
+        fun onVoiceChanger(mode: Int, isEnable: Boolean)
 
         /**机器人开关*/
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
@@ -137,9 +160,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
 
         /**最佳音效*/
         fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean)
-
-        /**AI降噪*/
-        fun onNoiseSuppression(ainsMode: Int, isEnable: Boolean)
 
         /**空间音频*/
         fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)

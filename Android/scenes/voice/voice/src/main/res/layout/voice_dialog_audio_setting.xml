@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:theme="@style/Theme.AppCompat"
     android:background="@drawable/voice_bg_rect_top_radius20_white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,6 +39,155 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
 
+        <!--  Own Audio Settings  -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtOwnAudioSettingTitle"
+            style="@style/voice_bottom_sheet_subtitle_style"
+            android:text="@string/voice_chatroom_own_audio_settings"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAINS"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtAINS"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAINS"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAINS"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="#AI 降噪"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtOwnAudioSettingTitle" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAINSArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAINS"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtAINS"
+            tools:text="@string/voice_chatroom_off" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAINS" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAEC"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtAEC"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAEC"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAEC"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="# AI 回声消除"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAINS" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAECArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAEC"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtAEC"
+            tools:text="@string/voice_chatroom_off" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAEC" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivOwnAudio"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtAGC"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAGC"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAGC"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="# 人声自动增益"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAEC" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtAGCArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/mtAGC"
+            app:layout_constraintTop_toTopOf="@+id/mtAGC"
+            tools:text="@string/voice_chatroom_off" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/voice_bottom_sheet_divider_style"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivVoiceChanger"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"
+            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtVoiceChanger"
+            style="@style/voice_bottom_sheet_text_style"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginStart="52dp"
+            android:text="# 变声"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtVoiceChangerArrow"
+            style="@style/voice_bottom_sheet_right_text_style"
+            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"
+            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"
+            tools:text="@string/voice_chatroom_off" />
+
         <!--  Bot Settings  -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtBotSettingsTitle"
@@ -45,7 +195,7 @@
             android:text="@string/voice_chatroom_bot_settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/mtVoiceChanger" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="20dp"
