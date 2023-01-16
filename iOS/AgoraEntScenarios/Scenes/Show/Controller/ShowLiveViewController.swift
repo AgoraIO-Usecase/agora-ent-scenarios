@@ -221,7 +221,7 @@ class ShowLiveViewController: UIViewController {
     }
     
     private func leaveRoom(){
-        ByteBeautyManager.shareManager.destroy()
+        BeautyManager.shareManager.destroy()
         agoraKitManager.leaveChannel()
         AppContext.showServiceImp.unsubscribeEvent(delegate: self)
         

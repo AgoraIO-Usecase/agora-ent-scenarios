@@ -41,7 +41,7 @@ PODS:
   - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
   - AgoraRtm_iOS (1.5.1)
   - Bugly (2.5.93)
-  - bytedEffect (4.3.0):
+  - BytedEffect (4.3.0):
     - SSZipArchive
   - ChameleonFramework (2.1.0):
     - ChameleonFramework/Default (= 2.1.0)
@@ -397,7 +397,7 @@ DEPENDENCIES:
   - AgoraRtcEngine_Special_iOS (= 4.0.1.4.full)
   - AgoraRtm_iOS
   - Bugly (= 2.5.93)
-  - bytedEffect (from `bytedEffect.podspec`)
+  - BytedEffect (from `bytedEffect.podspec`)
   - ChameleonFramework
   - CRBoxInputView
   - CYLTabBarController
@@ -466,7 +466,7 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 EXTERNAL SOURCES:
-  bytedEffect:
+  BytedEffect:
     :path: bytedEffect.podspec
 
 SPEC CHECKSUMS:
@@ -477,7 +477,7 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  bytedEffect: 38b05fb3c272a050021efb7b322aff795e329825
+  BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
   CYLTabBarController: db44b5901a28693a8a4279e4721b3aafdd36c178
@@ -509,6 +509,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: edcd7d0227304786a6c15f381dbdd5b1a8d4c8f4
+PODFILE CHECKSUM: e69d5896c6cbc961a0a66e686507a9ce2c2c4d3d
 
 COCOAPODS: 1.11.2

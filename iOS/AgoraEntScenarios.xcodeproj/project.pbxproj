@@ -236,7 +236,7 @@
 		DDE85628296BB34E00982E52 /* ShowMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A1296BB34E00982E52 /* ShowMusicManager.swift */; };
 		DDE85629296BB34E00982E52 /* ShowMusicModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A2296BB34E00982E52 /* ShowMusicModel.swift */; };
 		DDE8562A296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A3296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift */; };
-		DDE8562B296BB34E00982E52 /* ByteBeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A5296BB34E00982E52 /* ByteBeautyModel.swift */; };
+		DDE8562B296BB34E00982E52 /* BeautyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A5296BB34E00982E52 /* BeautyModel.swift */; };
 		DDE8562C296BB34E00982E52 /* ShowAgoraKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A6296BB34E00982E52 /* ShowAgoraKitManager.swift */; };
 		DDE8562D296BB34E00982E52 /* ShowChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A7296BB34E00982E52 /* ShowChatModel.swift */; };
 		DDE8562E296BB34E00982E52 /* ShowAgoraKitManager+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855A8296BB34E00982E52 /* ShowAgoraKitManager+Music.swift */; };
@@ -504,6 +504,19 @@
 		DDE85844296BB51100982E52 /* VLOnLineListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE8578C296BB51000982E52 /* VLOnLineListVC.m */; };
 		DDE85845296BB51100982E52 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DDE8578D296BB51000982E52 /* KtvResource.bundle */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
+		E75B151D296FE59100C33678 /* EffectsProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B150B296FE59100C33678 /* EffectsProcess.m */; };
+		E75B151E296FE59100C33678 /* VideoProcessingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B150C296FE59100C33678 /* VideoProcessingManager.m */; };
+		E75B151F296FE59100C33678 /* EffectsAnimal.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B150E296FE59100C33678 /* EffectsAnimal.m */; };
+		E75B1520296FE59100C33678 /* EFMotionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1511296FE59100C33678 /* EFMotionManager.m */; };
+		E75B1521296FE59100C33678 /* SENSEME.lic in Resources */ = {isa = PBXBuildFile; fileRef = E75B1512296FE59100C33678 /* SENSEME.lic */; };
+		E75B1522296FE59100C33678 /* EffectsLicense.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1513296FE59100C33678 /* EffectsLicense.m */; };
+		E75B1523296FE59100C33678 /* EffectsDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1515296FE59100C33678 /* EffectsDetector.m */; };
+		E75B1524296FE59100C33678 /* Effects.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1517296FE59100C33678 /* Effects.m */; };
+		E75B1525296FE59100C33678 /* EffectsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1518296FE59100C33678 /* EffectsAttribute.m */; };
+		E75B1526296FE59100C33678 /* EffectsCommonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B1519296FE59100C33678 /* EffectsCommonObject.m */; };
+		E75B1528296FE5EE00C33678 /* SenseBeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75B1527296FE5EE00C33678 /* SenseBeautyManager.swift */; };
+		E75B15322971582900C33678 /* BeautyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = E75B15312971582900C33678 /* BeautyLoad.m */; };
+		E75B1534297530EF00C33678 /* BeautyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75B1533297530EF00C33678 /* BeautyManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -833,7 +846,7 @@
 		DDE855A1296BB34E00982E52 /* ShowMusicManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicManager.swift; sourceTree = "<group>"; };
 		DDE855A2296BB34E00982E52 /* ShowMusicModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicModel.swift; sourceTree = "<group>"; };
 		DDE855A3296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Setting.swift"; sourceTree = "<group>"; };
-		DDE855A5296BB34E00982E52 /* ByteBeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteBeautyModel.swift; sourceTree = "<group>"; };
+		DDE855A5296BB34E00982E52 /* BeautyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeautyModel.swift; sourceTree = "<group>"; };
 		DDE855A6296BB34E00982E52 /* ShowAgoraKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowAgoraKitManager.swift; sourceTree = "<group>"; };
 		DDE855A7296BB34E00982E52 /* ShowChatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowChatModel.swift; sourceTree = "<group>"; };
 		DDE855A8296BB34E00982E52 /* ShowAgoraKitManager+Music.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+Music.swift"; sourceTree = "<group>"; };
@@ -1178,6 +1191,30 @@
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		E75B150A296FE59100C33678 /* EffectsAnimal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsAnimal.h; sourceTree = "<group>"; };
+		E75B150B296FE59100C33678 /* EffectsProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsProcess.m; sourceTree = "<group>"; };
+		E75B150C296FE59100C33678 /* VideoProcessingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoProcessingManager.m; sourceTree = "<group>"; };
+		E75B150D296FE59100C33678 /* EFMotionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EFMotionManager.h; sourceTree = "<group>"; };
+		E75B150E296FE59100C33678 /* EffectsAnimal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAnimal.m; sourceTree = "<group>"; };
+		E75B150F296FE59100C33678 /* EffectsCommonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsCommonObject.h; sourceTree = "<group>"; };
+		E75B1510296FE59100C33678 /* EffectsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsAttribute.h; sourceTree = "<group>"; };
+		E75B1511296FE59100C33678 /* EFMotionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EFMotionManager.m; sourceTree = "<group>"; };
+		E75B1512296FE59100C33678 /* SENSEME.lic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SENSEME.lic; sourceTree = "<group>"; };
+		E75B1513296FE59100C33678 /* EffectsLicense.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsLicense.m; sourceTree = "<group>"; };
+		E75B1514296FE59100C33678 /* Effects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Effects.h; sourceTree = "<group>"; };
+		E75B1515296FE59100C33678 /* EffectsDetector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsDetector.m; sourceTree = "<group>"; };
+		E75B1516296FE59100C33678 /* EffectsDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsDetector.h; sourceTree = "<group>"; };
+		E75B1517296FE59100C33678 /* Effects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Effects.m; sourceTree = "<group>"; };
+		E75B1518296FE59100C33678 /* EffectsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsAttribute.m; sourceTree = "<group>"; };
+		E75B1519296FE59100C33678 /* EffectsCommonObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EffectsCommonObject.m; sourceTree = "<group>"; };
+		E75B151A296FE59100C33678 /* EffectsLicense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsLicense.h; sourceTree = "<group>"; };
+		E75B151B296FE59100C33678 /* EffectsProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectsProcess.h; sourceTree = "<group>"; };
+		E75B151C296FE59100C33678 /* VideoProcessingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoProcessingManager.h; sourceTree = "<group>"; };
+		E75B1527296FE5EE00C33678 /* SenseBeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenseBeautyManager.swift; sourceTree = "<group>"; };
+		E75B1529297007C500C33678 /* EffectMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectMacro.h; sourceTree = "<group>"; };
+		E75B15302971582900C33678 /* BeautyLoad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BeautyLoad.h; sourceTree = "<group>"; };
+		E75B15312971582900C33678 /* BeautyLoad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BeautyLoad.m; sourceTree = "<group>"; };
+		E75B1533297530EF00C33678 /* BeautyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeautyManager.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2240,6 +2277,7 @@
 		DDE85595296BB34E00982E52 /* Show */ = {
 			isa = PBXGroup;
 			children = (
+				E75B1509296FE4E300C33678 /* SenseBeaufy */,
 				DDE85596296BB34E00982E52 /* showResource.bundle */,
 				DDE85597296BB34E00982E52 /* Utils */,
 				DDE8559F296BB34E00982E52 /* Models */,
@@ -2293,7 +2331,9 @@
 		DDE855A4296BB34E00982E52 /* BeautyFace */ = {
 			isa = PBXGroup;
 			children = (
-				DDE855A5296BB34E00982E52 /* ByteBeautyModel.swift */,
+				DDE855A5296BB34E00982E52 /* BeautyModel.swift */,
+				E75B15302971582900C33678 /* BeautyLoad.h */,
+				E75B15312971582900C33678 /* BeautyLoad.m */,
 			);
 			path = BeautyFace;
 			sourceTree = "<group>";
@@ -2338,6 +2378,7 @@
 				DDE855B4296BB34E00982E52 /* ShowSelectQualityVC.swift */,
 				DDE855B5296BB34E00982E52 /* ShowBeautySettingVC.swift */,
 				DDE855B6296BB34E00982E52 /* ShowBeautyFaceVC.swift */,
+				E75B1533297530EF00C33678 /* BeautyManager.swift */,
 			);
 			path = CreateLive;
 			sourceTree = "<group>";
@@ -3033,6 +3074,34 @@
 			path = KTV;
 			sourceTree = "<group>";
 		};
+		E75B1509296FE4E300C33678 /* SenseBeaufy */ = {
+			isa = PBXGroup;
+			children = (
+				E75B1529297007C500C33678 /* EffectMacro.h */,
+				E75B1512296FE59100C33678 /* SENSEME.lic */,
+				E75B1514296FE59100C33678 /* Effects.h */,
+				E75B1517296FE59100C33678 /* Effects.m */,
+				E75B150A296FE59100C33678 /* EffectsAnimal.h */,
+				E75B150E296FE59100C33678 /* EffectsAnimal.m */,
+				E75B1510296FE59100C33678 /* EffectsAttribute.h */,
+				E75B1518296FE59100C33678 /* EffectsAttribute.m */,
+				E75B150F296FE59100C33678 /* EffectsCommonObject.h */,
+				E75B1519296FE59100C33678 /* EffectsCommonObject.m */,
+				E75B1516296FE59100C33678 /* EffectsDetector.h */,
+				E75B1515296FE59100C33678 /* EffectsDetector.m */,
+				E75B151A296FE59100C33678 /* EffectsLicense.h */,
+				E75B1513296FE59100C33678 /* EffectsLicense.m */,
+				E75B151B296FE59100C33678 /* EffectsProcess.h */,
+				E75B150B296FE59100C33678 /* EffectsProcess.m */,
+				E75B150D296FE59100C33678 /* EFMotionManager.h */,
+				E75B1511296FE59100C33678 /* EFMotionManager.m */,
+				E75B151C296FE59100C33678 /* VideoProcessingManager.h */,
+				E75B150C296FE59100C33678 /* VideoProcessingManager.m */,
+				E75B1527296FE5EE00C33678 /* SenseBeautyManager.swift */,
+			);
+			path = SenseBeaufy;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3045,7 +3114,7 @@
 				DD2A43C428FFCEE7004CEDCF /* Frameworks */,
 				DD2A43C528FFCEE7004CEDCF /* Resources */,
 				AD4E4CC20B1F880834B4962F /* [CP] Embed Pods Frameworks */,
-				F2E31A3BEBDE60E607D01AE6 /* [CP] Copy Pods Resources */,
+				E42178060F617A5C23146401 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -3152,6 +3221,7 @@
 				DDE857B0296BB51100982E52 /* VoiceChatRoomResource.bundle in Resources */,
 				DD8417C929090C520026B624 /* Template.bundle in Resources */,
 				DDA19A1328FFE579009D3E61 /* AgoraSyncManagerLocal.podspec in Resources */,
+				E75B1521296FE59100C33678 /* SENSEME.lic in Resources */,
 				DDA19A2128FFE579009D3E61 /* publish.sh in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
@@ -3241,7 +3311,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F2E31A3BEBDE60E607D01AE6 /* [CP] Copy Pods Resources */ = {
+		E42178060F617A5C23146401 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3314,6 +3384,7 @@
 				DDE85646296BB34E00982E52 /* ShowBaseViewController.swift in Sources */,
 				DDE85800296BB51100982E52 /* VoiceRoomInviteCell.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
+				E75B15322971582900C33678 /* BeautyLoad.m in Sources */,
 				DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */,
 				DDE857BC296BB51100982E52 /* VRBaseViewController.swift in Sources */,
 				DDE8567F296BB34E00982E52 /* ShowServiceProtocol.swift in Sources */,
@@ -3429,6 +3500,7 @@
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
 				DDE857DD296BB51100982E52 /* VoiceRoomEndLiveAlert.swift in Sources */,
 				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
+				E75B151D296FE59100C33678 /* EffectsProcess.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDE857E6296BB51100982E52 /* VoiceRoomGifterCell.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
@@ -3439,6 +3511,7 @@
 				DDE85836296BB51100982E52 /* VLSearchEmptyView.m in Sources */,
 				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
 				DDE857C8296BB51100982E52 /* VRRoomsViewController.swift in Sources */,
+				E75B151E296FE59100C33678 /* VideoProcessingManager.m in Sources */,
 				DDE857C2296BB51100982E52 /* VoiceRoomViewController+IM.swift in Sources */,
 				DDE857B8296BB51100982E52 /* ChatRoomServiceImp.swift in Sources */,
 				DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */,
@@ -3454,9 +3527,10 @@
 				DDE857CE296BB51100982E52 /* HorizontalCardCell.swift in Sources */,
 				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
 				DDE8563C296BB34E00982E52 /* ShowSettingActionSheetVC.swift in Sources */,
-				DDE8562B296BB34E00982E52 /* ByteBeautyModel.swift in Sources */,
+				DDE8562B296BB34E00982E52 /* BeautyModel.swift in Sources */,
 				DDE85676296BB34E00982E52 /* ShowInviteCell.swift in Sources */,
 				DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */,
+				E75B1526296FE59100C33678 /* EffectsCommonObject.m in Sources */,
 				DDE85638296BB34E00982E52 /* ShowBeautyFaceVC.swift in Sources */,
 				DDE857D9296BB51100982E52 /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,
 				DDE857E8296BB51100982E52 /* VoiceRoomInputBar.swift in Sources */,
@@ -3488,6 +3562,7 @@
 				DDE85833296BB51100982E52 /* VLSelectSongView.m in Sources */,
 				DDE85824296BB51100982E52 /* LSTPopView+KTVModal.m in Sources */,
 				DDE857C9296BB51100982E52 /* VRSpatialSoundViewController.swift in Sources */,
+				E75B1523296FE59100C33678 /* EffectsDetector.m in Sources */,
 				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
@@ -3593,10 +3668,12 @@
 				DDE8564B296BB34E00982E52 /* BEEffectResourceHelper.m in Sources */,
 				DDA19A5428FFE57A009D3E61 /* EKAttributes+BackgroundStyle.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
+				E75B1522296FE59100C33678 /* EffectsLicense.m in Sources */,
 				DDE8562E296BB34E00982E52 /* ShowAgoraKitManager+Music.swift in Sources */,
 				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,
 				DDE85795296BB51100982E52 /* VoiceRoomEmojiManager.swift in Sources */,
 				DDE857C7296BB51100982E52 /* VRAllRoomsViewController.swift in Sources */,
+				E75B1525296FE59100C33678 /* EffectsAttribute.m in Sources */,
 				DDE857A8296BB51100982E52 /* ResourceBundleExtension.swift in Sources */,
 				DDE857F0296BB51100982E52 /* VoiceRoomSwitchBar.swift in Sources */,
 				DDE85808296BB51100982E52 /* HorizontalCardsView.swift in Sources */,
@@ -3608,11 +3685,13 @@
 				DDE85672296BB34E00982E52 /* ShowSettingSliderCell.swift in Sources */,
 				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
 				DDE8582E296BB51100982E52 /* VLKTVItemBaseView.m in Sources */,
+				E75B1520296FE59100C33678 /* EFMotionManager.m in Sources */,
 				DDE85657296BB34E00982E52 /* ShowMusicTableHeaderView.swift in Sources */,
 				DDE857CD296BB51100982E52 /* VRSoundEffectsCell.swift in Sources */,
 				DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */,
 				DDE85829296BB51100982E52 /* VLKTVTonesView.m in Sources */,
 				DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */,
+				E75B1528296FE5EE00C33678 /* SenseBeautyManager.swift in Sources */,
 				DDE85840296BB51100982E52 /* AppContext+KTV.m in Sources */,
 				DDE8578F296BB51100982E52 /* VoiceRoomRequest.swift in Sources */,
 				DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */,
@@ -3628,6 +3707,7 @@
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DDE85651296BB34E00982E52 /* BEHttpRequestProvider.mm in Sources */,
 				DDE8581F296BB51100982E52 /* VLPopMoreSelView.m in Sources */,
+				E75B1524296FE59100C33678 /* Effects.m in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DDE8583E296BB51100982E52 /* VLHomeOnLineListView.m in Sources */,
@@ -3696,6 +3776,7 @@
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				DDE8579E296BB51100982E52 /* PresentationEnums.swift in Sources */,
+				E75B1534297530EF00C33678 /* BeautyManager.swift in Sources */,
 				DDE8564E296BB34E00982E52 /* ByteBeautyManager.swift in Sources */,
 				DDE85837296BB51100982E52 /* VLPopChooseSongView.m in Sources */,
 				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
@@ -3715,6 +3796,7 @@
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
 				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
 				DDE85822296BB51100982E52 /* VLPopSelBgView.m in Sources */,
+				E75B151F296FE59100C33678 /* EffectsAnimal.m in Sources */,
 				DDE8583C296BB51100982E52 /* VLCreateRoomView.m in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 				DDE85635296BB34E00982E52 /* ShowMusicEffectVC.swift in Sources */,
