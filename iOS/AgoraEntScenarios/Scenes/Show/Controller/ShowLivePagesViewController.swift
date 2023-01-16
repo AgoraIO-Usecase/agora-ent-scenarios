@@ -40,6 +40,9 @@ class ShowLivePagesViewController: ViewController {
         return collectionView
     }()
     
+    deinit {
+        print("deinit-- ShowLivePagesViewController")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,15 +93,25 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         print("collectionView... willDisplay: \(indexPath.row)")
         guard let vc = self.roomVCMap[indexPath.row] else {
-            assert(false, "room at index \(indexPath.row) not found")
+//            assert(false, "room at index \(indexPath.row) not found")
             return
         }
-        self.roomVCMap.forEach { (key: Int, value: ShowLiveViewController) in
-            if value == vc {
-                value.loadingType = .loading
-                return
-            }
-            value.loadingType = .preload
+        vc.loadingType = .loading
+//        self.roomVCMap.forEach { (key: Int, value: ShowLiveViewController) in
+//            if value == vc {
+//                value.loadingType = .loading
+//                return
+//            }
+//            value.loadingType = .preload
+//        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        print("collectionView... didEndDisplaying: \(indexPath.row)")
+        guard let vc = self.roomVCMap[indexPath.row] else {
+//            assert(false, "room at index \(indexPath.row) not found")
+            return
         }
+        vc.loadingType = .preload
     }
 }
