@@ -87,7 +87,8 @@ class ShowPresettingVC: UIViewController {
             headerView.title = "show_advance_setting_presetting_audience_title".show_localized
         }
         view.addSubview(headerView)
-        headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_preset_close"))
+//        headerView.setLeftButtonTarget(self, action: #selector(didClickCloseButton), image: UIImage.show_sceneImage(name: "show_preset_close"))
+        headerView.leftItems = nil;
         let saveButtonItem = ShowBarButtonItem(title: "show_advanced_setting_presetting_save".show_localized, target: self, action: #selector(didClickSaveButton))
         headerView.rightItems = [saveButtonItem]
         
