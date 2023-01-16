@@ -18,7 +18,7 @@ extension AppContext {
     static func showServiceImp(_ roomId: String) -> ShowServiceProtocol {
         let showServiceImp = _showServiceImpMap[roomId]
         guard let showServiceImp = showServiceImp else {
-            let imp = ShowSyncManagerServiceImp()
+            let imp = roomId.count < 2 ? ShowRobotSyncManagerServiceImp() : ShowSyncManagerServiceImp()
             _showServiceImpMap[roomId] = imp
             return imp
         }
