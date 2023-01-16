@@ -48,8 +48,11 @@ data class RoomAudioSettingsBean constructor(
     var botOpen: Boolean = false,
     var botVolume: Int = ConfigConstants.RotDefaultVolume,
     var soundSelection: Int = ConfigConstants.SoundSelection.Social_Chat,
-    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium,
+    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Medium,
     var spatialOpen: Boolean = false,
+    var isAIAECOn: Boolean = false,
+    var isAGCOn: Boolean = false,
+    var voiceChangerMode: Int = 0,
 ) : BaseRoomBean
 
 /**
