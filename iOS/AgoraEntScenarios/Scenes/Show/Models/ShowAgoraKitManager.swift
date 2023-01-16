@@ -311,7 +311,7 @@ class ShowAgoraKitManager: NSObject {
                                    connection: connection,
                                    delegate: proxy,
                                    mediaOptions: mediaOptions) { channelName, uid, elapsed in
-                print("join channel \(channelName) \(uid) cost \(-date.timeIntervalSinceNow * 1000) ms")
+                print("join channel \(channelName) \(uid) cost \(Int(-date.timeIntervalSinceNow * 1000)) ms")
             }
             exConnectionMap[channelName] = connection
             
