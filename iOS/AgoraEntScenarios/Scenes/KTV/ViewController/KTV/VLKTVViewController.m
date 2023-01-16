@@ -449,7 +449,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     } else if ([dict[@"cmd"] isEqualToString:@"SingingScore"]) {
         int score = [dict[@"score"] intValue];
-        [self showScoreViewWithScore:[self.MVView getAvgSongScore]];
+        [self showScoreViewWithScore:score];
         KTVLogInfo(@"score: %ds",score);
         return;
     }
