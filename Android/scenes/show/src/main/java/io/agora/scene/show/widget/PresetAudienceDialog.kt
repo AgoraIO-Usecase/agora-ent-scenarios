@@ -9,6 +9,7 @@ import io.agora.scene.show.databinding.ShowSettingPresetAudienceDialogBinding
 
 class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
 
+    var callBack: OnPresetAudienceDialogCallBack? = null
     private val mBinding by lazy {
         ShowSettingPresetAudienceDialogBinding.inflate(
             LayoutInflater.from(
@@ -40,6 +41,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
                 return@setOnClickListener
             }
             onPresetShowModeSelected(showSelectPosition)
+            callBack?.onClickConfirm()
             dismiss()
         }
         groupItems(
@@ -142,5 +144,12 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
         }
     }
 
+
+}
+
+interface OnPresetAudienceDialogCallBack {
+
+    // 用户点击了确认按钮(并且有选择配置)
+    fun onClickConfirm()
 
 }
