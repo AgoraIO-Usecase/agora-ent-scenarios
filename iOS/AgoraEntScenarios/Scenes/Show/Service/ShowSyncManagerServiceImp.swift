@@ -99,7 +99,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     private var pkCreatedInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
     
     private var syncUtilsInited: Bool = false
-    private var roomId: String? {
+    fileprivate var roomId: String? {
         didSet {
             if oldValue == roomId {
                 return
@@ -112,6 +112,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
     }
     
+    deinit {
+        agoraPrint("deinit-- ShowSyncManagerServiceImp")
+    }
+    
     // MARK: Private
     private func getRoomId() -> String {
         guard let _roomId = roomId else {
@@ -122,7 +126,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         return _roomId
     }
     
-    private func initScene(completion: @escaping () -> Void) {
+    fileprivate func initScene(completion: @escaping () -> Void) {
         if syncUtilsInited {
             completion()
             return
@@ -204,7 +208,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
     }
     
-    func createRoom(roomName: String,
+    @objc func createRoom(roomName: String,
                     roomId: String,
                     thumbnailId: String,
                     completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
@@ -714,9 +718,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 
 //MARK: room operation
 extension ShowSyncManagerServiceImp {
-    func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
-        initScene {
-            self.syncUtilImp?.fetchAll { results in
+    @objc func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
+        initScene { [weak self] in
+            self?.syncUtilImp?.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 let dataArray = results.map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
@@ -807,7 +811,8 @@ extension ShowSyncManagerServiceImp {
 //MARK: user operation
 extension ShowSyncManagerServiceImp {
     private func _addUserIfNeed() {
-        _getUserList { error, userList in
+        _getUserList {[weak self] error, userList in
+            guard let self = self else {return}
             // current user already add
             if self.userList.contains(where: { $0.userId == VLUserCenter.user.id }) {
                 return
@@ -1877,6 +1882,103 @@ extension ShowSyncManagerServiceImp {
                     
                     self._handleCreatePkInvitationRespone(invitation: invitation, status: .updated)
                 }
+            }
+        }
+    }
+}
+
+
+private let robotRoomIds = ["1", "2", "3"]
+private let robotRoomOwnerHeaders = ["https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"]
+class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
+    deinit {
+        agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
+    }
+    
+    func _createRoom(roomName: String,
+                    roomId: String,
+                    completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+        let room = ShowRoomListModel()
+        room.roomName = roomName
+        room.roomId = roomId
+        room.thumbnailId = "1"
+        room.ownerId = roomId
+        room.ownerName = roomId
+        room.ownerAvatar = robotRoomOwnerHeaders[(Int(roomId) ?? 1) - 1]//VLUserCenter.user.headUrl
+        room.createdAt = Date().millionsecondSince1970()
+        let params = room.yy_modelToJSONObject() as? [String: Any]
+
+        initScene { [weak self] in
+            guard let imp = self?.syncUtilImp else {
+                return
+            }
+            imp.joinScene(id: roomId,
+                          userId: room.ownerId!,
+                          isOwner: true,
+                          property: params) { result in
+                let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
+                guard let _ = channelName else {
+                    agoraAssert("createRoom fail: channelName == nil")
+                    completion(nil, nil)
+                    return
+                }
+                let output = ShowRoomDetailModel.yy_model(with: params!)
+                imp.leaveScene(id: roomId)
+                completion(nil, output)
+            } fail: { error in
+                completion(error.toNSError(), nil)
+            }
+        }
+    }
+    
+    @objc override func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
+        initScene { [weak self] in
+            self?.syncUtilImp?.fetchAll {[weak self] results in
+                agoraPrint("result == \(results.compactMap { $0.toJson() })")
+                var dataArray = results.map({ info in
+                    return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
+                })
+                
+                var robotIds = robotRoomIds
+                dataArray.forEach { room in
+                    guard let roomId = room.roomId, let idx = robotIds.firstIndex(of: roomId) else{
+                        return
+                    }
+                    robotIds.remove(at: idx)
+                }
+                
+                if robotIds.count > 0 {
+                    let group = DispatchGroup()
+                    
+                    robotIds.forEach { robotId in
+                        group.enter()
+                        self?._createRoom(roomName: "Robot Room \(robotId)", roomId: robotId) { error, room in
+                            defer {
+                                group.leave()
+                            }
+                            
+                            guard let room = room else {
+                                return
+                            }
+                            
+                            dataArray.append(room)
+                        }
+                    }
+                    
+                    
+                    group.notify(queue: DispatchQueue.main) {
+                        let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
+                        completion(nil, roomList)
+                    }
+                    return
+                }
+                
+                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
+                completion(nil, roomList)
+            } fail: { error in
+                completion(error.toNSError(), nil)
             }
         }
     }
