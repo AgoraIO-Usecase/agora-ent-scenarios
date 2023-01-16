@@ -453,7 +453,7 @@ class RoomObservableViewDelegate constructor(
                     botOpen = voiceRoomModel.useRobot,
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
-                    anisMode = VoiceBuddyFactory.get().rtcChannelTemp.anisMode,
+                    AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.anisMode,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -462,6 +462,22 @@ class RoomObservableViewDelegate constructor(
 
         roomAudioSettingDialog?.audioSettingsListener =
             object : RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
+
+                override fun onAINS(mode: Int, isEnable: Boolean) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onAGC(isOn: Boolean, isEnable: Boolean) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onAIAEC(isOn: Boolean, isEnable: Boolean) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
+                    TODO("Not yet implemented")
+                }
 
                 override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
                     roomLivingViewModel.enableRobot(isChecked)
@@ -473,10 +489,6 @@ class RoomObservableViewDelegate constructor(
 
                 override fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean) {
                     onSoundSelectionDialog(soundSelectionType, finishBack)
-                }
-
-                override fun onNoiseSuppression(ainsMode: Int, isEnable: Boolean) {
-                    onAINSDialog(ainsMode)
                 }
 
                 override fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean) {
