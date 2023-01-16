@@ -26,9 +26,10 @@ class ShowSelectQualityVC: UIViewController {
         Resolution(width: 1080, height: 1920, valueStr: "1080P", name: "极清"),
         Resolution(width: 720, height: 1280, valueStr: "720P", name: "超清"),
         Resolution(width: 540, height: 960, valueStr: "540P", name: "高清"),
-        Resolution(width: 360, height: 640, valueStr: "360P", name: "标清"),
-        Resolution(width: 270, height: 480, valueStr: "270P", name: "流畅"),
-        Resolution(width: 180, height: 320, valueStr: "180P", name: "低清"),
+        Resolution(width: 480, height: 854, valueStr: "480P", name: "标清"),
+        Resolution(width: 360, height: 640, valueStr: "360P", name: "流畅"),
+        Resolution(width: 270, height: 480, valueStr: "270P", name: "低清"),
+//        Resolution(width: 180, height: 320, valueStr: "180P", name: "低清"),
     ]
     
     // 背景
