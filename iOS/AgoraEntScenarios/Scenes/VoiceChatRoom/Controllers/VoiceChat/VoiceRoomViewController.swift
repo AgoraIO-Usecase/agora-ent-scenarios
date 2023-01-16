@@ -371,7 +371,7 @@ extension VoiceRoomViewController {
                     }
                 } else {
                     if local_index != nil {
-                        Throttler.throttle(delay: .seconds(1)) {
+                        Throttler.throttle(queue:.main,delay: .seconds(1)) {
                             DispatchQueue.main.async {
                                 self.changeMic(from: self.local_index!, to: tag - 200)
                             }

@@ -25,7 +25,7 @@ public class VoiceRoomSendGiftCell: UICollectionViewCell {
 
     lazy var name: UILabel = .init(frame: CGRect(x: 0, y: self.icon.frame.maxY + 4, width: self.contentView.frame.width, height: 18)).textAlignment(.center).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x040925))
 
-    lazy var displayValue: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: self.name.frame.maxY + 1, width: self.contentView.frame.width, height: 15)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(red: 0.425, green: 0.445, blue: 0.573, alpha: 0.5), .normal)
+    lazy var displayValue: UIButton = .init(type: .custom).frame(CGRect(x: 0, y: self.name.frame.maxY + 1, width: self.contentView.frame.width, height: 15)).font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(red: 0.425, green: 0.445, blue: 0.573, alpha: 0.5), .normal).isUserInteractionEnabled(false)
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,11 +39,12 @@ public class VoiceRoomSendGiftCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func refresh(item: VoiceRoomGiftEntity) {
-        icon.image = UIImage(item.gift_id ?? "")
-        name.text = item.gift_name
-        displayValue.set(image: UIImage("dollagora"), title: item.gift_price ?? "100", titlePosition: .right, additionalSpacing: 5, state: .normal)
-        cover.isHidden = !item.selected
+    func refresh(item: VoiceRoomGiftEntity?) {
+        self.contentView.isHidden = (item == nil)
+        icon.image = UIImage(item?.gift_id ?? "")
+        name.text = item?.gift_name
+        displayValue.set(image: UIImage("dollagora"), title: item?.gift_price ?? "100", titlePosition: .right, additionalSpacing: 5, state: .normal)
+        cover.isHidden = !(item?.selected ?? false)
         cover.frame = CGRect(x: 0, y: 5, width: contentView.frame.width, height: contentView.frame.height - 5)
         icon.frame = CGRect(x: contentView.frame.width / 2.0 - 24, y: 16.5, width: 48, height: 48)
         displayValue.frame = CGRect(x: 0, y: name.frame.maxY + 1, width: contentView.frame.width, height: 15)

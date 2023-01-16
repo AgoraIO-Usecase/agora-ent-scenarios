@@ -44,7 +44,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func fetchGiftContribution() {
 //        let seconds: [Double] = [0,1,2,3]
 //        guard let refreshSeconds = seconds.randomElement() else { return }
-//        Throttler.throttle(delay: .seconds(refreshSeconds)) {
+//        Throttler.throttle(queue:.main,delay: .seconds(refreshSeconds)) {
 //            self.requestRankList()
 //        }
     }
