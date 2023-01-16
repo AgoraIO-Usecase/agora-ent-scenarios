@@ -199,6 +199,7 @@ class ShowLiveViewController: UIViewController {
     
     deinit {
         print("deinit-- ShowLiveViewController")
+        leaveRoom(exitRoom: false)
     }
     
     init(agoraKitManager:ShowAgoraKitManager) {
@@ -252,7 +253,7 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    private func leaveRoom(){
+    private func leaveRoom(exitRoom: Bool = true){
         ByteBeautyManager.shareManager.destroy()
         if role == .audience {
             agoraKitManager.leaveChannelEx(roomId: roomId)
@@ -260,6 +261,10 @@ class ShowLiveViewController: UIViewController {
             agoraKitManager.leaveChannel()
         }
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
+        
+        guard exitRoom else {
+            return
+        }
         
         AppContext.showServiceImp(roomId).leaveRoom {[weak self] error in
             self?.dismiss(animated: true) {
