@@ -26,12 +26,12 @@ class ShowCreateLiveVC: UIViewController {
     private lazy var beautyVC = ShowBeautySettingVC()
     
     deinit {
-        print("deinit-- ShowCreateLiveVC")
+        showLogger.info("deinit-- ShowCreateLiveVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        print("init-- ShowCreateLiveVC")
+        showLogger.info("init-- ShowCreateLiveVC")
     }
     
     required init?(coder: NSCoder) {

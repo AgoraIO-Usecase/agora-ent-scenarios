@@ -7,8 +7,11 @@
 
 import Foundation
 
+let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "Show"))
+
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
+
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
     

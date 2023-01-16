@@ -382,6 +382,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftyBeaver (1.9.5)
   - YYCache (1.0.4)
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
@@ -407,7 +408,7 @@ DEPENDENCIES:
   - HWPanModal (~> 0.8.9)
   - HWWeakTimer
   - InputKit
-  - IQKeyboardManager
+  - IQKeyboardManager (= 6.5.10)
   - JXCategoryView
   - KakaJSON
   - LEEAlert
@@ -422,6 +423,7 @@ DEPENDENCIES:
   - SocketRocket
   - SVGAPlayer
   - SVProgressHUD
+  - SwiftyBeaver (= 1.9.5)
   - YYCache (~> 1.0.4)
   - YYCategories (~> 1.0.4)
   - YYModel (~> 1.0.4)
@@ -462,6 +464,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftyBeaver
     - YYCache
     - YYCategories
     - YYModel
@@ -507,6 +510,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   YYCache: 8105b6638f5e849296c71f331ff83891a4942952
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
@@ -514,6 +518,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: e4c55437e3910f84d26b3f834c8088761ab9af7c
+PODFILE CHECKSUM: a236bceeedd2beeb1a30bafe8fc2287d35a454ba
 
 COCOAPODS: 1.11.3

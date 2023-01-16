@@ -113,10 +113,6 @@
 		DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994A28FFE579009D3E61 /* Screen.swift */; };
 		DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994B28FFE579009D3E61 /* JSONObject.swift */; };
 		DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994C28FFE579009D3E61 /* SyncUtil.swift */; };
-		DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994F28FFE579009D3E61 /* NetworkManager.swift */; };
-		DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995128FFE579009D3E61 /* VLCache.m */; };
-		DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995928FFE579009D3E61 /* VLUserCenter.m */; };
-		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
 		DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997C28FFE579009D3E61 /* QDThemeManager.m */; };
 		DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998028FFE579009D3E61 /* QMUIConfigurationTemplate.m */; };
 		DDA19A2928FFE57A009D3E61 /* QDUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998428FFE579009D3E61 /* QDUIHelper.m */; };
@@ -193,6 +189,11 @@
 		DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D728FFE579009D3E61 /* YGViewDisplayer.m */; };
 		DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA199D828FFE579009D3E61 /* _swiftYGViewDisplayer.swift */; };
 		DDA19A7228FFE57A009D3E61 /* ZQTCustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */; };
+		DDB116B129756C0B0042D9B6 /* AgoraEntLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB116B029756C0B0042D9B6 /* AgoraEntLog.swift */; };
+		DDB116DE29756E090042D9B6 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB116B429756E090042D9B6 /* NetworkManager.swift */; };
+		DDB116DF29756E090042D9B6 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116B629756E090042D9B6 /* VLCache.m */; };
+		DDB116E029756E090042D9B6 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116BF29756E090042D9B6 /* VLUserCenter.m */; };
+		DDB116E129756E090042D9B6 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116C029756E090042D9B6 /* VLGlobalHelper.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
@@ -489,16 +490,6 @@
 		DDA1994A28FFE579009D3E61 /* Screen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		DDA1994B28FFE579009D3E61 /* JSONObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObject.swift; sourceTree = "<group>"; };
 		DDA1994C28FFE579009D3E61 /* SyncUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncUtil.swift; sourceTree = "<group>"; };
-		DDA1994F28FFE579009D3E61 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		DDA1995128FFE579009D3E61 /* VLCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCache.m; sourceTree = "<group>"; };
-		DDA1995228FFE579009D3E61 /* VLCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCache.h; sourceTree = "<group>"; };
-		DDA1995428FFE579009D3E61 /* VLURLPathConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLURLPathConfig.h; sourceTree = "<group>"; };
-		DDA1995528FFE579009D3E61 /* VLMacroDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMacroDefine.h; sourceTree = "<group>"; };
-		DDA1995628FFE579009D3E61 /* VLColorDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLColorDefine.h; sourceTree = "<group>"; };
-		DDA1995828FFE579009D3E61 /* VLUserCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLUserCenter.h; sourceTree = "<group>"; };
-		DDA1995928FFE579009D3E61 /* VLUserCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUserCenter.m; sourceTree = "<group>"; };
-		DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLGlobalHelper.m; sourceTree = "<group>"; };
-		DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
 		DDA1997C28FFE579009D3E61 /* QDThemeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDThemeManager.m; sourceTree = "<group>"; };
 		DDA1997D28FFE579009D3E61 /* QMUIConfigurationTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfigurationTemplate.h; sourceTree = "<group>"; };
 		DDA1997E28FFE579009D3E61 /* QDThemeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDThemeProtocol.h; sourceTree = "<group>"; };
@@ -583,6 +574,17 @@
 		DDA199D928FFE579009D3E61 /* YGViewDisplayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YGViewDisplayer.h; sourceTree = "<group>"; };
 		DDA199DB28FFE579009D3E61 /* ZQTCustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZQTCustomSwitch.m; sourceTree = "<group>"; };
 		DDA199DC28FFE579009D3E61 /* ZQTCustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZQTCustomSwitch.h; sourceTree = "<group>"; };
+		DDB116B029756C0B0042D9B6 /* AgoraEntLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraEntLog.swift; sourceTree = "<group>"; };
+		DDB116B429756E090042D9B6 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		DDB116B629756E090042D9B6 /* VLCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCache.m; sourceTree = "<group>"; };
+		DDB116B729756E090042D9B6 /* VLCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCache.h; sourceTree = "<group>"; };
+		DDB116B929756E090042D9B6 /* VLURLPathConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLURLPathConfig.h; sourceTree = "<group>"; };
+		DDB116BA29756E090042D9B6 /* VLMacroDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMacroDefine.h; sourceTree = "<group>"; };
+		DDB116BB29756E090042D9B6 /* VLColorDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLColorDefine.h; sourceTree = "<group>"; };
+		DDB116BE29756E090042D9B6 /* VLUserCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLUserCenter.h; sourceTree = "<group>"; };
+		DDB116BF29756E090042D9B6 /* VLUserCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUserCenter.m; sourceTree = "<group>"; };
+		DDB116C029756E090042D9B6 /* VLGlobalHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLGlobalHelper.m; sourceTree = "<group>"; };
+		DDB116C129756E090042D9B6 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
 		DDDDDA2928FFD5DD005F4E8B /* AgoraEntScenarios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgoraEntScenarios-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Scene.swift"; sourceTree = "<group>"; };
@@ -1088,7 +1090,7 @@
 				DDA1991728FFE579009D3E61 /* Extension */,
 				DDA1991D28FFE579009D3E61 /* Category */,
 				DDA1994628FFE579009D3E61 /* Utils */,
-				DDA1994D28FFE579009D3E61 /* Manager */,
+				DDB116B229756E090042D9B6 /* Manager */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1390,63 +1392,6 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		DDA1994D28FFE579009D3E61 /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1994E28FFE579009D3E61 /* NetworkManager */,
-				DDA1995028FFE579009D3E61 /* Cache */,
-				DDA1995328FFE579009D3E61 /* VLDefine */,
-				DDA1995A28FFE579009D3E61 /* Helper */,
-			);
-			path = Manager;
-			sourceTree = "<group>";
-		};
-		DDA1994E28FFE579009D3E61 /* NetworkManager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1994F28FFE579009D3E61 /* NetworkManager.swift */,
-			);
-			path = NetworkManager;
-			sourceTree = "<group>";
-		};
-		DDA1995028FFE579009D3E61 /* Cache */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995128FFE579009D3E61 /* VLCache.m */,
-				DDA1995228FFE579009D3E61 /* VLCache.h */,
-			);
-			path = Cache;
-			sourceTree = "<group>";
-		};
-		DDA1995328FFE579009D3E61 /* VLDefine */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995428FFE579009D3E61 /* VLURLPathConfig.h */,
-				DDA1995528FFE579009D3E61 /* VLMacroDefine.h */,
-				DDA1995628FFE579009D3E61 /* VLColorDefine.h */,
-			);
-			path = VLDefine;
-			sourceTree = "<group>";
-		};
-		DDA1995728FFE579009D3E61 /* UserCenter */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995828FFE579009D3E61 /* VLUserCenter.h */,
-				DDA1995928FFE579009D3E61 /* VLUserCenter.m */,
-			);
-			path = UserCenter;
-			sourceTree = "<group>";
-		};
-		DDA1995A28FFE579009D3E61 /* Helper */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995728FFE579009D3E61 /* UserCenter */,
-				DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */,
-				DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */,
-			);
-			path = Helper;
-			sourceTree = "<group>";
-		};
 		DDA1997928FFE579009D3E61 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
@@ -1658,9 +1603,67 @@
 			path = ZQTCustomSwitch;
 			sourceTree = "<group>";
 		};
+		DDB116B229756E090042D9B6 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116B329756E090042D9B6 /* NetworkManager */,
+				DDB116B529756E090042D9B6 /* Cache */,
+				DDB116B829756E090042D9B6 /* VLDefine */,
+				DDB116BC29756E090042D9B6 /* Helper */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
+		DDB116B329756E090042D9B6 /* NetworkManager */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116B429756E090042D9B6 /* NetworkManager.swift */,
+			);
+			path = NetworkManager;
+			sourceTree = "<group>";
+		};
+		DDB116B529756E090042D9B6 /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116B629756E090042D9B6 /* VLCache.m */,
+				DDB116B729756E090042D9B6 /* VLCache.h */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
+		DDB116B829756E090042D9B6 /* VLDefine */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116B929756E090042D9B6 /* VLURLPathConfig.h */,
+				DDB116BA29756E090042D9B6 /* VLMacroDefine.h */,
+				DDB116BB29756E090042D9B6 /* VLColorDefine.h */,
+			);
+			path = VLDefine;
+			sourceTree = "<group>";
+		};
+		DDB116BC29756E090042D9B6 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116BD29756E090042D9B6 /* UserCenter */,
+				DDB116C029756E090042D9B6 /* VLGlobalHelper.m */,
+				DDB116C129756E090042D9B6 /* VLGlobalHelper.h */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		DDB116BD29756E090042D9B6 /* UserCenter */ = {
+			isa = PBXGroup;
+			children = (
+				DDB116BE29756E090042D9B6 /* VLUserCenter.h */,
+				DDB116BF29756E090042D9B6 /* VLUserCenter.m */,
+			);
+			path = UserCenter;
+			sourceTree = "<group>";
+		};
 		DDDDDB3228FFD78B005F4E8B /* Context */ = {
 			isa = PBXGroup;
 			children = (
+				DDB116B029756C0B0042D9B6 /* AgoraEntLog.swift */,
 				DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */,
 				DDDDDB3428FFD78B005F4E8B /* AppContext.swift */,
 				DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */,
@@ -2227,7 +2230,9 @@
 				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
 				DDA199ED28FFE579009D3E61 /* VLBaseView.m in Sources */,
 				DDE8566D296BB34E00982E52 /* ShowSettingSwitchCell.swift in Sources */,
+				DDB116DE29756E090042D9B6 /* NetworkManager.swift in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
+				DDB116E029756E090042D9B6 /* VLUserCenter.m in Sources */,
 				DDE85628296BB34E00982E52 /* ShowMusicManager.swift in Sources */,
 				DDE85660296BB34E00982E52 /* ShowEmptyView.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
@@ -2271,7 +2276,6 @@
 				DDE85629296BB34E00982E52 /* ShowMusicModel.swift in Sources */,
 				DDE85636296BB34E00982E52 /* ShowSelectQualityVC.swift in Sources */,
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
-				DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */,
 				DDA19A3728FFE57A009D3E61 /* HapticFeedbackGenerator.swift in Sources */,
 				DDE85625296BB34E00982E52 /* UIColor+Show.swift in Sources */,
 				DDA19A5028FFE57A009D3E61 /* EKAttributes+PositionConstraints.swift in Sources */,
@@ -2312,6 +2316,7 @@
 				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
 				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
+				DDB116E129756E090042D9B6 /* VLGlobalHelper.m in Sources */,
 				DDE8567E296BB34E00982E52 /* ShowSyncManagerServiceImp.swift in Sources */,
 				DDE85653296BB34E00982E52 /* BEImageUtils.m in Sources */,
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
@@ -2332,6 +2337,7 @@
 				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
+				DDB116B129756C0B0042D9B6 /* AgoraEntLog.swift in Sources */,
 				DDE85665296BB34E00982E52 /* ShowRoomLiveView.swift in Sources */,
 				DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */,
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
@@ -2340,6 +2346,7 @@
 				DDEAAC33296FE72300D23969 /* AgoraExtension.swift in Sources */,
 				DDA19A4728FFE57A009D3E61 /* EKAttributes+Position.swift in Sources */,
 				DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */,
+				DDB116DF29756E090042D9B6 /* VLCache.m in Sources */,
 				DDE85644296BB34E00982E52 /* AEACategoryTitleCell.m in Sources */,
 				DDA19A2C28FFE57A009D3E61 /* EKRootViewController.swift in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
@@ -2352,7 +2359,6 @@
 				DDE85649296BB34E00982E52 /* BEEffectManager.mm in Sources */,
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DDE85648296BB34E00982E52 /* BEOpenGLRenderHelper.m in Sources */,
-				DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */,
 				DD84178529090C520026B624 /* VLUploadImageResModel.m in Sources */,
 				DDE8564C296BB34E00982E52 /* BEResourceHelper.m in Sources */,
 				DDA199E228FFE579009D3E61 /* VLCommonWebViewController.m in Sources */,
@@ -2415,7 +2421,6 @@
 				DDE8567A296BB34E00982E52 /* ShowToolMenuView.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DDE85651296BB34E00982E52 /* BEHttpRequestProvider.mm in Sources */,
-				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DDA19A5328FFE57A009D3E61 /* EKAttributes+WindowLevel.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
@@ -2456,7 +2461,6 @@
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
 				DDE8564E296BB34E00982E52 /* ByteBeautyManager.swift in Sources */,
-				DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */,
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
 				DD84178A29090C520026B624 /* VLMainRootViewController.m in Sources */,
 				DDE85630296BB34E00982E52 /* ShowSettingManager.swift in Sources */,

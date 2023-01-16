@@ -198,14 +198,14 @@ class ShowLiveViewController: UIViewController {
     }
     
     deinit {
-        print("deinit-- ShowLiveViewController")
+        showLogger.info("deinit-- ShowLiveViewController")
         leaveRoom(exitRoom: false)
     }
     
     init(agoraKitManager:ShowAgoraKitManager) {
         self.agoraKitManager = agoraKitManager
         super.init(nibName: nil, bundle: nil)
-        print("init-- ShowLiveViewController")
+        showLogger.info("init-- ShowLiveViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -318,7 +318,7 @@ class ShowLiveViewController: UIViewController {
         showMsg.createAt = Date().millionsecondSince1970()
         
         AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
-            print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
+//            print("发送消息状态 \(error?.localizedDescription ?? "") text = \(text)")
         }
     }
 }
@@ -676,43 +676,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-//        LogUtils.log(message: "warning: \(warningCode.description)", level: .warning)
-        print("rtcEngine warningCode == \(warningCode.rawValue)")
+        showLogger.warning("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-//        LogUtils.log(message: "error: \(errorCode)", level: .error)
-//        showError(title: "Error", errMsg: "Error \(errorCode.rawValue) occur")
-        print("rtcEngine errorCode == \(errorCode.rawValue)")
+        showLogger.warning("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-//        LogUtils.log(message: "Join \(channel) with uid \(uid) elapsed \(elapsed)ms", level: .info)
-        print("rtcEngine didJoinChannel")
+        showLogger.info("rtcEngine didJoinChannel \(channel) with uid \(uid) elapsed \(elapsed)ms")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        print("rtcEngine didJoinedOfUid === \(uid)")
+        showLogger.info("rtcEngine didJoinedOfUid === \(uid)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        print("rtcEngine didOfflineOfUid === \(uid)")
-//        LogUtils.log(message: "remote user leval: \(uid) reason \(reason)", level: .info)
-//        didOfflineOfUid(uid: uid)
-//        if roomOwnerId == uid {
-//            let vc = ShowReceiveLiveFinishAlertVC()
-//            vc.dismissAlert { [weak self] in
-//                self?.leaveRoom()
-//            }
-//            present(vc, animated: true)
-//        }
-//        let videoCanvas = AgoraRtcVideoCanvas()
-//        videoCanvas.uid = uid
-//        videoCanvas.view = nil
-//        videoCanvas.renderMode = .hidden
-//        agoraKitManager.agoraKit?.setupRemoteVideo(videoCanvas)
-//        liveView.canvasView.setRemoteUserInfo(name: "")
-//        liveView.canvasView.canvasType = .none
-//        print("didOfflineOfUid: \(reason) \(uid) \(self.currentInteraction?.userId)")
+        showLogger.info("rtcEngine didOfflineOfUid === \(uid)")
         if let interaction = self.currentInteraction {
             let isRoomOwner: Bool = role == .broadcaster
             let isInteractionLeave: Bool = interaction.userId == "\(uid)"
@@ -743,7 +722,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
-        print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height), type  = \(stats.superResolutionType)")
+        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height), type  = \(stats.superResolutionType)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
@@ -759,7 +738,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        print("contentInspectResult: \(result.rawValue)")
+        showLogger.warning("contentInspectResult: \(result.rawValue)")
         guard result == .porn else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
     }
@@ -771,10 +750,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                    elapsed: Int) {
         DispatchQueue.main.async {
             let channelId = self.room?.roomId ?? ""
-            print("didLiveRtcRemoteVideoStateChanged channel uid state reason ", channelId, uid, state, reason)
+            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state) reason: \(reason)")
             if ( (state == .decoding) && ( (reason == .remoteUnmuted) || (reason == .localMuted) ) )  {
                 let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
-                print("show channel \(channelId) cost: \(Int(costTs)) ms")
+                showLogger.info("show channel \(channelId) cost: \(Int(costTs)) ms")
             }
         }
     }

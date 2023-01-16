@@ -55,13 +55,15 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 //    assert(condition, message)
     #else
     #endif
+    if condition {
+        return
+    }
+    
+    showLogger.error(message)
 }
 
 private func agoraPrint(_ message: String) {
-    #if DEBUG
-    print(message)
-    #else
-    #endif
+    showLogger.info(message)
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {

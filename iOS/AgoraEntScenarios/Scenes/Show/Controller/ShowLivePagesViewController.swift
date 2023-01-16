@@ -41,7 +41,7 @@ class ShowLivePagesViewController: ViewController {
     }()
     
     deinit {
-        print("deinit-- ShowLivePagesViewController")
+        showLogger.info("deinit-- ShowLivePagesViewController")
     }
     
     override func viewDidLoad() {
@@ -64,7 +64,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: UICollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(UICollectionViewCell.self),
                                                                           for: indexPath)
-        print("collectionView... cellForItemAt: \(indexPath.row)")
+        showLogger.info("collectionView... cellForItemAt: \(indexPath.row)")
         if let room = self.roomList?[indexPath.row] {
             if let vc = self.roomVCMap[indexPath.row] {
                 vc.view.frame = self.view.bounds
@@ -91,7 +91,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        print("collectionView... willDisplay: \(indexPath.row)")
+        showLogger.info("collectionView... willDisplay: \(indexPath.row)")
         guard let vc = self.roomVCMap[indexPath.row] else {
 //            assert(false, "room at index \(indexPath.row) not found")
             return
@@ -107,7 +107,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        print("collectionView... didEndDisplaying: \(indexPath.row)")
+        showLogger.info("collectionView... didEndDisplaying: \(indexPath.row)")
         guard let vc = self.roomVCMap[indexPath.row] else {
 //            assert(false, "room at index \(indexPath.row) not found")
             return
