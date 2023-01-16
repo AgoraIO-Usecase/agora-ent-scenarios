@@ -52,7 +52,7 @@ private func agoraAssert(_ message: String) {
 
 private func agoraAssert(_ condition: Bool, _ message: String) {
     #if DEBUG
-    assert(condition, message)
+//    assert(condition, message)
     #else
     #endif
 }
@@ -67,7 +67,14 @@ private func agoraPrint(_ message: String) {
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     fileprivate var syncUtilImp: SyncUtilImp?
     
-    private var roomList: [ShowRoomListModel]?
+    private var roomList: [ShowRoomListModel]? {
+        set {
+            AppContext.shared.showRoomList = newValue
+        }
+        get {
+            return AppContext.shared.showRoomList
+        }
+    }
     private var room: ShowRoomListModel? {
         return self.roomList?.filter({ $0.roomId == roomId}).first
     }
@@ -219,22 +226,25 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                           property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
+                guard let channelName = channelName else {
+                    agoraAssert("createRoom fail: channelName == nil")
+                    completion(nil, nil)
+                    return
+                }
                 self?.roomId = channelName
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
+                NetworkManager.shared.generateTokens(channelName: channelName,
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token007,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
+                                                     tokenTypes: [.rtc]) { tokenMap in
                     guard let self = self,
-                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
                     else {
                         agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
                         return
                     }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = rtcToken
-                    VLUserCenter.user.agoraRTMToken = rtmToken
+                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
+                    map[channelName] = rtcToken
+                    AppContext.shared.rtcTokenMap = map
                     let output = ShowRoomDetailModel.yy_model(with: params!)
                     self.roomList?.append(room)
                     completion(nil, output)
@@ -255,51 +265,42 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
         initScene { [weak self] in
-            //TODO: check room vaild
-            self?._getRoomList(page: 0) { [weak self] error, list in
-                guard let _ = list?.filter({ room.objectId == $0.objectId }).first,
-                      let imp = self?.syncUtilImp else {
-                    completion(NSError(domain: "Show Service Error", code: 1,
-                                       userInfo: [ NSLocalizedDescriptionKey : "show_error_room_has_been_destory".show_localized]), nil)
+            self?.syncUtilImp?.joinScene(id: room.roomId!,
+                          userId: room.ownerId!,
+                          isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
+                          property: params) { result in
+                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
+                guard let channelName = channelName else {
+                    agoraAssert("joinRoom fail: channelName == nil")
+                    completion(nil, nil)
                     return
                 }
-                
-                imp.joinScene(id: room.roomId!,
-                              userId: room.ownerId!,
-                              isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
-                              property: params) { result in
-                    //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
-                    let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-                    let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
-                    self?.roomId = channelName
-                    NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                         uid: "\(UserInfo.userId)",
-                                                         tokenGeneratorType: .token006,
-                                                         tokenTypes: [.rtc, .rtm]) { tokenMap in
-                        guard let self = self,
-                              let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue],
-                              let rtmToken = tokenMap[NetworkManager.AgoraTokenType.rtm.rawValue]
-                        else {
-                            agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
-                            return
-                        }
-                        VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
-                        VLUserCenter.user.agoraRTCToken = rtcToken
-                        VLUserCenter.user.agoraRTMToken = rtmToken
-                        let output = ShowRoomDetailModel.yy_model(with: params!)
-                        completion(nil, output)
-                        self._startCheckExpire()
-                        self._subscribeAll()
-                        self._addUserIfNeed()
-                        self._getAllPKInvitationList(room: nil) { error, list in
-                        }
+                self?.roomId = channelName
+                NetworkManager.shared.generateTokens(channelName: channelName,
+                                                     uid: "\(UserInfo.userId)",
+                                                     tokenGeneratorType: .token007,
+                                                     tokenTypes: [.rtc]) { tokenMap in
+                    guard let self = self,
+                          let rtcToken = tokenMap[NetworkManager.AgoraTokenType.rtc.rawValue]
+                    else {
+                        agoraAssert(tokenMap.count == 2, "rtcToken == nil || rtmToken == nil")
+                        return
                     }
-                } fail: { error in
-                    completion(error.toNSError(), nil)
+                    var map = AppContext.shared.rtcTokenMap ?? [String: String]()
+                    map[channelName] = rtcToken
+                    AppContext.shared.rtcTokenMap = map
+                    let output = ShowRoomDetailModel.yy_model(with: params!)
+                    completion(nil, output)
+                    self._startCheckExpire()
+                    self._subscribeAll()
+                    self._addUserIfNeed()
+                    self._getAllPKInvitationList(room: nil) { error, list in
+                    }
                 }
+            } fail: { error in
+                completion(error.toNSError(), nil)
             }
-            
-            
         }
     }
     
@@ -920,7 +921,7 @@ extension ShowSyncManagerServiceImp {
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                            
                        }, onDeleted: { [weak self] object in
-                           agoraPrint("imp user subscribe onDeleted...")
+                           agoraPrint("imp user subscribe onDeleted... [\(object.getId())]")
                            guard let self = self else { return }
                            var model: ShowUser? = nil
                            if let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) {
@@ -1076,7 +1077,7 @@ extension ShowSyncManagerServiceImp {
             .subscribe(key: SYNC_MANAGER_MESSAGE_COLLECTION,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
-                           agoraPrint("imp message subscribe onUpdated...")
+                           agoraPrint("imp message subscribe onUpdated... [\(object.getId())]")
                            guard let self = self,
                                  let jsonStr = object.toJson(),
                                  let model = ShowMessage.yy_model(withJSON: jsonStr)
@@ -1086,8 +1087,8 @@ extension ShowSyncManagerServiceImp {
                            self.messageList.append(model)
                            self.subscribeDelegate?.onMessageDidAdded(message: model)
                        }, onDeleted: { object in
-                           agoraPrint("imp message subscribe onDeleted...")
-                           assertionFailure("not implemented")
+                           agoraPrint("imp message subscribe onDeleted... [\(object.getId())]")
+                           agoraAssert("not implemented")
                        }, onSubscribed: {
                        }, fail: { error in
                            agoraPrint("imp message subscribe fail \(error.message)...")

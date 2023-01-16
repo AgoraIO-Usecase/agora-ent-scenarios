@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let kShowRoomListKey = "kShowRoomListKey"
+private let kRtcTokenMapKey = "kRtcTokenMapKey"
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
     
@@ -26,6 +28,24 @@ extension AppContext {
     
     static func unloadShowServiceImp() {
         _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
+    }
+    
+    public var showRoomList: [ShowRoomListModel]? {
+        set {
+            self.extDic[kShowRoomListKey] = newValue
+        }
+        get {
+            return self.extDic[kShowRoomListKey] as? [ShowRoomListModel]
+        }
+    }
+    
+    public var rtcTokenMap: [String: String]? {
+        set {
+            self.extDic[kRtcTokenMapKey] = newValue
+        }
+        get {
+            return self.extDic[kRtcTokenMapKey] as? [String: String]
+        }
     }
 }
 

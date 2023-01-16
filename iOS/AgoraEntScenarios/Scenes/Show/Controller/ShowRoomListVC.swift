@@ -96,20 +96,20 @@ class ShowRoomListVC: UIViewController {
     
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
-            if let error = error {
-                ToastView.show(text: error.localizedDescription)
-                return
-            }
+//        AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
+//            if let error = error {
+//                ToastView.show(text: error.localizedDescription)
+//                return
+//            }
             
-            guard let wSelf = self else { return }
-            let vc = ShowLiveViewController()
-            vc.audiencePresetType = wSelf.audiencePresetType
-            vc.room = room
+            let vc = ShowLivePagesViewController()
+            vc.audiencePresetType = self.audiencePresetType
+            vc.roomList = roomList
+        vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             let nc = UINavigationController(rootViewController: vc)
             nc.modalPresentationStyle = .fullScreen
-            wSelf.present(nc, animated: true)
-        }
+            self.present(nc, animated: true)
+//        }
     }
     
     private func getRoomList() {
