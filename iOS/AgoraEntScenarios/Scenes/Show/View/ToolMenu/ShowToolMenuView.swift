@@ -120,7 +120,7 @@ class ShowToolMenuView: UIView {
             case .managerMic:
                 updateToolType(type: [.mute_mic, .end_pk])
             case .idle_audience:
-                updateToolType(type: [.real_time_data])
+                updateToolType(type: [.real_time_data, .setting])
             }
         }
     }

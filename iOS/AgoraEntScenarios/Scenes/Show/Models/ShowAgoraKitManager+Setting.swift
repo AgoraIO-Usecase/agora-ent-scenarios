@@ -43,7 +43,6 @@ extension ShowAgoraKitManager {
         // 默认音量设置
         ShowSettingKey.recordingSignalVolume.writeValue(80)
         ShowSettingKey.musincVolume.writeValue(30)
-//        agoraKit.enableExtension(withVendor: <#T##String#>, extension: <#T##String#>, enabled: <#T##Bool#>)
 //        agoraKit.enableExtension("agora_video_filters_super_resolution", "super_resolution")
         ShowSettingKey.SR.writeValue(false) // 默认关闭sr
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
@@ -62,6 +61,16 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.recordingSignalVolume)
         updateSettingForkey(.musincVolume)
         updateSettingForkey(.audioBitRate)
+    }
+    
+    /// 设置超分 不保存数据
+    /// - Parameters:
+    ///   - isOn: 开关
+    ///   - srType: 默认1.33倍
+    func setSuperResolution(_ isOn: Bool, srType:SRType = .x1_33) {
+        agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+        agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+        agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
     }
     
     // 预设模式
@@ -90,17 +99,16 @@ extension ShowAgoraKitManager {
     
     /// 设置观众端画质增强
     private func _setQualityEnable(_ isOn: Bool, srType: SRType? = nil, uid: UInt?){
+        /*
         if let uid = uid {
             agoraKit.enableRemoteSuperResolution(uid, enable: isOn)
         }
         ShowSettingKey.SR.writeValue(isOn)
-        /*
-        agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
-        if srType != nil {
-            agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType!.rawValue)}")
-            agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
-        }
          */
+        if srType != nil {
+            setSuperResolution(isOn, srType: srType!)
+            ShowSettingKey.SR.writeValue(isOn)
+        }
     }
     
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode,uid: UInt? = nil) {

@@ -127,6 +127,7 @@ struct ShowStatisticsInfo {
         let videoSend = "码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
         let lastmile = "延迟".show_localized+": \(info.channelStats.lastmileDelay) ms"
         let uplink = "上行网络".show_localized+": \(uplink) KB/s"
+        let videoSize = "分辨率"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
         
         let fps = "帧率".show_localized+": \(fps) fps"
         let vSendLoss = "丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"
@@ -139,8 +140,8 @@ struct ShowStatisticsInfo {
         if audioOnly {
             return ([lastmile, audioSend, cpu, aSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo = [videoSend, lastmile, uplink].joined(separator: "\n\n")
-        let rightInfo = [fps, vSendLoss, downlink].joined(separator: "\n\n")
+        let leftInfo = [videoSend, lastmile, uplink, videoSize].joined(separator: "\n\n")
+        let rightInfo = [fps, vSendLoss, downlink,"  "].joined(separator: "\n\n")
 
         return (leftInfo, rightInfo)
     }
@@ -149,6 +150,7 @@ struct ShowStatisticsInfo {
         let videoSend = "码率".show_localized+": \(info.videoStats.receivedBitrate) kbps"
         let lastmile = "延迟".show_localized+": \(info.videoStats.avSyncTimeMs) ms"
         let uplink = "上行网络".show_localized+": \(uplink) KB/s"
+        let videoSize = "分辨率"+": \(info.videoStats.width) x \(info.videoStats.height)"
         
         let fps = "帧率".show_localized+": \(fps) fps"
         let vSendLoss = "丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
@@ -160,8 +162,8 @@ struct ShowStatisticsInfo {
         if audioOnly {
             return ([audioRecv, audioLoss, vSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo = [videoSend, lastmile, uplink].joined(separator: "\n\n")
-        let rightInfo = [fps, vSendLoss, downlink].joined(separator: "\n\n")
+        let leftInfo = [videoSend, lastmile, uplink, videoSize].joined(separator: "\n\n")
+        let rightInfo = [fps, vSendLoss, downlink, "  "].joined(separator: "\n\n")
 
         return (leftInfo, rightInfo)
     }
