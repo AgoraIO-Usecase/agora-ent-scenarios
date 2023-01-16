@@ -6,3 +6,7 @@ Pods
 **/*.xcworkspace/*
 **/xcuserdata
 KeyCenter.swift
+**/ByteEffectLib/*
+**/libs/*
+**/buglyqq-upload-symbol/**
+**/build.sh
