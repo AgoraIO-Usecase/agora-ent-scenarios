@@ -95,10 +95,10 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         }
         self.roomVCMap.forEach { (key: Int, value: ShowLiveViewController) in
             if value == vc {
-                vc.loadingType = .loading
+                value.loadingType = .loading
                 return
             }
-            vc.loadingType = .preload
+            value.loadingType = .preload
         }
     }
 }
