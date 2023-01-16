@@ -10,12 +10,19 @@ import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
+import io.agora.scene.show.widget.OnPresetAudienceDialogCallBack
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class RoomListActivity : AppCompatActivity() {
+
+    companion object {
+        // 是否设置了超分
+        var isSetSetting: Boolean = false
+    }
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
@@ -77,13 +84,26 @@ class RoomListActivity : AppCompatActivity() {
         }
     }
 
-    private fun goLivePrepareActivity(){
+    private fun goLivePrepareActivity() {
         Intent(this, LivePrepareActivity::class.java).let {
             startActivity(it)
         }
     }
 
     private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel) {
+        // 进房前设置一些必要的设置
+        if (!isSetSetting) {
+            PresetAudienceDialog(this).apply {
+                callBack = object : OnPresetAudienceDialogCallBack {
+                    override fun onClickConfirm() {
+                        isSetSetting = true
+                        goLiveDetailActivity(roomInfo)
+                    }
+                }
+                show()
+            }
+            return
+        }
         mService.joinRoom(roomInfo.roomId, {
             LiveDetailActivity.launch(this, it)
         }, {
@@ -91,9 +111,8 @@ class RoomListActivity : AppCompatActivity() {
         })
     }
 
-    private fun showAudienceSetting(){
-        PresetAudienceDialog(this)
-            .show()
+    private fun showAudienceSetting() {
+        PresetAudienceDialog(this).show()
     }
 
     override fun onDestroy() {
