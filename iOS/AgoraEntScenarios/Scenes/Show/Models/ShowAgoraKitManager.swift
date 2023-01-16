@@ -8,6 +8,7 @@
 import Foundation
 import AgoraRtcKit
 import UIKit
+import YYCategories
 
 //TODO: fix retain cycle
 class ShowAgoraExProxy: NSObject, AgoraRtcEngineDelegate {
@@ -145,7 +146,7 @@ class ShowAgoraKitManager: NSObject {
         let parasm: [String: Any] = ["appId": KeyCenter.AppId,
                                      "channelName": channelName,
                                      "channelType": rtcEngineConfig.channelProfile.rawValue,
-                                     "traceId": UUID().uuid16string(),
+                                     "traceId": NSString.withUUID().md5(),
                                      "src": "iOS",
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
         NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",

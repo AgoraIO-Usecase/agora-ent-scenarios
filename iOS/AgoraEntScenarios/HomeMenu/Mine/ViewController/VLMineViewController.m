@@ -18,7 +18,6 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
-#import "KTVMacro.h"
 #import <Photos/Photos.h>
 @import AgoraRtcKit;
 @import Masonry;

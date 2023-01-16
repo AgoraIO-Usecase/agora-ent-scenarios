@@ -5,7 +5,7 @@
 
 #import "VLHomeViewController.h"
 #import "VLHomeView.h"
-#import "VLOnLineListVC.h"
+//#import "VLOnLineListVC.h"
 #import "VLMacroDefine.h"
 #import "MenuUtils.h"
 
@@ -52,16 +52,16 @@
 - (void)itemClickAction:(int)tagValue {
     switch (tagValue) {
         case 0: {
-            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
-            vc.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:vc animated:YES];
-        }
-            break;
-        case 1: {
-            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
-            [self.navigationController pushViewController:vc animated:YES];
-        } break;
-        case 2: {
+//            VRRoomsViewController *vc = [[VRRoomsViewController alloc] initWithUser:VLUserCenter.user];
+//            vc.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:vc animated:YES];
+//        }
+//            break;
+//        case 1: {
+//            VLOnLineListVC *vc = [[VLOnLineListVC alloc]init];
+//            [self.navigationController pushViewController:vc animated:YES];
+//        } break;
+//        case 2: {
             ShowRoomListVC *vc = [ShowRoomListVC new];
             [self.navigationController pushViewController:vc animated:YES];
         } break;
