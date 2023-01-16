@@ -11,8 +11,17 @@ import IQKeyboardManager
 import SwiftUI
 
 class ShowLiveViewController: UIViewController {
-
     var room: ShowRoomListModel?
+    var loadingType: ShowRTCLoadingType = .preload {
+        didSet {
+            if loadingType == oldValue {
+                return
+            }
+            
+            agoraKitManager.updateLoadingType(channelName: room?.roomId ?? "", loadingType: loadingType)
+        }
+    }
+    private var joinStartDate: Date?
     
     private var roomId: String {
         get {
@@ -39,11 +48,7 @@ class ShowLiveViewController: UIViewController {
         return settingMenuVC
     }()
     
-    lazy var agoraKitManager: ShowAgoraKitManager = {
-        let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
-        return manager
-    }()
+    var agoraKitManager: ShowAgoraKitManager!
     
 //    private var settingManager: ShowSettingManager?
     
@@ -68,7 +73,7 @@ class ShowLiveViewController: UIViewController {
     
     // 音乐
     private lazy var musicManager: ShowMusicManager? = {
-        guard let agorakit = agoraKitManager.agoraKit else { return nil }
+         let agorakit = agoraKitManager.agoraKit
         return ShowMusicManager(agoraKit: agorakit)
     }()
     
@@ -196,8 +201,9 @@ class ShowLiveViewController: UIViewController {
         print("deinit-- ShowLiveViewController")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    init(agoraKitManager:ShowAgoraKitManager) {
+        self.agoraKitManager = agoraKitManager
+        super.init(nibName: nil, bundle: nil)
         print("init-- ShowLiveViewController")
     }
     
@@ -209,9 +215,24 @@ class ShowLiveViewController: UIViewController {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
-        joinChannel()
-        _subscribeServiceEvent()
-        UIApplication.shared.isIdleTimerDisabled = true
+        
+        guard let room = room else {return}
+        AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
+            if let error = error {
+                ToastView.show(text: error.localizedDescription)
+                return
+            }
+            
+            guard let self = self else {
+                return
+            }
+            
+            self.joinChannel()
+            self.agoraKitManager.updateLoadingType(channelName: detailModel?.roomId ?? "", loadingType: self.loadingType)
+            self._subscribeServiceEvent()
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -233,7 +254,11 @@ class ShowLiveViewController: UIViewController {
     
     private func leaveRoom(){
         ByteBeautyManager.shareManager.destroy()
-        agoraKitManager.leaveChannel()
+        if role == .audience {
+            agoraKitManager.leaveChannelEx(roomId: roomId)
+        } else {
+            agoraKitManager.leaveChannel()
+        }
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         
         AppContext.showServiceImp(roomId).leaveRoom {[weak self] error in
@@ -252,14 +277,27 @@ class ShowLiveViewController: UIViewController {
         if role == .audience, let type = audiencePresetType {
             agoraKitManager.updatePresetForType(type, mode: .signle,uid: UInt(ownerId))
         }
-        let ret = agoraKitManager.joinChannel(channelName: channelName, uid: uid, ownerId: ownerId, canvasView: liveView.canvasView.localView)
-        if ret == 0 {
-            print("进入房间")
-//            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
-        }else{
-            print("进入房间失败=====\(ret.debugDescription)")
-            showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
+        self.joinStartDate = Date()
+//        let ret =
+        if role == .audience {
+            agoraKitManager.joinChannelEx(channelName: channelName,
+                                          ownerId: ownerId,
+                                          options: self.channelOptions,
+                                          view: liveView.canvasView.localView,
+                                          role: .audience)
+        } else {
+            agoraKitManager.joinChannel(channelName: channelName,
+                                        uid: uid,
+                                        ownerId: ownerId,
+                                        canvasView: liveView.canvasView.localView)
         }
+//        if ret == 0 {
+//            print("进入房间 \(channelName) \(uid) \(ownerId)")
+////            settingManager = ShowSettingManager(agoraKit: agoraKitManager.agoraKit)
+//        }else{
+//            print("进入房间失败===\(channelName) \(uid) \(ownerId)==\(ret.debugDescription)")
+//            showError(title: "Join room failed", errMsg: "Error \(ret.debugDescription) occur")
+//        }
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
         
         sendMessageWithText("join_live_room".show_localized)
@@ -568,8 +606,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            guard let roomId = interaction.roomId else {
+                assert(false, "interaction room id is empty")
+                return
+            }
             if room?.roomId != interaction.roomId {
-                agoraKitManager.joinChannelEx(channelName: interaction.roomId,
+                agoraKitManager.joinChannelEx(channelName: roomId,
                                               ownerId: interaction.userId,
                                               options: self.channelOptions,
                                               view: liveView.canvasView.remoteView,
@@ -595,7 +637,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
-            agoraKitManager.leaveChannelEx()
+            agoraKitManager.leaveChannelEx(roomId: interaction.roomId ?? "")
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
 //            if interaction.userId == VLUserCenter.user.id {
@@ -715,6 +757,21 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         print("contentInspectResult: \(result.rawValue)")
         guard result == .porn else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit,
+                   remoteVideoStateChangedOfUid uid: UInt,
+                   state: AgoraVideoRemoteState,
+                   reason: AgoraVideoRemoteReason,
+                   elapsed: Int) {
+        DispatchQueue.main.async {
+            let channelId = self.room?.roomId ?? ""
+            print("didLiveRtcRemoteVideoStateChanged channel uid state reason ", channelId, uid, state, reason)
+            if ( (state == .decoding) && ( (reason == .remoteUnmuted) || (reason == .localMuted) ) )  {
+                let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
+                print("show channel \(channelId) cost: \(Int(costTs)) ms")
+            }
+        }
     }
 }
 

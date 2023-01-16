@@ -295,6 +295,7 @@
 		DDE8567F296BB34E00982E52 /* ShowServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8561F296BB34E00982E52 /* ShowServiceProtocol.swift */; };
 		DDEAAC33296FE72300D23969 /* AgoraExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1991A28FFE579009D3E61 /* AgoraExtension.swift */; };
 		DDEAACE7296FEFA000D23969 /* KtvResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DDEAACAF296FEFA000D23969 /* KtvResource.bundle */; };
+		DDFA327829710569009142C0 /* ShowLivePagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFA327729710569009142C0 /* ShowLivePagesViewController.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
@@ -702,6 +703,7 @@
 		DDE8561E296BB34E00982E52 /* ShowSyncManagerServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSyncManagerServiceImp.swift; sourceTree = "<group>"; };
 		DDE8561F296BB34E00982E52 /* ShowServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowServiceProtocol.swift; sourceTree = "<group>"; };
 		DDEAACAF296FEFA000D23969 /* KtvResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KtvResource.bundle; sourceTree = "<group>"; };
+		DDFA327729710569009142C0 /* ShowLivePagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowLivePagesViewController.swift; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1748,6 +1750,7 @@
 				DDE855B8296BB34E00982E52 /* ShowToolMenuViewController.swift */,
 				DDE855B9296BB34E00982E52 /* ShowLiveViewController.swift */,
 				DDE855BA296BB34E00982E52 /* Setting */,
+				DDFA327729710569009142C0 /* ShowLivePagesViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -2434,6 +2437,7 @@
 				DDE85667296BB34E00982E52 /* ShowChatInputView.swift in Sources */,
 				DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */,
 				DDE85621296BB34E00982E52 /* NSString+Show.swift in Sources */,
+				DDFA327829710569009142C0 /* ShowLivePagesViewController.swift in Sources */,
 				DDE8567B296BB34E00982E52 /* ShowSubscribeServiceProtocol.swift in Sources */,
 				DDE8564F296BB34E00982E52 /* BundleUtil.m in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
