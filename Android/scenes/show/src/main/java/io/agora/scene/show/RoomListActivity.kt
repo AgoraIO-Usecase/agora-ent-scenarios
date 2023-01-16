@@ -93,7 +93,7 @@ class RoomListActivity : AppCompatActivity() {
     private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
         if (!isSetSetting) {
-            PresetAudienceDialog(this).apply {
+            PresetAudienceDialog(this, false).apply {
                 callBack = object : OnPresetAudienceDialogCallBack {
                     override fun onClickConfirm() {
                         isSetSetting = true
