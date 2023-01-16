@@ -13,6 +13,7 @@
 #import "VLToast.h"
 #import "AppContext+KTV.h"
 #import "KTVMacro.h"
+#import "NSString+Helper.h"
 
 @interface VLSelectSongTableItemView ()<
 UITableViewDataSource,
@@ -121,11 +122,17 @@ AgoraMusicContentCenterEventDelegate
        
         NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
         NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
+        NSDictionary *dict = @{
+            @"pitchType":@(1),
+            @"needLyric": @(YES),
+        };
+        NSString *extra = [NSString convertToJsonData:dict];
         self.requestId =
-        [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
+       [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
                                                                     page:self.page
                                                                 pageSize:20
-                                                              jsonOption:nil];
+                                                              jsonOption:extra];
+        
     }];
 }
 
@@ -252,4 +259,5 @@ AgoraMusicContentCenterEventDelegate
               lyricUrl:(NSString *)lyricUrl {
 
 }
+
 @end
