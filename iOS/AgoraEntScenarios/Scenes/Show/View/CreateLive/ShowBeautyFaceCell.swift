@@ -24,7 +24,7 @@ class ShowBeautyFaceCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupModel(model: ByteBeautyModel) {
+    func setupModel(model: BeautyModel) {
         nameLabel.text = model.name
         imageView.image = UIImage.show_byteBeautyImage(name: model.icon)
         indicatorImgView.isHidden = !model.isSelected

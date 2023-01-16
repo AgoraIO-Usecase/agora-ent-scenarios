@@ -97,7 +97,7 @@ class ShowCreateLiveVC: UIViewController {
         
         // 创建默认美颜效果
         ShowBeautyFaceVC.beautyData.forEach({
-            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
+            BeautyManager.shareManager.setBeauty(path: $0.path,
                                                      key: $0.key,
                                                      value: $0.value)
         })
@@ -115,7 +115,7 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     @objc private func didClickCancelButton(){
-        ByteBeautyManager.shareManager.destroy()
+        BeautyManager.shareManager.destroy()
         dismiss(animated: true)
     }
 }

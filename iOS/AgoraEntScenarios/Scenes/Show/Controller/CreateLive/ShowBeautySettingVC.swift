@@ -227,7 +227,7 @@ extension ShowBeautySettingVC {
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
         sender.isSelected = !sender.isSelected
-        ByteBeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        BeautyManager.shareManager.isEnableBeauty = sender.isSelected
     }
 }
 

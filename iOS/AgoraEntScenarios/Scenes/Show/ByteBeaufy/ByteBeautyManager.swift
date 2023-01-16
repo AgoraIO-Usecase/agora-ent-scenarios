@@ -71,11 +71,7 @@ class ByteBeautyManager {
         processor.setStickerPath(path ?? "")
     }
     
-    func setCameraPosition(isFront: Bool) {
-        processor.setCameraPosition(isFront)
-    }
-    
-    func reset(datas: [ByteBeautyModel]) {
+    func reset(datas: [BeautyModel]) {
         datas.forEach({
             $0.isSelected = $0.key == "smooth"
             guard $0.path != nil else { return }
@@ -85,7 +81,7 @@ class ByteBeautyManager {
         })
     }
     
-    func resetStyle(datas: [ByteBeautyModel]) {
+    func resetStyle(datas: [BeautyModel]) {
         datas.forEach({
             $0.isSelected = $0.path == nil
             guard $0.path != nil else { return }
@@ -99,14 +95,14 @@ class ByteBeautyManager {
         stylePath = nil
     }
     
-    func resetFilter(datas: [ByteBeautyModel]) {
+    func resetFilter(datas: [BeautyModel]) {
         datas.forEach({ item in
             item.isSelected = item.path == nil
             setFilter(path: item.path, value: 0)
         })
     }
     
-    func resetSticker(datas: [ByteBeautyModel]) {
+    func resetSticker(datas: [BeautyModel]) {
         datas.forEach({ item in
             item.isSelected = item.path == nil
             setSticker(path: "")

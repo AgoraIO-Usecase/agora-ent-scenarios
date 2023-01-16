@@ -33,13 +33,13 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    static let beautyData = ByteBeautyModel.createBeautyData()
-    static let styleData = ByteBeautyModel.createStyleData()
-    static let filterData = ByteBeautyModel.createFilterData()
-    static let stickerData = ByteBeautyModel.createStickerData()
-    static let backgroundData = ByteBeautyModel.createBackgroundData()
+    static let beautyData = BeautyModel.createBeautyData()
+    static let styleData = BeautyModel.createStyleData()
+    static let filterData = BeautyModel.createFilterData()
+    static let stickerData = BeautyModel.createStickerData()
+    static let backgroundData = BeautyModel.createBackgroundData()
      
-    private lazy var dataArray: [ByteBeautyModel] = {
+    private lazy var dataArray: [BeautyModel] = {
         switch type {
         case .beauty: return ShowBeautyFaceVC.beautyData
         case .style: return ShowBeautyFaceVC.styleData
@@ -81,32 +81,32 @@ class ShowBeautyFaceVC: UIViewController {
         switch type {
         case .beauty:
             if isReset {
-                ByteBeautyManager.shareManager.reset(datas: dataArray)
+                BeautyManager.shareManager.reset(datas: dataArray)
                 return
             }
-            ByteBeautyManager.shareManager.setBeauty(path: model.path,
+            BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
             
 //        case .filter:
 //            if isReset {
-//                ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
+//                BeautyManager.shareManager.resetFilter(datas: dataArray)
 //                return
 //            }
-//            ByteBeautyManager.shareManager.setFilter(path: model.path,
+//            BeautyManager.shareManager.setFilter(path: model.path,
 //                                                     value: model.value)
             
         case .style:
             if isReset {
-                ByteBeautyManager.shareManager.resetStyle(datas: dataArray)
+                BeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
-            ByteBeautyManager.shareManager.setStyle(path: model.path,
+            BeautyManager.shareManager.setStyle(path: model.path,
                                                     key: model.key,
                                                     value: model.value)
             
         case .sticker:
-            ByteBeautyManager.shareManager.setSticker(path: model.path)
+            BeautyManager.shareManager.setSticker(path: model.path)
             
         case .background:
             if model.path == nil {

@@ -341,7 +341,7 @@ class ShowAgoraKitManager: NSObject {
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
     func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
         return true
     }
     
