@@ -382,7 +382,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func kickOff(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
-        let oldMic = self.mics[mic_index]
+        guard let oldMic = self.mics[safe: mic_index] else { return }
         mic.mic_index = mic_index
         mic.status = (oldMic.status == 2 ? 2:-1)
         self.cleanUserMicIndex(mic: oldMic)
@@ -396,7 +396,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func leaveMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
         let mic = VRRoomMic()
-        let oldMic = self.mics[mic_index]
+        guard let oldMic = self.mics[safe: mic_index] else { return }
         mic.mic_index = mic_index
         mic.status = oldMic.status == 2 ? 2:-1
         self.cleanUserMicIndex(mic: self.mics[mic_index])
@@ -447,7 +447,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
         let old_mic = VRRoomMic()
-        switch self.mics[old_index].status {
+        switch self.mics[safe: old_index]?.status ?? -1 {
         case 2:
             old_mic.status = self.mics[old_index].status
         case 3,4:
@@ -458,7 +458,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         old_mic.mic_index = old_index
         let new_mic = VRRoomMic()
-        switch self.mics[new_index].status {
+        switch self.mics[safe: old_index]?.status ?? -1 {
         case 2:
             new_mic.status = self.mics[new_index].status
         case 3,4:
@@ -502,7 +502,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             mic.mic_index = self.findMicIndex()
         }
-        switch self.mics[mic.mic_index].status {
+        switch self.mics[safe: mic.mic_index]?.status ?? -1 {
         case 2:
             mic.status = self.mics[mic.mic_index].status
         case 3,4:

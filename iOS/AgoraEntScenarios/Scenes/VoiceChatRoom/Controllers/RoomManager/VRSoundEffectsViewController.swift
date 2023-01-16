@@ -64,7 +64,9 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
+        print("fetch IMConfig begin:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
         ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+            print("fetch IMConfig end:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
             entity.chatroom_id = room_id
             entity.owner = VoiceRoomUserInfo.shared.user
             entity.owner?.chat_uid = uid
@@ -82,11 +84,15 @@ public class VRSoundEffectsViewController: VRBaseViewController {
             }
             let error = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
             if error == nil,VoiceRoomIMManager.shared != nil {
+                print("login IM begin:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                 VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
+                    print("login IM end:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                     if error == nil {
+                        print("create room begin:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                         ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
                             SVProgressHUD.dismiss()
+                            print("create room end:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                             self.view.window?.isUserInteractionEnabled = true
                             if let room = room,error == nil {
                                 self.entryRoom(room: room)
