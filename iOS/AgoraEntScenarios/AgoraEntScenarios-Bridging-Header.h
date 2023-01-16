@@ -3,7 +3,7 @@
 //
 
 #import "UIWindow+Router.h"
-#import "KTVServiceProtocol.h"
+//#import "KTVServiceProtocol.h"
 #import "VLUserCenter.h"
 //#import "KTVServiceModel.h"
 #import "VLLoginModel.h"

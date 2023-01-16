@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import AgoraSyncManager
 
 private let kSceneId = "scene_show"
 
@@ -204,6 +205,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         initScene { [weak self] in
             SyncUtil.joinScene(id: room.roomId!,
                                userId: room.ownerId!,
+                               isOwner: true,
                                property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
@@ -252,6 +254,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 
                 SyncUtil.joinScene(id: room.roomId!,
                                    userId: room.ownerId!,
+                                   isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
                                    property: params) { result in
                     //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                     let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
@@ -1333,6 +1336,7 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("imp pk invitation get2... \(channelName)")
             SyncUtil.joinScene(id: channelName,
                                userId: ownerId,
+                               isOwner: false,
                                property: params) { result in
                 SyncUtil
                     .scene(id: channelName)?
