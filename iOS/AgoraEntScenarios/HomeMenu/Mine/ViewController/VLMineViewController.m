@@ -10,7 +10,6 @@
 #import "VLCommonWebViewController.h"
 #import "VLMineView.h"
 #import "VLUploadImageResModel.h"
-#import <AgoraRtcKit/AgoraRtcKit.h>
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
@@ -19,8 +18,16 @@
 #import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
+#import "KTVMacro.h"
+#import <Photos/Photos.h>
+@import AgoraRtcKit;
 @import Masonry;
 @import LEEAlert;
+
+typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
+    photoLibrary = 0,
+    camera = 1,
+};
 
 @interface VLMineViewController ()
 <UINavigationControllerDelegate,UIImagePickerControllerDelegate,VLMineViewDelegate>
@@ -197,23 +204,18 @@
         action.titleColor = [UIColor whiteColor];
         action.font = VLUIFontMake(14);
     })
-//    .LeeAddAction(^(LEEAction * _Nonnull action) {
-//        action.type = LEEActionTypeDefault;
-//        action.title = AGLocalizedString(@"拍照上传");
-//        action.clickBlock = ^{
-//            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
-//        };
-//    })
+    .LeeAddAction(^(LEEAction * _Nonnull action) {
+        action.type = LEEActionTypeDefault;
+        action.title = AGLocalizedString(@"拍照上传");
+        action.clickBlock = ^{
+            [weakself requestAuthorizationForCamera];
+        };
+    })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
         action.title = AGLocalizedString(@"本地相册上传");
         action.clickBlock = ^{
-            if ([weakself getLibraryAccess] == NO) {
-                [weakself showAlert];
-                return;
-            }
-            
-            [weakself presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+            [weakself requestAuthorizationForPhotoLibrary];
         };
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
@@ -225,6 +227,41 @@
     .LeeShow();
 }
 
+- (void)requestAuthorizationForPhotoLibrary {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == PHAuthorizationStatusAuthorized) {
+                //操作图片
+                [self presentviewcontrollerWithSourceType: UIImagePickerControllerSourceTypePhotoLibrary];
+            }else{
+                [self showAlertWithMessage:@"相册权限未设置,请开启相册权限"];
+            }
+        });
+    }];
+}
+
+- (void)requestAuthorizationForCamera{
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(granted == true){
+                [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
+            } else {
+                [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
+            }
+        });
+    }];
+}
+
+-(void)showAlertWithMessage:(NSString *)mes {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"提示" message:mes preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:nil completionHandler:nil];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:cancelAction];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
 
 - (void)presentviewcontrollerWithSourceType:(UIImagePickerControllerSourceType)sourceType {
     if (sourceType == UIImagePickerControllerSourceTypePhotoLibrary && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {

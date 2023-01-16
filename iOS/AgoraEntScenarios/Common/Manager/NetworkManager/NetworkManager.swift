@@ -23,6 +23,27 @@ class NetworkManager:NSObject {
         case GET
         case POST
     }
+    
+    @objc enum SceneType: Int {
+            case show = 0
+            case voice = 1
+            case ktv = 2
+
+            func desc() ->String {
+                switch self {
+                case .show:
+                    return "show"
+                case .voice:
+                    return "voice_chat"
+                case .ktv:
+                    return "ktv"
+                default:
+                    break
+                }
+
+                return "unknown"
+            }
+        }
 
     var gameToken: String = ""
 
@@ -129,6 +150,7 @@ class NetworkManager:NSObject {
                           imUid: String?,
                           password: String,
                           uid: String,
+                          sceneType: SceneType,
                           success: @escaping (String?, String?, String?) -> Void) {
         if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
             success(nil, nil, nil)
@@ -156,25 +178,15 @@ class NetworkManager:NSObject {
             "clientSecret":KeyCenter.IMClientSecret,
         ]
         
-        let dic: [String: Any] = [
-            "id": VLUserCenter.user.id,     //用户id
-            "sceneName": "voice_chat"                 //场景名称，如果是秀场直播
-        ]
-                 
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            print("setupContentInspectConfig fail")
-            return
-        }
-        let payload: String = String(data: jsonData, encoding: .utf8) ?? ""
-        
+        let payload: String = getPlayloadWithSceneType(.voice) ?? ""
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
-                      "traceId": NSString.withUUID().md5,
+                      "traceId": NSString.withUUID().md5() as Any,
                       "user": userParams] as [String: Any]
-//        ToastView.showWait(text: "loading...", view: nil)
+ 
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,
                                           success: { response in
@@ -194,12 +206,16 @@ class NetworkManager:NSObject {
     
     func voiceIdentify(channelName: String,
                        channelType: Int,
+                       sceneType: SceneType,
                        success: @escaping (String?) -> Void) {
+        let payload: String = getPlayloadWithSceneType(.voice) ?? ""
         let params = ["appId": KeyCenter.AppId,
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5] as [String: Any]
+                      "traceId": NSString.withUUID().md5() as Any,
+                      "payload": payload] as [String: Any]
+                      
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
                                           params: params,
                                           success: { response in
@@ -210,6 +226,21 @@ class NetworkManager:NSObject {
             print(error)
             success(error.description)
         })
+    }
+    
+    func getPlayloadWithSceneType(_ type: SceneType) -> String? {
+    
+        let userInfo: [String: Any] = [
+            "id": VLUserCenter.user.id,     //用户id
+            "sceneName": type.desc()
+        ]
+                 
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted) else {
+            print("setupContentInspectConfig fail")
+            return nil
+        }
+        let payload: String? = String(data: jsonData, encoding: .utf8) ?? nil
+        return payload
     }
 
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {
