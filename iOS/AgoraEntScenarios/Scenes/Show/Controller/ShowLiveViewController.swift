@@ -932,7 +932,12 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     }
     
     func onClickRealTimeDataButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
-        AlertManager.show(view: realTimeView, alertPostion: .top)
+//        AlertManager.show(view: realTimeView, alertPostion: .top)
+        view.addSubview(realTimeView)
+        realTimeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(Screen.safeAreaTopHeight() + 50)
+        }
     }
     
     func onClickSwitchCameraButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
