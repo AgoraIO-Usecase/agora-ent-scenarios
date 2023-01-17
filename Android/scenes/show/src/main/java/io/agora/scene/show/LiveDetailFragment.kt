@@ -56,7 +56,7 @@ class LiveDetailFragment : Fragment() {
 
     companion object {
         // 房间存活时间，单位ms
-        private const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
+        const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
@@ -68,7 +68,7 @@ class LiveDetailFragment : Fragment() {
 
     }
 
-    private val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
+    val mRoomInfo by lazy { (arguments?.getParcelable(EXTRA_ROOM_DETAIL_INFO) as? ShowRoomDetailModel)!! }
     private val mBinding by lazy { ShowLiveDetailFragmentBinding.inflate(LayoutInflater.from(requireContext())) }
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
@@ -103,6 +103,8 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
+    private var mMainRtcConnection : RtcConnection? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -130,9 +132,7 @@ class LiveDetailFragment : Fragment() {
         ShowLogger.d(TAG, "Fragment Lifecycle: onResume")
 
         initView()
-        initService()
-        initRtcEngine()
-
+        initServiceWithJoinRoom()
         if (isRoomOwner) {
             mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
         } else {
@@ -146,10 +146,13 @@ class LiveDetailFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         ShowLogger.d(TAG, "Fragment Lifecycle: onPause")
-
         destroy()
     }
 
+    fun onRtcConnectionConnected(connection: RtcConnection) {
+        mMainRtcConnection = connection
+        initRtcEngine()
+    }
 
     private fun destroy(): Boolean {
         VideoSetting.resetBroadcastSetting()
@@ -933,6 +936,16 @@ class LiveDetailFragment : Fragment() {
 
     //================== Service Operation ===============
 
+    private fun initServiceWithJoinRoom(){
+        mService.joinRoom(mRoomInfo.roomId,
+            {
+                initService()
+            },
+            {
+                ToastUtils.showToast(it.message)
+            })
+    }
+
     private fun initService() {
         reFetchUserList()
         mService.subscribeReConnectEvent {
@@ -1297,9 +1310,7 @@ class LiveDetailFragment : Fragment() {
 
         }
 
-        // 设置token有效期为房间存活时长，到期后关闭并退出房间
-        TokenGenerator.expireSecond =
-            ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
+
         checkRequirePerms {
             joinChannel()
         }
@@ -1310,9 +1321,13 @@ class LiveDetailFragment : Fragment() {
         TokenGenerator.expireSecond = -1
         mRtcEngineHandler?.let {
             mRtcEngine.removeHandler(mRtcEngineHandler)
-            mRtcEngine.stopPreview()
-            mRtcEngine.leaveChannel()
             mRtcEngineHandler = null
+            val rtcConnection = mMainRtcConnection ?: return false
+            val channelMediaOptions = ChannelMediaOptions()
+            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+            channelMediaOptions.autoSubscribeVideo = false
+            channelMediaOptions.autoSubscribeAudio = false
+            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
             return true
         }
         return false
@@ -1328,43 +1343,36 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun joinChannel() {
+        val rtcConnection = mMainRtcConnection ?: return
         val uid = UserManager.getInstance().user.id
         val channelName = mRoomInfo.roomId
-        TokenGenerator.generateTokens(
+        val channelMediaOptions = ChannelMediaOptions()
+        channelMediaOptions.clientRoleType =
+            if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
+        channelMediaOptions.autoSubscribeVideo = true
+        channelMediaOptions.autoSubscribeAudio = true
+        channelMediaOptions.publishCameraTrack = isRoomOwner
+        channelMediaOptions.publishMicrophoneTrack = isRoomOwner
+        mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+        AudioModeration.moderationAudio(
             channelName,
-            uid.toString(),
-            TokenGenerator.TokenGeneratorType.token006,
-            arrayOf(TokenGenerator.AgoraTokenType.rtc),
-            {
-                val channelMediaOptions = ChannelMediaOptions()
-                channelMediaOptions.clientRoleType =
-                    if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
-                mRtcEngine.joinChannel(
-                    it[TokenGenerator.AgoraTokenType.rtc],
-                    channelName,
-                    uid.toInt(),
-                    channelMediaOptions
-                )
-                AudioModeration.moderationAudio(
-                    channelName,
-                    uid,
-                    AudioModeration.AgoraChannelType.broadcast,
-                    "show")
-            })
+            uid,
+            AudioModeration.AgoraChannelType.broadcast,
+            "show")
 
         // Render host video
         val videoView = TextureView(requireContext())
         mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
         if (isRoomOwner) {
             mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
-            mRtcEngine.startPreview()
         } else {
-            mRtcEngine.setupRemoteVideo(
+            mRtcEngine.setupRemoteVideoEx(
                 VideoCanvas(
                     videoView,
                     Constants.RENDER_MODE_HIDDEN,
                     mRoomInfo.ownerId.toInt()
-                )
+                ),
+                rtcConnection
             )
         }
     }
@@ -1413,6 +1421,7 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
         } else {
             val channelMediaOptions = ChannelMediaOptions()
+            val rtcConnection = mMainRtcConnection ?: return
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = false
             channelMediaOptions.publishCustomAudioTrack = false
@@ -1420,13 +1429,14 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
-            mRtcEngine.setupRemoteVideo(
+            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
+            mRtcEngine.setupRemoteVideoEx(
                 VideoCanvas(
                     broadcasterVideoView,
                     Constants.RENDER_MODE_HIDDEN,
                     mRoomInfo.ownerId.toInt()
-                )
+                ),
+                rtcConnection
             )
         }
     }
@@ -1437,6 +1447,7 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo?.interactStatus != ShowInteractionStatus.onSeat.value) return
         val broadcasterVideoView = TextureView(requireContext())
         val audienceVideoView = TextureView(requireContext())
+        val rtcConnection = mMainRtcConnection ?: return
 
         mBinding.videoLinkingLayout.videoContainer.addView(broadcasterVideoView)
         mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
@@ -1451,12 +1462,13 @@ class LiveDetailFragment : Fragment() {
             }
             enableLocalAudio(true)
             mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
-            mRtcEngine.setupRemoteVideo(
+            mRtcEngine.setupRemoteVideoEx(
                 VideoCanvas(
                     audienceVideoView,
                     Constants.RENDER_MODE_HIDDEN,
                     interactionInfo?.userId!!.toInt()
-                )
+                ),
+                rtcConnection
             )
         } else {
             // 连麦观众视角
@@ -1478,31 +1490,34 @@ class LiveDetailFragment : Fragment() {
                         mService.stopInteraction(interactionInfo!!)
                     },
                     granted = {
-                        mRtcEngine.updateChannelMediaOptions(channelMediaOptions)
+                        mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
                         mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
-                        mRtcEngine.setupRemoteVideo(
+                        mRtcEngine.setupRemoteVideoEx(
                             VideoCanvas(
                                 broadcasterVideoView,
                                 Constants.RENDER_MODE_HIDDEN,
                                 mRoomInfo.ownerId.toInt()
-                            )
+                            ),
+                            rtcConnection
                         )
                     })
             } else {
                 // 其他观众视角
-                mRtcEngine.setupRemoteVideo(
+                mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         audienceVideoView,
                         Constants.RENDER_MODE_HIDDEN,
                         interactionInfo?.userId!!.toInt()
-                    )
+                    ),
+                    rtcConnection
                 )
-                mRtcEngine.setupRemoteVideo(
+                mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         broadcasterVideoView,
                         Constants.RENDER_MODE_HIDDEN,
                         mRoomInfo.ownerId.toInt()
-                    )
+                    ),
+                    rtcConnection
                 )
             }
         }
@@ -1512,6 +1527,7 @@ class LiveDetailFragment : Fragment() {
         // 开始pk
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
+        val rtcConnection = mMainRtcConnection ?: return
         val view = TextureView(requireContext())
         val competitorView = TextureView(requireContext())
         mBinding.videoPKLayout.iBroadcasterAView.addView(view, 0)
@@ -1617,12 +1633,13 @@ class LiveDetailFragment : Fragment() {
                     )
                 })
 
-            mRtcEngine.setupRemoteVideo(
+            mRtcEngine.setupRemoteVideoEx(
                 VideoCanvas(
                     view,
                     Constants.RENDER_MODE_HIDDEN,
                     mRoomInfo.ownerId.toInt()
-                )
+                ),
+                rtcConnection
             )
         }
     }

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -85,11 +84,7 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
-        mService.joinRoom(roomInfo.roomId, {
-            LiveDetailActivity.launch(this, ArrayList(list), position, roomInfo.ownerId != UserManager.getInstance().user.id.toString())
-        }, {
-            ToastUtils.showToast(it.message)
-        })
+        LiveDetailActivity.launch(this, ArrayList(list), position, roomInfo.ownerId != UserManager.getInstance().user.id.toString())
     }
 
     private fun showAudienceSetting(){
