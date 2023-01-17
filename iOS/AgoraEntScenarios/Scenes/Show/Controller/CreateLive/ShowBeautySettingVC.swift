@@ -12,6 +12,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
 //    case filter
     case style
+    case adjust
     case sticker
     case background
     
@@ -20,6 +21,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
 //        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
+        case .adjust: return "create_beauty_setting_special_adjust".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
         case .background: return "背景".show_localized
         }
@@ -32,7 +34,12 @@ class ShowBeautySettingVC: UIViewController {
     var dismissed: (()->())?
     
     private var slider: UISlider!
-    private let titles = ShowBeautyFaceVCType.allCases.map({ $0.title })
+    private let titles = ShowBeautyFaceVCType.allCases.filter({
+        if BeautyModel.beautyType == .byte {
+            return $0 != .adjust
+        }
+        return true
+    }).map({ $0.title })
     private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
     
     // 背景

@@ -389,6 +389,44 @@ class BeautyModel: BeautyBaseModel {
         return dataArray
     }
     
+    static func createAdjustData() -> [BeautyModel] {
+        var dataArray = [BeautyModel]()
+        if beautyType == .sense {
+            var model = BeautyModel()
+            model.name = "对比度".show_localized
+            model.icon = "show_beauty_ic_adjust_contrast"
+            model.path = ""
+            model.key = "601"
+            model.value = 0
+            dataArray.append(model)
+            
+            model = BeautyModel()
+            model.name = "饱和度".show_localized
+            model.icon = "show_beauty_ic_adjust_saturation"
+            model.path = ""
+            model.key = "602"
+            model.value = 0
+            dataArray.append(model)
+            
+            model = BeautyModel()
+            model.name = "锐化".show_localized
+            model.icon = "show_beauty_ic_adjust_sharp"
+            model.path = ""
+            model.key = "603"
+            model.value = 0.5
+            dataArray.append(model)
+            
+            model = BeautyModel()
+            model.name = "清晰度".show_localized
+            model.icon = "show_beauty_ic_adjust_clear"
+            model.path = ""
+            model.key = "604"
+            model.value = 1.0
+            dataArray.append(model)
+        }
+        return dataArray
+    }
+    
     static func createBackgroundData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
         var model = BeautyModel()
