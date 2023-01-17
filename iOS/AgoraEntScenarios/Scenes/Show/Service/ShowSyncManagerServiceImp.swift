@@ -69,7 +69,7 @@ private func agoraPrint(_ message: String) {
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     fileprivate var syncUtilImp: SyncUtilImp?
     
-    private var roomList: [ShowRoomListModel]? {
+    fileprivate var roomList: [ShowRoomListModel]? {
         set {
             AppContext.shared.showRoomList = newValue
         }
@@ -77,7 +77,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             return AppContext.shared.showRoomList
         }
     }
-    private var room: ShowRoomListModel? {
+    fileprivate var room: ShowRoomListModel? {
         return self.roomList?.filter({ $0.roomId == roomId}).first
     }
     private var userList: [ShowUser] = [ShowUser]()
@@ -124,6 +124,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
 
         return _roomId
+    }
+    
+    fileprivate func isOwner(_ room: ShowRoomListModel) -> Bool {
+        return room.ownerId == VLUserCenter.user.id
     }
     
     fileprivate func initScene(completion: @escaping () -> Void) {
@@ -173,7 +177,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         userMuteLocalAudio = false
     }
     
-    private func _checkRoomExpire() {
+    fileprivate func _checkRoomExpire() {
         guard let room = self.room else { return }
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
@@ -184,7 +188,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         self.subscribeDelegate?.onRoomExpired()
     }
     
-    private func _startCheckExpire() {
+    fileprivate func _startCheckExpire() {
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
             guard let self = self else { return }
             
@@ -256,7 +260,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     completion(nil, output)
                     self._startCheckExpire()
                     self._subscribeAll()
-                    self._addUserIfNeed()
+//                    self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
                     }
                 }
@@ -266,15 +270,15 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         }
     }
     
-    func joinRoom(room: ShowRoomListModel,
-                  completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+    @objc func joinRoom(room: ShowRoomListModel,
+                        completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         let params = room.yy_modelToJSONObject() as? [String: Any]
 
         initScene { [weak self] in
             self?.syncUtilImp?.joinScene(id: room.roomId!,
-                          userId: room.ownerId!,
-                          isOwner: room.ownerId == VLUserCenter.user.id ? true : false,
-                          property: params) { result in
+                                         userId: room.ownerId!,
+                                         isOwner: self?.isOwner(room) ?? false,
+                                         property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
                 guard let channelName = channelName else {
@@ -300,7 +304,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     completion(nil, output)
                     self._startCheckExpire()
                     self._subscribeAll()
-                    self._addUserIfNeed()
+//                    self._addUserIfNeed()
                     self._getAllPKInvitationList(room: nil) { error, list in
                     }
                 }
@@ -358,6 +362,13 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         _leaveRoom(completion: completion)
     }
     
+    func initRoom(completion: @escaping (NSError?) -> Void) {
+        _addUserIfNeed(finished: completion)
+    }
+    
+    func deinitRoom(completion: @escaping (NSError?) -> Void) {
+        _removeUser(completion: completion)
+    }
     
     func getAllUserList(completion: @escaping (NSError?, [ShowUser]?) -> Void) {
         _getUserList(finished: completion)
@@ -787,7 +798,7 @@ extension ShowSyncManagerServiceImp {
         completion(nil)
     }
     
-    private func _subscribeAll() {
+    fileprivate func _subscribeAll() {
         _subscribeOnlineUsersChanged()
         _subscribeMessageChanged()
         _subscribeMicSeatApplyChanged()
@@ -810,14 +821,19 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: user operation
 extension ShowSyncManagerServiceImp {
-    private func _addUserIfNeed() {
+    fileprivate func _addUserIfNeed(finished: @escaping (NSError?) -> Void) {
         _getUserList {[weak self] error, userList in
-            guard let self = self else {return}
+            guard let self = self else {
+                finished(NSError(domain: "unknown error", code: -1))
+                return
+            }
             // current user already add
             if self.userList.contains(where: { $0.userId == VLUserCenter.user.id }) {
+                finished(nil)
                 return
             }
             self._addUserInfo {
+                finished(nil)
             }
         }
     }
@@ -1339,7 +1355,7 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: PK Invitation
 extension ShowSyncManagerServiceImp {
-    private func _getAllPKInvitationList(room: ShowRoomListModel?,
+    fileprivate func _getAllPKInvitationList(room: ShowRoomListModel?,
                                          completion: @escaping (NSError?, [ShowPKInvitation]?) -> Void) {
         guard let channelName = room?.roomId ?? roomId else {
             agoraAssert("channelName = nil")
@@ -1888,54 +1904,45 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3"]
+private let robotRoomIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 private let robotRoomOwnerHeaders = ["https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"]
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
         agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
     }
     
-    func _createRoom(roomName: String,
-                    roomId: String,
-                    completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
-        let room = ShowRoomListModel()
-        room.roomName = roomName
-        room.roomId = roomId
-        room.thumbnailId = "1"
-        room.ownerId = roomId
-        room.ownerName = roomId
-        room.ownerAvatar = robotRoomOwnerHeaders[(Int(roomId) ?? 1) - 1]//VLUserCenter.user.headUrl
-        room.createdAt = Date().millionsecondSince1970()
-        let params = room.yy_modelToJSONObject() as? [String: Any]
-
-        initScene { [weak self] in
-            guard let imp = self?.syncUtilImp else {
-                return
-            }
-            imp.joinScene(id: roomId,
-                          userId: room.ownerId!,
-                          isOwner: true,
-                          property: params) { result in
-                let channelName = result.getPropertyWith(key: "roomId", type: String.self) as? String
-                guard let _ = channelName else {
-                    agoraAssert("createRoom fail: channelName == nil")
-                    completion(nil, nil)
-                    return
-                }
-                let output = ShowRoomDetailModel.yy_model(with: params!)
-                imp.leaveScene(id: roomId)
-                completion(nil, output)
-            } fail: { error in
-                completion(error.toNSError(), nil)
-            }
+    override func isOwner(_ room: ShowRoomListModel) -> Bool {
+        if room.roomId?.count ?? 0 > 1 {
+            return super.isOwner(room)
         }
+        
+        return true
+    }
+    
+    override func _checkRoomExpire() {
+        guard let room = self.room, let roomId = room.roomId else { return }
+        if room.roomId?.count ?? 0 > 1 {
+            return super._checkRoomExpire()
+        }
+        
+        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: "\(UserInfo.userId)") { msg in
+            guard let msg = msg else {return}
+            agoraAssert("cloudPlayerHeartbeat fail: \(roomId) \(msg)")
+        }
+        
     }
     
     @objc override func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
         initScene { [weak self] in
-            self?.syncUtilImp?.fetchAll {[weak self] results in
+            self?.syncUtilImp?.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 var dataArray = results.map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
@@ -1949,30 +1956,17 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                     robotIds.remove(at: idx)
                 }
                 
-                if robotIds.count > 0 {
-                    let group = DispatchGroup()
-                    
-                    robotIds.forEach { robotId in
-                        group.enter()
-                        self?._createRoom(roomName: "Robot Room \(robotId)", roomId: robotId) { error, room in
-                            defer {
-                                group.leave()
-                            }
-                            
-                            guard let room = room else {
-                                return
-                            }
-                            
-                            dataArray.append(room)
-                        }
-                    }
-                    
-                    
-                    group.notify(queue: DispatchQueue.main) {
-                        let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
-                        completion(nil, roomList)
-                    }
-                    return
+                //create fake room
+                robotIds.forEach { robotId in
+                    let room = ShowRoomListModel()
+                    room.roomName = "Robot Room \(robotId)"
+                    room.roomId = robotId
+                    room.thumbnailId = "1"
+                    room.ownerId = robotId
+                    room.ownerName = robotId
+                    room.ownerAvatar = robotRoomOwnerHeaders[(Int(robotId) ?? 1) - 1]//VLUserCenter.user.headUrl
+                    room.createdAt = Date().millionsecondSince1970()
+                    dataArray.append(room)
                 }
                 
                 let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
@@ -1980,6 +1974,21 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             } fail: { error in
                 completion(error.toNSError(), nil)
             }
+        }
+    }
+    
+    @objc override func joinRoom(room: ShowRoomListModel,
+                        completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+        super.joinRoom(room: room, completion: completion)
+        if room.roomId?.count ?? 0 > 1 {
+            return
+        }
+        let channelName = room.roomId ?? ""
+        NetworkManager.shared.startCloudPlayer(channelName: channelName,
+                                               uid: "\(UserInfo.userId)",
+                                               streamUrl: "https://download.agora.io/sdk/release/agora_test_video_4.mp4") { msg in
+            guard let msg = msg else {return}
+            agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
         }
     }
 }
