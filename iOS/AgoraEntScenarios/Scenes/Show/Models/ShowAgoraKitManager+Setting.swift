@@ -66,8 +66,8 @@ extension ShowAgoraKitManager {
     /// 设置超分 不保存数据
     /// - Parameters:
     ///   - isOn: 开关
-    ///   - srType: 默认1.33倍
-    func setSuperResolution(_ isOn: Bool, srType:SRType = .x1_33) {
+    ///   - srType: 默认1.5倍
+    func setSuperResolution(_ isOn: Bool, srType:SRType = .x1_5) {
         agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
         agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
@@ -147,7 +147,7 @@ extension ShowAgoraKitManager {
         case .quality_medium:
             _setQualityEnable(true, srType: SRType.x1_5, uid: uid)
         case .quality_high:
-            _setQualityEnable(true, srType: SRType.x2, uid: uid)
+            _setQualityEnable(true, srType: SRType.x1_5, uid: uid)
         case .base_low:
             _setQualityEnable(false,uid: uid)
         case .base_medium:
