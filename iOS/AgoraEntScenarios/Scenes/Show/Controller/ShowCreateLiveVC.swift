@@ -8,6 +8,8 @@
 import UIKit
 import AgoraRtcKit
 
+private let kBroadcastorHasShowPreset = "kBroadcastorHasShowPreset"
+
 class ShowCreateLiveVC: UIViewController {
 
     private var createView: ShowCreateLiveView!
@@ -44,7 +46,10 @@ class ShowCreateLiveVC: UIViewController {
 //        agoraKitManager.defaultSetting()
         agoraKitManager.startPreview(canvasView: localView)
         configNaviBar()
-        showPreset()
+        if !UserDefaults.standard.bool(forKey: kBroadcastorHasShowPreset) {
+            showPreset()
+            UserDefaults.standard.set(true, forKey: kBroadcastorHasShowPreset)
+        }
     }
     
     func configNaviBar() {
