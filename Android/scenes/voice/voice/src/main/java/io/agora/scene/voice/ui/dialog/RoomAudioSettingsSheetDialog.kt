@@ -68,7 +68,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
             mtBestSoundEffectArrow.text =
                 RoomAudioSettingsConstructor.getSoundEffectName(view.context, audioSettingsInfo.soundSelection)
-            mtNoiseSuppressionArrow.text =
+            mtAINSArrow.text =
                 RoomAudioSettingsConstructor.getAINSName(view.context, audioSettingsInfo.AINSMode)
             mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
 
@@ -98,9 +98,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
-            }
-            mtNoiseSuppressionArrow.setOnClickListener {
-                audioSettingsListener?.onAINS(audioSettingsInfo.AINSMode, audioSettingsInfo.enable)
             }
             mtSpatialAudioArrow.setOnClickListener {
                 audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
