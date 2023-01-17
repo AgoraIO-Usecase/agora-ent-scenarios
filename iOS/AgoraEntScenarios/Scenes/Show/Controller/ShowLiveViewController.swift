@@ -18,7 +18,7 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             
-            agoraKitManager.updateLoadingType(channelName: room?.roomId ?? "", loadingType: loadingType)
+            updateLoadingType(loadingType: loadingType)
         }
     }
     private var joinStartDate: Date?
@@ -228,7 +228,9 @@ class ShowLiveViewController: UIViewController {
             }
             
             self.joinChannel()
-            self.agoraKitManager.updateLoadingType(channelName: detailModel?.roomId ?? "", loadingType: self.loadingType)
+            if self.loadingType == .loading {
+                self.updateLoadingType(loadingType: self.loadingType)
+            }
             self._subscribeServiceEvent()
             UIApplication.shared.isIdleTimerDisabled = true
         }
@@ -300,7 +302,6 @@ class ShowLiveViewController: UIViewController {
 //        }
         liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
         
-        sendMessageWithText("join_live_room".show_localized)
         self.muteLocalVideo = false
         self.muteLocalAudio = false
     }
@@ -318,13 +319,29 @@ class ShowLiveViewController: UIViewController {
     }
 }
 
-//MARK: private ui
+//MARK: private
 extension ShowLiveViewController {
     private func _updateApplyMenu() {
         if role == .broadcaster {
             applyAndInviteView.reloadData()
         } else {
             applyView.getAllMicSeatList(autoApply: false)
+        }
+    }
+    
+    
+    private func updateLoadingType(loadingType: ShowRTCLoadingType) {
+        agoraKitManager.updateLoadingType(channelName: roomId, loadingType: loadingType)
+        if loadingType == .loading {
+            AppContext.showServiceImp(roomId).initRoom { error in
+                
+            }
+            sendMessageWithText("join_live_room".show_localized)
+        } else {
+            AppContext.showServiceImp(roomId).deinitRoom { error in
+                
+            }
+            sendMessageWithText("leave_live_room".show_localized)
         }
     }
 }
