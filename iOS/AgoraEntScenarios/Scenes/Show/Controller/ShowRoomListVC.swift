@@ -8,6 +8,8 @@
 import UIKit
 import MJRefresh
 
+private let kAudienceHasShowPreset = "kAudienceHasShowPreset"
+
 class ShowRoomListVC: UIViewController {
 
     private var roomListView: ShowRoomListView!
@@ -67,8 +69,9 @@ class ShowRoomListVC: UIViewController {
         }
         roomListView.joinRoomAction = { [weak self] room in
             guard let wSelf = self else { return }
+            let hasShowPreset = UserDefaults.standard.bool(forKey: kAudienceHasShowPreset)
             // 如果是owner是自己 或者已经设置过观众模式
-            if room.ownerId == VLUserCenter.user.id || wSelf.firstSetAudience {
+            if room.ownerId == VLUserCenter.user.id || hasShowPreset {
                 wSelf.joinRoom(room)
             }else{
                 wSelf.showPresettingVC { [weak self] in
@@ -88,7 +91,8 @@ class ShowRoomListVC: UIViewController {
         vc.didSelectedPresetType = {[weak self] type, modeName in
             self?.audiencePresetType = type
             selected?()
-            self?.firstSetAudience = true
+//            self?.firstSetAudience = true
+            UserDefaults.standard.set(true, forKey: kAudienceHasShowPreset)
         }
         present(vc, animated: true)
     }
