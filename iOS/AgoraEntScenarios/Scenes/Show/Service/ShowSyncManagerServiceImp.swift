@@ -298,6 +298,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         return
                     }
                     var map = AppContext.shared.rtcTokenMap ?? [String: String]()
+                    agoraPrint("generateTokens channel: \(channelName) uid: \(UserInfo.userId) token \(rtcToken)")
                     map[channelName] = rtcToken
                     AppContext.shared.rtcTokenMap = map
                     let output = ShowRoomDetailModel.yy_model(with: params!)
@@ -1904,15 +1905,15 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-private let robotRoomOwnerHeaders = ["https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+private let robotRoomIds = ["1"/*, "2", "3", "4", "5", "6", "7", "8", "9"*/]
+private let robotRoomOwnerHeaders = [/*"https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",*/
                                      "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"]
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
@@ -1937,7 +1938,6 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             guard let msg = msg else {return}
             agoraAssert("cloudPlayerHeartbeat fail: \(roomId) \(msg)")
         }
-        
     }
     
     @objc override func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
