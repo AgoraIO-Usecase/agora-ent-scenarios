@@ -264,7 +264,7 @@ KTVApiDelegate
             weakSelf.choosedBgModel = selBgModel;
         } else if (status == KTVSubscribeDeleted) {
             //房主关闭房间
-            if ([roomInfo.creator isEqualToString:VLUserCenter.user.id]) {
+            if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"连接超时，房间已解散";
                 [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
@@ -308,7 +308,7 @@ KTVApiDelegate
     }];
     
     [[AppContext ktvServiceImp] subscribeRoomWillExpire:^{
-        bool isOwner = [weakSelf.roomModel.creator isEqualToString:VLUserCenter.user.id];
+        bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? @"您已体验超过20分钟，当前房间已过期，请退出重新创建房间" : @"当前房间已过期,请退出";
         [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
@@ -368,8 +368,11 @@ KTVApiDelegate
 
 //弹出音效
 - (void)popSetSoundEffectView {
+    LSTPopView* popView = 
     [LSTPopView popSetSoundEffectViewWithParentView:self.view
+                                          soundView:self.soundEffectView
                                        withDelegate:self];
+    self.soundEffectView = (VLSoundEffectView*)popView.currCustomView;
 }
 
 //网络差视图
@@ -515,6 +518,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
         return;
     }
+    //TODO: fix score view visible problem while owner reopen the room
+    [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
     [self markSongPlaying:model];
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
