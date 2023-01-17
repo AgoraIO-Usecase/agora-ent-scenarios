@@ -762,7 +762,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                    elapsed: Int) {
         DispatchQueue.main.async {
             let channelId = self.room?.roomId ?? ""
-            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state) reason: \(reason)")
+            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)")
             if ( (state == .decoding) && ( (reason == .remoteUnmuted) || (reason == .localMuted) ) )  {
                 let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
                 showLogger.info("show channel \(channelId) cost: \(Int(costTs)) ms")
