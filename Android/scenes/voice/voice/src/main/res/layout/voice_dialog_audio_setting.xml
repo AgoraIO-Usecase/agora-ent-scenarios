@@ -53,7 +53,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            android:src="@drawable/voice_icon_room_setting_noise_suppression"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtAINS"
             app:layout_constraintBottom_toBottomOf="@+id/mtAINS"/>
@@ -64,7 +64,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="#AI 降噪"
+            android:text="@string/voice_chatroom_noise_suppression"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtOwnAudioSettingTitle" />
 
@@ -75,7 +75,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/mtAINS"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtAINS"
-            tools:text="@string/voice_chatroom_off" />
+            tools:text="@string/voice_chatroom_medium" />
 
         <com.google.android.material.divider.MaterialDivider
             style="@style/voice_bottom_sheet_divider_style"
@@ -90,7 +90,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            android:src="@drawable/voice_icon_room_setting_aiaec"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtAEC"
             app:layout_constraintBottom_toBottomOf="@+id/mtAEC"/>
@@ -127,7 +127,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            android:src="@drawable/voice_icon_room_setting_aiagc"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtAGC"
             app:layout_constraintBottom_toBottomOf="@+id/mtAGC"/>
@@ -164,7 +164,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_spatial_audio"
+            android:src="@drawable/voice_icon_room_setting_voice_changer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"
             app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"/>
@@ -334,41 +334,6 @@
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_noise_suppression"
-            app:layout_constraintBottom_toBottomOf="@+id/mtNoiseSuppression"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtNoiseSuppression" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtNoiseSuppression"
-            style="@style/voice_bottom_sheet_text_style"
-            android:layout_marginTop="1dp"
-            android:layout_marginStart="52dp"
-            android:text="@string/voice_chatroom_noise_suppression"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtNoiseSuppressionArrow"
-            style="@style/voice_bottom_sheet_right_text_style"
-            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
-            app:layout_constraintBottom_toBottomOf="@+id/mtNoiseSuppression"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtNoiseSuppression"
-            tools:text="@string/voice_chatroom_medium" />
-
-        <com.google.android.material.divider.MaterialDivider
-            style="@style/voice_bottom_sheet_divider_style"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtNoiseSuppression" />
-
-        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivSpatialAudio"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -387,7 +352,7 @@
             android:text="@string/voice_chatroom_spatial_audio"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtNoiseSuppression" />
+            app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtSpatialAudioArrow"

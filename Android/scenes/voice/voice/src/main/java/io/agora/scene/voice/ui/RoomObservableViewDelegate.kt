@@ -464,19 +464,19 @@ class RoomObservableViewDelegate constructor(
             object : RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
 
                 override fun onAINS(mode: Int, isEnable: Boolean) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onAGC(isOn: Boolean, isEnable: Boolean) {
-                    TODO("Not yet implemented")
+                    onAINSDialog(mode)
                 }
 
                 override fun onAIAEC(isOn: Boolean, isEnable: Boolean) {
-                    TODO("Not yet implemented")
+                    onAIAECDialog(isOn)
+                }
+
+                override fun onAGC(isOn: Boolean, isEnable: Boolean) {
+                    onAIAGCDialog(isOn)
                 }
 
                 override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
-                    TODO("Not yet implemented")
+                    onVoiceChangerDialog(mode)
                 }
 
                 override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
@@ -575,6 +575,32 @@ class RoomObservableViewDelegate constructor(
         ainsDialog.show(activity.supportFragmentManager, "mtAnis")
     }
 
+    /**
+     * 回声消除弹框
+     */
+    fun onAIAECDialog(isOn: Boolean) {
+        val dialog = RoomAIAECSheetDialog()
+        dialog.onClickCheckBox = { isOn ->
+
+        }
+        dialog.show(activity.supportFragmentManager, "mtAIAEC")
+    }
+    /**
+     * 人声增强弹框
+     */
+    fun onAIAGCDialog(isOn: Boolean) {
+        val dialog = RoomAIAGCSheetDialog()
+        dialog.onClickCheckBox = { isOn ->
+
+        }
+        dialog.show(activity.supportFragmentManager, "mtAIAGC")
+    }
+    /**
+     * 变声器弹框
+     */
+    fun onVoiceChangerDialog(mode: Int) {
+
+    }
     /**
      * 空间音频弹框
      */
