@@ -128,6 +128,7 @@ class SenseBeautyManager: NSObject {
         SenseBeautyManager._sharedManager = nil
         datas.removeAll()
         reset(datas: ShowBeautyFaceVC.beautyData)
+        reset(datas: ShowBeautyFaceVC.adjustData)
         resetStyle(datas: ShowBeautyFaceVC.styleData)
         resetSticker(datas: ShowBeautyFaceVC.stickerData)
         resetFilter(datas: ShowBeautyFaceVC.filterData)

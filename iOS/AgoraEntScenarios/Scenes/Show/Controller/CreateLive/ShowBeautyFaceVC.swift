@@ -35,6 +35,7 @@ class ShowBeautyFaceVC: UIViewController {
     }()
     static let beautyData = BeautyModel.createBeautyData()
     static let styleData = BeautyModel.createStyleData()
+    static let adjustData = BeautyModel.createAdjustData()
     static let filterData = BeautyModel.createFilterData()
     static let stickerData = BeautyModel.createStickerData()
     static let backgroundData = BeautyModel.createBackgroundData()
@@ -43,6 +44,7 @@ class ShowBeautyFaceVC: UIViewController {
         switch type {
         case .beauty: return ShowBeautyFaceVC.beautyData
         case .style: return ShowBeautyFaceVC.styleData
+        case .adjust: return ShowBeautyFaceVC.adjustData
 //        case .filter: return ShowBeautyFaceVC.filterData
         case .sticker: return ShowBeautyFaceVC.stickerData
         case .background: return ShowBeautyFaceVC.backgroundData
@@ -79,7 +81,7 @@ class ShowBeautyFaceVC: UIViewController {
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
-        case .beauty:
+        case .beauty, .adjust:
             if isReset {
                 BeautyManager.shareManager.reset(datas: dataArray)
                 return
