@@ -235,6 +235,19 @@ class AgoraRtcEngineController {
     }
 
     /**
+     * AI 回声消除（AIAEC）
+     */
+    fun setAIAECOn(isOn: Boolean) {
+
+    }
+    /**
+     * AI 人声增强（AIAGC）
+     */
+    fun setAIAGCOn(isOn: Boolean) {
+
+    }
+
+    /**
      * 音效队列
      */
     private val soundAudioQueue: ArrayDeque<SoundAudioBean> = ArrayDeque()
