@@ -31,8 +31,14 @@ class VMAudioSettingView: UIView {
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
 
-    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+//    private var settingName: [String] = ["\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Sound"), "AINS", "Spatial Audio"]
+//    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+    
+    private var settingName: [String] = [LanguageManager.localValue(key: "AINS"),LanguageManager.localValue(key: "AIAEC"),LanguageManager.localValue(key: "AGC"),LanguageManager.localValue(key: "Voice Changer"),LanguageManager.localValue(key: "Best Sound"),LanguageManager.localValue(key: "Best Sound"),"\(LanguageManager.localValue(key: "blue")) & \(LanguageManager.localValue(key: "red"))", LanguageManager.localValue(key: "Robot Volume"), LanguageManager.localValue(key: "Best Agora Sound"), LanguageManager.localValue(key: "Spatial Audio"), LanguageManager.localValue(key: "Best Agora Sound"), LanguageManager.localValue(key: "Best Agora Sound")]
+    
+    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+
+
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
 
@@ -92,7 +98,7 @@ class VMAudioSettingView: UIView {
 
 extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -121,6 +127,49 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             headerView.addSubview(titleLabel)
             return headerView
+        } else  if section == 1{
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "ACEQ"))
+            let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
+            headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
+            titleLabel.font = UIFont.systemFont(ofSize: 13)
+            titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
+            titleLabel.text = LanguageManager.localValue(key: "ACEQ")
+            headerView.addSubview(titleLabel)
+
+            let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
+            imgView.image = UIImage("new")
+            headerView.addSubview(imgView)
+
+            return headerView
+        } else if section == 2 {
+            let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "ACEQ"))
+            let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
+            headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: width, height: 30))
+            titleLabel.font = UIFont.systemFont(ofSize: 13)
+            titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
+            titleLabel.text = LanguageManager.localValue(key: "ACEQ")
+            headerView.addSubview(titleLabel)
+
+            let imgView: UIImageView = .init(frame: CGRect(x: width + 30, y: 6, width: 30, height: 20))
+            imgView.image = UIImage("new")
+            headerView.addSubview(imgView)
+
+            return headerView
+        } else {
+            return nil
+        }
+        /*
+        if section == 0 {
+            let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
+            headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: 300, height: 30))
+            titleLabel.text = LanguageManager.localValue(key: "Bot Settings")
+            titleLabel.font = UIFont.systemFont(ofSize: 13)
+            titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
+            headerView.addSubview(titleLabel)
+            return headerView
         } else {
             let width = textAutoWidth(height: 300, font: UIFont.systemFont(ofSize: 13), text: LanguageManager.localValue(key: "ACEQ"))
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 32))
@@ -137,6 +186,8 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
             return headerView
         }
+         
+         */
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -186,6 +237,36 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 }
             }
             return cell
+        } else if indexPath.section == 2 {
+            if indexPath.row == 0 {
+                let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+                cell.iconView.image = UIImage(settingImage[0])
+                cell.titleLabel.text = settingName[0]
+                cell.isAudience = isAudience
+                cell.selectionStyle = .none
+                cell.swith.isOn = roomInfo?.room?.use_robot ?? false
+                cell.useRobotBlock = { [weak self] flag in
+                    guard let useRobotBlock = self?.useRobotBlock else { return }
+                    useRobotBlock(flag)
+                }
+                return cell
+            } else if indexPath.row == 1 {
+                let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
+                cell.iconView.image = UIImage(settingImage[1])
+                cell.titleLabel.text = settingName[1]
+                cell.isAudience = isAudience
+                cell.selectionStyle = .none
+                cell.volBlock = { [weak self] vol in
+                    guard let volBlock = self?.volBlock else { return }
+                    volBlock(vol)
+                }
+                
+                let volume = roomInfo?.room?.robot_volume ?? 50
+                cell.slider.value = Float(volume) / 100.0
+                cell.countLabel.text = "\(volume)"
+                return cell
+            }
+
         }
 
         return UITableViewCell()
