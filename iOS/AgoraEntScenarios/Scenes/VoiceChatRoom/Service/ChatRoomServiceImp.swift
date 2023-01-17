@@ -28,6 +28,8 @@ public class ChatRoomServiceImp: NSObject {
         self.mics.removeAll()
         self.applicants.removeAll()
     }
+    
+    let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 }
 
 extension ChatRoomServiceImp: VoiceRoomIMDelegate {

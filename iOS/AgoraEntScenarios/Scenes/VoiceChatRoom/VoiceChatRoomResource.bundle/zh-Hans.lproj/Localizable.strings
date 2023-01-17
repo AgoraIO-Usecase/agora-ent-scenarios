@@ -207,3 +207,8 @@
 "Members reach limit!" = "房间人数超过限制";
 "Content prohibited" = "内容禁止发送";
 "Incorrect room name" = "房间名不合规";
+"AIAEC" = "AI回声消除"
+"AGC" = "人声自动增益"
+"Agora Blue & Red Bot" = "声蓝羽&声红颜"
+"Personal Audio Settings" = "个人音效设置"
+"Room Audio Settings" = "房间音效设置"
