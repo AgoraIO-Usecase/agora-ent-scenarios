@@ -278,7 +278,7 @@
 		DDE85652296BB34E00982E52 /* BEPixelBufferInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE855E5296BB34E00982E52 /* BEPixelBufferInfo.m */; };
 		DDE85653296BB34E00982E52 /* BEImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE855E7296BB34E00982E52 /* BEImageUtils.m */; };
 		DDE85654296BB34E00982E52 /* BERender.mm in Sources */ = {isa = PBXBuildFile; fileRef = DDE855E9296BB34E00982E52 /* BERender.mm */; };
-		DDE85655296BB34E00982E52 /* ByteBeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DDE855EA296BB34E00982E52 /* ByteBeautyResource.bundle */; };
+		DDE85655296BB34E00982E52 /* BeautyResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DDE855EA296BB34E00982E52 /* BeautyResource.bundle */; };
 		DDE85656296BB34E00982E52 /* ShowMusicEffectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855ED296BB34E00982E52 /* ShowMusicEffectCell.swift */; };
 		DDE85657296BB34E00982E52 /* ShowMusicTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855EE296BB34E00982E52 /* ShowMusicTableHeaderView.swift */; };
 		DDE85658296BB34E00982E52 /* ShowMusicItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE855EF296BB34E00982E52 /* ShowMusicItemCell.swift */; };
@@ -906,7 +906,7 @@
 		DDE855E7296BB34E00982E52 /* BEImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BEImageUtils.m; sourceTree = "<group>"; };
 		DDE855E8296BB34E00982E52 /* BEEffectResourceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BEEffectResourceHelper.h; sourceTree = "<group>"; };
 		DDE855E9296BB34E00982E52 /* BERender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = BERender.mm; sourceTree = "<group>"; };
-		DDE855EA296BB34E00982E52 /* ByteBeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ByteBeautyResource.bundle; sourceTree = "<group>"; };
+		DDE855EA296BB34E00982E52 /* BeautyResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = BeautyResource.bundle; sourceTree = "<group>"; };
 		DDE855ED296BB34E00982E52 /* ShowMusicEffectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicEffectCell.swift; sourceTree = "<group>"; };
 		DDE855EE296BB34E00982E52 /* ShowMusicTableHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicTableHeaderView.swift; sourceTree = "<group>"; };
 		DDE855EF296BB34E00982E52 /* ShowMusicItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowMusicItemCell.swift; sourceTree = "<group>"; };
@@ -2277,14 +2277,12 @@
 		DDE85595296BB34E00982E52 /* Show */ = {
 			isa = PBXGroup;
 			children = (
-				E75B1509296FE4E300C33678 /* SenseBeaufy */,
+				E75B153529767B7D00C33678 /* Beauty */,
 				DDE85596296BB34E00982E52 /* showResource.bundle */,
 				DDE85597296BB34E00982E52 /* Utils */,
 				DDE8559F296BB34E00982E52 /* Models */,
 				DDE855AD296BB34E00982E52 /* Controller */,
 				DDE855C0296BB34E00982E52 /* Common */,
-				DDE855CC296BB34E00982E52 /* ByteBeaufy */,
-				DDE855EA296BB34E00982E52 /* ByteBeautyResource.bundle */,
 				DDE855EB296BB34E00982E52 /* View */,
 				DDE8561A296BB34E00982E52 /* Service */,
 			);
@@ -2310,7 +2308,6 @@
 			children = (
 				DDE855A0296BB34E00982E52 /* Music */,
 				DDE855A3296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift */,
-				DDE855A4296BB34E00982E52 /* BeautyFace */,
 				DDE855A6296BB34E00982E52 /* ShowAgoraKitManager.swift */,
 				DDE855A7296BB34E00982E52 /* ShowChatModel.swift */,
 				DDE855A8296BB34E00982E52 /* ShowAgoraKitManager+Music.swift */,
@@ -2328,14 +2325,14 @@
 			path = Music;
 			sourceTree = "<group>";
 		};
-		DDE855A4296BB34E00982E52 /* BeautyFace */ = {
+		DDE855A4296BB34E00982E52 /* BeautyModel */ = {
 			isa = PBXGroup;
 			children = (
 				DDE855A5296BB34E00982E52 /* BeautyModel.swift */,
 				E75B15302971582900C33678 /* BeautyLoad.h */,
 				E75B15312971582900C33678 /* BeautyLoad.m */,
 			);
-			path = BeautyFace;
+			path = BeautyModel;
 			sourceTree = "<group>";
 		};
 		DDE855A9296BB34E00982E52 /* Setting */ = {
@@ -2378,7 +2375,6 @@
 				DDE855B4296BB34E00982E52 /* ShowSelectQualityVC.swift */,
 				DDE855B5296BB34E00982E52 /* ShowBeautySettingVC.swift */,
 				DDE855B6296BB34E00982E52 /* ShowBeautyFaceVC.swift */,
-				E75B1533297530EF00C33678 /* BeautyManager.swift */,
 			);
 			path = CreateLive;
 			sourceTree = "<group>";
@@ -3102,6 +3098,18 @@
 			path = SenseBeaufy;
 			sourceTree = "<group>";
 		};
+		E75B153529767B7D00C33678 /* Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				E75B1533297530EF00C33678 /* BeautyManager.swift */,
+				DDE855A4296BB34E00982E52 /* BeautyModel */,
+				DDE855EA296BB34E00982E52 /* BeautyResource.bundle */,
+				DDE855CC296BB34E00982E52 /* ByteBeaufy */,
+				E75B1509296FE4E300C33678 /* SenseBeaufy */,
+			);
+			path = Beauty;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3242,7 +3250,7 @@
 				DDA19A1C28FFE579009D3E61 /* SyncManager.swift~HEAD in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
 				DDA19A1F28FFE579009D3E61 /* SyncManager.swift~zyq in Resources */,
-				DDE85655296BB34E00982E52 /* ByteBeautyResource.bundle in Resources */,
+				DDE85655296BB34E00982E52 /* BeautyResource.bundle in Resources */,
 				DD84176729090C520026B624 /* tab_profile.png in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
 				DD84176629090C520026B624 /* index.js in Resources */,
