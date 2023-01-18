@@ -202,6 +202,23 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
+            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+            cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
+            cell.titleLabel.text = settingName[0 + indexPath.row]
+            if indexPath.row == 0 {
+                cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
+            } else if indexPath.row == 1 {
+                switch ains_state {
+                case .high:
+                    cell.contentLabel.text = "High".localized()
+                case .mid:
+                    cell.contentLabel.text = "Middle".localized()
+                case .off:
+                    cell.contentLabel.text = "Off".localized()
+                }
+            }
+            return cell
+            /*
             if indexPath.row == 0 {
                 let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
                 cell.iconView.image = UIImage(settingImage[0])
@@ -246,6 +263,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 }
                 return cell
             }
+             */
         } else if indexPath.section == 1 {
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
