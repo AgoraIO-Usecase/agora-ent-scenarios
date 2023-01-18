@@ -101,7 +101,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="# AI 回声消除"
+            android:text="@string/voice_chatroom_aiaec"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAINS" />
 
@@ -138,7 +138,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
-            android:text="# 人声自动增益"
+            android:text="@string/voice_chatroom_aiagc"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAEC" />
 
@@ -159,34 +159,34 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivVoiceChanger"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_voice_changer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"
-            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"/>
+<!--        <androidx.appcompat.widget.AppCompatImageView-->
+<!--            android:id="@+id/ivVoiceChanger"-->
+<!--            android:layout_width="20dp"-->
+<!--            android:layout_height="20dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:src="@drawable/voice_icon_room_setting_voice_changer"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"/>-->
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtVoiceChanger"
-            style="@style/voice_bottom_sheet_text_style"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="15dp"
-            android:layout_marginStart="52dp"
-            android:text="# 变声"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
+<!--        <com.google.android.material.textview.MaterialTextView-->
+<!--            android:id="@+id/mtVoiceChanger"-->
+<!--            style="@style/voice_bottom_sheet_text_style"-->
+<!--            android:layout_marginTop="1dp"-->
+<!--            android:layout_marginBottom="15dp"-->
+<!--            android:layout_marginStart="52dp"-->
+<!--            android:text="# 变声"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />-->
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mtVoiceChangerArrow"
-            style="@style/voice_bottom_sheet_right_text_style"
-            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"
-            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"
-            tools:text="@string/voice_chatroom_off" />
+<!--        <com.google.android.material.textview.MaterialTextView-->
+<!--            android:id="@+id/mtVoiceChangerArrow"-->
+<!--            style="@style/voice_bottom_sheet_right_text_style"-->
+<!--            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/mtVoiceChanger"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/mtVoiceChanger"-->
+<!--            tools:text="@string/voice_chatroom_off" />-->
 
         <!--  Bot Settings  -->
         <com.google.android.material.textview.MaterialTextView
@@ -195,7 +195,7 @@
             android:text="@string/voice_chatroom_bot_settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtVoiceChanger" />
+            app:layout_constraintTop_toBottomOf="@+id/mtAGC" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="20dp"

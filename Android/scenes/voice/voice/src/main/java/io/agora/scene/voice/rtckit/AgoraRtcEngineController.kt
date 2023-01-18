@@ -79,7 +79,7 @@ class AgoraRtcEngineController {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
                     "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
                     // 默认开启降噪
-                    deNoise(VoiceBuddyFactory.get().rtcChannelTemp.anisMode)
+                    deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
                     joinCallback?.onSuccess(true)
                 }
 
@@ -238,13 +238,28 @@ class AgoraRtcEngineController {
      * AI 回声消除（AIAEC）
      */
     fun setAIAECOn(isOn: Boolean) {
-
+        rtcEngine?.apply {
+            if (isOn) {
+                setParameters("{\"che.audio.aiaec.working_mode\":1}")
+            } else {
+                setParameters("{\"che.audio.aiaec.working_mode\":0}")
+            }
+        }
     }
+
     /**
      * AI 人声增强（AIAGC）
      */
     fun setAIAGCOn(isOn: Boolean) {
-
+        rtcEngine?.apply {
+            if (isOn) {
+                setParameters("{\"che.audio.agc.enable\":true}")
+            } else {
+                setParameters("{\"che.audio.agc.enable\":false}")
+            }
+            setParameters("{\"che.audio.agc.targetlevelBov\":3}")
+            setParameters("{\"che.audio.agc.compressionGain\":18}")
+        }
     }
 
     /**

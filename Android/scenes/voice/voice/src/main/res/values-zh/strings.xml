@@ -143,6 +143,12 @@
     <string name="voice_chatroom_room_audio_settings">语聊房音效</string>
     <string name="voice_chatroom_best_sound_effect">最佳音效</string>
     <string name="voice_chatroom_noise_suppression">AI降噪</string>
+    <string name="voice_chatroom_aiaec">AI回声消除</string>
+    <string name="voice_chatroom_aiagc">人声自动增益</string>
+    <string name="voice_chatroom_turnon_aiaec">开启AI回声消除</string>
+    <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;当您开启伴奏唱歌的时候，AI回声消除能极大提升您的唱歌效果，强烈建议您在唱歌时候开启</string>
+    <string name="voice_chatroom_turnon_aiagc">开启人声自动增益</string>
+    <string name="voice_chatroom_aiagc_introduce">&#160;&#160;&#160;&#160;开启后会自动调整您唱歌的音量，以完美匹配伴奏音量，推荐您唱歌的时候开启</string>
     <string name="voice_chatroom_spatial_audio">空间⾳频</string>
     <string name="voice_chatroom_only_host_can_change_robot">只有房主可以调整机器⼈设置</string>
     <string name="voice_chatroom_agora_blue">声蓝⽻</string>
@@ -173,6 +179,7 @@
     <string name="voice_chatroom_high">高</string>
     <string name="voice_chatroom_medium">中</string>
     <string name="voice_chatroom_off">关闭</string>
+    <string name="voice_chatroom_on">开启</string>
     <string name="voice_chatroom_ains">有降噪</string>
     <string name="voice_chatroom_none">无降噪</string>
     <string name="voice_chatroom_agora_ains">了解AI降噪</string>

@@ -51,7 +51,7 @@ data class RoomAudioSettingsBean constructor(
     var AINSMode: Int = ConfigConstants.AINSMode.AINS_Medium,
     var spatialOpen: Boolean = false,
     var isAIAECOn: Boolean = false,
-    var isAGCOn: Boolean = false,
+    var isAIAGCOn: Boolean = false,
     var voiceChangerMode: Int = 0,
 ) : BaseRoomBean
 
