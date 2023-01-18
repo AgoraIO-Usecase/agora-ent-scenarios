@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class VMEQSettingView: UIView, UITextViewDelegate {
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
@@ -71,6 +72,11 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
+    private let AIAECSettingName: [String] = ["Turn on AIAEC".localized()]
+    
+    private let AGSettingName: [String] = ["Turn on AGC".localized()]
+
+    
     private let soundType: [String] = ["TV Sound".localized(), "Kitchen Sound".localized(), "Street Sound".localized(), "Mashine Sound".localized(), "Office Sound".localized(), "Home Sound".localized(), "Construction Sound".localized(), "Alert Sound/Music".localized(), "Applause".localized(), "Wind Sound".localized(), "Mic Pop Filter".localized(), "Audio Feedback".localized(), "Microphone Finger Rub Sound".localized(), "Screen Tap Sound".localized()]
     
     private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".localized(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".localized(), "Ex. Keyboard tapping, mouse clicking sounds".localized(), "Ex. Door closing, chair squeaking, baby crying sounds".localized(), "Ex. Knocking sound".localized()]
@@ -83,6 +89,11 @@ class VMEQSettingView: UIView, UITextViewDelegate {
                 titleLabel.text = "Noise Setting".localized()
             } else if settingType == .effect {
                 titleLabel.text = "Effect Setting".localized()
+            } else if settingType == .AIAEC {
+                titleLabel.text = "AIAEC".localized()
+            } else if settingType == .AGC {
+                titleLabel.text = "AGC".localized()
+
             }
             tableView.reloadData()
         }
@@ -192,7 +203,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             return textHeight(text: "AINS Sup".localized(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
             return 40~ + 12~ + otherSoundHeaderHeight + 10~
-        } else {
+        } else if settingType == .AIAEC || settingType == .AGC {
+            return 0;
+        }
+        else {
             return 40~
         }
     }
@@ -222,59 +236,95 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         if settingType == .effect && section == 1 {
             return 40
+        } else if settingType == .AIAEC || settingType == .AGC {
+            return 80;
         }
         return 0
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let footer = UIView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40))
-        footer.backgroundColor = .white
-        let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
+        if settingType == .AIAEC {
+            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 60))
 
-        let text = NSMutableAttributedString(string: "Visit More".localized())
-        text.addAttribute(NSAttributedString.Key.font,
-                          value: UIFont.systemFont(ofSize: 13),
-                          range: NSRange(location: 0, length: text.length))
-        text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
+            footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
+            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
+            titleLabel.font = UIFont.systemFont(ofSize: 13)
+            titleLabel.numberOfLines = 0
+            titleLabel.text = "When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing".localized()
+            titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
+            footer.addSubview(titleLabel)
+            return footer
+        } else if settingType == .AGC {
+            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 60))
 
-        let interactableText = NSMutableAttributedString(string: "www.agora.io")
-        interactableText.addAttribute(NSAttributedString.Key.font,
-                                      value: UIFont.systemFont(ofSize: 12, weight: .bold),
-                                      range: NSRange(location: 0, length: interactableText.length))
+            footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
+            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
+            titleLabel.font = UIFont.systemFont(ofSize: 13)
+            titleLabel.numberOfLines = 0
+            titleLabel.text = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing".localized()
+            titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
+            footer.addSubview(titleLabel)
+            return footer
+            
+        } else {
+            let footer = UIView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40))
+            footer.backgroundColor = .white
+            let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
 
-        interactableText.addAttribute(NSAttributedString.Key.underlineStyle, value: 1, range: NSRange(location: 0, length: interactableText.length))
+            let text = NSMutableAttributedString(string: "Visit More".localized())
+            text.addAttribute(NSAttributedString.Key.font,
+                              value: UIFont.systemFont(ofSize: 13),
+                              range: NSRange(location: 0, length: text.length))
+            text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: text.length))
 
-        // Adding the link interaction to the interactable text
-        interactableText.addAttribute(NSAttributedString.Key.link,
-                                      value: "SignInPseudoLink",
-                                      range: NSRange(location: 0, length: interactableText.length))
-        interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
-        text.append(interactableText)
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-        text.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: text.length))
-        textView.attributedText = text
+            let interactableText = NSMutableAttributedString(string: "www.agora.io")
+            interactableText.addAttribute(NSAttributedString.Key.font,
+                                          value: UIFont.systemFont(ofSize: 12, weight: .bold),
+                                          range: NSRange(location: 0, length: interactableText.length))
 
-        textView.isEditable = false
-        textView.isSelectable = true
-        textView.delegate = self
+            interactableText.addAttribute(NSAttributedString.Key.underlineStyle, value: 1, range: NSRange(location: 0, length: interactableText.length))
 
-        footer.addSubview(textView)
+            // Adding the link interaction to the interactable text
+            interactableText.addAttribute(NSAttributedString.Key.link,
+                                          value: "SignInPseudoLink",
+                                          range: NSRange(location: 0, length: interactableText.length))
+            interactableText.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.HexColor(hex: 0x3C4267, alpha: 1), range: NSRange(location: 0, length: interactableText.length))
+            text.append(interactableText)
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.alignment = .center
+            text.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: text.length))
+            textView.attributedText = text
 
-        return footer
+            textView.isEditable = false
+            textView.isSelectable = true
+            textView.delegate = self
+
+            footer.addSubview(textView)
+
+            return footer
+        }
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 40~))
+
             headerView.backgroundColor = settingType == .effect ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: 300~, height: 30~))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.text = "Current Sound".localized()
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
+            } else if settingType == .Spatial {
+                titleLabel.text = "Agora Blue Bot".localized()
+                titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
+            } else if settingType == .AIAEC {
+                
+            } else if settingType == .AGC {
+        
+
             } else {
-                titleLabel.text = settingType == .Spatial ? "Agora Blue Bot" : "AINS Settings".localized()
+                titleLabel.text = "AINS Settings".localized()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             }
             headerView.addSubview(titleLabel)
@@ -362,15 +412,13 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
          } else if settingType == .AIAEC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.isNoiseSet = true
-//             cell.titleLabel.text = settingName[indexPath.row]
-             cell.titleLabel.text = "AIAEC"
+             cell.titleLabel.text = AIAECSettingName[indexPath.row]
 
              return cell
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.isNoiseSet = false
-//             cell.titleLabel.text = settingName[indexPath.row]
-             cell.titleLabel.text = "AGC"
+             cell.titleLabel.text = AGSettingName[indexPath.row]
 
              return cell
          }
