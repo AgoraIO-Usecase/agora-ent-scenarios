@@ -272,6 +272,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     if(self.config.type == KTVSongTypeChorus) {
         [self leaveChorus2ndChannel];
     }
+    [self.lrcView stop];
+    [self.lrcView reset];
     self.config = nil;
 }
 
