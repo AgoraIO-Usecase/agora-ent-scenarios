@@ -453,7 +453,9 @@ class RoomObservableViewDelegate constructor(
                     botOpen = voiceRoomModel.useRobot,
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
-                    AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.anisMode,
+                    AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMode,
+                    isAIAECOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn,
+                    isAIAGCOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -545,8 +547,12 @@ class RoomObservableViewDelegate constructor(
             }
         }
         ainsDialog.anisModeCallback = {
-            VoiceBuddyFactory.get().rtcChannelTemp.anisMode = it.anisMode
+            VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
             AgoraRtcEngineController.get().deNoise(it.anisMode)
+            roomAudioSettingDialog?.apply {
+                audioSettingsInfo.AINSMode = it.anisMode
+                updateAINSView()
+            }
             if (roomKitBean.isOwner && voiceRoomModel.useRobot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
                 VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
@@ -581,7 +587,12 @@ class RoomObservableViewDelegate constructor(
     fun onAIAECDialog(isOn: Boolean) {
         val dialog = RoomAIAECSheetDialog()
         dialog.onClickCheckBox = { isOn ->
-
+            AgoraRtcEngineController.get().setAIAECOn(isOn)
+            VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn = isOn
+            roomAudioSettingDialog?.apply {
+                audioSettingsInfo.isAIAECOn = isOn
+                updateAIAECView()
+            }
         }
         dialog.show(activity.supportFragmentManager, "mtAIAEC")
     }
@@ -591,7 +602,12 @@ class RoomObservableViewDelegate constructor(
     fun onAIAGCDialog(isOn: Boolean) {
         val dialog = RoomAIAGCSheetDialog()
         dialog.onClickCheckBox = { isOn ->
-
+            AgoraRtcEngineController.get().setAIAGCOn(isOn)
+            VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn
+            roomAudioSettingDialog?.apply {
+                audioSettingsInfo.isAIAGCOn = isOn
+                updateAIAGCView()
+            }
         }
         dialog.show(activity.supportFragmentManager, "mtAIAGC")
     }
