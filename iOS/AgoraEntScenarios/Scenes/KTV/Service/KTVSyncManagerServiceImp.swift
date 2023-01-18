@@ -184,7 +184,6 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         roomInfo.name = inputModel.name
         roomInfo.isPrivate = inputModel.isPrivate.boolValue
         roomInfo.password = inputModel.password
-        roomInfo.creator = VLUserCenter.user.id
         roomInfo.creatorNo = VLUserCenter.user.id
         roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
         roomInfo.bgOption = Int.random(in: 1...2)
@@ -195,14 +194,16 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
+        let date = Date()
         initScene { [weak self] in
+            agoraPrint("createRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
-                               userId: roomInfo.creator,
-                               isOwner: roomInfo.creator == VLUserCenter.user.id,
+                               userId: roomInfo.creatorNo,
+                               isOwner: roomInfo.creatorNo == VLUserCenter.user.id,
                                property: params) { result in
-                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                agoraPrint("createRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
+                let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
                 let playerRTCUid = arc4random_uniform(1000000) + 10
@@ -229,6 +230,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.notify(queue: .main){
+                    agoraPrint("createRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
@@ -245,6 +247,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self.roomList?.append(roomInfo)
                     self._autoOnSeatIfNeed { seatArray in
+                        agoraPrint("createRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
                         _hideLoadingIfNeed()
                         let output = KTVCreateRoomOutputModel()
                         output.name = inputModel.name
@@ -273,14 +276,16 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         let params = mapConvert(model: roomInfo)
 
         _showLoadingIfNeed()
+        let date = Date()
         initScene { [weak self] in
+            agoraPrint("joinRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
             SyncUtil.joinScene(id: roomInfo.roomNo,
-                               userId: roomInfo.creator,
-                               isOwner: roomInfo.creator == VLUserCenter.user.id,
+                               userId: roomInfo.creatorNo,
+                               isOwner: roomInfo.creatorNo == VLUserCenter.user.id,
                                property: params) { result in
-                //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
+                agoraPrint("joinRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creator", type: String.self) as? String ?? ""
+                let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
                 self?.roomNo = channelName
                 
                 let playerRTCUid = arc4random_uniform(1000000) + 10
@@ -307,6 +312,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 }
                 
                 dispatchGroup.notify(queue: .main){
+                    agoraPrint("joinRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
                     guard let self = self,
                           let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
                           let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
@@ -322,9 +328,10 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                     VLUserCenter.user.agoraRTMToken = rtmToken
                     VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
                     self._autoOnSeatIfNeed { seatArray in
+                        agoraPrint("joinRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
                         _hideLoadingIfNeed()
                         let output = KTVJoinRoomOutputModel()
-                        output.creator = userId
+                        output.creatorNo = userId
                         output.seatsArray = seatArray
                         completion(nil, output)
                     }
@@ -346,7 +353,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
         
         //current user is room owner, remove room
-        if roomInfo.creator == VLUserCenter.user.id {
+        if roomInfo.creatorNo == VLUserCenter.user.id {
             _removeRoom(completion: completion)
             return
         }
@@ -833,7 +840,7 @@ extension KTVSyncManagerServiceImp {
     private func _updateUserCount(with count: Int) {
         guard let channelName = roomNo,
               let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
-              roomInfo.creator == VLUserCenter.user.id
+              roomInfo.creatorNo == VLUserCenter.user.id
         else {
 //            assert(false, "channelName = nil")
             agoraPrint("updateUserCount channelName = nil")
