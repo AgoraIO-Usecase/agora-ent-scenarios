@@ -26,12 +26,12 @@ UITextFieldDelegate
 @property (nonatomic, strong) JXCategoryTitleView *categoryView;
 @property (nonatomic, strong) JXCategoryListContainerView *listContainerView;
 @property (nonatomic, strong) VLSearchSongResultView *resultView;
-
+@property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) VLRoomListModel *roomModel;
-
+@property (nonatomic, strong) NSMutableArray *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
-
+@property (nonatomic, strong) NSArray *selSongArray;
 @end
 
 @implementation VLSelectedSongList
@@ -135,6 +135,9 @@ UITextFieldDelegate
                                                           ifChorus:self.ifChorus];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
+    
+    self.selSongViews = [NSMutableArray array];
+    self.currentIndex = 100;
 }
 
 #pragma mark --Event
@@ -149,10 +152,23 @@ UITextFieldDelegate
     self.resultView.hidden = YES;
 }
 
-#pragma mark --delegate
-// 点击选中或者滚动选中都会调用该方法。适用于只关心选中事件，不关心具体是点击还是滚动选中的。
-- (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
+-(void)setSelSongArrayWith:(NSArray *)array {
+    VLSelectSongTableItemView *selView = nil;
+    for(VLSelectSongTableItemView *view in self.selSongViews){
+        if (view.tag  == self.currentIndex) {
+            selView = view;
+            [selView setSelSongArrayWith:array];
+            self.selSongArray = array;
+            return;
+        }
+    }
     
+}
+
+#pragma mark --delegate
+- (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
+    self.currentIndex = index + 100;
+    [self setSelSongArrayWith:self.selSongArray];
 }
 
 // 返回列表的数量
@@ -165,9 +181,10 @@ UITextFieldDelegate
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
+    selSongView.tag = 100 + index;
+    [self.selSongViews addObject:selSongView];
     return selSongView;
 }
-
 
 - (void)textChangeAction {
     if (self.searchTF.text.length > 0) {

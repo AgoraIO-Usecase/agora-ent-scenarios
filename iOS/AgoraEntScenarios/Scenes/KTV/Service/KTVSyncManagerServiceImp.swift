@@ -490,6 +490,19 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     func chooseSong(withInput inputModel: KTVChooseSongInputModel,
                     completion: @escaping (Error?) -> Void)
     {
+        //添加歌曲前先判断
+        var flag = false
+        _ =  songList.compactMap { model in
+            if model.songNo == inputModel.songNo {
+                agoraPrint("The song has been added")
+                let error: NSError = NSError(domain: "The song has been added", code: 6)
+                flag = true
+                completion(error)
+                return
+            }
+        }
+        if flag {return}
+        
         let songInfo = VLRoomSelSongModel()
         songInfo.isChorus = inputModel.isChorus
         songInfo.songName = inputModel.songName
@@ -503,6 +516,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 //        songInfo.userId = UserInfo.userId
         /// 点歌人昵称
         songInfo.name = VLUserCenter.user.name
+
         _addChooseSongInfo(songInfo: songInfo) { error in
             // TODO(wushengtao): fetch all list can not be changed if immediately invoke
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
@@ -1166,7 +1180,10 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 agoraPrint("imp song get success... \(list.count)")
-                self.songList = list.compactMap({ VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)! })
+                let totalList = list.compactMap({
+                    VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)!
+                })
+                self.songList = totalList.filterDuplicates({$0.songNo})
                 self._sortChooseSongList()
                 let songList = self.songList
                 finished(nil, songList)

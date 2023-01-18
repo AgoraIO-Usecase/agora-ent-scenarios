@@ -85,6 +85,7 @@
         self.choosedCountLabel.hidden = YES;
     }
     [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
+    [self.selsectSongView setSelSongArrayWith: selSongsArray];
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
