@@ -135,7 +135,7 @@
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
 
     <string name="voice_chatroom_notice">Notice</string>
-    <string name="voice_chatroom_own_audio_settings">Own Audio Settings</string>
+    <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>
     <string name="voice_chatroom_audio_settings">Audio Settings</string>
     <string name="voice_chatroom_bot_settings">Bot Settings</string>
     <string name="voice_chatroom_agora_bot">Agora Blue &#038; Red Bot</string>
@@ -143,6 +143,12 @@
     <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
     <string name="voice_chatroom_best_sound_effect">Best Agora Sound</string>
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
+    <string name="voice_chatroom_aiaec">AIAEC</string>
+    <string name="voice_chatroom_aiagc">AGC</string>
+    <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
+    <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
+    <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>
+    <string name="voice_chatroom_aiagc_introduce">&#160;&#160;&#160;&#160;After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing</string>
     <string name="voice_chatroom_spatial_audio">Spatial Audio</string>
     <string name="voice_chatroom_only_host_can_change_robot">Only host can change the robot settings</string>
     <string name="voice_chatroom_agora_blue">Agora Blue</string>
@@ -173,6 +179,7 @@
     <string name="voice_chatroom_high">High</string>
     <string name="voice_chatroom_medium">Medium</string>
     <string name="voice_chatroom_off">Off</string>
+    <string name="voice_chatroom_on">On</string>
     <string name="voice_chatroom_ains">AINS</string>
     <string name="voice_chatroom_none">None</string>
     <string name="voice_chatroom_agora_ains">AINS Definition</string>

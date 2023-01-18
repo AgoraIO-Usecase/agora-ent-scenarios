@@ -25,7 +25,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
         const val KEY_AUDIO_SETTINGS_INFO = "audio_settings"
     }
 
-    private val audioSettingsInfo: io.agora.scene.voice.model.RoomAudioSettingsBean by lazy {
+    public val audioSettingsInfo: io.agora.scene.voice.model.RoomAudioSettingsBean by lazy {
         arguments?.getSerializable(KEY_AUDIO_SETTINGS_INFO) as io.agora.scene.voice.model.RoomAudioSettingsBean
     }
 
@@ -68,9 +68,11 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
             mtBestSoundEffectArrow.text =
                 RoomAudioSettingsConstructor.getSoundEffectName(view.context, audioSettingsInfo.soundSelection)
-            mtAINSArrow.text =
-                RoomAudioSettingsConstructor.getAINSName(view.context, audioSettingsInfo.AINSMode)
+
             mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
+            updateAINSView()
+            updateAIAECView()
+            updateAIAGCView()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 "isChecked：$isChecked".logD("mcbAgoraBot")
@@ -91,11 +93,11 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
                 audioSettingsListener?.onAIAEC(audioSettingsInfo.isAIAECOn, audioSettingsInfo.enable)
             }
             mtAGCArrow.setOnClickListener {
-                audioSettingsListener?.onAGC(audioSettingsInfo.isAGCOn, audioSettingsInfo.enable)
+                audioSettingsListener?.onAGC(audioSettingsInfo.isAIAGCOn, audioSettingsInfo.enable)
             }
-            mtVoiceChanger.setOnClickListener {
-                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
-            }
+//            mtVoiceChanger.setOnClickListener {
+//                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
+//            }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
             }
@@ -107,6 +109,41 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
                     mtAgoraBotVolumeValue.text = progress.toString()
                     audioSettingsListener?.onBotVolumeChange(progress)
                 }
+            }
+        }
+    }
+    /**
+     * 更新AINS
+     */
+    fun updateAINSView() {
+        binding?.apply {
+            mtAINSArrow.text = view?.let {
+                RoomAudioSettingsConstructor.getAINSName(it.context, audioSettingsInfo.AINSMode)
+            }
+        }
+    }
+    /**
+     * 更新AIAEC
+     */
+    fun updateAIAECView() {
+        binding?.apply {
+            if (audioSettingsInfo.isAIAECOn) {
+                mtAECArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
+            } else {
+                mtAECArrow.text = view?.context?.getString(R.string.voice_chatroom_off)
+            }
+        }
+    }
+
+    /**
+     * 更新AIAGC
+     */
+    fun updateAIAGCView() {
+        binding?.apply {
+            if (audioSettingsInfo.isAIAGCOn) {
+                mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
+            } else {
+                mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_off)
             }
         }
     }

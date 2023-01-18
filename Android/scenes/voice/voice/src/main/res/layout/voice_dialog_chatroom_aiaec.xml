@@ -28,7 +28,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtBottomSheetTitle"
         style="@style/voice_bottom_sheet_title_style"
-        android:text="AIAEC"
+        android:text="@string/voice_chatroom_aiaec"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
@@ -39,7 +39,7 @@
         android:layout_marginTop="1dp"
         android:layout_marginBottom="15dp"
         android:layout_marginStart="20dp"
-        android:text="# Turn on AEC"
+        android:text="@string/voice_chatroom_turnon_aiaec"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
 
@@ -71,9 +71,17 @@
         android:textColor="@color/voice_dark_grey_color_979cbb"
         android:textSize="@dimen/voice_sp_12"
         android:textAlignment="textStart"
-        android:drawableStart="@drawable/voice_icon_room_setting_introduce"
-        android:text="When you turn on the accompaniment, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. We recommended you to turn it on when you are singing. "
+        android:text="@string/voice_chatroom_aiaec_introduce"
         app:layout_constraintTop_toBottomOf="@+id/mtAEC"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:src="@drawable/voice_icon_room_setting_introduce"
+        app:layout_constraintStart_toStartOf="@+id/mtAECIntroduce"
+        app:layout_constraintTop_toTopOf="@+id/mtAECIntroduce"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
