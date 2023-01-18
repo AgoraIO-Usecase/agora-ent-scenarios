@@ -8,11 +8,14 @@
 import SnapKit
 import UIKit
 import ZSwiftBaseLib
+import CoreAudio
 
 public enum AUDIO_SETTING_TYPE {
     case effect
     case Noise
     case Spatial
+    case AIAEC
+    case AGC
 }
 
 
@@ -347,6 +350,43 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 0 {
+            guard let block = resBlock else { return }
+            switch indexPath.row {
+            case 0:
+                //AINS
+                block(.Noise)
+            case 1:
+                block(.AIAEC);
+            case 2:
+                block(.AGC)
+            default:
+                block(.Spatial)
+                
+            }
+        } else if indexPath.section == 1 {
+//            guard let block = resBlock else { return }
+//            switch indexPath.row {
+//            case 0:
+//                //最佳音效
+//                block(.effect)
+//            case 1:
+//                //AINs
+//                block(.Noise)
+//            default:
+//                block(.Spatial)
+//            }
+        } else {
+            guard let block = resBlock else { return }
+            switch indexPath.row {
+            case 0:
+                //最佳音效
+                block(.effect)
+            default:
+                block(.Spatial)
+            }
+        }
+        /*
         if indexPath.section == 1 {
             guard let block = resBlock else { return }
             switch indexPath.row {
@@ -358,6 +398,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 block(.Spatial)
             }
         }
+        */
     }
 
     func textAutoWidth(height: CGFloat, font: UIFont, text: String) -> CGFloat {

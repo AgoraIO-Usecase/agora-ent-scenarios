@@ -70,7 +70,9 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     private var selTag: Int?
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
+    
     private let soundType: [String] = ["TV Sound".localized(), "Kitchen Sound".localized(), "Street Sound".localized(), "Mashine Sound".localized(), "Office Sound".localized(), "Home Sound".localized(), "Construction Sound".localized(), "Alert Sound/Music".localized(), "Applause".localized(), "Wind Sound".localized(), "Mic Pop Filter".localized(), "Audio Feedback".localized(), "Microphone Finger Rub Sound".localized(), "Screen Tap Sound".localized()]
+    
     private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".localized(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".localized(), "Ex. Keyboard tapping, mouse clicking sounds".localized(), "Ex. Door closing, chair squeaking, baby crying sounds".localized(), "Ex. Knocking sound".localized()]
 
     var settingType: AUDIO_SETTING_TYPE = .Spatial {
@@ -149,7 +151,16 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
 extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return settingType == .Noise ? 3 : 2
+        if settingType == .Noise {
+            return 3
+        } else if settingType == .AIAEC {
+            return 1;
+        } else if settingType == .AGC {
+            return 1;
+        } else {
+            return 2;
+        }
+//        return settingType == .Noise ? 3 : 2
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -167,6 +178,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             } else {
                 return 54
             }
+        case .AIAEC:
+            return 54
+        case .AGC:
+            return 54
         case .Spatial:
             return 54
         }
@@ -187,7 +202,12 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             return section == 0 ? 1 : 3
         } else if settingType == .Spatial {
             return 4
-        } else {
+        } else if settingType == .AIAEC {
+            return 1;
+        } else if settingType == .AGC {
+            return 1;
+        }
+        else {
             switch section {
             case 0:
                 return 1
@@ -312,89 +332,104 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if settingType == .effect {
-            tableView.separatorStyle = .none
-            var cellType: SOUND_TYPE = .chat
-            var cellHeight: CGFloat = 0
-            if indexPath.section == 0 {
-                cellType = effectType[0]
-                cellHeight = effectHeight[0]
-            } else {
-                cellType = effectType[indexPath.row + 1]
-                cellHeight = effectHeight[indexPath.row + 1]
-            }
+         if settingType == .effect {
+             tableView.separatorStyle = .none
+             var cellType: SOUND_TYPE = .chat
+             var cellHeight: CGFloat = 0
+             if indexPath.section == 0 {
+                 cellType = effectType[0]
+                 cellHeight = effectHeight[0]
+             } else {
+                 cellType = effectType[indexPath.row + 1]
+                 cellHeight = effectHeight[indexPath.row + 1]
+             }
 
-            let cell: VMSoundSelTableViewCell = .init(style: .default, reuseIdentifier: soIdentifier, cellType: cellType, cellHeight: cellHeight)
-            cell.isSel = indexPath.section == 0
-            return cell
-        } else if settingType == .Spatial {
-            if indexPath.row == 1 {
-                let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
-                cell.isNoiseSet = true
-                cell.titleLabel.text = settingName[indexPath.row]
-                return cell
-            } else {
-                let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-                cell.isNoiseSet = true
-                cell.titleLabel.text = settingName[indexPath.row]
-                return cell
-            }
-        } else {
-            if indexPath.section == 0 {
-                let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell
-                cell.ains_state = ains_state
-                cell.selectionStyle = .none
-                cell.isTouchAble = isTouchAble
-                cell.selBlock = { [weak self] state in
-                    self?.ains_state = state
-                    guard let block = self?.selBlock else { return }
-                    block(state)
-                }
-                cell.selectionStyle = .none
-                return cell
-            } else if indexPath.section == 1 {
-                let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
-                cell.textLabel?.text = "AINS: AI Noise Suppression".localized()
-                cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
-                cell.textLabel?.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
-                cell.isUserInteractionEnabled = false
-                cell.selectionStyle = .none
-                return cell
-            } else {
-                let cell: VMANISSUPTableViewCell = tableView.dequeueReusableCell(withIdentifier: pIdentifier)! as! VMANISSUPTableViewCell
-                if indexPath.row > 1 && indexPath.row < 7 {
-                    cell.detailLabel.text = soundDetail[indexPath.row - 2]
-                    cell.cellType = .detail
-                } else {
-                    cell.cellType = .normal
-                }
-                cell.isTouchAble = isTouchAble
-                cell.isAudience = isAudience
-                cell.selectionStyle = .none
-                cell.titleLabel.text = soundType[indexPath.row]
-                cell.cellTag = 1000 + indexPath.row * 10
-                if selTag == nil {
-                    cell.btn_state = .none
-                } else {
-                    let index = (selTag! - 1000) / 10
-                    let tag = (selTag! - 1000) % 10
-                    if index == indexPath.row {
-                        cell.btn_state = tag == 1 ? .off : .middle
-                    } else {
-                        cell.btn_state = .none
-                    }
-                }
-                cell.resBlock = { [weak self] index in
-                    if cell.isTouchAble {
-                        self?.selTag = index
-                        self?.tableView.reloadData()
-                    }
-                    self?.soundBlock!(index)
-                }
-                return cell
-            }
-        }
-    }
+             let cell: VMSoundSelTableViewCell = .init(style: .default, reuseIdentifier: soIdentifier, cellType: cellType, cellHeight: cellHeight)
+             cell.isSel = indexPath.section == 0
+             return cell
+         } else if settingType == .Spatial {
+             if indexPath.row == 1 {
+                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
+                 cell.isNoiseSet = true
+                 cell.titleLabel.text = settingName[indexPath.row]
+                 return cell
+             } else {
+                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+                 cell.isNoiseSet = true
+                 cell.titleLabel.text = settingName[indexPath.row]
+                 return cell
+             }
+         } else if settingType == .AIAEC {
+             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+             cell.isNoiseSet = true
+//             cell.titleLabel.text = settingName[indexPath.row]
+             cell.titleLabel.text = "AIAEC"
+
+             return cell
+         } else if settingType == .AGC {
+             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+             cell.isNoiseSet = false
+//             cell.titleLabel.text = settingName[indexPath.row]
+             cell.titleLabel.text = "AGC"
+
+             return cell
+         }
+        else {
+             if indexPath.section == 0 {
+                 let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell
+                 cell.ains_state = ains_state
+                 cell.selectionStyle = .none
+                 cell.isTouchAble = isTouchAble
+                 cell.selBlock = { [weak self] state in
+                     self?.ains_state = state
+                     guard let block = self?.selBlock else { return }
+                     block(state)
+                 }
+                 cell.selectionStyle = .none
+                 return cell
+             } else if indexPath.section == 1 {
+                 let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
+                 cell.textLabel?.text = "AINS: AI Noise Suppression".localized()
+                 cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
+                 cell.textLabel?.textColor = UIColor.HexColor(hex: 0x3C4267, alpha: 1)
+                 cell.isUserInteractionEnabled = false
+                 cell.selectionStyle = .none
+                 return cell
+             } else {
+                 let cell: VMANISSUPTableViewCell = tableView.dequeueReusableCell(withIdentifier: pIdentifier)! as! VMANISSUPTableViewCell
+                 if indexPath.row > 1 && indexPath.row < 7 {
+                     cell.detailLabel.text = soundDetail[indexPath.row - 2]
+                     cell.cellType = .detail
+                 } else {
+                     cell.cellType = .normal
+                 }
+                 cell.isTouchAble = isTouchAble
+                 cell.isAudience = isAudience
+                 cell.selectionStyle = .none
+                 cell.titleLabel.text = soundType[indexPath.row]
+                 cell.cellTag = 1000 + indexPath.row * 10
+                 if selTag == nil {
+                     cell.btn_state = .none
+                 } else {
+                     let index = (selTag! - 1000) / 10
+                     let tag = (selTag! - 1000) % 10
+                     if index == indexPath.row {
+                         cell.btn_state = tag == 1 ? .off : .middle
+                     } else {
+                         cell.btn_state = .none
+                     }
+                 }
+                 cell.resBlock = { [weak self] index in
+                     if cell.isTouchAble {
+                         self?.selTag = index
+                         self?.tableView.reloadData()
+                     }
+                     self?.soundBlock!(index)
+                 }
+                 return cell
+             }
+         }
+     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if settingType == .effect {
