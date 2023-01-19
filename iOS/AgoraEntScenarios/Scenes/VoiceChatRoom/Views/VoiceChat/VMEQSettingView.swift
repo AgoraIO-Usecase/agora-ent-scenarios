@@ -411,8 +411,21 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
              }
          } else if settingType == .AIAEC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-             cell.isNoiseSet = true
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
+             cell.isAudience = isAudience
+             cell.selectionStyle = .none
+//             cell.swith.isOn = roomInfo?.room?.use_robot ?? false
+//             cell.useRobotBlock = { [weak self] flag in
+//                 guard let useRobotBlock = self?.useRobotBlock else { return }
+//                 useRobotBlock(flag)
+//             }
+             return cell
+
+             
+             
+//             let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+//             cell.isNoiseSet = true
+//             cell.titleLabel.text = AIAECSettingName[indexPath.row]
 
              return cell
          } else if settingType == .AGC {
@@ -487,6 +500,12 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             } else {
                 effectClickBlock(.none)
             }
+        } else if settingType == .AIAEC {
+            
+        } else if settingType == .AGC {
+            
+        } else {
+            print("other settingType")
         }
     }
 
