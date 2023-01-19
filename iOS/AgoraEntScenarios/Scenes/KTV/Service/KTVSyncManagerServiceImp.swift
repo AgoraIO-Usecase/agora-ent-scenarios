@@ -502,9 +502,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         _ =  songList.compactMap { model in
             if model.songNo == inputModel.songNo {
                 agoraPrint("The song has been added")
-                let error: NSError = NSError(domain: "The song has been added", code: 6)
                 flag = true
-                completion(error)
                 return
             }
         }
