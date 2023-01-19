@@ -241,7 +241,7 @@ public let kMPK_RTC_UID: UInt = 1
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
-                musicPath = musicPath.replacingOccurrences(of: "CN", with: "Lau".localized())
+                musicPath = musicPath.replacingOccurrences(of: "EN", with: "Lau".localized())
                 rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
