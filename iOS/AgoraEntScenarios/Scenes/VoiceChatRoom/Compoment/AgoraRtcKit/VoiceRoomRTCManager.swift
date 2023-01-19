@@ -470,7 +470,32 @@ public let kMPK_RTC_UID: UInt = 1
     public func enableAEC(with grade: AECGrade) -> Int32 {
         return rtcKit.setParameters("{\"rtc.audio.music_mode\": \(grade.rawValue)}")
     }
+    
+    //AIAEC-AI回声消除
+    public func setAIAECOn(isOn:Bool){
+        //agora_ai_echo_cancellation
+        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
+        
+        if (isOn){
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":true}");
 
+        } else {
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":false}");
+
+        }
+    }
+
+    //AGC-新增人声自动增益开关
+    public func setAGCOn(isOn:Bool){
+        if (isOn) {
+            rtcKit.setParameters("{\"che.audio.agc.enable\":true}")
+        } else {
+            rtcKit.setParameters("{\"che.audio.agc.enable\":false}")
+        }
+        rtcKit.setParameters("{\"che.audio.agc.targetlevelBov\":3}")
+        rtcKit.setParameters("{\"che.audio.agc.compressionGain\":18}")
+    }
+    
     /**
      * 开启/关闭 AI降噪
      * @param
