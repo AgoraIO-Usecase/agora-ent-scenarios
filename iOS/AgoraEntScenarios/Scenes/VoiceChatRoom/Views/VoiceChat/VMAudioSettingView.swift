@@ -354,6 +354,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         if indexPath.section == 0 {
             guard let block = resBlock else { return }
             switch indexPath.row {
@@ -368,19 +369,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 block(.Spatial)
                 
             }
-        } else if indexPath.section == 1 {
-//            guard let block = resBlock else { return }
-//            switch indexPath.row {
-//            case 0:
-//                //最佳音效
-//                block(.effect)
-//            case 1:
-//                //AINs
-//                block(.Noise)
-//            default:
-//                block(.Spatial)
-//            }
-        } else {
+        }  else if indexPath.section == 2 {
             guard let block = resBlock else { return }
             switch indexPath.row {
             case 0:
@@ -390,8 +379,9 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 block(.Spatial)
             }
         }
+        
         /*
-        if indexPath.section == 1 {
+        if indexPath.section == 0 {
             guard let block = resBlock else { return }
             switch indexPath.row {
             case 0:
