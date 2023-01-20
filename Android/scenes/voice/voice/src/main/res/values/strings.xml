@@ -135,6 +135,7 @@
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
 
     <string name="voice_chatroom_notice">Notice</string>
+    <string name="voice_chatroom_settings_host_only">Host Only</string>
     <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>
     <string name="voice_chatroom_audio_settings">Audio Settings</string>
     <string name="voice_chatroom_bot_settings">Bot Settings</string>
