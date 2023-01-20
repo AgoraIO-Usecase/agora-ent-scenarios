@@ -474,7 +474,7 @@ public let kMPK_RTC_UID: UInt = 1
     //AIAEC-AI回声消除
     public func setAIAECOn(isOn:Bool){
         //agora_ai_echo_cancellation
-        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
+//        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
         
         if (isOn){
             rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":true}");
