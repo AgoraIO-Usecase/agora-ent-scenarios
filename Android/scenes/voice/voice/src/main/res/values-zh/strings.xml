@@ -135,6 +135,7 @@
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
 
     <string name="voice_chatroom_notice">公告</string>
+    <string name="voice_chatroom_settings_host_only">仅房主可操作</string>
     <string name="voice_chatroom_own_audio_settings">个人音效设置</string>
     <string name="voice_chatroom_audio_settings">音效设置</string>
     <string name="voice_chatroom_bot_settings">机器人设置</string>
