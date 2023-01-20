@@ -27,7 +27,7 @@ class VMAudioSettingView: UIView {
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
     private var lineImgView: UIImageView = .init()
     private var titleLabel: UILabel = .init()
-    private var tableView: UITableView = .init()
+    public var tableView: UITableView = .init()
     public var isAudience: Bool = false
     public var isPrivate: Bool = false
 
@@ -210,10 +210,27 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
+            } else if indexPath.row == 1 {
+                if roomInfo?.room?.turn_AIAEC == true {
+                    cell.contentLabel.text = "On".localized()
+                } else {
+                    cell.contentLabel.text = "Off".localized()
+                }
+            } else if indexPath.row == 2 {
+                if roomInfo?.room?.turn_AGC == true {
+                    cell.contentLabel.text = "On".localized()
+                } else {
+                    cell.contentLabel.text = "Off".localized()
+                }
             } else {
-                cell.contentLabel.text = "Off".localized()
+                cell.contentLabel.text = "Other".localized()
 
             }
+//            else {
+//                if roomInfo?.room?.t
+//                cell.contentLabel.text = "Off".localized()
+//
+//            }
 //            else if indexPath.row == 1 {
 //                switch ains_state {
 //                case .high:

@@ -14,7 +14,7 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     private var titleLabel: UILabel = .init()
     private var tableView: UITableView = .init(frame: .zero, style: .grouped)
     private var backBtn: UIButton = .init()
-
+    public var roomInfo: VRRoomInfo?
     lazy var cover: UIView = {
         UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 56~)).backgroundColor(.clear).setGradient([UIColor(red: 0.929, green: 0.906, blue: 1, alpha: 1), UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }()
@@ -68,6 +68,9 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
     var selBlock: ((AINS_STATE) -> Void)?
     var soundBlock: ((Int) -> Void)?
+    var turnAIAECBlock:((Bool) ->Void)?
+    var turnAGCBlock:((Bool) ->Void)?
+
     private var selTag: Int?
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
@@ -414,11 +417,13 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
              cell.isAudience = isAudience
              cell.selectionStyle = .none
-//             cell.swith.isOn = roomInfo?.room?.use_robot ?? false
-//             cell.useRobotBlock = { [weak self] flag in
-//                 guard let useRobotBlock = self?.useRobotBlock else { return }
-//                 useRobotBlock(flag)
-//             }
+             cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
+             cell.useRobotBlock = { [weak self] flag in
+                 guard let turnAIAECBlock = self?.turnAIAECBlock else { return }
+                 turnAIAECBlock(flag)
+//                 guard let backBlock = self?.backBlock else {return}
+//                 backBlock();
+             }
              return cell
 
              
@@ -427,14 +432,20 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
 //             cell.isNoiseSet = true
 //             cell.titleLabel.text = AIAECSettingName[indexPath.row]
 
-             return cell
+//             return cell
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-             cell.isNoiseSet = false
-             cell.titleLabel.text = AGSettingName[indexPath.row]
-
-             return cell
-         }
+             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+             cell.isAudience = isAudience
+             cell.selectionStyle = .none
+             cell.swith.isOn = roomInfo?.room?.turn_AGC ?? false
+             cell.useRobotBlock = { [weak self] flag in
+                 guard let turnAGCBlock = self?.turnAGCBlock else { return }
+                 turnAGCBlock(flag)
+//                 guard let backBlock = self?.backBlock else {return}
+//                 backBlock();
+             }
+             return cell         }
         else {
              if indexPath.section == 0 {
                  let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell

@@ -45,6 +45,13 @@ extension VoiceRoomViewController {
             self?.preView.isTouchAble = flag
             self?.activeAlien(flag)
         }
+        preView.turnAIAECBlock = {[weak self] flag in
+            self?.rtckit.setAIAECOn(isOn: flag);
+        }
+        preView.turnAGCBlock = {[weak self] flag in
+            self?.rtckit.setAGCOn(isOn: flag);
+        }
+
         preView.volBlock = { [weak self] vol in
             self?.updateVolume(vol)
         }
