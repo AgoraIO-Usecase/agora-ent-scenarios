@@ -50,12 +50,25 @@ object RtcEngineInstance {
             return innerRtcEngine!!
         }
 
+    private var innerVideoSwitcher: VideoSwitcher? = null
+    val videoSwitcher: VideoSwitcher
+        get() {
+            if (innerVideoSwitcher == null) {
+                innerVideoSwitcher = VideoSwitcherImpl(rtcEngine)
+            }
+            return innerVideoSwitcher!!
+        }
+
     fun destroy() {
+        innerVideoSwitcher?.let {
+            it.unloadConnections()
+            innerVideoSwitcher = null
+        }
         innerRtcEngine?.let {
             RtcEngine.destroy()
             innerRtcEngine = null
         }
-        innerBeautyProcessor?.let { processor->
+        innerBeautyProcessor?.let { processor ->
             processor.release()
             innerBeautyProcessor = null
         }
