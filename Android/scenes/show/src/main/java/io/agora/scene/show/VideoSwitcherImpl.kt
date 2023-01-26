@@ -46,6 +46,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     ) {
         connectionJoined?.let {
             if (it.equal(connection)) {
+                rtcEventHandlers[connection.channelId]?.eventListener = eventListener
                 eventListener.onChannelJoined?.invoke()
                 return
             }
@@ -56,8 +57,8 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         connectionsPreloaded.firstOrNull { it.equal(connection) }
             ?.let {
                 eventListener.onChannelJoined?.invoke()
-                rtcEngine.updateChannelMediaOptionsEx(mediaOptions, it)
                 rtcEventHandlers[it.channelId]?.eventListener = eventListener
+                rtcEngine.updateChannelMediaOptionsEx(mediaOptions, it)
                 connectionsPreloaded.remove(it)
                 connectionJoined = it
             }

@@ -36,6 +36,7 @@ data class ShowRoomDetailModel(
     val interactStatus: Int = ShowInteractionStatus.idle.value,
     val createdAt: Double,
     val updatedAt: Double,
+    val isFakeData: Boolean
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
@@ -48,7 +49,8 @@ data class ShowRoomDetailModel(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readDouble(),
-        parcel.readDouble()
+        parcel.readDouble(),
+        parcel.readBoolean()
     )
 
     fun toMap(): HashMap<String, Any>{
@@ -64,6 +66,7 @@ data class ShowRoomDetailModel(
             Pair("interactStatus", interactStatus),
             Pair("createdAt", createdAt),
             Pair("updatedAt", updatedAt),
+            Pair("isFakeData", isFakeData),
         )
     }
 
@@ -98,6 +101,7 @@ data class ShowRoomDetailModel(
         parcel.writeInt(interactStatus)
         parcel.writeDouble(createdAt)
         parcel.writeDouble(updatedAt)
+        parcel.writeBoolean(isFakeData)
     }
 
     override fun describeContents(): Int {
