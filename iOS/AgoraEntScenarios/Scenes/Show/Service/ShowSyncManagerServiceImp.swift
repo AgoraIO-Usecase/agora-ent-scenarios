@@ -59,11 +59,11 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
         return
     }
     
-    showLogger.error(message)
+    showLogger.error(message, context: "Service")
 }
 
 private func agoraPrint(_ message: String) {
-    showLogger.info(message)
+    showLogger.info(message, context: "Service")
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
@@ -1905,15 +1905,28 @@ extension ShowSyncManagerServiceImp {
 
 
 private let robotRoomIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-private let robotRoomOwnerHeaders = ["https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-                                     "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"]
+private let robotRoomOwnerHeaders = [
+    "https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
+]
+private let robotStreamURL = [
+    "https://download.agora.io/sdk/release/agora_test_video_1.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
+    "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_1.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
+    "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
+    "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
+]
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
         agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
@@ -1986,7 +1999,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         let channelName = room.roomId ?? ""
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: "\(UserInfo.userId)",
-                                               streamUrl: "https://download.agora.io/sdk/release/agora_test_video_4.mp4") { msg in
+                                               streamUrl: robotStreamURL[(Int(channelName) ?? 1) - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
         }
