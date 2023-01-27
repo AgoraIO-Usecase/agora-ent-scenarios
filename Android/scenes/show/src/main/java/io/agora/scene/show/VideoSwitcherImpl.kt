@@ -46,8 +46,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     ) {
         connectionJoined?.let {
             if (it.equal(connection)) {
-                rtcEventHandlers[connection.channelId]?.eventListener = eventListener
-                eventListener.onChannelJoined?.invoke()
+                rtcEventHandlers[connection.channelId]?.setEventListener(eventListener)
                 return
             }
             leaveChannel(it)
@@ -57,7 +56,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         connectionsPreloaded.firstOrNull { it.equal(connection) }
             ?.let {
                 eventListener.onChannelJoined?.invoke()
-                rtcEventHandlers[it.channelId]?.eventListener = eventListener
+                rtcEventHandlers[it.channelId]?.setEventListener(eventListener)
                 rtcEngine.updateChannelMediaOptionsEx(mediaOptions, it)
                 connectionsPreloaded.remove(it)
                 connectionJoined = it
@@ -95,6 +94,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
                 joinRtcChannel(conn, options)
+                connectionsPreloaded.add(conn)
             }
             connPreLoaded.add(conn)
         }
@@ -120,7 +120,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             options.autoSubscribeVideo = false
             options.autoSubscribeAudio = false
             rtcEngine.updateChannelMediaOptionsEx(options, connection)
-            rtcEventHandlers[connection.channelId]?.eventListener = null
+            rtcEventHandlers[connection.channelId]?.setEventListener(null)
             connectionJoined = null
             connectionsPreloaded.add(connection)
             return true
@@ -165,11 +165,12 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                     "generate channel ${connection.channelId} token success cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
                 )
                 val eventHandler =
-                    RtcEngineEventHandlerImpl(joinChannelTime, connection, eventListener)
+                    RtcEngineEventHandlerImpl(joinChannelTime, connection)
+                eventHandler.setEventListener(eventListener)
                 val ret = rtcEngine.joinChannelEx(it, connection, mediaOptions, eventHandler)
                 ShowLogger.d(
                     tag,
-                    "join channel ret : code=$ret, message=${RtcEngine.getErrorDescription(ret)}"
+                    "join channel ret : channel=${connection.channelId} code=$ret, message=${RtcEngine.getErrorDescription(ret)}"
                 )
                 rtcEventHandlers[connection.channelId] = eventHandler
             },
@@ -183,8 +184,21 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     inner class RtcEngineEventHandlerImpl(
         private val joinChannelTime: Long,
         private val connection: RtcConnection,
-        var eventListener: VideoSwitcher.IChannelEventListener? = null
     ) : IRtcEngineEventHandler() {
+
+        private var firstRemoteUid: Int = 0
+        private var isJoinChannelSuccess = false
+        private var eventListener: VideoSwitcher.IChannelEventListener? = null
+
+        fun setEventListener(listener: VideoSwitcher.IChannelEventListener?) {
+            eventListener = listener
+            if (isJoinChannelSuccess) {
+                eventListener?.onChannelJoined?.invoke()
+            }
+            if (firstRemoteUid != 0) {
+                eventListener?.onUserJoined?.invoke(firstRemoteUid)
+            }
+        }
 
         override fun onError(err: Int) {
             super.onError(err)
@@ -202,11 +216,17 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             elapsed: Int
         ) {
             super.onJoinChannelSuccess(channel, uid, elapsed)
+            isJoinChannelSuccess = true
             eventListener?.onChannelJoined?.invoke()
             ShowLogger.d(
                 tag,
                 "join channel $channel success cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"
             )
+        }
+
+        override fun onLeaveChannel(stats: RtcStats?) {
+            super.onLeaveChannel(stats)
+            isJoinChannelSuccess = false
         }
 
         override fun onFirstRemoteVideoFrame(
@@ -238,11 +258,17 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
         override fun onUserJoined(uid: Int, elapsed: Int) {
             super.onUserJoined(uid, elapsed)
+            if( firstRemoteUid == 0){
+                firstRemoteUid = uid
+            }
             eventListener?.onUserJoined?.invoke(uid)
         }
 
         override fun onUserOffline(uid: Int, reason: Int) {
             super.onUserOffline(uid, reason)
+            if (uid == firstRemoteUid) {
+                firstRemoteUid = 0
+            }
             eventListener?.onUserOffline?.invoke(uid)
         }
 

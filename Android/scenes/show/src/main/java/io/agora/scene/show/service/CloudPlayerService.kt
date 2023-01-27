@@ -52,28 +52,37 @@ class CloudPlayerService {
         if (heartBeatTimerMap[channelName] != null) {
             return
         }
+        reqHeatBeatAsync(channelName, uid, failure)
         heartBeatTimerMap[channelName] = object : CountDownTimer(Long.MAX_VALUE, 30 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                scope.launch(Dispatchers.Main) {
-                    try {
-                        withContext(Dispatchers.IO) {
-                            reqHeatBeat(channelName, uid, channelName)
-                        }
-                    } catch (ex: Exception) {
-                        failure?.invoke(ex)
-                    }
-                }
+                reqHeatBeatAsync(channelName, uid, failure)
             }
 
             override fun onFinish() {
                 // do nothing
             }
-        }
+        }.start()
     }
 
     fun stopHeartBeat(channelName: String) {
-        val countDownTimer = heartBeatTimerMap[channelName] ?: return
+        val countDownTimer = heartBeatTimerMap.remove(channelName) ?: return
         countDownTimer.cancel()
+    }
+
+    private fun reqHeatBeatAsync(
+        channelName: String,
+        uid: String,
+        failure: ((Exception) -> Unit)?
+    ) {
+        scope.launch(Dispatchers.Main) {
+            try {
+                withContext(Dispatchers.IO) {
+                    reqHeatBeat(channelName, uid, channelName)
+                }
+            } catch (ex: Exception) {
+                failure?.invoke(ex)
+            }
+        }
     }
 
     private fun reqStartCloudPlayer(

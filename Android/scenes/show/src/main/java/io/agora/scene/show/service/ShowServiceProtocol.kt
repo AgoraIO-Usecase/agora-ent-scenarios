@@ -3,6 +3,8 @@ package io.agora.scene.show.service
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 
+// 房间存活时间，单位ms
+const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
 
 interface ShowServiceProtocol {
 
