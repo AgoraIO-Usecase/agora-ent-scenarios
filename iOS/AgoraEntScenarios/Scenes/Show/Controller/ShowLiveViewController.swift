@@ -18,6 +18,8 @@ class ShowLiveViewController: UIViewController {
                 return
             }
             
+            self.joinStartDate = Date()
+            showLogger.info("room(\(roomId)) loadingType: \(loadingType.rawValue)", context: "AgoraKit")
             updateLoadingType(loadingType: loadingType)
         }
     }
@@ -198,7 +200,9 @@ class ShowLiveViewController: UIViewController {
     }
     
     deinit {
-        showLogger.info("deinit-- ShowLiveViewController \(room?.roomId ?? "")")
+        let roomId = room?.roomId ?? ""
+        showLogger.info("deinit-- ShowLiveViewController \(roomId)")
+        agoraKitManager.leaveChannelEx(roomId: roomId)
     }
     
     init(agoraKitManager:ShowAgoraKitManager) {
@@ -272,7 +276,7 @@ class ShowLiveViewController: UIViewController {
     private func joinChannel() {
         agoraKitManager.delegate = self
 //        agoraKitManager.defaultSetting()
-        guard let channelName = room?.roomId, let uid: UInt = UInt(currentUserId), let ownerId = room?.ownerId else {
+        guard let channelName = room?.roomId, let ownerId = room?.ownerId else {
             return
         }
         // 观众端模式设置
@@ -282,16 +286,20 @@ class ShowLiveViewController: UIViewController {
         self.joinStartDate = Date()
 //        let ret =
         if role == .audience {
+            let uid: UInt = UInt(ownerId)!
             agoraKitManager.joinChannelEx(channelName: channelName,
-                                          ownerId: ownerId,
+                                          ownerId: uid,
                                           options: self.channelOptions,
-                                          view: liveView.canvasView.localView,
                                           role: .audience)
+            agoraKitManager.setupRemoteVideo(channelName: channelName,
+                                             uid: uid,
+                                             canvasView: liveView.canvasView.localView)
         } else {
+            let uid: UInt = UInt(currentUserId)!
             agoraKitManager.joinChannel(channelName: channelName,
                                         uid: uid,
-                                        ownerId: ownerId,
-                                        canvasView: liveView.canvasView.localView)
+                                        ownerId: ownerId)
+            agoraKitManager.setupLocalVideo(uid: uid, canvasView: liveView.canvasView.localView)
         }
 //        if ret == 0 {
 //            print("进入房间 \(channelName) \(uid) \(ownerId)")
@@ -628,18 +636,22 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 return
             }
             if room?.roomId != interaction.roomId {
+                let uid = UInt(interaction.userId!)!
                 agoraKitManager.joinChannelEx(channelName: roomId,
-                                              ownerId: interaction.userId,
+                                              ownerId: uid,
                                               options: self.channelOptions,
-                                              view: liveView.canvasView.remoteView,
                                               role: role)
+                agoraKitManager.setupRemoteVideo(channelName: roomId,
+                                                 uid: uid,
+                                                 canvasView: liveView.canvasView.remoteView)
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }
         case .onSeat:
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
-            agoraKitManager.switchRole(role: (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience,
+            let role: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
+            agoraKitManager.switchRole(role: role,
                                        options: self.channelOptions,
                                        uid: interaction.userId,
                                        canvasView: liveView.canvasView.remoteView)
@@ -699,7 +711,12 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showLogger.info("rtcEngine didJoinedOfUid === \(uid)")
+        showLogger.info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: "AgoraKit")
+        #if DEBUG
+        if uid > 100000 {
+            agoraKitManager.setupRemoteVideo(channelName: roomId, uid: uid, canvasView: liveView.canvasView.localView)
+        }
+        #endif
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
@@ -734,7 +751,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
-        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height), type  = \(stats.superResolutionType)")
+        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription ?? "")) width = \(stats.width), height = \(stats.height), type = \(stats.superResolutionType)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
@@ -762,10 +779,11 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                    elapsed: Int) {
         DispatchQueue.main.async {
             let channelId = self.room?.roomId ?? ""
-            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state) reason: \(reason)")
-            if ( (state == .decoding) && ( (reason == .remoteUnmuted) || (reason == .localMuted) ) )  {
+            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)", context: "AgoraKit")
+            if state == .decoding /*2*/,
+               ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
-                showLogger.info("show channel \(channelId) cost: \(Int(costTs)) ms")
+                showLogger.info("show first frame (\(channelId)) cost: \(Int(costTs)) ms", context: "AgoraKit")
             }
         }
     }
