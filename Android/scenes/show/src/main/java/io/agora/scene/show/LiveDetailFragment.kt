@@ -57,8 +57,6 @@ class LiveDetailFragment : Fragment() {
     private val TAG = this.toString()
 
     companion object {
-        // 房间存活时间，单位ms
-        const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
 
         private const val EXTRA_ROOM_DETAIL_INFO = "roomDetailInfo"
 
@@ -139,16 +137,16 @@ class LiveDetailFragment : Fragment() {
         super.onResume()
         ShowLogger.d(TAG, "Fragment Lifecycle: onResume")
 
-        initView()
-        initServiceWithJoinRoom()
-        initRtcEngine()
-        if (isRoomOwner) {
+        val roomLeftTime =
+            ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
+
+        if (roomLeftTime > 0) {
             mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+            initView()
+            initServiceWithJoinRoom()
+            initRtcEngine()
         } else {
-            mBinding.root.postDelayed(
-                timerRoomEndRun,
-                ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
-            )
+            timerRoomEndRun.run()
         }
     }
 
@@ -1293,35 +1291,15 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
         } else {
-            eventListener.onChannelJoined = {
+            eventListener.onUserJoined = { rUid ->
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         videoView,
                         Constants.RENDER_MODE_HIDDEN,
-                        mRoomInfo.ownerId.toInt()
+                        rUid
                     ),
                     rtcConnection
                 )
-            }
-            eventListener.onUserJoined = { rUid ->
-                if(rUid != mRoomInfo.ownerId.toInt()){
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            null,
-                            Constants.RENDER_MODE_HIDDEN,
-                            mRoomInfo.ownerId.toInt()
-                        ),
-                        rtcConnection
-                    )
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            videoView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            rUid
-                        ),
-                        rtcConnection
-                    )
-                }
             }
         }
 

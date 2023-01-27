@@ -12,6 +12,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
+import io.agora.scene.show.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -71,7 +72,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
         // 设置token有效期为房间存活时长，到期后关闭并退出房间
         TokenGenerator.expireSecond =
-            LiveDetailFragment.ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
+            ROOM_AVAILABLE_DURATION / 1000 + 10 // 20min + 10s，加10s防止临界条件下报token无效
 
         // 设置预加载
         val preloadCount = 3

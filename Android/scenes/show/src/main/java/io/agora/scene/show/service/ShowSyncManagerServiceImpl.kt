@@ -10,6 +10,7 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.ShowLogger
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.EventListener
+import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.random.Random
@@ -124,70 +125,27 @@ class ShowSyncManagerServiceImpl(
         error: ((Exception) -> Unit)?
     ) {
         val returnFakeData = true
-        val fakeDataSize = 2
+        val fakeDataSize = 5
 
         initSync {
             Sync.Instance().getScenes(object : Sync.DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
                     workerExecutor.execute {
-                        val roomList = result!!.map {
+
+                        var roomList = result!!.map {
                             it.toObject(ShowRoomDetailModel::class.java)
                         }
+                        roomList = removeExpiredRooms(roomList, !returnFakeData)
+
                         roomMap.clear()
-                        if (returnFakeData) {
-                            // check if has fake data
-                            val fakeList = roomList.filter { it.isFakeData }
-                            if (fakeList.size < fakeDataSize) {
-                                val createFakeCount = fakeDataSize - fakeList.size
-
-                                val letchCount = CountDownLatch(createFakeCount)
-
-                                runOnMainThread {
-                                    for (i in 0 until createFakeCount) {
-                                        val channelName =
-                                            Random(System.currentTimeMillis()).nextInt(10000) + 1000000 * (i + 1)
-                                        val uid =
-                                            Random(System.currentTimeMillis()).nextInt(10000) + 1000000 * (i + 1)
-                                        val streamUrl =
-                                            "https://download.agora.io/sdk/release/agora_test_video_${
-                                                Random.nextInt(
-                                                    1,
-                                                    5
-                                                )
-                                            }.mp4"
-                                        val streamRegion = "cn"
-                                        cloudPlayerService.startCloudPlayer(channelName.toString(),
-                                            uid.toString(),
-                                            streamUrl,
-                                            streamRegion,
-                                            success = {
-                                                createRoomInner(
-                                                    channelName.toString(),
-                                                    channelName.toString(),
-                                                    "1",
-                                                    uid.toString(),
-                                                    true,
-                                                    success = { letchCount.countDown() },
-                                                    error = { letchCount.countDown() }
-                                                )
-                                            },
-                                            failure = { letchCount.countDown() })
-                                    }
-                                }
-
-                                try {
-                                    letchCount.await()
-                                } catch (e: Exception) {
-                                    ShowLogger.e(TAG, e)
-                                }
-                            }
-                        }
-                        val retList = mutableListOf<ShowRoomDetailModel>()
-                        roomMap.values.forEach { retList.add(it) }
-                        retList.addAll(roomList)
                         roomList.forEach { roomMap[it.roomId] = it.copy() }
-                        val sortedBy = retList.sortedBy { it.createdAt }
-                        runOnMainThread{ success.invoke(sortedBy) }
+
+                        if (returnFakeData) {
+                            roomList = appendFakeRooms(roomList, fakeDataSize)
+                        }
+
+                        val sortedBy = roomList.sortedBy { it.createdAt }
+                        runOnMainThread { success.invoke(sortedBy) }
                     }
                 }
 
@@ -198,6 +156,151 @@ class ShowSyncManagerServiceImpl(
         }
     }
 
+    private fun appendFakeRooms(
+        roomList: List<ShowRoomDetailModel>,
+        fakeDataSize: Int
+    ) : List<ShowRoomDetailModel>{
+        val retRoomList = mutableListOf<ShowRoomDetailModel>()
+        retRoomList.addAll(roomList)
+        // check if has fake data
+        val fakeList = retRoomList.filter { it.isFakeData }
+        if (fakeList.size < fakeDataSize) {
+            val createFakeCount = fakeDataSize - fakeList.size
+
+            val letchCount = CountDownLatch(createFakeCount)
+
+            runOnMainThread {
+                val startChannelName = Random(TimeUtils.currentTimeMillis()).nextInt(1000) + 10000
+                val startUid = Random(TimeUtils.currentTimeMillis()).nextInt(100) + 1000
+                val fakeStreamUrls = arrayListOf(
+                    "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
+                    "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
+                    "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
+                    "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
+                )
+                for (i in 0 until createFakeCount) {
+                    val channelName = startChannelName + i
+                    val uid = startUid + i
+                    val streamUrl = fakeStreamUrls[i % fakeStreamUrls.size]
+                    val streamRegion = "cn"
+                    cloudPlayerService.startCloudPlayer(channelName.toString(),
+                        uid.toString(),
+                        streamUrl,
+                        streamRegion,
+                        success = {
+                            createRoomInner(
+                                channelName.toString(),
+                                channelName.toString(),
+                                1,
+                                "1",
+                                uid.toString(),
+                                true,
+                                success = {
+                                    Sync.Instance().joinScene(
+                                        it.roomId,
+                                        object : JoinSceneCallback {
+                                            override fun onSuccess(
+                                                sceneReference: SceneReference?
+                                            ) {
+                                                sceneReference ?: return
+                                                sceneReference.collection(
+                                                    kCollectionIdUser
+                                                ).add(
+                                                    ShowUser(
+                                                        uid.toString(),
+                                                        "",
+                                                        ""
+                                                    ),
+                                                    object :
+                                                        Sync.DataItemCallback {
+                                                        override fun onSuccess(
+                                                            result: IObject?
+                                                        ) {
+
+                                                        }
+
+                                                        override fun onFail(
+                                                            exception: SyncManagerException?
+                                                        ) {
+
+                                                        }
+                                                    })
+                                            }
+
+                                            override fun onFail(exception: SyncManagerException?) {
+
+                                            }
+
+                                        })
+                                    retRoomList.add(it)
+                                    letchCount.countDown()
+                                },
+                                error = { letchCount.countDown() }
+                            )
+                        },
+                        failure = { letchCount.countDown() })
+                }
+            }
+
+            try {
+                letchCount.await()
+            } catch (e: Exception) {
+                ShowLogger.e(TAG, e)
+            }
+        }
+        return retRoomList
+    }
+
+    private fun removeExpiredRooms(
+        roomList: List<ShowRoomDetailModel>,
+        removeFakeData: Boolean
+    ) : List<ShowRoomDetailModel> {
+        val retRoomList = mutableListOf<ShowRoomDetailModel>()
+        retRoomList.addAll(roomList)
+
+        val expireRoomList = roomList.filter {
+            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) || (removeFakeData && it.isFakeData)
+        }
+        if (expireRoomList.isNotEmpty()) {
+            val expireLetchCount = CountDownLatch(expireRoomList.size)
+            runOnMainThread {
+                expireRoomList.forEach {
+
+                    Sync.Instance()
+                        .joinScene(it.roomId, object : JoinSceneCallback {
+                            override fun onSuccess(sceneReference: SceneReference?) {
+                                runOnMainThread {
+                                    sceneReference?.delete(object : Sync.Callback {
+                                        override fun onSuccess() {
+                                            retRoomList.remove(it)
+                                            expireLetchCount.countDown()
+                                        }
+
+                                        override fun onFail(exception: SyncManagerException?) {
+                                            errorHandler.invoke(exception!!)
+                                            expireLetchCount.countDown()
+                                        }
+                                    }) ?: expireLetchCount.countDown()
+                                }
+                            }
+
+                            override fun onFail(exception: SyncManagerException?) {
+                                errorHandler.invoke(exception!!)
+                                expireLetchCount.countDown()
+                            }
+                        })
+                }
+            }
+
+            try {
+                expireLetchCount.await()
+            } catch (e: Exception) {
+                ShowLogger.e(TAG, e)
+            }
+        }
+        return retRoomList
+    }
+
     override fun createRoom(
         roomId: String,
         roomName: String,
@@ -206,13 +309,23 @@ class ShowSyncManagerServiceImpl(
         error: ((Exception) -> Unit)?
     ) {
         initSync {
-            createRoomInner(roomId,roomName,thumbnailId, UserManager.getInstance().user.id.toString(), false, success, error)
+            createRoomInner(
+                roomId,
+                roomName,
+                0,
+                thumbnailId,
+                UserManager.getInstance().user.id.toString(),
+                false,
+                success,
+                error
+            )
         }
     }
 
     private fun createRoomInner(
         roomId: String,
         roomName: String,
+        roomUserCount: Int,
         thumbnailId: String,
         uid: String,
         isFakeData: Boolean,
@@ -222,7 +335,7 @@ class ShowSyncManagerServiceImpl(
         val roomDetail = ShowRoomDetailModel(
             roomId,
             roomName,
-            0,
+            roomUserCount,
             thumbnailId,
             uid,
             UserManager.getInstance().user.headUrl,
@@ -313,10 +426,6 @@ class ShowSyncManagerServiceImpl(
             return
         }
 
-        if (roomDetail.isFakeData) {
-            cloudPlayerService.stopHeartBeat(currRoomNo)
-        }
-
         // 移除连麦申请
         val targetApply =
             micSeatApplyList.filter { it.userId == UserManager.getInstance().user.id.toString() }
@@ -340,12 +449,19 @@ class ShowSyncManagerServiceImpl(
             {},
             { errorHandler.invoke(it) }
         )
+        innerUpdateRoomUserCount(roomDetail.roomUserCount - 1, {}, {})
 
         Log.d(
             TAG,
             "leaveRoom roomNo=${currRoomNo} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id.toString()}"
         )
-        if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()) {
+        if (roomDetail.isFakeData) {
+            cloudPlayerService.stopHeartBeat(currRoomNo)
+        }
+
+        if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()
+            || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
+        ) {
             Log.d(TAG, "leaveRoom delete room")
 
             val roomNo = currRoomNo
