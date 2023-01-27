@@ -110,13 +110,13 @@ class ShowAgoraKitManager: NSObject {
     
     deinit {
         AgoraRtcEngineKit.destroy()
-        print("deinit-- ShowAgoraKitManager")
+        showLogger.info("deinit-- ShowAgoraKitManager")
     }
     
     override init() {
         super.init()
         setupContentInspectConfig()
-        print("init-- ShowAgoraKitManager")
+        showLogger.info("init-- ShowAgoraKitManager")
     }
     
     //MARK: private
@@ -128,7 +128,7 @@ class ShowAgoraKitManager: NSObject {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            print("setupContentInspectConfig fail")
+            showLogger.error("setupContentInspectConfig fail")
             return
         }
         let jsonStr = String(data: jsonData, encoding: .utf8)
@@ -138,7 +138,7 @@ class ShowAgoraKitManager: NSObject {
         module.type = .moderation
         config.modules = [module]
         let ret = agoraKit.enableContentInspect(true, config: config)
-        print("setupContentInspectConfig: \(ret)")
+        showLogger.info("setupContentInspectConfig: \(ret)")
     }
     
     /// 语音审核
@@ -155,9 +155,9 @@ class ShowAgoraKitManager: NSObject {
                                      "payload": JSONObject.toJsonString(dict: userInfo) ?? ""]
         NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.agoralab.co/v1/moderation/audio",
                                           params: parasm) { response in
-            print("response === \(response)")
+            showLogger.info("response === \(response)")
         } failure: { errr in
-            print(errr)
+            showLogger.error(errr)
         }
     }
     
@@ -210,7 +210,7 @@ class ShowAgoraKitManager: NSObject {
     func setCaptureVideoDimensions(_ size: CGSize){
         agoraKit.disableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
-        print("采集分辨率切换为 width = \(size.width), height = \(size.height)")
+        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height)")
         agoraKit.setCameraCapturerConfiguration(captureConfig)
         agoraKit.enableVideo()
     }
@@ -306,7 +306,6 @@ class ShowAgoraKitManager: NSObject {
             }
             exConnectionMap[channelName] = connection
             
-            
             if ret == 0 {
                 showLogger.info("join room ex: channelName: \(channelName) ownerId: \(ownerId)",
                                 context: "AgoraKitManager")
@@ -363,9 +362,9 @@ class ShowAgoraKitManager: NSObject {
 //        }
         
         if ret == 0 {
-            print("join room success: \(channelName) \(uid) \(ownerId)")
+            showLogger.info("join room success: \(channelName) \(uid) \(ownerId)")
         }else{
-            print("join room fail: \(channelName) \(uid) \(ownerId), \(ret)")
+            showLogger.error("join room fail: \(channelName) \(uid) \(ownerId), \(ret)")
         }
     }
     
@@ -407,7 +406,8 @@ class ShowAgoraKitManager: NSObject {
             mediaOptions.autoSubscribeAudio = true
             mediaOptions.autoSubscribeVideo = true
         }
-        print("updateLoadingType channelName: \(channelName) loadingType: \(loadingType.rawValue)")
+
+        showLogger.info("updateLoadingType \(channelName) \(loadingType.rawValue)")
         agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
     }
 }
