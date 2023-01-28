@@ -8,7 +8,7 @@
 import UIKit
 import MJRefresh
 
-private let kAudienceHasShowPreset = "kAudienceHasShowPreset"
+private let kAudienceShowPresetType = "kAudienceShowPresetType"
 
 class ShowRoomListVC: UIViewController {
 
@@ -67,9 +67,10 @@ class ShowRoomListVC: UIViewController {
         }
         roomListView.joinRoomAction = { [weak self] room in
             guard let wSelf = self else { return }
-            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceHasShowPreset)
+            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+            let audencePresetType = ShowPresetType(rawValue: value)
             // 如果是owner是自己 或者已经设置过观众模式
-            if room.ownerId == VLUserCenter.user.id || audencePresetType > 0 {
+            if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
                 wSelf.joinRoom(room)
             }else{
                 wSelf.showPresettingVC { [weak self] in
@@ -88,7 +89,7 @@ class ShowRoomListVC: UIViewController {
         vc.isBroadcaster = false
         vc.didSelectedPresetType = { type, modeName in
             selected?()
-            UserDefaults.standard.set(type.rawValue, forKey: kAudienceHasShowPreset)
+            UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
         }
         present(vc, animated: true)
     }
@@ -120,7 +121,7 @@ class ShowRoomListVC: UIViewController {
             
             guard let wSelf = self else { return }
             let vc = ShowLiveViewController()
-            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceHasShowPreset)
+            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
             vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
             vc.room = room
             let nc = UINavigationController(rootViewController: vc)

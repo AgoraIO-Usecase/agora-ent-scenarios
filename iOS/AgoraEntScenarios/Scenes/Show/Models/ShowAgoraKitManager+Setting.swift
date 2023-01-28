@@ -113,6 +113,8 @@ extension ShowAgoraKitManager {
     
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode,uid: UInt? = nil) {
         switch type {
+        case .unknown:
+            break
         case .show_low:
             switch mode {
             case .signle:
@@ -120,7 +122,6 @@ extension ShowAgoraKitManager {
             case .pk:
                 _presetValuesWith(dimensions: ._480x360, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
             }
-            break
         case .show_medium:
             switch mode {
             case .signle:
@@ -128,8 +129,6 @@ extension ShowAgoraKitManager {
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
             }
-            
-            break
         case .show_high:
             
             switch mode {
@@ -138,12 +137,8 @@ extension ShowAgoraKitManager {
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
             }
-            
-            break
-            
         case .quality_low:
             _setQualityEnable(false,uid: uid)
-            break
         case .quality_medium:
             _setQualityEnable(true, srType: SRType.x1_5, uid: uid)
         case .quality_high:
