@@ -698,7 +698,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                 // 打分 + 同步分数
                 if (lrcView == null || isChorusCoSinger()!!) return
-                val score = lrcView!!.cumulativeScore as Float
+                val score = lrcView!!.cumulativeScore.toFloat()
                 ktvApiEventHandler?.onSingingScoreResult(score)
                 syncSingingScore(score)
             }
