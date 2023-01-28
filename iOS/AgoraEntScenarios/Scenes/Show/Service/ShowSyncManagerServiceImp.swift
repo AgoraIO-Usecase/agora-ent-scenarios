@@ -2000,7 +2000,8 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         }
         let channelName = room.roomId ?? ""
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
-                                               uid: room.ownerId ?? "",
+                                               uid: VLUserCenter.user.id,
+                                               robotUid: room.ownerId ?? "",
                                                streamUrl: robotStreamURL[(Int(channelName) ?? 1) - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
