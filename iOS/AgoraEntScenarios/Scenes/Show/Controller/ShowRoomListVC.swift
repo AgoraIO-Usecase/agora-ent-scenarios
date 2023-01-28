@@ -17,8 +17,6 @@ class ShowRoomListVC: UIViewController {
     
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
-    // 观众端预设类型
-    private var audiencePresetType: ShowPresetType?
     
     private var firstSetAudience = false
     
@@ -69,9 +67,9 @@ class ShowRoomListVC: UIViewController {
         }
         roomListView.joinRoomAction = { [weak self] room in
             guard let wSelf = self else { return }
-            let hasShowPreset = UserDefaults.standard.bool(forKey: kAudienceHasShowPreset)
+            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceHasShowPreset)
             // 如果是owner是自己 或者已经设置过观众模式
-            if room.ownerId == VLUserCenter.user.id || hasShowPreset {
+            if room.ownerId == VLUserCenter.user.id || audencePresetType > 0 {
                 wSelf.joinRoom(room)
             }else{
                 wSelf.showPresettingVC { [weak self] in
@@ -88,11 +86,9 @@ class ShowRoomListVC: UIViewController {
     private func showPresettingVC(selected:(()->())? = nil) {
         let vc = ShowPresettingVC()
         vc.isBroadcaster = false
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.audiencePresetType = type
+        vc.didSelectedPresetType = { type, modeName in
             selected?()
-//            self?.firstSetAudience = true
-            UserDefaults.standard.set(true, forKey: kAudienceHasShowPreset)
+            UserDefaults.standard.set(type.rawValue, forKey: kAudienceHasShowPreset)
         }
         present(vc, animated: true)
     }
@@ -124,7 +120,8 @@ class ShowRoomListVC: UIViewController {
             
             guard let wSelf = self else { return }
             let vc = ShowLiveViewController()
-            vc.audiencePresetType = wSelf.audiencePresetType
+            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceHasShowPreset)
+            vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
             vc.room = room
             let nc = UINavigationController(rootViewController: vc)
             nc.modalPresentationStyle = .fullScreen
