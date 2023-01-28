@@ -37,6 +37,7 @@ class ShowLivePagesViewController: ViewController {
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
         collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.bounces = false
         return collectionView
     }()
     
@@ -91,6 +92,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             vc?.audiencePresetType = self.audiencePresetType
             vc?.selectedResolution = self.selectedResolution
             vc?.room = room
+            vc?.loadingType = .preload
         }
         
         guard let vc = vc else {
@@ -99,7 +101,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if let origVC = origVC {
             origVC.view.removeFromSuperview()
             origVC.removeFromParent()
-            origVC.leaveRoom()
+            origVC.loadingType = .idle
             AppContext.unloadShowServiceImp(origVC.room?.roomId ?? "")
             self.roomVCMap[origVC.room?.roomId ?? ""] = nil
             showLogger.info("remove cache vc: \(origVC.room?.roomId ?? "") cache vc count:\(self.roomVCMap.count)")

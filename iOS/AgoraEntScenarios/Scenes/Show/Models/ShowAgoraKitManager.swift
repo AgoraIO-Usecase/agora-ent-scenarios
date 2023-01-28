@@ -11,7 +11,8 @@ import UIKit
 import YYCategories
 
 enum ShowRTCLoadingType: Int {
-    case preload = 0
+    case idle = 0
+    case preload
     case loading
 }
 
@@ -94,11 +95,6 @@ class ShowAgoraKitManager: NSObject {
     
     fileprivate(set) lazy var agoraKit: AgoraRtcEngineKit = {
         let kit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
-        let roleOptions = AgoraClientRoleOptions()
-        roleOptions.audienceLatencyLevel = .ultraLowLatency
-        kit.setClientRole(.audience, options: roleOptions)
-        kit.enableAudio()
-        kit.enableVideo()
         return kit
     }()
     
@@ -399,12 +395,12 @@ class ShowAgoraKitManager: NSObject {
         }
         
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        if loadingType == .preload {
-            mediaOptions.autoSubscribeAudio = false
-            mediaOptions.autoSubscribeVideo = false
-        } else {
+        if loadingType == .loading {
             mediaOptions.autoSubscribeAudio = true
             mediaOptions.autoSubscribeVideo = true
+        } else {
+            mediaOptions.autoSubscribeAudio = false
+            mediaOptions.autoSubscribeVideo = false
         }
 
         showLogger.info("updateLoadingType \(channelName) \(loadingType.rawValue)")
@@ -478,10 +474,10 @@ extension ShowAgoraKitManager {
     func initAudienceConfig() {
         agoraKit.setParameters("{\"rtc.enable_crypto_access\":false}")
         agoraKit.setParameters("{\"rtc.use_global_location_priority_domain\":true}")
-        agoraKit.setParameters("{\"che.hardware_decoding\":0}")
-        agoraKit.setParameters("{\"rtc.enable_nasa2\": false}")
-        agoraKit.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
-        agoraKit.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
+//        agoraKit.setParameters("{\"che.hardware_decoding\":0}")
+//        agoraKit.setParameters("{\"rtc.enable_nasa2\": false}")
+//        agoraKit.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
+//        agoraKit.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
     }
     
     func initH265Config() {
