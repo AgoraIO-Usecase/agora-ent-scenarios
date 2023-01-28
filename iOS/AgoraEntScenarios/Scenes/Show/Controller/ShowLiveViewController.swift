@@ -202,7 +202,6 @@ class ShowLiveViewController: UIViewController {
     deinit {
         let roomId = room?.roomId ?? ""
         showLogger.info("deinit-- ShowLiveViewController \(roomId)")
-        agoraKitManager.leaveChannelEx(roomId: roomId)
     }
     
     init(agoraKitManager:ShowAgoraKitManager) {
@@ -345,11 +344,13 @@ extension ShowLiveViewController {
                 
             }
             sendMessageWithText("join_live_room".show_localized)
-        } else {
+        } else if loadingType == .preload {
             AppContext.showServiceImp(roomId).deinitRoom { error in
                 
             }
             sendMessageWithText("leave_live_room".show_localized)
+        } else {
+            leaveRoom()
         }
     }
 }
@@ -751,7 +752,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
-        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription ?? "")) width = \(stats.width), height = \(stats.height), type = \(stats.superResolutionType)")
+//        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription ?? "")) width = \(stats.width), height = \(stats.height), type = \(stats.superResolutionType)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {

@@ -736,7 +736,7 @@ extension ShowSyncManagerServiceImp {
                 let dataArray = results.map({ info in
                     return ShowRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
                 })
-                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
+                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $1.createdAt) })
                 completion(nil, roomList)
             } fail: { error in
                 completion(error.toNSError(), nil)
@@ -1904,7 +1904,7 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+private let robotRoomIds = ["1", "2", "3", "4"/*, "5", "6", "7", "8", "9"*/]
 private let robotRoomOwnerHeaders = [
     "https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
     "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
@@ -1946,7 +1946,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             return super._checkRoomExpire()
         }
         
-        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: "\(UserInfo.userId)") { msg in
+        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: room.ownerId ?? "") { msg in
             guard let msg = msg else {return}
             agoraAssert("cloudPlayerHeartbeat fail: \(roomId) \(msg)")
         }
@@ -1972,17 +1972,19 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 //create fake room
                 robotIds.forEach { robotId in
                     let room = ShowRoomListModel()
+                    let userId = "\(UInt(robotId) ?? 1 + 2000000000)"
                     room.roomName = "Robot Room \(robotId)"
                     room.roomId = robotId
                     room.thumbnailId = "1"
-                    room.ownerId = robotId
-                    room.ownerName = robotId
+                    room.ownerId = userId
+                    room.ownerName = userId
                     room.ownerAvatar = robotRoomOwnerHeaders[(Int(robotId) ?? 1) - 1]//VLUserCenter.user.headUrl
                     room.createdAt = Date().millionsecondSince1970()
                     dataArray.append(room)
                 }
                 
-                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
+//                let roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $1.createdAt) })
+                let roomList = dataArray.sorted(by: { $0.createdAt > $1.createdAt })
                 completion(nil, roomList)
             } fail: { error in
                 completion(error.toNSError(), nil)
@@ -1998,7 +2000,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         }
         let channelName = room.roomId ?? ""
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
-                                               uid: "\(UserInfo.userId)",
+                                               uid: room.ownerId ?? "",
                                                streamUrl: robotStreamURL[(Int(channelName) ?? 1) - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")

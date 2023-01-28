@@ -123,9 +123,9 @@ class ShowRoomListVC: UIViewController {
 //            }
             
             let vc = ShowLivePagesViewController()
-            vc.audiencePresetType = self.audiencePresetType
+            vc.audiencePresetType = self.audiencePresetType// ?? ShowPresetType.show_low
             vc.roomList = roomList
-        vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
+            vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
             let nc = UINavigationController(rootViewController: vc)
             nc.modalPresentationStyle = .fullScreen
             self.present(nc, animated: true)
