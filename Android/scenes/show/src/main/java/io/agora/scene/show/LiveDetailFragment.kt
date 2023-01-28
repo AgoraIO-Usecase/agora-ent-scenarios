@@ -35,7 +35,6 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
-import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.service.*
 import io.agora.scene.show.widget.*
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
@@ -105,7 +104,7 @@ class LiveDetailFragment : Fragment() {
 
     private val timerRoomEndRun = Runnable {
         if (destroy()) {
-            showLivingEndDialog()
+            showLivingEndLayout()
         }
     }
 
@@ -146,7 +145,7 @@ class LiveDetailFragment : Fragment() {
             initServiceWithJoinRoom()
             initRtcEngine()
         } else {
-            timerRoomEndRun.run()
+            showLivingEndLayout()
         }
     }
 
@@ -175,9 +174,22 @@ class LiveDetailFragment : Fragment() {
     //================== UI Operation ===============
 
     private fun initView() {
+        initLivingEndLayout()
         initTopLayout()
         initBottomLayout()
         initMessageLayout()
+    }
+
+    private fun initLivingEndLayout(){
+        val livingEndLayout = mBinding.livingEndLayout
+        livingEndLayout.root.isVisible = false
+        livingEndLayout.tvUserName.text = mRoomInfo.ownerName
+        Glide.with(this@LiveDetailFragment)
+            .load(mRoomInfo.ownerAvatar)
+            .into(livingEndLayout.ivAvatar)
+        livingEndLayout.ivClose.setOnClickListener {
+            requireActivity().finish()
+        }
     }
 
     private fun initTopLayout() {
@@ -957,7 +969,7 @@ class LiveDetailFragment : Fragment() {
         mService.subscribeCurrRoomEvent { status, _ ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
                 if (destroy()) {
-                    showLivingEndDialog()
+                    showLivingEndLayout()
                 }
             }
         }
@@ -1124,21 +1136,9 @@ class LiveDetailFragment : Fragment() {
         mService.leaveRoom()
     }
 
-    private fun showLivingEndDialog() {
-        AlertDialog.Builder(requireContext(), R.style.show_alert_dialog)
-            .setView(
-                ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext())).apply {
-                    Glide.with(this@LiveDetailFragment)
-                        .load(mRoomInfo.ownerAvatar)
-                        .into(ivAvatar)
-                }.root
-            )
-            .setCancelable(false)
-            .setPositiveButton(R.string.show_living_end_back_room_list) { dialog, _ ->
-                requireActivity().finish()
-                dialog.dismiss()
-            }
-            .show()
+    private fun showLivingEndLayout(){
+        val livingEndLayout = mBinding.livingEndLayout
+        livingEndLayout.root.isVisible = true
     }
 
     //================== RTC Operation ===================
