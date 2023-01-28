@@ -85,5 +85,13 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
         mLrcControlView.updateScore(score);
     }
 
+    @Override
+    public void onSkipPostludeClick() {
+        mViewModel.changeMusic();
+    }
 
+    @Override
+    public void onSkipPreludeClick() {
+
+    }
 }

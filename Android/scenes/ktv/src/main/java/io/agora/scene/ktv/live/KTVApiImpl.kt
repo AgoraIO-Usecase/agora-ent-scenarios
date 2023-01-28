@@ -361,6 +361,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val msg: MutableMap<String?, Any?> = java.util.HashMap()
                 msg["cmd"] = "setVoicePitch"
                 msg["pitch"] = pitch
+                msg["time"] = mPlayer!!.playPosition
                 val jsonMsg = JSONObject(msg)
                 val ret = mRtcEngine!!.sendStreamMessage(streamId, jsonMsg.toString().toByteArray())
                 if (ret < 0) {

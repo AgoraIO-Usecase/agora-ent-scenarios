@@ -136,4 +136,6 @@
     <string name="ktv_no_lrc">暂无歌词 </string>
     <string name="ktv_content">监测到当前内容存在违规行为</string>
     <string name="ktv_iknow">我知道了</string>
+    <string name="ktv_skip_prelude">跳过前奏</string>
+    <string name="ktv_skip_postlude">跳过尾奏</string>
 </resources>
