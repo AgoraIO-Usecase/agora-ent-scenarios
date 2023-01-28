@@ -237,7 +237,6 @@ class ShowLiveViewController: UIViewController {
             self._subscribeServiceEvent()
             UIApplication.shared.isIdleTimerDisabled = true
         }
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -289,10 +288,11 @@ class ShowLiveViewController: UIViewController {
             agoraKitManager.joinChannelEx(channelName: channelName,
                                           ownerId: uid,
                                           options: self.channelOptions,
-                                          role: .audience)
-            agoraKitManager.setupRemoteVideo(channelName: channelName,
-                                             uid: uid,
-                                             canvasView: liveView.canvasView.localView)
+                                          role: .audience) {
+                self.agoraKitManager.setupRemoteVideo(channelName: channelName,
+                                                      uid: uid,
+                                                      canvasView: self.liveView.canvasView.localView)
+            }
         } else {
             let uid: UInt = UInt(currentUserId)!
             agoraKitManager.joinChannel(channelName: channelName,
@@ -641,10 +641,12 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 agoraKitManager.joinChannelEx(channelName: roomId,
                                               ownerId: uid,
                                               options: self.channelOptions,
-                                              role: role)
-                agoraKitManager.setupRemoteVideo(channelName: roomId,
-                                                 uid: uid,
-                                                 canvasView: liveView.canvasView.remoteView)
+                                              role: role) {
+                    
+                    self.agoraKitManager.setupRemoteVideo(channelName: roomId,
+                                                          uid: uid,
+                                                          canvasView: self.liveView.canvasView.remoteView)
+                }
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             }

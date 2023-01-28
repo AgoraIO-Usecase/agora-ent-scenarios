@@ -237,13 +237,15 @@ class ShowAgoraKitManager: NSObject {
     func joinChannelEx(channelName: String,
                        ownerId: UInt,
                        options:AgoraRtcChannelMediaOptions,
-                       role: AgoraClientRole) {
+                       role: AgoraClientRole,
+                       completion: (()->())?) {
         if let rtcToken = AppContext.shared.rtcTokenMap?[channelName] {
             _joinChannelEx(channelName: channelName,
                            ownerId: ownerId,
                            token: rtcToken,
                            options: options,
                            role: role)
+            completion?()
             return
         }
         
@@ -267,6 +269,7 @@ class ShowAgoraKitManager: NSObject {
                                  token: token,
                                  options: options,
                                  role: role)
+            completion?()
         }
     }
     
