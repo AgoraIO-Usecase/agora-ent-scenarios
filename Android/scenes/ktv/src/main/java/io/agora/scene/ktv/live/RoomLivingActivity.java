@@ -31,6 +31,7 @@ import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.KTVLogger;
+import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvActivityRoomLivingBinding;
 import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding;
@@ -183,7 +184,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                         if (item.getUserNo().equals(songModel.getUserNo())) {
                             binding.tvZC.setText("主唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
-                        } else if (item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo())) {
+                        } else if ((item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo()))
+                            && (roomLivingViewModel.chorusPlayingLiveData.getValue() == null)) {
                             binding.tvZC.setText("合唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {
@@ -344,6 +346,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PREPARE) {
                 getBinding().lrcControlView.onPrepareStatus(roomLivingViewModel.isRoomOwner());
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_WAIT_CHORUS) {
+                if (!roomLivingViewModel.isRoomOwner() && roomLivingViewModel.seatLocalLiveData.getValue() == null) {
+                    ToastUtils.showToast(R.string.ktv_onseat_toast);
+                }
                 getBinding().lrcControlView.onWaitChorusStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHORUS_JOINED) {
                 getBinding().lrcControlView.onMemberJoinedChorus();
