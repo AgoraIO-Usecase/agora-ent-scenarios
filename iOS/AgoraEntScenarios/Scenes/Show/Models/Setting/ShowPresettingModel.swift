@@ -26,8 +26,8 @@ enum ShowMode {
     case pk // pk模式
 }
 
-enum ShowPresetType {
-    case show_low       // 秀场低端
+enum ShowPresetType: Int {
+    case show_low = 1   // 秀场低端
     case show_medium    // 秀场终端
     case show_high      // 秀场高端
     case quality_low    // 画质增强低端
