@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -362,19 +363,19 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     public void downloadLrcData(String url) {
         DownloadManager.getInstance().download(getContext(), url, file -> {
             if (file.getName().endsWith(".zip")) {
-                ZipUtils.unZipAsync(file.getAbsolutePath(),
+                ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
                         file.getAbsolutePath().replace(".zip", ""),
                         new ZipUtils.UnZipCallback() {
                             @Override
                             public void onFileUnZipped(List<String> unZipFilePaths) {
                                 String xmlPath = "";
                                 for (String path : unZipFilePaths) {
-                                    if(path.endsWith(".xml")){
+                                    if (path.endsWith(".xml")) {
                                         xmlPath = path;
                                         break;
                                     }
                                 }
-                                if(TextUtils.isEmpty(xmlPath)){
+                                if (TextUtils.isEmpty(xmlPath)) {
                                     ToastUtils.showToast("The xml file not exist!");
                                     return;
                                 }
