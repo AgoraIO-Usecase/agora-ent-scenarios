@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -221,6 +220,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.ivMusicStart.setVisibility(View.VISIBLE);
             mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicMenu.setVisibility(View.VISIBLE);
+            mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             if (this.mRole == Role.Listener) {
                 mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
@@ -370,7 +370,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.switchOriginal.setChecked(checked);
     }
 
+    public int retryTime = 0;
     public void downloadLrcData(String url) {
+        retryTime++;
         DownloadManager.getInstance().download(getContext(), url, file -> {
             if (file.getName().endsWith(".zip")) {
                 ZipUtils.unzipOnlyPlainXmlFilesAsync(file.getAbsolutePath(),
@@ -394,6 +396,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                                 LrcData data = LrcLoadUtils.parse(xmlFile);
                                 getLrcView().setLrcData(data);
                                 getPitchView().setLrcData(data);
+                                retryTime = 0;
                             }
 
                             @Override
@@ -405,9 +408,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 LrcData data = LrcLoadUtils.parse(file);
                 getLrcView().setLrcData(data);
                 getPitchView().setLrcData(data);
+                retryTime = 0;
             }
         }, exception -> {
-            ToastUtils.showToast(exception.getMessage());
+            if (retryTime < 3) {
+                downloadLrcData(url);
+            } else {
+                retryTime = 0;
+                ToastUtils.showToast(exception.getMessage());
+            }
         });
     }
 
