@@ -122,6 +122,7 @@ class LiveDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ShowLogger.d(TAG, "Fragment Lifecycle: onViewCreated")
+        initView()
         requireActivity().onBackPressedDispatcher.addCallback(enabled = isVisible) {
             onBackPressed()
         }
@@ -141,11 +142,8 @@ class LiveDetailFragment : Fragment() {
 
         if (roomLeftTime > 0) {
             mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
-            initView()
             initServiceWithJoinRoom()
             initRtcEngine()
-        } else {
-            showLivingEndLayout()
         }
     }
 
@@ -182,7 +180,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout(){
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = false
+        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
@@ -196,6 +194,7 @@ class LiveDetailFragment : Fragment() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
             .load(mRoomInfo.ownerAvatar)
+            .error(R.mipmap.show_default_avatar)
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
@@ -956,7 +955,11 @@ class LiveDetailFragment : Fragment() {
                 initService()
             },
             {
-                ToastUtils.showToast(it.message)
+                ShowLogger.e(TAG, it)
+                activity?.runOnUiThread {
+                    destroy()
+                    showLivingEndLayout()
+                }
             })
     }
 
@@ -1137,8 +1140,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showLivingEndLayout(){
-        val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = true
+        mBinding.livingEndLayout.root.isVisible = true
     }
 
     //================== RTC Operation ===================

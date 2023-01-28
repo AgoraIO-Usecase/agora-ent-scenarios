@@ -31,6 +31,7 @@
             <FrameLayout
                 android:id="@+id/flPK"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -59,6 +60,7 @@
             <FrameLayout
                 android:id="@+id/flLinking"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -94,6 +96,7 @@
                 android:padding="8dp"
                 android:layout_marginStart="5dp"
                 android:scaleType="fitXY"
+                android:visibility="gone"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />
 
 
@@ -103,6 +106,7 @@
                 android:layout_height="38dp"
                 android:src="@mipmap/show_live_bottom_ic_music"
                 android:padding="8dp"
+                android:visibility="gone"
                 android:layout_marginStart="5dp"
                 android:scaleType="fitXY"
                 android:background="@drawable/show_live_detail_bottom_btn_bg" />

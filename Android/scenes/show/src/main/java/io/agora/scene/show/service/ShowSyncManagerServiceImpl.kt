@@ -13,7 +13,6 @@ import io.agora.syncmanager.rtm.Sync.EventListener
 import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
-import kotlin.random.Random
 
 class ShowSyncManagerServiceImpl(
     private val context: Context,
@@ -150,7 +149,15 @@ class ShowSyncManagerServiceImpl(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                    if (exception?.message?.contains("empty") ?: false && returnFakeData) {
+                        workerExecutor.execute {
+                            val roomList = appendFakeRooms(emptyList(), fakeDataSize)
+                            val sortedBy = roomList.sortedBy { it.createdAt }
+                            runOnMainThread { success.invoke(sortedBy) }
+                        }
+                    } else {
+                        error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
+                    }
                 }
             })
         }
@@ -159,19 +166,19 @@ class ShowSyncManagerServiceImpl(
     private fun appendFakeRooms(
         roomList: List<ShowRoomDetailModel>,
         fakeDataSize: Int
-    ) : List<ShowRoomDetailModel>{
+    ): List<ShowRoomDetailModel> {
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
         // check if has fake data
-        val fakeList = retRoomList.filter { it.isFakeData }
+        val fakeList = retRoomList.filter { it.roomName.contains("Robot") }
         if (fakeList.size < fakeDataSize) {
             val createFakeCount = fakeDataSize - fakeList.size
 
             val letchCount = CountDownLatch(createFakeCount)
 
             runOnMainThread {
-                val startChannelName = Random(TimeUtils.currentTimeMillis()).nextInt(1000) + 10000
-                val startUid = Random(TimeUtils.currentTimeMillis()).nextInt(100) + 1000
+                val startChannelId = (retRoomList.maxOfOrNull { it.ownerId.toInt() } ?: 0) + 1
+                val startUid = (retRoomList.maxOfOrNull { it.ownerId.toInt() }?: 0) + 1
                 val fakeStreamUrls = arrayListOf(
                     "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
                     "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
@@ -179,20 +186,22 @@ class ShowSyncManagerServiceImpl(
                     "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
                 )
                 for (i in 0 until createFakeCount) {
-                    val channelName = startChannelName + i
+                    val channelId = startChannelId + i
                     val uid = startUid + i
                     val streamUrl = fakeStreamUrls[i % fakeStreamUrls.size]
                     val streamRegion = "cn"
-                    cloudPlayerService.startCloudPlayer(channelName.toString(),
+                    cloudPlayerService.startCloudPlayer(channelId.toString(),
                         uid.toString(),
                         streamUrl,
                         streamRegion,
                         success = {
                             createRoomInner(
-                                channelName.toString(),
-                                channelName.toString(),
+                                channelId.toString(),
+                                "Robot Room $channelId",
                                 1,
                                 "1",
+                                uid.toString(),
+                                "",
                                 uid.toString(),
                                 true,
                                 success = {
@@ -254,7 +263,7 @@ class ShowSyncManagerServiceImpl(
     private fun removeExpiredRooms(
         roomList: List<ShowRoomDetailModel>,
         removeFakeData: Boolean
-    ) : List<ShowRoomDetailModel> {
+    ): List<ShowRoomDetailModel> {
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
 
@@ -315,6 +324,8 @@ class ShowSyncManagerServiceImpl(
                 0,
                 thumbnailId,
                 UserManager.getInstance().user.id.toString(),
+                UserManager.getInstance().user.headUrl,
+                UserManager.getInstance().user.name,
                 false,
                 success,
                 error
@@ -327,7 +338,9 @@ class ShowSyncManagerServiceImpl(
         roomName: String,
         roomUserCount: Int,
         thumbnailId: String,
-        uid: String,
+        ownerUid: String,
+        ownerAvatar: String,
+        ownerName: String,
         isFakeData: Boolean,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)?
@@ -337,9 +350,9 @@ class ShowSyncManagerServiceImpl(
             roomName,
             roomUserCount,
             thumbnailId,
-            uid,
-            UserManager.getInstance().user.headUrl,
-            UserManager.getInstance().user.name,
+            ownerUid,
+            ownerAvatar,
+            ownerName,
             ShowRoomStatus.activity.value,
             ShowInteractionStatus.idle.value,
             TimeUtils.currentTimeMillis().toDouble(),
@@ -384,6 +397,7 @@ class ShowSyncManagerServiceImpl(
         val roomInfo = roomMap[roomNo] ?: return
         initSync {
             Sync.Instance().joinScene(
+                roomInfo.ownerId == UserManager.getInstance().user.id.toString(),
                 roomNo, object : Sync.JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         //this@ShowSyncManagerServiceImpl.currSceneReference = sceneReference!!
@@ -1076,8 +1090,7 @@ class ShowSyncManagerServiceImpl(
         }
         syncInitialized = true
         Sync.Instance().init(
-            context,
-            mutableMapOf(Pair("appid", BuildConfig.AGORA_APP_ID), Pair("defaultChannel", kSceneId)),
+            RethinkConfig(BuildConfig.AGORA_APP_ID, kSceneId),
             object : Sync.Callback {
                 override fun onSuccess() {
                     runOnMainThread { complete.invoke() }
@@ -1232,12 +1245,17 @@ class ShowSyncManagerServiceImpl(
         })
     }
 
-    private fun innerMayAddLocalUser(roomId: String, success: () -> Unit, error: (Exception) -> Unit) {
+    private fun innerMayAddLocalUser(
+        roomId: String,
+        success: () -> Unit,
+        error: (Exception) -> Unit
+    ) {
         val userId = UserManager.getInstance().user.id.toString()
         val avatarUrl = UserManager.getInstance().user.headUrl
         innerGetUserList(roomId, { list ->
             if (list.none { it.userId == it.toString() }) {
-                innerAddUser(roomId, ShowUser(userId, avatarUrl, UserManager.getInstance().user.name),
+                innerAddUser(roomId,
+                    ShowUser(userId, avatarUrl, UserManager.getInstance().user.name),
                     {
                         objIdOfUserId[userId] = it
                         innerUpdateRoomUserCount(roomId, list.size + 1, {
@@ -1257,7 +1275,11 @@ class ShowSyncManagerServiceImpl(
         })
     }
 
-    private fun innerGetUserList(roomId: String, success: (List<ShowUser>) -> Unit, error: (Exception) -> Unit) {
+    private fun innerGetUserList(
+        roomId: String,
+        success: (List<ShowUser>) -> Unit,
+        error: (Exception) -> Unit
+    ) {
         val sceneReference = sceneReferenceMap[roomId] ?: return
         sceneReference.collection(kCollectionIdUser)
             .get(object : Sync.DataListCallback {

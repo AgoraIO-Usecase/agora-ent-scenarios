@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    tools:background="#141650">
+    android:fitsSystemWindows="true"
+    android:background="#141650">
 
     <TextView
         android:id="@+id/tvLivingEnd"
