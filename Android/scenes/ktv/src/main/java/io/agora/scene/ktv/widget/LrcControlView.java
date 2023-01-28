@@ -490,6 +490,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
         default void onLineFinished(LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
         }
+
         default void onSkipPreludeClick() {
         }
 
