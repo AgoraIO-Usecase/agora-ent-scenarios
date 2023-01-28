@@ -236,10 +236,10 @@ class NetworkManager:NSObject {
     
     func startCloudPlayer(channelName: String,
                           uid: String,
-                          robotUid: String,
+                          robotUid: UInt,
                           streamUrl: String,
                           success: @escaping (String?) -> Void) {
-        let params: [String: String] = ["appId": KeyCenter.AppId,
+        let params: [String: Any] = ["appId": KeyCenter.AppId,
                                         "channelName": channelName,
                                         "uid": uid,
                                         "robotUid": robotUid,
