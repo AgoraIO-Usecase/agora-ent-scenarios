@@ -180,7 +180,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout(){
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
+        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
@@ -494,12 +494,11 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun refreshViewDetailLayout(status: Int) {
-        if (interactionInfo == null) return
         when (status) {
             ShowInteractionStatus.idle.value -> {
-                if (interactionInfo!!.interactStatus == ShowInteractionStatus.onSeat.value) {
+                if (interactionInfo?.interactStatus == ShowInteractionStatus.onSeat.value) {
                     ToastUtils.showToast(R.string.show_link_is_stopped)
-                } else if (interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) {
+                } else if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
                     ToastUtils.showToast(R.string.show_pk_is_stopped)
                 }
 
@@ -1099,6 +1098,8 @@ class LiveDetailFragment : Fragment() {
                 } else if (interactionInfo.interactStatus == ShowInteractionStatus.pking.value) {
                     updatePKingMode()
                 }
+            } else {
+                refreshViewDetailLayout(ShowInteractionStatus.idle.value)
             }
         })
     }
@@ -1293,12 +1294,12 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
         } else {
-            eventListener.onUserJoined = { rUid ->
+            eventListener.onChannelJoined = {
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         videoView,
                         Constants.RENDER_MODE_HIDDEN,
-                        rUid
+                        mRoomInfo.ownerId.toInt()
                     ),
                     rtcConnection
                 )

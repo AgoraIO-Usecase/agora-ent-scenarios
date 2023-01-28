@@ -190,8 +190,10 @@ class ShowSyncManagerServiceImpl(
                     val uid = startUid + i
                     val streamUrl = fakeStreamUrls[i % fakeStreamUrls.size]
                     val streamRegion = "cn"
-                    cloudPlayerService.startCloudPlayer(channelId.toString(),
-                        uid.toString(),
+                    cloudPlayerService.startCloudPlayer(
+                        channelId.toString(),
+                        UserManager.getInstance().user.userNo,
+                        uid,
                         streamUrl,
                         streamRegion,
                         success = {
