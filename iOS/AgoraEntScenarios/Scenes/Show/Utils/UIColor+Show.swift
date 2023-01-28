@@ -137,4 +137,7 @@ extension UIColor {
         return UIColor(hex: "F0F9FF", alpha: 1)
     }
     
+    @objc static var show_end_bg: UIColor {
+        return UIColor(hex: "141650", alpha: 1)
+    }
 }

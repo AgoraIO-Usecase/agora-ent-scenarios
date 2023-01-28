@@ -221,12 +221,10 @@ class ShowLiveViewController: UIViewController {
         
         guard let room = room else {return}
         AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
-            if let error = error {
-                ToastView.show(text: error.localizedDescription)
-                return
-            }
-            
-            guard let self = self else {
+            guard let self = self else { return }
+            if let _ = error {
+//                ToastView.show(text: error.localizedDescription)
+                self.onRoomExpired()
                 return
             }
             
@@ -406,12 +404,14 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
-        let vc = ShowReceiveLiveFinishAlertVC()
-        vc.dismissAlert { [weak self] in
+        ShowReceiveLiveFinishAlertVC.show(topVC: self,
+                                          ownerUrl: room?.ownerAvatar ?? "",
+                                          ownerName: room?.ownerName ?? "") { [weak self] in
+            if self?.presentedViewController != nil {
+                self?.presentedViewController?.dismiss(animated: false)
+            }
             self?.leaveRoom()
         }
-        
-        self.present(vc, animated: true)
     }
     
     func onUserCountChanged(userCount: Int) {
@@ -424,12 +424,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            ShowReceiveLiveFinishAlertVC.present { [weak self] in
-                if self?.presentedViewController != nil {
-                    self?.presentedViewController?.dismiss(animated: false)
-                }
-                self?.leaveRoom()
-            }
+            onRoomExpired()
         }
     }
     
