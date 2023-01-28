@@ -617,7 +617,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         // 从RTC中获取歌曲列表
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:" + type + " page:" + page);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
-        String requestId = iAgoraMusicContentCenter.getMusicCollectionByMusicChartId(type, page, 30);
+        String jsonOption = "{\"pitchType\":1,\"needLyric\":true}";
+        String requestId = iAgoraMusicContentCenter.getMusicCollectionByMusicChartId(type, page, 30, jsonOption);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
@@ -686,7 +687,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         KTVLogger.d(TAG, "RoomLivingViewModel.searchSong() called, condition:" + condition);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
 
-        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 100);
+        String jsonOption = "{\"pitchType\":1,\"needLyric\":true}";
+        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 100, jsonOption);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
