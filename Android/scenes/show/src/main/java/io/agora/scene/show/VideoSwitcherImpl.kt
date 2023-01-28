@@ -57,6 +57,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             ?.let {
                 eventListener.onChannelJoined?.invoke()
                 rtcEventHandlers[it.channelId]?.setEventListener(eventListener)
+                rtcEventHandlers[it.channelId]?.subscribeMediaTime = SystemClock.elapsedRealtime()
                 rtcEngine.updateChannelMediaOptionsEx(mediaOptions, it)
                 connectionsPreloaded.remove(it)
                 connectionJoined = it
@@ -67,20 +68,15 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             connectionJoined = connection
         }
 
-
-        if (connectionsPreloaded.size >= preloadCount) {
-            return
-        }
-
         val size = connectionsForPreloading.size
         val index =
             connectionsForPreloading.indexOfFirst { it.equal(connection) }
         val connPreLoaded = mutableListOf<RtcConnection>()
-        for (i in (index - (preloadCount - 1) / 2) until (index + preloadCount / 2)) {
+        for (i in (index - (preloadCount - 1) / 2)..(index + preloadCount / 2)) {
             if (i == index) {
                 continue
             }
-            val realIndex = if (i < 0) size + i else i
+            val realIndex = (if (i < 0) size + i else i) % size
             if (realIndex < 0 || realIndex >= size) {
                 continue
             }
@@ -124,7 +120,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             connectionJoined = null
             connectionsPreloaded.add(connection)
             return true
-        } else if (connectionsPreloaded.any { it.equal(connection) }){
+        } else if (connectionsPreloaded.any { it.equal(connection) }) {
             leaveRtcChannel(connection)
             connectionsPreloaded.removeIf { it.equal(connection) }
             return true
@@ -155,6 +151,11 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             tag,
             "join channel : channelId=${connection.channelId}, uid=${connection.localUid}"
         )
+        if (mediaOptions.clientRoleType == Constants.CLIENT_ROLE_AUDIENCE) {
+            initAudienceConfig(rtcEngine)
+        } else {
+            initBroadcasterConfig(rtcEngine)
+        }
         TokenGenerator.generateToken(
             connection.channelId, connection.localUid.toString(),
             TokenGenerator.TokenGeneratorType.token006,
@@ -170,7 +171,11 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                 val ret = rtcEngine.joinChannelEx(it, connection, mediaOptions, eventHandler)
                 ShowLogger.d(
                     tag,
-                    "join channel ret : channel=${connection.channelId} code=$ret, message=${RtcEngine.getErrorDescription(ret)}"
+                    "join channel ret : channel=${connection.channelId} code=$ret, message=${
+                        RtcEngine.getErrorDescription(
+                            ret
+                        )
+                    }"
                 )
                 rtcEventHandlers[connection.channelId] = eventHandler
             },
@@ -178,6 +183,29 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                 ShowLogger.e(tag, it, "generate token failed")
                 ToastUtils.showToast(it!!.message)
             })
+    }
+
+    fun initBroadcasterConfig(rtcEngine: RtcEngine) {
+        rtcEngine.setParameters("{\"rtc.enable_crypto_access\":false}")
+        rtcEngine.setParameters("{\"che.hardware_encoding\":1}")
+        rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":true}")
+        rtcEngine.setParameters("{\"che.video.keyFrameInterval\":2}")
+        rtcEngine.setParameters("{\"che.video.hw265_enc_enable\":1}")
+        rtcEngine.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
+        rtcEngine.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
+        rtcEngine.setParameters("{\"rtc.use_global_location_priority_domain\":true}")
+        rtcEngine.setParameters("{\"che.video.keepLastFrame\":false}")
+        rtcEngine.setParameters("{\"che.video.has_intra_request\":false}")
+    }
+
+    fun initAudienceConfig(rtcEngine: RtcEngine) {
+        rtcEngine.setParameters("{\"rtc.enable_crypto_access\":false}")
+        rtcEngine.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
+        rtcEngine.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
+        rtcEngine.setParameters("{\"rtc.use_global_location_priority_domain\":true}")
+        rtcEngine.setParameters("{\"che.video.keepLastFrame\":false}")
+        // rtcEngine.setParameters("{\"che.hardware_decoding\":0}")
+        rtcEngine.setParameters("{\"rtc.enable_nasa2\": false}")
     }
 
 
@@ -189,6 +217,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         private var firstRemoteUid: Int = 0
         private var isJoinChannelSuccess = false
         private var eventListener: VideoSwitcher.IChannelEventListener? = null
+        var subscribeMediaTime: Long = joinChannelTime
 
         fun setEventListener(listener: VideoSwitcher.IChannelEventListener?) {
             eventListener = listener
@@ -258,7 +287,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
         override fun onUserJoined(uid: Int, elapsed: Int) {
             super.onUserJoined(uid, elapsed)
-            if( firstRemoteUid == 0){
+            if (firstRemoteUid == 0) {
                 firstRemoteUid = uid
             }
             eventListener?.onUserJoined?.invoke(uid)
@@ -283,6 +312,16 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
         override fun onRemoteVideoStateChanged(uid: Int, state: Int, reason: Int, elapsed: Int) {
             super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
+            if (state == Constants.REMOTE_VIDEO_STATE_PLAYING
+                && (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED || reason == Constants.REMOTE_VIDEO_STATE_REASON_LOCAL_UNMUTED)
+            ) {
+                val durationFromSubscribe = SystemClock.elapsedRealtime() - subscribeMediaTime
+                val durationFromJoiningRoom = SystemClock.elapsedRealtime() - joinChannelTime
+                ShowLogger.d(
+                    tag,
+                    "video cost time : channel=${connection.channelId}, uid=$uid, durationFromJoiningRoom=$durationFromJoiningRoom, durationFromSubscribe=$durationFromSubscribe "
+                )
+            }
             eventListener?.onRemoteVideoStateChanged?.invoke(uid, state)
         }
 
