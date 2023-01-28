@@ -236,11 +236,13 @@ class NetworkManager:NSObject {
     
     func startCloudPlayer(channelName: String,
                           uid: String,
+                          robotUid: String,
                           streamUrl: String,
                           success: @escaping (String?) -> Void) {
         let params: [String: String] = ["appId": KeyCenter.AppId,
                                         "channelName": channelName,
                                         "uid": uid,
+                                        "robotUid": robotUid,
                                         "region": "cn",
                                         "streamUrl": streamUrl,
                                         "src": "iOS",
