@@ -27,6 +27,7 @@ class CloudPlayerService {
     fun startCloudPlayer(
         channelName: String,
         uid: String,
+        robotUid: Int,
         streamUrl: String,
         streamRegion: String, // cn, ap, na, eu
         success: () -> Unit,
@@ -35,7 +36,7 @@ class CloudPlayerService {
         scope.launch(Dispatchers.Main) {
             try {
                 withContext(Dispatchers.IO) {
-                    reqStartCloudPlayer(channelName, uid, streamUrl, streamRegion, channelName)
+                    reqStartCloudPlayer(channelName, uid, robotUid, streamUrl, streamRegion, channelName)
                 }
                 success.invoke()
             } catch (ex: Exception) {
@@ -88,6 +89,7 @@ class CloudPlayerService {
     private fun reqStartCloudPlayer(
         channelName: String,
         uid: String,
+        robotUid: Int,
         streamUrl: String,
         streamRegion: String, // cn, ap, na, eu
         traceId: String
@@ -100,6 +102,7 @@ class CloudPlayerService {
                 //.put("basicAuth", "")
                 .put("channelName", channelName)
                 .put("uid", uid)
+                .put("robotUid", robotUid)
                 .put("region", streamRegion)
                 .put("streamUrl", streamUrl)
                 .put("traceId", traceId)

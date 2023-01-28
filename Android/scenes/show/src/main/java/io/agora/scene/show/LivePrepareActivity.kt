@@ -187,18 +187,11 @@ class LivePrepareActivity : ComponentActivity() {
 
         mBinding.btnStartLive.isEnabled = false
         mService.createRoom(mRoomId, roomName, mThumbnailId, {
-            mService.joinRoom(it.roomId, { roomDetailInfo ->
-                runOnUiThread {
-                    isFinishToLiveDetail = true
-                    LiveDetailActivity.launch(this@LivePrepareActivity, roomDetailInfo)
-                    finish()
-                }
-            }, { ex ->
-                ToastUtils.showToast(ex.message)
-                runOnUiThread {
-                    mBinding.btnStartLive.isEnabled = true
-                }
-            })
+            runOnUiThread {
+                isFinishToLiveDetail = true
+                LiveDetailActivity.launch(this@LivePrepareActivity, it)
+                finish()
+            }
         }, {
             runOnUiThread {
                 ToastUtils.showToast(it.message)
