@@ -1972,7 +1972,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 //create fake room
                 robotIds.forEach { robotId in
                     let room = ShowRoomListModel()
-                    let userId = "\(UInt(robotId) ?? 1 + 2000000000)"
+                    let userId = "\((UInt(robotId) ?? 1) + 2000000000)"
                     room.roomName = "Robot Room \(robotId)"
                     room.roomId = robotId
                     room.thumbnailId = "1"
@@ -2001,7 +2001,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         let channelName = room.roomId ?? ""
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: VLUserCenter.user.id,
-                                               robotUid: room.ownerId ?? "",
+                                               robotUid: UInt(room.ownerId ?? "") ?? 0,
                                                streamUrl: robotStreamURL[(Int(channelName) ?? 1) - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
