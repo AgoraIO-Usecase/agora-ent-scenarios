@@ -178,11 +178,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             guard let wSelf = self, let detailModel = detailModel else { return }
             let liveVC = ShowLivePagesViewController()
             liveVC.agoraKitManager = wSelf.agoraKitManager
-            #if DEBUG
-            liveVC.roomList = AppContext.shared.showRoomList
-            #else
             liveVC.roomList = [detailModel]
-            #endif
             liveVC.selectedResolution = wSelf.selectedResolution
             liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             

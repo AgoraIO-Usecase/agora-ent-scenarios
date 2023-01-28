@@ -10,9 +10,8 @@ import UIKit
 class ShowReceiveLiveFinishAlertVC: UIViewController {
 
     private var dismissAlert: (()->())?
-    private lazy var finishAlertView: ShowReceiveFinishView = {
+    fileprivate lazy var finishAlertView: ShowReceiveFinishView = {
         let view = ShowReceiveFinishView()
-        view.headImg = VLUserCenter.user.headUrl
         view.delegate = self
         return view
     }()
@@ -48,12 +47,19 @@ class ShowReceiveLiveFinishAlertVC: UIViewController {
 
 }
 
+private let alertViewTag = 1000001
 extension ShowReceiveLiveFinishAlertVC {
-    class func present(dismiss: @escaping (()->())){
+    class func show(topVC: UIViewController,
+                    ownerUrl: String,
+                    ownerName: String,
+                    dismiss: @escaping (()->())){
         let vc = ShowReceiveLiveFinishAlertVC()
+        vc.finishAlertView.headImg = ownerUrl
+        vc.finishAlertView.headName = ownerName
         vc.dismissAlert = dismiss
-        let topVC = UIViewController.cl_topViewController()
-        topVC?.present(vc, animated: true)
+        topVC.view.addSubview(vc.view)
+        vc.view.frame = topVC.view.bounds
+        topVC.addChild(vc)
     }
 }
 
