@@ -212,8 +212,8 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         setupSwitchItem(
             ITEM_ID_SWITCH_QUALITY_ENHANCE,
             binding.qualityEnhance,
-            R.string.show_setting_advance_quality_enhance,
-            R.string.show_setting_advance_quality_enhance_tip
+            R.string.show_setting_advance_quality_h265,
+            R.string.show_setting_advance_quality_h265_tip
         )
         setupSwitchItem(
             ITEM_ID_SWITCH_COLOR_ENHANCE,
