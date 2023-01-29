@@ -275,7 +275,7 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"rtc.audio_resend\":false}")
         rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
         rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
-        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+        self .setParametersWithMD()
 
         rtcKit.setAudioProfile(.musicHighQualityStereo, scenario: .chorus)
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: false)
@@ -305,7 +305,7 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = false
             option.autoSubscribeVideo = false
             option.clientRoleType = .broadcaster
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+            self .setParametersWithMD()
 
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
@@ -337,7 +337,7 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = true
             option.autoSubscribeVideo = true
             option.clientRoleType = .broadcaster
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+            self .setParametersWithMD()
 
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
@@ -347,7 +347,7 @@ public let kMPK_RTC_UID: UInt = 1
             option.publishCameraTrack = false // 关闭视频采集
             option.publishMicrophoneTrack = false // 关闭音频采集
             option.autoSubscribeAudio = true
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+            self .setParametersWithMD()
 
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus) // 设置profile
             option.clientRoleType = .audience // 设置观众角色
@@ -366,21 +366,18 @@ public let kMPK_RTC_UID: UInt = 1
         self.type = .VoiceChat
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        self .setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
 
             rtcKit.setAudioProfile(.musicHighQuality)
             rtcKit.setAudioScenario(.gameStreaming)
         } else if type == .game {
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
             rtcKit.setChannelProfile(.communication)
         } else if type == .anchor {
             rtcKit.setChannelProfile(.liveBroadcasting)
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
             rtcKit.setAudioProfile(.musicHighQualityStereo)
             rtcKit.setAudioScenario(.gameStreaming)
-            rtcKit.setParameters("{\"che.audio.md.enable\":false}")
             rtcKit.setParameters("{\"che.audio.custom_payload_type\":73}")
             rtcKit.setParameters("{\"che.audio.custom_bitrate\":128000}")
             //  rtcKit.setRecordingDeviceVolume(128)
@@ -401,6 +398,10 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.delegate = self
     }
 
+    private func setParametersWithMD (){
+        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+
+    }
     /**
      * 加载RTC
      */
