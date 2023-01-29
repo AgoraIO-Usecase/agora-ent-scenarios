@@ -166,6 +166,7 @@ extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
                                                  for: indexPath) as! ShowPKInviteViewCell
+        cell.roomId = roomId
         cell.pkUser = self.pkUserInvitationList?[indexPath.row]
         cell.pkInvitation = self.createPKInvitationMap?[cell.pkUser?.roomId ?? ""]
         return cell

@@ -181,15 +181,18 @@ class ShowAgoraKitManager: NSObject {
                     options:AgoraRtcChannelMediaOptions,
                     uid: String?,
                     canvasView: UIView?) {
+        guard let uid = uid, let canvasView = canvasView else {
+            showLogger.error("switchRole fatel")
+            return
+        }
 //        let options = AgoraRtcChannelMediaOptions()
         options.clientRoleType = role
 //        options.publishMicrophoneTrack = role == .broadcaster
 //        options.publishCameraTrack = role == .broadcaster
         agoraKit.updateChannel(with: options)
         agoraKit.setClientRole(role)
-        guard canvasView != nil else { return }
         let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = UInt(uid ?? "0") ?? 0
+        videoCanvas.uid = UInt(uid) ?? 0
         videoCanvas.renderMode = .hidden
         videoCanvas.view = canvasView
         if uid == VLUserCenter.user.id {
