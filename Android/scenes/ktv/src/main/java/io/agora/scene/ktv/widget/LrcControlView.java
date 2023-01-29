@@ -135,14 +135,23 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivMusicMenu.setOnClickListener(this);
         mBinding.ilActive.ivMusicStart.setOnClickListener(this);
         mBinding.ilActive.ivChangeSong.setOnClickListener(this);
-        mBinding.ilActive.ivSkipPostlude.setOnClickListener(this);
-        mBinding.ilActive.ivSkipPrelude.setOnClickListener(this);
+        mBinding.ilActive.ivSkipPostludeSkip.setOnClickListener(this);
+        mBinding.ilActive.ivSkipPreludeSkip.setOnClickListener(this);
+        mBinding.ilActive.ivSkipPostludeCancel.setOnClickListener(this);
+        mBinding.ilActive.ivSkipPreludeCancel.setOnClickListener(this);
 
         mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
             @Override
             public void onDragTo(KaraokeView view, long position) {
                 if (mOnKaraokeActionListener != null) {
                     mOnKaraokeActionListener.onDragTo(position);
+                    LyricsModel lyrics = mKaraokeView.getLyricsData();
+                    if (lyrics == null) {
+                        return;
+                    }
+                    if (position >= lyrics.startOfVerse) {
+                        mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+                    }
                 }
             }
 
@@ -392,10 +401,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             } else if (mRole == Role.Listener) {
                 mOnKaraokeActionListener.onJoinChorus();
             }
-        } else if (v == mBinding.ilActive.ivSkipPrelude) {
+        } else if (v == mBinding.ilActive.ivSkipPreludeSkip) {
             mOnKaraokeActionListener.onSkipPreludeClick();
-        } else if (v == mBinding.ilActive.ivSkipPostlude) {
+            mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+        } else if (v == mBinding.ilActive.ivSkipPostludeSkip) {
             mOnKaraokeActionListener.onSkipPostludeClick();
+        } else if (v == mBinding.ilActive.ivSkipPreludeCancel) {
+            mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+        }  else if (v == mBinding.ilActive.ivSkipPostludeCancel) {
+            mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         }
     }
 
