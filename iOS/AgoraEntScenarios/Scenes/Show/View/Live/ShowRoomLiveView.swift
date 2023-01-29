@@ -135,16 +135,18 @@ class ShowRoomLiveView: UIView {
         
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 109
             make.left.equalTo(15)
-            make.bottom.equalTo(-143)
+            make.bottom.equalTo(-bottomOffset)
             make.right.equalTo(-70)
             make.height.equalTo(168)
         }
     
         addSubview(chatButton)
         chatButton.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 4
             make.left.equalTo(15)
-            make.bottom.equalTo(-38)
+            make.bottom.equalTo(-max(10, bottomOffset))
         }
         
         addSubview(bottomBar)

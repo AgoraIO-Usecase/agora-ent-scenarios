@@ -98,17 +98,15 @@ extension ShowAgoraKitManager {
     }
     
     /// 设置观众端画质增强
-    private func _setQualityEnable(_ isOn: Bool, srType: SRType? = nil, uid: UInt?){
+    private func _setQualityEnable(_ isOn: Bool, srType: SRType = .x1_5, uid: UInt?){
         /*
         if let uid = uid {
             agoraKit.enableRemoteSuperResolution(uid, enable: isOn)
         }
         ShowSettingKey.SR.writeValue(isOn)
          */
-        if srType != nil {
-            setSuperResolution(isOn, srType: srType!)
-            ShowSettingKey.SR.writeValue(isOn)
-        }
+        setSuperResolution(isOn, srType: srType)
+        ShowSettingKey.SR.writeValue(isOn)
     }
     
     func updatePresetForType(_ type: ShowPresetType, mode: ShowMode,uid: UInt? = nil) {
@@ -171,7 +169,8 @@ extension ShowAgoraKitManager {
         case .PVC:
             agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .SR:
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+//            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+            setSuperResolution(isOn)
         case .BFrame:
             
            break
