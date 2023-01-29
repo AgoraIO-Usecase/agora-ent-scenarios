@@ -477,10 +477,10 @@ public let kMPK_RTC_UID: UInt = 1
 //        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
         
         if (isOn){
-            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":true}");
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":1}");
 
         } else {
-            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":false}");
+            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":0}");
 
         }
     }

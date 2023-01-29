@@ -253,7 +253,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing".localized()
+            titleLabel.text = "AIAEC_desc".localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -264,7 +264,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing".localized()
+            titleLabel.text = "AGC_desc".localized()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
