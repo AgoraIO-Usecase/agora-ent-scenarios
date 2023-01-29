@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            tools:background="@mipmap/bg_player_default"
+            tools:background="@mipmap/ktv_mv_default"
             tools:visibility="visible">
 
             <TextView

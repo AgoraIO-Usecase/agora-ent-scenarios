@@ -201,7 +201,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.VISIBLE);
-        mBinding.clActive.setBackgroundResource(R.mipmap.bg_player_default);
+        mBinding.clActive.setBackgroundResource(R.mipmap.ktv_mv_default);
         mPrepareBinding.statusPrepareViewLrc.setVisibility(View.GONE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
 
@@ -353,7 +353,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilChorus.tvWaitingTimeCount.setText(getContext().getString(R.string.ktv_room_time_wait, 0, time));
     }
 
-    private int backgroundResId = R.mipmap.bg_player_default;
+    private int backgroundResId = R.mipmap.ktv_mv_default;
 
     public void setLrcViewBackground(@DrawableRes int resId) {
         backgroundResId = resId;
