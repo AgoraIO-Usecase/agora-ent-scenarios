@@ -31,6 +31,7 @@ import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.show.VideoSetting.toIndex
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.service.*
@@ -411,6 +412,11 @@ class LiveDetailFragment : Fragment() {
         if (!visible) {
             return
         }
+        val index = VideoSetting.getCurrBroadcastSetting().video.encodeResolution.toIndex()
+        val resolutionStr = VideoSetting.ResolutionList.get(index).let {
+            "${it.width}x${it.height}"
+        }
+        topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, resolutionStr)
         if (isRoomOwner) {
             if (isAudioOnlyMode) {
                 delay?.let {
