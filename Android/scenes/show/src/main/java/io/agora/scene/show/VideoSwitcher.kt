@@ -7,7 +7,8 @@ import io.agora.rtc2.RtcConnection
 interface VideoSwitcher {
 
     class IChannelEventListener(
-        var onChannelJoined: (()->Unit)? = null,
+        var onTokenGenerateFailedException: ((error: Throwable)->Unit)? = null,
+        var onChannelJoined: ((connection: RtcConnection)->Unit)? = null,
         var onUserJoined: ((uid: Int) -> Unit)? = null,
         var onUserOffline: ((uid: Int) -> Unit)? = null,
         var onLocalVideoStateChanged: ((state: Int) -> Unit)? = null,

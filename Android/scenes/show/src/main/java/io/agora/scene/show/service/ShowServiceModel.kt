@@ -35,9 +35,9 @@ data class ShowRoomDetailModel(
     val roomStatus: Int = ShowRoomStatus.activity.value,
     val interactStatus: Int = ShowInteractionStatus.idle.value,
     val createdAt: Double,
-    val updatedAt: Double,
-    val isFakeData: Boolean
-): Parcelable {
+    val updatedAt: Double
+) : Parcelable {
+
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readString()!!,
@@ -49,9 +49,9 @@ data class ShowRoomDetailModel(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readDouble(),
-        parcel.readDouble(),
-        parcel.readBoolean()
-    )
+        parcel.readDouble()
+    ) {
+    }
 
     fun toMap(): HashMap<String, Any>{
         return hashMapOf(
@@ -66,7 +66,6 @@ data class ShowRoomDetailModel(
             Pair("interactStatus", interactStatus),
             Pair("createdAt", createdAt),
             Pair("updatedAt", updatedAt),
-            Pair("isFakeData", isFakeData),
         )
     }
 
@@ -78,16 +77,7 @@ data class ShowRoomDetailModel(
         else -> R.mipmap.show_room_cover_0
     }
 
-    companion object CREATOR : Parcelable.Creator<ShowRoomDetailModel> {
-        override fun createFromParcel(parcel: Parcel): ShowRoomDetailModel {
-            return ShowRoomDetailModel(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ShowRoomDetailModel?> {
-            return arrayOfNulls(size)
-        }
-
-    }
+    fun isFake() = roomId.length > 6
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(roomId)
@@ -101,12 +91,22 @@ data class ShowRoomDetailModel(
         parcel.writeInt(interactStatus)
         parcel.writeDouble(createdAt)
         parcel.writeDouble(updatedAt)
-        parcel.writeBoolean(isFakeData)
     }
 
     override fun describeContents(): Int {
         return 0
     }
+
+    companion object CREATOR : Parcelable.Creator<ShowRoomDetailModel> {
+        override fun createFromParcel(parcel: Parcel): ShowRoomDetailModel {
+            return ShowRoomDetailModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ShowRoomDetailModel?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 
 }
 

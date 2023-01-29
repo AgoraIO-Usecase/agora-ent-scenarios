@@ -22,14 +22,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
-import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
@@ -142,8 +140,11 @@ class LiveDetailFragment : Fragment() {
 
         if (roomLeftTime > 0) {
             mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
-            initServiceWithJoinRoom()
-            initRtcEngine()
+            initRtcEngine {
+                if (isResumed) {
+                    initServiceWithJoinRoom()
+                }
+            }
         }
     }
 
@@ -184,6 +185,7 @@ class LiveDetailFragment : Fragment() {
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
+            .error(R.mipmap.show_default_avatar)
             .into(livingEndLayout.ivAvatar)
         livingEndLayout.ivClose.setOnClickListener {
             requireActivity().finish()
@@ -951,13 +953,17 @@ class LiveDetailFragment : Fragment() {
     private fun initServiceWithJoinRoom() {
         mService.joinRoom(mRoomInfo.roomId,
             {
-                initService()
+                if(isResumed){
+                    initService()
+                }
             },
             {
                 ShowLogger.e(TAG, it)
-                activity?.runOnUiThread {
-                    destroy()
-                    showLivingEndLayout()
+                if(isResumed){
+                    activity?.runOnUiThread {
+                        destroy()
+                        showLivingEndLayout()
+                    }
                 }
             })
     }
@@ -1146,7 +1152,7 @@ class LiveDetailFragment : Fragment() {
 
     //================== RTC Operation ===================
 
-    private fun initRtcEngine() {
+    private fun initRtcEngine(onJoinChannelSuccess: ()->Unit) {
         val eventListener = VideoSwitcher.IChannelEventListener(
             onUserOffline = { uid ->
                 if (interactionInfo != null && interactionInfo!!.userId == uid.toString()) {
@@ -1239,6 +1245,29 @@ class LiveDetailFragment : Fragment() {
         )
 
         checkRequirePerms {
+
+            // Render host video
+            val videoView = TextureView(requireContext())
+            mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
+            if (isRoomOwner) {
+                mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
+                eventListener.onChannelJoined = {
+                    onJoinChannelSuccess.invoke()
+                }
+            } else {
+                eventListener.onChannelJoined = {
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(
+                            videoView,
+                            Constants.RENDER_MODE_HIDDEN,
+                            mRoomInfo.ownerId.toInt()
+                        ),
+                        it
+                    )
+                    onJoinChannelSuccess.invoke()
+                }
+            }
+
             joinChannel(eventListener)
         }
 
@@ -1288,44 +1317,6 @@ class LiveDetailFragment : Fragment() {
             "show"
         )
 
-        // Render host video
-        val videoView = TextureView(requireContext())
-        mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
-        if (isRoomOwner) {
-            mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
-        } else {
-            eventListener.onChannelJoined = {
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(
-                        videoView,
-                        Constants.RENDER_MODE_HIDDEN,
-                        mRoomInfo.ownerId.toInt()
-                    ),
-                    rtcConnection
-                )
-            }
-            eventListener.onUserJoined = { rUid ->
-                if( mRoomInfo.ownerId.toInt() != rUid){
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            null,
-                            Constants.RENDER_MODE_HIDDEN,
-                            mRoomInfo.ownerId.toInt()
-                            ),
-                        rtcConnection
-                    )
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            videoView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            rUid
-                        ),
-                        rtcConnection
-                    )
-                }
-            }
-        }
-
         val channelMediaOptions = ChannelMediaOptions()
         channelMediaOptions.clientRoleType =
             if (isRoomOwner) Constants.CLIENT_ROLE_BROADCASTER else Constants.CLIENT_ROLE_AUDIENCE
@@ -1369,7 +1360,7 @@ class LiveDetailFragment : Fragment() {
     private fun updateIdleMode() {
         if (interactionInfo?.interactStatus == ShowInteractionStatus.pking.value) {
             // 退出连麦多频道
-            mRtcEngine.leaveChannelEx(
+            mRtcVideoSwitcher.leaveChannel(
                 RtcConnection(
                     interactionInfo!!.roomId,
                     UserManager.getInstance().user.id.toInt()
@@ -1412,7 +1403,9 @@ class LiveDetailFragment : Fragment() {
         val audienceVideoView = TextureView(requireContext())
         val rtcConnection = mMainRtcConnection ?: return
 
+        mBinding.videoLinkingLayout.videoContainer.removeAllViews()
         mBinding.videoLinkingLayout.videoContainer.addView(broadcasterVideoView)
+        mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
         mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
@@ -1493,6 +1486,16 @@ class LiveDetailFragment : Fragment() {
         val rtcConnection = mMainRtcConnection ?: return
         val view = TextureView(requireContext())
         val competitorView = TextureView(requireContext())
+        mBinding.videoPKLayout.iBroadcasterAView.apply {
+            if (childCount > 1) {
+                removeViewAt(0)
+            }
+        }
+        mBinding.videoPKLayout.iBroadcasterBView.apply {
+            if (childCount > 1) {
+                removeViewAt(0)
+            }
+        }
         mBinding.videoPKLayout.iBroadcasterAView.addView(view, 0)
         mBinding.videoPKLayout.iBroadcasterBView.addView(competitorView, 0)
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
@@ -1515,41 +1518,21 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-            TokenGenerator.generateTokens(
+            mRtcVideoSwitcher.joinChannel(RtcConnection(
                 interactionInfo!!.roomId,
-                UserManager.getInstance().user.id.toString(),
-                TokenGenerator.TokenGeneratorType.token006,
-                arrayOf(TokenGenerator.AgoraTokenType.rtc),
-                {
-                    mRtcEngine.joinChannelEx(
-                        it[TokenGenerator.AgoraTokenType.rtc],
-                        RtcConnection(
-                            interactionInfo!!.roomId,
-                            UserManager.getInstance().user.id.toInt()
+                UserManager.getInstance().user.id.toInt()
+            ), channelMediaOptions, VideoSwitcher.IChannelEventListener(
+                onChannelJoined = {
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(
+                            competitorView,
+                            Constants.RENDER_MODE_HIDDEN,
+                            interactionInfo?.userId!!.toInt()
                         ),
-                        channelMediaOptions,
-                        object : IRtcEngineEventHandler() {
-                            override fun onJoinChannelSuccess(
-                                channel: String?,
-                                uid: Int,
-                                elapsed: Int
-                            ) {
-                                super.onJoinChannelSuccess(channel, uid, elapsed)
-                                mRtcEngine.setupRemoteVideoEx(
-                                    VideoCanvas(
-                                        competitorView,
-                                        Constants.RENDER_MODE_HIDDEN,
-                                        interactionInfo?.userId!!.toInt()
-                                    ),
-                                    RtcConnection(
-                                        interactionInfo!!.roomId,
-                                        UserManager.getInstance().user.id.toInt()
-                                    )
-                                )
-                            }
-                        }
+                        it
                     )
-                })
+                }
+            ))
         } else {
             // 观众
             val channelMediaOptions = ChannelMediaOptions()
@@ -1560,41 +1543,21 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            TokenGenerator.generateTokens(
+            mRtcVideoSwitcher.joinChannel(RtcConnection(
                 interactionInfo!!.roomId,
-                UserManager.getInstance().user.id.toString(),
-                TokenGenerator.TokenGeneratorType.token006,
-                arrayOf(TokenGenerator.AgoraTokenType.rtc),
-                {
-                    mRtcEngine.joinChannelEx(
-                        it[TokenGenerator.AgoraTokenType.rtc],
-                        RtcConnection(
-                            interactionInfo!!.roomId,
-                            UserManager.getInstance().user.id.toInt()
+                UserManager.getInstance().user.id.toInt()
+            ), channelMediaOptions, VideoSwitcher.IChannelEventListener(
+                onChannelJoined = {
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(
+                            competitorView,
+                            Constants.RENDER_MODE_HIDDEN,
+                            interactionInfo?.userId!!.toInt()
                         ),
-                        channelMediaOptions,
-                        object : IRtcEngineEventHandler() {
-                            override fun onJoinChannelSuccess(
-                                channel: String?,
-                                uid: Int,
-                                elapsed: Int
-                            ) {
-                                super.onJoinChannelSuccess(channel, uid, elapsed)
-                                mRtcEngine.setupRemoteVideoEx(
-                                    VideoCanvas(
-                                        competitorView,
-                                        Constants.RENDER_MODE_HIDDEN,
-                                        interactionInfo?.userId!!.toInt()
-                                    ),
-                                    RtcConnection(
-                                        interactionInfo!!.roomId,
-                                        UserManager.getInstance().user.id.toInt()
-                                    )
-                                )
-                            }
-                        }
+                        it
                     )
-                })
+                }
+            ))
 
             mRtcEngine.setupRemoteVideoEx(
                 VideoCanvas(
