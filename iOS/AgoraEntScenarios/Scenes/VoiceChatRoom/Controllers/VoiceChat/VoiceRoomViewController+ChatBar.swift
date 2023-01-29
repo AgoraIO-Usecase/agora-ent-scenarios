@@ -11,6 +11,8 @@ import KakaJSON
 import ZSwiftBaseLib
 
 extension VoiceRoomViewController {
+    
+    
     func showEQView() {
         preView = VMPresentView(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 280~))
         preView.isAudience = !isOwner
@@ -45,6 +47,13 @@ extension VoiceRoomViewController {
             self?.preView.isTouchAble = flag
             self?.activeAlien(flag)
         }
+        preView.turnAIAECBlock = {[weak self] flag in
+            self?.rtckit.setAIAECOn(isOn: flag);
+        }
+        preView.turnAGCBlock = {[weak self] flag in
+            self?.rtckit.setAGCOn(isOn: flag);
+        }
+
         preView.volBlock = { [weak self] vol in
             self?.updateVolume(vol)
         }
@@ -96,6 +105,10 @@ extension VoiceRoomViewController {
         rtcView.isUserInteractionEnabled = false
         headerView.isUserInteractionEnabled = false
 
+        let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
+        
+        voiceLogger.info(rtckit, context: "rtc")
+        
         UIView.animate(withDuration: 0.5, animations: {
             self.preView.frame = CGRect(x: 0, y: ScreenHeight - 360~, width: ScreenWidth, height: 360~)
         }, completion: nil)
