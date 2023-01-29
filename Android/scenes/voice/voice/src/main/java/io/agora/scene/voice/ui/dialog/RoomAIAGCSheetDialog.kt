@@ -9,6 +9,14 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
 
+    companion object {
+        const val KEY_IS_ON = "isOn"
+    }
+
+    private val isOn by lazy {
+        arguments?.getBoolean(RoomAIAECSheetDialog.KEY_IS_ON, true) ?: true
+    }
+
     public var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
     override fun getViewBinding(
@@ -21,8 +29,9 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.accbAGC?.setOnClickListener {
-            onClickCheckBox?.invoke(true)
+        binding?.accbAGC?.isChecked = isOn
+        binding?.accbAGC?.setOnCheckedChangeListener { _, b ->
+            onClickCheckBox?.invoke(b)
         }
     }
 }
