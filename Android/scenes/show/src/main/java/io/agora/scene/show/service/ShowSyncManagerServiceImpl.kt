@@ -170,14 +170,14 @@ class ShowSyncManagerServiceImpl(
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
         // check if has fake data
-        val fakeList = retRoomList.filter { it.roomName.contains("Robot") }
+        val fakeList = retRoomList.filter { it.isFake() }
         if (fakeList.size < fakeDataSize) {
             val createFakeCount = fakeDataSize - fakeList.size
 
             val letchCount = CountDownLatch(createFakeCount)
 
             runOnMainThread {
-                val startChannelId = (retRoomList.maxOfOrNull { it.ownerId.toInt() } ?: 0) + 1
+                val startChannelId = (retRoomList.maxOfOrNull { it.ownerId.toInt() } ?: 0) + 1 + 2023000
                 val startUid = (retRoomList.maxOfOrNull { it.ownerId.toInt() }?: 0) + 1
                 val fakeStreamUrls = arrayListOf(
                     "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
@@ -187,7 +187,7 @@ class ShowSyncManagerServiceImpl(
                 )
                 for (i in 0 until createFakeCount) {
                     val channelId = startChannelId + i
-                    val uid = startUid + i
+                    val uid = 2000000001
                     val streamUrl = fakeStreamUrls[i % fakeStreamUrls.size]
                     val streamRegion = "cn"
                     cloudPlayerService.startCloudPlayer(
@@ -199,13 +199,12 @@ class ShowSyncManagerServiceImpl(
                         success = {
                             createRoomInner(
                                 channelId.toString(),
-                                "Robot Room $channelId",
+                                "Smooth $channelId",
                                 1,
-                                "1",
+                                (channelId % 4).toString(),
                                 uid.toString(),
                                 "",
-                                uid.toString(),
-                                true,
+                                "User $channelId",
                                 success = {
                                     Sync.Instance().joinScene(
                                         it.roomId,
@@ -270,7 +269,7 @@ class ShowSyncManagerServiceImpl(
         retRoomList.addAll(roomList)
 
         val expireRoomList = roomList.filter {
-            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) || (removeFakeData && it.isFakeData)
+            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) || (removeFakeData && it.isFake())
         }
         if (expireRoomList.isNotEmpty()) {
             val expireLetchCount = CountDownLatch(expireRoomList.size)
@@ -328,7 +327,6 @@ class ShowSyncManagerServiceImpl(
                 UserManager.getInstance().user.id.toString(),
                 UserManager.getInstance().user.headUrl,
                 UserManager.getInstance().user.name,
-                false,
                 success,
                 error
             )
@@ -343,7 +341,6 @@ class ShowSyncManagerServiceImpl(
         ownerUid: String,
         ownerAvatar: String,
         ownerName: String,
-        isFakeData: Boolean,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
@@ -358,8 +355,7 @@ class ShowSyncManagerServiceImpl(
             ShowRoomStatus.activity.value,
             ShowInteractionStatus.idle.value,
             TimeUtils.currentTimeMillis().toDouble(),
-            TimeUtils.currentTimeMillis().toDouble(),
-            isFakeData
+            TimeUtils.currentTimeMillis().toDouble()
         )
 
         val scene = Scene().apply {
@@ -414,7 +410,8 @@ class ShowSyncManagerServiceImpl(
                         innerSubscribeSeatApplyChanged(roomNo)
                         innerSubscribeInteractionChanged(roomNo)
                         innerSubscribePKInvitationChanged(roomNo)
-                        if (roomInfo.isFakeData) {
+                        innerSubscribeRoomChange(roomNo)
+                        if (roomInfo.isFake()) {
                             cloudPlayerService.startHeartBeat(
                                 roomNo,
                                 UserManager.getInstance().user.id.toString()
@@ -473,7 +470,7 @@ class ShowSyncManagerServiceImpl(
             TAG,
             "leaveRoom roomNo=${roomId} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id.toString()}"
         )
-        if (roomDetail.isFakeData) {
+        if (roomDetail.isFake()) {
             cloudPlayerService.stopHeartBeat(roomId)
         }
 
@@ -481,8 +478,7 @@ class ShowSyncManagerServiceImpl(
             || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
         ) {
             Log.d(TAG, "leaveRoom delete room")
-
-            sceneReference.delete(object : Sync.Callback {
+            Sync.Instance().deleteScene(roomId, object : Sync.Callback {
                 override fun onSuccess() {
                     roomMap.remove(roomId)
                 }
@@ -1104,53 +1100,6 @@ class ShowSyncManagerServiceImpl(
                 }
             }
         )
-        Sync.Instance().joinScene(kSceneId, object : Sync.JoinSceneCallback {
-            override fun onSuccess(sceneReference: SceneReference?) {
-                sceneReference?.subscribe(object : EventListener {
-                    override fun onCreated(item: IObject?) {
-
-                    }
-
-                    override fun onUpdated(item: IObject?) {
-                        item ?: return
-                        val roomInfo = item.toObject(ShowRoomDetailModel::class.java)
-                        roomMap[item.id] = roomInfo
-                        Log.d(TAG, "Sync Room Update roomNo=${item.id}, roomInfo=${roomInfo}")
-                        if (currRoomNo.isNotEmpty()) {
-                            runOnMainThread {
-                                currRoomChangeSubscriber?.invoke(
-                                    ShowServiceProtocol.ShowSubscribeStatus.updated,
-                                    roomInfo
-                                )
-                            }
-                        }
-                    }
-
-                    override fun onDeleted(item: IObject?) {
-                        item ?: return
-                        val roomInfo = roomMap.remove(item.id)
-                        Log.d(TAG, "Sync Room Delete roomNo=${item.id}")
-                        if (currRoomNo.isNotEmpty() && currRoomNo == item.id) {
-                            runOnMainThread {
-                                currRoomChangeSubscriber?.invoke(
-                                    ShowServiceProtocol.ShowSubscribeStatus.deleted,
-                                    roomInfo
-                                )
-                            }
-                        }
-                    }
-
-                    override fun onSubscribeError(ex: SyncManagerException?) {
-                        errorHandler.invoke(ex!!)
-                    }
-                })
-            }
-
-            override fun onFail(exception: SyncManagerException?) {
-                errorHandler.invoke(exception!!)
-            }
-
-        })
         Sync.Instance().subscribeConnectState {
             Log.d(TAG, "subscribeConnectState state=$it")
             if (it == Sync.ConnectionState.open) {
@@ -1198,7 +1147,6 @@ class ShowSyncManagerServiceImpl(
             interactStatus,
             roomInfo.createdAt,
             roomInfo.updatedAt,
-            roomInfo.isFakeData
         )
         sceneReference.update(nRoomInfo.toMap(), object : Sync.DataItemCallback {
             override fun onSuccess(result: IObject?) {
@@ -1233,7 +1181,6 @@ class ShowSyncManagerServiceImpl(
             roomInfo.interactStatus,
             roomInfo.createdAt,
             roomInfo.updatedAt,
-            roomInfo.isFakeData
         )
         sceneReference.update(nRoomInfo.toMap(), object : Sync.DataItemCallback {
             override fun onSuccess(result: IObject?) {
@@ -1417,6 +1364,51 @@ class ShowSyncManagerServiceImpl(
         currEventListeners.add(listener)
         sceneReference.collection(kCollectionIdUser)
             .subscribe(listener)
+    }
+
+    private fun innerSubscribeRoomChange(roomId: String){
+        val sceneReference = sceneReferenceMap[roomId] ?: return
+        val listener = object : EventListener {
+            override fun onCreated(item: IObject?) {
+                // do nothing
+            }
+
+            override fun onUpdated(item: IObject?) {
+                item?: return
+                val roomInfo = item.toObject(ShowRoomDetailModel::class.java)
+                roomMap[item.id] = roomInfo
+                ShowLogger.d(TAG, "SubscribeRoomChange Update roomNo=${item.id}, roomInfo=${roomInfo}")
+                if (currRoomNo.isNotEmpty()) {
+                    runOnMainThread {
+                        currRoomChangeSubscriber?.invoke(
+                            ShowServiceProtocol.ShowSubscribeStatus.updated,
+                            roomInfo
+                        )
+                    }
+                }
+
+            }
+
+            override fun onDeleted(item: IObject?) {
+                item ?: return
+                val roomInfo = roomMap.remove(item.id)
+                ShowLogger.d(TAG, "SubscribeRoomChange Delete roomNo=${item.id}")
+                if (currRoomNo.isNotEmpty() && currRoomNo == item.id) {
+                    runOnMainThread {
+                        currRoomChangeSubscriber?.invoke(
+                            ShowServiceProtocol.ShowSubscribeStatus.deleted,
+                            roomInfo
+                        )
+                    }
+                }
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException?) {
+                errorHandler.invoke(ex!!)
+            }
+        }
+        currEventListeners.add(listener)
+        Sync.Instance().subscribeScene(sceneReference, listener)
     }
 
     // ----------------------------------- 连麦申请 -----------------------------------
@@ -1793,7 +1785,7 @@ class ShowSyncManagerServiceImpl(
                         ownerMuteAudio = false,
                         createdAt = info.createAt
                     )
-                    innerCreateInteraction(roomId, interaction, null, null)
+                    innerCreateInteraction(info.fromRoomId, interaction, null, null)
                 } else {
                     val oldInteraction =
                         interactionInfoList.filter { it.userId == info.userId }.getOrNull(0)

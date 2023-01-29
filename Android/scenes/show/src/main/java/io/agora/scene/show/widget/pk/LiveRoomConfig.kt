@@ -44,8 +44,7 @@ class LiveRoomConfig constructor(room: ShowRoomDetailModel, waitingForPK: Boolea
             roomStatus,
             interactStatus,
             createdAt,
-            updatedAt,
-            false
+            updatedAt
         )
     }
 
