@@ -54,13 +54,55 @@ class ShowLivePagesViewController: ViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.view.addSubview(collectionView)
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
-        collectionView.scrollToItem(at: IndexPath(row: focusIndex, section: 0), at: .centeredVertically, animated: false)
+        collectionView.scrollToItem(at: IndexPath(row: fakeCellIndex(with: focusIndex), section: 0), at: .centeredVertically, animated: false)
     }
 }
 
 
-//MARK: live vc cache
+private let kPageCacheCount = 100
+//MARK: private
 extension ShowLivePagesViewController {
+    fileprivate func fakeCellCount() -> Int {
+        guard let count = roomList?.count else {
+            return 0
+        }
+        return count > 1 ? count + kPageCacheCount : count
+    }
+    
+    fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
+        if fakeCellCount() < 2 {
+            return fakeIndex
+        }
+        
+        guard let realCount = roomList?.count else {
+            showLogger.error("realCellIndex roomList?.count == nil", context: kShowLogBaseContext)
+            return 0
+        }
+        let offset = kPageCacheCount / 2
+        var realIndex = fakeIndex + realCount * max(1 + offset / realCount, 2) - offset
+        realIndex = realIndex % realCount
+        
+        return realIndex
+    }
+    
+    fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
+        if fakeCellCount() < 2 {
+            return realIndex
+        }
+        
+        guard let _ = roomList?.count else {
+            showLogger.error("fakeCellIndex roomList?.count == nil", context: kShowLogBaseContext)
+            return 0
+        }
+        let offset = kPageCacheCount / 2
+        let fakeIndex = realIndex + offset
+        
+        return fakeIndex
+    }
+}
+
+//MARK: live vc cache
+extension ShowLiveViewController {
     
 }
 
@@ -70,11 +112,12 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: UICollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(UICollectionViewCell.self),
                                                                             for: indexPath)
+        let idx = realCellIndex(with: indexPath.row)
         defer {
-            showLogger.info("collectionView... cellForItemAt: \(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
+            showLogger.info("collectionView cellForItemAt: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
         }
         
-        guard let room = self.roomList?[indexPath.row], let roomId = room.roomId else {
+        guard let room = self.roomList?[idx], let roomId = room.roomId else {
             return cell
         }
         
@@ -117,22 +160,24 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.roomList?.count ?? 0
+        return fakeCellCount()
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        showLogger.info("collectionView... willDisplay: \(indexPath.row)")
-        guard let room = self.roomList?[indexPath.row], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
-//            assert(false, "room at index \(indexPath.row) not found")
+        let idx = realCellIndex(with: indexPath.row)
+        showLogger.info("collectionView willDisplay: \(idx)/\(indexPath.row)")
+        guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
+//            assert(false, "room at index \(idx) not found")
             return
         }
         vc.loadingType = .loading
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        showLogger.info("collectionView... didEndDisplaying: \(indexPath.row)")
-        guard let room = self.roomList?[indexPath.row], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
-//            assert(false, "room at index \(indexPath.row) not found")
+        let idx = realCellIndex(with: indexPath.row)
+        showLogger.info("collectionView didEndDisplaying: \(idx)/\(indexPath.row)")
+        guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
+//            assert(false, "room at index \(idx) not found")
             return
         }
         vc.loadingType = .preload

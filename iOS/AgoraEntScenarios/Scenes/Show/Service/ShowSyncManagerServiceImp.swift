@@ -1929,7 +1929,7 @@ private let robotStreamURL = [
 ]
 
 private let kRobotRoomStartId = 2023000
-private let kRobotUid = 2000000000
+private let kRobotUid = 2000000001
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
         agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
@@ -1966,7 +1966,8 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 
                 var robotIds = robotRoomIds
                 dataArray.forEach { room in
-                    guard let roomId = room.roomId, let idx = robotIds.firstIndex(of: roomId) else{
+                    let roomId = (Int(room.roomId ?? "") ?? 0) - kRobotRoomStartId
+                    guard roomId > 0, let idx = robotIds.firstIndex(of: "\(roomId)") else{
                         return
                     }
                     robotIds.remove(at: idx)
@@ -1976,7 +1977,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 robotIds.forEach { robotId in
                     let room = ShowRoomListModel()
                     let robotId = Int(robotId) ?? 1
-                    let userId = "\(robotId + kRobotUid)"
+                    let userId = "\(kRobotUid)"
                     room.roomName = "Smooth \(robotId)"
                     room.roomId = "\(robotId + kRobotRoomStartId)"
                     room.thumbnailId = "1"
@@ -1999,7 +2000,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     @objc override func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.joinRoom(room: room, completion: completion)
-        if room.roomId?.count ?? 0 == 6 {
+        guard room.roomId?.count ?? 0 == 6 else {
             return
         }
         let channelName = room.roomId ?? ""
