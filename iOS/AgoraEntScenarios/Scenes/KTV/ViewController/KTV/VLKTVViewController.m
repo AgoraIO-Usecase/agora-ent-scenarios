@@ -103,6 +103,8 @@ KTVApiDelegate
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApi* ktvApi;
+
+@property (nonatomic, assign) NSUInteger retryCount;
 @end
 
 @implementation VLKTVViewController
@@ -126,14 +128,13 @@ KTVApiDelegate
     [self.view addSubview:bgView];
     //头部视图
     VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
-    topView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
     [self.view addSubview:topView];
     self.topView = topView;
     topView.listModel = self.roomModel;
     
     //底部按钮视图
     VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
-    bottomView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
+    bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];
     
@@ -164,6 +165,8 @@ KTVApiDelegate
     //处理背景
     [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    
+    self.retryCount = 0;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -384,8 +387,7 @@ KTVApiDelegate
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"确定"), nil];
-    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"房主已解散房间,请确认离开房间") message:@"" placeHolder:@"" type:ALERTYPECONFIRM buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"房主已解散房间,请确认离开房间") buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -537,6 +539,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
+            self.retryCount = 0;
+        } else if(state == KTVLoadSongStateNoLyricUrl) {
+            //如果歌词加载失败进行三次重试
+            if(self.retryCount < 2) {
+                [self loadAndPlaySong];
+                self.retryCount++;
+            }
         }
     }];
     
@@ -896,12 +905,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView stop];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
             [self.MVView reset];
+            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            self.retryCount = 0;
             if(local) {
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
@@ -1116,6 +1128,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if (weakSelf.selSongsArray.count >= 1) {
                     [weakSelf.ktvApi stopSong];
                     [weakSelf removeCurrentSongWithSync:YES];
+                    weakSelf.retryCount = 0;
                 }
             }
             [[VLAlert shared] dismiss];
