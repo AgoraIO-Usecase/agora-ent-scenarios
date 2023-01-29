@@ -3,6 +3,6 @@
     android:id="@+id/video_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_5B">
+    android:background="#141650">
 
 </FrameLayout>

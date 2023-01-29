@@ -10,18 +10,20 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
-import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.BeautyDialog
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import kotlin.random.Random
 
 class LivePrepareActivity : ComponentActivity() {
 
@@ -29,8 +31,8 @@ class LivePrepareActivity : ComponentActivity() {
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
-    private val mThumbnailId by lazy { ShowRoomDetailModel.getRandomThumbnailId() }
-    private val mRoomId by lazy { ShowRoomDetailModel.getRandomRoomId() }
+    private val mThumbnailId by lazy { getRandomThumbnailId() }
+    private val mRoomId by lazy { getRandomRoomId() }
     private val mBeautyProcessor by lazy { RtcEngineInstance.beautyProcessor }
 
     private val mPermissionHelp = PermissionHelp(this)
@@ -43,7 +45,7 @@ class LivePrepareActivity : ComponentActivity() {
         StatusBarUtil.hideStatusBar(window, false)
         setContentView(mBinding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        mBinding.ivRoomCover.setImageResource(ShowRoomDetailModel.getThumbnailIcon(mThumbnailId))
+        mBinding.ivRoomCover.setImageResource(getThumbnailIcon(mThumbnailId))
         mBinding.tvRoomId.text = getString(R.string.show_room_id, mRoomId)
         mBinding.etRoomName.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -185,24 +187,31 @@ class LivePrepareActivity : ComponentActivity() {
 
         mBinding.btnStartLive.isEnabled = false
         mService.createRoom(mRoomId, roomName, mThumbnailId, {
-            mService.joinRoom(it.roomId, { roomDetailInfo ->
-                runOnUiThread {
-                    isFinishToLiveDetail = true
-                    LiveDetailActivity.launch(this@LivePrepareActivity, roomDetailInfo)
-                    finish()
-                }
-            }, { ex ->
-                ToastUtils.showToast(ex.message)
-                runOnUiThread {
-                    mBinding.btnStartLive.isEnabled = true
-                }
-            })
+            runOnUiThread {
+                isFinishToLiveDetail = true
+                LiveDetailActivity.launch(this@LivePrepareActivity, it)
+                finish()
+            }
         }, {
             runOnUiThread {
                 ToastUtils.showToast(it.message)
                 mBinding.btnStartLive.isEnabled = true
             }
         })
+    }
+
+
+    private fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+
+    private fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
+
+    @DrawableRes
+    private fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
+        "0" -> R.mipmap.show_room_cover_0
+        "1" -> R.mipmap.show_room_cover_1
+        "2" -> R.mipmap.show_room_cover_2
+        "3" -> R.mipmap.show_room_cover_3
+        else -> R.mipmap.show_room_cover_0
     }
 
 }

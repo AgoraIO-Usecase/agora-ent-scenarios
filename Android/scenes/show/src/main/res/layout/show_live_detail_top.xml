@@ -27,6 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearance="@style/show_roundStyle_50"
+            app:strokeColor="@android:color/transparent"
             tools:src="@mipmap/portrait01" />
 
         <androidx.appcompat.widget.AppCompatTextView

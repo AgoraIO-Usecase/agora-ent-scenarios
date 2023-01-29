@@ -281,8 +281,8 @@ public class STRenderer {
 //            imageWidth = height;
 //            imageHeight = width;
 //        }
-
-        if (mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length) {
+        boolean imageSizeChange = mImageDataBuffer == null || mImageDataBuffer.length != cameraPixel.length;
+        if (imageSizeChange) {
             mImageDataBuffer = new byte[cameraPixel.length];
         }
         System.arraycopy(cameraPixel, 0, mImageDataBuffer, 0, cameraPixel.length);
@@ -313,6 +313,10 @@ public class STRenderer {
         if (mTextureOutId == null) {
             mTextureOutId = new int[2];
             GlUtil.initEffectTexture(imageWidth, imageHeight, mTextureOutId, GLES20.GL_TEXTURE_2D);
+        }else if(imageSizeChange){
+            GLES20.glDeleteTextures(mTextureOutId.length, mTextureOutId, 0);
+            mTextureOutId = null;
+            return -1;
         }
 
         mSTMobileColorConvertNative.setTextureSize(imageWidth, imageHeight);
