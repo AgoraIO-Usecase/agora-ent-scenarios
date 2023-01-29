@@ -37,7 +37,9 @@ def all_pods
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+ # pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+   pod 'AgoraRtcEngine_iOS', :path => './libs'
+
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 
   #ThirdParty
@@ -71,6 +73,7 @@ def all_pods
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
+  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
   pod 'Bugly','2.5.93'
