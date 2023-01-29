@@ -19,7 +19,7 @@ class ShowLiveViewController: UIViewController {
             }
             
             self.joinStartDate = Date()
-            showLogger.info("room(\(roomId)) loadingType: \(loadingType.rawValue)", context: "AgoraKit")
+            showLogger.info("room(\(roomId)) loadingType: \(loadingType.rawValue)", context: kShowLogBaseContext)
             updateLoadingType(loadingType: loadingType)
         }
     }
@@ -709,12 +709,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showLogger.info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: "AgoraKit")
-        #if DEBUG
-        if uid > 100000 {
-            agoraKitManager.setupRemoteVideo(channelName: roomId, uid: uid, canvasView: liveView.canvasView.localView)
-        }
-        #endif
+        showLogger.info("rtcEngine didJoinedOfUid \(uid) channelId: \(roomId)", context: kShowLogBaseContext)
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
@@ -777,11 +772,12 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
                    elapsed: Int) {
         DispatchQueue.main.async {
             let channelId = self.room?.roomId ?? ""
-            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)", context: "AgoraKit")
+            showLogger.info("didLiveRtcRemoteVideoStateChanged channelId: \(channelId) uid: \(uid) state: \(state.rawValue) reason: \(reason.rawValue)",
+                            context: kShowLogBaseContext)
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
-                showLogger.info("show first frame (\(channelId)) cost: \(Int(costTs)) ms", context: "AgoraKit")
+                showLogger.info("show first frame (\(channelId)) cost: \(Int(costTs)) ms", context: kShowLogBaseContext)
             }
         }
     }

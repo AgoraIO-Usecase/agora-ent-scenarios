@@ -1904,7 +1904,7 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3", "4"/*, "5", "6", "7", "8", "9"*/]
+private let robotRoomIds = ["1", "2", "3"/*, "4", "5", "6", "7", "8", "9"*/]
 private let robotRoomOwnerHeaders = [
     "https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
     "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
@@ -1927,13 +1927,16 @@ private let robotStreamURL = [
     "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
     "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
 ]
+
+private let kRobotRoomStartId = 2023000
+private let kRobotUid = 2000000000
 class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     deinit {
         agoraPrint("deinit-- ShowRobotSyncManagerServiceImp")
     }
     
     override func isOwner(_ room: ShowRoomListModel) -> Bool {
-        if room.roomId?.count ?? 0 > 1 {
+        if room.roomId?.count ?? 0 == 6 {
             return super.isOwner(room)
         }
         
@@ -1942,7 +1945,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     
     override func _checkRoomExpire() {
         guard let room = self.room, let roomId = room.roomId else { return }
-        if room.roomId?.count ?? 0 > 1 {
+        if room.roomId?.count ?? 0 == 6 {
             return super._checkRoomExpire()
         }
         
@@ -1972,13 +1975,14 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 //create fake room
                 robotIds.forEach { robotId in
                     let room = ShowRoomListModel()
-                    let userId = "\((UInt(robotId) ?? 1) + 2000000000)"
-                    room.roomName = "Robot Room \(robotId)"
-                    room.roomId = robotId
+                    let robotId = Int(robotId) ?? 1
+                    let userId = "\(robotId + kRobotUid)"
+                    room.roomName = "Smooth \(robotId)"
+                    room.roomId = "\(robotId + kRobotRoomStartId)"
                     room.thumbnailId = "1"
                     room.ownerId = userId
                     room.ownerName = userId
-                    room.ownerAvatar = robotRoomOwnerHeaders[(Int(robotId) ?? 1) - 1]//VLUserCenter.user.headUrl
+                    room.ownerAvatar = robotRoomOwnerHeaders[robotId - 1]//VLUserCenter.user.headUrl
                     room.createdAt = Date().millionsecondSince1970()
                     dataArray.append(room)
                 }
@@ -1995,14 +1999,14 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     @objc override func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.joinRoom(room: room, completion: completion)
-        if room.roomId?.count ?? 0 > 1 {
+        if room.roomId?.count ?? 0 == 6 {
             return
         }
         let channelName = room.roomId ?? ""
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: VLUserCenter.user.id,
                                                robotUid: UInt(room.ownerId ?? "") ?? 0,
-                                               streamUrl: robotStreamURL[(Int(channelName) ?? 1) - 1]) { msg in
+                                               streamUrl: robotStreamURL[(Int(channelName) ?? 1) - kRobotRoomStartId - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
         }

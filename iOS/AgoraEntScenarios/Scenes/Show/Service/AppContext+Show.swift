@@ -7,6 +7,7 @@
 
 import Foundation
 
+let kShowLogBaseContext = "AgoraKit"
 let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "Show"))
 
 private let kShowRoomListKey = "kShowRoomListKey"
@@ -18,7 +19,7 @@ extension AppContext {
     static func showServiceImp(_ roomId: String) -> ShowServiceProtocol {
         let showServiceImp = _showServiceImpMap[roomId]
         guard let showServiceImp = showServiceImp else {
-            let imp = roomId.count < 2 ? ShowRobotSyncManagerServiceImp() : ShowSyncManagerServiceImp()
+            let imp = roomId.count == 6 ? ShowSyncManagerServiceImp() : ShowRobotSyncManagerServiceImp()
             _showServiceImpMap[roomId] = imp
             return imp
         }
