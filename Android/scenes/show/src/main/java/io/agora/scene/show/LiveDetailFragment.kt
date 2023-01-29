@@ -1304,6 +1304,26 @@ class LiveDetailFragment : Fragment() {
                     rtcConnection
                 )
             }
+            eventListener.onUserJoined = { rUid ->
+                if( mRoomInfo.ownerId.toInt() != rUid){
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(
+                            null,
+                            Constants.RENDER_MODE_HIDDEN,
+                            mRoomInfo.ownerId.toInt()
+                            ),
+                        rtcConnection
+                    )
+                    mRtcEngine.setupRemoteVideoEx(
+                        VideoCanvas(
+                            videoView,
+                            Constants.RENDER_MODE_HIDDEN,
+                            rUid
+                        ),
+                        rtcConnection
+                    )
+                }
+            }
         }
 
         val channelMediaOptions = ChannelMediaOptions()
