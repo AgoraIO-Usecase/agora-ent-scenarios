@@ -886,6 +886,8 @@
 				DD0292AC295BF0DC00485225 /* VLHomeOnLineListView.m */,
 				DD0292AD295BF0DC00485225 /* VLHomeOnLineListCCell.h */,
 				DD0292AE295BF0DC00485225 /* VLCreateRoomView.h */,
+				E320DDD429865E9E00C6D7AA /* KTVSkipView.h */,
+				E320DDD529865E9E00C6D7AA /* KTVSkipView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2443,6 +2445,7 @@
 				DD220B57295B332C00F57F30 /* VMSoundView.swift in Sources */,
 				DD0292DA295BF0DC00485225 /* VLPopMoreSelView.m in Sources */,
 				DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */,
+				E320DDD629865E9E00C6D7AA /* KTVSkipView.m in Sources */,
 				DDA19A0228FFE579009D3E61 /* UIGestureRecognizer+VL.m in Sources */,
 				DD0292DC295BF0DC00485225 /* VLPopScoreView.m in Sources */,
 				DD220B16295B332C00F57F30 /* SwiftyFitSize.swift in Sources */,
