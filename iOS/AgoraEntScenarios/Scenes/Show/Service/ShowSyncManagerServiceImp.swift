@@ -1998,16 +1998,33 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         }
     }
     
+    @objc override func createRoom(roomName: String,
+                                   roomId: String,
+                                   thumbnailId: String,
+                                   completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
+        super.createRoom(roomName: roomName, roomId: roomId, thumbnailId: thumbnailId, completion: completion)
+        
+        startCloudPlayer(roomId: roomId, robotUid: UInt(kRobotUid))
+    }
+    
     @objc override func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.joinRoom(room: room, completion: completion)
-        guard room.roomId?.count ?? 0 == 6 else {
+        
+        startCloudPlayer(roomId: room.roomId, robotUid: UInt(room.ownerId ?? "") ?? 0)
+    }
+    
+    
+    //MARK: private
+    private func startCloudPlayer(roomId: String?, robotUid: UInt) {
+        guard let roomId = roomId, roomId.count == 7 else {
             return
         }
-        let channelName = room.roomId ?? ""
+        let channelName = roomId
+        agoraPrint("startCloudPlayer: \(roomId) /\(robotUid)")
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: VLUserCenter.user.id,
-                                               robotUid: UInt(room.ownerId ?? "") ?? 0,
+                                               robotUid: UInt(kRobotUid),
                                                streamUrl: robotStreamURL[(Int(channelName) ?? 1) - kRobotRoomStartId - 1]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
