@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -45,7 +45,7 @@ class RoomListActivity : AppCompatActivity() {
                 holder: BindingViewHolder<ShowRoomItemBinding>,
                 position: Int
             ) {
-                updateRoomItem(holder.binding, getItem(position) ?: return)
+                updateRoomItem(mDataList, position, holder.binding, getItem(position) ?: return)
             }
         }
         mBinding.rvRooms.adapter = mRoomAdapter
@@ -74,13 +74,13 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.smartRefreshLayout.finishRefresh()
     }
 
-    private fun updateRoomItem(binding: ShowRoomItemBinding, roomInfo: ShowRoomDetailModel) {
+    private fun updateRoomItem(list: List<ShowRoomDetailModel>, position: Int, binding: ShowRoomItemBinding, roomInfo: ShowRoomDetailModel) {
         binding.tvRoomName.text = roomInfo.roomName
         binding.tvRoomId.text = getString(R.string.show_room_id, roomInfo.roomId)
         binding.tvUserCount.text = getString(R.string.show_user_count, roomInfo.roomUserCount)
         binding.ivCover.setImageResource(roomInfo.getThumbnailIcon())
         binding.root.setOnClickListener {
-            goLiveDetailActivity(roomInfo)
+            goLiveDetailActivity(list, position, roomInfo)
         }
     }
 
@@ -90,25 +90,21 @@ class RoomListActivity : AppCompatActivity() {
         }
     }
 
-    private fun goLiveDetailActivity(roomInfo: ShowRoomDetailModel) {
+    private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
         if (!isSetSetting) {
             PresetAudienceDialog(this, false).apply {
                 callBack = object : OnPresetAudienceDialogCallBack {
                     override fun onClickConfirm() {
                         isSetSetting = true
-                        goLiveDetailActivity(roomInfo)
+                        goLiveDetailActivity(list, position, roomInfo)
                     }
                 }
                 show()
             }
             return
         }
-        mService.joinRoom(roomInfo.roomId, {
-            LiveDetailActivity.launch(this, it)
-        }, {
-            ToastUtils.showToast(it.message)
-        })
+        LiveDetailActivity.launch(this, ArrayList(list), position, roomInfo.ownerId != UserManager.getInstance().user.id.toString())
     }
 
     private fun showAudienceSetting() {

@@ -1,9 +1,8 @@
 package io.agora.scene.show.service
 
-import androidx.annotation.DrawableRes
-import io.agora.scene.base.utils.TimeUtils
+import android.os.Parcel
+import android.os.Parcelable
 import io.agora.scene.show.R
-import kotlin.random.Random
 
 enum class ShowRoomStatus(val value: Int) {
     activity(0),//直播中
@@ -36,8 +35,24 @@ data class ShowRoomDetailModel(
     val roomStatus: Int = ShowRoomStatus.activity.value,
     val interactStatus: Int = ShowInteractionStatus.idle.value,
     val createdAt: Double,
-    val updatedAt: Double,
-): java.io.Serializable {
+    val updatedAt: Double
+) : Parcelable {
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readInt(),
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readDouble(),
+        parcel.readDouble()
+    ) {
+    }
+
     fun toMap(): HashMap<String, Any>{
         return hashMapOf(
             Pair("roomId", roomId),
@@ -62,22 +77,36 @@ data class ShowRoomDetailModel(
         else -> R.mipmap.show_room_cover_0
     }
 
-    companion object{
+    fun isFake() = roomId.length > 6
 
-        fun getRandomRoomId() = (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(roomId)
+        parcel.writeString(roomName)
+        parcel.writeInt(roomUserCount)
+        parcel.writeString(thumbnailId)
+        parcel.writeString(ownerId)
+        parcel.writeString(ownerAvatar)
+        parcel.writeString(ownerName)
+        parcel.writeInt(roomStatus)
+        parcel.writeInt(interactStatus)
+        parcel.writeDouble(createdAt)
+        parcel.writeDouble(updatedAt)
+    }
 
-        fun getRandomThumbnailId() = Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
+    override fun describeContents(): Int {
+        return 0
+    }
 
-        @DrawableRes
-        fun getThumbnailIcon(thumbnailId: String) = when (thumbnailId) {
-            "0" -> R.mipmap.show_room_cover_0
-            "1" -> R.mipmap.show_room_cover_1
-            "2" -> R.mipmap.show_room_cover_2
-            "3" -> R.mipmap.show_room_cover_3
-            else -> R.mipmap.show_room_cover_0
+    companion object CREATOR : Parcelable.Creator<ShowRoomDetailModel> {
+        override fun createFromParcel(parcel: Parcel): ShowRoomDetailModel {
+            return ShowRoomDetailModel(parcel)
         }
 
+        override fun newArray(size: Int): Array<ShowRoomDetailModel?> {
+            return arrayOfNulls(size)
+        }
     }
+
 
 }
 

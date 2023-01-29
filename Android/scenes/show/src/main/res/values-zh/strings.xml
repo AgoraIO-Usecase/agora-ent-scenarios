@@ -199,4 +199,6 @@
     <string name="show_beauty_group_virtual_bg">背景</string>
     <string name="show_beauty_item_virtual_bg_blur">模糊</string>
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
+    <string name="show_live_detail_living_end">直播已结束</string>
+    <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
 </resources>
