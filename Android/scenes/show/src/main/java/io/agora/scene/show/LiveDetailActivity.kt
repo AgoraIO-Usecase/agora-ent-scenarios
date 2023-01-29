@@ -68,6 +68,7 @@ class LiveDetailActivity : AppCompatActivity() {
         setContentView(mBinding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         mPermissionHelp = PermissionHelp(this)
+
         val selectedRoomIndex = intent.getIntExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, 0)
 
         // 设置token有效期为房间存活时长，到期后关闭并退出房间
