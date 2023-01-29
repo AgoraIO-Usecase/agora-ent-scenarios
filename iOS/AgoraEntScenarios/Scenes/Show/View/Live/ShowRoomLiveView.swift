@@ -116,7 +116,8 @@ class ShowRoomLiveView: UIView {
         
         addSubview(roomInfoView)
         roomInfoView.snp.makeConstraints { make in
-            make.top.equalTo(44)
+            let top = Screen.safeAreaTopHeight()
+            make.top.equalTo(max(top, 20))
             make.left.equalTo(15)
         }
         

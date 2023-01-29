@@ -349,7 +349,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
-            ShowReceiveLiveFinishAlertVC.present { [weak self] in
+            ShowReceiveLiveFinishAlertVC.present(headUrl: room?.ownerAvatar) { [weak self] in
                 if self?.presentedViewController != nil {
                     self?.presentedViewController?.dismiss(animated: false)
                 }

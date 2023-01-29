@@ -12,11 +12,15 @@ class ShowReceiveLiveFinishAlertVC: UIViewController {
     private var dismissAlert: (()->())?
     private lazy var finishAlertView: ShowReceiveFinishView = {
         let view = ShowReceiveFinishView()
-        view.headImg = VLUserCenter.user.headUrl
         view.delegate = self
         return view
     }()
 
+    fileprivate var headUrl: String? {
+        didSet{
+            finishAlertView.headImg = headUrl
+        }
+    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -49,8 +53,9 @@ class ShowReceiveLiveFinishAlertVC: UIViewController {
 }
 
 extension ShowReceiveLiveFinishAlertVC {
-    class func present(dismiss: @escaping (()->())){
+    class func present(headUrl: String?, dismiss: @escaping (()->())){
         let vc = ShowReceiveLiveFinishAlertVC()
+        vc.headUrl = headUrl
         vc.dismissAlert = dismiss
         let topVC = UIViewController.cl_topViewController()
         topVC?.present(vc, animated: true)
