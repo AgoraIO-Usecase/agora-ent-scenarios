@@ -65,6 +65,9 @@ class VMAudioSettingView: UIView {
     }
 
     private func layoutUI() {
+        
+     
+        
         let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
         let layer = CAShapeLayer()
         layer.path = path.cgPath
@@ -205,7 +208,14 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+//            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                // handle the failure case here
+                return UITableViewCell()
+            }
+
+            guard !settingImage.isEmpty else { return cell}
+
             cell.iconView.image = UIImage(settingImage[0 + indexPath.row])
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
@@ -291,6 +301,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
         } else if indexPath.section == 1 {
             if indexPath.row == 0 {
                 let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
+                guard !settingImage.isEmpty else { return cell}
                 cell.iconView.image = UIImage(settingImage[3])
                 cell.titleLabel.text = settingName[3]
                 cell.isAudience = isAudience
@@ -303,6 +314,8 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 return cell
             } else if indexPath.row == 1 {
                 let cell: VMSliderTableViewCell = tableView.dequeueReusableCell(withIdentifier: slIdentifier) as! VMSliderTableViewCell
+                guard !settingImage.isEmpty else { return cell}
+
                 cell.iconView.image = UIImage(settingImage[4])
                 cell.titleLabel.text = settingName[4]
                 cell.isAudience = isAudience
@@ -319,9 +332,17 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 2 {
             
-            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+//            let cell: VMNorSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as! VMNorSetTableViewCell
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
+                // handle the failure case here
+                return UITableViewCell()
+            }
+            guard !settingImage.isEmpty else { return cell}
+
             cell.iconView.image = UIImage(settingImage[5])
             cell.titleLabel.text = settingName[5]
+            
+            
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
             } else if indexPath.row == 1 {
