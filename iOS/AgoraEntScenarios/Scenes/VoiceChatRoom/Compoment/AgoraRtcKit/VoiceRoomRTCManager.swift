@@ -275,6 +275,8 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"rtc.audio_resend\":false}")
         rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
         rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
+        self .setParametersWithMD()
+
         rtcKit.setAudioProfile(.musicHighQualityStereo, scenario: .chorus)
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: false)
 
@@ -303,6 +305,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = false
             option.autoSubscribeVideo = false
             option.clientRoleType = .broadcaster
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
 
@@ -333,6 +337,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.autoSubscribeAudio = true
             option.autoSubscribeVideo = true
             option.clientRoleType = .broadcaster
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
 
@@ -341,6 +347,8 @@ public let kMPK_RTC_UID: UInt = 1
             option.publishCameraTrack = false // 关闭视频采集
             option.publishMicrophoneTrack = false // 关闭音频采集
             option.autoSubscribeAudio = true
+            self .setParametersWithMD()
+
             rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus) // 设置profile
             option.clientRoleType = .audience // 设置观众角色
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: 0, mediaOptions: option)
@@ -358,8 +366,10 @@ public let kMPK_RTC_UID: UInt = 1
         self.type = .VoiceChat
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        self .setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
+
             rtcKit.setAudioProfile(.musicHighQuality)
             rtcKit.setAudioScenario(.gameStreaming)
         } else if type == .game {
@@ -388,6 +398,10 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.delegate = self
     }
 
+    private func setParametersWithMD (){
+        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+
+    }
     /**
      * 加载RTC
      */
@@ -830,6 +844,7 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
         playerDelegate?.didReceiveStreamMsgOfUid?(uid: uid, data: data)
     }
 
+    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
         guard let _ = delegate else {
             return

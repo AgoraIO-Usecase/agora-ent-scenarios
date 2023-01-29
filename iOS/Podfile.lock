@@ -18,27 +18,7 @@ PODS:
   - Agora_Chat_iOS (1.0.8)
   - AgoraLyricsScore (1.0.8.8):
     - Zip
-  - AgoraRtcEngine_Special_iOS (4.0.1.4.full):
-    - AgoraRtcEngine_Special_iOS/AINS (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/AudioBeauty (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/ClearVision (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/ContentInspect (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/PVC (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/ReplayKit (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/RtcBasic (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/SpatialAudio (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/SuperResolution (= 4.0.1.4.full)
-    - AgoraRtcEngine_Special_iOS/VirtualBackground (= 4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/AINS (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/AudioBeauty (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/ClearVision (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/ContentInspect (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/PVC (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/ReplayKit (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/RtcBasic (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/SpatialAudio (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/SuperResolution (4.0.1.4.full)
-  - AgoraRtcEngine_Special_iOS/VirtualBackground (4.0.1.4.full)
+  - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
   - Bugly (2.5.93)
   - ChameleonFramework (2.1.0):
@@ -52,10 +32,13 @@ PODS:
   - HWPanModal (0.8.9)
   - HWWeakTimer (1.0)
   - InputKit (1.1.15)
-  - IQKeyboardManager (6.5.10)
+  - IQKeyboardManager (6.5.11)
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
+  - LookinServer/Core (1.1.5)
+  - LookinServer/Swift (1.1.5):
+    - LookinServer/Core
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
     - LSTTimer
@@ -393,7 +376,7 @@ DEPENDENCIES:
   - Agora-Scene-Utils (~> 1.0.8)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.0.8.8)
-  - AgoraRtcEngine_Special_iOS (= 4.0.1.4.full)
+  - AgoraRtcEngine_iOS (from `./libs`)
   - AgoraRtm_iOS
   - Bugly (= 2.5.93)
   - ChameleonFramework
@@ -406,6 +389,7 @@ DEPENDENCIES:
   - JXCategoryView
   - KakaJSON
   - LEEAlert
+  - LookinServer/Swift
   - LSTPopView
   - Masonry (~> 1.1.0)
   - MBProgressHUD (~> 1.1.0)
@@ -430,7 +414,6 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - Bugly
     - ChameleonFramework
@@ -443,6 +426,7 @@ SPEC REPOS:
     - JXCategoryView
     - KakaJSON
     - LEEAlert
+    - LookinServer
     - LSTPopView
     - LSTTimer
     - Masonry
@@ -465,12 +449,16 @@ SPEC REPOS:
     - Zip
     - ZSwiftBaseLib
 
+EXTERNAL SOURCES:
+  AgoraRtcEngine_iOS:
+    :path: "./libs"
+
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
-  AgoraRtcEngine_Special_iOS: 64b4317fd11086e2be1b0138d327eaa4fe1d4ea8
+  AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
@@ -479,10 +467,11 @@ SPEC CHECKSUMS:
   HWPanModal: 259f6916c706b3f63003a325ad1bdfbe913b0fdc
   HWWeakTimer: 79488095ef2dd8937f94b676d12bd5fa954486e6
   InputKit: b82938c2c684d285909cac9de150739aa4814d10
-  IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
+  IQKeyboardManager: ef43ce1ba1e5aaf4adf222c0a46f39761f246879
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
+  LookinServer: 2893f2bae53cbf3fd49bbe1a8ea1745582ef1317
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
@@ -505,6 +494,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 72eed5b6b8b5ec6e62f7264707e998cb1615306e
+PODFILE CHECKSUM: dfee77d7ac8774cc383c18bf7c9c40e2dcadcc3c
 
 COCOAPODS: 1.11.3
