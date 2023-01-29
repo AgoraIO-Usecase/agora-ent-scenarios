@@ -22,17 +22,17 @@ object VideoSetting {
         V_1080P(1920, 1080),
         V_720P(1080, 720),
         V_540P(960, 540),
+        V_480P(854, 480),
         V_360P(640, 360),
-        V_270P(480, 270),
-        V_180P(360, 180),
+        V_270P(480, 270)
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
 
     val ResolutionList = listOf(
-        Resolution.V_180P,
         Resolution.V_270P,
         Resolution.V_360P,
+        Resolution.V_480P,
         Resolution.V_540P,
         Resolution.V_720P,
         Resolution.V_1080P
