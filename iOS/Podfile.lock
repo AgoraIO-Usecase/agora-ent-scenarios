@@ -378,6 +378,7 @@ PODS:
   - SVGAPlayer/ProtoFiles (2.5.7):
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
+  - SwiftyBeaver (1.9.5)
   - YYCache (1.0.4)
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
@@ -416,6 +417,7 @@ DEPENDENCIES:
   - SocketRocket
   - SVGAPlayer
   - SVProgressHUD
+  - SwiftyBeaver (= 1.9.5)
   - YYCache (~> 1.0.4)
   - YYCategories (~> 1.0.4)
   - YYModel (~> 1.0.4)
@@ -455,6 +457,7 @@ SPEC REPOS:
     - SSZipArchive
     - SVGAPlayer
     - SVProgressHUD
+    - SwiftyBeaver
     - YYCache
     - YYCategories
     - YYModel
@@ -463,7 +466,7 @@ SPEC REPOS:
     - ZSwiftBaseLib
 
 SPEC CHECKSUMS:
-  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
@@ -494,6 +497,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
   YYCache: 8105b6638f5e849296c71f331ff83891a4942952
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
@@ -501,6 +505,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: c8e8ea9505599216c3224461f3c0161d4d86fcb2
+PODFILE CHECKSUM: 72eed5b6b8b5ec6e62f7264707e998cb1615306e
 
 COCOAPODS: 1.11.3
