@@ -121,15 +121,24 @@ class ShowRoomListVC: UIViewController {
         let vc = ShowLivePagesViewController()
         vc.audiencePresetType = self.audiencePresetType// ?? ShowPresetType.show_low
         if room.ownerId == VLUserCenter.user.id {
-            vc.roomList = [room]
-            vc.focusIndex = 0
+            AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, model in
+                if let error = error {
+                    ToastView.show(text: error.localizedDescription)
+                    return
+                }
+                vc.roomList = [room]
+                vc.focusIndex = 0
+                let nc = UINavigationController(rootViewController: vc)
+                nc.modalPresentationStyle = .fullScreen
+                self?.present(nc, animated: true)
+            }
         } else {
             vc.roomList = roomList?.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
+            let nc = UINavigationController(rootViewController: vc)
+            nc.modalPresentationStyle = .fullScreen
+            self.present(nc, animated: true)
         }
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        self.present(nc, animated: true)
     }
     
     private func getRoomList() {
