@@ -7,8 +7,9 @@ import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingPresetAudienceDialogBinding
 
-class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
+class PresetAudienceDialog(context: Context, showCloseBtn: Boolean = true) : BottomFullDialog(context) {
 
+    var callBack: OnPresetAudienceDialogCallBack? = null
     private val mBinding by lazy {
         ShowSettingPresetAudienceDialogBinding.inflate(
             LayoutInflater.from(
@@ -19,6 +20,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
 
     init {
         setContentView(mBinding.root)
+        mBinding.ivClose.visibility = if (showCloseBtn) View.VISIBLE else View.INVISIBLE
         mBinding.ivClose.setOnClickListener {
             onPresetShowModeSelected(-1)
             dismiss()
@@ -40,6 +42,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
                 return@setOnClickListener
             }
             onPresetShowModeSelected(showSelectPosition)
+            callBack?.onClickConfirm()
             dismiss()
         }
         groupItems(
@@ -104,7 +107,7 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
             }
             // 高端机：画质增强
             2 -> {
-                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1)
+                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1_5)
                 VideoSetting.updateBroadcastSetting(
                     deviceLevel = VideoSetting.DeviceLevel.High,
                     isByAudience = true
@@ -142,5 +145,12 @@ class PresetAudienceDialog(context: Context) : BottomFullDialog(context) {
         }
     }
 
+
+}
+
+interface OnPresetAudienceDialogCallBack {
+
+    // 用户点击了确认按钮(并且有选择配置)
+    fun onClickConfirm()
 
 }

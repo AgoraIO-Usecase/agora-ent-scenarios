@@ -173,6 +173,17 @@
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_down_net_speech" />
         </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvResolution"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_resolution" />
+
+        </TableRow>
     </TableLayout>
 
     <ImageView
