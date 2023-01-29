@@ -301,7 +301,7 @@ class ShowAgoraKitManager: NSObject {
                                    delegate: proxy,
                                    mediaOptions: mediaOptions) { channelName, uid, elapsed in
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
-                showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: "AgoraKit")
+                showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
             exConnectionMap[channelName] = connection
             
@@ -310,7 +310,7 @@ class ShowAgoraKitManager: NSObject {
                                 context: "AgoraKitManager")
             }else{
                 showLogger.error("join room ex fail: channelName: \(channelName) ownerId: \(ownerId), \(ret)",
-                                 context: "AgoraKit")
+                                 context: kShowLogBaseContext)
             }
         }
         
