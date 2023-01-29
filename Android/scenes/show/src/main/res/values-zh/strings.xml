@@ -89,6 +89,7 @@
     <string name="show_statistic_loss_package">丢包率: %s ％</string>
     <string name="show_statistic_up_net_speech">上行网络: %s KB/s</string>
     <string name="show_statistic_down_net_speech">下行网络: %s KB/s</string>
+    <string name="show_statistic_resolution">分辨率: %s</string>
     <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
     <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
     <string name="show_music_effect_beauty_voice_mohuan">魔幻</string>
