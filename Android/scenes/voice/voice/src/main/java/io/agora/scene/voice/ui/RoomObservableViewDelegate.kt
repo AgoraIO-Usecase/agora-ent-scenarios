@@ -585,7 +585,11 @@ class RoomObservableViewDelegate constructor(
      * 回声消除弹框
      */
     fun onAIAECDialog(isOn: Boolean) {
-        val dialog = RoomAIAECSheetDialog()
+        val dialog = RoomAIAECSheetDialog().apply {
+            arguments = Bundle().apply {
+                putBoolean(RoomAIAECSheetDialog.KEY_IS_ON, isOn)
+            }
+        }
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAECOn(isOn)
             VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn = isOn
@@ -600,7 +604,11 @@ class RoomObservableViewDelegate constructor(
      * 人声增强弹框
      */
     fun onAIAGCDialog(isOn: Boolean) {
-        val dialog = RoomAIAGCSheetDialog()
+        val dialog = RoomAIAGCSheetDialog().apply {
+            arguments = Bundle().apply {
+                putBoolean(RoomAIAGCSheetDialog.KEY_IS_ON, isOn)
+            }
+        }
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAGCOn(isOn)
             VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn

@@ -4,11 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAinsBinding
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
+
+    companion object {
+        const val KEY_IS_ON = "isOn"
+    }
+
+    private val isOn by lazy {
+        arguments?.getBoolean(KEY_IS_ON, true) ?: true
+    }
 
     public var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
@@ -22,8 +31,9 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.accbAEC?.setOnClickListener {
-            onClickCheckBox?.invoke(true)
+        binding?.accbAEC?.isChecked =  isOn
+        binding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
+            onClickCheckBox?.invoke(isChecked)
         }
     }
 }
