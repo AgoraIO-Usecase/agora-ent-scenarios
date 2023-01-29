@@ -254,7 +254,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         };
         getBinding().lrcControlView.setOnLrcClickListener(lrcActionListenerImpl);
-        getBinding().lrcControlView.setPitchViewOnActionListener(lrcActionListenerImpl);
         getBinding().cbVideo.setOnCheckedChangeListener((compoundButton, b) -> toggleSelfVideo(b));
 
         roomLivingViewModel.loadingDialogVisible.observe(this, visible -> {

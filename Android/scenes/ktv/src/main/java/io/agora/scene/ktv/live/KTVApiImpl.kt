@@ -470,8 +470,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (offset <= 1000) {
                         curTs = mReceivedPlayPosition + offset
                         runOnMainThread {
-                            lrcView?.lrcView?.updateTime(curTs)
-                            lrcView?.pitchView?.updateTime(curTs)
+                            lrcView?.karaokeView?.setProgress(curTs)
                         }
                     }
                 }
@@ -580,7 +579,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (mPlayer == null || songConfig == null) return
                 if (!isChorusCoSinger()!!) {
                     val pitch = jsonMsg.getDouble("pitch")
-                    runOnMainThread { lrcView!!.pitchView.updateLocalPitch(pitch.toFloat()) }
+                    runOnMainThread { lrcView!!.karaokeView.setPitch(pitch.toFloat()) }
                 }
             } else if (jsonMsg.getString("cmd") == "PlayerState") {
                 // 其他端收到原唱seek指令
@@ -613,7 +612,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
         super.onAudioVolumeIndication(speakers, totalVolume)
-        // VideoPitch回调, 用于同步各端音准
+        // VideoPitch 回调, 用于同步各端音准
         if (songConfig == null || mPlayer == null) return
         if (songConfig!!.mainSingerUid.toLong() == UserManager.getInstance().user.id
             || songConfig!!.coSingerUid.toLong() == UserManager.getInstance().user.id
@@ -621,10 +620,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             for (info in speakers!!) {
                 if (info.uid == 0) {
                     if (mPlayer != null && mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-                        runOnMainThread { lrcView?.pitchView?.updateLocalPitch(info.voicePitch.toFloat()) }
+                        runOnMainThread { lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat()) }
                         pitch = info.voicePitch
                     } else {
-                        runOnMainThread { lrcView?.pitchView?.updateLocalPitch(0.0F) }
+                        runOnMainThread { lrcView?.karaokeView?.setPitch(0.0F) }
                         pitch = 0.0
                     }
                 }
@@ -699,7 +698,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                 // 打分 + 同步分数
                 if (lrcView == null || isChorusCoSinger()!!) return
-                val score = lrcView!!.pitchView.cumulatedScore
+                val score = lrcView!!.cumulativeScore.toFloat()
                 ktvApiEventHandler?.onSingingScoreResult(score)
                 syncSingingScore(score)
             }
