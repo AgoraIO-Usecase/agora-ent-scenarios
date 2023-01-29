@@ -107,7 +107,7 @@ class PresetAudienceDialog(context: Context, showCloseBtn: Boolean = true) : Bot
             }
             // 高端机：画质增强
             2 -> {
-                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1)
+                VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1_5)
                 VideoSetting.updateBroadcastSetting(
                     deviceLevel = VideoSetting.DeviceLevel.High,
                     isByAudience = true
