@@ -221,6 +221,7 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowSeatApplyAndInviteViewCell.description(),
                                                  for: indexPath) as! ShowSeatApplyAndInviteViewCell
+        cell.roomId = roomId
         let model = self.tableView.dataArray?[indexPath.row]
         
         cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil)
