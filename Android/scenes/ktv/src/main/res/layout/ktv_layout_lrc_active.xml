@@ -8,7 +8,7 @@
     tools:layout_height="230dp"
     tools:theme="@style/Theme.MaterialComponents.Light">
 
-    <io.agora.lyrics_view.PitchView
+    <io.agora.karaoke_view.v11.ScoringView
         android:id="@+id/pitchView"
         android:layout_width="match_parent"
         android:layout_height="90dp"
@@ -23,7 +23,7 @@
         app:pitchInitialScore="0"
         app:pitchStickHeight="6dp" />
 
-    <io.agora.lyrics_view.LrcView
+    <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lrcView"
         android:layout_width="match_parent"
         android:layout_height="0dp"

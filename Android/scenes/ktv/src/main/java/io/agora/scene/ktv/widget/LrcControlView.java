@@ -21,11 +21,13 @@ import androidx.palette.graphics.Palette;
 import java.io.File;
 import java.util.List;
 
-import io.agora.lyrics_view.DownloadManager;
-import io.agora.lyrics_view.LrcLoadUtils;
-import io.agora.lyrics_view.LrcView;
-import io.agora.lyrics_view.PitchView;
-import io.agora.lyrics_view.bean.LrcData;
+import io.agora.karaoke_view.DownloadManager;
+import io.agora.karaoke_view.v11.KaraokeEvent;
+import io.agora.karaoke_view.v11.KaraokeView;
+import io.agora.karaoke_view.v11.LyricsView;
+import io.agora.karaoke_view.v11.ScoringView;
+import io.agora.karaoke_view.v11.model.LyricsLineModel;
+import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
@@ -42,7 +44,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     protected KtvLayoutLrcControlViewBinding mBinding;
     protected KtvLayoutLrcPrepareBinding mPrepareBinding;
 
-    public LrcView getLrcView() {
+    protected KaraokeView mKaraokeView;
+
+    protected double mCumulativeScore;
+
+    public double getCumulativeScore() {
+        return mCumulativeScore;
+    }
+
+    public LyricsView getLrcView() {
         if (mBinding != null && mBinding.ilActive != null) {
             return mBinding.ilActive.lrcView;
         } else {
@@ -50,17 +60,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         }
     }
 
-    public PitchView getPitchView() {
+    public ScoringView getPitchView() {
         return mBinding.ilActive.pitchView;
     }
 
+    public KaraokeView getKaraokeView() {
+        return mKaraokeView;
+    }
 
     public enum Role {
         Singer, Listener, Partner
     }
 
     private Role mRole = Role.Listener;
-    private OnLrcActionListener mOnLrcActionListener;
+    private OnKaraokeEventListener mOnKaraokeActionListener;
 
     public LrcControlView(@NonNull Context context) {
         this(context, null);
@@ -82,6 +95,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
         mBinding.ilIDLE.getRoot().setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
+
+        mKaraokeView = new KaraokeView(mBinding.ilActive.lrcView, mBinding.ilActive.pitchView);
 
         initListener();
     }
@@ -122,15 +137,33 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivChangeSong.setOnClickListener(this);
         mBinding.ilActive.ivSkipPostlude.setOnClickListener(this);
         mBinding.ilActive.ivSkipPrelude.setOnClickListener(this);
+
+        mKaraokeView.setKaraokeEvent(new KaraokeEvent() {
+            @Override
+            public void onDragTo(KaraokeView view, long position) {
+                if (mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onDragTo(position);
+                }
+            }
+
+            @Override
+            public void onRefPitchUpdate(float refPitch, int numberOfRefPitches) {
+                if (mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onRefPitchUpdate(refPitch, numberOfRefPitches);
+                }
+            }
+
+            @Override
+            public void onLineFinished(KaraokeView view, LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
+                if (mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
+                }
+            }
+        });
     }
 
-    public void setOnLrcClickListener(OnLrcActionListener mOnLrcActionListener) {
-        this.mOnLrcActionListener = mOnLrcActionListener;
-        mBinding.ilActive.lrcView.setSeekListener(mOnLrcActionListener);
-    }
-
-    public void setPitchViewOnActionListener(PitchView.OnSingScoreListener onActionListener) {
-        mBinding.ilActive.pitchView.setSingScoreListener(onActionListener);
+    public void setOnLrcClickListener(OnKaraokeEventListener karaokeActionListener) {
+        this.mOnKaraokeActionListener = karaokeActionListener;
     }
 
     private CountDownTimer mCountDownLatch;
@@ -143,8 +176,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             public void onTick(long millisUntilFinished) {
                 int second = (int) (millisUntilFinished / 1000);
 
-                if (mOnLrcActionListener != null) {
-                    mOnLrcActionListener.onCountTime(second);
+                if (mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onCountTime(second);
                 }
 
                 setCountDown(second);
@@ -152,7 +185,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
             @Override
             public void onFinish() {
-                mOnLrcActionListener.onWaitTimeOut();
+                mOnKaraokeActionListener.onWaitTimeOut();
             }
         }.start();
     }
@@ -304,8 +337,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void setMusic(@NonNull RoomSelSongModel mMusic) {
-        mBinding.ilActive.lrcView.reset();
-        mBinding.ilActive.pitchView.setLrcData(null);
+        mKaraokeView.reset();
 
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
@@ -339,30 +371,31 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.clActive.setBackgroundResource(resId);
     }
 
-    public void updateScore(double score) {
+    public void updateScore(double score, double cumulativeScore) {
         mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, score));
+        mCumulativeScore = cumulativeScore;
     }
 
     @Override
     public void onClick(View v) {
         if (v == mBinding.ilActive.switchOriginal) {
-            mOnLrcActionListener.onSwitchOriginalClick();
+            mOnKaraokeActionListener.onSwitchOriginalClick();
         } else if (v == mBinding.ilActive.ivMusicMenu) {
-            mOnLrcActionListener.onMenuClick();
+            mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {
-            mOnLrcActionListener.onPlayClick();
+            mOnKaraokeActionListener.onPlayClick();
         } else if (v == mBinding.ilActive.ivChangeSong) {
-            mOnLrcActionListener.onChangeMusicClick();
+            mOnKaraokeActionListener.onChangeMusicClick();
         } else if (v == mBinding.ilChorus.btChorus) {
             if (mRole == Role.Singer) {
-                mOnLrcActionListener.onStartSing();
+                mOnKaraokeActionListener.onStartSing();
             } else if (mRole == Role.Listener) {
-                mOnLrcActionListener.onJoinChorus();
+                mOnKaraokeActionListener.onJoinChorus();
             }
         } else if (v == mBinding.ilActive.ivSkipPrelude) {
-            mOnLrcActionListener.onSkipPreludeClick();
+            mOnKaraokeActionListener.onSkipPreludeClick();
         } else if (v == mBinding.ilActive.ivSkipPostlude) {
-            mOnLrcActionListener.onSkipPostludeClick();
+            mOnKaraokeActionListener.onSkipPostludeClick();
         }
     }
 
@@ -393,9 +426,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                                 }
                                 File xmlFile = new File(xmlPath);
 
-                                LrcData data = LrcLoadUtils.parse(xmlFile);
-                                getLrcView().setLrcData(data);
-                                getPitchView().setLrcData(data);
+                                LyricsModel lyricsModel = KaraokeView.parseLyricsData(xmlFile);
+                                if (mKaraokeView != null) {
+                                    mKaraokeView.setLyricsData(lyricsModel);
+                                }
+
                                 retryTime = 0;
                             }
 
@@ -405,9 +440,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                             }
                         });
             } else {
-                LrcData data = LrcLoadUtils.parse(file);
-                getLrcView().setLrcData(data);
-                getPitchView().setLrcData(data);
+                LyricsModel lyricsModel = KaraokeView.parseLyricsData(file);
+                if (mKaraokeView != null) {
+                    mKaraokeView.setLyricsData(lyricsModel);
+                }
+
                 retryTime = 0;
             }
         }, exception -> {
@@ -420,7 +457,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         });
     }
 
-    public interface OnLrcActionListener extends LrcView.OnLyricsSeekListener {
+    public interface OnKaraokeEventListener {
         default void onSwitchOriginalClick() {
         }
 
@@ -443,6 +480,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         }
 
         default void onCountTime(int time) {
+        }
+
+        default void onDragTo(long position) {
+        }
+
+        default void onRefPitchUpdate(float refPitch, int numberOfRefPitches) {
+        }
+
+        default void onLineFinished(LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
         }
 
         default void onSkipPreludeClick() {

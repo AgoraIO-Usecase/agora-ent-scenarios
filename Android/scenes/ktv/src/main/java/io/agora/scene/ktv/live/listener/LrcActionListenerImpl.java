@@ -2,11 +2,11 @@ package io.agora.scene.ktv.live.listener;
 
 import android.content.Context;
 
-import io.agora.lyrics_view.PitchView;
+import io.agora.karaoke_view.v11.model.LyricsLineModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.LrcControlView;
 
-public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener, PitchView.OnSingScoreListener {
+public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 
     private final Context mContext;
     private final RoomLivingViewModel mViewModel;
@@ -19,10 +19,9 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
     }
 
 
-
     @Override
     public void onSwitchOriginalClick() {
-        LrcControlView.OnLrcActionListener.super.onSwitchOriginalClick();
+        LrcControlView.OnKaraokeEventListener.super.onSwitchOriginalClick();
         if (mViewModel.musicToggleOriginal()) {
             mLrcControlView.setSwitchOriginalChecked(true);
         }
@@ -30,7 +29,7 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
 
     @Override
     public void onPlayClick() {
-        LrcControlView.OnLrcActionListener.super.onPlayClick();
+        LrcControlView.OnKaraokeEventListener.super.onPlayClick();
         mViewModel.musicToggleStart();
     }
 
@@ -55,34 +54,14 @@ public class LrcActionListenerImpl implements LrcControlView.OnLrcActionListener
         mViewModel.musicCountDown(time);
     }
 
-    // The Impl of LrcControlView.OnLrcActionListener
-
     @Override
-    public void onProgressChanged(long time) {
+    public void onDragTo(long time) {
         mViewModel.musicSeek(time);
     }
 
     @Override
-    public void onStartTrackingTouch() {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch() {
-
-    }
-
-
-    // The Impl of PitchView.OnSingScoreListener
-
-    @Override
-    public void onOriginalPitch(float pitch, int totalCount) {
-
-    }
-
-    @Override
-    public void onScore(double score, double cumulativeScore, double totalScore) {
-        mLrcControlView.updateScore(score);
+    public void onLineFinished(LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
+        mLrcControlView.updateScore(score, cumulativeScore);
     }
 
     @Override
