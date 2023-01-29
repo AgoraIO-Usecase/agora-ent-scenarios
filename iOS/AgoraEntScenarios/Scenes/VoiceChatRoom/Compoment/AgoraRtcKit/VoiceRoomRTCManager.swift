@@ -275,6 +275,8 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.setParameters("{\"rtc.audio_resend\":false}")
         rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
         rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
+        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
+
         rtcKit.setAudioProfile(.musicHighQualityStereo, scenario: .chorus)
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: false)
 
