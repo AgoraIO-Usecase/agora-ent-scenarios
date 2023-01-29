@@ -118,7 +118,7 @@ extension ShowAgoraKitManager {
         case .show_low:
             switch mode {
             case .signle:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, videoSize: ._1280x720)
+                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, videoSize: ._1920x1080)
             case .pk:
                 _presetValuesWith(dimensions: ._480x360, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
             }
@@ -133,7 +133,7 @@ extension ShowAgoraKitManager {
             
             switch mode {
             case .signle:
-                _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 1800, h265On: true, videoSize: ._1280x720)
+                _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 2099, h265On: true, videoSize: ._1280x720)
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
             }

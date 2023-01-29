@@ -73,7 +73,8 @@ class ShowRoomListVC: UIViewController {
             if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
                 wSelf.joinRoom(room)
             }else{
-                wSelf.showPresettingVC { [weak self] in
+                wSelf.showPresettingVC { [weak self] type in
+                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
                     self?.joinRoom(room)
                 }
             }
@@ -84,12 +85,11 @@ class ShowRoomListVC: UIViewController {
         }
     }
     
-    private func showPresettingVC(selected:(()->())? = nil) {
+    private func showPresettingVC(selected:((_ type: ShowPresetType)->())? = nil) {
         let vc = ShowPresettingVC()
         vc.isBroadcaster = false
         vc.didSelectedPresetType = { type, modeName in
-            selected?()
-            UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+            selected?(type)
         }
         present(vc, animated: true)
     }
