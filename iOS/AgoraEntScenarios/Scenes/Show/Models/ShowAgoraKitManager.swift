@@ -157,137 +157,19 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    /// 初始化并预览
-    /// - Parameter canvasView: 画布
-    func startPreview(canvasView: UIView) {
-        agoraKit.setClientRole(.broadcaster)
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-        agoraKit.setVideoFrameDelegate(self)
-        agoraKit.setCameraCapturerConfiguration(captureConfig)
-        
-        canvas.view = canvasView
-        agoraKit.setupLocalVideo(canvas)
-        agoraKit.enableVideo()
-        agoraKit.startPreview()
-    }
-    
-    /// 切换摄像头
-    func switchCamera() {
-        agoraKit.switchCamera()
-    }
-    
-    /// 切换连麦角色
-    func switchRole(role: AgoraClientRole,
-                    options:AgoraRtcChannelMediaOptions,
-                    uid: String?,
-                    canvasView: UIView?) {
-        guard let uid = uid, let canvasView = canvasView else {
-            showLogger.error("switchRole fatel")
-            return
-        }
-//        let options = AgoraRtcChannelMediaOptions()
-        options.clientRoleType = role
-//        options.publishMicrophoneTrack = role == .broadcaster
-//        options.publishCameraTrack = role == .broadcaster
-        agoraKit.updateChannel(with: options)
-        agoraKit.setClientRole(role)
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = UInt(uid) ?? 0
-        videoCanvas.renderMode = .hidden
-        videoCanvas.view = canvasView
-        if uid == VLUserCenter.user.id {
-            agoraKit.setupLocalVideo(videoCanvas)
-            agoraKit.startPreview()
-        } else {
-            agoraKit.setupRemoteVideo(videoCanvas)
-        }
-    }
-    
-    /// 设置分辨率
-    /// 设置采集分辨率
-    /// - Parameter size: 分辨率
-    func setCaptureVideoDimensions(_ size: CGSize){
-        agoraKit.disableVideo()
-        captureConfig.dimensions = CGSize(width: size.width, height: size.height)
-        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height)")
-        agoraKit.setCameraCapturerConfiguration(captureConfig)
-        agoraKit.enableVideo()
-    }
-    
-    /// 设置编码分辨率
-    /// - Parameter size: 分辨率
-    func setVideoDimensions(_ size: CGSize){
-        videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-    }
-    
-    func leaveChannel(){
-        agoraKit.leaveChannel({stats in
-            showLogger.info("leave channel: \(stats)")
-        })
-        agoraKit.stopPreview()
-        agoraKit.disableAudio()
-        agoraKit.disableVideo()
-//        AgoraRtcEngineKit.destroy()
-    }
-    
-    func leaveChannelEx(roomId: String) {
-        guard let connection = exConnectionMap[roomId] else { return }
-        agoraKit.leaveChannelEx(connection)
-        exConnectionMap[roomId] = nil
-    }
-    
-    func joinChannelEx(channelName: String,
-                       ownerId: UInt,
-                       options:AgoraRtcChannelMediaOptions,
-                       role: AgoraClientRole,
-                       completion: (()->())?) {
-        if let rtcToken = AppContext.shared.rtcTokenMap?[channelName] {
-            _joinChannelEx(channelName: channelName,
-                           ownerId: ownerId,
-                           token: rtcToken,
-                           options: options,
-                           role: role)
-            completion?()
-            return
-        }
-        
-        
-        let group = DispatchGroup()
-        group.enter()
-        NetworkManager.shared.generateToken(channelName: channelName,
-                                            uid: VLUserCenter.user.id,
-                                            tokenType: .token007,
-                                            type: .rtc) {[weak self] token in
-            defer {
-                group.leave()
-            }
-            
-            guard let token = token else {
-                assert(false, "joinChannelEx fail: token is empty")
-                return
-            }
-            self?._joinChannelEx(channelName: channelName,
-                                 ownerId: ownerId,
-                                 token: token,
-                                 options: options,
-                                 role: role)
-            completion?()
-        }
-    }
-    
     private func _joinChannelEx(channelName: String,
                                 ownerId: UInt,
                                 token: String,
                                 options:AgoraRtcChannelMediaOptions,
                                 role: AgoraClientRole) {
-        initAudienceConfig()
+//        initAudienceConfig()
         if exConnectionMap[channelName] == nil {
             let mediaOptions = AgoraRtcChannelMediaOptions()
-            mediaOptions.autoSubscribeAudio = false
-            mediaOptions.autoSubscribeVideo = false
-            mediaOptions.publishCameraTrack = false
-            mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
+            let subscribeStatus = role == .audience ? false : true
+            mediaOptions.autoSubscribeAudio = subscribeStatus
+            mediaOptions.autoSubscribeVideo = subscribeStatus
+//            mediaOptions.publishCameraTrack = false
+//            mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
             mediaOptions.clientRoleType = role
         
             let connection = AgoraRtcConnection()
@@ -316,57 +198,113 @@ class ShowAgoraKitManager: NSObject {
                                  context: kShowLogBaseContext)
             }
         }
-        
-//        guard let connection = exConnectionMap[channelName] else {
-//            assert(false, "_joinChannelEx fail: connection is empty")
-//            return
-//        }
-//
-//        let uid = UInt(ownerId ?? "0") ?? 0
-//        let videoCanvas = AgoraRtcVideoCanvas()
-//        videoCanvas.uid = uid
-//        videoCanvas.view = view
-//        videoCanvas.renderMode = .hidden
-//        agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
     }
     
-    func joinChannel(channelName: String, uid: UInt, ownerId: String) {
-        let role: AgoraClientRole = ownerId == VLUserCenter.user.id ? .broadcaster : .audience
-        let roleOptions = AgoraClientRoleOptions()
-        let isAudience = role == .audience ? true : false
-        roleOptions.audienceLatencyLevel = isAudience ? .ultraLowLatency : .lowLatency
-        agoraKit.setClientRole(role, options: roleOptions)
-        if isAudience {
-            initAudienceConfig()
-        } else {
-            initBroadcasterConfig()
-        }
+    //MARK: public
+    /// 初始化并预览
+    /// - Parameter canvasView: 画布
+    func startPreview(canvasView: UIView) {
+        agoraKit.setClientRole(.broadcaster)
+        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        agoraKit.setVideoFrameDelegate(self)
+        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        
+        canvas.view = canvasView
+        agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
+        agoraKit.startPreview()
+    }
+    
+    /// 切换摄像头
+    func switchCamera() {
+        agoraKit.switchCamera()
+    }
+    
+    func updateChannelEx(channelName: String, options: AgoraRtcChannelMediaOptions) {
+        guard let connection = exConnectionMap[channelName] else {
+            showLogger.error("updateChannelEx fail: connection is empty")
+            return
+        }
         
-        let rtcToken: String? = AppContext.shared.rtcTokenMap?[channelName]
-        let ret = agoraKit.joinChannel(byToken: rtcToken!,
-                                        channelId: channelName,
-                                        info: nil,
-                                        uid: uid)
-        moderationAudio(channelName: channelName, role: role)
+        agoraKit.updateChannelEx(with: options, connection: connection)
+    }
+    
+    /// 切换连麦角色
+    func switchRole(role: AgoraClientRole,
+                    channelName: String,
+                    options:AgoraRtcChannelMediaOptions,
+                    uid: String?,
+                    canvasView: UIView?) {
+        guard let uid = UInt(uid ?? ""), let canvasView = canvasView else {
+            showLogger.error("switchRole fatel")
+            return
+        }
+        options.clientRoleType = role
+        updateChannelEx(channelName:channelName, options: options)
+        if "\(uid)" == VLUserCenter.user.id {
+            setupLocalVideo(uid: uid, canvasView: canvasView)
+        } else {
+            setupRemoteVideo(channelName: channelName, uid: uid, canvasView: canvasView)
+        }
+    }
+    
+    /// 设置分辨率
+    /// 设置采集分辨率
+    /// - Parameter size: 分辨率
+    func setCaptureVideoDimensions(_ size: CGSize){
+        agoraKit.disableVideo()
+        captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height)")
+        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        agoraKit.enableVideo()
+    }
+    
+    /// 设置编码分辨率
+    /// - Parameter size: 分辨率
+    func setVideoDimensions(_ size: CGSize){
+        videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)
+        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+    }
+    
+    func leaveChannelEx(roomId: String) {
+        guard let connection = exConnectionMap[roomId] else { return }
+        agoraKit.leaveChannelEx(connection)
+        exConnectionMap[roomId] = nil
+    }
+    
+    func joinChannelEx(channelName: String,
+                       ownerId: UInt,
+                       options:AgoraRtcChannelMediaOptions,
+                       role: AgoraClientRole,
+                       completion: (()->())?) {
+        if let rtcToken = AppContext.shared.rtcTokenMap?[channelName] {
+            _joinChannelEx(channelName: channelName,
+                           ownerId: ownerId,
+                           token: rtcToken,
+                           options: options,
+                           role: role)
+            completion?()
+            return
+        }
         
-//        canvas.view = canvasView
-//        if role == .broadcaster {
-//            canvas.uid = uid
-//            agoraKit.setVideoFrameDelegate(self)
-//            agoraKit.setDefaultAudioRouteToSpeakerphone(true)
-//            agoraKit.enableAudio()
-//            agoraKit.setupLocalVideo(canvas)
-//            agoraKit.startPreview()
-//        } else {
-//            canvas.uid = UInt(ownerId) ?? 0
-//            agoraKit.setupRemoteVideo(canvas)
-//        }
-        
-        if ret == 0 {
-            showLogger.info("join room success: \(channelName) \(uid) \(ownerId)")
-        }else{
-            showLogger.error("join room fail: \(channelName) \(uid) \(ownerId), \(ret)")
+        NetworkManager.shared.generateToken(channelName: channelName,
+                                            uid: VLUserCenter.user.id,
+                                            tokenType: .token007,
+                                            type: .rtc) {[weak self] token in
+            defer {
+                completion?()
+            }
+            
+            guard let token = token else {
+                showLogger.error("joinChannelEx fail: token is empty")
+                return
+            }
+            self?._joinChannelEx(channelName: channelName,
+                                 ownerId: ownerId,
+                                 token: token,
+                                 options: options,
+                                 role: role)
+            
         }
     }
     
@@ -376,13 +314,15 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setVideoFrameDelegate(self)
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         agoraKit.enableAudio()
-        agoraKit.setupLocalVideo(canvas)
-        agoraKit.startPreview()
+        agoraKit.enableVideo()
+        let ret1 = agoraKit.setupLocalVideo(canvas)
+        let ret2 = agoraKit.startPreview()
+        showLogger.info("setupLocalVideo setupLocalVideo = \(ret1), startPreview = \(ret2), uid:\(uid)/\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
     func setupRemoteVideo(channelName: String, uid: UInt, canvasView: UIView) {
         guard let connection = exConnectionMap[channelName] else {
-            assert(false, "_joinChannelEx fail: connection is empty")
+            showLogger.error("_joinChannelEx fail: connection is empty")
             return
         }
         
@@ -390,16 +330,17 @@ class ShowAgoraKitManager: NSObject {
         videoCanvas.uid = uid
         videoCanvas.view = canvasView
         videoCanvas.renderMode = .hidden
-        agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
+        let ret = agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
+        
+        showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid)/\(UserInfo.userId) channelName: \(channelName)", context: kShowLogBaseContext)
     }
     
     
     func updateLoadingType(channelName: String, loadingType: ShowRTCLoadingType) {
-        guard let connection = exConnectionMap[channelName] else {
+        guard let _ = exConnectionMap[channelName] else {
 //            assert(false, "updateLoadingType fail, mediaOptions not found")
             return
         }
-        
         let mediaOptions = AgoraRtcChannelMediaOptions()
         if loadingType == .loading {
             mediaOptions.autoSubscribeAudio = true
@@ -410,7 +351,7 @@ class ShowAgoraKitManager: NSObject {
         }
 
         showLogger.info("updateLoadingType \(channelName) \(loadingType.rawValue)")
-        agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
+        updateChannelEx(channelName:channelName, options: mediaOptions)
     }
 }
 
@@ -480,10 +421,10 @@ extension ShowAgoraKitManager {
     func initAudienceConfig() {
         agoraKit.setParameters("{\"rtc.enable_crypto_access\":false}")
         agoraKit.setParameters("{\"rtc.use_global_location_priority_domain\":true}")
-//        agoraKit.setParameters("{\"che.hardware_decoding\":0}")
-//        agoraKit.setParameters("{\"rtc.enable_nasa2\": false}")
-//        agoraKit.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
-//        agoraKit.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
+        agoraKit.setParameters("{\"che.hardware_decoding\":0}")
+        agoraKit.setParameters("{\"rtc.enable_nasa2\": false}")
+        agoraKit.setParameters("{\"rtc.asyncCreateMediaEngine\":true}")
+        agoraKit.setParameters("{\"che.video.enable_first_frame_sw_decode\":true}")
     }
     
     func initH265Config() {
