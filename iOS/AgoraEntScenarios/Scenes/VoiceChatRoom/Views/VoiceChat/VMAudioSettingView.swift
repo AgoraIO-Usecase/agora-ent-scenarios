@@ -221,6 +221,16 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.titleLabel.text = settingName[0 + indexPath.row]
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
+                switch ains_state {
+                case .high:
+                    cell.contentLabel.text = "High".localized()
+                case .mid:
+                    cell.contentLabel.text = "Middle".localized()
+                case .off:
+                    cell.contentLabel.text = "Off".localized()
+                }
+                
+                
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
                     cell.contentLabel.text = "On".localized()
@@ -342,12 +352,8 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
 
             cell.iconView.image = UIImage(settingImage[5])
             cell.titleLabel.text = settingName[5]
-            
-            print("*******")
-            print(cell.titleLabel.text as Any)
-            print("*******")
+      
 
-            
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
             } else if indexPath.row == 1 {
