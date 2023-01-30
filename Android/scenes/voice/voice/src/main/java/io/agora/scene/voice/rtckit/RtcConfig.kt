@@ -16,5 +16,7 @@ data class RtcChannelTemp constructor(
         firstActiveBot = true
         firstSwitchAnis = true
         AINSMode = ConfigConstants.AINSMode.AINS_Medium
+        isAIAECOn = false
+        isAIAGCOn = false
     }
 }
