@@ -53,15 +53,18 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceDialogAu
                 mcbAgoraBot.alpha = ENABLE_ALPHA
                 pbAgoraBotVolume.alpha = ENABLE_ALPHA
                 mtAgoraBotVolumeValue.alpha = ENABLE_ALPHA
+                mtBestSoundEffectArrow.alpha = ENABLE_ALPHA
                 mcbAgoraBotDisable.isVisible = false
             } else {
                 mcbAgoraBot.alpha = DISABLE_ALPHA
                 pbAgoraBotVolume.alpha = DISABLE_ALPHA
                 mtAgoraBotVolumeValue.alpha = DISABLE_ALPHA
+                mtBestSoundEffectArrow.alpha = DISABLE_ALPHA
                 mcbAgoraBotDisable.isVisible = true
             }
             mcbAgoraBot.isEnabled = audioSettingsInfo.enable
             pbAgoraBotVolume.isEnabled = audioSettingsInfo.enable
+            mtBestSoundEffectArrow.isEnabled = audioSettingsInfo.enable
 
             mcbAgoraBot.isChecked = audioSettingsInfo.botOpen
             pbAgoraBotVolume.progress = audioSettingsInfo.botVolume
