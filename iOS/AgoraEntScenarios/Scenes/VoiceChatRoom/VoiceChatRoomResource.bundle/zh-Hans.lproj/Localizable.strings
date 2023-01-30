@@ -218,6 +218,4 @@
 "AIAEC_desc" = "当您开启伴奏唱歌的时候，AI回声消除能极大提升您的唱歌效果，强烈建议您在唱歌时候开启";
 "AGC_desc" = "开启后会自动调整您唱歌的音量，以完美匹配伴奏音量，推荐您唱歌的时候开启";
 "Personal audio Settings" = "个人音效设置";
-
-//"当您开启伴奏唱歌的时候，AI回声消除能极大提升您的唱歌效果，强烈建议您在唱歌时候开启" = "When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing"
-//"开启后会自动调整您唱歌的音量，以完美匹配伴奏音量，推荐您唱歌的时候开启" = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing"
+"Best Agora Sound" = "最佳音效";
