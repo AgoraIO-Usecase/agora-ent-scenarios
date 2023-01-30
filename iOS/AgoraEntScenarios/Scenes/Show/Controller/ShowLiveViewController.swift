@@ -265,7 +265,7 @@ class ShowLiveViewController: UIViewController {
     
     func leaveRoom(){
         agoraKitManager.setRtcDelegate(delegate: nil, roomId: roomId)
-        ByteBeautyManager.shareManager.destroy()
+        agoraKitManager.cleanCapture()
         agoraKitManager.leaveChannelEx(roomId: roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         

@@ -17,8 +17,8 @@ enum ShowRTCLoadingType: Int {
 }
 
 //TODO: fix retain cycle
-class ShowAgoraExProxy: NSObject, AgoraRtcEngineDelegate {
-    weak var delegate: AgoraRtcEngineDelegate?
+class ShowAgoraProxy: NSObject {
+    weak var delegate: NSObjectProtocol?
     
     override func responds(to aSelector: Selector!) -> Bool {
         return delegate?.responds(to: aSelector) ?? false
@@ -38,6 +38,13 @@ class ShowAgoraExProxy: NSObject, AgoraRtcEngineDelegate {
         }
         
         return super.forwardingTarget(for: aSelector)
+    }
+}
+
+class ShowAgoraExProxy: ShowAgoraProxy, AgoraRtcEngineDelegate {
+    init(delegate: AgoraRtcEngineDelegate?) {
+        super.init()
+        self.delegate = delegate
     }
 }
 
@@ -97,6 +104,7 @@ class ShowAgoraKitManager: NSObject {
     
     fileprivate(set) lazy var agoraKit: AgoraRtcEngineKit = {
         let kit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
+        showLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())")
         return kit
     }()
     
@@ -174,8 +182,7 @@ class ShowAgoraKitManager: NSObject {
             connection.localUid = UInt(VLUserCenter.user.id) ?? 0
             
             //TODO: retain cycle in joinChannelEx
-            let proxy = ShowAgoraExProxy()
-            proxy.delegate = delegateMap[currentChannelId]
+            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
             let date = Date()
             let ret =
             agoraKit.joinChannelEx(byToken: token,
@@ -203,8 +210,7 @@ class ShowAgoraKitManager: NSObject {
             delegateMap[roomId] = nil
             return
         }
-        let proxy = ShowAgoraExProxy()
-        proxy.delegate = delegate
+        let proxy = ShowAgoraExProxy(delegate:delegate)
         
         delegateMap[roomId] = proxy
     }
@@ -301,6 +307,11 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
     }
     
+    func cleanCapture() {
+        ByteBeautyManager.shareManager.destroy()
+        agoraKit.stopPreview()
+    }
+    
     func leaveChannelEx(roomId: String) {
         guard let connection = exConnectionMap[roomId] else { return }
         agoraKit.leaveChannelEx(connection)
@@ -353,9 +364,9 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         agoraKit.enableAudio()
         agoraKit.enableVideo()
-        let ret1 = agoraKit.setupLocalVideo(canvas)
-        let ret2 = agoraKit.startPreview()
-        showLogger.info("setupLocalVideo setupLocalVideo = \(ret1), startPreview = \(ret2), uid:\(uid)/\(UserInfo.userId)", context: kShowLogBaseContext)
+        agoraKit.setupLocalVideo(canvas)
+        agoraKit.startPreview()
+        showLogger.info("setupLocalVideo target uid:\(uid), user uid\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
     func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView) {
@@ -372,7 +383,6 @@ class ShowAgoraKitManager: NSObject {
         
         showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid)/\(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
     }
-    
     
     func updateLoadingType(channelId: String, loadingType: ShowRTCLoadingType) {
         guard let _ = exConnectionMap[channelId] else {
