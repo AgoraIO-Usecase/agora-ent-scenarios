@@ -7,19 +7,10 @@
 
 
     <include
-        android:id="@+id/videoSinglehostLayout"
-        layout="@layout/show_live_detail_video_singlehost"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:visibility="visible" />
-
-    <include
         android:id="@+id/videoLinkingLayout"
         layout="@layout/show_live_detail_video_link"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:layout_height="match_parent" />
 
     <include
         android:id="@+id/videoLinkingAudienceLayout"
