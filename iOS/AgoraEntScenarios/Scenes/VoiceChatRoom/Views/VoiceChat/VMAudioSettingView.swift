@@ -139,6 +139,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 2, width: 300, height: 30))
             titleLabel.text = LanguageManager.localValue(key: "Personal audio Settings")
+            
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             headerView.addSubview(titleLabel)
