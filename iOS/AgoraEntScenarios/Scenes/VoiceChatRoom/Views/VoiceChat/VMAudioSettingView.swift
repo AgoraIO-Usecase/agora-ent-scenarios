@@ -343,6 +343,10 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             cell.iconView.image = UIImage(settingImage[5])
             cell.titleLabel.text = settingName[5]
             
+            print("*******")
+            print(cell.titleLabel.text as Any)
+            print("*******")
+
             
             if indexPath.row == 0 {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
