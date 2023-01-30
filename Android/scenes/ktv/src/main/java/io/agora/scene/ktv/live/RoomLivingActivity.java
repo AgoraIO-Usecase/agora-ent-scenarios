@@ -73,8 +73,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     // 房间存活时间，单位ms
     private KtvCommonDialog timeUpExitDialog;
-    private long ROOM_AVAILABLE_DURATION = 20 * 60 * 1000;// 20min
-    private Runnable timerRoomEndRun = () -> {
+    private final long ROOM_AVAILABLE_DURATION = 20 * 60 * 1000;// 20min
+    private final Runnable timerRoomEndRun = () -> {
         if (roomLivingViewModel.release()) {
             showTimeUpExitDialog();
         }
@@ -221,12 +221,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     @Override
     public void initListener() {
-        getBinding().ivExit.setOnClickListener(view -> {
-            showExitDialog();
-        });
-        getBinding().superLayout.setOnClickListener(view -> {
-            setDarkStatusIcon(isBlackDarkStatus());
-        });
+        getBinding().ivExit.setOnClickListener(view -> showExitDialog());
+        getBinding().superLayout.setOnClickListener(view -> setDarkStatusIcon(isBlackDarkStatus()));
         getBinding().cbMic.setOnCheckedChangeListener((compoundButton, b) -> {
             RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
             if (seatLocal == null || mRoomSpeakerAdapter.getItem(seatLocal.getSeatIndex()) == null) {
@@ -237,9 +233,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         getBinding().iBtnChorus.setOnClickListener(v -> showChorusSongDialog());
         getBinding().iBtnChooseSong.setOnClickListener(v -> showChooseSongDialog());
         getBinding().btnMenu.setOnClickListener(this::showMoreDialog);
-        getBinding().btnOK.setOnClickListener(view -> {
-            getBinding().groupResult.setVisibility(View.GONE);
-        });
+        getBinding().btnOK.setOnClickListener(view -> getBinding().groupResult.setVisibility(View.GONE));
         LrcActionListenerImpl lrcActionListenerImpl = new LrcActionListenerImpl(this, roomLivingViewModel, getBinding().lrcControlView) {
             @Override
             public void onMenuClick() {
@@ -367,7 +361,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
-            KTVLogger.d("cwtsw", "计算得分");
             getBinding().tvResultScore.setText(String.valueOf(score));
             if (score >= 90) {
                 getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
@@ -393,7 +386,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_yellow);
             getBinding().tvNetStatus.setText(R.string.ktv_net_status_m);
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN
-                || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_VBAD) {
+                || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
             getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
             getBinding().tvNetStatus.setText(R.string.ktv_net_status_low);
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD
@@ -412,7 +405,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onResume() {
         super.onResume();
-        KTVLogger.d("cwtsw", "onResume() " + isBlackDarkStatus() + " " +
+        KTVLogger.d("ktv", "onResume() " + isBlackDarkStatus() + " " +
                 Resources.getSystem().getDisplayMetrics().density + " " +
                 Resources.getSystem().getDisplayMetrics().densityDpi + " " + Resources.getSystem().getDisplayMetrics().heightPixels);
         setDarkStatusIcon(isBlackDarkStatus());
@@ -516,7 +509,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         } else {
             getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         }
-        roomLivingViewModel.musicStartPlay(this, music);
+        roomLivingViewModel.musicStartPlay(music);
         mRoomSpeakerAdapter.notifyDataSetChanged();
     }
 

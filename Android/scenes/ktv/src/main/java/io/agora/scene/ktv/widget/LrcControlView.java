@@ -145,13 +145,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             public void onDragTo(KaraokeView view, long position) {
                 if (mOnKaraokeActionListener != null) {
                     mOnKaraokeActionListener.onDragTo(position);
-                    LyricsModel lyrics = mKaraokeView.getLyricsData();
-                    if (lyrics == null) {
-                        return;
-                    }
-                    if (position >= lyrics.startOfVerse) {
-                        mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
-                    }
                 }
             }
 
@@ -267,8 +260,11 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.switchOriginal.setVisibility(View.INVISIBLE);
                 mBinding.ilActive.ivMusicMenu.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
             } else if (this.mRole == Role.Partner) {
                 mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
+                mBinding.ilActive.ivSkipPrelude.setVisibility(View.INVISIBLE);
             }
         }
         stopTimer();
@@ -415,6 +411,21 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setSwitchOriginalChecked(boolean checked) {
         mBinding.ilActive.switchOriginal.setChecked(checked);
+    }
+
+    public void setProgress(Long progress) {
+        if (mRole == Role.Singer) {
+            if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
+                mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
+            }
+
+            if (progress >= mKaraokeView.getLyricsData().duration) {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
+            } else {
+                mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
+            }
+        }
+        mKaraokeView.setProgress(progress);
     }
 
     public int retryTime = 0;
