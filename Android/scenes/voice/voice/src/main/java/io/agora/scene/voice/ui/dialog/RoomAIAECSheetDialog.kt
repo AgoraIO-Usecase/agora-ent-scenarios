@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAinsBinding
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
@@ -30,8 +31,9 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
 
-        binding?.accbAEC?.isChecked =  isOn
+        binding?.accbAEC?.isChecked = isOn
         binding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
             onClickCheckBox?.invoke(isChecked)
         }
