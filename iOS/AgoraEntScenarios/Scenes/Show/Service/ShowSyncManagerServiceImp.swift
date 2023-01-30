@@ -1038,15 +1038,15 @@ extension ShowSyncManagerServiceImp {
         roomInfo.interactStatus = status
         roomInfo.objectId = channelName
         let params = roomInfo.yy_modelToJSONObject() as! [String: Any]
-        agoraPrint("imp interaction update status... [\(channelName)]")
+        agoraPrint("imp interaction update status... \(channelName)")
         self.syncUtilImp?
             .scene(id: channelName)?
             .update(key: "",
                     data: params,
                     success: { obj in
-                agoraPrint("imp interaction update status success...")
+                agoraPrint("imp interaction update status success... \(channelName)")
             }, fail: { error in
-                agoraPrint("imp interaction update status fail \(error.message)...")
+                agoraPrint("imp interaction update status fail \(error.message)... \(channelName)")
             })
 
 //        userListCountDidChanged?(UInt(count))
@@ -1713,17 +1713,17 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("channelName = nil")
             return
         }
-        agoraPrint("imp interaction get...")
+        agoraPrint("imp interaction get... \(channelName)")
         self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .get(success: { [weak self] list in
-                agoraPrint("imp interaction get success... \(list.count)")
+                agoraPrint("imp interaction get success... \(list.count) \(channelName)")
                 let interactionList = list.compactMap({ ShowInteractionInfo.yy_model(withJSON: $0.toJson()!)! })
                 self?.interactionList = interactionList
                 completion(nil, interactionList)
             }, fail: { error in
-                agoraPrint("imp pk invitation get fail :\(error.message)...")
+                agoraPrint("imp interaction get fail :\(error.message)... \(channelName)")
                 completion(error.toNSError(), nil)
             })
     }
@@ -1812,7 +1812,7 @@ extension ShowSyncManagerServiceImp {
                 agoraPrint("imp interaction add success... \(channelName)")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp interaction add fail :\(error.message)...")
+                agoraPrint("imp interaction add fail :\(error.message)... \(channelName)")
                 completion(error.toNSError())
             })
         
@@ -1836,17 +1836,17 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("_removeInteraction channelName = nil")
             return
         }
-        agoraPrint("imp interaction remove...")
+        agoraPrint("imp interaction remove... \(channelName)")
 
         self.syncUtilImp?
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_INTERACTION_COLLECTION)
             .delete(id: interaction.objectId!,
                     success: { _ in
-                agoraPrint("imp interaction remove success...")
+                agoraPrint("imp interaction remove success... \(channelName)")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp interaction remove fail :\(error.message)...")
+                agoraPrint("imp interaction remove fail :\(error.message)... \(channelName)")
                 completion(error.toNSError())
             })
         _updateInteractionStatus(with: .idle)
@@ -1857,7 +1857,7 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("_updateInteraction channelName = nil")
             return
         }
-        agoraPrint("imp interaction update...")
+        agoraPrint("imp interaction update... \(channelName)")
 
         let params = interaction.yy_modelToJSONObject() as! [String: Any]
         self.syncUtilImp?
@@ -1866,10 +1866,10 @@ extension ShowSyncManagerServiceImp {
             .update(id: interaction.objectId!,
                     data:params,
                     success: {
-                agoraPrint("imp interaction update success...")
+                agoraPrint("imp interaction update success... \(channelName)")
                 completion(nil)
             }, fail: { error in
-                agoraPrint("imp interaction update fail :\(error.message)...")
+                agoraPrint("imp interaction update fail :\(error.message)... \(channelName)")
                 completion(error.toNSError())
             })
     }
@@ -2021,11 +2021,16 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             return
         }
         let channelName = roomId
+        let idx = (Int(channelName) ?? 1) - kRobotRoomStartId - 1
+        guard idx > 0, idx < robotStreamURL.count else {
+            agoraAssert("startCloudPlayer fail")
+            return
+        }
         agoraPrint("startCloudPlayer: \(roomId) /\(robotUid)")
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: VLUserCenter.user.id,
                                                robotUid: UInt(kRobotUid),
-                                               streamUrl: robotStreamURL[(Int(channelName) ?? 1) - kRobotRoomStartId - 1]) { msg in
+                                               streamUrl: robotStreamURL[idx]) { msg in
             guard let msg = msg else {return}
             agoraPrint("startCloudPlayer fail \(channelName) \(msg)")
         }

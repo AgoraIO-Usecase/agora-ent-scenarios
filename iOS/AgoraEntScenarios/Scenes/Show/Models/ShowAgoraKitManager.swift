@@ -70,6 +70,8 @@ class ShowAgoraKitManager: NSObject {
     
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
     
+    private var delegateMap: [String: ShowAgoraExProxy] = [:]
+    
     private lazy var rtcEngineConfig: AgoraRtcEngineConfig = {
        let config = AgoraRtcEngineConfig()
         config.appId = KeyCenter.AppId
@@ -97,12 +99,6 @@ class ShowAgoraKitManager: NSObject {
         let kit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
         return kit
     }()
-    
-    weak var delegate: AgoraRtcEngineDelegate? {
-        didSet {
-            agoraKit.delegate = delegate
-        }
-    }
     
     deinit {
         AgoraRtcEngineKit.destroy()
@@ -157,13 +153,14 @@ class ShowAgoraKitManager: NSObject {
         }
     }
     
-    private func _joinChannelEx(channelName: String,
+    private func _joinChannelEx(currentChannelId: String,
+                                targetChannelId: String,
                                 ownerId: UInt,
                                 token: String,
                                 options:AgoraRtcChannelMediaOptions,
                                 role: AgoraClientRole) {
 //        initAudienceConfig()
-        if exConnectionMap[channelName] == nil {
+        if exConnectionMap[targetChannelId] == nil {
             let mediaOptions = AgoraRtcChannelMediaOptions()
             let subscribeStatus = role == .audience ? false : true
             mediaOptions.autoSubscribeAudio = subscribeStatus
@@ -173,12 +170,12 @@ class ShowAgoraKitManager: NSObject {
             mediaOptions.clientRoleType = role
         
             let connection = AgoraRtcConnection()
-            connection.channelId = channelName
+            connection.channelId = targetChannelId
             connection.localUid = UInt(VLUserCenter.user.id) ?? 0
             
             //TODO: retain cycle in joinChannelEx
             let proxy = ShowAgoraExProxy()
-            proxy.delegate = self.delegate
+            proxy.delegate = delegateMap[currentChannelId]
             let date = Date()
             let ret =
             agoraKit.joinChannelEx(byToken: token,
@@ -188,19 +185,57 @@ class ShowAgoraKitManager: NSObject {
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
                 showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
-            exConnectionMap[channelName] = connection
+            exConnectionMap[targetChannelId] = connection
             
             if ret == 0 {
-                showLogger.info("join room ex: channelName: \(channelName) ownerId: \(ownerId)",
+                showLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
                                 context: "AgoraKitManager")
             }else{
-                showLogger.error("join room ex fail: channelName: \(channelName) ownerId: \(ownerId), \(ret)",
+                showLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId), \(ret)",
                                  context: kShowLogBaseContext)
             }
         }
     }
     
-    //MARK: public
+    //MARK: public method
+    func setRtcDelegate(delegate: AgoraRtcEngineDelegate?, roomId: String) {
+        guard let delegate = delegate else {
+            delegateMap[roomId] = nil
+            return
+        }
+        let proxy = ShowAgoraExProxy()
+        proxy.delegate = delegate
+        
+        delegateMap[roomId] = proxy
+    }
+    
+    func renewToken(origToken: String) {
+        AppContext.shared.rtcTokenMap?.forEach({ (key: String, value: String) in
+            if origToken == value {
+                self.renewToken(channelId: key)
+            }
+        })
+    }
+    
+    func renewToken(channelId: String) {
+        showLogger.info("renewToken with channelId: \(channelId)",
+                        context: kShowLogBaseContext)
+        NetworkManager.shared.generateToken(channelName: channelId,
+                                            uid: UserInfo.userId,
+                                            tokenType: .token007,
+                                            type: .rtc) { token in
+            guard let token = token else {
+                showLogger.error("renewToken fail: token is empty")
+                return
+            }
+            let option = AgoraRtcChannelMediaOptions()
+            option.token = token
+            AppContext.shared.rtcTokenMap?[channelId] = token
+            self.updateChannelEx(channelId: channelId, options: option)
+        }
+    }
+    
+    //MARK: public sdk method
     /// 初始化并预览
     /// - Parameter canvasView: 画布
     func startPreview(canvasView: UIView) {
@@ -220,8 +255,8 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
-    func updateChannelEx(channelName: String, options: AgoraRtcChannelMediaOptions) {
-        guard let connection = exConnectionMap[channelName] else {
+    func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
+        guard let connection = exConnectionMap[channelId] else {
             showLogger.error("updateChannelEx fail: connection is empty")
             return
         }
@@ -231,7 +266,7 @@ class ShowAgoraKitManager: NSObject {
     
     /// 切换连麦角色
     func switchRole(role: AgoraClientRole,
-                    channelName: String,
+                    channelId: String,
                     options:AgoraRtcChannelMediaOptions,
                     uid: String?,
                     canvasView: UIView?) {
@@ -240,11 +275,11 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         options.clientRoleType = role
-        updateChannelEx(channelName:channelName, options: options)
+        updateChannelEx(channelId:channelId, options: options)
         if "\(uid)" == VLUserCenter.user.id {
             setupLocalVideo(uid: uid, canvasView: canvasView)
         } else {
-            setupRemoteVideo(channelName: channelName, uid: uid, canvasView: canvasView)
+            setupRemoteVideo(channelId: channelId, uid: uid, canvasView: canvasView)
         }
     }
     
@@ -272,13 +307,15 @@ class ShowAgoraKitManager: NSObject {
         exConnectionMap[roomId] = nil
     }
     
-    func joinChannelEx(channelName: String,
+    func joinChannelEx(currentChannelId: String,
+                       targetChannelId: String,
                        ownerId: UInt,
                        options:AgoraRtcChannelMediaOptions,
                        role: AgoraClientRole,
                        completion: (()->())?) {
-        if let rtcToken = AppContext.shared.rtcTokenMap?[channelName] {
-            _joinChannelEx(channelName: channelName,
+        if let rtcToken = AppContext.shared.rtcTokenMap?[targetChannelId] {
+            _joinChannelEx(currentChannelId: currentChannelId,
+                           targetChannelId: targetChannelId,
                            ownerId: ownerId,
                            token: rtcToken,
                            options: options,
@@ -287,7 +324,7 @@ class ShowAgoraKitManager: NSObject {
             return
         }
         
-        NetworkManager.shared.generateToken(channelName: channelName,
+        NetworkManager.shared.generateToken(channelName: targetChannelId,
                                             uid: VLUserCenter.user.id,
                                             tokenType: .token007,
                                             type: .rtc) {[weak self] token in
@@ -299,12 +336,13 @@ class ShowAgoraKitManager: NSObject {
                 showLogger.error("joinChannelEx fail: token is empty")
                 return
             }
-            self?._joinChannelEx(channelName: channelName,
+            AppContext.shared.rtcTokenMap?[targetChannelId] = token
+            self?._joinChannelEx(currentChannelId: currentChannelId,
+                                 targetChannelId: targetChannelId,
                                  ownerId: ownerId,
                                  token: token,
                                  options: options,
                                  role: role)
-            
         }
     }
     
@@ -320,8 +358,8 @@ class ShowAgoraKitManager: NSObject {
         showLogger.info("setupLocalVideo setupLocalVideo = \(ret1), startPreview = \(ret2), uid:\(uid)/\(UserInfo.userId)", context: kShowLogBaseContext)
     }
     
-    func setupRemoteVideo(channelName: String, uid: UInt, canvasView: UIView) {
-        guard let connection = exConnectionMap[channelName] else {
+    func setupRemoteVideo(channelId: String, uid: UInt, canvasView: UIView) {
+        guard let connection = exConnectionMap[channelId] else {
             showLogger.error("_joinChannelEx fail: connection is empty")
             return
         }
@@ -332,12 +370,12 @@ class ShowAgoraKitManager: NSObject {
         videoCanvas.renderMode = .hidden
         let ret = agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
         
-        showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid)/\(UserInfo.userId) channelName: \(channelName)", context: kShowLogBaseContext)
+        showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid)/\(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
     }
     
     
-    func updateLoadingType(channelName: String, loadingType: ShowRTCLoadingType) {
-        guard let _ = exConnectionMap[channelName] else {
+    func updateLoadingType(channelId: String, loadingType: ShowRTCLoadingType) {
+        guard let _ = exConnectionMap[channelId] else {
 //            assert(false, "updateLoadingType fail, mediaOptions not found")
             return
         }
@@ -350,8 +388,8 @@ class ShowAgoraKitManager: NSObject {
             mediaOptions.autoSubscribeVideo = false
         }
 
-        showLogger.info("updateLoadingType \(channelName) \(loadingType.rawValue)")
-        updateChannelEx(channelName:channelName, options: mediaOptions)
+        showLogger.info("updateLoadingType \(channelId) \(loadingType.rawValue)")
+        updateChannelEx(channelId:channelId, options: mediaOptions)
     }
 }
 
