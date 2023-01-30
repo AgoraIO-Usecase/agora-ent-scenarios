@@ -247,10 +247,10 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if settingType == .AIAEC {
-            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 60))
+            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 66))
 
             footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 66))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
             titleLabel.text = "AIAEC_desc".localized()

@@ -210,16 +210,11 @@
 "AIAEC" = "AI回声消除";
 "AGC" = "人声自动增益";
 "Agora Blue & Red Bot" = "声蓝羽&声红颜";
-"Personal Audio Settings" = "个人音效设置";
 "Room Audio Settings" = "房间音效设置";
 "AIAEC" = "AI回声消除";
 "AGC" = "人声自动增益";
 "Turn on AIAEC" = "开启AI回声消除";
 "Turn on AGC" = "开启人声自动增益";
-"AIAEC_desc" = "When you turn on accompaniment singing, AIAEC can greatly
-improve your singing effect. It is strongly recommended that you turn it on
-when singing";
-"AGC_desc" = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing";
 "AIAEC_desc" = "当您开启伴奏唱歌的时候，AI回声消除能极大提升您的唱歌效果，强烈建议您在唱歌时候开启";
 "AGC_desc" = "开启后会自动调整您唱歌的音量，以完美匹配伴奏音量，推荐您唱歌的时候开启";
 

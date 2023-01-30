@@ -109,7 +109,7 @@ extension VoiceRoomViewController {
         
         voiceLogger.info(rtckit, context: "rtc")
         
-        UIView.animate(withDuration: 0.5, animations: {
+        UIView.animate(withDuration: 0.2, animations: {
             self.preView.frame = CGRect(x: 0, y: ScreenHeight - 360~, width: ScreenWidth, height: 360~)
         }, completion: nil)
     }
