@@ -43,7 +43,13 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickSettingButton(){
-        showPresettingVC()
+        showPresettingVC { type in
+            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+            let audencePresetType = ShowPresetType(rawValue: value)
+            if audencePresetType != .unknown {
+                UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

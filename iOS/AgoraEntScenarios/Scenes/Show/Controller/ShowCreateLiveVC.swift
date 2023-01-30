@@ -111,7 +111,7 @@ class ShowCreateLiveVC: UIViewController {
     private func showPreset() {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraKitManager.updatePresetForType(type, mode: .signle)
+            self?.agoraKitManager.updatePresetForType(type, mode: .single)
             let text1 = "show_presetting_update_toast1".show_localized
             let text2 = "show_presetting_update_toast2".show_localized
             ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
