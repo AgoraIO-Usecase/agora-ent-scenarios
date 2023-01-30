@@ -179,7 +179,7 @@ extension ShowAdvancedSettingVC {
     @objc private func didClickPreSetBarButton() {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .signle)
+            self?.settingManager.updatePresetForType(type, mode: self?.mode ?? .single)
             self?.videoSettingVC?.reloadData()
             self?.audioSettingVC?.reloadData()
             let text1 = "show_presetting_update_toast1".show_localized

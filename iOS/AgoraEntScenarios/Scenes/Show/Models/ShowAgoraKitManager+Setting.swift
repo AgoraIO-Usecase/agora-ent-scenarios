@@ -48,7 +48,7 @@ extension ShowAgoraKitManager {
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
         // 第一次进入房间的时候设置
         if hasOpened == false {
-            updatePresetForType(presetType ?? .show_low, mode: .signle)
+            updatePresetForType(presetType ?? .show_low, mode: .single)
             UserDefaults.standard.set(true, forKey: hasOpenedKey)
         }
         updateSettingForkey(.lowlightEnhance)
@@ -115,14 +115,14 @@ extension ShowAgoraKitManager {
             break
         case .show_low:
             switch mode {
-            case .signle:
+            case .single:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, videoSize: ._1920x1080)
             case .pk:
                 _presetValuesWith(dimensions: ._480x360, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
             }
         case .show_medium:
             switch mode {
-            case .signle:
+            case .single:
                 _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 1800, h265On: true, videoSize: ._1280x720)
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
@@ -130,7 +130,7 @@ extension ShowAgoraKitManager {
         case .show_high:
             
             switch mode {
-            case .signle:
+            case .single:
                 _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 2099, h265On: true, videoSize: ._1280x720)
             case .pk:
                 _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
