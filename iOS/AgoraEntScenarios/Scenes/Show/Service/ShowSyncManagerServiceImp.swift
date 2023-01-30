@@ -555,6 +555,9 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 self?._handleCreatePkInvitationRespone(invitation: invitation, status: status)
             }
             
+            //TODO: can not recv interaction subscribe if join another room(use syncmanager v2)
+            self._subscribeInteractionChanged()
+            
             guard let completion = self.createPkInvitationClosure else {
                 //TODO: remove pk invitation alway callback
                 agoraPrint("createPkInvitation fail")
@@ -1416,7 +1419,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp pk invitation unsubscribe ...")
         self.syncUtilImp?
             .scene(id: channelName)?
-            .unsubscribeScene()
+            .unsubscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION)
     }
     
     private func _subscribePKInvitationChanged() {
