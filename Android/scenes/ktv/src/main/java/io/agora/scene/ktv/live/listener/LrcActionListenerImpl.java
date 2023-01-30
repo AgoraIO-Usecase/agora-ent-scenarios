@@ -77,6 +77,10 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
     @Override
     public void onSkipPostludeClick() {
-        mViewModel.changeMusic();
+        LyricsModel lyrics = mLrcControlView.getKaraokeView().getLyricsData();
+        if (lyrics == null) {
+            return;
+        }
+        mViewModel.musicSeek(mViewModel.getSongDuration() - 500);
     }
 }

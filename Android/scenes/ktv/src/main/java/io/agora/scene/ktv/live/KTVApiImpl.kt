@@ -470,7 +470,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     if (offset <= 1000) {
                         curTs = mReceivedPlayPosition + offset
                         runOnMainThread {
-                            lrcView?.karaokeView?.setProgress(curTs)
+                            lrcView?.setProgress(curTs)
                         }
                     }
                 }
@@ -582,7 +582,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     val time = jsonMsg.getLong("time")
                     runOnMainThread {
                         lrcView!!.karaokeView.setPitch(pitch.toFloat())
-                        lrcView!!.karaokeView.setProgress(time)
+                        lrcView!!.setProgress(time)
                     }
                 }
             } else if (jsonMsg.getString("cmd") == "PlayerState") {
@@ -623,15 +623,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         ) {
             for (info in speakers!!) {
                 if (info.uid == 0) {
-                    if (mPlayer != null && mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                    pitch = if (mPlayer != null && mPlayer!!.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                         runOnMainThread {
                             lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat())
-                            lrcView?.karaokeView?.setProgress(mPlayer!!.playPosition)
+                            lrcView?.setProgress(mPlayer!!.playPosition)
                         }
-                        pitch = info.voicePitch
+                        info.voicePitch
                     } else {
                         runOnMainThread { lrcView?.karaokeView?.setPitch(0.0F) }
-                        pitch = 0.0
+                        0.0
                     }
                 }
             }
