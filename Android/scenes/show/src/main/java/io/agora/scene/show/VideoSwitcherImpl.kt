@@ -1,7 +1,13 @@
 package io.agora.scene.show
 
 import android.os.SystemClock
+import android.view.TextureView
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import io.agora.rtc2.*
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.utils.ToastUtils
 
@@ -13,6 +19,8 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private val connectionsPreloaded = mutableListOf<RtcConnection>()
     private val connectionsJoined = mutableListOf<RtcConnection>()
     private val rtcEventHandlers = mutableMapOf<String, RtcEngineEventHandlerImpl>()
+    private val remoteVideoCanvasList = mutableListOf<RemoteVideoCanvasWrap>()
+    private var localVideoCanvas: LocalVideoCanvasWrap? = null
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -31,6 +39,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             leaveRtcChannel(it)
         }
 
+        localVideoCanvas?.release()
         rtcEventHandlers.clear()
         connectionsForPreloading.clear()
         connectionsPreloaded.clear()
@@ -108,15 +117,16 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
     override fun leaveChannel(connection: RtcConnection): Boolean {
         connectionsJoined.firstOrNull { it.equal(connection) }
-            ?.let {
+            ?.let { conn ->
                 val options = ChannelMediaOptions()
                 options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
-                rtcEngine.updateChannelMediaOptionsEx(options, it)
-                rtcEventHandlers[it.channelId]?.setEventListener(null)
-                connectionsJoined.remove(it)
-                connectionsPreloaded.add(it)
+                rtcEngine.updateChannelMediaOptionsEx(options, conn)
+                rtcEventHandlers[conn.channelId]?.setEventListener(null)
+                connectionsJoined.remove(conn)
+                connectionsPreloaded.add(conn)
+                //remoteVideoCanvasList.filter { canvas -> canvas.connection.equal(conn) }.forEach { it.release() }
                 return true
             }
 
@@ -130,6 +140,69 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         return false
     }
 
+    override fun setupRemoteVideo(
+        connection: RtcConnection,
+        container: VideoSwitcher.VideoCanvasContainer
+    ) {
+        remoteVideoCanvasList.firstOrNull {
+            it.connection.equal(connection) && it.uid == container.uid && it.renderMode == container.renderMode && it.lifecycleOwner == container.lifecycleOwner
+        }?.let {
+            val videoView = it.view
+            val viewIndex = container.container.indexOfChild(videoView)
+            if (viewIndex == container.viewIndex) {
+                return
+            }
+            (videoView.parent as? ViewGroup)?.removeView(videoView)
+            container.container.addView(videoView, container.viewIndex)
+            return
+        }
+
+        var videoView = container.container.getChildAt(container.viewIndex)
+        if (!(videoView is TextureView)) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        }
+
+        val remoteVideoCanvasWrap = RemoteVideoCanvasWrap(
+            connection,
+            container.lifecycleOwner,
+            videoView,
+            container.renderMode,
+            container.uid
+        )
+        rtcEventHandlers[connection.channelId]?.let {
+            if (it.isJoinChannelSuccess) {
+                rtcEngine.setupRemoteVideoEx(
+                    remoteVideoCanvasWrap,
+                    connection
+                )
+            }
+        }
+    }
+
+    override fun setupLocalVideo(container: VideoSwitcher.VideoCanvasContainer) {
+        localVideoCanvas?.let {
+            if (it.lifecycleOwner == container.lifecycleOwner && it.renderMode == container.renderMode && it.uid == container.uid) {
+                val videoView = it.view
+                val viewIndex = container.container.indexOfChild(videoView)
+                if (viewIndex == container.viewIndex) {
+                    return
+                }
+                (videoView.parent as? ViewGroup)?.removeView(videoView)
+                container.container.addView(videoView, container.viewIndex)
+                return
+            }
+        }
+        var videoView = container.container.getChildAt(container.viewIndex)
+        if (!(videoView is TextureView)) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        }
+
+        rtcEngine.setupLocalVideo(LocalVideoCanvasWrap(container.lifecycleOwner,
+            videoView, container.renderMode, container.uid))
+    }
+
     private fun leaveRtcChannel(connection: RtcConnection) {
         val options = LeaveChannelOptions()
         options.stopAllEffect = false
@@ -141,6 +214,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             "leave channel ret : code=$ret, message=${RtcEngine.getErrorDescription(ret)}"
         )
         rtcEventHandlers.remove(connection.channelId)
+        remoteVideoCanvasList.filter { it.connection.equal(connection) }.forEach { it.release() }
     }
 
     private fun joinRtcChannel(
@@ -183,6 +257,66 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             })
     }
 
+    inner class LocalVideoCanvasWrap(
+        val lifecycleOwner: LifecycleOwner,
+        view: View,
+        renderMode: Int,
+        uid: Int
+    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
+
+        init {
+            lifecycleOwner.lifecycle.addObserver(this)
+            if(localVideoCanvas != this){
+                localVideoCanvas?.release()
+                localVideoCanvas = this
+            }
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            if (lifecycleOwner == owner) {
+                release()
+            }
+        }
+
+        fun release(){
+            lifecycleOwner.lifecycle.removeObserver(this)
+            view = null
+            rtcEngine.setupLocalVideo(this)
+            localVideoCanvas = null
+        }
+
+    }
+
+    inner class RemoteVideoCanvasWrap(
+        val connection: RtcConnection,
+        val lifecycleOwner: LifecycleOwner,
+        view: View,
+        renderMode: Int,
+        uid: Int
+    ) : DefaultLifecycleObserver, VideoCanvas(view, renderMode, uid) {
+
+        init {
+            lifecycleOwner.lifecycle.addObserver(this)
+            remoteVideoCanvasList.add(this)
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            if (lifecycleOwner == owner) {
+                release()
+            }
+        }
+
+        fun release(){
+            lifecycleOwner.lifecycle.removeObserver(this)
+            view = null
+            rtcEngine.setupRemoteVideoEx(this, connection)
+            remoteVideoCanvasList.remove(this)
+        }
+
+    }
+
 
     inner class RtcEngineEventHandlerImpl(
         private val joinChannelTime: Long,
@@ -190,7 +324,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     ) : IRtcEngineEventHandler() {
 
         private var firstRemoteUid: Int = 0
-        private var isJoinChannelSuccess = false
+        var isJoinChannelSuccess = false
         private var eventListener: VideoSwitcher.IChannelEventListener? = null
         var subscribeMediaTime: Long = joinChannelTime
 
@@ -222,6 +356,9 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             super.onJoinChannelSuccess(channel, uid, elapsed)
             isJoinChannelSuccess = true
             eventListener?.onChannelJoined?.invoke(connection)
+            remoteVideoCanvasList.filter { canvas -> canvas.connection.equal(connection) }.forEach {
+                rtcEngine.setupRemoteVideoEx(it, connection)
+            }
             ShowLogger.d(
                 tag,
                 "join channel $channel success cost time : ${SystemClock.elapsedRealtime() - joinChannelTime} ms"

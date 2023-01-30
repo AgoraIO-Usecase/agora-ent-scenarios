@@ -9,7 +9,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
@@ -26,7 +25,6 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -34,6 +32,7 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.VideoSetting.toIndex
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
+import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
 import io.agora.scene.show.service.*
 import io.agora.scene.show.widget.*
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
@@ -178,6 +177,30 @@ class LiveDetailFragment : Fragment() {
         initTopLayout()
         initBottomLayout()
         initMessageLayout()
+
+        // Render host video
+        initVideoView()
+    }
+
+    private fun initVideoView() {
+        if (isRoomOwner) {
+            mRtcVideoSwitcher.setupLocalVideo(
+                VideoSwitcher.VideoCanvasContainer(
+                    requireActivity(),
+                    mBinding.videoLinkingLayout.videoContainer,
+                    0
+                )
+            )
+        } else {
+            mRtcVideoSwitcher.setupRemoteVideo(
+                mMainRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(
+                    requireActivity(),
+                    mBinding.videoLinkingLayout.videoContainer,
+                    mRoomInfo.ownerId.toInt()
+                )
+            )
+        }
     }
 
     private fun initLivingEndLayout(){
@@ -510,47 +533,18 @@ class LiveDetailFragment : Fragment() {
                     ToastUtils.showToast(R.string.show_pk_is_stopped)
                 }
 
-                mBinding.videoPKLayout.iBroadcasterAView.apply {
-                    if (childCount > 1) {
-                        removeViewAt(0)
-                    }
-                }
-                mBinding.videoPKLayout.iBroadcasterBView.apply {
-                    if (childCount > 1) {
-                        removeViewAt(0)
-                    }
-                }
-                mBinding.videoLinkingLayout.videoContainer.removeAllViews()
-                mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
-                mBinding.videoLinkingLayout.root.isVisible = false
                 mBinding.videoLinkingAudienceLayout.root.isVisible = false
                 mBinding.videoPKLayout.root.isVisible = false
-                mBinding.videoSinglehostLayout.root.isVisible = true
+                mBinding.videoLinkingLayout.root.isVisible = true
             }
             ShowInteractionStatus.onSeat.value -> {
-                mBinding.videoPKLayout.iBroadcasterAView.apply {
-                    if (childCount > 1) {
-                        removeViewAt(0)
-                    }
-                }
-                mBinding.videoPKLayout.iBroadcasterBView.apply {
-                    if (childCount > 1) {
-                        removeViewAt(0)
-                    }
-                }
-                mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
-                mBinding.videoSinglehostLayout.root.isVisible = false
                 mBinding.videoPKLayout.root.isVisible = false
                 mBinding.videoLinkingLayout.root.isVisible = true
                 mBinding.videoLinkingAudienceLayout.root.isVisible = true
             }
             ShowInteractionStatus.pking.value -> {
-                mBinding.videoSinglehostLayout.videoContainer.removeAllViews()
-                mBinding.videoLinkingLayout.videoContainer.removeAllViews()
-                mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
                 mBinding.videoLinkingLayout.root.isVisible = false
                 mBinding.videoLinkingAudienceLayout.root.isVisible = false
-                mBinding.videoSinglehostLayout.root.isVisible = false
                 mBinding.videoPKLayout.root.isVisible = true
             }
         }
@@ -1152,8 +1146,23 @@ class LiveDetailFragment : Fragment() {
         mService.leaveRoom()
     }
 
-    private fun showLivingEndLayout(){
-        mBinding.livingEndLayout.root.isVisible = true
+    private fun showLivingEndLayout() {
+        if (isRoomOwner) {
+            AlertDialog.Builder(requireContext(), R.style.show_alert_dialog)
+                .setView(ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext())).apply {
+                    Glide.with(this@LiveDetailFragment)
+                        .load(mRoomInfo.ownerAvatar)
+                        .into(ivAvatar)
+                }.root)
+                .setCancelable(false)
+                .setPositiveButton(R.string.show_living_end_back_room_list) { dialog, _ ->
+                    requireActivity().finish()
+                    dialog.dismiss()
+                }
+                .show()
+        } else {
+            mBinding.livingEndLayout.root.isVisible = true
+        }
     }
 
     //================== RTC Operation ===================
@@ -1247,33 +1256,15 @@ class LiveDetailFragment : Fragment() {
                 if (result > 1) {
                     ToastUtils.showToast(R.string.show_content)
                 }
+            },
+            onChannelJoined = {
+                onJoinChannelSuccess.invoke()
             }
         )
 
         checkRequirePerms {
-
             // Render host video
-            val videoView = TextureView(requireContext())
-            mBinding.videoSinglehostLayout.videoContainer.addView(videoView)
-            if (isRoomOwner) {
-                mRtcEngine.setupLocalVideo(VideoCanvas(videoView))
-                eventListener.onChannelJoined = {
-                    onJoinChannelSuccess.invoke()
-                }
-            } else {
-                eventListener.onChannelJoined = {
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            videoView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            mRoomInfo.ownerId.toInt()
-                        ),
-                        it
-                    )
-                    onJoinChannelSuccess.invoke()
-                }
-            }
-
+            initVideoView()
             joinChannel(eventListener)
         }
 
@@ -1297,6 +1288,8 @@ class LiveDetailFragment : Fragment() {
 
         }
     }
+
+
 
     private fun destroyRtcEngine(): Boolean {
         return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection)
@@ -1374,11 +1367,9 @@ class LiveDetailFragment : Fragment() {
             )
         }
 
-        val broadcasterVideoView = TextureView(requireContext())
-        mBinding.videoSinglehostLayout.videoContainer.addView(broadcasterVideoView)
         if (isRoomOwner) {
             enableLocalAudio(true)
-            mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
+            mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoLinkingLayout.videoContainer, 0))
         } else {
             val channelMediaOptions = ChannelMediaOptions()
             val rtcConnection = mMainRtcConnection ?: return
@@ -1390,13 +1381,9 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
-            mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(
-                    broadcasterVideoView,
-                    Constants.RENDER_MODE_HIDDEN,
-                    mRoomInfo.ownerId.toInt()
-                ),
-                rtcConnection
+            mRtcVideoSwitcher.setupRemoteVideo(
+                rtcConnection,
+                VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoLinkingLayout.videoContainer, mRoomInfo.ownerId.toInt())
             )
         }
     }
@@ -1405,37 +1392,37 @@ class LiveDetailFragment : Fragment() {
         // 开始连麦
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.onSeat.value) return
-        val broadcasterVideoView = TextureView(requireContext())
-        val audienceVideoView = TextureView(requireContext())
         val rtcConnection = mMainRtcConnection ?: return
 
-        mBinding.videoLinkingLayout.videoContainer.removeAllViews()
-        mBinding.videoLinkingLayout.videoContainer.addView(broadcasterVideoView)
-        mBinding.videoLinkingAudienceLayout.videoContainer.removeAllViews()
-        mBinding.videoLinkingAudienceLayout.videoContainer.addView(audienceVideoView)
         mBinding.videoLinkingAudienceLayout.userName.text = interactionInfo!!.userName
         mBinding.videoLinkingAudienceLayout.userName.bringToFront()
         mBinding.videoLinkingAudienceLayout.userName.isActivated =
             interactionInfo?.muteAudio?.not() ?: false
         if (isRoomOwner) {
             // 连麦主播视角
-            audienceVideoView.setOnClickListener {
+            mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                 showLinkSettingsDialog()
             }
             enableLocalAudio(true)
-            mRtcEngine.setupLocalVideo(VideoCanvas(broadcasterVideoView))
-            mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(
-                    audienceVideoView,
-                    Constants.RENDER_MODE_HIDDEN,
+            mRtcVideoSwitcher.setupLocalVideo(
+                VideoSwitcher.VideoCanvasContainer(
+                    requireActivity(),
+                    mBinding.videoLinkingLayout.videoContainer,
+                    0
+                )
+            )
+            mRtcVideoSwitcher.setupRemoteVideo(
+                rtcConnection,
+                VideoSwitcher.VideoCanvasContainer(
+                    requireActivity(),
+                    mBinding.videoLinkingAudienceLayout.videoContainer,
                     interactionInfo?.userId!!.toInt()
-                ),
-                rtcConnection
+                )
             )
         } else {
             // 连麦观众视角
             if (interactionInfo?.userId.equals(UserManager.getInstance().user.id.toString())) {
-                audienceVideoView.setOnClickListener {
+                mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                     showLinkSettingsDialog()
                 }
                 enableLocalAudio(true)
@@ -1453,33 +1440,41 @@ class LiveDetailFragment : Fragment() {
                     },
                     granted = {
                         mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
-                        mRtcEngine.setupLocalVideo(VideoCanvas(audienceVideoView))
-                        mRtcEngine.setupRemoteVideoEx(
-                            VideoCanvas(
-                                broadcasterVideoView,
-                                Constants.RENDER_MODE_HIDDEN,
+
+                        mRtcVideoSwitcher.setupRemoteVideo(
+                            rtcConnection,
+                            VideoSwitcher.VideoCanvasContainer(
+                                requireActivity(),
+                                mBinding.videoLinkingLayout.videoContainer,
                                 mRoomInfo.ownerId.toInt()
-                            ),
-                            rtcConnection
+                            )
                         )
+                        mRtcVideoSwitcher.setupLocalVideo(
+                            VideoSwitcher.VideoCanvasContainer(
+                                requireActivity(),
+                                mBinding.videoLinkingAudienceLayout.videoContainer,
+                                0
+                            )
+                        )
+
                     })
             } else {
                 // 其他观众视角
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(
-                        audienceVideoView,
-                        Constants.RENDER_MODE_HIDDEN,
+                mRtcVideoSwitcher.setupRemoteVideo(
+                    rtcConnection,
+                    VideoSwitcher.VideoCanvasContainer(
+                        requireActivity(),
+                        mBinding.videoLinkingAudienceLayout.videoContainer,
                         interactionInfo?.userId!!.toInt()
-                    ),
-                    rtcConnection
+                    )
                 )
-                mRtcEngine.setupRemoteVideoEx(
-                    VideoCanvas(
-                        broadcasterVideoView,
-                        Constants.RENDER_MODE_HIDDEN,
+                mRtcVideoSwitcher.setupRemoteVideo(
+                    rtcConnection,
+                    VideoSwitcher.VideoCanvasContainer(
+                        requireActivity(),
+                        mBinding.videoLinkingLayout.videoContainer,
                         mRoomInfo.ownerId.toInt()
-                    ),
-                    rtcConnection
+                    )
                 )
             }
         }
@@ -1490,20 +1485,6 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
         val rtcConnection = mMainRtcConnection ?: return
-        val view = TextureView(requireContext())
-        val competitorView = TextureView(requireContext())
-        mBinding.videoPKLayout.iBroadcasterAView.apply {
-            if (childCount > 1) {
-                removeViewAt(0)
-            }
-        }
-        mBinding.videoPKLayout.iBroadcasterBView.apply {
-            if (childCount > 1) {
-                removeViewAt(0)
-            }
-        }
-        mBinding.videoPKLayout.iBroadcasterAView.addView(view, 0)
-        mBinding.videoPKLayout.iBroadcasterBView.addView(competitorView, 0)
         mBinding.videoPKLayout.userNameA.text = mRoomInfo.ownerName
         mBinding.videoPKLayout.userNameA.isActivated = interactionInfo!!.ownerMuteAudio.not()
         mBinding.videoPKLayout.userNameB.text = interactionInfo!!.userName
@@ -1513,7 +1494,7 @@ class LiveDetailFragment : Fragment() {
             mBinding.videoPKLayout.iBroadcasterBView.setOnClickListener {
                 showPKSettingsDialog()
             }
-            mRtcEngine.setupLocalVideo(VideoCanvas(view))
+            mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoPKLayout.iBroadcasterAView, 0, viewIndex = 0))
             enableLocalAudio(true)
             mRtcEngine.enableLocalVideo(true)
             val channelMediaOptions = ChannelMediaOptions()
@@ -1524,21 +1505,21 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-            mRtcVideoSwitcher.joinChannel(RtcConnection(
+            val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
-            ), channelMediaOptions, VideoSwitcher.IChannelEventListener(
-                onChannelJoined = {
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            competitorView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            interactionInfo?.userId!!.toInt()
-                        ),
-                        it
-                    )
-                }
-            ))
+            )
+            mRtcVideoSwitcher.joinChannel(
+                pkRtcConnection, channelMediaOptions, VideoSwitcher.IChannelEventListener())
+            mRtcVideoSwitcher.setupRemoteVideo(
+                pkRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(
+                    requireActivity(),
+                    mBinding.videoPKLayout.iBroadcasterBView,
+                    interactionInfo?.userId!!.toInt(),
+                    viewIndex = 0
+                )
+            )
         } else {
             // 观众
             val channelMediaOptions = ChannelMediaOptions()
@@ -1549,29 +1530,21 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
-            mRtcVideoSwitcher.joinChannel(RtcConnection(
+            val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
-            ), channelMediaOptions, VideoSwitcher.IChannelEventListener(
-                onChannelJoined = {
-                    mRtcEngine.setupRemoteVideoEx(
-                        VideoCanvas(
-                            competitorView,
-                            Constants.RENDER_MODE_HIDDEN,
-                            interactionInfo?.userId!!.toInt()
-                        ),
-                        it
-                    )
-                }
-            ))
+            )
+            mRtcVideoSwitcher.joinChannel(
+                pkRtcConnection, channelMediaOptions, VideoSwitcher.IChannelEventListener())
 
-            mRtcEngine.setupRemoteVideoEx(
-                VideoCanvas(
-                    view,
-                    Constants.RENDER_MODE_HIDDEN,
-                    mRoomInfo.ownerId.toInt()
-                ),
-                rtcConnection
+            mRtcVideoSwitcher.setupRemoteVideo(
+                pkRtcConnection,
+                VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoPKLayout.iBroadcasterBView, interactionInfo?.userId!!.toInt(), viewIndex = 0)
+            )
+
+            mRtcVideoSwitcher.setupRemoteVideo(
+                rtcConnection,
+                VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoPKLayout.iBroadcasterAView, mRoomInfo.ownerId.toInt(), viewIndex = 0)
             )
         }
     }
