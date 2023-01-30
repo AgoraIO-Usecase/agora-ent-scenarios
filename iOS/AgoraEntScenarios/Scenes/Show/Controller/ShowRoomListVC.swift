@@ -9,7 +9,7 @@ import UIKit
 import MJRefresh
 import AgoraRtcKit
 
-private let kAudienceHasShowPreset = "kAudienceHasShowPreset"
+private let kAudienceShowPresetType = "kAudienceShowPresetType"
 
 class ShowRoomListVC: UIViewController {
 
@@ -18,8 +18,6 @@ class ShowRoomListVC: UIViewController {
     
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
-    // 观众端预设类型
-    private var audiencePresetType: ShowPresetType?
     
     private var firstSetAudience = false
     
@@ -71,12 +69,14 @@ class ShowRoomListVC: UIViewController {
         }
         roomListView.joinRoomAction = { [weak self] room in
             guard let wSelf = self else { return }
-            let hasShowPreset = UserDefaults.standard.bool(forKey: kAudienceHasShowPreset)
+            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+            let audencePresetType = ShowPresetType(rawValue: value)
             // 如果是owner是自己 或者已经设置过观众模式
-            if room.ownerId == VLUserCenter.user.id || hasShowPreset {
+            if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
                 wSelf.joinRoom(room)
             }else{
-                wSelf.showPresettingVC { [weak self] in
+                wSelf.showPresettingVC { [weak self] type in
+                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
                     self?.joinRoom(room)
                 }
             }
@@ -87,14 +87,11 @@ class ShowRoomListVC: UIViewController {
         }
     }
     
-    private func showPresettingVC(selected:(()->())? = nil) {
+    private func showPresettingVC(selected:((_ type: ShowPresetType)->())? = nil) {
         let vc = ShowPresettingVC()
         vc.isBroadcaster = false
-        vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.audiencePresetType = type
-            selected?()
-//            self?.firstSetAudience = true
-            UserDefaults.standard.set(true, forKey: kAudienceHasShowPreset)
+        vc.didSelectedPresetType = { type, modeName in
+            selected?(type)
         }
         present(vc, animated: true)
     }
@@ -119,7 +116,10 @@ class ShowRoomListVC: UIViewController {
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
         let vc = ShowLivePagesViewController()
-        vc.audiencePresetType = self.audiencePresetType// ?? ShowPresetType.show_low
+        let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+        vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
             AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, model in
                 if let error = error {
@@ -128,15 +128,11 @@ class ShowRoomListVC: UIViewController {
                 }
                 vc.roomList = [room]
                 vc.focusIndex = 0
-                let nc = UINavigationController(rootViewController: vc)
-                nc.modalPresentationStyle = .fullScreen
                 self?.present(nc, animated: true)
             }
         } else {
             vc.roomList = roomList?.filter({ $0.ownerId != VLUserCenter.user.id })
             vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
-            let nc = UINavigationController(rootViewController: vc)
-            nc.modalPresentationStyle = .fullScreen
             self.present(nc, animated: true)
         }
     }
