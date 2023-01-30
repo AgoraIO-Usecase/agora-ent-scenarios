@@ -7,7 +7,6 @@
 
 import UIKit
 import MJRefresh
-import AgoraRtcKit
 
 private let kAudienceShowPresetType = "kAudienceShowPresetType"
 
@@ -27,7 +26,6 @@ class ShowRoomListVC: UIViewController {
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        showLogger.info("load show, sdk version: \(AgoraRtcEngineKit.getSdkVersion())")
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         hidesBottomBarWhenPushed = true
         showLogger.info("init-- ShowRoomListVC")
