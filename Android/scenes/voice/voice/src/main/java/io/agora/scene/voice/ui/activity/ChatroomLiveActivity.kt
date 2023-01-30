@@ -12,7 +12,10 @@ import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
@@ -506,6 +509,33 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         })
             }
         })
+
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object: FragmentManager.FragmentLifecycleCallbacks(){
+            private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
+            override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
+                if (f is BottomSheetDialogFragment) {
+                    if (dialogFragments.contains(f)) {
+                        return
+                    }
+                    val lastFragment = dialogFragments.lastOrNull()
+                    dialogFragments.add(f)
+                    lastFragment?.dismiss()
+                }
+                super.onFragmentStarted(fm, f)
+            }
+            override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
+                super.onFragmentStopped(fm, f)
+                if(f is BottomSheetDialogFragment){
+                    val lastFragment = dialogFragments.lastOrNull()
+                    if (lastFragment == f) {
+                        dialogFragments.remove(f)
+                        dialogFragments.lastOrNull()?.let {
+                            it.show(fm, it.tag)
+                        }
+                    }
+                }
+            }
+        }, true)
     }
 
     override fun onBackPressed() {

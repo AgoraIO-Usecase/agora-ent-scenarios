@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiagcBinding
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
@@ -28,6 +29,7 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
 
         binding?.accbAGC?.isChecked = isOn
         binding?.accbAGC?.setOnCheckedChangeListener { _, b ->
