@@ -16,6 +16,11 @@ class ShowReceiveLiveFinishAlertVC: UIViewController {
         return view
     }()
 
+    fileprivate var headUrl: String? {
+        didSet{
+            finishAlertView.headImg = headUrl
+        }
+    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
