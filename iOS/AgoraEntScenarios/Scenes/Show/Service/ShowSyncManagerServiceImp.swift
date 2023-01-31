@@ -1910,26 +1910,13 @@ extension ShowSyncManagerServiceImp {
 
 private let robotRoomIds = ["1", "2", "3"/*, "4", "5", "6", "7", "8", "9"*/]
 private let robotRoomOwnerHeaders = [
-    "https://img0.baidu.com/it/u=1764313044,42117373&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=184851089,3620794628&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-    "https://img1.baidu.com/it/u=1217061905,2277984247&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
+    "https://download.agora.io/demo/release/bot1.png"
 ]
 private let robotStreamURL = [
     "https://download.agora.io/sdk/release/agora_test_video_1.mp4",
     "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
     "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
     "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_1.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
-    "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
 ]
 
 private let kRobotRoomStartId = 2023000
@@ -1987,7 +1974,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                     room.thumbnailId = "1"
                     room.ownerId = userId
                     room.ownerName = userId
-                    room.ownerAvatar = robotRoomOwnerHeaders[robotId - 1]//VLUserCenter.user.headUrl
+                    room.ownerAvatar = robotRoomOwnerHeaders[(robotId - 1) % robotRoomOwnerHeaders.count]//VLUserCenter.user.headUrl
                     room.createdAt = Date().millionsecondSince1970()
                     dataArray.append(room)
                 }
@@ -2024,11 +2011,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
             return
         }
         let channelName = roomId
-        let idx = (Int(channelName) ?? 1) - kRobotRoomStartId - 1
-        guard idx >= 0, idx < robotStreamURL.count else {
-            agoraAssert("startCloudPlayer fail")
-            return
-        }
+        let idx = ((Int(channelName) ?? 1) - kRobotRoomStartId - 1) % robotStreamURL.count
         agoraPrint("startCloudPlayer: \(roomId) /\(robotUid)")
         NetworkManager.shared.startCloudPlayer(channelName: channelName,
                                                uid: VLUserCenter.user.id,
