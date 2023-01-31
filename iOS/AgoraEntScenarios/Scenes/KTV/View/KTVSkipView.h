@@ -18,11 +18,11 @@ typedef NS_ENUM(NSUInteger, SkipType) {
     SkipTypeEpilogue = 1,
 };
 
-typedef void (^OnCallback)(SkipActionType type);
+typedef void (^OnSkipCallback)(SkipActionType type);
 
 @interface KTVSkipView : UIView
 
--(instancetype)initWithFrame:(CGRect)frame completion:(OnCallback _Nullable)completion;
+-(instancetype)initWithFrame:(CGRect)frame completion:(OnSkipCallback _Nullable)completion;
 
 -(void)setSkipType:(SkipType)type;
 

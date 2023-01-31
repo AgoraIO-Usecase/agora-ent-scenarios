@@ -15,7 +15,6 @@
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
 #import "KTVMacro.h"
-#import "KTVSkipView.h"
 @import Masonry;
 
 @interface VLKTVMVView () <VLKTVMVIdleViewDelegate,VLJoinChorusViewDelegate,VLStartSoloViewDelegate,AgoraKaraokeScoreDelegate>
@@ -148,7 +147,7 @@
         make.width.equalTo(@(120));
         make.height.equalTo(@(34));
     }];
-   // self.skipView.hidden = true;
+    self.skipView.hidden = true;
 }
 
 - (void)_refreshOriginButton {
@@ -160,6 +159,14 @@
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
+}
+
+-(void)setSkipType:(SkipType)type{
+    [self.skipView setSkipType:type];
+}
+
+-(void)showSkipView:(bool)flag{
+    self.skipView.hidden = !flag;
 }
 
 #pragma mark - public
