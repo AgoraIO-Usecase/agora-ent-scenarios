@@ -12,6 +12,7 @@ import AgoraChat.AgoraChatError
 
 private let cSceneId = "scene_chatRoom"
 
+let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
     static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
@@ -29,7 +30,6 @@ public class ChatRoomServiceImp: NSObject {
         self.applicants.removeAll()
     }
     
-    let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 }
 
 extension ChatRoomServiceImp: VoiceRoomIMDelegate {
