@@ -586,7 +586,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     //co singer record & playout
     options.enableAudioRecordingOrPlayout = role == KTVSingRoleMainSinger ? NO : YES;
     options.clientRoleType = AgoraClientRoleBroadcaster;
-    options.publishDirectCustomAudioTrack = YES;
+    options.publishDirectCustomAudioTrack = role == KTVSingRoleMainSinger ? YES : NO;;
     
     AgoraRtcConnection* connection = [AgoraRtcConnection new];
     connection.channelId = [NSString stringWithFormat:@"%@_ex", self.channelName];
