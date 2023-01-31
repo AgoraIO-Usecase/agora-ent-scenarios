@@ -1,6 +1,7 @@
 package com.agora.entfulldemo.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +74,11 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                 ARouter.getInstance()
                         .build(PagePathConstant.pageVoiceChat)
                         .navigation();
+                break;
+            case Voice_Chat_Spatial:
+                Intent intent = new Intent();
+                intent.setClassName(requireContext(), "io.agora.scene.voice.spatial.ui.activity.VoiceRoomListActivity");
+                startActivity(intent);
                 break;
             case Meta_Live:
                 break;
