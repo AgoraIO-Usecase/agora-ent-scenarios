@@ -11,6 +11,7 @@ object ScenesConstructor {
     enum class SceneType {
         Ktv_Online,
         Voice_Chat,
+        Voice_Chat_Spatial,
         Meta_Live,
         Meta_Chat,
         Games,
@@ -31,6 +32,13 @@ object ScenesConstructor {
                 context.getString(R.string.ktv_online),
                 R.mipmap.bg_btn_home1,
                 R.mipmap.bg_btn_home_ktv,
+                true
+            ),
+            ScenesModel(
+                SceneType.Voice_Chat_Spatial,
+                context.getString(R.string.app_voice_chat_spatial),
+                R.mipmap.bg_btn_home3,
+                R.mipmap.bg_btn_home_chat,
                 true
             ),
 //            ScenesModel(

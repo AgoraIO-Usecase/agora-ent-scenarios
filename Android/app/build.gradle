@@ -18,6 +18,9 @@ dependencies {
     if (isProjectLibrary(':scenes:voice:voice')) {
         runtimeOnly project(':scenes:voice:voice')
     }
+    if (isProjectLibrary(':scenes:voice:voice_spatial')) {
+        runtimeOnly project(':scenes:voice:voice_spatial')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide
