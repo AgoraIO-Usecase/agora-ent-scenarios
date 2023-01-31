@@ -14,7 +14,7 @@ class ShowLiveViewController: UIViewController {
 
     var room: ShowRoomListModel?
     
-    var selectedResolution = 1
+//    var selectedResolution = ShowSettingKey.captureVideoSize.intValue
     
     var audiencePresetType: ShowPresetType?
     
@@ -707,7 +707,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, videoSizeChangedOf sourceType: AgoraVideoSourceType, uid: UInt, size: CGSize, rotation: Int) {
-        print("videoSizeChangedOf = \(String(describing: room?.ownerId?.debugDescription)) width = \(size.width), height = \(size.height)")
+        print("videoSizeChangedOf = \(String(describing: room?.ownerId?.debugDescription)) width = \(size.width), height = \(size.height), sourceType = \(sourceType.rawValue)")
     }
 }
 
@@ -821,7 +821,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: false)
         
         let vc = ShowSelectQualityVC()
-        vc.defalutSelectIndex = selectedResolution
+//        vc.defalutSelectIndex = selectedResolution
         present(vc, animated: false)
         vc.dismissed = { [weak self] in
             guard let wSelf = self else { return }
@@ -829,7 +829,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         }
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
-            wSelf.selectedResolution = index
+//            wSelf.selectedResolution = index
             wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
         }
     }

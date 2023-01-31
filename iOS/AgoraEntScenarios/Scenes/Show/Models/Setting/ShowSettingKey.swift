@@ -27,6 +27,44 @@ enum ShowAgoraVideoDimensions: String, CaseIterable {
     }
 }
 
+enum ShowAgoraCaptureVideoDimensions: Int, CaseIterable {
+    
+    case _1080P = 1080
+    case _720P = 720
+    case _540P = 540
+    case _480P = 480
+    case _360P = 360
+    case _270P = 270
+     
+    var sizeValue: CGSize {
+        if rawValue == 480 {
+            return CGSize(width: 480, height: 854)
+        }
+        return CGSize(width: CGFloat(rawValue), height: CGFloat(rawValue) * 1280.0 / 720.0)
+    }
+    
+    var valueTitle: String {
+        return "\(rawValue)P"
+    }
+    
+    var levelTitle: String {
+        switch self {
+        case ._1080P:
+            return "极清"
+        case ._720P:
+            return "超清"
+        case ._540P:
+            return "高清"
+        case ._480P:
+            return "标清"
+        case ._360P:
+            return "流畅"
+        case ._270P:
+            return "低清"
+        }
+    }
+}
+
 extension AgoraVideoFrameRate {
     func stringValue() -> String {
         return "\(rawValue) fps"
@@ -57,6 +95,7 @@ enum ShowSettingKey: String, CaseIterable {
     case recordingSignalVolume  // 人声音量
     case musincVolume           // 音乐音量
     case audioBitRate           // 音频码率
+    case captureVideoSize       // 采集分辨率
     
     var title: String {
         switch self {
@@ -90,6 +129,8 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_musicVolume_title".show_localized
         case .audioBitRate:
             return "show_advance_setting_audio_bitRate_title".show_localized
+        case .captureVideoSize:
+            return ""
         }
     }
     
@@ -125,6 +166,8 @@ enum ShowSettingKey: String, CaseIterable {
         case .musincVolume:
             return .slider
         case .audioBitRate:
+            return .label
+        case .captureVideoSize:
             return .label
         }
     }
@@ -179,6 +222,8 @@ enum ShowSettingKey: String, CaseIterable {
             ]
         case .audioBitRate:
             return ["2","3","5"]
+        case .captureVideoSize:
+            return ShowAgoraCaptureVideoDimensions.allCases.map({ "\($0.rawValue)P" })
         default:
             return []
         }

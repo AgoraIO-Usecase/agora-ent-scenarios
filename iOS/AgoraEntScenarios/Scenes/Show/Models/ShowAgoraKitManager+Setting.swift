@@ -26,6 +26,10 @@ extension ShowAgoraKitManager {
         ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
     }
     
+    private var captureDimensionsItems: [CGSize] {
+        ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
+    }
+    
     private var fpsItems: [AgoraVideoFrameRate] {
         [
            .fps1,
@@ -61,6 +65,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.recordingSignalVolume)
         updateSettingForkey(.musincVolume)
         updateSettingForkey(.audioBitRate)
+        updateSettingForkey(.captureVideoSize)
     }
     
     /// 设置超分 不保存数据
@@ -73,12 +78,20 @@ extension ShowAgoraKitManager {
         agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
     }
     
+    /// 选择采集分辨率
+    /// - Parameter index: 索引
+    func selectCaptureVideoDimensions(index: Int) {
+        setCaptureVideoDimensions(captureDimensionsItems[index])
+        ShowSettingKey.captureVideoSize.writeValue(index)
+    }
+    
     // 预设模式
-    private func _presetValuesWith(dimensions: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, videoSize: ShowAgoraVideoDimensions) {
-        ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: dimensions.sizeValue))
+    private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captureSize: ShowAgoraCaptureVideoDimensions) {
+        ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: encodeSize.sizeValue))
         ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
         ShowSettingKey.H265.writeValue(h265On)
+        ShowSettingKey.captureVideoSize.writeValue(captureDimensionsItems.firstIndex(of: captureSize.sizeValue))
         ShowSettingKey.lowlightEnhance.writeValue(false)
         ShowSettingKey.colorEnhance.writeValue(false)
         ShowSettingKey.videoDenoiser.writeValue(false)
@@ -92,6 +105,7 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.colorEnhance)
         updateSettingForkey(.videoDenoiser)
         updateSettingForkey(.PVC)
+        updateSettingForkey(.captureVideoSize)
         
         // 设置采集分辨率
 //        setCaptureVideoDimensions(videoSize.sizeValue)
@@ -116,24 +130,24 @@ extension ShowAgoraKitManager {
         case .show_low:
             switch mode {
             case .single:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, videoSize: ._1920x1080)
+                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, captureSize: ._1080P)
             case .pk:
-                _presetValuesWith(dimensions: ._480x360, fps: .fps15, bitRate: 700, h265On: false, videoSize: ._1280x720)
+                _presetValuesWith(encodeSize: ._480x360, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
             }
         case .show_medium:
             switch mode {
             case .single:
-                _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 1800, h265On: true, videoSize: ._1280x720)
+                _presetValuesWith(encodeSize: ._1280x720, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
             case .pk:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
+                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
         case .show_high:
             
             switch mode {
             case .single:
-                _presetValuesWith(dimensions: ._1280x720, fps: .fps24, bitRate: 2099, h265On: true, videoSize: ._1280x720)
+                _presetValuesWith(encodeSize: ._1280x720, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
             case .pk:
-                _presetValuesWith(dimensions: ._960x540, fps: .fps15, bitRate: 800, h265On: true, videoSize: ._1280x720)
+                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
         case .quality_low:
             _setQualityEnable(false,uid: uid)
@@ -194,6 +208,8 @@ extension ShowAgoraKitManager {
             agoraKit.adjustAudioMixingVolume(Int(sliderValue))
         case .audioBitRate:
             break
+        case .captureVideoSize:
+            setCaptureVideoDimensions(captureDimensionsItems[index])
         }
     }
 
