@@ -1,14 +1,13 @@
 //
-//  VMEQSettingView.swift
-//  AgoraScene_iOS
+//  VoiceRoomAudioSettingDetailViewController.swift
+//  AgoraEntScenarios
 //
-//  Created by CP on 2022/9/8.
+//  Created by CP on 2023/1/31.
 //
 
 import UIKit
-import SwiftUI
 
-class VMEQSettingView: UIView, UITextViewDelegate {
+class VoiceRoomAudioSettingDetailViewController: UIViewController {
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
     private var lineImgView: UIImageView = .init()
     private var titleLabel: UILabel = .init()
@@ -18,7 +17,7 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     lazy var cover: UIView = {
         UIView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 56~)).backgroundColor(.clear).setGradient([UIColor(red: 0.929, green: 0.906, blue: 1, alpha: 1), UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)], [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 1)])
     }()
-
+    let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
     private let swIdentifier = "switch"
     private let slIdentifier = "slider"
     private let nIdentifier = "normal"
@@ -28,7 +27,6 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     private let tIdentifier = "tv"
     private var effectHeight: [CGFloat] = [0, 0, 0, 0]
     private var effectType: [SOUND_TYPE] = [.chat, .karaoke, .game, .anchor]
-    var backBlock: (() -> Void)?
     var effectClickBlock: ((SOUND_TYPE) -> Void)?
     var visitBlock: (() -> Void)?
     var isTouchAble: Bool = false
@@ -42,10 +40,10 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     var soundEffect: Int = 1 {
         didSet {
 
-            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: bounds.size.width - 80~)
-            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: bounds.size.width - 80~)
-            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: bounds.size.width - 80~)
-            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: bounds.size.width - 80~)
+            let socialH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the voice call problem of the Social Chat scene, including noise cancellation and echo suppression of the anchor's voice. It can enable users of different network environments and models to enjoy ultra-low delay and clear and beautiful voice in multi-person chat."), fontSize: 13, width: self.view.bounds.size.width - 80~)
+            let ktvH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the Karaoke scene of single-person or multi-person singing, including the balance processing of accompaniment and voice, the beautification of sound melody and voice line, the volume balance and real-time synchronization of multi-person chorus, etc. It can make the scenes of Karaoke more realistic and the singers' songs more beautiful."), fontSize: 13, width: self.view.bounds.size.width - 80~)
+            let gameH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving all kinds of problems in the game scene where the anchor plays with him, including the collaborative reverberation processing of voice and game sound, the melody of sound and the beautification of sound lines. It can make the voice of the accompanying anchor more attractive and ensure the scene feeling of the game voice. "), fontSize: 13, width: self.view.bounds.size.width - 80~)
+            let anchorH: CGFloat = textHeight(text: LanguageManager.localValue(key: "This sound effect focuses on solving the problems of poor sound quality of mono anchors and compatibility with mainstream external sound cards. The sound network stereo collection and high sound quality technology can greatly improve the sound quality of anchors using sound cards and enhance the attraction of live broadcasting rooms. At present, it has been adapted to mainstream sound cards in the market. "), fontSize: 13, width: self.view.bounds.size.width - 80~)
             print("\(soundEffect)-----")
             switch soundEffect {
             case 1:
@@ -106,37 +104,37 @@ class VMEQSettingView: UIView, UITextViewDelegate {
 
     var resBlock: ((AUDIO_SETTING_TYPE) -> Void)?
 
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        backgroundColor = .white
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
         layoutUI()
     }
-
+    
     private func layoutUI() {
-        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
+        let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
         let layer = CAShapeLayer()
         layer.path = path.cgPath
-        self.layer.mask = layer
+        self.view.layer.mask = layer
 
-        addSubview(cover)
+        view.addSubview(cover)
 
         backBtn.frame = CGRect(x: 10~, y: 30~, width: 20~, height: 30~)
         backBtn.setImage(UIImage("back"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
-        addSubview(backBtn)
+        view.addSubview(backBtn)
 
         lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20~, y: 8, width: 40~, height: 4)
         lineImgView.image = UIImage("pop_indicator")
-        addSubview(lineImgView)
+        view.addSubview(lineImgView)
 
         titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60~, y: 25~, width: 120~, height: 30~)
         titleLabel.textAlignment = .center
         titleLabel.text = "Spatial Audio"
         titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        addSubview(titleLabel)
+        view.addSubview(titleLabel)
 
-        tableView.frame = CGRect(x: 0, y: 70~, width: ScreenWidth, height: 280~)
+        tableView.frame = CGRect(x: 0, y: 70~, width: ScreenWidth, height: 384~)
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
         tableView.registerCell(VMSliderTableViewCell.self, forCellReuseIdentifier: slIdentifier)
         tableView.registerCell(VMNorSetTableViewCell.self, forCellReuseIdentifier: nIdentifier)
@@ -146,7 +144,7 @@ class VMEQSettingView: UIView, UITextViewDelegate {
         tableView.registerCell(UITableViewCell.self, forCellReuseIdentifier: tIdentifier)
         tableView.dataSource = self
         tableView.delegate = self
-        addSubview(tableView)
+        view.addSubview(tableView)
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -156,14 +154,12 @@ class VMEQSettingView: UIView, UITextViewDelegate {
     }
 
     @objc private func back() {
-        guard let backBlock = backBlock else {
-            return
-        }
-        backBlock()
+        self.presentView.pop()
     }
+
 }
 
-extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
+extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         if settingType == .Noise {
             return 3
@@ -415,7 +411,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
          } else if settingType == .AIAEC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
-//             cell.isAudience = isAudience
+             cell.isAudience = isAudience
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
              cell.useRobotBlock = { [weak self] flag in
@@ -436,7 +432,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
-//             cell.isAudience = isAudience
+             cell.isAudience = isAudience
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AGC ?? false
              cell.useRobotBlock = { [weak self] flag in
