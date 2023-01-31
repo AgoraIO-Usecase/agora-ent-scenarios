@@ -73,12 +73,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
 
     // 房间存活时间，单位ms
     private KtvCommonDialog timeUpExitDialog;
-    private final long ROOM_AVAILABLE_DURATION = 20 * 60 * 1000;// 20min
-    private final Runnable timerRoomEndRun = () -> {
-        if (roomLivingViewModel.release()) {
-            showTimeUpExitDialog();
-        }
-    };
 
 
     public static void launch(Context context, JoinRoomOutputModel roomInfo) {
@@ -214,9 +208,6 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             setPlayerBgFromMsg(0);
         }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
-
-        // 定时删除房间
-        getBinding().getRoot().postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION);
     }
 
     @Override
@@ -274,6 +265,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         });
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
                 getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
+        roomLivingViewModel.roomTimeUpLiveData.observe(this, isTimeUp -> {
+            if (roomLivingViewModel.release()) {
+                showTimeUpExitDialog();
+            }
+        });
 
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
