@@ -10,18 +10,17 @@ import AgoraRtcKit
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
     
-    case _320x240 = "320x240"
-    case _480x360 = "480x360"
+    case _240x360 = "240x360"
     case _360x640 = "360x640"
-    case _960x540 = "960x540"
-    case _960x720 = "960x720"
-    case _1280x720 = "1280x720"
-    case _1920x1080 = "1920x1080"
+    case _480x854 = "480x854"
+    case _540x960 = "540x960"
+    case _720x1280 = "720x1280"
+    case _1080x1920 = "1080x1920"
      
     var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
         guard let first = arr.first, let width = Float(first), let last = arr.last, let height = Float(last) else {
-            return CGSize(width: 320, height: 240)
+            return CGSize(width: 360, height: 640)
         }
         return CGSize(width: CGFloat(width), height: CGFloat(height))
     }

@@ -68,6 +68,9 @@ class ShowAgoraKitManager: NSObject {
     // 预设类型
     var presetType: ShowPresetType?
     
+    var srIsOn = false
+    var srType: SRType = .x1_33
+    
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
     private var exConnection: AgoraRtcConnection?

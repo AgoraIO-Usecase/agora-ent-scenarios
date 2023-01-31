@@ -15,6 +15,7 @@ extension ShowAgoraKitManager {
     
     // 超分倍数
     enum SRType: Int {
+        case none = -1
         case x1 = 6
         case x1_33 = 7
         case x1_5 = 8
@@ -72,10 +73,66 @@ extension ShowAgoraKitManager {
     /// - Parameters:
     ///   - isOn: 开关
     ///   - srType: 默认1.5倍
-    func setSuperResolution(_ isOn: Bool, srType:SRType = .x1_5) {
-        agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
-        agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
-        agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+    func setSuperResolutionOn(_ isOn: Bool, srType:SRType = .x1_33) {
+        // 避免重复设置
+        if isOn == self.srIsOn && srType == self.srType {
+            return
+        }
+        self.srIsOn = isOn
+        self.srType = srType
+        if srType == .none {
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
+        }else{
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+            agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
+            agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+        }
+    }
+    
+    /// 设置超分倍数
+    /// - Parameters:
+    ///   - presetType: 预设类型
+    ///   - videoWidth: 编码分辨率的宽
+    func setSuperResolutionForAudienceType(presetType: ShowPresetType, videoWidth:Int, mode: ShowMode) {
+        var srType: SRType = .x1_33
+        switch presetType {
+        case .unknown,.show_low, .show_medium, .show_high:
+        break
+        case .quality_low:
+            srType = .none
+        case .quality_medium:
+            switch mode {
+            case .single:
+                if videoWidth <= 540 {
+                    srType = .x1_33
+                } else if videoWidth == 720 {
+                    srType = .x1_5
+                } else {
+                    srType = .none
+                }
+            case .pk:
+                srType = .x1_33
+            }
+        case .quality_high:
+            switch mode {
+            case .single:
+                if videoWidth <= 360 {
+                    srType = .x2
+                }else if videoWidth <= 540 {
+                    srType = .x1_33
+                }else if videoWidth == 720 {
+                    srType = .x1_5
+                }else {
+                    srType = .none
+                }
+            case .pk:
+                srType = .x1_33
+            }
+        case .base_low, .base_medium, .base_high:
+            srType = .none
+            break
+        }
+        setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
     }
     
     /// 选择采集分辨率
@@ -112,14 +169,14 @@ extension ShowAgoraKitManager {
     }
     
     /// 设置观众端画质增强
-    private func _setQualityEnable(_ isOn: Bool, srType: SRType = .x1_5, uid: UInt?){
+    private func _setQualityEnable(_ isOn: Bool, uid: UInt?){
         /*
         if let uid = uid {
             agoraKit.enableRemoteSuperResolution(uid, enable: isOn)
         }
         ShowSettingKey.SR.writeValue(isOn)
          */
-        setSuperResolution(isOn, srType: srType)
+//        setSuperResolutionOn(isOn, srType: srType)
         ShowSettingKey.SR.writeValue(isOn)
     }
     
@@ -130,31 +187,31 @@ extension ShowAgoraKitManager {
         case .show_low:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 1500, h265On: false, captureSize: ._1080P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1500, h265On: false, captureSize: ._1080P)
             case .pk:
-                _presetValuesWith(encodeSize: ._480x360, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
             }
         case .show_medium:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._1280x720, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
             case .pk:
-                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
         case .show_high:
             
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._1280x720, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
             case .pk:
-                _presetValuesWith(encodeSize: ._960x540, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
         case .quality_low:
             _setQualityEnable(false,uid: uid)
         case .quality_medium:
-            _setQualityEnable(true, srType: SRType.x1_5, uid: uid)
+            _setQualityEnable(true, uid: uid)
         case .quality_high:
-            _setQualityEnable(true, srType: SRType.x1_5, uid: uid)
+            _setQualityEnable(true, uid: uid)
         case .base_low:
             _setQualityEnable(false,uid: uid)
         case .base_medium:
@@ -184,7 +241,7 @@ extension ShowAgoraKitManager {
             agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .SR:
 //            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
-            setSuperResolution(isOn)
+            setSuperResolutionOn(isOn)
         case .BFrame:
             
            break

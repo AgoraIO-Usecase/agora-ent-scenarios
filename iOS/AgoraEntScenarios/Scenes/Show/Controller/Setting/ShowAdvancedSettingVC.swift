@@ -20,9 +20,11 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     var settingManager: ShowAgoraKitManager!
     
-    // 当前设置的预设值
+    // 当前设置的预设值名称
     var presetModeName: String?
-    
+    // 当前的观众预设类型
+    var audiencePresetType: ShowPresetType?
+
     private let titles = ["show_advance_setting_video_title".show_localized,
                           "show_advance_setting_audio_title".show_localized]
     
@@ -158,6 +160,15 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     
     // 判断是否需要显示修改预设值的弹窗
     private func showModifyAlertIfNeeded(_ key: ShowSettingKey, value: Any) -> Bool {
+        // 如果当前是观众低端机
+        if audiencePresetType == .quality_low || audiencePresetType == .base_high || audiencePresetType == .base_medium || audiencePresetType == .base_low {
+            // sr开关即将打开 则不运行打开
+            if key == .SR , let srValue = value as? Bool, srValue == true {
+                let msg = "show_presetting_alert_will_change_sr_value_message".show_localized
+                showAlert(title: "show_presetting_alert_will_change_value_title".show_localized, message: msg, confirmTitle: "OK", cancelTitle: nil)
+                return false
+            }
+        }
         if presetModeName != nil {
             let msg1 = "show_presetting_alert_will_change_value_message1".show_localized
             let msg2 = "show_presetting_alert_will_change_value_message2".show_localized

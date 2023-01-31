@@ -686,6 +686,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
         print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height)")
+        if let audiencePresetType = audiencePresetType {
+            let mode: ShowMode = interactionStatus == .idle ? .single : .pk
+            agoraKitManager.setSuperResolutionForAudienceType(presetType: audiencePresetType, videoWidth: Int(stats.width), mode: mode)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
@@ -888,6 +892,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
             vc.settingManager = wSelf.agoraKitManager
+            vc.audiencePresetType = wSelf.audiencePresetType
             wSelf.navigationController?.pushViewController(vc, animated: true)
         }
     }
