@@ -115,6 +115,7 @@ class AgoraRtcEngineController {
             }
             // 加载ai 降噪so
             config.addExtension("agora_ai_noise_suppression_extension")
+            config.addExtension("agora_ai_echo_cancellation_extension")
             try {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
             } catch (e: Exception) {
