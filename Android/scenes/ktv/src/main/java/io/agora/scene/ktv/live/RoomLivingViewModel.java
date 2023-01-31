@@ -76,6 +76,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     final MutableLiveData<JoinRoomOutputModel> roomInfoLiveData;
     final MutableLiveData<Boolean> roomDeleteLiveData = new MutableLiveData<>();
+    final MutableLiveData<Boolean> roomTimeUpLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> roomUserCountLiveData = new MutableLiveData<>(0);
 
     /**
@@ -164,8 +165,12 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     public boolean release() {
-        ktvApiProtocol.release();
+        KTVLogger.d(TAG, "release called");
         streamId = 0;
+        if (mPlayer != null && iAgoraMusicContentCenter != null && mRtcEngine != null) {
+            ktvApiProtocol.release();
+        }
+
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer.destroy();
@@ -262,6 +267,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             return null;
         });
 
+        ktvServiceProtocol.subscribeRoomTimeUp(() -> {
+            roomTimeUpLiveData.postValue(true);
+            return null;
+        });
+
     }
 
     /**
@@ -274,6 +284,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 // success
                 KTVLogger.d(TAG, "RoomLivingViewModel.exitRoom() success");
                 roomDeleteLiveData.postValue(false);
+                roomTimeUpLiveData.postValue(false);
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());

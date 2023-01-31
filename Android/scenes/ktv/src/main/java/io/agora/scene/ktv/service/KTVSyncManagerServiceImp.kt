@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.Log
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -48,6 +47,7 @@ class KTVSyncManagerServiceImp(
     private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
         null
     private var onReconnectSubscriber: (() -> Unit)? = null
+    private var roomTimeUpSubscriber: (() -> Unit)? = null
 
     // cache objectId
     private val objIdOfRoomNo = HashMap<String, String>() // objectId of room no
@@ -64,6 +64,14 @@ class KTVSyncManagerServiceImp(
 
     @Volatile
     private var currRoomNo: String = ""
+
+    // time limit
+    private val ROOM_AVAILABLE_DURATION : Long = 20 * 60 * 1000 // 20min
+    private val timerRoomEndRun = Runnable {
+        runOnMainThread {
+            roomTimeUpSubscriber?.invoke()
+        }
+    }
 
     override fun reset() {
         if (syncUtilsInited) {
@@ -216,6 +224,9 @@ class KTVSyncManagerServiceImp(
                                     runOnMainThread {
                                         completion.invoke(null, kTVJoinRoomOutputModel)
                                     }
+
+                                    // 定时删除房间
+                                    mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
                                 }
 
                             }
@@ -351,6 +362,10 @@ class KTVSyncManagerServiceImp(
 
     override fun subscribeUserListCount(changedBlock: (count: Int) -> Unit) {
         roomUserCountSubscriber = changedBlock
+    }
+
+    override fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit) {
+        roomTimeUpSubscriber = onRoomTimeUp
     }
 
     // =================== 麦位相关 ===============================
@@ -708,6 +723,22 @@ class KTVSyncManagerServiceImp(
 
     override fun subscribeChooseSong(changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit) {
         chooseSongSubscriber = changedBlock
+    }
+
+    override fun subscribeReConnectEvent(onReconnect: () -> Unit) {
+        onReconnectSubscriber = onReconnect
+    }
+
+    override fun getAllUserList(success: (userNum: Int) -> Unit, error: ((Exception) -> Unit)?) {
+        innerGetUserInfo { err, list ->
+            if (err != null) {
+                error?.invoke(err)
+                return@innerGetUserInfo
+            }
+            if (list != null) {
+                success.invoke(list.size)
+            }
+        }
     }
 
     // ===================== 内部实现 =====================
@@ -1311,21 +1342,5 @@ class KTVSyncManagerServiceImp(
         }
         roomSubscribeListener.add(listener)
         Instance().subscribeScene(mSceneReference, listener)
-    }
-
-    override fun subscribeReConnectEvent(onReconnect: () -> Unit) {
-        onReconnectSubscriber = onReconnect
-    }
-
-    override fun getAllUserList(success: (userNum: Int) -> Unit, error: ((Exception) -> Unit)?) {
-        innerGetUserInfo { err, list ->
-            if (err != null) {
-                error?.invoke(err)
-                return@innerGetUserInfo
-            }
-            if (list != null) {
-                success.invoke(list.size)
-            }
-        }
     }
 }
