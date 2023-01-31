@@ -15,7 +15,7 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var selectedResolution = 1
+//    private var selectedResolution = 1
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
@@ -150,14 +150,14 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickQualityBtnAction() {
         createView.hideBottomViews = true
         let vc = ShowSelectQualityVC()
-        vc.defalutSelectIndex = selectedResolution
+//        vc.defalutSelectIndex = selectedResolution
         present(vc, animated: true)
         vc.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
-            wSelf.selectedResolution = index
+//            wSelf.selectedResolution = index
             wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
         }
     }
@@ -180,7 +180,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             guard let wSelf = self else { return }
 //            let liveVC = ShowLiveViewController()
             wSelf.liveVC.room = detailModel
-            wSelf.liveVC.selectedResolution = wSelf.selectedResolution
+//            wSelf.liveVC.selectedResolution = wSelf.selectedResolution
 //            liveVC.agoraKitManager = wSelf.agoraKitManager
             
             wSelf.navigationController?.pushViewController(wSelf.liveVC, animated: false)
