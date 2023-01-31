@@ -2025,7 +2025,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
         }
         let channelName = roomId
         let idx = (Int(channelName) ?? 1) - kRobotRoomStartId - 1
-        guard idx > 0, idx < robotStreamURL.count else {
+        guard idx >= 0, idx < robotStreamURL.count else {
             agoraAssert("startCloudPlayer fail")
             return
         }
