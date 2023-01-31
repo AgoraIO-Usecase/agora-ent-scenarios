@@ -54,7 +54,7 @@ class ShowLivePagesViewController: ViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         self.view.addSubview(collectionView)
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
-        collectionView.scrollToItem(at: IndexPath(row: fakeCellIndex(with: focusIndex), section: 0), at: .centeredVertically, animated: false)
+        scroll(to: fakeCellIndex(with: focusIndex))
     }
 }
 
@@ -98,6 +98,10 @@ extension ShowLivePagesViewController {
         let fakeIndex = realIndex + offset
         
         return fakeIndex
+    }
+    
+    private func scroll(to index: Int) {
+        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
     }
 }
 
@@ -165,7 +169,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
-        showLogger.info("collectionView willDisplay: \(idx)/\(indexPath.row)")
+        showLogger.info("collectionView willDisplay: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
         guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
@@ -175,7 +179,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
-        showLogger.info("collectionView didEndDisplaying: \(idx)/\(indexPath.row)")
+        showLogger.info("collectionView didEndDisplaying: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
         guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
@@ -188,8 +192,8 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
         let realIndex = realCellIndex(with: currentIndex)
         let toIndex = fakeCellIndex(with: realIndex)
-        showLogger.info("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+        showLogger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
         
-        collectionView.scrollToItem(at: IndexPath(row: toIndex, section: 0), at: .centeredVertically, animated: false)
+        scroll(to: toIndex)
     }
 }
