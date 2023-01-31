@@ -59,14 +59,14 @@ class ShowLivePagesViewController: ViewController {
 }
 
 
-private let kPageCacheCount = 100
+private let kPageCacheHalfCount = 5
 //MARK: private
 extension ShowLivePagesViewController {
     fileprivate func fakeCellCount() -> Int {
         guard let count = roomList?.count else {
             return 0
         }
-        return count > 1 ? count + kPageCacheCount : count
+        return count > 1 ? count + kPageCacheHalfCount * 2 : count
     }
     
     fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
@@ -78,7 +78,7 @@ extension ShowLivePagesViewController {
             showLogger.error("realCellIndex roomList?.count == nil", context: kShowLogBaseContext)
             return 0
         }
-        let offset = kPageCacheCount / 2
+        let offset = kPageCacheHalfCount
         var realIndex = fakeIndex + realCount * max(1 + offset / realCount, 2) - offset
         realIndex = realIndex % realCount
         
@@ -94,7 +94,7 @@ extension ShowLivePagesViewController {
             showLogger.error("fakeCellIndex roomList?.count == nil", context: kShowLogBaseContext)
             return 0
         }
-        let offset = kPageCacheCount / 2
+        let offset = kPageCacheHalfCount
         let fakeIndex = realIndex + offset
         
         return fakeIndex
@@ -181,5 +181,15 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         vc.loadingType = .preload
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let currentIndex = Int(scrollView.contentOffset.y / scrollView.height)
+        if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
+        let realIndex = realCellIndex(with: currentIndex)
+        let toIndex = fakeCellIndex(with: realIndex)
+        showLogger.info("scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+        
+        collectionView.scrollToItem(at: IndexPath(row: toIndex, section: 0), at: .centeredVertically, animated: false)
     }
 }
