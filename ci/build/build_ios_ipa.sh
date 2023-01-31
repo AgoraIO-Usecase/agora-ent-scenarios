@@ -20,7 +20,7 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
-cp $KEYCENTER_PATH.bak $KEYCENTER_PATH
+INFO_PLIST_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/Info.plist"
 
 # 打包环境
 CONFIGURATION=Development
@@ -41,6 +41,12 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CODE_SIGN_STYLE 'Manual'" $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:DEVELOPMENT_TEAM 'GM72UGLGZW'" $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'App'" $PBXPROJ_PATH
+
+#修改build number
+# Debug
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F228FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
+# Release
+/usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
