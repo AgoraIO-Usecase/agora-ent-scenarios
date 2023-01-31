@@ -415,7 +415,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
          } else if settingType == .AIAEC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
-             cell.isAudience = isAudience
+//             cell.isAudience = isAudience
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
              cell.useRobotBlock = { [weak self] flag in
@@ -436,7 +436,7 @@ extension VMEQSettingView: UITableViewDelegate, UITableViewDataSource {
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
-             cell.isAudience = isAudience
+//             cell.isAudience = isAudience
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AGC ?? false
              cell.useRobotBlock = { [weak self] flag in
