@@ -11,12 +11,12 @@
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UIButton *SkipBtn;
 @property (nonatomic, strong) UIButton *CanCelBtn;
-@property (nonatomic, copy) OnCallback completion;
+@property (nonatomic, copy) OnSkipCallback completion;
 @end
 
 @implementation KTVSkipView
 
--(instancetype)initWithFrame:(CGRect)frame completion:(OnCallback _Nullable)completion {
+-(instancetype)initWithFrame:(CGRect)frame completion:(OnSkipCallback _Nullable)completion {
     if(self = [super initWithFrame:frame]){
         self.completion = completion;
         self.bgView = [[UIView alloc]init];

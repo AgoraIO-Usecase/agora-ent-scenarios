@@ -545,7 +545,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
+            [weakSelf.MVView showSkipView:true];
         } else if(state == KTVLoadSongStateNoLyricUrl) {
+            [weakSelf.MVView showSkipView:true];
             //如果歌词加载失败进行三次重试
             if(weakSelf.retryCount < 2) {
                 KTVLogInfo(@"songName: %@, songNo: %@, retryCount: %lu",model.songName, model.songNo,(unsigned long)weakSelf.retryCount);
