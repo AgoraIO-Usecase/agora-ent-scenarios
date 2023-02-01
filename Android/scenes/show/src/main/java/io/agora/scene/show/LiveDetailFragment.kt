@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
@@ -21,10 +22,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -73,6 +76,8 @@ class LiveDetailFragment : Fragment() {
             )
         )
     }
+    private var localVideoStats: IRtcEngineEventHandler.LocalVideoStats? = null
+    private var remoteVideoStats: IRtcEngineEventHandler.RemoteVideoStats? = null
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
@@ -435,12 +440,9 @@ class LiveDetailFragment : Fragment() {
         if (!visible) {
             return
         }
-        val index = VideoSetting.getCurrBroadcastSetting().video.encodeResolution.toIndex()
-        val resolutionStr = VideoSetting.ResolutionList.get(index).let {
-            "${it.width}x${it.height}"
-        }
-        topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, resolutionStr)
         if (isRoomOwner) {
+            val resolutionStr = "${localVideoStats?.captureFrameWidth}x${localVideoStats?.captureFrameHeight}"
+            topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, resolutionStr)
             if (isAudioOnlyMode) {
                 delay?.let {
                     topBinding.tvStatisticBitrate.text =
@@ -632,7 +634,7 @@ class LiveDetailFragment : Fragment() {
                         }
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
-                    SettingDialog.ITEM_ID_SETTING -> showAdvanceSettingDialog()
+                    SettingDialog.ITEM_ID_SETTING -> if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
                 }
             }
             show()
@@ -1196,6 +1198,7 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onLocalVideoStats = { stats ->
+                localVideoStats = stats
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
@@ -1217,6 +1220,8 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteVideoStats = { stats ->
+                remoteVideoStats = stats
+                setEnhance(stats)
                 if (stats.uid == mRoomInfo.ownerId.toInt()) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
@@ -1289,7 +1294,75 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-
+    // 观众配置
+    private fun setEnhance(stats: IRtcEngineEventHandler.RemoteVideoStats) {
+        // 只处理房主推送过来的视频流信息
+        if (mRoomInfo.ownerId != stats.uid.toString()) {
+            return
+        }
+        var superResolution: VideoSetting.SuperResolution = VideoSetting.SuperResolution.SR_NONE
+        when (VideoSetting.getCurrBroadcastSetting()) {
+            VideoSetting.RecommendBroadcastSetting.LowDevice1v1, VideoSetting.RecommendBroadcastSetting.MediumDevice1v1, VideoSetting.RecommendBroadcastSetting.HighDevice1v1 -> when (VideoSetting.currAudiencePlaySetting) {
+                // 画质增强、高端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
+                    // 1080P
+                    if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
+                        superResolution = VideoSetting.SuperResolution.SR_NONE
+                    }
+                    // 720P
+                    else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
+                        superResolution = VideoSetting.SuperResolution.SR_1_5
+                    }
+                    // 540P、480P
+                    else if ((stats.width == VideoSetting.Resolution.V_540P.width && stats.height == VideoSetting.Resolution.V_540P.height) || (stats.width == VideoSetting.Resolution.V_480P.width && stats.height == VideoSetting.Resolution.V_480P.height)) {
+                        superResolution = VideoSetting.SuperResolution.SR_1_33
+                    }
+                    // 360P以及以下
+                    else {
+                        superResolution = VideoSetting.SuperResolution.SR_2
+                    }
+                }
+                // 画质增强、中端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
+                    // 1080P
+                    if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
+                        superResolution = VideoSetting.SuperResolution.SR_NONE
+                    }
+                    // 720P
+                    else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
+                        superResolution = VideoSetting.SuperResolution.SR_1
+                    }
+                    // 360P以及以下
+                    else {
+                        superResolution = VideoSetting.SuperResolution.SR_1_33
+                    }
+                }
+                // 画质增强、低端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_LOW -> {
+                    superResolution = VideoSetting.SuperResolution.SR_NONE
+                }
+            }
+            VideoSetting.RecommendBroadcastSetting.LowDevicePK, VideoSetting.RecommendBroadcastSetting.MediumDevicePK, VideoSetting.RecommendBroadcastSetting.HighDevicePK -> when (VideoSetting.currAudiencePlaySetting) {
+                // 画质增强、高端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
+                    superResolution = VideoSetting.SuperResolution.SR_1_33
+                }
+                // 画质增强、中端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
+                    superResolution = VideoSetting.SuperResolution.SR_1_33
+                }
+                // 画质增强、低端机
+                VideoSetting.AudiencePlaySetting.ENHANCE_LOW -> {
+                    superResolution = VideoSetting.SuperResolution.SR_NONE
+                }
+            }
+        }
+        // 不要重复设置
+        if (superResolution == VideoSetting.getCurrAudienceSetting().video.SR) {
+            return
+        }
+        VideoSetting.updateAudioSetting(SR = superResolution)
+    }
 
     private fun destroyRtcEngine(): Boolean {
         return mRtcVideoSwitcher.leaveChannel(mMainRtcConnection)
