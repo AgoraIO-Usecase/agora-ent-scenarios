@@ -178,12 +178,10 @@ class ShowSyncManagerServiceImpl(
 
             runOnMainThread {
                 val startChannelId = (retRoomList.maxOfOrNull { it.ownerId.toInt() } ?: 0) + 1 + 2023000
-                val startUid = (retRoomList.maxOfOrNull { it.ownerId.toInt() }?: 0) + 1
                 val fakeStreamUrls = arrayListOf(
-                    "https://download.agora.io/sdk/release/agora_test_video_4.mp4",
-                    "https://download.agora.io/sdk/release/agora_test_video_3.mp4",
-                    "https://download.agora.io/sdk/release/agora_test_video_2.MP4",
-                    "https://download.agora.io/sdk/release/agora_test_video_1.mp4"
+                    "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
+                    "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
+                    "https://download.agora.io/sdk/release/agora_test_video_12.mp4",
                 )
                 for (i in 0 until createFakeCount) {
                     val channelId = startChannelId + i
@@ -203,7 +201,7 @@ class ShowSyncManagerServiceImpl(
                                 1,
                                 (channelId % 4).toString(),
                                 uid.toString(),
-                                "",
+                                "https://download.agora.io/demo/release/bot1.png",
                                 "User $channelId",
                                 success = {
                                     Sync.Instance().joinScene(
