@@ -38,6 +38,8 @@ import KakaJSON
     public var member_list: [VRUser]? = [VRUser]() // 用户榜
     public var rtc_uid: Int? = 0
     public var use_robot: Bool? = false
+    public var turn_AIAEC: Bool? = false
+    public var turn_AGC: Bool? = false
     public var robot_volume: UInt?
     public var sound_effect: Int = 1
 
