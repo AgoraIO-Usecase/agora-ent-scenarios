@@ -1,15 +1,24 @@
 package io.agora.scene.ktv.widget;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -17,6 +26,16 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.util.List;
@@ -35,6 +54,7 @@ import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
 import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.widget.basic.OutlineSpan;
 
 /**
  * 歌词控制View
@@ -51,6 +71,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     public double getCumulativeScore() {
         return mCumulativeScore;
     }
+
+    protected ComboControl mComboControl;
 
     public LyricsView getLrcView() {
         if (mBinding != null && mBinding.ilActive != null) {
@@ -282,19 +304,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilActive.ivMusicStart.setImageResource(R.mipmap.ktv_ic_pause);
     }
 
+    private boolean mNeedToShowComboView;
+
     public void setScoreControlView(RoomSelSongModel songPlaying) {
         if (songPlaying != null && songPlaying.isChorus()) {
-            if (UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo())) {
-                mBinding.scoreControlView.setVisibility(VISIBLE);
-                mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
-            } else {
-                mBinding.scoreControlView.setVisibility(GONE);
-            }
+            mNeedToShowComboView = UserManager.getInstance().getUser().id.toString().equals(songPlaying.getUserNo());
         } else if (songPlaying != null && !songPlaying.isChorus()) {
-            mBinding.scoreControlView.setVisibility(VISIBLE);
-            mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, 0.00));
+            mNeedToShowComboView = true;
         } else {
-            mBinding.scoreControlView.setVisibility(GONE);
+            mNeedToShowComboView = false;
         }
     }
 
@@ -343,6 +361,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     public void setMusic(@NonNull RoomSelSongModel mMusic) {
         mKaraokeView.reset();
+        if (mComboControl != null) {
+            mComboControl.reset(mBinding);
+        }
 
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
@@ -377,9 +398,164 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void updateScore(double score, double cumulativeScore) {
-        mBinding.scoreControlView.setText(getContext().getString(R.string.ktv_score_formatter, score));
         mCumulativeScore = cumulativeScore;
+
+        if (!mNeedToShowComboView) {
+            return;
+        }
+
+        if (mComboControl == null) {
+            mComboControl = new ComboControl();
+        }
+        mComboControl.checkAndShowCombos(mBinding, score, cumulativeScore);
     }
+
+    private static class ComboControl {
+        private GifDrawable mComboIconDrawable;
+
+        private int mNumberOfCombos;
+
+        private void reset(KtvLayoutLrcControlViewBinding binding) {
+            mNumberOfCombos = 0;
+            binding.comboView.getRoot().setVisibility(INVISIBLE);
+        }
+
+        private void checkAndShowCombos(KtvLayoutLrcControlViewBinding binding, double score, double cumulativeScore) {
+            binding.comboView.getRoot().setVisibility(VISIBLE);
+
+            showComboAnimation(binding.comboView.getRoot(), score);
+            showScoreAnimation((View) binding.comboView.getRoot().getParent(), score);
+        }
+
+        private void showComboAnimation(View comboView, double score) {
+            int comboIconRes = 0;
+
+            if (score >= 90) {
+                comboIconRes = R.drawable.combo_excellent_3x;
+            } else if (score >= 75) {
+                comboIconRes = R.drawable.combo_good_3x;
+            } else if (score >= 60) {
+                comboIconRes = R.drawable.combo_fair_3x;
+            }
+
+            ImageView comboIcon = comboView.findViewById(R.id.combo_icon);
+            TextView comboText = comboView.findViewById(R.id.combo_text);
+
+            if (comboIconRes > 0) {
+                mNumberOfCombos++;
+                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.RESOURCE);
+                OutlineSpan outlineSpan = new OutlineSpan(Color.parseColor("#368CFF"), 10F
+                );
+                Glide.with(comboView.getContext()).asGif().load(comboIconRes).apply(options).addListener(new RequestListener<GifDrawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
+                        mComboIconDrawable = resource;
+
+                        resource.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
+                            @Override
+                            public void onAnimationStart(Drawable drawable) {
+                                super.onAnimationStart(drawable);
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Drawable drawable) {
+                                super.onAnimationEnd(drawable);
+
+                                comboText.setAlpha(0f);
+                                comboIcon.setVisibility(INVISIBLE);
+                                comboText.setVisibility(INVISIBLE);
+
+                                mComboIconDrawable.unregisterAnimationCallback(this);
+                            }
+                        });
+
+                        resource.setLoopCount(1);
+
+                        comboText.setAlpha(0f);
+                        comboIcon.setVisibility(VISIBLE);
+                        comboText.setVisibility(VISIBLE);
+
+                        String text = "x" + mNumberOfCombos;
+                        SpannableString spannable = new SpannableString(text);
+                        spannable.setSpan(outlineSpan, 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        comboText.setText(spannable);
+                        comboText.animate().alpha(1f).setDuration(500).setStartDelay(0).start();
+
+                        return false;
+                    }
+                }).into(comboIcon);
+            } else {
+                mNumberOfCombos = 0;
+                comboIcon.setVisibility(INVISIBLE);
+                comboText.setVisibility(INVISIBLE);
+            }
+        }
+
+        private void showScoreAnimation(View lyricsControlView, double score) {
+            if (score == 0) {
+                return;
+            }
+            TextView lineScore = lyricsControlView.findViewById(R.id.line_score);
+            int widthOfParent = ((View) (lineScore.getParent())).getWidth();
+            int marginLeft = (int) (widthOfParent * 0.4);
+            ((MarginLayoutParams) (lineScore.getLayoutParams())).leftMargin = marginLeft;
+            ((MarginLayoutParams) (lineScore.getLayoutParams())).setMarginStart(marginLeft);
+
+            lineScore.setText("+" + (int) score);
+            lineScore.setAlpha(1.0f);
+            lineScore.setVisibility(VISIBLE);
+            float yOfScore = lineScore.getY();
+
+            float movingPixels = 200;
+            lineScore.animate().translationY(-movingPixels).setDuration(1000).setListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    lineScore.animate().alpha(0).setDuration(100).setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            lineScore.setY(yOfScore);
+                            lineScore.setVisibility(INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    }).start();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            }).start();
+
+        }
+
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -404,7 +580,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mOnKaraokeActionListener.onSkipPostludeClick();
         } else if (v == mBinding.ilActive.ivSkipPreludeCancel) {
             mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
-        }  else if (v == mBinding.ilActive.ivSkipPostludeCancel) {
+        } else if (v == mBinding.ilActive.ivSkipPostludeCancel) {
             mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
         }
     }
@@ -429,6 +605,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public int retryTime = 0;
+
     public void downloadLrcData(String url) {
         retryTime++;
         DownloadManager.getInstance().download(getContext(), url, file -> {
