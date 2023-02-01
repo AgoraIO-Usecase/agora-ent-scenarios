@@ -18,6 +18,9 @@ class ShowLiveViewController: UIViewController {
     
     var audiencePresetType: ShowPresetType?
     
+    private var remoteVideoWidth: UInt?
+    private var currentMode: ShowMode?
+    
     private var interruptInteractionReason: String?
     
     //TODO: remove
@@ -688,7 +691,15 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height)")
         if let audiencePresetType = audiencePresetType {
             let mode: ShowMode = interactionStatus == .idle ? .single : .pk
-            agoraKitManager.setSuperResolutionForAudienceType(presetType: audiencePresetType, videoWidth: Int(stats.width), mode: mode)
+            // 防止多次调用
+            if mode != currentMode || stats.width != remoteVideoWidth {
+                agoraKitManager.setSuperResolutionForAudienceType(presetType: audiencePresetType, videoWidth: Int(stats.width), mode: mode)
+                currentMode = mode
+                remoteVideoWidth = stats.width
+                if stats.width >= 1080 && ShowSettingKey.SR.boolValue == true {
+                    ToastView.show(text: "show_presetting_alert_will_change_sr_value_message".show_localized)
+                }
+            }
         }
     }
     

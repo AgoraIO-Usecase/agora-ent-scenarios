@@ -97,6 +97,9 @@ class ShowRoomListVC: UIViewController {
         vc.didSelectedPresetType = { type, modeName in
             selected?(type)
         }
+//        let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+//        let audencePresetType = ShowPresetType(rawValue: value)
+//        vc.selectedType = audencePresetType
         present(vc, animated: true)
     }
     

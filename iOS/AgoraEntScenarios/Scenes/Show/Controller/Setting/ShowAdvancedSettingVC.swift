@@ -164,8 +164,9 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         if audiencePresetType == .quality_low || audiencePresetType == .base_high || audiencePresetType == .base_medium || audiencePresetType == .base_low {
             // sr开关即将打开 则不运行打开
             if key == .SR , let srValue = value as? Bool, srValue == true {
-                let msg = "show_presetting_alert_will_change_sr_value_message".show_localized
-                showAlert(title: "show_presetting_alert_will_change_value_title".show_localized, message: msg, confirmTitle: "OK", cancelTitle: nil)
+//                let msg = "show_presetting_alert_will_change_sr_value_message".show_localized
+//                showAlert(title: "show_presetting_alert_will_change_value_title".show_localized, message: msg, confirmTitle: "OK", cancelTitle: nil)
+                ToastView.show(text: "show_presetting_alert_will_change_sr_value_message".show_localized)
                 return false
             }
         }
