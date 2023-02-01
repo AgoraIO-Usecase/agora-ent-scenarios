@@ -8,6 +8,7 @@ import android.os.CountDownTimer
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
@@ -76,8 +77,6 @@ class LiveDetailFragment : Fragment() {
             )
         )
     }
-    private var localVideoStats: IRtcEngineEventHandler.LocalVideoStats? = null
-    private var remoteVideoStats: IRtcEngineEventHandler.RemoteVideoStats? = null
     private val mService by lazy { ShowServiceProtocol.getImplInstance() }
     private val isRoomOwner by lazy { mRoomInfo.ownerId == UserManager.getInstance().user.id.toString() }
 
@@ -208,7 +207,7 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private fun initLivingEndLayout(){
+    private fun initLivingEndLayout() {
         val livingEndLayout = mBinding.livingEndLayout
         livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
@@ -432,7 +431,8 @@ class LiveDetailFragment : Fragment() {
         bitrate: Int? = null, fps: Int? = null, delay: Int? = null,
         lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null,
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
-        cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null
+        cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,
+        videoSize: Size? = null
     ) {
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
@@ -440,9 +440,8 @@ class LiveDetailFragment : Fragment() {
         if (!visible) {
             return
         }
+        videoSize?.let { topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, "${it.width}x${it.height}") }
         if (isRoomOwner) {
-            val resolutionStr = "${localVideoStats?.captureFrameWidth}x${localVideoStats?.captureFrameHeight}"
-            topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, resolutionStr)
             if (isAudioOnlyMode) {
                 delay?.let {
                     topBinding.tvStatisticBitrate.text =
@@ -1198,7 +1197,7 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onLocalVideoStats = { stats ->
-                localVideoStats = stats
+                refreshStatisticInfo(videoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight))
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
@@ -1220,7 +1219,7 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteVideoStats = { stats ->
-                remoteVideoStats = stats
+                refreshStatisticInfo(videoSize = Size(stats.width, stats.height))
                 setEnhance(stats)
                 if (stats.uid == mRoomInfo.ownerId.toInt()) {
                     activity?.runOnUiThread {
