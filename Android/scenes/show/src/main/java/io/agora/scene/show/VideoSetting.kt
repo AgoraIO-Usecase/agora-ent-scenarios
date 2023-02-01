@@ -4,7 +4,7 @@ import io.agora.rtc2.video.*
 
 object VideoSetting {
 
-    enum class SuperResolution(val value:Int){
+    enum class SuperResolution(val value: Int) {
         //1倍：     n=6
         //1.33倍:  n=7
         //1.5倍：  n=8
@@ -20,17 +20,17 @@ object VideoSetting {
 
     enum class Resolution(val width: Int, val height: Int) {
         V_1080P(1920, 1080),
-        V_720P(1080, 720),
-        V_540P(960, 540),
+        V_720P(1280, 720),
+        V_540P(480, 540),
         V_480P(854, 480),
         V_360P(640, 360),
-        V_270P(480, 270)
+        V_240P(360, 240)
     }
 
     fun Resolution.toIndex() = ResolutionList.indexOf(this)
 
     val ResolutionList = listOf(
-        Resolution.V_270P,
+        Resolution.V_240P,
         Resolution.V_360P,
         Resolution.V_480P,
         Resolution.V_540P,
@@ -64,6 +64,31 @@ object VideoSetting {
         Low(0),
         Medium(1),
         High(2)
+    }
+
+    // 观众端 ---- 看播设置
+    class AudiencePlaySetting {
+
+        companion object {
+            // 画质增强、低端机
+            val ENHANCE_LOW = 0
+
+            // 画质增强、中端机
+            val ENHANCE_MEDIUM = 1
+
+            // 画质增强、高端机
+            val ENHANCE_HIGH = 2
+
+            // 基础模式、低端机
+            val BASE_LOW = 3
+
+            // 基础模式、中端机
+            val BASE_MEDIUM = 4
+
+            // 基础模式、高端机
+            val BASE_HIGH = 5
+        }
+
     }
 
     enum class LiveMode(val value: Int) {
@@ -123,7 +148,7 @@ object VideoSetting {
                 captureResolution = Resolution.V_1080P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 1500
+                bitRate = 1461
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -137,8 +162,8 @@ object VideoSetting {
                 PVC = false,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
-                frameRate = FrameRate.FPS_24,
-                bitRate = 1800
+                frameRate = FrameRate.FPS_15,
+                bitRate = 1461
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -168,37 +193,37 @@ object VideoSetting {
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_360P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 680
+                bitRate = 700
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val MediumDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = false,
+                H265 = true,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
                 captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_360P,
+                encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 680
+                bitRate = 800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
 
         val HighDevicePK = BroadcastSetting(
             BroadcastSetting.Video(
-                H265 = false,
+                H265 = true,
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
                 PVC = false,
                 captureResolution = Resolution.V_720P,
-                encodeResolution = Resolution.V_360P,
+                encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
-                bitRate = 680
+                bitRate = 800
             ),
             BroadcastSetting.Audio(false, 80, 30)
         )
@@ -207,13 +232,21 @@ object VideoSetting {
 
     private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
     private var currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
+
+    // 当前观众设备等级（高、中、低）
     private var currAudienceDeviceLevel = DeviceLevel.Low
+
+    // 观众看播设置
+    var currAudiencePlaySetting = AudiencePlaySetting.BASE_LOW
+
+    // 超分开关
+    var currAudienceEnhanceSwitch = true
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
 
     fun resetBroadcastSetting() {
-        currBroadcastSetting = when(currAudienceDeviceLevel){
+        currBroadcastSetting = when (currAudienceDeviceLevel) {
             DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
             DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
             DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
@@ -228,15 +261,8 @@ object VideoSetting {
         )
     }
 
-    fun updateAudioSetting(
-        isJoinedRoom: Boolean = false,
-        SR: SuperResolution? = null
-    ) {
-        currAudienceSetting = AudienceSetting(
-            AudienceSetting.Video(
-                SR ?: currAudienceSetting.video.SR
-            )
-        )
+    fun updateAudioSetting(isJoinedRoom: Boolean = false, SR: SuperResolution? = null) {
+        currAudienceSetting = AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR))
         updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
@@ -244,7 +270,7 @@ object VideoSetting {
         var liveMode = LiveMode.OneVOne
         if (isByAudience) {
             currAudienceDeviceLevel = deviceLevel
-        }else{
+        } else {
             liveMode = when (currBroadcastSetting) {
                 RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
                 RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
@@ -379,29 +405,28 @@ object VideoSetting {
 
 
     private fun updateRTCAudioSetting(
-        isJoinedRoom: Boolean,
-        SR: SuperResolution? = null
-    ) {
+        isJoinedRoom: Boolean, SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            if (!isJoinedRoom) {
-                // 超分，只能在加入频道前配置
-                val open = SR != SuperResolution.SR_NONE
-                // 超分开关
-                rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${open}, \"mode\": 2}}")
-                if(open){
-                    // 设置最大分辨率
-                    rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600")
-                    //超分倍数选项
-                    //1倍：     n=6
-                    //1.33倍:  n=7
-                    //1.5倍：  n=8
-                    //2倍：     n=3
-                    //锐化：    n=10(android是10，iOS是11)
-                    val n = SR.value
-                    rtcEngine.setParameters("{\"rtc.video.sr_type\":${n}")
-                }
+            if (isJoinedRoom) {
+                return
             }
+            // 超分开关
+            rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${currAudienceEnhanceSwitch}, \"mode\": 2}}")
+            if (!currAudienceEnhanceSwitch) {
+                return
+            }
+            // 设置最大分辨率
+            rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
+            /**
+             * 超分倍数选项
+             * 1倍：      n=6
+             * 1.33倍:   n=7
+             * 1.5倍：   n=8
+             * 2倍：     n=3
+             * 锐化：    n=10(android是10，iOS是11)
+             */
+            rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
         }
     }
 

@@ -57,7 +57,7 @@ class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context)
             ToastDialog(context).showTip(context.getString(tip))
         }
         binding.switchCompat.setOnCheckedChangeListener(null)
-        binding.switchCompat.isChecked = (defaultItemValues[itemId] ?: 0) > 0
+        binding.switchCompat.isChecked = VideoSetting.currAudienceEnhanceSwitch
         onSwitchChanged(itemId, binding.switchCompat.isChecked)
         binding.switchCompat.setOnCheckedChangeListener { btn, isChecked ->
             defaultItemValues[itemId] = if (isChecked) 1 else 0
@@ -68,7 +68,10 @@ class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context)
 
     private fun onSwitchChanged(itemId: Int, isChecked: Boolean) {
         when (itemId) {
-            ITEM_ID_SWITCH_QUALITY_ENHANCE -> VideoSetting.updateAudioSetting(SR = if(isChecked) VideoSetting.SuperResolution.SR_1_5 else VideoSetting.SuperResolution.SR_NONE)
+            ITEM_ID_SWITCH_QUALITY_ENHANCE -> {
+                VideoSetting.currAudienceEnhanceSwitch = isChecked
+                VideoSetting.updateAudioSetting(SR = VideoSetting.getCurrAudienceSetting().video.SR)
+            }
         }
     }
 
