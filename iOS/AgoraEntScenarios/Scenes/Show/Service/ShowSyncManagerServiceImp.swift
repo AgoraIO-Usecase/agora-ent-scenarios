@@ -1379,7 +1379,7 @@ extension ShowSyncManagerServiceImp {
         agoraPrint("imp pk invitation unsubscribe ...")
         SyncUtil
             .scene(id: channelName)?
-            .unsubscribeScene()
+            .unsubscribe(key: SYNC_MANAGER_PK_INVITATION_COLLECTION)
     }
     
     private func _subscribePKInvitationChanged() {
