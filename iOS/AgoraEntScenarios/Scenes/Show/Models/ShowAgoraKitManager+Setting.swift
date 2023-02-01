@@ -130,7 +130,6 @@ extension ShowAgoraKitManager {
             }
         case .base_low, .base_medium, .base_high:
             srType = .none
-            break
         }
         setSuperResolutionOn(ShowSettingKey.SR.boolValue, srType: srType)
     }
@@ -187,7 +186,7 @@ extension ShowAgoraKitManager {
         case .show_low:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1500, h265On: false, captureSize: ._1080P)
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P)
             case .pk:
                 _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
             }
