@@ -408,9 +408,6 @@ object VideoSetting {
         isJoinedRoom: Boolean, SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            if (isJoinedRoom) {
-                return
-            }
             // 超分开关
             rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${currAudienceEnhanceSwitch}, \"mode\": 2}}")
             if (!currAudienceEnhanceSwitch) {
