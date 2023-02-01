@@ -175,3 +175,5 @@ improve your singing effect. It is strongly recommended that you turn it on when
 "AGC_desc" = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing";
 "Personal audio Settings" = "Personal audio Settings";
 "Best Agora Sound" = "Agora Sound Selection";
+"Turn on AIAEC" = "Turn on AIAEC";
+"Turn on AGC" = "Turn on AGC";
