@@ -83,59 +83,47 @@ class PresetAudienceDialog(context: Context, showCloseBtn: Boolean = true) : Bot
     }
 
     private fun onPresetShowModeSelected(level: Int) {
-        val selectedLevel = level
-        if (selectedLevel < 0) {
+        if (level < 0) {
             // 没有选择默认使用低端机配置
             return
         }
-        when (selectedLevel) {
+        VideoSetting.currAudiencePlaySetting = level
+        when (VideoSetting.currAudiencePlaySetting) {
             // 低端机：画质增强
-            0 -> {
+            VideoSetting.AudiencePlaySetting.ENHANCE_LOW -> {
+                VideoSetting.currAudienceEnhanceSwitch = false
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.Low,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low, isByAudience = true)
             }
             // 中端机：画质增强
-            1 -> {
+            VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
+                VideoSetting.currAudienceEnhanceSwitch = true
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.Medium,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium, isByAudience = true)
             }
             // 高端机：画质增强
-            2 -> {
+            VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
+                VideoSetting.currAudienceEnhanceSwitch = true
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_1_5)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.High,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High, isByAudience = true)
             }
             // 低端机：基础
-            3 -> {
+            VideoSetting.AudiencePlaySetting.BASE_LOW -> {
+                VideoSetting.currAudienceEnhanceSwitch = false
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.Low,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low, isByAudience = true)
             }
             // 中端机：基础
-            4 -> {
+            VideoSetting.AudiencePlaySetting.BASE_MEDIUM -> {
+                VideoSetting.currAudienceEnhanceSwitch = false
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.Medium,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium, isByAudience = true)
             }
             // 高端机：基础
-            5 -> {
+            VideoSetting.AudiencePlaySetting.BASE_HIGH -> {
+                VideoSetting.currAudienceEnhanceSwitch = false
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
-                VideoSetting.updateBroadcastSetting(
-                    deviceLevel = VideoSetting.DeviceLevel.High,
-                    isByAudience = true
-                )
+                VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High, isByAudience = true)
             }
         }
 
