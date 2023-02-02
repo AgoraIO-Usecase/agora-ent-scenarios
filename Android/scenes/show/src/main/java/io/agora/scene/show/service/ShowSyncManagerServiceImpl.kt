@@ -27,6 +27,16 @@ class ShowSyncManagerServiceImpl(
     private val kCollectionIdPKInvitation = "show_pk_invitation_collection"
     private val kCollectionIdInteractionInfo = "show_interaction_collection"
 
+    private val kRobotIds = mutableListOf(1, 2, 3)
+    private val kRobotAvatars = listOf("https://download.agora.io/demo/release/bot1.png")
+    private val kRobotRoomStartId = 2023000
+    private val kRobotUid = 2000000001
+    private val kRobotVideoStreamUrls = arrayListOf(
+        "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
+        "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
+        "https://download.agora.io/sdk/release/agora_test_video_12.mp4"
+    )
+
     @Volatile
     private var syncInitialized = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -124,7 +134,6 @@ class ShowSyncManagerServiceImpl(
         error: ((Exception) -> Unit)?
     ) {
         val returnFakeData = true
-        val fakeDataSize = 2
 
         initSync {
             Sync.Instance().getScenes(object : Sync.DataListCallback {
@@ -140,7 +149,7 @@ class ShowSyncManagerServiceImpl(
                         roomList.forEach { roomMap[it.roomId] = it.copy() }
 
                         if (returnFakeData) {
-                            roomList = appendFakeRooms(roomList, fakeDataSize)
+                            roomList = appendRobotRooms(roomList)
                         }
 
                         val sortedBy = roomList.sortedBy { it.createdAt }
@@ -151,7 +160,8 @@ class ShowSyncManagerServiceImpl(
                 override fun onFail(exception: SyncManagerException?) {
                     if (exception?.message?.contains("empty") ?: false && returnFakeData) {
                         workerExecutor.execute {
-                            val roomList = appendFakeRooms(emptyList(), fakeDataSize)
+                            val roomList = appendRobotRooms(emptyList())
+
                             val sortedBy = roomList.sortedBy { it.createdAt }
                             runOnMainThread { success.invoke(sortedBy) }
                         }
@@ -163,99 +173,40 @@ class ShowSyncManagerServiceImpl(
         }
     }
 
-    private fun appendFakeRooms(
-        roomList: List<ShowRoomDetailModel>,
-        fakeDataSize: Int
+    private fun appendRobotRooms(
+        roomList: List<ShowRoomDetailModel>
     ): List<ShowRoomDetailModel> {
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
-        // check if has fake data
-        val fakeList = retRoomList.filter { it.isFake() }
-        if (fakeList.size < fakeDataSize) {
-            val createFakeCount = fakeDataSize - fakeList.size
 
-            val letchCount = CountDownLatch(createFakeCount)
-
-            runOnMainThread {
-                val startChannelId = (retRoomList.maxOfOrNull { it.ownerId.toInt() } ?: 0) + 1 + 2023000
-                val fakeStreamUrls = arrayListOf(
-                    "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-                    "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-                    "https://download.agora.io/sdk/release/agora_test_video_12.mp4",
-                )
-                for (i in 0 until createFakeCount) {
-                    val channelId = startChannelId + i
-                    val uid = 2000000001
-                    val streamUrl = fakeStreamUrls[i % fakeStreamUrls.size]
-                    val streamRegion = "cn"
-                    cloudPlayerService.startCloudPlayer(
-                        channelId.toString(),
-                        UserManager.getInstance().user.userNo,
-                        uid,
-                        streamUrl,
-                        streamRegion,
-                        success = {
-                            createRoomInner(
-                                channelId.toString(),
-                                "Smooth $channelId",
-                                1,
-                                (channelId % 4).toString(),
-                                uid.toString(),
-                                "https://download.agora.io/demo/release/bot1.png",
-                                "User $channelId",
-                                success = {
-                                    Sync.Instance().joinScene(
-                                        it.roomId,
-                                        object : JoinSceneCallback {
-                                            override fun onSuccess(
-                                                sceneReference: SceneReference?
-                                            ) {
-                                                sceneReference ?: return
-                                                sceneReference.collection(
-                                                    kCollectionIdUser
-                                                ).add(
-                                                    ShowUser(
-                                                        uid.toString(),
-                                                        "",
-                                                        ""
-                                                    ),
-                                                    object :
-                                                        Sync.DataItemCallback {
-                                                        override fun onSuccess(
-                                                            result: IObject?
-                                                        ) {
-
-                                                        }
-
-                                                        override fun onFail(
-                                                            exception: SyncManagerException?
-                                                        ) {
-
-                                                        }
-                                                    })
-                                            }
-
-                                            override fun onFail(exception: SyncManagerException?) {
-
-                                            }
-
-                                        })
-                                    retRoomList.add(it)
-                                    letchCount.countDown()
-                                },
-                                error = { letchCount.countDown() }
-                            )
-                        },
-                        failure = { letchCount.countDown() })
+        val robotIds = ArrayList<Int>(kRobotIds)
+        retRoomList.forEach {
+            val robotId = it.roomId.toInt() - kRobotRoomStartId
+            if(robotId > 0){
+                robotIds.firstOrNull { id -> id == robotId }?.let { id ->
+                    robotIds.remove(id)
                 }
             }
-
-            try {
-                letchCount.await()
-            } catch (e: Exception) {
-                ShowLogger.e(TAG, e)
-            }
         }
+
+        robotIds.forEach { robotId ->
+            val roomInfo = ShowRoomDetailModel(
+                (robotId + kRobotRoomStartId).toString(), // roomId
+                "Smooth $robotId", // roomName
+                1,
+                "1",
+                kRobotUid.toString(),
+                kRobotAvatars[(robotId - 1) % kRobotAvatars.size],
+                "Robot $robotId",
+                ShowRoomStatus.activity.value,
+                ShowInteractionStatus.idle.value,
+                TimeUtils.currentTimeMillis().toDouble(),
+                TimeUtils.currentTimeMillis().toDouble()
+            )
+            roomMap[roomInfo.roomId] = roomInfo
+            retRoomList.add(roomInfo)
+        }
+
         return retRoomList
     }
 
@@ -418,8 +369,55 @@ class ShowSyncManagerServiceImpl(
                     }
 
                     override fun onFail(exception: SyncManagerException?) {
-                        error?.invoke(exception!!) ?: errorHandler.invoke(exception!!)
-                        currRoomNo = ""
+                        exception?: return
+                        if(exception.code == -2000 && roomInfo.isFake()){
+                            // 房间不存在，并且是假数据：创建cloudPlayer并创建房间
+                            cloudPlayerService.startCloudPlayer(
+                                roomNo,
+                                UserManager.getInstance().user.userNo,
+                                roomInfo.ownerId.toInt(),
+                                kRobotVideoStreamUrls[roomInfo.roomId.toInt() % kRobotVideoStreamUrls.size],
+                                "cn",
+                                success = {
+                                    createRoomInner(
+                                        roomNo,
+                                        roomInfo.roomName,
+                                        roomInfo.roomUserCount,
+                                        roomInfo.thumbnailId,
+                                        roomInfo.ownerId,
+                                        roomInfo.ownerAvatar,
+                                        roomInfo.ownerName,
+                                        success = {
+                                            runOnMainThread {
+                                                currRoomNo = ""
+                                                joinRoom(roomNo, { joinRet ->
+                                                    innerAddUser(roomNo,
+                                                        ShowUser(
+                                                            roomInfo.ownerId,
+                                                            roomInfo.ownerAvatar,
+                                                            roomInfo.ownerName
+                                                        ),
+                                                        {
+                                                            objIdOfUserId[roomInfo.ownerId] = it
+                                                            innerUpdateRoomUserCount(
+                                                                roomNo,
+                                                                userList.size + 1,
+                                                                {},
+                                                                {})
+                                                        },
+                                                        {})
+                                                    success.invoke(joinRet)
+                                                }, error)
+                                            }
+                                        },
+                                        error
+                                    )
+                                },
+                                failure = { error?.invoke(it) })
+                        }else{
+                            error?.invoke(exception) ?: errorHandler.invoke(exception)
+                            currRoomNo = ""
+                        }
                     }
                 }
             )
