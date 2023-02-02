@@ -1,5 +1,6 @@
 package com.agora.entfulldemo.home.holder
 
+import android.view.View
 import androidx.core.view.isGone
 import com.agora.entfulldemo.databinding.AppItemHomeIndexBinding
 import com.agora.entfulldemo.home.constructor.ScenesModel
@@ -17,6 +18,8 @@ class HomeIndexHolder(mBinding: AppItemHomeIndexBinding) :
             mBinding.tvScenesName.text = name
             mBinding.ivScenesBg.setBackgroundResource(background)
             mBinding.ivScenesIcon.setBackgroundResource(icon)
+            mBinding.tvTip.visibility = if (tip.isEmpty()) View.GONE else View.VISIBLE
+            mBinding.tvTip.text = tip
         }
     }
 }
