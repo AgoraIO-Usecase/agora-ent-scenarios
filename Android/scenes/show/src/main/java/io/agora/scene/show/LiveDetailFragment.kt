@@ -136,14 +136,21 @@ class LiveDetailFragment : Fragment() {
         super.onResume()
         ShowLogger.d(TAG, "Fragment Lifecycle: onResume")
 
-        val roomLeftTime =
-            ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
-
-        if (roomLeftTime > 0) {
-            mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+        if (mRoomInfo.isRobotRoom()) {
             initRtcEngine {
                 if (isResumed) {
                     initServiceWithJoinRoom()
+                }
+            }
+        } else {
+            val roomLeftTime =
+                ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong())
+            if (roomLeftTime > 0) {
+                mBinding.root.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                initRtcEngine {
+                    if (isResumed) {
+                        initServiceWithJoinRoom()
+                    }
                 }
             }
         }
@@ -208,7 +215,7 @@ class LiveDetailFragment : Fragment() {
 
     private fun initLivingEndLayout() {
         val livingEndLayout = mBinding.livingEndLayout
-        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner
+        livingEndLayout.root.isVisible = ROOM_AVAILABLE_DURATION < (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt.toLong()) && !isRoomOwner && !mRoomInfo.isRobotRoom()
         livingEndLayout.tvUserName.text = mRoomInfo.ownerName
         Glide.with(this@LiveDetailFragment)
             .load(mRoomInfo.ownerAvatar)
