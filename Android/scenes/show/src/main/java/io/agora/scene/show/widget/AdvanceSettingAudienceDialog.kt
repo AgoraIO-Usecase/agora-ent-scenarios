@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingAdvanceDialogAudienceBinding
@@ -60,6 +61,11 @@ class AdvanceSettingAudienceDialog(context: Context) : BottomFullDialog(context)
         binding.switchCompat.isChecked = VideoSetting.currAudienceEnhanceSwitch
         onSwitchChanged(itemId, binding.switchCompat.isChecked)
         binding.switchCompat.setOnCheckedChangeListener { btn, isChecked ->
+            if (isChecked && (VideoSetting.currAudiencePlaySetting == VideoSetting.AudiencePlaySetting.BASE_LOW || VideoSetting.currAudiencePlaySetting == VideoSetting.AudiencePlaySetting.ENHANCE_LOW)) {
+                binding.switchCompat.isChecked = false
+                ToastUtils.showToast(context.getString(R.string.show_setting_quality_enhance_tip))
+                return@setOnCheckedChangeListener
+            }
             defaultItemValues[itemId] = if (isChecked) 1 else 0
             onSwitchChanged(itemId, isChecked)
         }
