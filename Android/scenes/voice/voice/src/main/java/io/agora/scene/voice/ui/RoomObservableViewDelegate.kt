@@ -654,6 +654,19 @@ class RoomObservableViewDelegate constructor(
     }
 
     /**
+     * 超时退出房间
+     */
+    fun onTimeUpExitRoom(title: String, content: String, finishBack: () -> Unit) {
+        CommonFragmentAlertDialog().titleText(title).contentText(content)
+            .rightText(activity.getString(R.string.voice_room_confirm))
+            .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
+                override fun onConfirmClick() {
+                    finishBack.invoke()
+                }
+            }).show(activity.supportFragmentManager, "mtCenterDialog")
+    }
+
+    /**
      * 点击麦位
      */
     fun onUserMicClick(micInfo: VoiceMicInfoModel) {
