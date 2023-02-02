@@ -176,6 +176,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         vc.loadingType = .loading
+        self.view.endEditing(true)
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -186,6 +187,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         vc.loadingType = .preload
+        self.view.endEditing(true)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

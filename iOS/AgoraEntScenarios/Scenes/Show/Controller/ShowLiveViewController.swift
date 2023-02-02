@@ -7,7 +7,6 @@
 
 import UIKit
 import AgoraRtcKit
-import IQKeyboardManager
 import SwiftUI
 
 class ShowLiveViewController: UIViewController {
