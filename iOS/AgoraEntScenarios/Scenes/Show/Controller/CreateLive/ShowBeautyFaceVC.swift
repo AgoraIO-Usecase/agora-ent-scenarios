@@ -10,10 +10,15 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
-    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool) -> Void)?
+    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
     
     var defalutSelectIndex = 0
    
+    lazy var agoraKitManager: ShowAgoraKitManager = {
+        let manager = ShowAgoraKitManager()
+        return manager
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -28,17 +33,21 @@ class ShowBeautyFaceVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
-    static let beautyData = ByteBeautyModel.createBeautyData()
-    static let styleData = ByteBeautyModel.createStyleData()
-    static let filterData = ByteBeautyModel.createFilterData()
-    static let stickerData = ByteBeautyModel.createStickerData()
+    static let beautyData = BeautyModel.createBeautyData()
+    static let styleData = BeautyModel.createStyleData()
+    static let adjustData = BeautyModel.createAdjustData()
+    static let filterData = BeautyModel.createFilterData()
+    static let stickerData = BeautyModel.createStickerData()
+    static let backgroundData = BeautyModel.createBackgroundData()
      
-    private lazy var dataArray: [ByteBeautyModel] = {
+    private lazy var dataArray: [BeautyModel] = {
         switch type {
         case .beauty: return ShowBeautyFaceVC.beautyData
         case .style: return ShowBeautyFaceVC.styleData
+        case .adjust: return ShowBeautyFaceVC.adjustData
 //        case .filter: return ShowBeautyFaceVC.filterData
         case .sticker: return ShowBeautyFaceVC.stickerData
+        case .background: return ShowBeautyFaceVC.backgroundData
         }
     }()
     
@@ -72,34 +81,53 @@ class ShowBeautyFaceVC: UIViewController {
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
-        case .beauty:
+        case .beauty, .adjust:
             if isReset {
-                ByteBeautyManager.shareManager.reset(datas: dataArray)
+                BeautyManager.shareManager.reset(datas: dataArray)
                 return
             }
-            ByteBeautyManager.shareManager.setBeauty(path: model.path,
+            BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
             
 //        case .filter:
 //            if isReset {
-//                ByteBeautyManager.shareManager.resetFilter(datas: dataArray)
+//                BeautyManager.shareManager.resetFilter(datas: dataArray)
 //                return
 //            }
-//            ByteBeautyManager.shareManager.setFilter(path: model.path,
+//            BeautyManager.shareManager.setFilter(path: model.path,
 //                                                     value: model.value)
             
         case .style:
             if isReset {
-                ByteBeautyManager.shareManager.resetStyle(datas: dataArray)
+                BeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
-            ByteBeautyManager.shareManager.setStyle(path: model.path,
+            BeautyManager.shareManager.setStyle(path: model.path,
                                                     key: model.key,
                                                     value: model.value)
             
         case .sticker:
-            ByteBeautyManager.shareManager.setSticker(path: model.path)
+            BeautyManager.shareManager.setSticker(path: model.path)
+            
+        case .background:
+            if model.path == nil {
+                ShowAgoraKitManager.isOpenGreen = false
+                ShowAgoraKitManager.isBlur = false
+                agoraKitManager.enableVirtualBackground(isOn: false)
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: nil,
+                                                         isOn: false)
+            } else if model.path == "xuhua" {
+                ShowAgoraKitManager.isBlur = true
+                agoraKitManager.enableVirtualBackground(isOn: true,
+                                                        greenCapacity: Float(value))
+                
+            } else {
+                ShowAgoraKitManager.isBlur = false
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: model.key,
+                                                         isOn: true,
+                                                         greenCapacity: Float(value))
+            }
         }
     }
     
@@ -137,7 +165,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.key == nil)
+            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0)
             defalutSelectIndex = indexPath.item
         }
         return cell
@@ -157,10 +185,10 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
         if type == .sticker {
-            selectedItemClosure?(0, true)
+            selectedItemClosure?(0, true, false)
             return
         }
-        selectedItemClosure?(model.value, model.path == nil)
+        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0)
     }
 }
 

@@ -2,6 +2,8 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, '12.0'
 inhibit_all_warnings!
+plugin 'cocoapods-pod-sign'
+skip_pod_bundle_sign # 用来跳过Xcode对bundle资源的签名
 
 def all_pods
   
@@ -34,14 +36,16 @@ def all_pods
   #滚动视图
   pod 'JXCategoryView'
   # 火山美颜
-  pod 'bytedEffect', :path => 'bytedEffect.podspec'
+  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  # 商汤美颜
+#  pod 'SenseLib', :path => 'sense.podspec'
   
   
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+#  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
-#pod 'AgoraRtcEngine_iOS', :path => './libs'
+pod 'AgoraRtcEngine_iOS', :path => './libs'
 
   #ThirdParty
   pod 'HWWeakTimer'

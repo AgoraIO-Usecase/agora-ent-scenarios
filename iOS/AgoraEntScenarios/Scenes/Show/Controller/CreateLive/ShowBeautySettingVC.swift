@@ -12,14 +12,18 @@ enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
 //    case filter
     case style
+    case adjust
     case sticker
+    case background
     
     var title: String {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
 //        case .filter: return "create_beauty_setting_filter".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
+        case .adjust: return "create_beauty_setting_special_adjust".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
+        case .background: return "背景".show_localized
         }
     }
 }
@@ -30,7 +34,12 @@ class ShowBeautySettingVC: UIViewController {
     var dismissed: (()->())?
     
     private var slider: UISlider!
-    private let titles = ShowBeautyFaceVCType.allCases.map({ $0.title })
+    private let titles = ShowBeautyFaceVCType.allCases.filter({
+        if BeautyModel.beautyType == .byte {
+            return $0 != .adjust
+        }
+        return true
+    }).map({ $0.title })
     private let vcs = ShowBeautyFaceVCType.allCases.map({ ShowBeautyFaceVC(type: $0) })
     
     // 背景
@@ -54,6 +63,22 @@ class ShowBeautySettingVC: UIViewController {
         compareButton.isSelected = true
         compareButton.cornerRadius(18)
         return compareButton
+    }()
+    
+    private lazy var segLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.text = "绿幕"
+        label.font = .systemFont(ofSize: 12)
+        label.isHidden = true
+        return label
+    }()
+    private lazy var segSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.onTintColor = .show_zi03
+        sw.addTarget(self, action: #selector(onTapSegSwitch(sender:)), for: .valueChanged)
+        sw.isHidden = true
+        return sw
     }()
     
     // 指示条
@@ -81,6 +106,8 @@ class ShowBeautySettingVC: UIViewController {
         return segmentedView
     }()
     
+    private lazy var agoraKitManager = ShowAgoraKitManager()
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .overCurrentContext
@@ -93,10 +120,13 @@ class ShowBeautySettingVC: UIViewController {
 
     private var beautyFaceVC: ShowBeautyFaceVC? {
         didSet {
-            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue in
+            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
                 guard let self = self else { return }
-                self.slider.isHidden = isHiddenValue
-                self.compareButton.isHidden = isHiddenValue
+                self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
+                self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
+                self.segSwitch.isHidden = !isShowSegSwitch
+                self.segSwitch.isOn = isShowSegSwitch == false ? false : self.segSwitch.isOn
+                self.segLabel.isHidden = !isShowSegSwitch
                 self.slider.setValue(Float(value), animated: true)
             }
             beautyFaceVC?.reloadData()
@@ -120,18 +150,29 @@ class ShowBeautySettingVC: UIViewController {
         view.addSubview(slider)
         slider.snp.makeConstraints { make in
             make.left.equalTo(22)
-            make.right.equalTo(-80)
+            make.right.equalTo(-83)
             make.height.equalTo(30)
             make.bottom.equalTo(-214)
         }
         
         // 对比按钮
-        
         view.addSubview(compareButton)
         compareButton.snp.makeConstraints { make in
             make.centerY.equalTo(slider)
             make.right.equalTo(-20)
             make.width.height.equalTo(36)
+        }
+        
+        view.addSubview(segSwitch)
+        segSwitch.snp.makeConstraints { make in
+            make.centerY.equalTo(slider)
+            make.right.equalTo(-7)
+        }
+
+        view.addSubview(segLabel)
+        segLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(slider)
+            make.right.equalTo(segSwitch.snp.left).offset(-2)
         }
         
         view.addSubview(bgView)
@@ -167,6 +208,20 @@ class ShowBeautySettingVC: UIViewController {
     private func onTapSliderHandler(sender: UISlider) {
         beautyFaceVC?.changeValueHandler(value: CGFloat(sender.value))
     }
+    
+    @objc
+    private func onTapSegSwitch(sender: UISwitch) {
+        ShowAgoraKitManager.isOpenGreen = sender.isOn
+        slider.isHidden = !sender.isOn
+        if ShowAgoraKitManager.isBlur {
+            agoraKitManager.enableVirtualBackground(isOn: true,
+                                                    greenCapacity: slider.value)
+        } else {
+            agoraKitManager.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
+                                                     isOn: true,
+                                                     greenCapacity: slider.value)
+        }
+    }
 }
 
 extension ShowBeautySettingVC {
@@ -179,7 +234,7 @@ extension ShowBeautySettingVC {
     // 点击对比按钮
     @objc private func didClickCompareButton(sender: UIButton){
         sender.isSelected = !sender.isSelected
-        ByteBeautyManager.shareManager.isEnableBeauty = sender.isSelected
+        BeautyManager.shareManager.isEnableBeauty = sender.isSelected
     }
 }
 
@@ -188,7 +243,6 @@ extension ShowBeautySettingVC: JXCategoryViewDelegate {
     func categoryView(_ categoryView: JXCategoryBaseView!, didSelectedItemAt index: Int) {
         beautyFaceVC = vcs[index]
         if index == vcs.count - 1 {
-            slider.isHidden = true
             compareButton.isHidden = true
         }
     }
