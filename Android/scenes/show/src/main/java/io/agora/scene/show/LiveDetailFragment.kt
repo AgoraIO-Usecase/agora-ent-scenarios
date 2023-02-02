@@ -1299,6 +1299,7 @@ class LiveDetailFragment : Fragment() {
         if (mRoomInfo.ownerId != stats.uid.toString()) {
             return
         }
+        var showTip = false
         var superResolution: VideoSetting.SuperResolution = VideoSetting.SuperResolution.SR_NONE
         when (VideoSetting.getCurrBroadcastSetting()) {
             VideoSetting.RecommendBroadcastSetting.LowDevice1v1, VideoSetting.RecommendBroadcastSetting.MediumDevice1v1, VideoSetting.RecommendBroadcastSetting.HighDevice1v1 -> when (VideoSetting.currAudiencePlaySetting) {
@@ -1307,6 +1308,7 @@ class LiveDetailFragment : Fragment() {
                     // 1080P
                     if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
                         superResolution = VideoSetting.SuperResolution.SR_NONE
+                        showTip = true;
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
@@ -1326,6 +1328,7 @@ class LiveDetailFragment : Fragment() {
                     // 1080P
                     if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
                         superResolution = VideoSetting.SuperResolution.SR_NONE
+                        showTip = true;
                     }
                     // 720P
                     else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
@@ -1359,6 +1362,9 @@ class LiveDetailFragment : Fragment() {
         // 不要重复设置
         if (superResolution == VideoSetting.getCurrAudienceSetting().video.SR) {
             return
+        }
+        if (showTip) {
+            ToastUtils.showToast(context?.getString(R.string.show_setting_quality_enhance_tip2))
         }
         VideoSetting.updateAudioSetting(SR = superResolution)
     }
