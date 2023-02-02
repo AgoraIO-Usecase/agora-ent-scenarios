@@ -1,5 +1,7 @@
 package io.agora.scene.show
 
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.TextureView
 import android.view.View
@@ -21,6 +23,8 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private val rtcEventHandlers = mutableMapOf<String, RtcEngineEventHandlerImpl>()
     private val remoteVideoCanvasList = mutableListOf<RemoteVideoCanvasWrap>()
     private var localVideoCanvas: LocalVideoCanvasWrap? = null
+
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -357,7 +361,9 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             isJoinChannelSuccess = true
             eventListener?.onChannelJoined?.invoke(connection)
             remoteVideoCanvasList.filter { canvas -> canvas.connection.equal(connection) }.forEach {
-                rtcEngine.setupRemoteVideoEx(it, connection)
+                runOnUiThread {
+                    rtcEngine.setupRemoteVideoEx(it, connection)
+                }
             }
             ShowLogger.d(
                 tag,
@@ -491,5 +497,13 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
 
     private fun RtcConnection.equal(conn: Any?) =
         conn is RtcConnection && this.channelId == conn.channelId && this.localUid == conn.localUid
+
+    private fun runOnUiThread(run: () -> Unit) {
+        if (Thread.currentThread() == mainHandler.looper.thread) {
+            run.invoke()
+        } else {
+            mainHandler.post(run)
+        }
+    }
 
 }

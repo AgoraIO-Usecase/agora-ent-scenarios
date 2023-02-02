@@ -183,7 +183,7 @@ class LiveDetailFragment : Fragment() {
         initMessageLayout()
 
         // Render host video
-        initVideoView()
+        // initVideoView()
     }
 
     private fun initVideoView() {
