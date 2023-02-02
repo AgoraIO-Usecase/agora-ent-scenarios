@@ -75,7 +75,10 @@ class ShowAgoraKitManager: NSObject {
     
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
+    //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
+    //[ex channelId: [room id: status]]
+    private var exConnectionDeps: [String: [String: ShowRTCLoadingType]] = [:]
     
     private var delegateMap: [String: ShowAgoraExProxy] = [:]
     
@@ -104,7 +107,7 @@ class ShowAgoraKitManager: NSObject {
     
     fileprivate(set) lazy var agoraKit: AgoraRtcEngineKit = {
         let kit = AgoraRtcEngineKit.sharedEngine(with: rtcEngineConfig, delegate: nil)
-        showLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())")
+        showLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
         return kit
     }()
     
@@ -314,6 +317,7 @@ class ShowAgoraKitManager: NSObject {
     
     func leaveChannelEx(roomId: String) {
         guard let connection = exConnectionMap[roomId] else { return }
+        showLogger.info("leaveChannelEx \(roomId)", context: kShowLogBaseContext)
         agoraKit.leaveChannelEx(connection)
         exConnectionMap[roomId] = nil
     }
@@ -384,13 +388,39 @@ class ShowAgoraKitManager: NSObject {
         showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
     }
     
-    func updateLoadingType(channelId: String, loadingType: ShowRTCLoadingType) {
+    func updateLoadingType(roomId: String, channelId: String, loadingType: ShowRTCLoadingType) {
         guard let _ = exConnectionMap[channelId] else {
 //            assert(false, "updateLoadingType fail, mediaOptions not found")
             return
         }
+        
+        //TODO: new func?
+        var map: [String: ShowRTCLoadingType]? = exConnectionDeps[channelId]
+        if map == nil {
+            map = [:]
+        }
+        if loadingType == .idle {
+            map?[roomId] = nil
+        } else {
+            map?[roomId] = loadingType
+        }
+        
+        guard let map = map else {
+            showLogger.error("updateLoadingType fatal, map init fail")
+            return
+        }
+        exConnectionDeps[channelId] = map
+        
+        var realLoadingType = loadingType
+        //calc real type
+        map.forEach { (key: String, value: ShowRTCLoadingType) in
+            if realLoadingType.rawValue < value.rawValue {
+                realLoadingType = value
+            }
+        }
+        
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        if loadingType == .loading {
+        if realLoadingType == .loading {
             mediaOptions.autoSubscribeAudio = true
             mediaOptions.autoSubscribeVideo = true
         } else {
@@ -398,7 +428,7 @@ class ShowAgoraKitManager: NSObject {
             mediaOptions.autoSubscribeVideo = false
         }
 
-        showLogger.info("updateLoadingType \(channelId) \(loadingType.rawValue)")
+        showLogger.info("room[\(roomId)] updateLoadingType \(channelId) want:\(loadingType.rawValue) real: \(realLoadingType.rawValue)", context: kShowLogBaseContext)
         updateChannelEx(channelId:channelId, options: mediaOptions)
     }
 }

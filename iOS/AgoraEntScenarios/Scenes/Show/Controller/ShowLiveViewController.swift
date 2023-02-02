@@ -310,7 +310,7 @@ class ShowLiveViewController: UIViewController {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
         showMsg.userName = VLUserCenter.user.name
-        showMsg.message = "\(text) \(roomId)"
+        showMsg.message = text
         showMsg.createAt = Date().millionsecondSince1970()
         
         AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
@@ -331,15 +331,29 @@ extension ShowLiveViewController {
     
 
     private func updateLoadingType(loadingType: ShowRTCLoadingType) {
-        agoraKitManager.updateLoadingType(channelId: roomId, loadingType: loadingType)
+        agoraKitManager.updateLoadingType(roomId: roomId, channelId: roomId, loadingType: loadingType)
         if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
-            agoraKitManager.updateLoadingType(channelId: targetRoomId, loadingType: loadingType)
+            agoraKitManager.updateLoadingType(roomId: roomId, channelId: targetRoomId, loadingType: loadingType)
         }
         if loadingType == .loading {
             AppContext.showServiceImp(roomId).initRoom { error in
                 
             }
             sendMessageWithText("join_live_room".show_localized)
+            
+            //TODO: need to optimize
+            if self.role == .audience {
+                let uid: UInt = UInt(room?.ownerId ?? "")!
+                self.agoraKitManager.setupRemoteVideo(channelId: roomId,
+                                                      uid: uid,
+                                                      canvasView: self.liveView.canvasView.localView)
+                if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
+                    let uid = UInt(currentInteraction?.userId ?? "")!
+                    self.agoraKitManager.setupRemoteVideo(channelId: targetRoomId,
+                                                    uid: uid,
+                                                    canvasView: self.liveView.canvasView.remoteView)
+                }
+            }
         } else if loadingType == .preload {
             AppContext.showServiceImp(roomId).deinitRoom { error in
                 
@@ -625,19 +639,18 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStartInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
-            guard let roomId = interaction.roomId else {
+            guard let interactionRoomId = interaction.roomId else {
                 assert(false, "interaction room id is empty")
                 return
             }
-            if room?.roomId != interaction.roomId {
+            if roomId != interaction.roomId {
                 let uid = UInt(interaction.userId!)!
-                agoraKitManager.joinChannelEx(currentChannelId: self.roomId,
-                                              targetChannelId: roomId,
+                agoraKitManager.joinChannelEx(currentChannelId: roomId,
+                                              targetChannelId: interactionRoomId,
                                               ownerId: uid,
                                               options: self.channelOptions,
                                               role: role) {
-                    
-                    self.agoraKitManager.setupRemoteVideo(channelId: roomId,
+                    self.agoraKitManager.setupRemoteVideo(channelId: interactionRoomId,
                                                           uid: uid,
                                                           canvasView: self.liveView.canvasView.remoteView)
                     self.updateLoadingType(loadingType: self.loadingType)
@@ -650,7 +663,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             let role: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
             agoraKitManager.switchRole(role: role,
-                                       channelId: room?.roomId ?? "",
+                                       channelId: roomId,
                                        options: self.channelOptions,
                                        uid: interaction.userId,
                                        canvasView: liveView.canvasView.remoteView)
