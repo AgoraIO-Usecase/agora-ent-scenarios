@@ -23,6 +23,7 @@
     <string name="show_setting_quality">画质</string>
     <string name="show_setting_advance_setting">高级设置</string>
     <string name="show_setting_quality_enhance_tip">由于您的机型选择为低端机，为保障设备流畅运行，已关闭画质增强功能</string>
+    <string name="show_setting_quality_enhance_tip2">由于您选择机型或分辨率原因，为保证流畅运行，已为您暂时关闭画质增强功能</string>
     <string name="show_picture_quality_title">画质选择</string>
     <string name="show_picture_quality_1080p">1080P\n极清</string>
     <string name="show_picture_quality_720p">720P\n超清</string>
