@@ -10,7 +10,6 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
@@ -28,12 +27,10 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
-import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.show.VideoSetting.toIndex
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
@@ -150,6 +147,8 @@ class LiveDetailFragment : Fragment() {
                 }
             }
         }
+
+        startTopLayoutTimer()
     }
 
     override fun onPause() {
@@ -230,8 +229,10 @@ class LiveDetailFragment : Fragment() {
         topLayout.tvRoomId.text = getString(R.string.show_room_id, mRoomInfo.roomId)
         topLayout.tvUserCount.text = mRoomInfo.roomUserCount.toString()
         topLayout.ivClose.setOnClickListener { onBackPressed() }
+    }
 
-        // Start Timer counter
+    private fun startTopLayoutTimer() {
+        val topLayout = mBinding.topLayout
         val dataFormat =
             SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
         Log.d(
@@ -1197,13 +1198,13 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onLocalVideoStats = { stats ->
-                refreshStatisticInfo(videoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight))
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
                             bitrate = stats.sentBitrate,
                             fps = stats.sentFrameRate,
-                            lossPackage = stats.txPacketLossRate
+                            lossPackage = stats.txPacketLossRate,
+                            videoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
                         )
                     }
                 }
@@ -1219,7 +1220,6 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteVideoStats = { stats ->
-                refreshStatisticInfo(videoSize = Size(stats.width, stats.height))
                 setEnhance(stats)
                 if (stats.uid == mRoomInfo.ownerId.toInt()) {
                     activity?.runOnUiThread {
@@ -1227,7 +1227,8 @@ class LiveDetailFragment : Fragment() {
                             bitrate = stats.receivedBitrate,
                             fps = stats.decoderOutputFrameRate,
                             lossPackage = stats.packetLossRate,
-                            delay = stats.delay
+                            delay = stats.delay,
+                            videoSize = Size(stats.width, stats.height)
                         )
                     }
                 }
