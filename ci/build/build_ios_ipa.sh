@@ -7,7 +7,7 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
 
-cd ${PROJECT_PATH} && pod install
+cd ${PROJECT_PATH} && pod install --repo-update
 
 if [ $? -eq 0 ]; then
     echo "success"
@@ -20,6 +20,10 @@ fi
 TARGET_NAME=AgoraEntScenarios
 
 KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
+KEYCENTER_BAK_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift.bak"
+
+cp $KEYCENTER_BAT_PATH $KEYCENTER_PATH
+
 INFO_PLIST_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/Info.plist"
 
 METHOD_PATH=${PROJECT_PATH}"/ExportOptions.plist"
