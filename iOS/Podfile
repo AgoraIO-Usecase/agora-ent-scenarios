@@ -28,7 +28,7 @@ def all_pods
 #  pod 'libextobjc', '~> 0.4.1'
   pod 'MJExtension'
   # 键盘
-  pod 'IQKeyboardManager'
+#  pod 'IQKeyboardManager', '6.5.10'
   # 变色龙
   pod 'ChameleonFramework'
   #弹框
@@ -80,6 +80,8 @@ pod 'AgoraRtcEngine_iOS', :path => './libs'
   pod 'SVGAPlayer'
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.0.8'
+
+  pod 'SwiftyBeaver', '1.9.5'
   
   #bugly
   pod 'Bugly','2.5.93'

@@ -22,13 +22,13 @@ class ShowRoomListVC: UIViewController {
     
     deinit {
         AppContext.unloadShowServiceImp()
-        print("deinit-- ShowRoomListVC")
+        showLogger.info("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         hidesBottomBarWhenPushed = true
-        print("init-- ShowRoomListVC")
+        showLogger.info("init-- ShowRoomListVC")
     }
     
     required init?(coder: NSCoder) {
@@ -122,25 +122,30 @@ class ShowRoomListVC: UIViewController {
     
     // 加入房间
     private func joinRoom(_ room: ShowRoomListModel){
-        AppContext.showServiceImp.joinRoom(room: room) {[weak self] error, detailModel in
-            if let error = error {
-                ToastView.show(text: error.localizedDescription)
-                return
+        let vc = ShowLivePagesViewController()
+        let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+        vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
+        if room.ownerId == VLUserCenter.user.id {
+            AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, model in
+                if let error = error {
+                    ToastView.show(text: error.localizedDescription)
+                    return
+                }
+                vc.roomList = [room]
+                vc.focusIndex = 0
+                self?.present(nc, animated: true)
             }
-            
-            guard let wSelf = self else { return }
-            let vc = ShowLiveViewController()
-            let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-            vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
-            vc.room = room
-            let nc = UINavigationController(rootViewController: vc)
-            nc.modalPresentationStyle = .fullScreen
-            wSelf.present(nc, animated: true)
+        } else {
+            vc.roomList = roomList?.filter({ $0.ownerId != VLUserCenter.user.id })
+            vc.focusIndex = vc.roomList?.firstIndex(where: { $0.roomId == room.roomId }) ?? 0
+            self.present(nc, animated: true)
         }
     }
     
     private func getRoomList() {
-        AppContext.showServiceImp.getRoomList(page: 1) { [weak self] error, roomList in
+        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
             if let list = roomList {
                 self?.roomListView.roomList = list
                 self?.roomList = list

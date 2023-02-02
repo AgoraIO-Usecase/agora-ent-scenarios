@@ -96,7 +96,7 @@ class ShowApplyAndInviteView: UIView {
         return view
     }()
     private var tipsViewHeightCons: NSLayoutConstraint?
-    private var roomId: String?
+    private var roomId: String!
     private var type: ShowApplyAndInviteType = .apply
     var seatMicModel: ShowInteractionInfo? {
         didSet {
@@ -110,9 +110,9 @@ class ShowApplyAndInviteView: UIView {
         }
     }
     
-    init(roomId: String?) {
-        super.init(frame: .zero)
+    init(roomId: String) {
         self.roomId = roomId
+        super.init(frame: .zero)
         setupUI()
         getApplyList()
     }
@@ -131,20 +131,20 @@ class ShowApplyAndInviteView: UIView {
     }
     
     private func getApplyList() {
-        AppContext.showServiceImp.getAllMicSeatApplyList {[weak self] _, list in
+        AppContext.showServiceImp(roomId).getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filterDuplicates({ $0.userId }) else { return }
             self?.tableView.dataArray = list.filter({ $0.status == .waitting })
         }
     }
     private func getInviteList() {
-        AppContext.showServiceImp.getAllUserList {[weak self] _, list in
+        AppContext.showServiceImp(roomId).getAllUserList {[weak self] _, list in
             guard let list = list?.filter({$0.userId != VLUserCenter.user.id}) else { return }
             self?.tableView.dataArray = list.filter({ $0.status != .accepted })
         }
     }
     
     private func getApplyPKInfo() {
-        AppContext.showServiceImp.getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
+        AppContext.showServiceImp(roomId).getCurrentApplyUser(roomId: roomId) {[weak self] roomModel in
             self?.tipsContainerView.isHidden = roomModel == nil
             self?.tipsLabel.text = String(format: "与主播%@PK中".show_localized, roomModel?.ownerName ?? "")
         }
@@ -212,7 +212,7 @@ class ShowApplyAndInviteView: UIView {
     private func onTapEndButton(sender: AGEButton) {
         updateLayout(isHidden: true)
         if let model = seatMicModel {
-            AppContext.showServiceImp.stopInteraction(interaction: model) { _ in }
+            AppContext.showServiceImp(roomId).stopInteraction(interaction: model) { _ in }
         }
         applyStatusClosure?(.idle)
     }
@@ -221,6 +221,7 @@ extension ShowApplyAndInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowSeatApplyAndInviteViewCell.description(),
                                                  for: indexPath) as! ShowSeatApplyAndInviteViewCell
+        cell.roomId = roomId
         let model = self.tableView.dataArray?[indexPath.row]
         
         cell.setupApplyAndInviteData(model: model, isLink: seatMicModel != nil)

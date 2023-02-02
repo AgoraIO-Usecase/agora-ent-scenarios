@@ -16,7 +16,7 @@
 #import "QMUIConfigurationTemplate.h"
 
 @import QMUIKit;
-@import IQKeyboardManager;
+//@import IQKeyboardManager;
 
 @implementation UIWindow (Router)
 - (void)configRootViewController {
@@ -63,9 +63,9 @@
 }
 
 - (void)configureKeyboard {
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    manager.enable = YES;
-    manager.shouldResignOnTouchOutside =YES;
-    manager.enableAutoToolbar = NO;
+//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+//    manager.enable = YES;
+//    manager.shouldResignOnTouchOutside =YES;
+//    manager.enableAutoToolbar = NO;
 }
 @end
