@@ -118,9 +118,6 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
                             it.member?.chatUid?.let { chatUid ->
-                                io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(
-                                    chatUid
-                                )
                                 adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)

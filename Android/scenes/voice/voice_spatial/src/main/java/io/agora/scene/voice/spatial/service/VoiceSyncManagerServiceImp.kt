@@ -4,9 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import io.agora.CallBack
-import io.agora.ValueCallBack
-import io.agora.chat.adapter.EMAError
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.netkit.VoiceToolboxServerHttpManager
@@ -41,6 +38,15 @@ class VoiceSyncManagerServiceImp(
     private val roomSubscribeListener = mutableListOf<Sync.EventListener>()
 
     private val roomServiceSubscribeDelegates = mutableListOf<VoiceRoomSubscribeDelegate>()
+
+    // time limit
+    private var roomTimeUpSubscriber: (() -> Unit)? = null
+    private val ROOM_AVAILABLE_DURATION : Int = 20 * 60 * 1000 // 20min
+    private val timerRoomEndRun = Runnable {
+        ThreadManager.getInstance().runOnMainThread {
+            roomTimeUpSubscriber?.invoke()
+        }
+    }
 
     /**
      * 注册订阅
@@ -129,66 +135,32 @@ class VoiceSyncManagerServiceImp(
         }
         val owner = VoiceMemberModel().apply {
             rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
-            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
             nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
             userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
             micIndex = 0
             portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
         }
         voiceRoomModel.owner = owner
-        // 2、置换token,获取im 配置，创建房间需要这里的数据
-        VoiceToolboxServerHttpManager.get().requestToolboxService(
-            channelId = voiceRoomModel.channelId,
-            chatroomId = "",
-            chatroomName = inputModel.roomName,
-            chatOwner = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-            completion = { error, chatroomId ->
-                if (error != VoiceServiceProtocol.ERR_OK) {
-                    completion.invoke(error, voiceRoomModel)
-                    return@requestToolboxService
-                }
-                voiceRoomModel.chatroomId = chatroomId
-                beforeCreateRoomLoginImTask(loginCallBack = { error->
-                    if (error == VoiceServiceProtocol.ERR_LOGIN_SUCCESS){
-                        // 3、创建房间
-                        initScene {
-                            val scene = Scene()
-                            scene.id = voiceRoomModel.roomId
-                            scene.userId = owner.userId
-                            scene.property = GsonTools.beanToMap(voiceRoomModel)
-                            Sync.Instance().createScene(scene, object : Sync.Callback {
-                                override fun onSuccess() {
-                                    roomMap[voiceRoomModel.roomId] = voiceRoomModel
-                                    completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
-                                }
 
-                                override fun onFail(exception: SyncManagerException?) {
-                                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
-                                }
-                            })
-                        }
-                    }else{
-                        completion.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR, voiceRoomModel)
-                    }
-                })
-            })
-    }
+        //2、置换token,获取im 配置，创建房间需要这里的数据 TODO 不需要？
 
-    private fun beforeCreateRoomLoginImTask(loginCallBack: (error: Int) -> Unit){
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().login(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-            VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
+        //3、创建房间
+        initScene {
+            val scene = Scene()
+            scene.id = voiceRoomModel.roomId
+            scene.userId = owner.userId
+            scene.property = GsonTools.beanToMap(voiceRoomModel)
+            Sync.Instance().createScene(scene, object : Sync.Callback {
                 override fun onSuccess() {
-                    loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_SUCCESS)
+                    roomMap[voiceRoomModel.roomId] = voiceRoomModel
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, voiceRoomModel)
                 }
 
-                override fun onError(code: Int, desc: String) {
-                    if (code == EMAError.USER_ALREADY_LOGIN) {
-                        loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_SUCCESS)
-                    } else {
-                        loginCallBack.invoke(VoiceServiceProtocol.ERR_LOGIN_ERROR)
-                    }
+                override fun onFail(exception: SyncManagerException?) {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, voiceRoomModel)
                 }
             })
+        }
     }
 
     /**
@@ -227,6 +199,12 @@ class VoiceSyncManagerServiceImp(
                         }
                     })
                     completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
+
+                    if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                    } else {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - curRoomInfo.createdAt).toInt())
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -303,78 +281,28 @@ class VoiceSyncManagerServiceImp(
         voiceRoomModel: VoiceRoomModel,
         completion: (error: Int, result: VoiceRoomInfo?) -> Unit
     ) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().fetchRoomDetail(voiceRoomModel, object : ValueCallBack<VoiceRoomInfo> {
-            override fun onSuccess(value: VoiceRoomInfo?) {
-                if (value != null) {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-                } else {
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-                }
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-            }
-        })
-    }
-
-    /**
-     * 获取排行榜列表
-     */
-    override fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().fetchGiftContribute(object :
-            ValueCallBack<MutableList<VoiceRankUserModel>>{
-            override fun onSuccess(value: MutableList<VoiceRankUserModel>) {
-                ThreadManager.getInstance().runOnMainThread{
-                    completion.invoke(VoiceServiceProtocol.ERR_OK,value)
-                }
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                ThreadManager.getInstance().runOnMainThread{
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-                }
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
      * 获取用户列表
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
-        val  memberList = io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().fetchRoomMembers()
-        if (memberList != null ){
-            completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
-        }else{
-            completion.invoke(VoiceServiceProtocol.ERR_FAILED,mutableListOf())
-        }
+        // TODO with SyncManager
     }
 
     /**
      * 更新用户列表
      */
     override fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit){
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateRoomMembers(object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
      * 申请列表
      */
     override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
-       val raisedList = io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().fetchRaisedList()
-        if (raisedList != null){
-            completion.invoke(VoiceServiceProtocol.ERR_OK,raisedList)
-        }else{
-            completion.invoke(VoiceServiceProtocol.ERR_FAILED, mutableListOf())
-        }
+        // TODO with SyncManager
     }
 
     /**
@@ -382,15 +310,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().startMicSeatApply(object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -398,16 +318,7 @@ class VoiceSyncManagerServiceImp(
      * @param chatUid 环信用户id
      */
     override fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().acceptMicSeatApply(chatUid,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -415,15 +326,7 @@ class VoiceSyncManagerServiceImp(
      * @param chatUid im uid
      */
     override fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().cancelMicSeatApply(chatUid,object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -435,46 +338,21 @@ class VoiceSyncManagerServiceImp(
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().invitationMic(chatUid,object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
      * 接受邀请
      */
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().acceptMicSeatInvitation(object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel?) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
      * 拒绝邀请
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().refuseInvite(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), object : CallBack {
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -482,16 +360,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().muteLocal(micIndex,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel?) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -499,16 +368,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().unMuteLocal(micIndex,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK,value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED,null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -516,16 +376,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().forbidMic(micIndex,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -533,16 +384,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().unForbidMic(micIndex,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -550,20 +392,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().lockMic(micIndex, object :ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                ThreadManager.getInstance().runOnIOThread {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-                }
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                ThreadManager.getInstance().runOnIOThread {
-                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-                }
-            }
-
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -571,16 +400,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().unLockMic(micIndex,object :
-            ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -588,15 +408,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().kickOff(micIndex,object : ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -604,15 +416,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().leaveMic(micIndex,object : ValueCallBack<VoiceMicInfoModel>{
-            override fun onSuccess(value: VoiceMicInfoModel) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -625,16 +429,7 @@ class VoiceSyncManagerServiceImp(
         newIndex: Int,
         completion: (error: Int, result: Map<Int, VoiceMicInfoModel>?) -> Unit
     ) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().changeMic(oldIndex,newIndex,object :
-            ValueCallBack<MutableMap<Int, VoiceMicInfoModel>>{
-            override fun onSuccess(value: MutableMap<Int, VoiceMicInfoModel>?) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -642,15 +437,7 @@ class VoiceSyncManagerServiceImp(
      * @param content 公告内容
      */
     override fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateAnnouncement(content,object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -658,16 +445,7 @@ class VoiceSyncManagerServiceImp(
      * @param enable true 启动机器人，false 关闭机器人
      */
     override fun enableRobot(enable: Boolean, completion: (error: Int, result:Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().enableRobot(enable,object :
-            ValueCallBack<Boolean>{
-            override fun onSuccess(value: Boolean) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, value)
-            }
-
-            override fun onError(error: Int, errorMsg: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
-            }
-        })
+        // TODO with SyncManager
     }
 
     /**
@@ -675,15 +453,10 @@ class VoiceSyncManagerServiceImp(
      * @param value 音量
      */
     override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateRobotVolume(value,object : CallBack{
-            override fun onSuccess() {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-            }
-
-            override fun onError(code: Int, error: String?) {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
-            }
-        })
+        // TODO with SyncManager
+    }
+    override fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit) {
+        roomTimeUpSubscriber = onRoomTimeUp
     }
 
     private fun initScene(complete: () -> Unit) {
@@ -692,11 +465,8 @@ class VoiceSyncManagerServiceImp(
             return
         }
         val handler = Handler(Looper.getMainLooper())
-        Sync.Instance().init(context,
-            mapOf(
-                Pair("appid", VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()),
-                Pair("defaultChannel", voiceSceneId)
-            ),
+        Sync.Instance().init(
+            RethinkConfig(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId),
             object : Sync.Callback {
                 override fun onSuccess() {
                     handler.post {

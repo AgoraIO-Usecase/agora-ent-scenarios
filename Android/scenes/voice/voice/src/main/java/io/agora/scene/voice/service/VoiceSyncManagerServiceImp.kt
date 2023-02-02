@@ -246,7 +246,11 @@ class VoiceSyncManagerServiceImp(
                     })
                     completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
 
-                    ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                    if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                    } else {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - curRoomInfo.createdAt).toInt())
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {

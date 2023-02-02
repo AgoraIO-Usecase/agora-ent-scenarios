@@ -64,7 +64,6 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceSpatialFragmentContr
             initAdapter(rvContributionRanking)
             slContributionRanking.setOnRefreshListener(this@RoomContributionRankingFragment)
         }
-        roomRankViewModel.fetchGiftContribute()
         roomRankViewModel.contributeListObservable()
             .observe(requireActivity()) { response: Resource<List<VoiceRankUserModel>> ->
                 parseResource(response, object : OnResourceParseCallback<List<VoiceRankUserModel>>() {
@@ -119,8 +118,6 @@ class RoomContributionRankingFragment : BaseUiFragment<VoiceSpatialFragmentContr
     }
 
     override fun onRefresh() {
-        roomKitBean?.let {
-            roomRankViewModel.fetchGiftContribute()
-        }
+
     }
 }

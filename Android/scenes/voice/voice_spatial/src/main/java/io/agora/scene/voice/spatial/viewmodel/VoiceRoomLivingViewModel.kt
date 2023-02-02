@@ -173,23 +173,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 }
             }
         )
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance()
-            .joinRoom(roomKitBean.chatroomId, object : ValueCallBack<ChatRoom?> {
-                override fun onSuccess(value: ChatRoom?) {
-                    "im joinChatRoom onSuccess roomId:${roomKitBean.chatroomId}".logD()
-                    joinImRoom.set(true)
-                    checkJoinRoom()
-                }
-
-                override fun onError(error: Int, errorMsg: String) {
-                    _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
-                        override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                            callBack.onError(error, errorMsg)
-                        }
-                    }.asLiveData())
-                    "im joinChatRoom onError roomId:${roomKitBean.chatroomId},$error  $errorMsg".logE()
-                }
-            })
     }
 
     private fun checkJoinRoom() {
