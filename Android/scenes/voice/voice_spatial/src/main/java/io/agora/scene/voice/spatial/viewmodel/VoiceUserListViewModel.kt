@@ -51,11 +51,6 @@ class VoiceUserListViewModel : ViewModel() {
         _inviteListObservable.setSource(mRepository.fetchInvitedList())
     }
 
-    /**贡献排行榜*/
-    fun fetchGiftContribute() {
-        _contributeListObservable.setSource(mRepository.fetchGiftContribute())
-    }
-
     // 邀请用户上麦
     fun startMicSeatInvitation(chatUid: String, micIndex: Int?) {
         _startMicSeatInvitationObservable.setSource(mRepository.startMicSeatInvitation(chatUid, micIndex))
