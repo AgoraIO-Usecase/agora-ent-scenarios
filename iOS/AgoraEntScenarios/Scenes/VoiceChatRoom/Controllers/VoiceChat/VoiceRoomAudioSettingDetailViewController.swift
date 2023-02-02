@@ -83,7 +83,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     
     private let AIAECSettingName: [String] = ["Turn on AIAEC".localized()]
     
-    private let AGSettingName: [String] = ["Turn on AGC".localized()]
+    private let AGCSettingName: [String] = ["Turn on AGC".localized()]
 
     
     private let soundType: [String] = ["TV Sound".localized(), "Kitchen Sound".localized(), "Street Sound".localized(), "Mashine Sound".localized(), "Office Sound".localized(), "Home Sound".localized(), "Construction Sound".localized(), "Alert Sound/Music".localized(), "Applause".localized(), "Wind Sound".localized(), "Mic Pop Filter".localized(), "Audio Feedback".localized(), "Microphone Finger Rub Sound".localized(), "Screen Tap Sound".localized()]
@@ -461,7 +461,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 //             return cell
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-             cell.titleLabel.text = AIAECSettingName[indexPath.row]
+             cell.titleLabel.text = AGCSettingName[indexPath.row]
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AGC ?? false
              cell.useRobotBlock = { [weak self] flag in
