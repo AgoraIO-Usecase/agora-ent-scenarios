@@ -77,3 +77,42 @@ class SyncUtil: NSObject {
         manager?.subscribeConnectState(state: state)
     }
 }
+
+
+class SyncUtilsWrapper {
+    static private var syncUtilsInited: Bool = false
+    static private var subscribeConnectStateMap: [String: (SocketConnectState?, Bool)->Void] = [:]
+    
+    class func initScene(uniqueId: String, sceneId: String, completion: @escaping (SocketConnectState?, Bool)->Void) {
+        subscribeConnectStateMap[uniqueId] = completion
+        if syncUtilsInited {
+            completion(nil, true)
+            return
+        }
+        
+        SyncUtil.initSyncManager(sceneId: sceneId) {
+        }
+        
+        SyncUtil.subscribeConnectState { state in
+            
+            let inited = syncUtilsInited
+            defer {
+                subscribeConnectStateMap.forEach { (key: String, value: (SocketConnectState, Bool) -> Void) in
+                    value(state, inited)
+                }
+            }
+            
+            guard state == .open else { return }
+            guard !syncUtilsInited else {
+                return
+            }
+            
+            syncUtilsInited = true
+        }
+    }
+    
+    class func cleanScene() {
+        syncUtilsInited = false
+        subscribeConnectStateMap.removeAll()
+    }
+}

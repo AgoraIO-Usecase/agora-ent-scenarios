@@ -19,24 +19,21 @@ class ShowCreateLiveVC: UIViewController {
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
-    private let liveVC = ShowLiveViewController()
-    
     lazy var agoraKitManager: ShowAgoraKitManager = {
-//        let manager = ShowAgoraKitManager()
-//        manager.defaultSetting()
-//        return manager
-        return liveVC.agoraKitManager
+        let manager = ShowAgoraKitManager()
+        manager.defaultSetting()
+        return manager
     }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
     
     deinit {
-        print("deinit-- ShowCreateLiveVC")
+        showLogger.info("deinit-- ShowCreateLiveVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        print("init-- ShowCreateLiveVC")
+        showLogger.info("init-- ShowCreateLiveVC")
     }
     
     required init?(coder: NSCoder) {
@@ -174,17 +171,19 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             return
         }
         
-        AppContext.showServiceImp.createRoom(roomName: roomName,
-                                             roomId: createView.roomNo,
-                                             thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+        let roomId = createView.roomNo
+        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+                                                                roomId: roomId,
+                                                                thumbnailId: createView.roomBg) { [weak self] err, detailModel in
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
-            guard let wSelf = self else { return }
-//            let liveVC = ShowLiveViewController()
-            wSelf.liveVC.room = detailModel
-//            wSelf.liveVC.selectedResolution = wSelf.selectedResolution
-//            liveVC.agoraKitManager = wSelf.agoraKitManager
+            guard let wSelf = self, let detailModel = detailModel else { return }
+            let liveVC = ShowLivePagesViewController()
+            liveVC.agoraKitManager = wSelf.agoraKitManager
+            liveVC.roomList = [detailModel]
+//            liveVC.selectedResolution = wSelf.selectedResolution
+            liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             
-            wSelf.navigationController?.pushViewController(wSelf.liveVC, animated: false)
+            wSelf.navigationController?.pushViewController(liveVC, animated: false)
         }
     }
 }
