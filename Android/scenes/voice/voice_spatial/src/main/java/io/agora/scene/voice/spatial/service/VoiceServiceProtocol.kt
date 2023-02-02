@@ -19,6 +19,7 @@ interface VoiceServiceProtocol {
         const val ERR_LOGIN_SUCCESS = 3
         const val ERR_ROOM_UNAVAILABLE = 4
         const val ERR_ROOM_NAME_INCORRECT = 5
+        const val ERR_ROOM_LIST_EMPTY = 1003
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
@@ -77,11 +78,6 @@ interface VoiceServiceProtocol {
      * @param voiceRoomModel 房间概要
      */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo?) -> Unit)
-
-    /**
-     * 获取排行榜列表
-     */
-    fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit)
 
     /**
      * 获取用户列表
@@ -208,4 +204,8 @@ interface VoiceServiceProtocol {
      * @param value 音量
      */
     fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit)
+
+    fun subscribeRoomTimeUp(
+        onRoomTimeUp: () -> Unit
+    )
 }
