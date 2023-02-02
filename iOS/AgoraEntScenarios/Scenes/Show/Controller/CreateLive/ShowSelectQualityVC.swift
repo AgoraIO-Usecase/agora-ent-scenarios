@@ -158,7 +158,6 @@ extension ShowSelectQualityVC: UICollectionViewDelegateFlowLayout, UICollectionV
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = dataArray[indexPath.item]
         selectedItem?(item, indexPath.item)
-        ShowSettingKey.captureVideoSize.writeValue(indexPath.item)
         dismiss(animated: true)
         dismissed?()
     }

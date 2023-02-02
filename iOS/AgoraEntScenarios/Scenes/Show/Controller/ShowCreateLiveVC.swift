@@ -158,7 +158,8 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
 //            wSelf.selectedResolution = index
-            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
         }
     }
     

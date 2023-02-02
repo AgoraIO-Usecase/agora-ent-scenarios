@@ -34,7 +34,7 @@ class ShowPresettingFooterView: UITableViewHeaderFooterView {
         contentView.addSubview(bgImgView)
         bgImgView.snp.makeConstraints { make in
             make.left.equalTo(20)
-            make.right.equalTo(-20)
+            make.right.equalTo(-20).priority(.medium)
             make.top.bottom.equalToSuperview()
         }
     }
