@@ -92,7 +92,13 @@
                 @"iconImgStr":@"home_KTV_icon",
                 @"titleStr":AGLocalizedString(@"在线K歌房"),
                 @"subTitleStr":@""
-            }
+            },
+            @{
+                @"bgImgStr":@"home_talk_bg",
+                @"iconImgStr":@"home_talk_icon",
+                @"titleStr":AGLocalizedString(@"空间音频"),
+                @"subTitleStr":AGLocalizedString(@"")
+            },
         ];
     }
     return _itemsArray;
