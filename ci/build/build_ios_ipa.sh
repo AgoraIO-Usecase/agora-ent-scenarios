@@ -51,7 +51,18 @@ echo PBXPROJ_PATH: $PBXPROJ_PATH
 /usr/libexec/PlistBuddy -c "Set :objects:DD2A43F328FFCEE7004CEDCF:buildSettings:CURRENT_PROJECT_VERSION ${BUILD_NUMBER}" $PBXPROJ_PATH
 
 #修改打包方式
+set signingCertificate='Apple Development'
+set teamID='GM72UGLGZW'
+set provisioningProfiles='App'
+if [[ $CONFIGURATION=='app-store' ]]; then
+    signingCertificate='Apple Distribution'
+    teamID='YS397FG5PA'
+    provisioningProfiles='io.agora.entfull'
+fi
 /usr/libexec/PlistBuddy -c "Set :method $CONFIGURATION" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :signingCertificate $signingCertificate" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :teamID $teamID" $METHOD_PATH
+/usr/libexec/PlistBuddy -c "Set :provisioningProfiles:io.agora.entfull $provisioningProfiles" $METHOD_PATH
 
 # 读取APPID环境变量
 echo AGORA_APP_ID:$APP_ID
