@@ -401,7 +401,7 @@ class ShowSyncManagerServiceImpl(
                                                             objIdOfUserId[roomInfo.ownerId] = it
                                                             innerUpdateRoomUserCount(
                                                                 roomNo,
-                                                                userList.size + 1,
+                                                                2,
                                                                 {},
                                                                 {})
                                                         },
