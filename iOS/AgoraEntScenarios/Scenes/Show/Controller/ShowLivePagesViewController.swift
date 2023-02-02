@@ -38,6 +38,7 @@ class ShowLivePagesViewController: ViewController {
         collectionView.isPagingEnabled = true
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.bounces = false
+        collectionView.showsVerticalScrollIndicator = false
         return collectionView
     }()
     
@@ -66,11 +67,11 @@ extension ShowLivePagesViewController {
         guard let count = roomList?.count else {
             return 0
         }
-        return count > 1 ? count + kPageCacheHalfCount * 2 : count
+        return count > 2 ? count + kPageCacheHalfCount * 2 : count
     }
     
     fileprivate func realCellIndex(with fakeIndex: Int) -> Int {
-        if fakeCellCount() < 2 {
+        if fakeCellCount() < 3 {
             return fakeIndex
         }
         
@@ -86,7 +87,7 @@ extension ShowLivePagesViewController {
     }
     
     fileprivate func fakeCellIndex(with realIndex: Int) -> Int {
-        if fakeCellCount() < 2 {
+        if fakeCellCount() < 3 {
             return realIndex
         }
         
