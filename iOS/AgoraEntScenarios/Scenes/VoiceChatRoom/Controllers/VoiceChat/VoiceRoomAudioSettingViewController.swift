@@ -460,12 +460,19 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 return
             }
             turnAIAECBlock(flag)
+
+            self?.roomInfo?.room?.turn_AIAEC = flag;
+            self?.tableView.reloadData()
+            
         }
         detailVC.turnAGCBlock = { [weak self] flag in
             guard let turnAGCBlock = self?.turnAGCBlock else {
                 return
             }
-            turnAGCBlock(flag)
+            turnAGCBlock(flag);
+            self?.roomInfo?.room?.turn_AGC = flag;
+            self?.tableView.reloadData()
+
         }
         detailVC.soundBlock = { [weak self] index in
             guard let soundBlock = self?.soundBlock else {
