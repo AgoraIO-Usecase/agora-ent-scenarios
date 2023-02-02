@@ -310,7 +310,7 @@ class ShowLiveViewController: UIViewController {
         let showMsg = ShowMessage()
         showMsg.userId = VLUserCenter.user.id
         showMsg.userName = VLUserCenter.user.name
-        showMsg.message = text
+        showMsg.message = "\(text) \(roomId)"
         showMsg.createAt = Date().millionsecondSince1970()
         
         AppContext.showServiceImp(roomId).sendChatMessage(message: showMsg) { error in
@@ -329,9 +329,12 @@ extension ShowLiveViewController {
         }
     }
     
-    
+
     private func updateLoadingType(loadingType: ShowRTCLoadingType) {
         agoraKitManager.updateLoadingType(channelId: roomId, loadingType: loadingType)
+        if let targetRoomId = currentInteraction?.roomId, targetRoomId != roomId {
+            agoraKitManager.updateLoadingType(channelId: targetRoomId, loadingType: loadingType)
+        }
         if loadingType == .loading {
             AppContext.showServiceImp(roomId).initRoom { error in
                 
@@ -637,6 +640,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     self.agoraKitManager.setupRemoteVideo(channelId: roomId,
                                                           uid: uid,
                                                           canvasView: self.liveView.canvasView.remoteView)
+                    self.updateLoadingType(loadingType: self.loadingType)
                 }
                 liveView.canvasView.canvasType = .pk
                 liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")

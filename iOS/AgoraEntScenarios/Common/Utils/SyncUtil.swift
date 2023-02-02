@@ -9,47 +9,11 @@ import UIKit
  import AgoraSyncManager
 
 class SyncUtil: NSObject {
-    private static var imp: SyncUtilImp?
+    private static var manager: AgoraSyncManager?
+    override private init() {}
+    private static var sceneRefs: [String: SceneReference] = .init()
 
     static func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
-        imp = SyncUtilImp()
-        imp?.initSyncManager(sceneId: sceneId, complete: complete)
-    }
-
-    class func joinScene(id: String,
-                         userId: String,
-                         isOwner: Bool,
-                         property: [String: Any]?,
-                         success: SuccessBlockObj? = nil,
-                         fail: FailBlock? = nil)
-    {
-        imp?.joinScene(id: id, userId: userId, isOwner: isOwner, property: property, success: success, fail: fail)
-    }
-
-    class func scene(id: String) -> SceneReference? {
-        imp?.scene(id: id)
-    }
-
-    class func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
-        imp?.fetchAll(success: success, fail: fail)
-    }
-
-    class func leaveScene(id: String) {
-        imp?.leaveScene(id: id)
-    }
-    
-    class func subscribeConnectState(state: @escaping ConnectBlockState) {
-        imp?.subscribeConnectState(state: state)
-    }
-}
-
-
-class SyncUtilImp: NSObject {
-    private var manager: AgoraSyncManager?
-//    override private init() {}
-    private var sceneRefs: [String: SceneReference] = .init()
-
-    func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
 //        let config = AgoraSyncManager.RtmConfig(appId: KeyCenter.AppId,
 //                                                channelName: sceneId)
 //        manager = AgoraSyncManager(config: config, complete: { code in
@@ -74,18 +38,19 @@ class SyncUtilImp: NSObject {
         })
     }
 
-    func joinScene(id: String,
-                   userId: String,
-                   isOwner: Bool,
-                   property: [String: Any]?,
-                   success: SuccessBlockObj? = nil,
-                   fail: FailBlock? = nil) {
+    class func joinScene(id: String,
+                         userId: String,
+                         isOwner: Bool,
+                         property: [String: Any]?,
+                         success: SuccessBlockObj? = nil,
+                         fail: FailBlock? = nil)
+    {
         guard let manager = manager else { return }
         let jsonString = JSONObject.toJsonString(dict: property) ?? ""
         let scene = Scene(id: id, userId: userId, isOwner: isOwner, property: property)
         manager.createScene(scene: scene, success: {
             manager.joinScene(sceneId: id) { sceneRef in
-                self.sceneRefs[id] = sceneRef
+                sceneRefs[id] = sceneRef
                 let attr = Attribute(key: id, value: jsonString)
                 success?(attr)
             } fail: { error in
@@ -96,19 +61,58 @@ class SyncUtilImp: NSObject {
         }
     }
 
-    func scene(id: String) -> SceneReference? {
+    class func scene(id: String) -> SceneReference? {
         sceneRefs[id]
     }
 
-    func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
+    class func fetchAll(success: SuccessBlock? = nil, fail: FailBlock? = nil) {
         manager?.getScenes(success: success, fail: fail)
     }
 
-    func leaveScene(id: String) {
+    class func leaveScene(id: String) {
         sceneRefs.removeValue(forKey: id)
     }
     
-    func subscribeConnectState(state: @escaping ConnectBlockState) {
+    class func subscribeConnectState(state: @escaping ConnectBlockState) {
         manager?.subscribeConnectState(state: state)
+    }
+}
+
+
+class SyncUtilsWrapper {
+    static private var syncUtilsInited: Bool = false
+    static private var subscribeConnectStateMap: [String: (SocketConnectState?, Bool)->Void] = [:]
+    
+    class func initScene(uniqueId: String, sceneId: String, completion: @escaping (SocketConnectState?, Bool)->Void) {
+        subscribeConnectStateMap[uniqueId] = completion
+        if syncUtilsInited {
+            completion(nil, true)
+            return
+        }
+        
+        SyncUtil.initSyncManager(sceneId: sceneId) {
+        }
+        
+        SyncUtil.subscribeConnectState { state in
+            
+            let inited = syncUtilsInited
+            defer {
+                subscribeConnectStateMap.forEach { (key: String, value: (SocketConnectState, Bool) -> Void) in
+                    value(state, inited)
+                }
+            }
+            
+            guard state == .open else { return }
+            guard !syncUtilsInited else {
+                return
+            }
+            
+            syncUtilsInited = true
+        }
+    }
+    
+    class func cleanScene() {
+        syncUtilsInited = false
+        subscribeConnectStateMap.removeAll()
     }
 }
