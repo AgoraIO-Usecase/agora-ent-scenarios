@@ -77,7 +77,7 @@ data class ShowRoomDetailModel(
         else -> R.mipmap.show_room_cover_0
     }
 
-    fun isFake() = roomId.length > 6
+    fun isRobotRoom() = roomId.length > 6
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(roomId)

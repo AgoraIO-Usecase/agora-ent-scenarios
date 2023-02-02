@@ -133,8 +133,6 @@ class ShowSyncManagerServiceImpl(
         success: (List<ShowRoomDetailModel>) -> Unit,
         error: ((Exception) -> Unit)?
     ) {
-        val returnFakeData = true
-
         initSync {
             Sync.Instance().getScenes(object : Sync.DataListCallback {
                 override fun onSuccess(result: MutableList<IObject>?) {
@@ -143,14 +141,12 @@ class ShowSyncManagerServiceImpl(
                         var roomList = result!!.map {
                             it.toObject(ShowRoomDetailModel::class.java)
                         }
-                        roomList = removeExpiredRooms(roomList, !returnFakeData)
+                        roomList = removeExpiredRooms(roomList)
 
                         roomMap.clear()
                         roomList.forEach { roomMap[it.roomId] = it.copy() }
 
-                        if (returnFakeData) {
-                            roomList = appendRobotRooms(roomList)
-                        }
+                        roomList = appendRobotRooms(roomList)
 
                         val sortedBy = roomList.sortedBy { it.createdAt }
                         runOnMainThread { success.invoke(sortedBy) }
@@ -158,7 +154,7 @@ class ShowSyncManagerServiceImpl(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
-                    if (exception?.message?.contains("empty") ?: false && returnFakeData) {
+                    if (exception?.message?.contains("empty") ?: false ) {
                         workerExecutor.execute {
                             val roomList = appendRobotRooms(emptyList())
 
@@ -211,14 +207,13 @@ class ShowSyncManagerServiceImpl(
     }
 
     private fun removeExpiredRooms(
-        roomList: List<ShowRoomDetailModel>,
-        removeFakeData: Boolean
+        roomList: List<ShowRoomDetailModel>
     ): List<ShowRoomDetailModel> {
         val retRoomList = mutableListOf<ShowRoomDetailModel>()
         retRoomList.addAll(roomList)
 
         val expireRoomList = roomList.filter {
-            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) || (removeFakeData && it.isFake())
+            (TimeUtils.currentTimeMillis() - it.createdAt.toLong() > ROOM_AVAILABLE_DURATION) && !it.isRobotRoom()
         }
         if (expireRoomList.isNotEmpty()) {
             val expireLetchCount = CountDownLatch(expireRoomList.size)
@@ -344,7 +339,7 @@ class ShowSyncManagerServiceImpl(
         val roomInfo = roomMap[roomNo] ?: return
         initSync {
             Sync.Instance().joinScene(
-                roomInfo.ownerId == UserManager.getInstance().user.id.toString(),
+                roomInfo.ownerId == UserManager.getInstance().user.id.toString() || roomInfo.isRobotRoom(),
                 roomNo, object : Sync.JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         //this@ShowSyncManagerServiceImpl.currSceneReference = sceneReference!!
@@ -360,7 +355,7 @@ class ShowSyncManagerServiceImpl(
                         innerSubscribeInteractionChanged(roomNo)
                         innerSubscribePKInvitationChanged(roomNo)
                         innerSubscribeRoomChange(roomNo)
-                        if (roomInfo.isFake()) {
+                        if (roomInfo.isRobotRoom()) {
                             cloudPlayerService.startHeartBeat(
                                 roomNo,
                                 UserManager.getInstance().user.id.toString()
@@ -370,7 +365,7 @@ class ShowSyncManagerServiceImpl(
 
                     override fun onFail(exception: SyncManagerException?) {
                         exception?: return
-                        if(exception.code == -2000 && roomInfo.isFake()){
+                        if(exception.code == -2000 && roomInfo.isRobotRoom()){
                             // 房间不存在，并且是假数据：创建cloudPlayer并创建房间
                             cloudPlayerService.startCloudPlayer(
                                 roomNo,
@@ -466,11 +461,9 @@ class ShowSyncManagerServiceImpl(
             TAG,
             "leaveRoom roomNo=${roomId} ownerId=${roomDetail.ownerId} myId=${UserManager.getInstance().user.id.toString()}"
         )
-        if (roomDetail.isFake()) {
+        if (roomDetail.isRobotRoom()) {
             cloudPlayerService.stopHeartBeat(roomId)
-        }
-
-        if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()
+        }else if (roomDetail.ownerId == UserManager.getInstance().user.id.toString()
             || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
         ) {
             Log.d(TAG, "leaveRoom delete room")
