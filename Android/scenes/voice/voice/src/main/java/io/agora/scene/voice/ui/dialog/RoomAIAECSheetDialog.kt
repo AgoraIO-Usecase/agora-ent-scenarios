@@ -20,7 +20,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         arguments?.getBoolean(KEY_IS_ON, true) ?: true
     }
 
-    public var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
+    var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
     override fun getViewBinding(
         inflater: LayoutInflater,

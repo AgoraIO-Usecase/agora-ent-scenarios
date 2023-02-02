@@ -95,7 +95,7 @@ public class HomeMineFragment extends BaseViewBindingFragment<AppFragmentHomeMin
             showLogoffAccountDialog();
         });
         getBinding().tvAbout.setOnClickListener(view -> {
-            PagePilotManager.pageWebView("https://www.agora.io/cn/about-us/");
+            PagePilotManager.pageMineAboutUs();
         });
         getBinding().vToEdit.setOnClickListener(view -> {
             if (editNameDialog == null) {

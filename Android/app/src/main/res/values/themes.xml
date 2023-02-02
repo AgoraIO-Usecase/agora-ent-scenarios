@@ -30,7 +30,14 @@
         <item name="layout_constraintStart_toStartOf">parent</item>
     </style>
 
+    <style name="app_Theme.AgoraKTV.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
+    <style name="app_Theme.AgoraKTV.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="app_Theme.AgoraKTV.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
 </resources>
