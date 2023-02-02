@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcvSoundSelectionContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginTop="10dp"
+        app:strokeColor="@color/voice_color_d8d8d8"
+        app:strokeWidth="1.5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="17.5dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/sound_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:textColor="#156EF3"
+                android:textColorHint="#156EF3"
+                android:textSize="@dimen/voice_sp_16"
+                android:textStyle="bold"
+                tools:text="@string/voice_chatroom_social_chat"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/sound_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="4.5dp"
+                android:layout_marginEnd="20dp"
+                android:breakStrategy="simple"
+                android:lineSpacingExtra="3dp"
+                android:textColorHint="#3C4267"
+                android:textSize="@dimen/voice_sp_13"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sound_name"
+                tools:text="This sound effect focuses on solving the voice call problem of Social Chat scene, including noise cancellation and echo suppression of the anchor&#180;s voice. It can enable users of different network environments and models to enjoy ultra-low delay, clear and beautiful voice in multi person chat." />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/voice_color_f6f6f6"
+                app:layout_constraintTop_toBottomOf="@+id/sound_desc" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/usage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/voice_room_current_customer_usage"
+                android:textColor="#979CBB"
+                android:textColorHint="#979CBB"
+                android:textSize="@dimen/voice_sp_13"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sound_desc" />
+
+            <LinearLayout
+                android:id="@+id/llSoundCustomerUsage"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/usage" />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSoundSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/voice_icon_room_sound_selected"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

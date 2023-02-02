@@ -43,6 +43,15 @@ class VoiceSyncManagerServiceImp(
 
     private val roomServiceSubscribeDelegates = mutableListOf<VoiceRoomSubscribeDelegate>()
 
+    // time limit
+    private var roomTimeUpSubscriber: (() -> Unit)? = null
+    private val ROOM_AVAILABLE_DURATION : Int = 20 * 60 * 1000 // 20min
+    private val timerRoomEndRun = Runnable {
+        ThreadManager.getInstance().runOnMainThread {
+            roomTimeUpSubscriber?.invoke()
+        }
+    }
+
     /**
      * 注册订阅
      * @param delegate 聊天室内IM回调处理
@@ -100,6 +109,14 @@ class VoiceSyncManagerServiceImp(
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
+                    val e = exception ?: return
+                    val ret = mutableListOf<VoiceRoomModel>()
+                    if (e.code == -VoiceServiceProtocol.ERR_ROOM_LIST_EMPTY) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, ret)
+                        }
+                        return
+                    }
                     ThreadManager.getInstance().runOnMainThread {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, emptyList())
                     }
@@ -228,6 +245,12 @@ class VoiceSyncManagerServiceImp(
                         }
                     })
                     completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
+
+                    if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                    } else {
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - curRoomInfo.createdAt).toInt())
+                    }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
@@ -687,17 +710,18 @@ class VoiceSyncManagerServiceImp(
         })
     }
 
+    override fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit) {
+        roomTimeUpSubscriber = onRoomTimeUp
+    }
+
     private fun initScene(complete: () -> Unit) {
         if (syncUtilsInit) {
             complete.invoke()
             return
         }
         val handler = Handler(Looper.getMainLooper())
-        Sync.Instance().init(context,
-            mapOf(
-                Pair("appid", VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()),
-                Pair("defaultChannel", voiceSceneId)
-            ),
+        Sync.Instance().init(
+            RethinkConfig(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId),
             object : Sync.Callback {
                 override fun onSuccess() {
                     handler.post {
