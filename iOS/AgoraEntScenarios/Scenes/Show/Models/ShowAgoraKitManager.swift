@@ -381,7 +381,7 @@ class ShowAgoraKitManager: NSObject {
         videoCanvas.renderMode = .hidden
         let ret = agoraKit.setupRemoteVideoEx(videoCanvas, connection: connection)
         
-        showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid)/\(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
+        showLogger.info("setupRemoteVideoEx ret = \(ret), uid:\(uid) localuid: \(UserInfo.userId) channelId: \(channelId)", context: kShowLogBaseContext)
     }
     
     func updateLoadingType(channelId: String, loadingType: ShowRTCLoadingType) {

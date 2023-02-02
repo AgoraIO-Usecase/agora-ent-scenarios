@@ -94,11 +94,6 @@ class ShowApplyView: UIView {
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                imp.createMicSeatApply { _ in
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                        self?.getAllMicSeatList(autoApply: autoApply)
-                    } 
-                }
                 self?.revokeutton.setTitle("撤回申请".show_localized, for: .normal)
                 self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
                                           for: .normal,
@@ -106,6 +101,17 @@ class ShowApplyView: UIView {
                                           spacing: 5)
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
+                imp.createMicSeatApply { error in
+                    if let error = error {
+                        self?.revokeutton.isHidden = true
+                        ToastView.show(text: error.localizedDescription)
+                        return
+                    }
+                    
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+                        self?.getAllMicSeatList(autoApply: autoApply)
+                    }
+                }
             }
             self?.setupTipsInfo(count: list.count)
             self?.tableView.dataArray = list
