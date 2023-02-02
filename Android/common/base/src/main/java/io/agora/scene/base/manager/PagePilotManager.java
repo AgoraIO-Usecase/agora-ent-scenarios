@@ -43,4 +43,12 @@ public class PagePilotManager {
                 .navigation();
     }
 
+    /**
+     * 关于页面
+     */
+    public static void pageMineAboutUs() {
+        ARouter.getInstance()
+                .build(PagePathConstant.pageMineAboutUs)
+                .navigation();
+    }
 }
