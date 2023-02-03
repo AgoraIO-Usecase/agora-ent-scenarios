@@ -438,6 +438,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             normalLayout.setVisibility(View.VISIBLE);
             menuLayout.setVisibility(View.VISIBLE);
             hideExpressionView(false);
+            if (roomType == 1) {
+                return false;
+            }
             return true;
         }
         return false;
