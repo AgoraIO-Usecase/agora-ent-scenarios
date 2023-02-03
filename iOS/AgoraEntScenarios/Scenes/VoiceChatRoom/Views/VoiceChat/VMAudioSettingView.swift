@@ -315,7 +315,7 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 guard !settingImage.isEmpty else { return cell}
                 cell.iconView.image = UIImage(settingImage[3])
                 cell.titleLabel.text = settingName[3]
-                cell.isAudience = isAudience
+               // cell.isAudience = isAudience
                 cell.selectionStyle = .none
                 cell.swith.isOn = roomInfo?.room?.use_robot ?? false
                 cell.useRobotBlock = { [weak self] flag in

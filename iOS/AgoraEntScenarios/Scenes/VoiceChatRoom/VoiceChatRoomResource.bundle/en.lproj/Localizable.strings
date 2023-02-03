@@ -122,6 +122,7 @@
 "High" = "High";
 "Middle" = "Middle";
 "Off" = "Off";
+"On" = "On";
 "AINS" = "AINS";
 "Your AINS" = "Your AINS";
 "AINS Settings" = "AINS Settings";
@@ -170,8 +171,9 @@
 "Removed Stage" = "You were removed from stage";
 "Mic Closed" = "Mic closed by host";
 "Members reach limit!" = "Members reach limit!";
-"AIAEC_desc" = "When you turn on accompaniment singing, AIAEC can greatly
-improve your singing effect. It is strongly recommended that you turn it on when singing";
+"AIAEC_desc" = "When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing";
 "AGC_desc" = "After it is turned on, the volume of your singing will be automatically adjusted to perfectly match the accompaniment volume. It is recommended that you turn it on when you sing";
 "Personal audio Settings" = "Personal audio Settings";
 "Best Agora Sound" = "Agora Sound Selection";
+"Turn on AIAEC" = "Turn on AIAEC";
+"Turn on AGC" = "Turn on AGC";
