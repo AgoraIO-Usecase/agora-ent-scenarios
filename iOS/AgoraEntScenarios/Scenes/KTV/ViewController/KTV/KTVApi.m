@@ -54,6 +54,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, assign) NSInteger dataStreamId;
 @property (nonatomic, strong) KTVSongConfiguration* config;
 
+@property (nonatomic, assign) int playoutVolume;
+@property (nonatomic, assign) int publishSignalVolume;
+
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
 @end
 
@@ -67,6 +70,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         self.musicCallbacks = [NSMutableDictionary dictionary];
         self.loadDict = [NSMutableDictionary dictionary];
         self.lyricUrlDict = [NSMutableDictionary dictionary];
+        
+        // 调节本地播放音量。0-100
+        [self adjustPlayoutVolume:200];
+        // 调节远端用户听到的音量。0-400
+        [self adjustPublishSignalVolume:200];
         
         self.engine = engine;
         self.channelName = channelName;
@@ -251,7 +259,12 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
             options.autoSubscribeVideo = YES;
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
+            
+            return;
         }
+        
+        [self.rtcMediaPlayer adjustPlayoutVolume:50];
+        [self.rtcMediaPlayer adjustPublishSignalVolume:50];
     }
 }
 
@@ -283,6 +296,17 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 //    [self syncTrackMode:mode];
 }
 
+
+- (void)adjustPlayoutVolume:(int)volume {
+    self.playoutVolume = volume;
+    [self.rtcMediaPlayer adjustPlayoutVolume:volume];
+}
+
+- (void)adjustPublishSignalVolume:(int)volume {
+    self.publishSignalVolume = volume;
+    [self.rtcMediaPlayer adjustPublishSignalVolume:volume];
+}
+
 #pragma mark private
 - (void)updateCosingerPlayerStatusIfNeed {
     if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
@@ -306,6 +330,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 #pragma mark - rtc delgate proxies
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
+    KTVLogInfo(@"didJoinedOfUid: %ld", uid);
 //    if(self.config.type == KTVSongTypeChorus &&
 //       self.config.role == KTVSingRoleCoSinger &&
 //       uid == self.config.mainSingerUid) {
@@ -590,7 +615,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     
     AgoraRtcConnection* connection = [AgoraRtcConnection new];
     connection.channelId = [NSString stringWithFormat:@"%@_ex", self.channelName];
-    connection.localUid = VLUserCenter.user.agoraPlayerRTCUid;
+    connection.localUid = [VLLoginModel mediaPlayerUidWithUid:VLUserCenter.user.id];//VLUserCenter.user.agoraPlayerRTCUid;
     self.subChorusConnection = connection;
     
     KTVLogInfo(@"will joinChannelExByToken: channelId: %@, enableAudioRecordingOrPlayout: %d, role: %ld", connection.channelId, options.enableAudioRecordingOrPlayout, role);
@@ -603,6 +628,19 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
            weakSelf.config.role == KTVSingRoleMainSinger) {
             //fix pushDirectAudioFrameRawData frozen
             weakSelf.pushDirectAudioEnable = YES;
+        }
+        
+        /*
+         合唱的时候，建议把接受远端人声的音量降低（建议是25或者50，后续这个值可以根据 端到端延迟来自动确认，比如150ms内可以50。 否则音量25），相应的api是adjustUserPlaybackSignalVolume(remoteUid, volume)；一是可以解决在aec nlp等级降低的情况下出现小音量回声问题，二是可以减小远端固有延迟的合唱者声音给本地k歌带来的影响
+         */
+        if(weakSelf.config.type == KTVSongTypeChorus) {
+            NSUInteger uid = 0;
+            if (weakSelf.config.role == KTVSingRoleCoSinger){
+                uid = [VLLoginModel mediaPlayerUidWithUid:[NSString stringWithFormat:@"%ld", weakSelf.config.mainSingerUid]];
+            } else {
+                return;
+            }
+            [weakSelf.engine adjustUserPlaybackSignalVolumeEx:uid volume:25 connection:connection];
         }
     }];
     if(ret != 0) {
@@ -622,6 +660,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
         [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:NO];
     }
+    
+    [self adjustPlayoutVolume:self.playoutVolume];
+    [self adjustPublishSignalVolume:self.publishSignalVolume];
     self.pushDirectAudioEnable = NO;
 }
 
