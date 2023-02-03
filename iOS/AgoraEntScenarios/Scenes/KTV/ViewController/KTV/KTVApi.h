@@ -67,6 +67,9 @@ typedef enum : NSUInteger {
 -(void)pausePlay;
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode;
 
+- (void)adjustPlayoutVolume:(int)volume;
+- (void)adjustPublishSignalVolume:(int)volume;
+
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed;
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine
