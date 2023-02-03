@@ -48,7 +48,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceSpatialActivityCreateRoomLay
     private val pageData: List<PageBean> by lazy {
         mutableListOf<PageBean>().apply {
             val bean = PageBean()
-            bean.room_type = 0
+            bean.room_type = 1
             bean.tab_title = getString(R.string.voice_tab_layout_chat_room)
             bean.room_name = getString(R.string.voice_room_create_chat_room)
             bean.room_desc = getString(R.string.voice_room_create_chat_room_desc)
