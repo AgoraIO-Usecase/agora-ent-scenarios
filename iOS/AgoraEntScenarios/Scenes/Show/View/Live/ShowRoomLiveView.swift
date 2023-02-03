@@ -7,7 +7,7 @@
 
 import UIKit
 
-private let kTableViewBottomOffset: CGFloat = 143
+private let kTableViewBottomOffset: CGFloat = Screen.safeAreaBottomHeight() + 109
 private let kChatInputViewHeight: CGFloat = 56
 
 
@@ -147,6 +147,7 @@ class ShowRoomLiveView: UIView {
         
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 109
             make.left.equalTo(15)
             make.bottom.equalTo(-kTableViewBottomOffset)
             make.right.equalTo(-70)
@@ -155,8 +156,9 @@ class ShowRoomLiveView: UIView {
     
         addSubview(chatButton)
         chatButton.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 4
             make.left.equalTo(15)
-            make.bottom.equalTo(-38)
+            make.bottom.equalTo(-max(10, bottomOffset))
         }
         
         addSubview(bottomBar)

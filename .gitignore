@@ -3,6 +3,7 @@
 local.properties
 .idea
 Pods
+**/SenseLib/*
 **/*.xcworkspace/*
 **/xcuserdata
 KeyCenter.swift

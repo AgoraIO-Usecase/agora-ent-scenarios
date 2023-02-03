@@ -24,9 +24,9 @@ class ShowBeautyFaceCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupModel(model: ByteBeautyModel) {
+    func setupModel(model: BeautyModel) {
         nameLabel.text = model.name
-        imageView.image = UIImage.show_byteBeautyImage(name: model.icon)
+        imageView.image = UIImage.show_beautyImage(name: model.icon)
         indicatorImgView.isHidden = !model.isSelected
         nameLabel.font = model.isSelected ? .show_M_12 : .show_R_11
         nameLabel.textColor = model.isSelected ? .show_main_text : .show_beauty_deselect
@@ -35,14 +35,14 @@ class ShowBeautyFaceCell: UICollectionViewCell {
     private func createSubviews(){
         // 图
         imageView = UIImageView()
-        imageView.image = UIImage.show_byteBeautyImage(name: "show_beauty_none")
+        imageView.image = UIImage.show_beautyImage(name: "show_beauty_none")
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
         
         // 选中标识
         indicatorImgView = UIImageView()
         indicatorImgView.isHidden = true
-        indicatorImgView.image = UIImage.show_byteBeautyImage(name: "show_beauty_selected")
+        indicatorImgView.image = UIImage.show_beautyImage(name: "show_beauty_selected")
         contentView.addSubview(indicatorImgView)
         
         imageView.snp.makeConstraints { make in

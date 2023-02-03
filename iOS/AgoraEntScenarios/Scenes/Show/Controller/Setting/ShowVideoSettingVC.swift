@@ -28,6 +28,7 @@ class ShowVideoSettingVC: UIViewController {
         tableView.dataSource = self
         tableView.allowsSelection = false
         tableView.rowHeight = 47
+        tableView.separatorStyle = .none
         tableView.registerCell(ShowSettingSwitchCell.self, forCellReuseIdentifier: SwitchCellID)
         tableView.registerCell(ShowSettingSegmentCell.self, forCellReuseIdentifier: SegmentCellID)
         tableView.registerCell(ShowSettingSliderCell.self, forCellReuseIdentifier: SliderCellID)

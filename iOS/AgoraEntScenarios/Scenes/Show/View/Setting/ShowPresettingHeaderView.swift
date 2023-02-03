@@ -58,7 +58,7 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
             make.left.equalTo(20)
             make.right.equalTo(-20)
             make.top.equalTo(15)
-            make.bottom.equalTo(0)
+            make.bottom.equalTo(0).priority(.high)
         }
         
         contentView.addSubview(titleLabel)
@@ -78,7 +78,7 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
             make.left.equalTo(40)
             make.top.equalTo(70)
             make.right.equalTo(-40)
-            make.bottom.equalTo(-20)
+            make.bottom.equalTo(-20).priority(.high)
         }
     }
     
