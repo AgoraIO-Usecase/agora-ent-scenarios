@@ -135,7 +135,7 @@ class SAVMManagerView: UIView {
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage.sceneImage(name:"avatar1")
+        iconView.image = UIImage(named:"avatar1")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
