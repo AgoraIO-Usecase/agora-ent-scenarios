@@ -18,7 +18,7 @@ class ShowRoomListVC: UIViewController {
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
     
-    private var firstSetAudience = false
+    private var needUpdateAudiencePresetType = false
     
     deinit {
         AppContext.unloadShowServiceImp()
@@ -43,12 +43,13 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickSettingButton(){
-        showPresettingVC { type in
+        showPresettingVC {[weak self] type in
             let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
             let audencePresetType = ShowPresetType(rawValue: value)
             if audencePresetType != .unknown {
                 UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
             }
+            self?.needUpdateAudiencePresetType = true
         }
     }
     
@@ -80,6 +81,7 @@ class ShowRoomListVC: UIViewController {
                 wSelf.joinRoom(room)
             }else{
                 wSelf.showPresettingVC { [weak self] type in
+                    self?.needUpdateAudiencePresetType = true
                     UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
                     self?.joinRoom(room)
                 }
@@ -125,6 +127,7 @@ class ShowRoomListVC: UIViewController {
         let vc = ShowLivePagesViewController()
         let audencePresetType = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
         vc.audiencePresetType = ShowPresetType(rawValue: audencePresetType)
+        vc.needUpdateAudiencePresetType = needUpdateAudiencePresetType
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {

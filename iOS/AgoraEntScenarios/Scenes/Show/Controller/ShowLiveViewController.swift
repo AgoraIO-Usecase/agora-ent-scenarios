@@ -283,10 +283,6 @@ class ShowLiveViewController: UIViewController {
         guard let channelId = room?.roomId, let ownerId = room?.ownerId else {
             return
         }
-        // 观众端模式设置
-        if role == .audience, let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .single,uid: UInt(ownerId))
-        }
         self.joinStartDate = Date()
         let uid: UInt = UInt(ownerId)!
         agoraKitManager.joinChannelEx(currentChannelId: channelId,
