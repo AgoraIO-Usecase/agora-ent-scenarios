@@ -36,6 +36,9 @@ PODS:
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
+  - LookinServer/Core (1.1.5)
+  - LookinServer/Swift (1.1.5):
+    - LookinServer/Core
   - LSTPopView (0.3.10):
     - LSTPopView/Code (= 0.3.10)
     - LSTTimer
@@ -386,6 +389,7 @@ DEPENDENCIES:
   - JXCategoryView
   - KakaJSON
   - LEEAlert
+  - LookinServer/Swift
   - LSTPopView
   - Masonry (~> 1.1.0)
   - MBProgressHUD (~> 1.1.0)
@@ -422,6 +426,7 @@ SPEC REPOS:
     - JXCategoryView
     - KakaJSON
     - LEEAlert
+    - LookinServer
     - LSTPopView
     - LSTTimer
     - Masonry
@@ -449,7 +454,7 @@ EXTERNAL SOURCES:
     :path: "./libs"
 
 SPEC CHECKSUMS:
-  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
@@ -466,6 +471,7 @@ SPEC CHECKSUMS:
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
+  LookinServer: 2893f2bae53cbf3fd49bbe1a8ea1745582ef1317
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
@@ -488,6 +494,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 05f4adf0cd6d06b9a411155eca3cb0bf4b4ca71d
+PODFILE CHECKSUM: 62c23608745ff994165fce2121d52fd847cfd1bf
 
 COCOAPODS: 1.11.3
