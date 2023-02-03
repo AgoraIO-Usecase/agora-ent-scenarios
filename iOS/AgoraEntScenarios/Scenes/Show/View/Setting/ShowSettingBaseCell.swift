@@ -9,6 +9,12 @@ import UIKit
 
 class ShowSettingBaseCell: UITableViewCell {
     
+    private var separatorLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(hex: "#F6F6F6")
+        return view
+    }()
+    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .show_Ellipse6
@@ -30,6 +36,14 @@ class ShowSettingBaseCell: UITableViewCell {
         titleLabel.snp.makeConstraints { make in
             make.left.equalTo(20)
             make.centerY.equalToSuperview()
+        }
+        
+        contentView.addSubview(separatorLineView)
+        separatorLineView.snp.makeConstraints { make in
+            make.left.equalTo(20)
+            make.right.equalTo(-20)
+            make.bottom.equalToSuperview()
+            make.height.equalTo(1)
         }
     }
     

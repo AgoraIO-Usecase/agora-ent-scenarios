@@ -15,7 +15,7 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var selectedResolution = 1
+//    private var selectedResolution = 1
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
@@ -99,7 +99,7 @@ class ShowCreateLiveVC: UIViewController {
         
         // 创建默认美颜效果
         ShowBeautyFaceVC.beautyData.forEach({
-            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
+            BeautyManager.shareManager.setBeauty(path: $0.path,
                                                      key: $0.key,
                                                      value: $0.value)
         })
@@ -108,7 +108,7 @@ class ShowCreateLiveVC: UIViewController {
     private func showPreset() {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraKitManager.updatePresetForType(type, mode: .signle)
+            self?.agoraKitManager.updatePresetForType(type, mode: .single)
             let text1 = "show_presetting_update_toast1".show_localized
             let text2 = "show_presetting_update_toast2".show_localized
             ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
@@ -117,7 +117,7 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     @objc private func didClickCancelButton(){
-        ByteBeautyManager.shareManager.destroy()
+        BeautyManager.shareManager.destroy()
         dismiss(animated: true)
     }
 }
@@ -147,15 +147,16 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickQualityBtnAction() {
         createView.hideBottomViews = true
         let vc = ShowSelectQualityVC()
-        vc.defalutSelectIndex = selectedResolution
+//        vc.defalutSelectIndex = selectedResolution
         present(vc, animated: true)
         vc.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
-            wSelf.selectedResolution = index
-            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.selectedResolution = index
+//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
         }
     }
     
@@ -179,7 +180,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             let liveVC = ShowLivePagesViewController()
             liveVC.agoraKitManager = wSelf.agoraKitManager
             liveVC.roomList = [detailModel]
-            liveVC.selectedResolution = wSelf.selectedResolution
+//            liveVC.selectedResolution = wSelf.selectedResolution
             liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             
             wSelf.navigationController?.pushViewController(liveVC, animated: false)

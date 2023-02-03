@@ -35,9 +35,12 @@ class ShowLiveViewController: UIViewController {
         }
     }
     
-    var selectedResolution = 1
+//    var selectedResolution = ShowSettingKey.captureVideoSize.intValue
     
     var audiencePresetType: ShowPresetType?
+    
+    private var remoteVideoWidth: UInt?
+    private var currentMode: ShowMode?
     
     private var interruptInteractionReason: String?
     
@@ -279,10 +282,6 @@ class ShowLiveViewController: UIViewController {
 //        agoraKitManager.defaultSetting()
         guard let channelId = room?.roomId, let ownerId = room?.ownerId else {
             return
-        }
-        // 观众端模式设置
-        if role == .audience, let type = audiencePresetType {
-            agoraKitManager.updatePresetForType(type, mode: .signle,uid: UInt(ownerId))
         }
         self.joinStartDate = Date()
         let uid: UInt = UInt(ownerId)!
@@ -758,7 +757,19 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
         realTimeView.statsInfo?.updateVideoStats(stats)
-//        showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription ?? "")) width = \(stats.width), height = \(stats.height), type = \(stats.superResolutionType)")
+        print("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height)")
+        if let audiencePresetType = audiencePresetType {
+            let mode: ShowMode = interactionStatus == .idle ? .single : .pk
+            // 防止多次调用
+            if mode != currentMode || stats.width != remoteVideoWidth {
+                agoraKitManager.setSuperResolutionForAudienceType(presetType: audiencePresetType, videoWidth: Int(stats.width), mode: mode)
+                currentMode = mode
+                remoteVideoWidth = stats.width
+                if stats.width >= 1080 && ShowSettingKey.SR.boolValue == true {
+                    ToastView.show(text: "show_presetting_alert_will_change_sr_value_message".show_localized)
+                }
+            }
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
@@ -777,6 +788,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         showLogger.warning("contentInspectResult: \(result.rawValue)")
         guard result == .porn else { return }
         ToastView.show(text: "监测到当前内容存在违规行为")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, videoSizeChangedOf sourceType: AgoraVideoSourceType, uid: UInt, size: CGSize, rotation: Int) {
+        print("videoSizeChangedOf = \(String(describing: room?.ownerId?.debugDescription)) width = \(size.width), height = \(size.height), sourceType = \(sourceType.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit,
@@ -918,7 +933,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         settingMenuVC.dismiss(animated: false)
         
         let vc = ShowSelectQualityVC()
-        vc.defalutSelectIndex = selectedResolution
+//        vc.defalutSelectIndex = selectedResolution
         present(vc, animated: false)
         vc.dismissed = { [weak self] in
             guard let wSelf = self else { return }
@@ -926,8 +941,9 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
         }
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
-            wSelf.selectedResolution = index
-            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.selectedResolution = index
+//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
         }
     }
     
@@ -982,9 +998,10 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             guard let wSelf = self else { return }
             let vc = ShowAdvancedSettingVC()
             vc.isOutside = false
-            vc.mode = wSelf.interactionStatus == .pking ? .pk : .signle // 根据当前模式设置
+            vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
             vc.isBroadcaster = wSelf.role == .broadcaster
             vc.settingManager = wSelf.agoraKitManager
+            vc.audiencePresetType = wSelf.audiencePresetType
             wSelf.navigationController?.pushViewController(vc, animated: true)
         }
     }

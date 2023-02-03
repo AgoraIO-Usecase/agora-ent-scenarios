@@ -70,8 +70,15 @@ class ShowAgoraKitManager: NSObject {
     }()
     */
     
+    // 是否开启绿幕功能
+    static var isOpenGreen: Bool = false
+    static var isBlur: Bool = false
+    
     // 预设类型
     var presetType: ShowPresetType?
+    
+    var srIsOn = false
+    var srType: SRType = .x1_33
     
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
@@ -264,6 +271,37 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.switchCamera()
     }
     
+    /// 开启虚化背景
+    func enableVirtualBackground(isOn: Bool, greenCapacity: Float = 0) {
+        let source = AgoraVirtualBackgroundSource()
+        source.backgroundSourceType = .blur
+        source.blurDegree = .high
+        var seg: AgoraSegmentationProperty?
+        if ShowAgoraKitManager.isOpenGreen {
+            seg = AgoraSegmentationProperty()
+            seg?.modelType = .agoraGreen
+            seg?.greenCapacity = greenCapacity
+        }
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
+    }
+    
+    /// 设置虚拟背景
+    func seVirtualtBackgoundImage(imagePath: String?, isOn: Bool, greenCapacity: Float = 0) {
+        guard let bundlePath = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
+              let bundle = Bundle(path: bundlePath) else { return }
+        let imgPath = bundle.path(forResource: imagePath, ofType: "jpg")
+        let source = AgoraVirtualBackgroundSource()
+        source.backgroundSourceType = .img
+        source.source = imgPath
+        var seg: AgoraSegmentationProperty?
+        if ShowAgoraKitManager.isOpenGreen {
+            seg = AgoraSegmentationProperty()
+            seg?.modelType = .agoraGreen
+            seg?.greenCapacity = greenCapacity
+        }
+        agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
+    }
+    
     func updateChannelEx(channelId: String, options: AgoraRtcChannelMediaOptions) {
         guard let connection = exConnectionMap[channelId] else {
             showLogger.error("updateChannelEx fail: connection is empty")
@@ -437,7 +475,7 @@ class ShowAgoraKitManager: NSObject {
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
     func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        videoFrame.pixelBuffer = ByteBeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
         return true
     }
     
