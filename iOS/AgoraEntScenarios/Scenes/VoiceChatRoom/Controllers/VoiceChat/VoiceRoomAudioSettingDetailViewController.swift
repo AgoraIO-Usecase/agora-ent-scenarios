@@ -125,6 +125,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: tableViewHeight > screenHeight ? screenHeight - 70 : tableViewHeight)
     }
     
