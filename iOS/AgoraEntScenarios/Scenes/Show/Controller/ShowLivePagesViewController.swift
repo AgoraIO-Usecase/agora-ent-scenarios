@@ -12,7 +12,8 @@ class ShowLivePagesViewController: ViewController {
     var roomList: [ShowRoomListModel]?
     // 观众端预设类型
     var audiencePresetType: ShowPresetType?
-    var selectedResolution = 1
+    var needUpdateAudiencePresetType = false
+//    var selectedResolution = 1
     
     var focusIndex: Int = 0
     
@@ -56,6 +57,7 @@ class ShowLivePagesViewController: ViewController {
         self.view.addSubview(collectionView)
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
         scroll(to: fakeCellIndex(with: focusIndex))
+        updateAudiencePresetType()
     }
 }
 
@@ -103,6 +105,20 @@ extension ShowLivePagesViewController {
     
     private func scroll(to index: Int) {
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+    }
+    
+    // 观众端模式设置
+    private func updateAudiencePresetType() {
+        // 如果是主播 不执行
+        if let room = roomList?[focusIndex], room.ownerId == VLUserCenter.user.id {
+            return
+        }
+        if needUpdateAudiencePresetType == false {
+            return
+        }
+        if let type = audiencePresetType {
+            agoraKitManager.updatePresetForType(type, mode: .single)
+        }
     }
 }
 

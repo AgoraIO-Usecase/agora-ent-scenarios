@@ -49,7 +49,7 @@ extension ShowAgoraKitManager {
         ShowSettingKey.recordingSignalVolume.writeValue(80)
         ShowSettingKey.musincVolume.writeValue(30)
 //        agoraKit.enableExtension("agora_video_filters_super_resolution", "super_resolution")
-        ShowSettingKey.SR.writeValue(false) // 默认关闭sr
+//        ShowSettingKey.SR.writeValue(false) // 默认关闭sr
         let hasOpened = UserDefaults.standard.bool(forKey: hasOpenedKey)
         // 第一次进入房间的时候设置
         if hasOpened == false {
