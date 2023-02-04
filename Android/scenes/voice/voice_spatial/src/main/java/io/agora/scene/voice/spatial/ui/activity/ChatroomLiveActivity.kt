@@ -369,15 +369,14 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             binding.messageView.init(roomKitBean.chatroomId, roomKitBean.ownerChatUid)
             binding.rvChatroom2dMicLayout.isVisible = true
             binding.rvChatroom3dMicLayout.isVisible = false
-            roomObservableDelegate =
-                io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
-                    this,
-                    roomLivingViewModel,
-                    roomKitBean,
-                    binding.cTopView,
-                    binding.rvChatroom2dMicLayout,
-                    binding.chatBottom
-                )
+            roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
+                this,
+                roomLivingViewModel,
+                roomKitBean,
+                binding.cTopView,
+                binding.rvChatroom2dMicLayout,
+                binding.chatBottom
+            )
             binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom2dMicLayout.onItemClickListener(
                 object :
@@ -397,15 +396,15 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             binding.likeView.isVisible = false
             binding.rvChatroom2dMicLayout.isVisible = false
             binding.rvChatroom3dMicLayout.isVisible = true
-            roomObservableDelegate =
-                io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
-                    this,
-                    roomLivingViewModel,
-                    roomKitBean,
-                    binding.cTopView,
-                    binding.rvChatroom3dMicLayout,
-                    binding.chatBottom
-                )
+            roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
+                this,
+                roomLivingViewModel,
+                roomKitBean,
+                binding.cTopView,
+                binding.rvChatroom3dMicLayout,
+                binding.chatBottom
+            )
+            roomObservableDelegate.showRoom3DWelcomeSheetDialog()
             binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
             binding.rvChatroom3dMicLayout.onItemClickListener(
                 object :
