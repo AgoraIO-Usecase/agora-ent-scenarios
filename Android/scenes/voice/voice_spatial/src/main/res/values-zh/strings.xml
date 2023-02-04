@@ -134,6 +134,10 @@
     <string name="voice_room_disclaimer_content_3">如果您下载、安装、使⽤本产品，即表明您确认并同意声⽹对因任何原因在试⽤本产品时可能对您⾃身或他⼈造成的任何形式的损失和伤害不承担任何责任。</string>
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
 
+    <string name="voice_chatroom_welcome">如何使用3D空间音频</string>
+    <string name="voice_chatroom_welcome_tip1">戴上耳机</string>
+    <string name="voice_chatroom_welcome_tip2">移动头像可以听到不同的空间音频效果</string>
+    <string name="voice_chatroom_welcome_gotit">我明白了</string>
     <string name="voice_chatroom_notice">公告</string>
     <string name="voice_chatroom_settings_host_only">仅房主可操作</string>
     <string name="voice_chatroom_own_audio_settings">个人音效设置</string>

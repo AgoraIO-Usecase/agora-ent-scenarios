@@ -402,6 +402,17 @@ class RoomObservableViewDelegate constructor(
     }
 
     /**
+     * 展示3D空间音频欢迎页
+     */
+    fun showRoom3DWelcomeSheetDialog() {
+        if (!Room3DWelcomeSheetDialog.needShow) {
+            return
+        }
+        val room3DWelcomeSheetDialog = Room3DWelcomeSheetDialog()
+        room3DWelcomeSheetDialog.show(activity.supportFragmentManager, "room3DWelcomeSheetDialog")
+    }
+
+    /**
      * 公告
      */
     fun onClickNotice() {
