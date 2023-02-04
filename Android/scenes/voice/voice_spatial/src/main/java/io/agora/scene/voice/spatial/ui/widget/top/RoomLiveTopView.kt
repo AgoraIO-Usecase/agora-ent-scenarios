@@ -56,6 +56,10 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.llTitle.layoutParams = layoutParams
     }
 
+    fun hideRoomGifts() {
+        binding.mtChatroomGifts.visibility = GONE
+    }
+
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
         this.roomDetailInfo = voiceRoomModel
         binding.apply {

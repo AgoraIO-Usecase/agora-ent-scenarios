@@ -424,6 +424,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         }
         binding.cTopView.setTitleMaxWidth()
 //        roomObservableDelegate.onRoomModel(voiceRoomModel)
+        binding.cTopView.hideRoomGifts()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()
