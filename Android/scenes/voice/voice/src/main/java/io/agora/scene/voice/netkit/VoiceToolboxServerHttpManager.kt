@@ -157,6 +157,7 @@ class VoiceToolboxServerHttpManager {
             requestIM.putOpt("clientId", io.agora.scene.voice.BuildConfig.im_client_id)
             requestIM.putOpt("clientSecret", io.agora.scene.voice.BuildConfig.im_client_secret)
             requestBody.putOpt("im", requestIM)
+            requestBody.putOpt("type",0)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
