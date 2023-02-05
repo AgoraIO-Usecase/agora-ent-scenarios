@@ -133,6 +133,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             let showState = ShowServiceConnectState(rawValue: state.rawValue) ?? .open
             self.subscribeDelegate?.onConnectStateChanged(state: showState)            
             guard state == .open else { return }
+            self._subscribeAll()
             guard !inited else {
                 self._fetchCreatePkInvitation()
                 self._getUserList {[weak self] (err, list) in
@@ -294,7 +295,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         defer {
             self.pkCreatedInvitationMap.values.forEach { invitation in
                 guard let pkRoomId = invitation.roomId else { return }
-                SyncUtil.leaveScene(id: pkRoomId)
+                _leaveScene(roomId: pkRoomId)
             }
             
             cleanCache()
@@ -767,7 +768,7 @@ extension ShowSyncManagerServiceImp {
         _removeUser { error in
         }
         
-        SyncUtil.leaveScene(id: channelName)
+        _leaveScene(roomId: channelName)
     }
 
     private func _removeRoom(completion: @escaping (NSError?) -> Void) {
@@ -798,6 +799,11 @@ extension ShowSyncManagerServiceImp {
         SyncUtil
             .scene(id: channelName)?
             .unsubscribeScene()
+    }
+    
+    private func _leaveScene(roomId: String) {
+        agoraPrint("imp leave scene: \(roomId)")
+        SyncUtil.leaveScene(id: roomId)
     }
 }
 
@@ -1212,6 +1218,12 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: PK Invitation
 extension ShowSyncManagerServiceImp {
+    private func _pkFixed() {
+        //TODO: it seems that join 2nd scene will be remove subscibe
+        self._unsubscribeAll()
+        self._subscribeAll()
+    }
+    
     fileprivate func _getAllPKInvitationList(room: ShowRoomListModel?,
                                          completion: @escaping (NSError?, [ShowPKInvitation]?) -> Void) {
         guard let channelName = room?.roomId ?? roomId else {
@@ -1231,9 +1243,7 @@ extension ShowSyncManagerServiceImp {
                                userId: ownerId,
                                isOwner: false,
                                property: params) { result in
-                //TODO: it seems that join 2nd scene will be remove subscibe
-                self._unsubscribeAll()
-                self._subscribeAll()
+                self._pkFixed()
                 
                 SyncUtil
                     .scene(id: channelName)?
@@ -1448,7 +1458,7 @@ extension ShowSyncManagerServiceImp {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId, pkRoomId != roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
 //        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
-        SyncUtil.leaveScene(id: pkRoomId)
+        _leaveScene(roomId: pkRoomId)
 //        guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else { return }
 //        _removeInteraction(interaction: interaction) { error in
 //        }
@@ -1499,7 +1509,7 @@ extension ShowSyncManagerServiceImp {
         guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
 //        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
-        SyncUtil.leaveScene(id: pkRoomId)
+        _leaveScene(roomId: pkRoomId)
         guard let interaction = self.interactionList.filter({ $0.userId == invitation.userId }).first else {
             return
         }
