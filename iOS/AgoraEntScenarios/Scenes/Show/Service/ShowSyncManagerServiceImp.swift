@@ -99,19 +99,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     //create pk invitation map
     private var pkCreatedInvitationMap: [String: ShowPKInvitation] = [String: ShowPKInvitation]()
     
-    fileprivate var roomId: String? {
-        didSet {
-            if oldValue == roomId {
-                return
-            }
-            guard let _ = roomId else {
-                return
-            }
-
-//            syncUtilsInited = false
-            SyncUtilsWrapper.cleanScene()
-        }
-    }
+    fileprivate var roomId: String?
     
     deinit {
         agoraPrint("deinit-- ShowSyncManagerServiceImp")
@@ -1243,6 +1231,10 @@ extension ShowSyncManagerServiceImp {
                                userId: ownerId,
                                isOwner: false,
                                property: params) { result in
+                //TODO: it seems that join 2nd scene will be remove subscibe
+                self._unsubscribeAll()
+                self._subscribeAll()
+                
                 SyncUtil
                     .scene(id: channelName)?
                     .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
