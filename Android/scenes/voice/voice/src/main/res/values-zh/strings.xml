@@ -63,6 +63,7 @@
     <string name="voice_chatroom_gift_title">打赏</string>
     <string name="voice_chatroom_gift_dialog_send">发送</string>
     <string name="voice_gift_sent">赠送 </string>
+    <string name="voice_chatroom_gift_notice"> %1$s 送给 %2$s 一发火箭</string>
 
     <string name="voice_chatroom_send_gift_fail">礼物发送失败</string>
     <string name="voice_chatroom_create_tip1">本应用为测试产品，请勿商用</string>

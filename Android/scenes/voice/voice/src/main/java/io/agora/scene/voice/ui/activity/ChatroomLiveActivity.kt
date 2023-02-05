@@ -209,6 +209,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.chatroomGiftView.refresh()
                     if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
                         giftViewDelegate.showGiftAction()
+                        binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
+                            ChatroomIMManager.getInstance().getUserName(message),roomKitBean.chatroomId))
                     }
                     roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
                 }
@@ -481,6 +483,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
+                                binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
+                                    ChatroomIMManager.getInstance().getUserName(message),roomKitBean.chatroomId))
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
@@ -583,6 +587,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
         ChatroomIMManager.getInstance().logout(false)
+        binding.subtitle.clearTask()
         super.finish()
     }
 
