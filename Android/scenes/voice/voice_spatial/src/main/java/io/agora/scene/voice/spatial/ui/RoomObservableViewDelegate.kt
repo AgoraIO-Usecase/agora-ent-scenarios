@@ -848,8 +848,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        // TODO chatUSerName 改为RTC的uid？
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString())
+                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
                     } else {
                         roomLivingViewModel.startMicSeatApply(micIndex)
                     }

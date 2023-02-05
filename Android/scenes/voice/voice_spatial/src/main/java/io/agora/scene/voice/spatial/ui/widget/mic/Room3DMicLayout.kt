@@ -376,12 +376,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             }
         } else {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex5]?.apply {
-                this.micStatus = MicStatus.BotActivated
+                this.micStatus = MicStatus.BotInactive
                 binding.micV2Blue.binding(this)
                 micViewMap[ConfigConstants.MicConstant.KeyIndex5]?.binding(this)
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
-                this.micStatus = MicStatus.BotActivated
+                this.micStatus = MicStatus.BotInactive
                 micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
             }
         }
@@ -437,7 +437,24 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
-                val index = entry.key
+                // TODO 需要做一个映射
+                val index = when (entry.key) {
+                    2 -> {
+                        5
+                    }
+                    3 -> {
+                        6
+                    }
+                    5 -> {
+                        2
+                    }
+                    6 -> {
+                        3
+                    }
+                    else -> {
+                        entry.key
+                    }
+                }
                 val micInfo = entry.value
                 // 普通用户
                 if (index < USER_SIZE) {
@@ -448,8 +465,8 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 }
             }
             // 机器人
-            if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex5)) {
-                val value = newMicMap[ConfigConstants.MicConstant.KeyIndex5]
+            if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex2)) {
+                val value = newMicMap[ConfigConstants.MicConstant.KeyIndex2]
                 activeBot(value?.micStatus == MicStatus.BotActivated)
             }
         }

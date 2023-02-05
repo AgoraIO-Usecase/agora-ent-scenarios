@@ -102,9 +102,9 @@ interface VoiceServiceProtocol {
 
     /**
      * 同意申请
-     * @param chatUid 环信用户id
+     * @param userId 用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatApply(userId: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消上麦
