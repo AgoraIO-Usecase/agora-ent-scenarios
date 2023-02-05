@@ -94,7 +94,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
     private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
-//        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
     private fun initListeners() {
@@ -262,11 +261,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             ) {
                 super.onSeatUpdated(roomId, attributeMap, fromId)
                 "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logD()
-                if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-//                attributeMap.let {
-//                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
-//                    roomObservableDelegate.onSeatUpdated(it)
-//                }
+                if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
+                attributeMap.let {
+                    //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
+                    roomObservableDelegate.onSeatUpdated(it)
+                }
                 attributeMap
                     .filter { it.key.startsWith("mic_") }
                     .forEach { (key, value) ->
