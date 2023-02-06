@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AgoraSyncManager
 
 private let cSceneId = "scene_ChatRoom"
 
@@ -19,9 +20,25 @@ public enum updateRoomState {
     case removed
     case destroyed
     case offLined
+    
+    func errorDesc() -> String {
+        switch self {
+        case .removed:
+            return "you are removed by owner!"
+        case .destroyed:
+            return "VoiceRoom was destroyed!"
+        case .offLined:
+            return"you are offline!"
+        default:
+            return ""
+        }
+    }
 }
 
 @objc public protocol ChatRoomServiceSubscribeDelegate: NSObjectProtocol {
+    
+    /// 房间过期
+    func onRoomExpired()
     
     /// Description token 过期
     func chatTokenWillExpire()
