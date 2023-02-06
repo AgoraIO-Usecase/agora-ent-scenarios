@@ -308,11 +308,9 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = DDEAAC31296D3D9E00D23969 /* VLAlert.m */; };
-		E320DE23298B615000C6D7AA /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E320DE22298B615000C6D7AA /* KeyCenter.swift */; };
 		E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E33622C8296FBAB0002F9341 /* VLKTVAlert.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
-
 		E3D1D83C298CAA5400BDBAC2 /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */; };
 		E3D1D83D298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D838298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift */; };
 		E3D1D83E298CAA5400BDBAC2 /* AgoraStringExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D839298CAA5400BDBAC2 /* AgoraStringExtention.swift */; };
@@ -321,7 +319,6 @@
 		E3D1D842298CACA000BDBAC2 /* AgoraLrcModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D841298CACA000BDBAC2 /* AgoraLrcModel.swift */; };
 		E3D1D844298CAD4000BDBAC2 /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D843298CAD4000BDBAC2 /* AgoraLrcParse.swift */; };
 		E3D1D846298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D845298CADAF00BDBAC2 /* AgoraMiguXmlLrcParse.swift */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -771,7 +768,6 @@
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		DDEAAC30296D3D9E00D23969 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
 		DDEAAC31296D3D9E00D23969 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
-		E320DE22298B615000C6D7AA /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		E33622C7296FBAB0002F9341 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
 		E33622C8296FBAB0002F9341 /* VLKTVAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVAlert.m; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
@@ -781,6 +777,7 @@
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
+
 		E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E3D1D838298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
 		E3D1D839298CAA5400BDBAC2 /* AgoraStringExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraStringExtention.swift; sourceTree = "<group>"; };
@@ -1356,7 +1353,6 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
-				E320DE22298B615000C6D7AA /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
 				DDDDDB3228FFD78B005F4E8B /* Context */,
@@ -2401,7 +2397,6 @@
 				DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */,
 				DD220B28295B332C00F57F30 /* VoiceRoomIMManager.swift in Sources */,
 				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
-				E320DE23298B615000C6D7AA /* KeyCenter.swift in Sources */,
 				DD220B1C295B332C00F57F30 /* VRVerifyCodeTextView.swift in Sources */,
 				DD220B45295B332C00F57F30 /* VRCreateRoomViewController.swift in Sources */,
 				DD220B85295B332C00F57F30 /* VRSoundEffectsList.swift in Sources */,
