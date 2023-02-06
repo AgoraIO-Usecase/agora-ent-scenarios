@@ -35,17 +35,19 @@ class SARoomViewController: SABaseViewController {
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
-    lazy var chatView: SAChatView = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - (ScreenHeight / 667) * 210 - 50, width: ScreenWidth, height: (ScreenHeight / 667) * 210))
-
-    lazy var chatBar: SAChatBar = .init(frame: CGRect(x: 0, y: ScreenHeight - CGFloat(ZBottombarHeight) - 50, width: ScreenWidth, height: 50), style: self.roomInfo?.room?.type ?? 0 == 1 ? .spatialAudio : .normal)
-
-    lazy var inputBar: SAInputBar = .init(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 60)).backgroundColor(.white)
+    lazy var chatBar: SAChatBar = .init(frame: CGRect(x: 0,
+                                                      y: ScreenHeight - CGFloat(ZBottombarHeight) - 50,
+                                                      width: ScreenWidth,
+                                                      height: 50),
+                                        style: .spatialAudio)
 
     var preView: SAVMPresentView!
     var noticeView: SANoticeView!
     var isShowPreSentView: Bool = false
-    var rtckit: SARTCManager = SARTCManager.getSharedInstance()
-    var isOwner: Bool = false
+    var rtckit = SARTCManager.getSharedInstance()
+    var isOwner: Bool {
+        SAUserInfo.shared.user?.uid == roomInfo?.room?.owner?.uid
+    }
     var ains_state: SARtcType.AINS_STATE = .mid
     var local_index: Int?
     var alienCanPlay: Bool = true
@@ -53,15 +55,9 @@ class SARoomViewController: SABaseViewController {
 
     public var roomInfo: SARoomInfo? {
         didSet {
-            SAUserInfo.shared.currentRoomOwner = self.roomInfo?.room?.owner
+            SAUserInfo.shared.currentRoomOwner = roomInfo?.room?.owner
             if let mics = roomInfo?.mic_info {
-                if let type = roomInfo?.room?.type {
-                    if type == 0 && self.rtcView != nil {
-                        self.rtcView.micInfos = mics
-                    } else if type == 1 && self.sRtcView != nil {
-                        self.sRtcView.micInfos = mics
-                    }
-                }
+                sRtcView.micInfos = mics
             }
         }
     }
@@ -81,10 +77,7 @@ class SARoomViewController: SABaseViewController {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
 
-        guard let user = SAUserInfo.shared.user else { return }
-        guard let owner = roomInfo?.room?.owner else { return }
         guard let type = roomInfo?.room?.sound_effect else { return }
-        isOwner = user.uid == owner.uid
         local_index = isOwner ? 0 : nil
         vmType = getSceneType(type)
         SpatialAudioServiceImp.getSharedInstance().subscribeEvent(with: self)
@@ -175,7 +168,10 @@ extension SARoomViewController {
     private func sendJoinedMessage() {
         guard let user = SAUserInfo.shared.user else {return}
         user.mic_index = -1
-        SAIMManager.shared?.sendCustomMessage(roomId: self.roomInfo?.room?.chatroom_id ?? "", event: SAJoinedMember, customExt: ["user" : user.kj.JSONString()], completion: { message, error in
+        SAIMManager.shared?.sendCustomMessage(roomId: roomInfo?.room?.chatroom_id ?? "",
+                                              event: SAJoinedMember,
+                                              customExt: ["user" : user.kj.JSONString()],
+                                              completion: { message, error in
             if error != nil {
                 self.view.makeToast("Send joined chatroom message failed!")
             }
@@ -183,13 +179,13 @@ extension SARoomViewController {
     }
     
     func refreshRoomInfo() {
-        self.roomInfo?.room?.member_list = [SAUser]()
-        self.roomInfo?.room?.ranking_list = [SAUser]()
-        if let info = self.roomInfo {
+        roomInfo?.room?.member_list = [SAUser]()
+        roomInfo?.room?.ranking_list = [SAUser]()
+        if let info = roomInfo {
             info.mic_info = SpatialAudioServiceImp.getSharedInstance().mics
-            self.roomInfo = info
-            self.headerView.updateHeader(with: info.room)
-            SpatialAudioServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
+            roomInfo = info
+            headerView.updateHeader(with: info.room)
+            SpatialAudioServiceImp.getSharedInstance().userList = roomInfo?.room?.member_list
         }
     }
 
@@ -205,7 +201,7 @@ extension SARoomViewController {
     // 加入房间获取房间详情
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
-        SpatialAudioServiceImp.getSharedInstance().fetchRoomDetail(entity: self.roomInfo?.room ?? SARoomEntity()) { [weak self] error, room_info in
+        SpatialAudioServiceImp.getSharedInstance().fetchRoomDetail(entity: roomInfo?.room ?? SARoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
                 self?.roomInfoUpdateUI(info: info)
@@ -216,23 +212,22 @@ extension SARoomViewController {
     }
     
     func roomInfoUpdateUI(info: SARoomInfo) {
-        self.roomInfo = info
-        self.headerView.updateHeader(with: info.room)
-        guard let mics = self.roomInfo?.mic_info else { return }
-        if self.roomInfo?.room?.member_list == nil {
-            self.roomInfo?.room?.member_list = [SAUser]()
+        roomInfo = info
+        headerView.updateHeader(with: info.room)
+        guard let mics = roomInfo?.mic_info else { return }
+        if roomInfo?.room?.member_list == nil {
+            roomInfo?.room?.member_list = [SAUser]()
         }
-        self.roomInfo?.room?.member_list?.append(SAUserInfo.shared.user!)
-        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+        roomInfo?.room?.member_list?.append(SAUserInfo.shared.user!)
+        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list": roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
             if error != nil {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
         SpatialAudioServiceImp.getSharedInstance().mics = mics
-        SpatialAudioServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
-        self.roomInfo?.room?.ranking_list = info.room?.ranking_list
-        if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid
-        }) {
+        SpatialAudioServiceImp.getSharedInstance().userList = roomInfo?.room?.member_list
+        roomInfo?.room?.ranking_list = info.room?.ranking_list
+        if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid }) {
             SAUserInfo.shared.user?.amount = first.amount
         }
     }
@@ -269,7 +264,7 @@ extension SARoomViewController {
         }
         view.addSubview(headerView)
 
-        sRtcView = SA3DRtcView()
+        sRtcView = SA3DRtcView(frame: .zero)
         view.addSubview(sRtcView)
 
         rtcView = SANormalRtcView()
@@ -277,7 +272,7 @@ extension SARoomViewController {
         rtcView.clickBlock = { [weak self] type, tag in
             self?.didRtcAction(with: type, tag: tag)
         }
-        view.addSubview(rtcView)
+//        view.addSubview(rtcView)
 
         if let entity = roomInfo?.room {
             sRtcView.isHidden = entity.type == 0
@@ -286,12 +281,12 @@ extension SARoomViewController {
         }
 
         bgImgView.snp.makeConstraints { make in
-            make.left.right.top.bottom.equalTo(self.view)
+            make.left.right.top.bottom.equalTo(view)
         }
 
         let isHairScreen = SwiftyFitsize.isFullScreen
         headerView.snp.makeConstraints { make in
-            make.left.top.right.equalTo(self.view)
+            make.left.top.right.equalTo(view)
             make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
         }
 
@@ -300,23 +295,7 @@ extension SARoomViewController {
             make.left.right.equalTo(self.view)
             make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
         }
-
-        rtcView.snp.makeConstraints { make in
-            make.top.equalTo(self.headerView.snp.bottom)
-            make.left.right.equalTo(self.view)
-            make.height.equalTo(240~)
-        }
-        if roomInfo?.room?.type ?? 0 == 1 {
-            view.addSubViews([chatBar])
-            inputBar.isHidden = true
-        } else {
-            let pan = UIPanGestureRecognizer(target: self, action: #selector(resignKeyboard))
-            pan.minimumNumberOfTouches = 1
-            rtcView.addGestureRecognizer(pan)
-            view.addSubViews([chatView, giftList(), chatBar, inputBar])
-            inputBar.isHidden = true
-        }
-        chatView.messages?.append(startMessage())
+        view.addSubViews([chatBar])
     }
 
 
@@ -397,7 +376,6 @@ extension SARoomViewController {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        inputBar.hiddenInputBar()
         if isShowPreSentView {
             UIView.animate(withDuration: 0.5, animations: {
                 self.preView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 450~)
@@ -405,7 +383,6 @@ extension SARoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-                self.sRtcView.isUserInteractionEnabled = true
                 self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
@@ -414,7 +391,10 @@ extension SARoomViewController {
     }
 
     func showNoticeView(with role: ROLE_TYPE) {
-        let noticeView = SANoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220))
+        let noticeView = SANoticeView(frame: CGRect(x: 0,
+                                                    y: 0,
+                                                    width: ScreenWidth,
+                                                    height: 220))
         noticeView.roleType = role
         noticeView.noticeStr = roomInfo?.room?.announcement ?? ""
         noticeView.resBlock = { [weak self] flag, str in
@@ -425,13 +405,22 @@ extension SARoomViewController {
         }
         let noticeStr = roomInfo?.room?.announcement ?? ""
         noticeView.noticeStr = noticeStr
-        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 220)), custom: noticeView)
+        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                                             height: 220)),
+                                       custom: noticeView)
         sa_presentViewController(vc)
     }
 
     func showSoundView() {
-        let soundView = SASoundView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1)), soundEffect: roomInfo?.room?.sound_effect ?? 1)
-        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1))), custom: soundView)
+        let soundView = SASoundView(frame: CGRect(x: 0,
+                                                  y: 0,
+                                                  width: ScreenWidth,
+                                                  height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1)),
+                                    soundEffect: roomInfo?.room?.sound_effect ?? 1)
+        let height = 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1)
+        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                                             height: height)),
+                                       custom: soundView)
         sa_presentViewController(vc)
     }
 
@@ -440,8 +429,13 @@ extension SARoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        let confirmView = SAConfirmView(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 40~, height: 220~), type: .addbot)
-        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~, height: 220~))
+        let confirmView = SAConfirmView(frame: CGRect(x: 0,
+                                                      y: 0,
+                                                      width: ScreenWidth - 40~,
+                                                      height: 220~),
+                                        type: .addbot)
+        var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 40~,
+                                                                   height: 220~))
         compent.destination = .center
         let vc = SAAlertViewController(compent: compent, custom: confirmView)
         confirmView.resBlock = { [weak self] flag in
@@ -505,13 +499,6 @@ extension SARoomViewController {
     }
 
     func charBarEvents() {
-        chatBar.raiseKeyboard = { [weak self] in
-            self?.inputBar.isHidden = false
-            self?.inputBar.inputField.becomeFirstResponder()
-        }
-        inputBar.sendClosure = { [weak self] in
-            self?.sendTextMessage(text: $0)
-        }
         chatBar.events = { [weak self] in
             guard let self = self else { return }
             switch $0 {
@@ -528,7 +515,6 @@ extension SARoomViewController {
     func showEndLive() {
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 190))
         compent.destination = .center
-        inputBar.hiddenInputBar()
         let micAlert = SAEndLiveAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 190), title: sceneLocalized( "End Live"), content: sceneLocalized( "The room will close after you leave."), cancel: sceneLocalized( "Cancel"), confirm: sceneLocalized( "Confirm")).cornerRadius(16).backgroundColor(.white)
         let vc = SAAlertViewController(compent: compent, custom: micAlert)
         micAlert.actionEvents = { [weak self] in
@@ -552,7 +538,6 @@ extension SARoomViewController {
     }
 
     func showInviteMicAlert() {
-        inputBar.hiddenInputBar()
         var compent = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 75, height: 200))
         compent.destination = .center
         let micAlert = SAApplyAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 75, height: 200), content: "Anchor Invited You On-Stage", cancel: "Decline", confirm: "Accept", position: .center).cornerRadius(16).backgroundColor(.white)
@@ -630,7 +615,7 @@ extension SARoomViewController: SAManagerDelegate {
                 let user = mic.member
                 guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
-                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+//                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
                     break
                 }
             }

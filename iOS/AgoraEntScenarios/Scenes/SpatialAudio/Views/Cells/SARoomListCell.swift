@@ -71,7 +71,7 @@ public final class SARoomListCell: UITableViewCell {
 //        })
         print("avatar: \(room.owner?.portrait ?? "")")
         var image = UIImage.sceneImage(name: "normal_room")
-        if (room.type ?? 0) == 1 {
+        if room.type == 1 {
             image = UIImage.sceneImage(name: "specific_room")
         }
         background.image = image

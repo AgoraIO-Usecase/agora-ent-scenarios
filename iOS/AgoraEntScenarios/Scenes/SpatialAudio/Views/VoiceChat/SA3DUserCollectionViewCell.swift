@@ -36,7 +36,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.volume = user?.volume ?? 0
         }
     }
-
+    
     public var clickBlock: (() -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
 
@@ -51,6 +51,11 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func setArrowInfo(imageName: String, margin: CGFloat) {
+        rtcUserView.arrowImgMargin = margin
+        rtcUserView.arrowImgUrl = imageName
+    }
+    
     fileprivate func layoutUI() {
         contentView.addSubview(rtcUserView)
 
