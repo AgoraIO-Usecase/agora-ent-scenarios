@@ -196,6 +196,7 @@ private func _hideLoadingIfNeed() {
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
+                               isOwner: true,
                                property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
@@ -249,6 +250,7 @@ private func _hideLoadingIfNeed() {
         initScene { [weak self] in
             SyncUtil.joinScene(id: roomInfo.roomNo,
                                userId: roomInfo.creator,
+                               isOwner: roomInfo.creator == VLUserCenter.user.id,
                                property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
                 let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
