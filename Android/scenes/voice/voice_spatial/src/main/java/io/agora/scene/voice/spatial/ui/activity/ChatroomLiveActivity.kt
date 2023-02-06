@@ -94,7 +94,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
     private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
-//        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
     private fun initListeners() {
@@ -195,7 +194,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             override fun onAnnouncementChanged(roomId: String, content: String) {
                 super.onAnnouncementChanged(roomId, content)
                 "onAnnouncementChanged $content".logD(TAG)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 ThreadManager.getInstance().runOnMainThread {
                     roomObservableDelegate.updateAnnouncement(content)
                 }
@@ -203,7 +202,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onUserJoinedRoom $roomId, ${voiceMember.chatUid}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
@@ -219,7 +218,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onUserLeftRoom(roomId: String, chatUid: String) {
                 super.onUserLeftRoom(roomId, chatUid)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     chatUid.let {
@@ -242,7 +241,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
                 super.onUserBeKicked(roomId, reason)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "userBeKicked $reason".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
@@ -262,11 +261,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             ) {
                 super.onSeatUpdated(roomId, attributeMap, fromId)
                 "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logD()
-                if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-//                attributeMap.let {
-//                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
-//                    roomObservableDelegate.onSeatUpdated(it)
-//                }
+                if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
+                attributeMap.let {
+                    //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
+                    roomObservableDelegate.onSeatUpdated(it)
+                }
                 attributeMap
                     .filter { it.key.startsWith("mic_") }
                     .forEach { (key, value) ->
@@ -294,7 +293,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onRoomDestroyed(roomId: String) {
                 super.onRoomDestroyed(roomId)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onRoomDestroyed $roomId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
