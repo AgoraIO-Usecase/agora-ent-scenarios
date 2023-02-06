@@ -354,7 +354,19 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean) {
         micInfoList.forEach { micInfo ->
-            val index = micInfo.micIndex
+            if (micInfo.micIndex == 2) return@forEach
+            val index = when (micInfo.micIndex) {
+                5 -> {
+                    2
+                }
+                6 -> {
+                    3
+                }
+                else -> {
+                    micInfo.micIndex
+                }
+            }
+
             micInfoMap[index] = micInfo
             micViewMap[index]?.apply {
                 binding(micInfo)
