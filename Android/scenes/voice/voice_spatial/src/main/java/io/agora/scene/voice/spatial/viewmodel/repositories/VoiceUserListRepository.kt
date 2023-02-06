@@ -49,10 +49,10 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
+    fun acceptMicSeatApply(userId: String): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
+                voiceServiceProtocol.acceptMicSeatApply(userId, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {

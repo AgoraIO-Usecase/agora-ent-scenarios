@@ -31,9 +31,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     private val mRepository by lazy { VoiceRoomLivingRepository() }
 
-    private val joinRtcChannel = AtomicBoolean(false)
-    private val joinImRoom = AtomicBoolean(false)
-
     private val _roomDetailsObservable: SingleSourceLiveData<Resource<VoiceRoomInfo>> =
         SingleSourceLiveData()
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
@@ -146,8 +143,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     fun initSdkJoin(roomKitBean: RoomKitBean) {
-        joinRtcChannel.set(false)
-        joinImRoom.set(false)
         AgoraRtcEngineController.get().joinChannel(
             VoiceBuddyFactory.get().getVoiceBuddy().application(),
             roomKitBean.channelId,
@@ -156,8 +151,13 @@ class VoiceRoomLivingViewModel : ViewModel() {
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
                     "rtc  joinChannel onSuccess channelId:${roomKitBean.channelId}".logD()
-                    joinRtcChannel.set(true)
-                    checkJoinRoom()
+                    ThreadManager.getInstance().runOnMainThread {
+                        _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
+                            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                                callBack.onSuccess(MutableLiveData(true))
+                            }
+                        }.asLiveData())
+                    }
                 }
 
                 override fun onError(error: Int, errorMsg: String) {
@@ -173,16 +173,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
                 }
             }
         )
-    }
-
-    private fun checkJoinRoom() {
-        if (joinRtcChannel.get() && joinImRoom.get()) {
-            _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
-                override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                    callBack.onSuccess(MutableLiveData(true))
-                }
-            }.asLiveData())
-        }
     }
 
     // 开启/关闭机器人
@@ -260,8 +250,8 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     //取消上麦
-    fun cancelMicSeatApply(chatUid: String) {
-        _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatUid))
+    fun cancelMicSeatApply(userId: String) {
+        _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(userId))
     }
 
     // 换麦

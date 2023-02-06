@@ -84,4 +84,6 @@ dependencies {
     implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.svga_player
     implementation rootProject.ext.deps.agora_chat
+
+    implementation rootProject.ext.deps.apng
 }
