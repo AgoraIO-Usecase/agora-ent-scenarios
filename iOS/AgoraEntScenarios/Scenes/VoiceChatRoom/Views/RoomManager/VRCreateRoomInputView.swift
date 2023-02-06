@@ -56,7 +56,7 @@ public class VRCreateRoomInputView: UIView, UITextFieldDelegate {
         let host = NSMutableAttributedString(attachment: attachment)
         space.append(host)
         space.append(NSAttributedString {
-            AttributedText("This product is for testing only, not for commerce.\nEvery room will be maintained for 10 minutes.".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
+            AttributedText("DemoTestDesc".localized()).foregroundColor(UIColor(0x3C4267)).font(.systemFont(ofSize: 12, weight: .regular)).lineBreakeMode(.byCharWrapping).alignment(.center)
         })
         return space
     }()
