@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
@@ -319,15 +318,35 @@ class VoiceSyncManagerServiceImp(
         voiceRoomModel: VoiceRoomModel,
         completion: (error: Int, result: VoiceRoomInfo?) -> Unit
     ) {
-        innerGetAllSeatInfo { list ->
-            val info = VoiceRoomInfo().apply {
-                roomInfo = voiceRoomModel
-                micInfo = list
+        Sync.Instance().getScenes(object : DataListCallback {
+            override fun onSuccess(result: MutableList<IObject>?) {
+                result?.forEach { iObj ->
+                    try {
+                        val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
+                        if (voiceRoom.roomId == currRoomNo) {
+                            innerGetAllSeatInfo { list ->
+                                val info = VoiceRoomInfo().apply {
+                                    roomInfo = voiceRoom
+                                    micInfo = list
+                                }
+                                ThreadManager.getInstance().runOnIOThread {
+                                    completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        "voice room list get scene error: ${e.message}".logE()
+                    }
+
+                }
             }
-            ThreadManager.getInstance().runOnIOThread {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+
+            override fun onFail(exception: SyncManagerException?) {
+                ThreadManager.getInstance().runOnMainThread {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                }
             }
-        }
+        })
     }
 
     /**
@@ -822,7 +841,7 @@ class VoiceSyncManagerServiceImp(
     override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
         val roomInfo = roomMap[currRoomNo] ?: return
         roomInfo.robotVolume = value
-        innerUpdateRoomInfo(HashMap(GsonUtils.covertToMap(roomInfo))) {
+        innerUpdateRoomInfo(GsonTools.beanToMap(roomInfo)) {
             if (it == null) {
                 completion.invoke(VoiceServiceProtocol.ERR_OK, true)
             } else {
@@ -1269,6 +1288,16 @@ class VoiceSyncManagerServiceImp(
                     roomServiceSubscribeDelegates.forEach {
                         ThreadManager.getInstance().runOnMainThread {
                             it.onAnnouncementChanged(roomInfo.roomId, roomInfo.announcement)
+                        }
+                    }
+                }
+                if (originRoomInfo.robotVolume != roomInfo.robotVolume) {
+                    roomServiceSubscribeDelegates.forEach {
+                        ThreadManager.getInstance().runOnMainThread {
+                            val attributeMap = hashMapOf<String, String>()
+                            val key = "robot_volume"
+                            attributeMap[key] = roomInfo.robotVolume.toString()
+                            it.onSeatUpdated(currRoomNo, attributeMap, "")
                         }
                     }
                 }
