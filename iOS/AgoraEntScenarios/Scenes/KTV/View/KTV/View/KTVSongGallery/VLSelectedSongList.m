@@ -30,7 +30,7 @@ UITextFieldDelegate
 @property (nonatomic, strong) VLSearchSongResultView *resultView;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) VLRoomListModel *roomModel;
-@property (nonatomic, strong) NSMutableArray *selSongViews;
+@property (nonatomic, strong) NSMutableSet *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, strong) NSArray *selSongArray;
@@ -138,7 +138,7 @@ UITextFieldDelegate
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
     
-    self.selSongViews = [NSMutableArray array];
+    self.selSongViews = [NSMutableSet set];
     self.currentIndex = 100;
 }
 
