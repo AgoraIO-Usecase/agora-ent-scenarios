@@ -9,6 +9,7 @@ import Foundation
 import KakaJSON
 import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
+import AgoraSyncManager
 
 private let cSceneId = "scene_spatialAudio"
 
@@ -697,6 +698,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
                                userId:VLUserCenter.user.userNo,
+                               isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 completion(nil,model)

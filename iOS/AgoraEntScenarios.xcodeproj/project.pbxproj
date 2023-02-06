@@ -179,28 +179,6 @@
 		DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995128FFE579009D3E61 /* VLCache.m */; };
 		DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995928FFE579009D3E61 /* VLUserCenter.m */; };
 		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
-		DDA19A1128FFE579009D3E61 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995F28FFE579009D3E61 /* Log.swift */; };
-		DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996028FFE579009D3E61 /* Utils.swift */; };
-		DDA19A1328FFE579009D3E61 /* AgoraSyncManagerLocal.podspec in Resources */ = {isa = PBXBuildFile; fileRef = DDA1996128FFE579009D3E61 /* AgoraSyncManagerLocal.podspec */; };
-		DDA19A1428FFE579009D3E61 /* SyncManager+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996328FFE579009D3E61 /* SyncManager+Info.swift */; };
-		DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996428FFE579009D3E61 /* AgoraSyncManager.swift */; };
-		DDA19A1628FFE579009D3E61 /* RtmSyncManager+Handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996628FFE579009D3E61 /* RtmSyncManager+Handle.swift */; };
-		DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996728FFE579009D3E61 /* RtmSyncManager+Info.swift */; };
-		DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift */; };
-		DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996928FFE579009D3E61 /* RtmSyncManager.swift */; };
-		DDA19A1A28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996B28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift */; };
-		DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996C28FFE579009D3E61 /* RethinkSyncManager.swift */; };
-		DDA19A1C28FFE579009D3E61 /* SyncManager.swift~HEAD in Resources */ = {isa = PBXBuildFile; fileRef = DDA1996D28FFE579009D3E61 /* SyncManager.swift~HEAD */; };
-		DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996E28FFE579009D3E61 /* Protocols.swift */; };
-		DDA19A1E28FFE579009D3E61 /* CollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1996F28FFE579009D3E61 /* CollectionReference.swift */; };
-		DDA19A1F28FFE579009D3E61 /* SyncManager.swift~zyq in Resources */ = {isa = PBXBuildFile; fileRef = DDA1997028FFE579009D3E61 /* SyncManager.swift~zyq */; };
-		DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997128FFE579009D3E61 /* DocumentReference.swift */; };
-		DDA19A2128FFE579009D3E61 /* publish.sh in Resources */ = {isa = PBXBuildFile; fileRef = DDA1997228FFE579009D3E61 /* publish.sh */; };
-		DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997428FFE579009D3E61 /* Blocks.swift */; };
-		DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997528FFE579009D3E61 /* Extensions.swift */; };
-		DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997628FFE579009D3E61 /* Models.swift */; };
-		DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997728FFE579009D3E61 /* SyncError.swift */; };
-		DDA19A2628FFE57A009D3E61 /* AgoraSyncManager.podspec in Resources */ = {isa = PBXBuildFile; fileRef = DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */; };
 		DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1997C28FFE579009D3E61 /* QDThemeManager.m */; };
 		DDA19A2828FFE57A009D3E61 /* QMUIConfigurationTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998028FFE579009D3E61 /* QMUIConfigurationTemplate.m */; };
 		DDA19A2928FFE57A009D3E61 /* QDUIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1998428FFE579009D3E61 /* QDUIHelper.m */; };
@@ -855,28 +833,6 @@
 		DDA1995928FFE579009D3E61 /* VLUserCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLUserCenter.m; sourceTree = "<group>"; };
 		DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLGlobalHelper.m; sourceTree = "<group>"; };
 		DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLGlobalHelper.h; sourceTree = "<group>"; };
-		DDA1995F28FFE579009D3E61 /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
-		DDA1996028FFE579009D3E61 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		DDA1996128FFE579009D3E61 /* AgoraSyncManagerLocal.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManagerLocal.podspec; sourceTree = "<group>"; };
-		DDA1996328FFE579009D3E61 /* SyncManager+Info.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SyncManager+Info.swift"; sourceTree = "<group>"; };
-		DDA1996428FFE579009D3E61 /* AgoraSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraSyncManager.swift; sourceTree = "<group>"; };
-		DDA1996628FFE579009D3E61 /* RtmSyncManager+Handle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RtmSyncManager+Handle.swift"; sourceTree = "<group>"; };
-		DDA1996728FFE579009D3E61 /* RtmSyncManager+Info.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RtmSyncManager+Info.swift"; sourceTree = "<group>"; };
-		DDA1996828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RtmSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
-		DDA1996928FFE579009D3E61 /* RtmSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RtmSyncManager.swift; sourceTree = "<group>"; };
-		DDA1996B28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RethinkSyncManager+ISyncManager.swift"; sourceTree = "<group>"; };
-		DDA1996C28FFE579009D3E61 /* RethinkSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RethinkSyncManager.swift; sourceTree = "<group>"; };
-		DDA1996D28FFE579009D3E61 /* SyncManager.swift~HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "SyncManager.swift~HEAD"; sourceTree = "<group>"; };
-		DDA1996E28FFE579009D3E61 /* Protocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
-		DDA1996F28FFE579009D3E61 /* CollectionReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionReference.swift; sourceTree = "<group>"; };
-		DDA1997028FFE579009D3E61 /* SyncManager.swift~zyq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "SyncManager.swift~zyq"; sourceTree = "<group>"; };
-		DDA1997128FFE579009D3E61 /* DocumentReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentReference.swift; sourceTree = "<group>"; };
-		DDA1997228FFE579009D3E61 /* publish.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = publish.sh; sourceTree = "<group>"; };
-		DDA1997428FFE579009D3E61 /* Blocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blocks.swift; sourceTree = "<group>"; };
-		DDA1997528FFE579009D3E61 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		DDA1997628FFE579009D3E61 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		DDA1997728FFE579009D3E61 /* SyncError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncError.swift; sourceTree = "<group>"; };
-		DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AgoraSyncManager.podspec; sourceTree = "<group>"; };
 		DDA1997C28FFE579009D3E61 /* QDThemeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDThemeManager.m; sourceTree = "<group>"; };
 		DDA1997D28FFE579009D3E61 /* QMUIConfigurationTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QMUIConfigurationTemplate.h; sourceTree = "<group>"; };
 		DDA1997E28FFE579009D3E61 /* QDThemeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDThemeProtocol.h; sourceTree = "<group>"; };
@@ -2166,7 +2122,6 @@
 				DDA1995028FFE579009D3E61 /* Cache */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
 				DDA1995A28FFE579009D3E61 /* Helper */,
-				DDA1995D28FFE579009D3E61 /* AgoraSyncManager */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -2215,75 +2170,6 @@
 				DDA1995C28FFE579009D3E61 /* VLGlobalHelper.h */,
 			);
 			path = Helper;
-			sourceTree = "<group>";
-		};
-		DDA1995D28FFE579009D3E61 /* AgoraSyncManager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995E28FFE579009D3E61 /* Other */,
-				DDA1996128FFE579009D3E61 /* AgoraSyncManagerLocal.podspec */,
-				DDA1996228FFE579009D3E61 /* SyncManager */,
-				DDA1997228FFE579009D3E61 /* publish.sh */,
-				DDA1997328FFE579009D3E61 /* Objects */,
-				DDA1997828FFE579009D3E61 /* AgoraSyncManager.podspec */,
-			);
-			path = AgoraSyncManager;
-			sourceTree = "<group>";
-		};
-		DDA1995E28FFE579009D3E61 /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995F28FFE579009D3E61 /* Log.swift */,
-				DDA1996028FFE579009D3E61 /* Utils.swift */,
-			);
-			path = Other;
-			sourceTree = "<group>";
-		};
-		DDA1996228FFE579009D3E61 /* SyncManager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1996328FFE579009D3E61 /* SyncManager+Info.swift */,
-				DDA1996428FFE579009D3E61 /* AgoraSyncManager.swift */,
-				DDA1996528FFE579009D3E61 /* RtmManager */,
-				DDA1996A28FFE579009D3E61 /* RethinkDB */,
-				DDA1996D28FFE579009D3E61 /* SyncManager.swift~HEAD */,
-				DDA1996E28FFE579009D3E61 /* Protocols.swift */,
-				DDA1996F28FFE579009D3E61 /* CollectionReference.swift */,
-				DDA1997028FFE579009D3E61 /* SyncManager.swift~zyq */,
-				DDA1997128FFE579009D3E61 /* DocumentReference.swift */,
-			);
-			path = SyncManager;
-			sourceTree = "<group>";
-		};
-		DDA1996528FFE579009D3E61 /* RtmManager */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1996628FFE579009D3E61 /* RtmSyncManager+Handle.swift */,
-				DDA1996728FFE579009D3E61 /* RtmSyncManager+Info.swift */,
-				DDA1996828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift */,
-				DDA1996928FFE579009D3E61 /* RtmSyncManager.swift */,
-			);
-			path = RtmManager;
-			sourceTree = "<group>";
-		};
-		DDA1996A28FFE579009D3E61 /* RethinkDB */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1996B28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift */,
-				DDA1996C28FFE579009D3E61 /* RethinkSyncManager.swift */,
-			);
-			path = RethinkDB;
-			sourceTree = "<group>";
-		};
-		DDA1997328FFE579009D3E61 /* Objects */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1997428FFE579009D3E61 /* Blocks.swift */,
-				DDA1997528FFE579009D3E61 /* Extensions.swift */,
-				DDA1997628FFE579009D3E61 /* Models.swift */,
-				DDA1997728FFE579009D3E61 /* SyncError.swift */,
-			);
-			path = Objects;
 			sourceTree = "<group>";
 		};
 		DDA1997928FFE579009D3E61 /* ThirdParty */ = {
@@ -3151,8 +3037,6 @@
 				DD84176E29090C520026B624 /* tab_discover.png in Resources */,
 				DD84177A29090C520026B624 /* product.js in Resources */,
 				DDC51E0C298C1D8900D837AC /* VoiceChatRoomResource.bundle in Resources */,
-				DDA19A1328FFE579009D3E61 /* AgoraSyncManagerLocal.podspec in Resources */,
-				DDA19A2128FFE579009D3E61 /* publish.sh in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
 				DD84177529090C520026B624 /* product1.png in Resources */,
@@ -3167,12 +3051,9 @@
 				DD84177729090C520026B624 /* entertainment.html in Resources */,
 				DD84179029090C520026B624 /* Media.xcassets in Resources */,
 				DD84176229090C520026B624 /* index.html in Resources */,
-				DDA19A2628FFE57A009D3E61 /* AgoraSyncManager.podspec in Resources */,
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				DD84177829090C520026B624 /* entertainment.js in Resources */,
-				DDA19A1C28FFE579009D3E61 /* SyncManager.swift~HEAD in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
-				DDA19A1F28FFE579009D3E61 /* SyncManager.swift~zyq in Resources */,
 				DDC51CD9298C141C00D837AC /* SpatialAudioResource.bundle in Resources */,
 				DDC51E08298C1D8900D837AC /* README.md in Resources */,
 				DD4DFA31298BCBE5000AF053 /* Template.bundle in Resources */,
@@ -3258,12 +3139,10 @@
 				DDC51CFE298C141C00D837AC /* SpatialAudioServiceImp.swift in Sources */,
 				DDC51DF6298C1D8900D837AC /* Throttle.swift in Sources */,
 				DDC51D25298C141C00D837AC /* SAEQSettingView.swift in Sources */,
-				DDA19A1628FFE579009D3E61 /* RtmSyncManager+Handle.swift in Sources */,
 				DD4DFA0A298BCBE4000AF053 /* LEEAlert+KTVModal.m in Sources */,
 				DD4DFA02298BCBE4000AF053 /* VLRoomSelSongModel.m in Sources */,
 				DDA19A6C28FFE57A009D3E61 /* EKRatingSymbolsContainerView.swift in Sources */,
 				DDA19A6828FFE57A009D3E61 /* EKTextField.swift in Sources */,
-				DDA19A1A28FFE579009D3E61 /* RethinkSyncManager+ISyncManager.swift in Sources */,
 				DDC51E28298C1D8900D837AC /* VRCreateRoomViewController.swift in Sources */,
 				DDC51D2A298C141C00D837AC /* SASwitchBar.swift in Sources */,
 				DDA19A6728FFE57A009D3E61 /* EKFormMessageView.swift in Sources */,
@@ -3292,7 +3171,6 @@
 				DDC51E47298C1D8900D837AC /* AgoraMicVolView.swift in Sources */,
 				DDC51D4E298C141C00D837AC /* SAHorizontalCardView.swift in Sources */,
 				DDC51D51298C141C00D837AC /* SARoomCreateView.swift in Sources */,
-				DDA19A1228FFE579009D3E61 /* Utils.swift in Sources */,
 				DD4DFA12298BCBE5000AF053 /* VLKTVSettingView.m in Sources */,
 				DDA19A5628FFE57A009D3E61 /* EKAttributes+HapticFeedback.swift in Sources */,
 				DDC51E23298C1D8900D837AC /* VoiceRoomInviteUsersController.swift in Sources */,
@@ -3327,7 +3205,6 @@
 				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
 				DDC51E17298C1D8900D837AC /* ChatRoomServiceProtocol.swift in Sources */,
 				DDC51E07298C1D8900D837AC /* String + Extension.swift in Sources */,
-				DDA19A1D28FFE579009D3E61 /* Protocols.swift in Sources */,
 				DDC51E37298C1D8900D837AC /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,
 				DDC51CF3298C141C00D837AC /* SAIMManager.swift in Sources */,
 				DDC51E38298C1D8900D837AC /* VMAudioSettingView.swift in Sources */,
@@ -3453,7 +3330,6 @@
 				DDC51CFF298C141C00D837AC /* SpatialAudioServiceModel.swift in Sources */,
 				DDC51E46298C1D8900D837AC /* VoiceRoomInputBar.swift in Sources */,
 				DDC51D42298C141C00D837AC /* SAEmojiListView.swift in Sources */,
-				DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */,
 				DDC51D1B298C141C00D837AC /* SAEndLiveAlert.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DDC51D1E298C141C00D837AC /* SASliderTableViewCell.swift in Sources */,
@@ -3473,9 +3349,7 @@
 				DDC51CF8298C141C00D837AC /* SAGiftEntity.swift in Sources */,
 				DDC51E0A298C1D8900D837AC /* AgoraSceneConfig.swift in Sources */,
 				DDC51D19298C141C00D837AC /* SAChatView.swift in Sources */,
-				DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */,
 				DD4DFA00298BCBE4000AF053 /* VLBelcantoModel.m in Sources */,
-				DDA19A1428FFE579009D3E61 /* SyncManager+Info.swift in Sources */,
 				DDC51E02298C1D8900D837AC /* UIButtonLayoutExtension.swift in Sources */,
 				DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */,
 				DDA19A3228FFE57A009D3E61 /* EKWrapperView.swift in Sources */,
@@ -3483,10 +3357,8 @@
 				DDC51E2A298C1D8900D837AC /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DDC51CEA298C141C00D837AC /* Notification+SAPresentation.swift in Sources */,
-				DDA19A2028FFE579009D3E61 /* DocumentReference.swift in Sources */,
 				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
 				DDC51D13298C141C00D837AC /* SARoomListCell.swift in Sources */,
-				DDA19A1128FFE579009D3E61 /* Log.swift in Sources */,
 				DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */,
 				DDC51E64298C1D8900D837AC /* VREmptyView.swift in Sources */,
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
@@ -3506,7 +3378,6 @@
 				DDC51D3D298C141C00D837AC /* SASwitchTableViewCell.swift in Sources */,
 				DD4DFA03298BCBE4000AF053 /* VLRoomPersonIteimCCell.m in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
-				DDA19A1E28FFE579009D3E61 /* CollectionReference.swift in Sources */,
 				DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */,
 				DDC51D4F298C141C00D837AC /* SAEmptyView.swift in Sources */,
 				DD4DFA0B298BCBE4000AF053 /* VLPopScoreView.m in Sources */,
@@ -3527,7 +3398,6 @@
 				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
 				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
-				DDA19A1528FFE579009D3E61 /* AgoraSyncManager.swift in Sources */,
 				DDC51E2B298C1D8900D837AC /* VRSoundEffectsCell.swift in Sources */,
 				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				DDC51E43298C1D8900D837AC /* PopTip+Draw.swift in Sources */,
@@ -3545,13 +3415,11 @@
 				DD4DFA2A298BCBE5000AF053 /* AppContext+KTV.m in Sources */,
 				DDC51E40298C1D8900D837AC /* VoiceRoomGiftView.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
-				DDA19A1B28FFE579009D3E61 /* RethinkSyncManager.swift in Sources */,
 				DDC51E1F298C1D8900D837AC /* VoiceRoomViewController.swift in Sources */,
 				DD4DFA22298BCBE5000AF053 /* VLKTVTopView.m in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
 				DDC51E09298C1D8900D837AC /* VoiceRoomIMManager.swift in Sources */,
 				DD4DFA08298BCBE4000AF053 /* VLBadNetWorkView.m in Sources */,
-				DDA19A1728FFE579009D3E61 /* RtmSyncManager+Info.swift in Sources */,
 				DDC51D30298C141C00D837AC /* SAUpstageView.swift in Sources */,
 				DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */,
 				DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */,
@@ -3642,7 +3510,6 @@
 				DDC51D31298C141C00D837AC /* SAGifterCell.swift in Sources */,
 				DDC51D24298C141C00D837AC /* SAPraiseEmitterView.swift in Sources */,
 				DDA19A5128FFE57A009D3E61 /* EKAttributes+Scroll.swift in Sources */,
-				DDA19A2428FFE57A009D3E61 /* Models.swift in Sources */,
 				DD4DFA17298BCBE5000AF053 /* VLKTVKindsView.m in Sources */,
 				DDA19A0928FFE579009D3E61 /* DeviceAssistant.swift in Sources */,
 				DDC51DFA298C1D8900D837AC /* PresentationEnums.swift in Sources */,
@@ -3677,7 +3544,6 @@
 				DDC51E19298C1D8900D837AC /* VoiceRoomAudiencesViewController.swift in Sources */,
 				DD4DFA0D298BCBE4000AF053 /* VLPopOnLineTypeView.m in Sources */,
 				DD84178229090C520026B624 /* VLDiscoveryView.m in Sources */,
-				DDA19A1928FFE579009D3E61 /* RtmSyncManager.swift in Sources */,
 				DDA19A5728FFE57A009D3E61 /* EKAttributes+LifecycleActions.swift in Sources */,
 				DDA19A0A28FFE579009D3E61 /* Screen.swift in Sources */,
 				DDC51E2E298C1D8900D837AC /* VRCreateRoomCardCell.swift in Sources */,
@@ -3701,7 +3567,6 @@
 				DD4DFA07298BCBE4000AF053 /* VLKTVBottomView.m in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DDC51E3C298C1D8900D837AC /* VoiceRoomEmojiListView.swift in Sources */,
-				DDA19A2328FFE579009D3E61 /* Extensions.swift in Sources */,
 				DDC51E67298C1D8900D837AC /* HorizontalCardsView.swift in Sources */,
 				DDC51E13298C1D8900D837AC /* VoiceRoomChatModel.swift in Sources */,
 				DDC51E3D298C1D8900D837AC /* VoiceRoomGiftCell.swift in Sources */,

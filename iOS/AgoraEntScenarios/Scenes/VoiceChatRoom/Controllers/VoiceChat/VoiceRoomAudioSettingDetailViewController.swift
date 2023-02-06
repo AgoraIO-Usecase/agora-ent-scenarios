@@ -6,9 +6,17 @@
 //
 
 import UIKit
+//不同场景的视图高度
+public enum TV_TYPE_HEIGHT: CGFloat {
+    case ANS = 920
+    case AEC = 455
+    case AGC = 454
+    case EFFECT = 921
+}
 
 class VoiceRoomAudioSettingDetailViewController: UIViewController {
     private var screenWidth: CGFloat = UIScreen.main.bounds.size.width
+    private var screenHeight: CGFloat = UIScreen.main.bounds.size.height
     private var lineImgView: UIImageView = .init()
     private var titleLabel: UILabel = .init()
     private var tableView: UITableView = .init(frame: .zero, style: .grouped)
@@ -75,7 +83,7 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
     
     private let AIAECSettingName: [String] = ["Turn on AIAEC".localized()]
     
-    private let AGSettingName: [String] = ["Turn on AGC".localized()]
+    private let AGCSettingName: [String] = ["Turn on AGC".localized()]
 
     
     private let soundType: [String] = ["TV Sound".localized(), "Kitchen Sound".localized(), "Street Sound".localized(), "Mashine Sound".localized(), "Office Sound".localized(), "Home Sound".localized(), "Construction Sound".localized(), "Alert Sound/Music".localized(), "Applause".localized(), "Wind Sound".localized(), "Mic Pop Filter".localized(), "Audio Feedback".localized(), "Microphone Finger Rub Sound".localized(), "Screen Tap Sound".localized()]
@@ -94,9 +102,14 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
                 titleLabel.text = "AIAEC".localized()
             } else if settingType == .AGC {
                 titleLabel.text = "AGC".localized()
-
             }
             tableView.reloadData()
+        }
+    }
+    
+    var tableViewHeight: CGFloat = 0 {
+        didSet {
+            
         }
     }
 
@@ -110,6 +123,17 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         layoutUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: tableViewHeight > screenHeight ? screenHeight - 70 : tableViewHeight)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+    }
+    
     private func layoutUI() {
         let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))
         let layer = CAShapeLayer()
@@ -118,23 +142,23 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
 
         view.addSubview(cover)
 
-        backBtn.frame = CGRect(x: 10~, y: 30~, width: 20~, height: 30~)
+        backBtn.frame = CGRect(x: 10, y: 30, width: 20, height: 30)
         backBtn.setImage(UIImage("back"), for: .normal)
         backBtn.addTargetFor(self, action: #selector(back), for: .touchUpInside)
         view.addSubview(backBtn)
 
-        lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20~, y: 8, width: 40~, height: 4)
+        lineImgView.frame = CGRect(x: ScreenWidth / 2.0 - 20, y: 8, width: 40, height: 4)
         lineImgView.image = UIImage("pop_indicator")
         view.addSubview(lineImgView)
 
-        titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60~, y: 25~, width: 120~, height: 30~)
+        titleLabel.frame = CGRect(x: ScreenWidth / 2.0 - 60, y: 25, width: 120, height: 30)
         titleLabel.textAlignment = .center
         titleLabel.text = "Spatial Audio"
         titleLabel.textColor = UIColor.HexColor(hex: 0x040925, alpha: 1)
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
 
-        tableView.frame = CGRect(x: 0, y: 70~, width: ScreenWidth, height: 384~)
+        tableView.frame = .zero
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
         tableView.registerCell(VMSliderTableViewCell.self, forCellReuseIdentifier: slIdentifier)
         tableView.registerCell(VMNorSetTableViewCell.self, forCellReuseIdentifier: nIdentifier)
@@ -145,6 +169,8 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         view.addSubview(tableView)
+        tableView.isScrollEnabled = false
+        tableView.showsVerticalScrollIndicator = false
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 0
@@ -236,17 +262,23 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
         if settingType == .effect && section == 1 {
             return 40
         } else if settingType == .AIAEC || settingType == .AGC {
-            return 80;
+            var detailStr: String = ""
+            if settingType == .AIAEC {
+                detailStr = "AIAEC_desc".localized()
+            } else {
+                detailStr = "AGC_desc".localized()
+            }
+            return textHeight(text: detailStr, fontSize: 13, width: screenWidth - 40) + 10;
         }
         return 0
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if settingType == .AIAEC {
-            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 66))
-
+            let height: CGFloat = textHeight(text: "AIAEC_desc".localized(), fontSize: 13, width: screenWidth - 40) + 10
+            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height))
             footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 66))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 0, width: screenWidth-40, height: height))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
             titleLabel.text = "AIAEC_desc".localized()
@@ -254,10 +286,10 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             footer.addSubview(titleLabel)
             return footer
         } else if settingType == .AGC {
-            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 60))
-
+            let height: CGFloat = textHeight(text: "AGC_desc".localized(), fontSize: 13, width: screenWidth - 40) + 10
+            let footer: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height))
             footer.backgroundColor = settingType == .AIAEC ? .white : UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
-            let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
+            let titleLabel: UILabel = .init(frame: CGRect(x: 20, y: 0, width: screenWidth-40, height: height))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
             titleLabel.text = "AGC_desc".localized()
@@ -411,7 +443,6 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
          } else if settingType == .AIAEC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
              cell.titleLabel.text = AIAECSettingName[indexPath.row]
-             cell.isAudience = isAudience
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AIAEC ?? false
              cell.useRobotBlock = { [weak self] flag in
@@ -431,8 +462,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
 //             return cell
          } else if settingType == .AGC {
              let cell: VMSwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! VMSwitchTableViewCell
-             cell.titleLabel.text = AIAECSettingName[indexPath.row]
-             cell.isAudience = isAudience
+             cell.titleLabel.text = AGCSettingName[indexPath.row]
              cell.selectionStyle = .none
              cell.swith.isOn = roomInfo?.room?.turn_AGC ?? false
              cell.useRobotBlock = { [weak self] flag in
