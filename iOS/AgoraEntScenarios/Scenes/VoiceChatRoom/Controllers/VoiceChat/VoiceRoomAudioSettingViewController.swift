@@ -86,7 +86,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(titleLabel)
         print("\(self.view.bounds.size.height)")
-        tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: 300)
+        tableView.frame = CGRect(x: 0, y: 70, width: ScreenWidth, height: 430)
         tableView.registerCell(VMSwitchTableViewCell.self, forCellReuseIdentifier: swIdentifier)
         tableView.registerCell(VMSliderTableViewCell.self, forCellReuseIdentifier: slIdentifier)
         tableView.registerCell(VMNorSetTableViewCell.self, forCellReuseIdentifier: nIdentifier)
@@ -94,6 +94,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         tableView.delegate = self
         view.addSubview(tableView)
         tableView.tableFooterView = UIView()
+        tableView.isScrollEnabled = false
 
         tableView.separatorColor = UIColor.HexColor(hex: 0xF6F6F6, alpha: 1)
 
@@ -316,7 +317,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 guard !settingImage.isEmpty else { return cell}
                 cell.iconView.image = UIImage(settingImage[3])
                 cell.titleLabel.text = settingName[3]
-                cell.isAudience = isAudience
+                cell.swith.alpha = isAudience ? 0.5 : 1
+                cell.swith.isUserInteractionEnabled = !isAudience
                 cell.selectionStyle = .none
                 cell.swith.isOn = roomInfo?.room?.use_robot ?? false
                 cell.useRobotBlock = { [weak self] flag in
@@ -406,15 +408,21 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var state: AUDIO_SETTING_TYPE = .Noise
+        var heightType: TV_TYPE_HEIGHT = .AEC
+        var tableViewHeight: CGFloat = 0
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:
                 //AINS
                 state = .Noise
+                heightType = .ANS
+                
             case 1:
                 state = .AIAEC
+                heightType = .AEC
             case 2:
                 state = .AGC
+                heightType = .AGC
             default:
                 state = .Spatial
             }
@@ -423,11 +431,14 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             case 0:
                 //最佳音效
                 state = .effect
+                heightType = .EFFECT
             default:
                 state = .Spatial
             }
+        } else if indexPath.section == 1 {
+            return
         }
-        
+        tableViewHeight = heightType.rawValue - 70
         let detailVC: VoiceRoomAudioSettingDetailViewController = VoiceRoomAudioSettingDetailViewController()
         detailVC.roomInfo = roomInfo
         detailVC.isAudience = isAudience
@@ -435,6 +446,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         detailVC.settingType = state
         detailVC.ains_state = ains_state
         detailVC.isTouchAble = isTouchAble
+        detailVC.tableViewHeight = tableViewHeight
         detailVC.selBlock = { [weak self] state in
             guard let selBlock = self?.selBlock else {
                 return
@@ -447,13 +459,21 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             guard let turnAIAECBlock = self?.turnAIAECBlock else {
                 return
             }
+
+            self?.roomInfo?.room?.turn_AIAEC = flag;
+            self?.tableView.reloadData()
             turnAIAECBlock(flag)
+
+            
         }
         detailVC.turnAGCBlock = { [weak self] flag in
             guard let turnAGCBlock = self?.turnAGCBlock else {
                 return
             }
-            turnAGCBlock(flag)
+            self?.roomInfo?.room?.turn_AGC = flag;
+            self?.tableView.reloadData()
+            turnAGCBlock(flag);
+
         }
         detailVC.soundBlock = { [weak self] index in
             guard let soundBlock = self?.soundBlock else {
@@ -475,7 +495,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             visitBlock()
         }
         DispatchQueue.main.async {[weak self] in
-            self?.presentView.push(with: detailVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454~))
+            self?.presentView.push(with: detailVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 454), maxHeight: heightType.rawValue)
         }
     }
 
