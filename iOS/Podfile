@@ -38,7 +38,7 @@ def all_pods
 #  pod 'AgoraRtcEngine_iOS', '~> 4.0.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
  # pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
-   pod 'AgoraRtcEngine_iOS', :path => './libs'
+  pod 'sdk', :path => 'sdk.podspec'
 
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
 

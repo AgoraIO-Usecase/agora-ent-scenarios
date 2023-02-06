@@ -347,7 +347,7 @@ extension SARoomViewController {
     }
     
     func giftList() -> SAGiftView {
-        SAGiftView(frame: CGRect(x: 10, y: chatView.frame.minY - (ScreenWidth / 9.0 * 2), width: ScreenWidth / 3.0 * 2 + 20, height: ScreenWidth / 9.0 * 1.8)).backgroundColor(.clear).tag(1111)
+        SAGiftView()
     }
 
     func startMessage() -> SAChatEntity {
@@ -362,7 +362,5 @@ extension SARoomViewController {
         return entity
     }
 
-    @objc func resignKeyboard() {
-        inputBar.hiddenInputBar()
-    }
+    @objc func resignKeyboard() { }
 }

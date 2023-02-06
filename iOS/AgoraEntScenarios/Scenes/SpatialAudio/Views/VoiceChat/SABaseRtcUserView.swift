@@ -80,7 +80,19 @@ class SABaseRtcUserView: UIView {
 
     public var iconImgUrl: String = "" {
         didSet {
-            iconView.image = UIImage(iconImgUrl)
+            iconView.image = UIImage.sceneImage(name: iconImgUrl)
+        }
+    }
+    
+    public var arrowImgUrl: String = "" {
+        didSet {
+            arrowImageView.image = UIImage.sceneImage(name: arrowImgUrl)
+        }
+    }
+    public var arrowImgMargin: CGFloat = 6 {
+        didSet {
+            arrowImageCons?.constant = arrowImgMargin
+            arrowImageCons?.isActive = true
         }
     }
 
@@ -138,6 +150,11 @@ class SABaseRtcUserView: UIView {
     private var coverView: UIView = .init()
     private var activeButton: UIButton = .init()
     private var targetBtn: UIButton = .init()
+    private lazy var arrowImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_up_arrow"))
+        return imageView
+    }()
+    private var arrowImageCons: NSLayoutConstraint?
 
     var clickBlock: (() -> Void)?
 
@@ -157,7 +174,7 @@ class SABaseRtcUserView: UIView {
         bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.3)
         addSubview(bgView)
-
+        
         bgIconView.image = UIImage("icons／solid／add")
         bgIconView.layer.cornerRadius = 15
         bgIconView.layer.masksToBounds = true
@@ -167,6 +184,12 @@ class SABaseRtcUserView: UIView {
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         bgView.addSubview(iconView)
+        
+        addSubview(arrowImageView)
+        arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+        arrowImageView.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+        arrowImageCons = arrowImageView.centerYAnchor.constraint(equalTo: bgView.centerYAnchor)
+        arrowImageCons?.isActive = true
 
         addSubview(micView)
 
@@ -198,7 +221,8 @@ class SABaseRtcUserView: UIView {
         nameBtn.isUserInteractionEnabled = false
         addSubview(nameBtn)
 
-        targetBtn.addTargetFor(self, action: #selector(tapClick), for: .touchUpInside)
+//        targetBtn.addTargetFor(self, action: #selector(tapClick), for: .touchUpInside)
+        targetBtn.isUserInteractionEnabled = false
         addSubview(targetBtn)
 
         bgView.snp.makeConstraints { make in

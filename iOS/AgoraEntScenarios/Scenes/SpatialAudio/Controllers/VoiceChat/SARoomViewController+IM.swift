@@ -169,10 +169,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func receiveTextMessage(roomId: String, message: SAChatEntity) {
-        chatView.messages?.append(message)
-        DispatchQueue.main.async {
-            self.refreshChatView()
-        }
+       
     }
 
     private func updateMic(_ mics: [SARoomMic], fromId: String) {
@@ -275,11 +272,11 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
 
     func sendTextMessage(text: String) {
-        inputBar.endEditing(true)
-        inputBar.inputField.text = ""
         guard let roomId = roomInfo?.room?.chatroom_id else { return }
         guard let userName = SAUserInfo.shared.user?.name else { return }
-        showMessage(message: AgoraChatMessage(conversationID: roomId, body: AgoraChatTextMessageBody(text: text), ext: ["userName": SAUserInfo.shared.user?.name ?? ""]))
+        showMessage(message: AgoraChatMessage(conversationID: roomId,
+                                              body: AgoraChatTextMessageBody(text: text),
+                                              ext: ["userName": SAUserInfo.shared.user?.name ?? ""]))
         SAIMManager.shared?.sendMessage(roomId: roomId, text: text, ext: ["userName": userName]) { message, error in
             if error != nil,error?.code == .moderationFailed {
                 self.view.makeToast("Content prohibited".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
@@ -294,17 +291,11 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
 
     func convertShowText(userName: String, content: String, joined: Bool) {
-        let dic = ["userName": userName, "content": content]
-        chatView.messages?.append(chatView.getItem(dic: dic, join: joined))
-        DispatchQueue.main.async {
-            self.refreshChatView()
-        }
+       
     }
 
     @objc func refreshChatView() {
-        chatView.chatView.reloadData()
-        let row = (chatView.messages?.count ?? 0) - 1
-        chatView.chatView.scrollToRow(at: IndexPath(row: row, section: 0), at: .bottom, animated: true)
+        
     }
 
     func gifts() -> [SAGiftEntity] {

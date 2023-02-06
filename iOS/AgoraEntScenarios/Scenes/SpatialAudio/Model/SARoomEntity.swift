@@ -29,7 +29,7 @@ import KakaJSON
     public var gift_amount: Int? = 0 // 礼物数
     public var owner: SAUser?
     public var is_private: Bool? // 是否为私密房间
-    public var type: Int? = 0 // 房间类型， 0 ：普通房间，1:3D房间
+    public var type: Int = 1 // 房间类型， 0 ：普通房间，1:3D房间
     public var created_at: UInt? // 创建房间时间戳，单位毫秒
     public var roomPassword = ""
     public var click_count: Int? = 0 // 观看人数
@@ -53,7 +53,7 @@ import KakaJSON
 @objc open class SARoomMic: NSObject, Convertible {
     var mic_index: Int = 0
 
-    var status: Int = 0 // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲
+    var status: Int = 0 // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5: -1:空闲
 
     var member: SAUser?
 

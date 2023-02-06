@@ -477,8 +477,6 @@
 		DDC51E30298C1D8900D837AC /* BaseNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DAB298C1D8800D837AC /* BaseNavigationView.swift */; };
 		DDC51E31298C1D8900D837AC /* VoiceRoomApplyAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DAD298C1D8800D837AC /* VoiceRoomApplyAlert.swift */; };
 		DDC51E32298C1D8900D837AC /* VoiceRoomSendGiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DAE298C1D8800D837AC /* VoiceRoomSendGiftCell.swift */; };
-		DDC51E33298C1D8900D837AC /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DAF298C1D8800D837AC /* AgoraChatRoom3DUserCollectionViewCell.swift */; };
-		DDC51E34298C1D8900D837AC /* AgoraChatRoom3DRtcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DB0298C1D8800D837AC /* AgoraChatRoom3DRtcView.swift */; };
 		DDC51E35298C1D8900D837AC /* VMUserListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DB1298C1D8800D837AC /* VMUserListView.swift */; };
 		DDC51E36298C1D8900D837AC /* PopTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DB2298C1D8800D837AC /* PopTip.swift */; };
 		DDC51E37298C1D8900D837AC /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51DB3298C1D8800D837AC /* AgoraChatRoomBaseAlienCollectionViewCell.swift */; };
@@ -1164,8 +1162,6 @@
 		DDC51DAB298C1D8800D837AC /* BaseNavigationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseNavigationView.swift; sourceTree = "<group>"; };
 		DDC51DAD298C1D8800D837AC /* VoiceRoomApplyAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomApplyAlert.swift; sourceTree = "<group>"; };
 		DDC51DAE298C1D8800D837AC /* VoiceRoomSendGiftCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomSendGiftCell.swift; sourceTree = "<group>"; };
-		DDC51DAF298C1D8800D837AC /* AgoraChatRoom3DUserCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraChatRoom3DUserCollectionViewCell.swift; sourceTree = "<group>"; };
-		DDC51DB0298C1D8800D837AC /* AgoraChatRoom3DRtcView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraChatRoom3DRtcView.swift; sourceTree = "<group>"; };
 		DDC51DB1298C1D8800D837AC /* VMUserListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMUserListView.swift; sourceTree = "<group>"; };
 		DDC51DB2298C1D8800D837AC /* PopTip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopTip.swift; sourceTree = "<group>"; };
 		DDC51DB3298C1D8800D837AC /* AgoraChatRoomBaseAlienCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraChatRoomBaseAlienCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -2961,8 +2957,6 @@
 			children = (
 				DDC51DAD298C1D8800D837AC /* VoiceRoomApplyAlert.swift */,
 				DDC51DAE298C1D8800D837AC /* VoiceRoomSendGiftCell.swift */,
-				DDC51DAF298C1D8800D837AC /* AgoraChatRoom3DUserCollectionViewCell.swift */,
-				DDC51DB0298C1D8800D837AC /* AgoraChatRoom3DRtcView.swift */,
 				DDC51DB1298C1D8800D837AC /* VMUserListView.swift */,
 				DDC51DB2298C1D8800D837AC /* PopTip.swift */,
 				DDC51DB3298C1D8800D837AC /* AgoraChatRoomBaseAlienCollectionViewCell.swift */,
@@ -3376,7 +3370,6 @@
 				DDC51D3F298C141C00D837AC /* SAPopTip+Transitions.swift in Sources */,
 				DDC51E58298C1D8900D837AC /* VMSwitchTableViewCell.swift in Sources */,
 				DD4DFA2B298BCBE5000AF053 /* KTVServiceModel.m in Sources */,
-				DDC51E33298C1D8900D837AC /* AgoraChatRoom3DUserCollectionViewCell.swift in Sources */,
 				DDA19A4128FFE57A009D3E61 /* UIEdgeInsets+Utils.swift in Sources */,
 				DDC51E52298C1D8900D837AC /* VMNorSetTableViewCell.swift in Sources */,
 				DDA199F628FFE579009D3E61 /* UIImage+Color.swift in Sources */,
@@ -3568,7 +3561,6 @@
 				DD4DFA25298BCBE5000AF053 /* VLNoBodyOnLineView.m in Sources */,
 				DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */,
 				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
-				DDC51E34298C1D8900D837AC /* AgoraChatRoom3DRtcView.swift in Sources */,
 				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DD4DF9FE298BCBE4000AF053 /* AgoraRtm.m in Sources */,

@@ -38,11 +38,9 @@ class SA3DRtcView: UIView {
             collectionView.reloadData()
 
             guard let micInfos = micInfos else { return }
-            guard let micInfo: SARoomMic = micInfos[4] as? SARoomMic else { return }
+            let micInfo = micInfos[4]
             rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
             rtcUserView.tag = 204
-            guard let member = micInfo.member else { return }
-
             rtcUserView.user = micInfo.member
         }
     }
@@ -75,7 +73,7 @@ class SA3DRtcView: UIView {
         self.collectionView = collectionView
         addSubview(collectionView)
         self.collectionView.snp.makeConstraints { make in
-            make.left.top.bottom.right.equalTo(self)
+            make.edges.equalTo(self)
         }
 
         addSubview(rtcUserView)
@@ -83,49 +81,13 @@ class SA3DRtcView: UIView {
             make.center.equalTo(self)
             make.width.height.equalTo(150~)
         }
-
-        isUserInteractionEnabled = true
-
-        let tap = UITapGestureRecognizer(target: self, action: #selector(taptap))
-        addGestureRecognizer(tap)
-
+        
         let pan = UIPanGestureRecognizer(target: self, action: #selector(pan))
-        addGestureRecognizer(pan)
+        rtcUserView.addGestureRecognizer(pan)
     }
 }
 
 extension SA3DRtcView {
-    @objc private func taptap(tap: UIGestureRecognizer) {
-        var location = tap.location(in: self)
-
-        // 处理边界
-        if location.x <= 75~ {
-            location.x = 75~
-        }
-
-        if location.y <= 75~ {
-            location.y = 75~
-        }
-
-        if location.x >= bounds.size.width - 75~ {
-            location.x = bounds.size.width - 75~
-        }
-
-        if location.y >= bounds.size.height - 75~ {
-            location.y = bounds.size.height - 75~
-        }
-
-        let angle = getAngle(location, preP: lastCenterPoint)
-        rtcUserView.angle = angle - _lastPointAngle
-        UIView.animate(withDuration: 3, delay: 0) { [self] in
-            self.rtcUserView.center = CGPoint(x: location.x, y: location.y)
-        }
-
-        if angle == _lastPointAngle { return }
-        _lastPointAngle = angle
-        lastCenterPoint = rtcUserView.center
-    }
-
     @objc private func pan(pan: UIPanGestureRecognizer) {
         let translation = pan.translation(in: self)
 
@@ -153,6 +115,7 @@ extension SA3DRtcView {
 
         if getCurrentTimeStamp() - sendTS < 300 { return }
         let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
+        print("angle == \(angle)")
         if abs(angle - _lastPointAngle) < 0.2 {
             return
         }
@@ -168,7 +131,7 @@ extension SA3DRtcView {
         let changeY = curP.y - preP.y
         let radina = atan2(changeY, changeX)
         let angle = 180.0 / Double.pi * radina
-        return (angle + 90) / 180.0 * Double.pi
+        return (angle - 90) / 180.0 * Double.pi
     }
 
     fileprivate func getCurrentTimeStamp() -> CLongLong {
@@ -182,11 +145,7 @@ extension SA3DRtcView {
 
 extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
-    }
-
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        micInfos == nil ? 0 : 7
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -199,11 +158,13 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.item != 3 {
-            let cell: SA3DUserCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: vIdentifier, for: indexPath) as! SA3DUserCollectionViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: vIdentifier,
+                                                          for: indexPath) as! SA3DUserCollectionViewCell
             switch indexPath.item {
             case 0:
                 if let mic_info = micInfos?[0] {
                     cell.tag = 200
+                    cell.setArrowInfo(imageName: "sa_downright_arrow", margin: 6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
@@ -211,31 +172,35 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 1:
                 if let mic_info = micInfos?[1] {
                     cell.tag = 201
+                    cell.setArrowInfo(imageName: "sa_down_arrow", margin: 6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                 }
             case 2:
-                if let mic_info = micInfos?[5] {
-                    let user = SAUser()
-                    user.name = "Agora Blue"
-                    user.portrait = "blue"
-                    cell.user = user
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
-                    cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
-                }
-            case 4:
                 if let mic_info = micInfos?[6] {
                     let user = SAUser()
                     user.name = "Agora Red"
                     user.portrait = "red"
+                    cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
                     cell.user = user
-                    cell.cellType = getCellTypeWithStatus(mic_info.status)
+                    cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
+                    cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
+                }
+            case 4:
+                if let mic_info = micInfos?[5] {
+                    let user = SAUser()
+                    user.name = "Agora Blue"
+                    user.portrait = "blue"
+                    cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
+                    cell.user = user
+                    cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                 }
             case 5:
                 if let mic_info = micInfos?[2] {
                     cell.tag = 202
+                    cell.setArrowInfo(imageName: "sa_up_arrow", margin: -6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
@@ -243,6 +208,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 6:
                 if let mic_info = micInfos?[3] {
                     cell.tag = 203
+                    cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
@@ -266,13 +232,15 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             }
             return cell
         } else {
-            let cell: UICollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: nIdentifier, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nIdentifier, for: indexPath)
             return cell
         }
     }
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
-
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("index === \(indexPath.item)")
+    }
+    
     private func getCellTypeWithStatus(_ status: Int) -> SABaseUserCellType {
 //        switch status {
 //            case -2:

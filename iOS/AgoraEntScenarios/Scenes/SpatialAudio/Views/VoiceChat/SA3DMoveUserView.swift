@@ -103,14 +103,16 @@ class SA3DMoveUserView: UIView {
     private var nameBtn: UIButton = .init()
     private var coverView: UIView = .init()
     private var activeButton: UIButton = .init()
-
-    private var arrowImgView: UIImageView = .init()
     private var svgaPlayer: SVGAPlayer = .init()
     private var parser: SVGAParser = .init()
+    private lazy var arrowImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_middle_arrow"))
+        return imageView
+    }()
     public var angle: Double = 0 {
         didSet {
-            UIView.animate(withDuration: 0.3) { [weak self] in
-                self!.lineView.transform = self!.lineView.transform.rotated(by: self!.angle)
+            UIView.animate(withDuration: 0.25) {
+                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: self.angle)
             }
         }
     }
@@ -134,11 +136,17 @@ class SA3DMoveUserView: UIView {
         lineView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
         addSubview(lineView)
 
+        addSubview(arrowImageView)
+        arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+        
         bgView.layer.cornerRadius = 40~
         bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 104 / 255.0, green: 128 / 255.0, blue: 1, alpha: 1)
         addSubview(bgView)
-
+        
+        arrowImageView.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+        arrowImageView.centerYAnchor.constraint(equalTo: bgView.centerYAnchor, constant: 0).isActive = true
+    
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapClick))
         bgView.addGestureRecognizer(tap)
         bgView.isUserInteractionEnabled = true

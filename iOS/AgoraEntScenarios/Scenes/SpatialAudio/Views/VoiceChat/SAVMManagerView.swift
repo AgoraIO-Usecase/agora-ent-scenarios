@@ -147,7 +147,7 @@ class SAVMManagerView: UIView {
         nameLabel.text = ""
         nameLabel.textAlignment = .center
         nameLabel.font = UIFont.systemFont(ofSize: 14, weight: .bold)
-        nameLabel.textColor = UIColor(hex: "0x3333")
+        nameLabel.textColor = UIColor(hex: "0x333333")
         addSubview(nameLabel)
 
         roleBtn.frame = CGRect(x: ScreenWidth / 2.0 - 50, y: 135, width: 100, height: 20)
