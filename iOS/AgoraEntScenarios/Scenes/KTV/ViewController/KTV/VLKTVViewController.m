@@ -143,11 +143,11 @@ KTVApiDelegate
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.4) withDelegate:self];
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self];
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
-    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.6) withDelegate:self withRTCkit:self.RTCkit];
+    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
@@ -843,7 +843,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.rtcMediaPlayer adjustPublishSignalVolume:200];
     
     self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
-    self.ktvApi.lrcView = self.MVView.lrcView;
+    self.ktvApi.karaokeView = self.MVView.karaokeView;
     
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -931,6 +931,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)controller:(KTVApi *)controller song:(NSInteger)songCode config:(nonnull KTVSongConfiguration *)config didChangedToPosition:(NSInteger)position local:(BOOL)local
 {
     
+}
+
+#pragma mark -- VLKTVAPIDelegate
+- (void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+}
+
+- (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+    [self.MVView.incentiveView showWithScore:score];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1153,6 +1163,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self joinChorus]; //发送加入合唱的消息
         }
     }
+}
+
+- (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
+    [self.rtcMediaPlayer seekToPosition:position];
 }
 
 #pragma mark - VLKTVSettingViewDelegate
