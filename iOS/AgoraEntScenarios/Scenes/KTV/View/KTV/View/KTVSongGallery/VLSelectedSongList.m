@@ -12,6 +12,8 @@
 #import "VLHotSpotBtn.h"
 #import "KTVMacro.h"
 
+#define BASICVCINDEX 100
+
 @interface VLSelectedSongList ()<
 JXCategoryViewDelegate,
 JXCategoryListContainerViewDelegate,
@@ -167,7 +169,7 @@ UITextFieldDelegate
 
 #pragma mark --delegate
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    self.currentIndex = index + 100;
+    self.currentIndex = index + BASICVCINDEX;
     [self setSelSongArrayWith:self.selSongArray];
 }
 
@@ -181,7 +183,7 @@ UITextFieldDelegate
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
-    selSongView.tag = 100 + index;
+    selSongView.tag = BASICVCINDEX + index;
     [self.selSongViews addObject:selSongView];
     return selSongView;
 }

@@ -103,6 +103,8 @@ KTVApiDelegate
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
 @property (nonatomic, strong) KTVApi* ktvApi;
+
+@property (nonatomic, assign) NSUInteger retryCount;
 @end
 
 @implementation VLKTVViewController
@@ -126,14 +128,13 @@ KTVApiDelegate
     [self.view addSubview:bgView];
     //头部视图
     VLKTVTopView *topView = [[VLKTVTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
-    topView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
     [self.view addSubview:topView];
     self.topView = topView;
     topView.listModel = self.roomModel;
     
     //底部按钮视图
     VLKTVBottomToolbar *bottomView = [[VLKTVBottomToolbar alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT-50-kSafeAreaBottomHeight, SCREEN_WIDTH, 50) withDelegate:self withRoomNo:self.roomModel.roomNo withData:self.seatsArray];
-    bottomView.backgroundColor = [UIColor colorWithRed:1 green:0.9 blue:0 alpha:0.2];
+    bottomView.backgroundColor = [UIColor clearColor];
     self.bottomView = bottomView;
     [self.view addSubview:bottomView];
     
@@ -142,11 +143,11 @@ KTVApiDelegate
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.4) withDelegate:self];
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self];
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
-    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.6) withDelegate:self withRTCkit:self.RTCkit];
+    VLMicSeatList *personView = [[VLMicSeatList alloc] initWithFrame:CGRectMake(0, self.MVView.bottom + 20, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self withRTCkit:self.RTCkit];
     self.roomPersonView = personView;
     self.roomPersonView.roomSeatsArray = self.seatsArray;
     [self.view addSubview:personView];
@@ -164,6 +165,8 @@ KTVApiDelegate
     //处理背景
     [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    
+    self.retryCount = 0;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -384,8 +387,7 @@ KTVApiDelegate
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    NSArray *array = [[NSArray alloc]initWithObjects:KTVLocalizedString(@"确定"), nil];
-    [[VLAlert shared] showAlertWithFrame:UIScreen.mainScreen.bounds title:KTVLocalizedString(@"房主已解散房间,请确认离开房间") message:@"" placeHolder:@"" type:ALERTYPECONFIRM buttonTitles:array completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:KTVLocalizedString(@"房主已解散房间,请确认离开房间") buttonTitle:KTVLocalizedString(@"确定") completion:^(bool flag, NSString * _Nullable text) {
         for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
@@ -537,6 +539,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
+            self.retryCount = 0;
+        } else if(state == KTVLoadSongStateNoLyricUrl) {
+            //如果歌词加载失败进行三次重试
+            if(self.retryCount < 2) {
+                [self loadAndPlaySong];
+                self.retryCount++;
+            }
         }
     }];
     
@@ -834,7 +843,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.rtcMediaPlayer adjustPublishSignalVolume:200];
     
     self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
-    self.ktvApi.lrcView = self.MVView.lrcView;
+    self.ktvApi.karaokeView = self.MVView.karaokeView;
     
     KTVLogInfo(@"Agora - joining RTC channel with token: %@, for roomNo: %@, with uid: %@", VLUserCenter.user.agoraRTCToken, self.roomModel.roomNo, VLUserCenter.user.id);
     int ret =
@@ -896,12 +905,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
+            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView stop];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
             [self.MVView reset];
+            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            self.retryCount = 0;
             if(local) {
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
@@ -919,6 +931,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)controller:(KTVApi *)controller song:(NSInteger)songCode config:(nonnull KTVSongConfiguration *)config didChangedToPosition:(NSInteger)position local:(BOOL)local
 {
     
+}
+
+#pragma mark -- VLKTVAPIDelegate
+- (void)didlrcViewDidScrolledWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+}
+
+- (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+    [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
+    [self.MVView.incentiveView showWithScore:score];
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1116,6 +1138,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if (weakSelf.selSongsArray.count >= 1) {
                     [weakSelf.ktvApi stopSong];
                     [weakSelf removeCurrentSongWithSync:YES];
+                    weakSelf.retryCount = 0;
                 }
             }
             [[VLAlert shared] dismiss];
@@ -1140,6 +1163,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             [self joinChorus]; //发送加入合唱的消息
         }
     }
+}
+
+- (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
+    [self.rtcMediaPlayer seekToPosition:position];
 }
 
 #pragma mark - VLKTVSettingViewDelegate
