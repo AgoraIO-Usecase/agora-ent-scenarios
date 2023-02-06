@@ -4,6 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AgoraEntScenarios-swift.h"
 #import "VLRoomSelSongModel.h"
 #import "KTVSkipView.h"
 @import AgoraLyricsScore;
@@ -45,7 +46,9 @@ typedef enum : NSUInteger {
 
 @interface VLKTVMVView : UIView
 
-@property (nonatomic, strong) AgoraLrcScoreView *lrcView;
+@property (nonatomic, strong) KaraokeView *karaokeView;
+@property (nonatomic, strong) GradeView *gradeView;
+@property (nonatomic, strong) IncentiveView *incentiveView;
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 

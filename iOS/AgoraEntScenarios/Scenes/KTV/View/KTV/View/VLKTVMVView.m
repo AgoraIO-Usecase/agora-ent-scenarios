@@ -17,7 +17,7 @@
 #import "KTVMacro.h"
 @import Masonry;
 
-@interface VLKTVMVView () <VLKTVMVIdleViewDelegate,VLJoinChorusViewDelegate,VLStartSoloViewDelegate,AgoraKaraokeScoreDelegate>
+@interface VLKTVMVView () <VLKTVMVIdleViewDelegate,VLJoinChorusViewDelegate,VLStartSoloViewDelegate,KaraokeDelegate>
 
 @property(nonatomic, weak) id <VLKTVMVViewDelegate>delegate;
 
@@ -35,7 +35,7 @@
 @property (nonatomic, strong) VLStartSoloView *startSoloView; // 独唱倒计时视图
 @property (nonatomic, strong) VLKTVMVIdleView *idleView;//没有人演唱视图
 
-@property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
+//@property (nonatomic, strong) AgoraLrcScoreConfigModel *config;
 @property (nonatomic, assign) int totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) double currentTime;
@@ -92,22 +92,29 @@
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
-    self.lrcView.frame = CGRectMake(0, lY, self.width, lH);
-    [self addSubview:self.lrcView];
+    self.karaokeView = [[KaraokeView alloc]initWithFrame:CGRectMake(0, lY, self.width, lH)];
+    [self addSubview:self.karaokeView];
     
-    self.scoreLabel.hidden = YES;
-    [self.lrcView addSubview:self.scoreLabel];
-    [self.scoreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(10);
-        make.top.mas_equalTo(35);
-    }];
+//    self.gradeView = [[GradeView alloc]init];
+//    self.gradeView.frame = CGRectMake(15, 10, self.width - 30, 30);
+//    [self.karaokeView addSubview:self.gradeView];
     
-    self.scoreUnitLabel.hidden = YES;
-    [self.lrcView addSubview:self.scoreUnitLabel];
-    [self.scoreUnitLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(self.scoreLabel.mas_right);
-        make.bottom.mas_equalTo(self.scoreLabel.mas_bottom).offset(-2.5);
-    }];
+    self.incentiveView = [[IncentiveView alloc]init];
+    self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
+    [self.karaokeView addSubview:self.incentiveView];
+//    self.scoreLabel.hidden = YES;
+//    [self.lrcView addSubview:self.scoreLabel];
+//    [self.scoreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.mas_equalTo(10);
+//        make.top.mas_equalTo(35);
+//    }];
+//
+//    self.scoreUnitLabel.hidden = YES;
+//    [self.lrcView addSubview:self.scoreUnitLabel];
+//    [self.scoreUnitLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.mas_equalTo(self.scoreLabel.mas_right);
+//        make.bottom.mas_equalTo(self.scoreLabel.mas_bottom).offset(-2.5);
+//    }];
     
     self.pauseBtn.frame = CGRectMake(20, self.height-24-12, 24, 24);
     [self addSubview:self.pauseBtn];
@@ -133,7 +140,7 @@
     self.idleView.hidden = NO;
     [self addSubview:self.idleView];
     
-    self.lrcView.config = self.config;
+   // self.lrcView.config = self.config;
     [self setPlayerViewsHidden:YES nextButtonHidden:YES];
     
     VL(weakSelf);
@@ -275,8 +282,8 @@
     self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
     
     //config score label visibility
-    self.config.isHiddenScoreView = NO;
-    [self.lrcView setConfig:self.config];
+//    self.config.isHiddenScoreView = NO;
+//    [self.lrcView setConfig:self.config];
     self.scoreLabel.hidden = NO;
     
     if(song) {
@@ -422,82 +429,61 @@
 #pragma mark -
 
 - (void)loadLrcURL:(NSString *)lrcURL {
-    [_lrcView setLrcUrlWithUrl:lrcURL];
+    NSURL *musicUrl = [NSURL URLWithString:lrcURL];
+    NSData *data = [NSData dataWithContentsOfURL:musicUrl];
+    LyricModel *model = [KaraokeView parseLyricDataWithData:data];
+    if(model){
+        [_karaokeView setLyricDataWithData:model];
+    } else {
+        NSLog(@"歌词解析失败！");
+    }
 }
 
 - (void)start {
-    [_lrcView start];
+   // [_karaokeView start];
 }
 
 - (void)stop {
-    [_lrcView stop];
+    [_karaokeView reset];
 }
 
 - (void)reset {
-    [_lrcView stop];
-    [_lrcView reset];
+    [_karaokeView reset];
     [self setSongScore:0];
     self.isPlayAccompany = YES;
-    [_lrcView resetTime];
     [self cleanMusicText];
 }
 
 - (void)resetTime {
-    [_lrcView resetTime];
+    [_karaokeView reset];
 }
 
 - (void)scrollToTime:(NSTimeInterval)time {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.lrcView scrollToTimeWithTimestamp:time];
+        [self.lrcView setProgressWithProgress:time];
     });
 }
 
-#pragma mark -
+#pragma mark 
 
-- (AgoraLrcScoreConfigModel *)config {
-    if (!_config) {
-        // 配置
-        _config = [[AgoraLrcScoreConfigModel alloc] init];
-        /// 评分组件和歌词组件之间的间距 默认: 0
-        _config.spacing = 0;
-        /// 背景图
-        _config.backgroundImageView = nil;
-        _config.isHiddenScoreView = YES;
-        
-        // 评分组件配置
-        AgoraScoreItemConfigModel *scoreConfig = [[AgoraScoreItemConfigModel alloc] init];
-        scoreConfig.tailAnimateColor = [UIColor yellowColor];
-        scoreConfig.scoreViewHeight = 100; // 评分视图高度
-        scoreConfig.emitterColors = @[[UIColor purpleColor]];
-        scoreConfig.isHiddenSeparatorLine = NO;
-        scoreConfig.separatorLineColor = [UIColor whiteColor];
-        
-        // 歌词组件配置
-        AgoraLrcConfigModel *lrcConfig = [[AgoraLrcConfigModel alloc] init];
-        lrcConfig.lrcFontSize = VLUIFontMake(15);
-        lrcConfig.isHiddenWatitingView = NO;
-        lrcConfig.isHiddenBottomMask = NO;
-        lrcConfig.lrcHighlightFontSize = VLUIFontMake(18);
-        lrcConfig.lrcTopAndBottomMargin = 8;
-        lrcConfig.isHiddenSeparator = YES;
-        lrcConfig.isDrag = YES;
-        lrcConfig.tipsColor = [UIColor whiteColor];
-
-        _config.lrcConfig = lrcConfig;
-        _config.scoreConfig = scoreConfig;
+- (KaraokeView *)lrcView {
+    if (!_karaokeView) {
+        _karaokeView = [[KaraokeView alloc] init];
+        _karaokeView.delegate = self;
+        _karaokeView.lyricsView.textNormalColor = [UIColor yellowColor];
+        _karaokeView.lyricsView.textSelectedColor = [UIColor blueColor];
+        _karaokeView.lyricsView.textHighlightedColor = [UIColor yellowColor];
+        _karaokeView.lyricsView.textNormalFontSize = [UIFont systemFontOfSize:16];
+        _karaokeView.lyricsView.textHighlightFontSize = [UIFont systemFontOfSize:23];
+        _karaokeView.lyricsView.draggable = true;
+        _karaokeView.scoringView.viewHeight = 160;
+        _karaokeView.scoringView.topSpaces = 50;
+        _karaokeView.scoringView.localPitchCursorOffsetX = 5;
+        _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
+        _karaokeView.scoringView.showDebugView = true;
+        _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
     }
-    return _config;
-}
-
-- (AgoraLrcScoreView *)lrcView {
-    if (!_lrcView) {
-        _lrcView = [[AgoraLrcScoreView alloc] initWithDelegate:_delegate];
-        _lrcView.downloadDelegate = _delegate;
-        _lrcView.backgroundColor = [UIColor clearColor];
-        _lrcView.scoreDelegate = self;
-        _lrcView.clipsToBounds = YES;
-    }
-    return _lrcView;
+    return _karaokeView;
 }
 
 - (UILabel *)musicTitleLabel {

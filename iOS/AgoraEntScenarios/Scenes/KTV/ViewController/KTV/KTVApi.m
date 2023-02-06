@@ -11,6 +11,7 @@
 #import <AgoraLyricsScore-Swift.h>
 #import "AppContext+KTV.h"
 #import "VLGlobalHelper.h"
+#import "AgoraEntScenarios-Swift.h"
 
 typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
@@ -32,8 +33,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     AgoraRtcMediaPlayerDelegate,
     AgoraMusicContentCenterEventDelegate,
     AgoraRtcEngineDelegate,
-    AgoraLrcViewDelegate,
-    AgoraLrcDownloadDelegate,
+    KaraokeDelegate,
     AgoraAudioFrameDelegate
 >
 
@@ -55,6 +55,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, strong) KTVSongConfiguration* config;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
+@property (nonatomic, assign) NSInteger cumulativeScore;
+@property (nonatomic, assign) NSInteger totalCount;
+@property (nonatomic, strong) AgoraDownLoadManager *downLoadManager;
+@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, assign) NSInteger lastTime;
 @end
 
 @implementation KTVApi
@@ -80,8 +85,29 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [engine setDirectExternalAudioSource:true];
         [engine setRecordingAudioFrameParametersWithSampleRate:48000 channel:2 mode:0 samplesPerCall:960];
         [engine setAudioFrameDelegate:self];
+        self.cumulativeScore = 0;
+        [self loadTimer];
     }
     return self;
+}
+
+-(void)loadTimer {
+    self.lastTime = 0;
+    kWeakSelf(self)
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:0.01 block:^(NSTimer * _Nonnull timer) {
+        NSInteger current = weakself.lastTime;
+        if(current % 1000 == 0){
+            current = [self.rtcMediaPlayer getPosition];
+        }
+        current += 10;
+        self.lastTime = current;
+        NSInteger time = current;
+        if (time > 250) {
+            time -= 250;
+        }
+        [self.karaokeView setProgressWithProgress:current];
+    } repeats:true];
+    
 }
 
 -(void)dealloc
@@ -272,8 +298,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     if(self.config.type == KTVSongTypeChorus) {
         [self leaveChorus2ndChannel];
     }
-    [self.lrcView stop];
-    [self.lrcView reset];
+    [self.karaokeView reset];
     self.config = nil;
 }
 
@@ -361,7 +386,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
         int pitch = [dict[@"pitch"] intValue];
         NSInteger time = [dict[@"time"] integerValue];
-        [self.lrcView setVoicePitch:@[@(pitch)]];
+        [self.karaokeView setPitchWithPitch:pitch];
         KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 }
@@ -382,15 +407,29 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
     
-    [self.lrcView setVoicePitch:@[@(pitch)]];
+    [self.karaokeView setPitchWithPitch:pitch];
 }
 
 #pragma mark - setter
-- (void)setLrcView:(AgoraLrcScoreView *)lrcView
-{
-    _lrcView = lrcView;
-    lrcView.downloadDelegate = self;
-    lrcView.delegate = self;
+- (void)setKaraokeView:(KaraokeView *)karaokeView{
+    _karaokeView = karaokeView;
+    _karaokeView.delegate = self;
+}
+
+- (void)onKaraokeViewWithView:(KaraokeView *)view didDragTo:(NSInteger)position{
+    [self.rtcMediaPlayer seekToPosition:position];
+    self.cumulativeScore = [view.scoringView getCumulativeScore];
+    if([self.delegate respondsToSelector:@selector(didlrcViewDidScrolledWithCumulativeScore:totalScore:)]){
+        [self.delegate didlrcViewDidScrolledWithCumulativeScore:self.cumulativeScore totalScore:self.totalCount];
+    }
+    
+}
+
+- (void)onKaraokeViewWithView:(KaraokeView *)view didFinishLineWith:(LyricLineModel *)model score:(NSInteger)score cumulativeScore:(NSInteger)cumulativeScore lineIndex:(NSInteger)lineIndex lineCount:(NSInteger)lineCount{
+    self.cumulativeScore = cumulativeScore;
+    if([self.delegate respondsToSelector:@selector(didlrcViewDidScrollFinishedWithCumulativeScore:totalScore:)]){
+        [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.cumulativeScore totalScore:lineCount * 100];
+    }
 }
 
 #pragma mark - AgoraAudioFrameDelegate
@@ -408,8 +447,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
         [playerKit play];
+        [self.timer fire];
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
+        [self.timer setFireDate:[NSDate date]];
+        self.lastTime = 0;
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -440,22 +482,22 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 }
 
 #pragma mark - AgoraLrcViewDelegate
--(NSTimeInterval)getTotalTime {
-    if (self.config.role == KTVSingRoleMainSinger) {
-        NSTimeInterval time = [_rtcMediaPlayer getDuration];
-        return time;
-    }
-    return self.remotePlayerDuration;
-}
-
-- (NSTimeInterval)getPlayerCurrentTime {
-    if (self.config.role == KTVSingRoleMainSinger) {
-        NSTimeInterval time = [_rtcMediaPlayer getPosition];
-        return time;
-    }
-    
-    return self.remotePlayerPosition;
-}
+//-(NSTimeInterval)getTotalTime {
+//    if (self.config.role == KTVSingRoleMainSinger) {
+//        NSTimeInterval time = [_rtcMediaPlayer getDuration];
+//        return time;
+//    }
+//    return self.remotePlayerDuration;
+//}
+//
+//- (NSTimeInterval)getPlayerCurrentTime {
+//    if (self.config.role == KTVSingRoleMainSinger) {
+//        NSTimeInterval time = [_rtcMediaPlayer getPosition];
+//        return time;
+//    }
+//
+//    return self.remotePlayerPosition;
+//}
 
 
 #pragma mark - AgoraLrcDownloadDelegate
@@ -638,7 +680,26 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         //overwrite existing callback and use new
         [self.lyricCallbacks setObject:block forKey:url];
     }
-    [self.lrcView setLrcUrlWithUrl:url];
+    
+    //判断歌词是zip文件还是本地地址
+    bool isLocal = [url hasSuffix:@".zip"];
+    self.downLoadManager = [[AgoraDownLoadManager alloc]init];
+    [self.downLoadManager downloadLrcFileWithUrlString:url completion:^(NSString *lrcUrl) {
+        NSURL *musicUrl = isLocal ? [NSURL fileURLWithPath:lrcUrl] : [NSURL URLWithString:url];
+        NSData *data = [NSData dataWithContentsOfURL:musicUrl];
+        LyricModel *model = [KaraokeView parseLyricDataWithData:data];
+        if(model){
+            [self.karaokeView setLyricDataWithData:model];
+            self.totalCount = model.lines.count;
+            block(url);
+        } else {
+            NSLog(@"歌词解析失败！");
+        }
+   } failure:^{
+            
+   }];
+    
+    
 }
 
 - (NSString*)cachedLyricUrl:(NSInteger)songCode

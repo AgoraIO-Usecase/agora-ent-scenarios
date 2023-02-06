@@ -168,7 +168,7 @@ AgoraMusicContentCenterEventDelegate
     inputModel.singer = model.singer;
     [[AppContext ktvServiceImp] chooseSongWithInput:inputModel
                                          completion:^(NSError * error) {
-        if (error != nil && error.code != 6) {
+        if (error != nil) {
             [self dianGeFailedWithModel:model];
             return;
         }
