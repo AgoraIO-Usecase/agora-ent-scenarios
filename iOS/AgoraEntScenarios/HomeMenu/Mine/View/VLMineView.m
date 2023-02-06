@@ -10,9 +10,14 @@
 #import "VLMacroDefine.h"
 #import "UIView+VL.h"
 #import "MenuUtils.h"
+#import "VLMineCellModel.h"
 @import SDWebImage;
 @import QMUIKit;
 @import YYCategories;
+
+static NSString * const kDevelopModeIsOn = @"kDevelopModeIsOn";
+static NSString * const kSwitchCellID = @"switchCellID";
+static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 @interface VLMineView ()<UITableViewDelegate,UITableViewDataSource>
 
@@ -25,6 +30,7 @@
 
 @property (nonatomic, strong) UITableView *mineTable;
 @property (nonatomic, strong) NSArray *itemsArray;
+@property (nonatomic, strong) NSMutableArray *dataArray;
 
 @end
 
@@ -34,6 +40,7 @@
     if (self = [super initWithFrame:frame]) {
         self.delegate = delegate;
         [self setupView];
+        [self setupData];
     }
     return self;
 }
@@ -45,6 +52,16 @@
     [self.mineTopView addSubview:self.IDLabel];
     [self.mineTopView addSubview:self.editBtn];
     [self addSubview:self.mineTable];
+}
+
+- (void)setupData {
+    self.dataArray = [self.itemsArray mutableCopy];
+    BOOL developIsOn = [[NSUserDefaults standardUserDefaults] boolForKey:kDevelopModeIsOn];
+    if (developIsOn) {
+        VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
+        [self.dataArray addObject:model];
+    }
+    _mineTable.frame = CGRectMake(20, _mineTopView.bottom+VLREALVALUE_WIDTH(15), SCREEN_WIDTH-40, VLREALVALUE_WIDTH(58)* self.dataArray.count + 10);
 }
 
 - (void)editButtonClickEvent {
@@ -71,16 +88,26 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.itemsArray.count;
+    return self.dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *reuseCell = @"reuse";
-    VLMineTCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseCell];
-    if (cell == nil) {
-        cell = [[VLMineTCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseCell];
+    VLMineCellModel *model = self.dataArray[indexPath.row];
+    if (model.style == VLMineCellStyleSwitch) {
+        VLMineSwitchCell *switchCell = [tableView dequeueReusableCellWithIdentifier:kSwitchCellID forIndexPath:indexPath];
+        BOOL developIsOn = [[NSUserDefaults standardUserDefaults] boolForKey:kDevelopModeIsOn];
+        @weakify(self)
+        [switchCell setTitle:model.titleStr isOn:developIsOn valueChangedAction:^(BOOL isOn) {
+            @strongify(self)
+            [[NSUserDefaults standardUserDefaults] setValue:@(isOn) forKey:kDevelopModeIsOn];
+            [self setupData];
+            [self.mineTable reloadData];
+        }];
+        return switchCell;
     }
-    cell.dict = self.itemsArray[indexPath.row];
+    
+    VLMineTCell *cell = [tableView dequeueReusableCellWithIdentifier:kDefaultCellID forIndexPath:indexPath];
+    [cell setIconImageName:model.itemImgStr title:model.titleStr];
     return cell;
 }
 
@@ -166,6 +193,8 @@
         _mineTable.layer.masksToBounds = YES;
         _mineTable.scrollEnabled = NO;
         _mineTable.separatorStyle = UITableViewCellSeparatorStyleNone;
+        [_mineTable registerClass:[VLMineTCell class] forCellReuseIdentifier:kDefaultCellID];
+        [_mineTable registerClass:[VLMineSwitchCell class] forCellReuseIdentifier:kSwitchCellID];
     }
     return _mineTable;
 }
@@ -173,15 +202,24 @@
 - (NSArray *)itemsArray {
     if (!_itemsArray) {
         _itemsArray = @[
-            @{@"itemImgStr":@"mine_screct_icon",@"titleStr":AGLocalizedString(@"用户协议")},
-            @{@"itemImgStr":@"mine_userRule_icon",@"titleStr":AGLocalizedString(@"隐私政策")},
-            @{@"itemImgStr":@"mine_aboutus_icon",@"titleStr":AGLocalizedString(@"关于我们")},
-            @{@"itemImgStr":@"mine_logout_icon",@"titleStr":AGLocalizedString(@"退出登录")},
-            @{@"itemImgStr":@"mine_quit_icon",@"titleStr":AGLocalizedString(@"注销账号")},
+            [VLMineCellModel modelWithItemImg:@"mine_screct_icon" title:AGLocalizedString(@"用户协议")],
+            [VLMineCellModel modelWithItemImg:@"mine_userRule_icon" title:AGLocalizedString(@"隐私政策")],
+            [VLMineCellModel modelWithItemImg:@"mine_aboutus_icon" title:AGLocalizedString(@"关于我们")],
+            [VLMineCellModel modelWithItemImg:@"mine_logout_icon" title:AGLocalizedString(@"退出登录")],
+            [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"注销账号")],
         ];
     }
     return _itemsArray;
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = touches.anyObject;
+    if (touch.tapCount >= 5) {
+        [[NSUserDefaults standardUserDefaults] setValue:@(YES) forKey:kDevelopModeIsOn];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self setupData];
+        [self.mineTable reloadData];
+    }
+}
 
 @end

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
+		A8889DB62990DB04004BAA1C /* VLMineSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DB52990DB04004BAA1C /* VLMineSwitchCell.swift */; };
+		A8889DBC2990E0A7004BAA1C /* VLMineCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A8889DBB2990E0A7004BAA1C /* VLMineCellModel.m */; };
 		A8E630BD298520CF002EADA4 /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E630BC298520CF002EADA4 /* KeyCenter.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
@@ -195,7 +197,6 @@
 		DDB116DF29756E090042D9B6 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116B629756E090042D9B6 /* VLCache.m */; };
 		DDB116E029756E090042D9B6 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116BF29756E090042D9B6 /* VLUserCenter.m */; };
 		DDB116E129756E090042D9B6 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDB116C029756E090042D9B6 /* VLGlobalHelper.m */; };
-		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
 		DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3328FFD78B005F4E8B /* UIImage+Scene.swift */; };
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
@@ -334,6 +335,9 @@
 		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
+		A8889DB52990DB04004BAA1C /* VLMineSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineSwitchCell.swift; sourceTree = "<group>"; };
+		A8889DBA2990E0A7004BAA1C /* VLMineCellModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLMineCellModel.h; sourceTree = "<group>"; };
+		A8889DBB2990E0A7004BAA1C /* VLMineCellModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLMineCellModel.m; sourceTree = "<group>"; };
 		A8E630BC298520CF002EADA4 /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1021,6 +1025,8 @@
 			children = (
 				DD8416C029090C520026B624 /* VLUploadImageResModel.h */,
 				DD8416C129090C520026B624 /* VLUploadImageResModel.m */,
+				A8889DBA2990E0A7004BAA1C /* VLMineCellModel.h */,
+				A8889DBB2990E0A7004BAA1C /* VLMineCellModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1032,6 +1038,7 @@
 				DD8416C429090C520026B624 /* VLMineTCell.m */,
 				DD8416C529090C520026B624 /* VLMineView.h */,
 				DD8416C629090C520026B624 /* VLMineTCell.h */,
+				A8889DB52990DB04004BAA1C /* VLMineSwitchCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2184,11 +2191,7 @@
 				DD84176C29090C520026B624 /* ic_game.png in Resources */,
 				DD84176E29090C520026B624 /* tab_discover.png in Resources */,
 				DD84177A29090C520026B624 /* product.js in Resources */,
-				DDE857B0296BB51100982E52 /* VoiceChatRoomResource.bundle in Resources */,
-				DD8417C929090C520026B624 /* Template.bundle in Resources */,
-				DDA19A1328FFE579009D3E61 /* AgoraSyncManagerLocal.podspec in Resources */,
 				E75B1521296FE59100C33678 /* SENSEME.lic in Resources */,
-				DDA19A2128FFE579009D3E61 /* publish.sh in Resources */,
 				DD84177629090C520026B624 /* product4.png in Resources */,
 				DD84177129090C520026B624 /* ic_play.png in Resources */,
 				DD84177529090C520026B624 /* product1.png in Resources */,
@@ -2206,7 +2209,6 @@
 				DD2A43D428FFCEE7004CEDCF /* Assets.xcassets in Resources */,
 				DD84177829090C520026B624 /* entertainment.js in Resources */,
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
-				DDA19A1F28FFE579009D3E61 /* SyncManager.swift~zyq in Resources */,
 				DDE85655296BB34E00982E52 /* BeautyResource.bundle in Resources */,
 				DD84176729090C520026B624 /* tab_profile.png in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
@@ -2319,6 +2321,7 @@
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
 				DDE85652296BB34E00982E52 /* BEPixelBufferInfo.m in Sources */,
 				DDA19A2D28FFE57A009D3E61 /* EKEntryView.swift in Sources */,
+				A8889DB62990DB04004BAA1C /* VLMineSwitchCell.swift in Sources */,
 				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				DDE85647296BB34E00982E52 /* BELicenseHelper.mm in Sources */,
@@ -2398,11 +2401,7 @@
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
 				DDA199EE28FFE579009D3E61 /* VLUIView.m in Sources */,
 				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
-				DDE857C8296BB51100982E52 /* VRRoomsViewController.swift in Sources */,
 				E75B151E296FE59100C33678 /* VideoProcessingManager.m in Sources */,
-				DDE857C2296BB51100982E52 /* VoiceRoomViewController+IM.swift in Sources */,
-				DDE857B8296BB51100982E52 /* ChatRoomServiceImp.swift in Sources */,
-				DDA19A2228FFE579009D3E61 /* Blocks.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
 				DDB116E129756E090042D9B6 /* VLGlobalHelper.m in Sources */,
 				DDE8567E296BB34E00982E52 /* ShowSyncManagerServiceImp.swift in Sources */,
@@ -2417,7 +2416,6 @@
 				DDE8563C296BB34E00982E52 /* ShowSettingActionSheetVC.swift in Sources */,
 				DDE8562B296BB34E00982E52 /* BeautyModel.swift in Sources */,
 				DDE85676296BB34E00982E52 /* ShowInviteCell.swift in Sources */,
-				DDA19A2528FFE57A009D3E61 /* SyncError.swift in Sources */,
 				E75B1526296FE59100C33678 /* EffectsCommonObject.m in Sources */,
 				DDE85638296BB34E00982E52 /* ShowBeautyFaceVC.swift in Sources */,
 				DDA19A4E28FFE57A009D3E61 /* EKAttributes+PopBehavior.swift in Sources */,
@@ -2432,9 +2430,6 @@
 				DDA19A2B28FFE57A009D3E61 /* QDCommonUI.m in Sources */,
 				DDA19A3128FFE57A009D3E61 /* EKBackgroundView.swift in Sources */,
 				DDA19A3F28FFE57A009D3E61 /* QLUtils.swift in Sources */,
-				DDE85833296BB51100982E52 /* VLSelectSongView.m in Sources */,
-				DDE85824296BB51100982E52 /* LSTPopView+KTVModal.m in Sources */,
-				DDE857C9296BB51100982E52 /* VRSpatialSoundViewController.swift in Sources */,
 				E75B1523296FE59100C33678 /* EffectsDetector.m in Sources */,
 				DDA19A4628FFE57A009D3E61 /* EKAttributes+Shadow.swift in Sources */,
 				DDEAAC33296FE72300D23969 /* AgoraExtension.swift in Sources */,
@@ -2497,26 +2492,18 @@
 				E75B1522296FE59100C33678 /* EffectsLicense.m in Sources */,
 				DDE8562E296BB34E00982E52 /* ShowAgoraKitManager+Music.swift in Sources */,
 				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,
-				DDE85795296BB51100982E52 /* VoiceRoomEmojiManager.swift in Sources */,
-				DDE857C7296BB51100982E52 /* VRAllRoomsViewController.swift in Sources */,
 				E75B1525296FE59100C33678 /* EffectsAttribute.m in Sources */,
-				DDE857A8296BB51100982E52 /* ResourceBundleExtension.swift in Sources */,
-				DDE857F0296BB51100982E52 /* VoiceRoomSwitchBar.swift in Sources */,
-				DDE85808296BB51100982E52 /* HorizontalCardsView.swift in Sources */,
 				DDA19A3928FFE57A009D3E61 /* UIColor+Utils.swift in Sources */,
 				DDE85631296BB34E00982E52 /* ShowPresettingModel.swift in Sources */,
 				DDE8566C296BB34E00982E52 /* ShowSettingBaseCell.swift in Sources */,
 				DDE85659296BB34E00982E52 /* ShowReceiveFinishView.swift in Sources */,
 				DDE85672296BB34E00982E52 /* ShowSettingSliderCell.swift in Sources */,
 				DDA19A7028FFE57A009D3E61 /* YGViewDisplayer.m in Sources */,
-				DDE8582E296BB51100982E52 /* VLKTVItemBaseView.m in Sources */,
 				E75B1520296FE59100C33678 /* EFMotionManager.m in Sources */,
 				DDE85657296BB34E00982E52 /* ShowMusicTableHeaderView.swift in Sources */,
 				DDA19A6028FFE57A009D3E61 /* EKAlertMessageView.swift in Sources */,
 				DDA19A6128FFE57A009D3E61 /* EKSimpleMessageView.swift in Sources */,
 				E75B1528296FE5EE00C33678 /* SenseBeautyManager.swift in Sources */,
-				DDE85840296BB51100982E52 /* AppContext+KTV.m in Sources */,
-				DDE8578F296BB51100982E52 /* VoiceRoomRequest.swift in Sources */,
 				DDA19A5828FFE57A009D3E61 /* EKAttributes+FrameStyle.swift in Sources */,
 				DDA19A4028FFE57A009D3E61 /* QLCompatibility.swift in Sources */,
 				DDA19A3428FFE57A009D3E61 /* EKStyleView.swift in Sources */,
@@ -2527,9 +2514,7 @@
 				DDE8567A296BB34E00982E52 /* ShowToolMenuView.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DDE85651296BB34E00982E52 /* BEHttpRequestProvider.mm in Sources */,
-				DDE8581F296BB51100982E52 /* VLPopMoreSelView.m in Sources */,
 				E75B1524296FE59100C33678 /* Effects.m in Sources */,
-				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
 				DDA19A5328FFE57A009D3E61 /* EKAttributes+WindowLevel.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
@@ -2566,10 +2551,10 @@
 				DDE8563A296BB34E00982E52 /* ShowToolMenuViewController.swift in Sources */,
 				DDA19A4C28FFE57A009D3E61 /* EKAttributes+Validations.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
+				A8889DBC2990E0A7004BAA1C /* VLMineCellModel.m in Sources */,
 				DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */,
 				DDA199EA28FFE579009D3E61 /* VLBaseModel.m in Sources */,
 				DDA19A5528FFE57A009D3E61 /* EKAttributes+Precedence.swift in Sources */,
-				DDE8579E296BB51100982E52 /* PresentationEnums.swift in Sources */,
 				E75B1534297530EF00C33678 /* BeautyManager.swift in Sources */,
 				DDE8564E296BB34E00982E52 /* ByteBeautyManager.swift in Sources */,
 				DDA199E628FFE579009D3E61 /* UIButton+Font.m in Sources */,
@@ -2580,9 +2565,7 @@
 				DDE8567C296BB34E00982E52 /* ShowServiceModel.swift in Sources */,
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
 				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
-				DDE85822296BB51100982E52 /* VLPopSelBgView.m in Sources */,
 				E75B151F296FE59100C33678 /* EffectsAnimal.m in Sources */,
-				DDE8583C296BB51100982E52 /* VLCreateRoomView.m in Sources */,
 				DDA199FF28FFE579009D3E61 /* NSString+Helper.m in Sources */,
 				DDE85635296BB34E00982E52 /* ShowMusicEffectVC.swift in Sources */,
 			);
