@@ -52,6 +52,9 @@ class SARoomViewController: SABaseViewController {
     var local_index: Int?
     var alienCanPlay: Bool = true
     var vmType: SARtcType.VMMUSIC_TYPE = .social
+    
+    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
+    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
 
     public var roomInfo: SARoomInfo? {
         didSet {
@@ -114,6 +117,11 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
+        
+        rtckit.initSpatialAudio()
+        
+        redMediaPlayer = rtckit.initMediaPlayer()
+        blueMediaPlayer = rtckit.initMediaPlayer()
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false

@@ -68,6 +68,7 @@ public struct SARtcType {
     @objc public enum ASManagerType: Int {
         case VoiceChat = 1
         case KTV = 2
+        case SpatialAudio = 3
     }
 
     /**
@@ -178,6 +179,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     @objc public weak var delegate: SAManagerDelegate?
 
     @objc public weak var playerDelegate: SAMusicPlayerDelegate?
+    
+    public var localSpatial: AgoraLocalSpatialAudioKit?
 
     // 单例
     @objc public class func getSharedInstance() -> SARTCManager {
@@ -269,7 +272,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @objc public func joinKTVChannelWith(with channelName: String, rtcUid: Int) {
         self.channelName = channelName
-        type = .KTV
+        type = .SpatialAudio
 
         loadKit(with: channelName, rtcUid: rtcUid)
 
@@ -277,14 +280,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
         rtcKit.setParameters("{\"rtc.audio_resend\":false}")
         rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
         rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
-        self .setParametersWithMD()
 
-        rtcKit.setAudioProfile(.musicHighQualityStereo, scenario: .chorus)
-        rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: false)
-
-        let config = AgoraVideoEncoderConfiguration(width: 120, height: 160, frameRate: .fps7, bitrate: AgoraVideoBitrateStandard, orientationMode: .adaptative, mirrorMode: .auto)
-        rtcKit.setVideoEncoderConfiguration(config)
-
+        setParametersWithMD()
         if role != .audience {
             mediaPlayer = rtcKit.createMediaPlayer(with: self)
 
@@ -301,57 +298,24 @@ public let kMPK_RTC_UID_SA: UInt = 1
 
         if role == .owner {
             let option = AgoraRtcChannelMediaOptions()
-            option.publishCameraTrack = true
-            option.publishMicrophoneTrack = true
-            option.publishCustomAudioTrack = false
-            option.autoSubscribeAudio = false
-            option.autoSubscribeVideo = false
-            option.clientRoleType = .broadcaster
-            self .setParametersWithMD()
-
-            rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
-            rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
-
-            let connection = AgoraRtcConnection()
-            connection.channelId = channelName
-            connection.localUid = kMPK_RTC_UID_SA
-
-            let option2 = AgoraRtcChannelMediaOptions()
-            option2.publishCameraTrack = false // 取消发送视频流
-            option2.publishMicrophoneTrack = false // 取消SDK采集音频
-            option2.autoSubscribeAudio = false // 取消订阅其他人的音频流
-            option2.publishCustomAudioTrack = false // 开启音频自采集，如果使用SDK采集，传入false。
-
-            option2.enableAudioRecordingOrPlayout = false
-            option2.publishMediaPlayerAudioTrack = true
-            option2.publishMediaPlayerId = Int(mediaPlayer!.getMediaPlayerId())
-            option2.clientRoleType = .broadcaster // 设置角色为主播
-
-            rtcKit.joinChannelEx(byToken: nil, connection: connection, delegate: nil, mediaOptions: option2) { [weak self] channel_name, user_uid, elapsed in
-                self?.rtcKit.muteRemoteAudioStream(kMPK_RTC_UID_SA, mute: true)
-            }
-
-        } else if role == .coHost {
-            let option = AgoraRtcChannelMediaOptions()
-            option.publishCameraTrack = true
+            option.publishCameraTrack = false
             option.publishMicrophoneTrack = true
             option.publishCustomAudioTrack = false
             option.autoSubscribeAudio = true
-            option.autoSubscribeVideo = true
+            option.autoSubscribeVideo = false
             option.clientRoleType = .broadcaster
-            self .setParametersWithMD()
+            setParametersWithMD()
 
-            rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus)
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
 
-        } else {
+        }  else {
             let option = AgoraRtcChannelMediaOptions()
             option.publishCameraTrack = false // 关闭视频采集
             option.publishMicrophoneTrack = false // 关闭音频采集
             option.autoSubscribeAudio = true
-            self .setParametersWithMD()
+            option.clientRoleType = .audience
+            setParametersWithMD()
 
-            rtcKit.setAudioProfile(.musicHighQuality, scenario: .chorus) // 设置profile
             option.clientRoleType = .audience // 设置观众角色
             rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: 0, mediaOptions: option)
         }
@@ -367,8 +331,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: SARtcType.VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
         rtcKit.delegate = self
-        rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
-        self .setParametersWithMD()
+        
+        setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
 
@@ -390,7 +354,41 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
     }
+    
+    func initSpatialAudio() {
+        localSpatial = AgoraLocalSpatialAudioKit()
+        let localSpatialConfig = AgoraLocalSpatialAudioConfig()
+        localSpatialConfig.rtcEngine = rtcKit
+        localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
+        localSpatial?.muteLocalAudioStream(false)
+        localSpatial?.muteAllRemoteAudioStreams(false)
+        localSpatial?.setAudioRecvRange(7.5)
+        localSpatial?.setMaxAudioRecvCount(6)
+        localSpatial?.setDistanceUnit(10)
+    }
+    
+    func initMediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
+        let mediaPlayer = rtcKit.createMediaPlayer(with: self)
+        mediaPlayer?.setLoopCount(10000)
+        return mediaPlayer
+    }
 
+    func setMediaPlayerPositionInfo(playerId: Int,
+                                    positionInfo: AgoraRemoteVoicePositionInfo) {
+        localSpatial?.updatePlayerPositionInfo(playerId,
+                                               positionInfo: positionInfo)
+    }
+    
+    func updateSpetialPostion(position: [NSNumber],
+                              axisForward: [NSNumber],
+                              axisRight: [NSNumber],
+                              axisUp: [NSNumber]) {
+        localSpatial?.updateSelfPosition(position,
+                                         axisForward: axisForward,
+                                         axisRight: axisRight,
+                                         axisUp: axisUp)
+    }
+    
     /**
      * 加载RTC
      * @param channelName 频道名称
@@ -541,16 +539,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
             rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
             rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
         }
-    }
-
-    /**
-     * 开启/关闭 本地视频
-     * @param enable 是否开启视频
-     * @return 开启/关闭视频的结果
-     */
-    @discardableResult
-    public func enableLocalVideo(enable: Bool) -> Int32 {
-        return rtcKit.enableLocalVideo(enable)
     }
 
     /**

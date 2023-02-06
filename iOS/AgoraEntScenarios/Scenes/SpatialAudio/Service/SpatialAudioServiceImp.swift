@@ -858,7 +858,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
                 im_token = token ?? ""
                 impGroup.leave()
             }
-            
+
         }
         
         impGroup.enter()
