@@ -13,7 +13,7 @@ public enum SA3DUserDirectionType {
 }
 
 class SA3DUserCollectionViewCell: UICollectionViewCell {
-    private var rtcUserView: SABaseRtcUserView = .init()
+    var rtcUserView: SABaseRtcUserView = .init()
 
     public var cellType: SABaseUserCellType = .AgoraChatRoomBaseUserCellTypeAdd {
         didSet {

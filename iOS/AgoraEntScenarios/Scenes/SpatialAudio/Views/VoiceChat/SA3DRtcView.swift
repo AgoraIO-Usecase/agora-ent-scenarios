@@ -29,6 +29,8 @@ class SA3DRtcView: UIView {
 
     public var clickBlock: (() -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
+    
+    public var rtcKit: SARTCManager?
 
     public var micInfos: [SARoomMic]? {
         didSet {
@@ -160,25 +162,42 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
         if indexPath.item != 3 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: vIdentifier,
                                                           for: indexPath) as! SA3DUserCollectionViewCell
+            let pos: [NSNumber] = [NSNumber(value: Double(cell.rtcUserView.center.x)),
+                                   NSNumber(value: Double(cell.rtcUserView.center.y)),
+                                   0]
             switch indexPath.item {
             case 0:
                 if let mic_info = micInfos?[0] {
+                    mic_info.forward = [1, -1, 0]
+                    mic_info.right = [-1, -1, 0]
                     cell.tag = 200
                     cell.setArrowInfo(imageName: "sa_downright_arrow", margin: 6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             case 1:
                 if let mic_info = micInfos?[1] {
+                    mic_info.forward = [0, -1, 0]
+                    mic_info.right = [-1, 0, 0]
                     cell.tag = 201
                     cell.setArrowInfo(imageName: "sa_down_arrow", margin: 6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             case 2:
                 if let mic_info = micInfos?[6] {
+                    mic_info.forward = [-1, -1, 0]
+                    mic_info.right = [-1, 1, 0]
                     let user = SAUser()
                     user.name = "Agora Red"
                     user.portrait = "red"
@@ -186,49 +205,57 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.user = user
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             case 4:
                 if let mic_info = micInfos?[5] {
                     let user = SAUser()
+                    mic_info.forward = [1, 1, 0]
+                    mic_info.right = [1, -1, 0]
                     user.name = "Agora Blue"
                     user.portrait = "blue"
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
                     cell.user = user
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             case 5:
                 if let mic_info = micInfos?[2] {
+                    mic_info.forward = [0, 1, 0]
+                    mic_info.right = [1, 0, 0]
                     cell.tag = 202
                     cell.setArrowInfo(imageName: "sa_up_arrow", margin: -6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             case 6:
                 if let mic_info = micInfos?[3] {
+                    mic_info.forward = [-1, 1, 0]
+                    mic_info.right = [1, 1, 0]
                     cell.tag = 203
                     cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -6)
                     cell.user = mic_info.member
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
+                    rtcKit?.updateSpetialPostion(position: pos,
+                                                 axisForward: mic_info.forward ?? [],
+                                                 axisRight: mic_info.right ?? [],
+                                                 axisUp: mic_info.up)
                 }
             default:
                 break
-            }
-
-            if indexPath.item == 2 || indexPath.item == 4 {
-                cell.activeBlock = { [weak self] type in
-                    guard let activeBlock = self?.activeBlock else {
-                        return
-                    }
-                    activeBlock(type)
-                }
-            } else {
-                cell.clickBlock = { [weak self] in
-                    guard let clickBlock = self?.clickBlock else { return }
-                    clickBlock()
-                }
             }
             return cell
         } else {

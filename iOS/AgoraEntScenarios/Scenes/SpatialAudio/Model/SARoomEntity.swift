@@ -62,6 +62,10 @@ import KakaJSON
     public func kj_modelKey(from property: Property) -> ModelPropertyKey {
         property.name
     }
+    
+    var forward: [NSNumber]?
+    var right: [NSNumber]?
+    var up: [NSNumber] = [0, 0, 1]
 }
 
 @objc open class SAUsers: NSObject, Convertible {
