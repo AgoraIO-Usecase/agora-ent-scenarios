@@ -534,21 +534,28 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     config.mainSingerUid = [[model userNo] integerValue];
     config.coSingerUid = [[model chorusNo] integerValue];
     KTVLogInfo(@"loadSong name: %@, songNo: %@, type: %ld, role: %ld", model.songName, model.songNo, type, role);
+    self.retryCount = 0;
+    [self loadSongWithModel:model config:config];
+    
+}
+
+- (void)loadSongWithModel:(VLRoomSelSongModel *)model config:(nonnull KTVSongConfiguration *)config {
     VL(weakSelf);
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
-            self.retryCount = 0;
+            [weakSelf.MVView showSkipView:true];
         } else if(state == KTVLoadSongStateNoLyricUrl) {
+            [weakSelf.MVView showSkipView:true];
             //如果歌词加载失败进行三次重试
-            if(self.retryCount < 2) {
-                [self loadAndPlaySong];
-                self.retryCount++;
+            if(weakSelf.retryCount < 2) {
+                KTVLogInfo(@"songName: %@, songNo: %@, retryCount: %lu",model.songName, model.songNo,(unsigned long)weakSelf.retryCount);
+                [weakSelf loadSongWithModel:model config:config];
+                weakSelf.retryCount++;
             }
         }
     }];
-    
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index {
@@ -905,15 +912,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             }
             [self.MVView start];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
-            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView stop];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
             [self.MVView reset];
-            self.retryCount = 0;
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            self.retryCount = 0;
             if(local) {
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
@@ -1138,7 +1142,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if (weakSelf.selSongsArray.count >= 1) {
                     [weakSelf.ktvApi stopSong];
                     [weakSelf removeCurrentSongWithSync:YES];
-                    weakSelf.retryCount = 0;
                 }
             }
             [[VLAlert shared] dismiss];

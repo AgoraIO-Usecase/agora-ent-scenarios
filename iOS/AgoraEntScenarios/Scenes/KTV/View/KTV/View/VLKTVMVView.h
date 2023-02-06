@@ -6,6 +6,7 @@
 #import <UIKit/UIKit.h>
 #import "AgoraEntScenarios-swift.h"
 #import "VLRoomSelSongModel.h"
+#import "KTVSkipView.h"
 @import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -99,6 +100,10 @@ typedef enum : NSUInteger {
 ///滚动到指定位置
 - (void)scrollToTime:(NSTimeInterval)time;
 
+#pragma mark - 前奏尾奏相关
+-(void)setSkipType:(SkipType)type;
+
+-(void)showSkipView:(bool)flag;
 @end
 
 NS_ASSUME_NONNULL_END

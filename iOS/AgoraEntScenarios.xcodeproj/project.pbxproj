@@ -308,6 +308,7 @@
 		DDDDDC3728FFD78C005F4E8B /* AppContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3428FFD78B005F4E8B /* AppContext.swift */; };
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = DDEAAC31296D3D9E00D23969 /* VLAlert.m */; };
+		E320DDDB298760BF00C6D7AA /* KTVSkipView.m in Sources */ = {isa = PBXBuildFile; fileRef = E320DDDA298760BF00C6D7AA /* KTVSkipView.m */; };
 		E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E33622C8296FBAB0002F9341 /* VLKTVAlert.m */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
@@ -768,6 +769,8 @@
 		DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneLocalizedString.swift; sourceTree = "<group>"; };
 		DDEAAC30296D3D9E00D23969 /* VLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLAlert.h; sourceTree = "<group>"; };
 		DDEAAC31296D3D9E00D23969 /* VLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLAlert.m; sourceTree = "<group>"; };
+		E320DDD9298760BF00C6D7AA /* KTVSkipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KTVSkipView.h; sourceTree = "<group>"; };
+		E320DDDA298760BF00C6D7AA /* KTVSkipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVSkipView.m; sourceTree = "<group>"; };
 		E33622C7296FBAB0002F9341 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
 		E33622C8296FBAB0002F9341 /* VLKTVAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVAlert.m; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
@@ -895,6 +898,8 @@
 		DD02925C295BF0DC00485225 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E320DDD9298760BF00C6D7AA /* KTVSkipView.h */,
+				E320DDDA298760BF00C6D7AA /* KTVSkipView.m */,
 				DD02925D295BF0DC00485225 /* VLHomeOnLineListView.h */,
 				DD02925E295BF0DC00485225 /* KTV */,
 				DD0292AA295BF0DC00485225 /* VLCreateRoomView.m */,
@@ -2408,6 +2413,7 @@
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
 				DD0292D3295BF0DC00485225 /* VLSearchEmptyView.m in Sources */,
 				DD220B62295B332C00F57F30 /* VoiceRoomChatBarCell.swift in Sources */,
+				E320DDDB298760BF00C6D7AA /* KTVSkipView.m in Sources */,
 				DD220B7B295B332C00F57F30 /* VoiceRoomInviteCell.swift in Sources */,
 				DD0292CA295BF0DC00485225 /* VLRoomSelSongModel.m in Sources */,
 				DD0292EF295BF0DC00485225 /* VLHomeOnLineListCCell.m in Sources */,

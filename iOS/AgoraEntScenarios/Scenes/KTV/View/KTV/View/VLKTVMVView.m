@@ -41,6 +41,7 @@
 @property (nonatomic, assign) double currentTime;
 
 @property (nonatomic, assign) BOOL isPlayAccompany;
+@property (nonatomic, strong) KTVSkipView *skipView;
 @end
 
 @implementation VLKTVMVView
@@ -141,6 +142,19 @@
     
    // self.lrcView.config = self.config;
     [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+    
+    VL(weakSelf);
+    self.skipView = [[KTVSkipView alloc]initWithFrame:CGRectZero completion:^(SkipActionType type) {
+        weakSelf.skipView.hidden = true;
+    }];
+    [self addSubview:self.skipView];
+    [self.skipView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self);
+        make.bottom.equalTo(self).offset(-24);
+        make.width.equalTo(@(120));
+        make.height.equalTo(@(34));
+    }];
+    self.skipView.hidden = true;
 }
 
 - (void)_refreshOriginButton {
@@ -152,6 +166,14 @@
         [self.originBtn setTitle:KTVLocalizedString(@"伴奏") forState:UIControlStateSelected];
     }
     [self setNeedsLayout];
+}
+
+-(void)setSkipType:(SkipType)type{
+    [self.skipView setSkipType:type];
+}
+
+-(void)showSkipView:(bool)flag{
+    self.skipView.hidden = !flag;
 }
 
 #pragma mark - public
