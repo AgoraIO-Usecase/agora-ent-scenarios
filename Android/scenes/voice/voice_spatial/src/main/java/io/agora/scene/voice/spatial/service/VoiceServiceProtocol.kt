@@ -102,15 +102,15 @@ interface VoiceServiceProtocol {
 
     /**
      * 同意申请
-     * @param chatUid 环信用户id
+     * @param userId 用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatApply(userId: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消上麦
      * @param chatUid im uid
      */
-    fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun cancelMicSeatApply(userId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 邀请用户上麦

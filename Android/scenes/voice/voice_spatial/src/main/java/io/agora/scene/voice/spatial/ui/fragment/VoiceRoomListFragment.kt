@@ -109,6 +109,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
                 override fun onSuccess(reslut: VoiceRoomModel?) {
                     curVoiceRoomModel = reslut ?: return
+                    goChatroomPage()
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -128,20 +129,23 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
     }
 
     private fun gotoJoinRoom(voiceRoomModel: VoiceRoomModel) {
-        VoiceToolboxServerHttpManager.get().requestToolboxService(
-            channelId = voiceRoomModel.channelId,
-            chatroomId = voiceRoomModel.chatroomId,
-            chatroomName = voiceRoomModel.roomName,
-            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
-            completion = { error, _ ->
-                if (error == VoiceServiceProtocol.ERR_OK) {
-                    ThreadManager.getInstance().runOnMainThread {
-                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
-                    }
-                }else{
-                    dismissLoading()
-                }
-            })
+        ThreadManager.getInstance().runOnMainThread {
+            voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
+        }
+//        VoiceToolboxServerHttpManager.get().requestToolboxService(
+//            channelId = voiceRoomModel.channelId,
+//            chatroomId = voiceRoomModel.chatroomId,
+//            chatroomName = voiceRoomModel.roomName,
+//            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
+//            completion = { error, _ ->
+//                if (error == VoiceServiceProtocol.ERR_OK) {
+//                    ThreadManager.getInstance().runOnMainThread {
+//                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
+//                    }
+//                }else{
+//                    dismissLoading()
+//                }
+//            })
     }
 
     private fun onItemClick(voiceRoomModel: VoiceRoomModel) {
