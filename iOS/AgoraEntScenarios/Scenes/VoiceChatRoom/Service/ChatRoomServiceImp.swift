@@ -722,7 +722,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.userNo
+        owner.uid = VLUserCenter.user.id
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
@@ -730,7 +730,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId:VLUserCenter.user.userNo,
+                               userId:VLUserCenter.user.id,
                                isOwner: true,
                                property: params) {[weak self] result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
@@ -775,23 +775,23 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
                         VLUserCenter.user.im_token = im_token
                         VLUserCenter.user.chat_uid = chat_uid
-                        completion(nil, updateRoom)
                         
-                        self.roomId = roomId
-                        self._startCheckExpire()
+                        //TODO(chenpan):  waitting for join scene success & error handler?
+                        completion(nil, updateRoom)
                     }
                     initScene{
-                        SyncUtil
-                            .scene(id: roomId)?
-                            .update(key: "",
-                                    data: params,
-                                    success: {[weak self] obj in
-                                agoraPrint("updateUserCount success")
-                            },
-                                    fail: { error in
-                                agoraPrint("updateUserCount fail")
-                                completion(error, nil)
-                            })
+                        SyncUtil.joinScene(id: roomId,
+                                           userId: VLUserCenter.user.id,
+                                           isOwner: VLUserCenter.user.id == room.owner?.uid,
+                                           property: params) {[weak self] result in
+//                            let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                            self?.roomId = roomId
+                            self?._startCheckExpire()
+//                            completion(nil, model)
+                            //TODO(chenpan): without callback
+                        } fail: { error in
+                            completion(error, nil)
+                        }
                     }
                     break
                 }
@@ -814,7 +814,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 if room.room_id == roomId {
                     var isOwner = false
                     if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.userNo
+                        isOwner = owner_uid == VLUserCenter.user.id
                     }
                     if isOwner {
                         self.roomList?.remove(at: index)
@@ -848,7 +848,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = 0
         mic.status = 0
         mic.member = VRUser()
-        mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
