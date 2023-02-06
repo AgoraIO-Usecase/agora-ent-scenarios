@@ -1218,12 +1218,6 @@ extension ShowSyncManagerServiceImp {
 
 //MARK: PK Invitation
 extension ShowSyncManagerServiceImp {
-    private func _pkFixed() {
-        //TODO: it seems that join 2nd scene will be remove subscibe
-        self._unsubscribeAll()
-        self._subscribeAll()
-    }
-    
     fileprivate func _getAllPKInvitationList(room: ShowRoomListModel?,
                                          completion: @escaping (NSError?, [ShowPKInvitation]?) -> Void) {
         guard let channelName = room?.roomId ?? roomId else {
@@ -1241,10 +1235,8 @@ extension ShowSyncManagerServiceImp {
             agoraPrint("imp pk invitation get2... \(channelName)")
             SyncUtil.joinScene(id: channelName,
                                userId: ownerId,
-                               isOwner: false,
+                               isOwner: true,
                                property: params) { result in
-                self._pkFixed()
-                
                 SyncUtil
                     .scene(id: channelName)?
                     .collection(className: SYNC_MANAGER_PK_INVITATION_COLLECTION)
