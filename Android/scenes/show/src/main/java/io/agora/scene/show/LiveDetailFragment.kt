@@ -1382,7 +1382,7 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun enableLocalAudio(enable: Boolean) {
-        mRtcEngine.enableLocalAudio(enable)
+        mRtcEngine.muteLocalAudioStreamEx(!enable, mMainRtcConnection)
         if (enable) {
             VideoSetting.updateBroadcastSetting(
                 inEarMonitoring = VideoSetting.getCurrBroadcastSetting().audio.inEarMonitoring
