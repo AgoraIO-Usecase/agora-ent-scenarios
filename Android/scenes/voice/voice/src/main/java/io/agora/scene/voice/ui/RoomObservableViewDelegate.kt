@@ -7,9 +7,12 @@ import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
+import io.agora.ValueCallBack
+import io.agora.chat.ChatRoom
 import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
+import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.model.annotation.MicClickAction
@@ -33,6 +36,7 @@ import io.agora.voice.common.net.Resource
 import io.agora.voice.common.ui.IParserSource
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.GsonTools
+import io.agora.voice.common.utils.LogTools.e
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
@@ -73,6 +77,8 @@ class RoomObservableViewDelegate constructor(
     private fun localUserIndex(): Int {
         return localUserMicInfo?.micIndex ?: -1
     }
+
+    private var memberCountDialog: RoomMemberCountDialog? = null
 
     init {
         // 更新公告
@@ -402,6 +408,50 @@ class RoomObservableViewDelegate constructor(
         dialog.show(
             activity.supportFragmentManager, "ContributionAndAudienceSheetDialog"
         )
+    }
+
+    /**
+     * 成员数
+     */
+    fun onClickMemberCount(){
+        RoomMemberCountDialog(object : RoomMemberCountDialog.OnClickKickMemberListener{
+            override fun onKickMember(member: VoiceMemberModel,index:Int) {
+                val userList = mutableListOf<String>()
+                member.chatUid?.let { userList.add(it) }
+                //房主踢用户(踢出房间)
+                ChatroomIMManager.getInstance().removeMemberToRoom(userList,object :
+                    ValueCallBack<ChatRoom>{
+                    override fun onSuccess(value: ChatRoom?) {
+                        userList.clear()
+                        if (userList.size > 0){
+                            for (s in userList) {
+                                ChatroomCacheManager.cacheManager.removeMember(s)
+                            }
+                        }
+                        memberCountDialog?.notifyItemRemovedRefresh(index)
+                    }
+
+                    override fun onError(code: Int, error: String?) {
+                        e(
+                            TAG, "onClickMemberCount onKickMember onError code = $code desc: $error"
+                        )
+                    }
+                })
+            }
+        }).apply {
+            memberCountDialog = this
+            arguments = Bundle().apply {
+                putString(RoomMemberCountDialog.OWNER_CHAT_UID, voiceRoomModel.owner?.chatUid)
+            }
+
+        }.show(activity.supportFragmentManager, "mtClickMemberCount")
+    }
+
+    /**
+     * 成员加入刷新成员列表
+     */
+    fun onMemberJoinRefresh(){
+        memberCountDialog?.notifyItemAddRefresh()
     }
 
     /**
