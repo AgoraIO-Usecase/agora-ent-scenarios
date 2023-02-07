@@ -277,6 +277,11 @@ class LiveDetailFragment : Fragment() {
             showMusicEffectDialog()
         }
         bottomLayout.ivLinking.setOnClickListener {
+            // 如果是机器人
+            if (mRoomInfo.isRobotRoom()) {
+                ToastUtils.showToast("主播正忙，已拒绝你的邀请")
+                return@setOnClickListener
+            }
             bottomLayout.vLinkingDot.isVisible = false
             if (!isRoomOwner) {
                 // 观众发送连麦申请
