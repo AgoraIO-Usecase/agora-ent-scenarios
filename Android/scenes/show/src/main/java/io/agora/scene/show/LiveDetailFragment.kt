@@ -279,7 +279,7 @@ class LiveDetailFragment : Fragment() {
         bottomLayout.ivLinking.setOnClickListener {
             // 如果是机器人
             if (mRoomInfo.isRobotRoom()) {
-                ToastUtils.showToast("主播正忙，已拒绝你的邀请")
+                ToastUtils.showToast(context?.getString(R.string.show_tip1))
                 return@setOnClickListener
             }
             bottomLayout.vLinkingDot.isVisible = false
@@ -888,6 +888,10 @@ class LiveDetailFragment : Fragment() {
             }
 
             override fun onInviteButtonChosen(dialog: LivePKDialog, roomItem: LiveRoomConfig) {
+                if (roomItem.isRobotRoom()) {
+                    ToastUtils.showToast(context?.getString(R.string.show_tip1))
+                    return
+                }
                 if (isRoomOwner) {
                     mService.createPKInvitation(roomItem.convertToShowRoomDetailModel())
                 }
