@@ -16,9 +16,9 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 收到取消上麦申请消息
-     * @param chatUid 环信IM SDK 用户id
+     * @param userId 环信IM SDK 用户id
      */
-    fun onReceiveSeatRequestRejected(chatUid: String) {}
+    fun onReceiveSeatRequestRejected(userId: String) {}
 
     /**
      * 接收邀请消息
@@ -28,9 +28,9 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 接收拒绝邀请消息
-     *  @param chatUid
+     *  @param userId
      */
-    fun onReceiveSeatInvitationRejected(chatUid: String) {}
+    fun onReceiveSeatInvitationRejected(userId: String) {}
 
 //    /**
 //     * 接收拒绝申请消息

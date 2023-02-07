@@ -1155,7 +1155,32 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdUser)?.subscribe(listener)
     }
 
-    // ---------------------------------
+    private fun selectEmptySeat(index: Int) : Int {
+        var micIndex = index
+        for (i in 1 until 5) {
+            if (micIndex == -1 && i != 3) {
+                if (!micSeatMap.containsKey(i.toString())) {
+                    micIndex = i
+                    break
+                }
+                if (micSeatMap[i.toString()]?.member == null) {
+                    micIndex = i
+                    break
+                }
+            }
+        }
+        if (micIndex == -1) {
+            if (!micSeatMap.containsKey("0")) {
+                micIndex = 0
+            }
+            if (micSeatMap["0"]?.member == null) {
+                micIndex = 0
+            }
+        }
+        return micIndex
+    }
+
+    // ----------------------------- 上麦申请 -----------------------------
     private fun innerGetAllMicSeatApply(completion: (error: Int, result: List<VoiceRoomApply>) -> Unit) {
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdSeatApply).get(object: DataListCallback {
@@ -1208,31 +1233,6 @@ class VoiceSyncManagerServiceImp(
                     completion.invoke(VoiceServiceProtocol.ERR_OK, false)
                 }
             })
-    }
-
-    private fun selectEmptySeat(index: Int) : Int {
-        var micIndex = index
-        for (i in 1 until 5) {
-            if (micIndex == -1 && i != 3) {
-                if (!micSeatMap.containsKey(i.toString())) {
-                    micIndex = i
-                    break
-                }
-                if (micSeatMap[i.toString()]?.member == null) {
-                    micIndex = i
-                    break
-                }
-            }
-        }
-        if (micIndex == -1) {
-            if (!micSeatMap.containsKey("0")) {
-                micIndex = 0
-            }
-            if (micSeatMap["0"]?.member == null) {
-                micIndex = 0
-            }
-        }
-        return micIndex
     }
 
     // -------------------------------
