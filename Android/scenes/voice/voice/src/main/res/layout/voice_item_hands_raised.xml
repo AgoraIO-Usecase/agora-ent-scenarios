@@ -14,7 +14,6 @@
         android:layout_marginBottom="14dp"
         android:background="@drawable/voice_bg_oval_white30"
         android:scaleType="centerCrop"
-        android:src="@drawable/avatar1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

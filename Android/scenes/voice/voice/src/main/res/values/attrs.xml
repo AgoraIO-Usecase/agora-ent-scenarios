@@ -28,4 +28,13 @@
         <!-- 标题文本的字体颜色 -->
         <attr name="voice_titleBarTitleTextColor" format="reference|color"/>
     </declare-styleable>
+
+    <declare-styleable name="voice_SubtitleView">
+        <attr name="voice_customScrollSpeed">
+            <enum name="fast" value="9" />
+            <enum name="medium" value="6" />
+            <enum name="slow" value="3" />
+        </attr>
+        <attr name="voice_setSubtitleBgResource" format="reference"/>
+    </declare-styleable>
 </resources>

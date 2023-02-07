@@ -363,10 +363,10 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取用户列表
+     * 获取邀请列表
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
-        val  memberList = ChatroomIMManager.getInstance().fetchRoomMembers()
+        val  memberList = ChatroomIMManager.getInstance().fetchRoomInviteMembers()
         if (memberList != null ){
             completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
         }else{

@@ -46,6 +46,7 @@
     <string name="voice_room_profile">Profile</string>
     <string name="voice_room_close">Room Closed</string>
     <string name="voice_room_kick_member">Kicked Out</string>
+    <string name="voice_member_count_action_kick">Kick</string>
 
     <string name="voice_room_welcome">Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.</string>
 
@@ -63,10 +64,11 @@
     <string name="voice_chatroom_gift_title">Gifts</string>
     <string name="voice_chatroom_gift_dialog_send">Send</string>
     <string name="voice_gift_sent">sent </string>
+    <string name="voice_chatroom_gift_notice">User %1$s gifts User %2$s a Rocket</string>
 
     <string name="voice_chatroom_send_gift_fail">Gift Sent Failed</string>
     <string name="voice_chatroom_create_tip1">This product is for testing only, not for commerce.</string>
-    <string name="voice_chatroom_create_tip2">Every room will be maintained for 10 minutes.</string>
+    <string name="voice_chatroom_create_tip2">Every room will be maintained for 20 minutes.</string>
     <string name="voice_chatroom_profile_change_picture">Change Profile Picture</string>
 
     <string name="voice_room_agree_success">Agree success!</string>
@@ -74,6 +76,7 @@
     <string name="voice_room_send_invited_fail">Invited failed!</string>
     <string name="voice_room_raised_hands_title">Raised Hands</string>
     <string name="voice_room_invite_hands_title">Invite On-Stage</string>
+    <string name="voice_room_invite_audience_title">Audience</string>
     <string name="voice_room_invite">Invite</string>
     <string name="voice_room_invited">Invited</string>
     <string name="voice_room_accept">Accept</string>

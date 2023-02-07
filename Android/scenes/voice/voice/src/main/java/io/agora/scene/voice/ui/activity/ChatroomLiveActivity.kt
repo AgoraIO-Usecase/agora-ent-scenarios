@@ -132,7 +132,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
-                        ChatroomIMManager.getInstance().setMemberList(ChatroomIMManager.getInstance().mySelfModel)
                     }
                 }
             })
@@ -209,6 +208,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.chatroomGiftView.refresh()
                     if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
                         giftViewDelegate.showGiftAction()
+                        binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
+                            ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
                     }
                     roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
                 }
@@ -275,9 +276,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
                     voiceMember.let {
-                        ChatroomIMManager.getInstance().setMemberList(it)
+                        if (!voiceRoomModel.owner?.chatUid.equals(it.chatUid)){
+                            ChatroomIMManager.getInstance().setMemberList(it)
+                        }
                     }
                     binding.messageView.refreshSelectLast()
+                    roomObservableDelegate.onMemberJoinRefresh()
                 }
             }
 
@@ -462,6 +466,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                     finish()
                 })
             }
+
+            override fun onClickMemberCount(view: View) {
+                roomObservableDelegate.onClickMemberCount()
+            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object : MenuItemClickListener {
             override fun onChatExtendMenuItemClick(itemId: Int, view: View?) {
@@ -481,6 +489,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
+                                binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
+                                    ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
@@ -583,6 +593,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
         ChatroomIMManager.getInstance().logout(false)
+        binding.subtitle.clearTask()
         super.finish()
     }
 

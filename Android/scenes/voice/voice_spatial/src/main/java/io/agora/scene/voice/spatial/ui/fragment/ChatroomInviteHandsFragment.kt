@@ -148,7 +148,12 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
     override fun onItemActionClick(view: View, position: Int, userId: String) {
         map[userId] = true
         adapter?.setInvited(map)
-        userListViewModel.startMicSeatInvitation(userId,-1)
+        userListViewModel.startMicSeatInvitation(userId, index)
+    }
+
+    private var index: Int = 0
+    fun setIndex(index: Int) {
+        this.index = index
     }
 
     fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {

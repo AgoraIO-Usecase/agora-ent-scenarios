@@ -18,8 +18,14 @@ interface OnLiveTopClickListener {
      * 公告
      */
     fun onClickNotice(view: View)
+
     /**
      * 音效
      */
     fun onClickSoundSocial(view: View)
+
+    /**
+     * 成员数
+     */
+    fun onClickMemberCount(view:View)
 }

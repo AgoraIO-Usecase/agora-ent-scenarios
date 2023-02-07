@@ -16,6 +16,7 @@ import io.agora.ValueCallBack;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.ChatRoom;
+import io.agora.chat.ChatRoomManager;
 import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
@@ -83,6 +84,10 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
     public String getCurrentRoomId() {
         return this.chatroomId;
+    }
+
+    private ChatRoomManager getChatRoomManager(){
+        return ChatClient.getInstance().chatroomManager();
     }
 
     /**
@@ -773,7 +778,14 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 获取用户列表
+     * 获取邀请列表(过滤已在麦位的成员)
+     */
+    public List<VoiceMemberModel> fetchRoomInviteMembers(){
+        return delegate.fetchRoomInviteMembers();
+    }
+
+    /**
+     * 获取房间内所有观众列表
      */
     public List<VoiceMemberModel> fetchRoomMembers(){
         return delegate.fetchRoomMembers();
@@ -900,5 +912,13 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
         }else {
             return -1;
         }
+    }
+
+    /**
+     * 将成员移出房间
+     * @param userList
+     */
+    public void removeMemberToRoom(List<String> userList,ValueCallBack<ChatRoom> callBack){
+        getChatRoomManager().asyncRemoveChatRoomMembers(chatroomId,userList,callBack);
     }
 }
