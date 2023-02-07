@@ -367,8 +367,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
+
         mBinding.ivCumulativeScoreGrade.setImageResource(R.drawable.ktv_ic_grade_c);
         mBinding.tvCumulativeScore.setText("0.0");
+        mBinding.gradeView.setScore(0, 0, 0);
     }
 
     public void setCountDown(int time) {
@@ -489,7 +491,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
                         String text = "x" + mNumberOfCombos;
                         SpannableString spannable = new SpannableString(text);
-                        spannable.setSpan(outlineSpan, 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        spannable.setSpan(outlineSpan, 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         comboText.setText(spannable);
                         comboText.animate().alpha(1f).setDuration(500).setStartDelay(0).start();
 
