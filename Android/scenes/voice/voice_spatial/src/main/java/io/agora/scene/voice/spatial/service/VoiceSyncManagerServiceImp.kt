@@ -23,11 +23,10 @@ class VoiceSyncManagerServiceImp(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : VoiceServiceProtocol {
 
-    private val voiceSceneId = "scene_chatRoom"
+    private val voiceSceneId = "scene_spatialChatRoom"
     private val kCollectionIdUser = "user_collection"
     private val kCollectionIdSeatInfo = "seat_info_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
-    private val kCollectionIdSeatInvitation = "show_seat_invitation_collection"
 
     private val roomChecker = RoomChecker(context)
 
@@ -414,7 +413,11 @@ class VoiceSyncManagerServiceImp(
                         innerRemoveMicSeatApply(objId, it) { _,_ -> }
                         // 2、更改麦位状态
                         val micIndex = it.index
-                        if (micSeatMap.containsKey(micIndex.toString())) return@forEach
+                        if (micSeatMap.containsKey(micIndex.toString()) &&
+                            micSeatMap[micIndex.toString()]?.member != null) {
+                            // 麦上有人
+                            return@forEach
+                        }
                         val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex!!,
                             it.member?.userId!!
                         )
@@ -457,28 +460,55 @@ class VoiceSyncManagerServiceImp(
 
     /**
      * 邀请用户上麦
-     * @param chatUid im uid
+     * @param userId im uid
      */
     override fun startMicSeatInvitation(
-        chatUid: String,
+        userId: String,
         micIndex: Int?,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
-        // TODO with SyncManager
+        val userInfo = userMap[userId] ?: return
+        val index = micIndex ?: return
+        userInfo.micIndex = index
+        userInfo.status = MicRequestStatus.waitting.value
+        innerUpdateUserRoomRequestStatus(userInfo, {
+            completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+        }, {})
     }
 
     /**
      * 接受邀请
      */
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        // TODO with SyncManager
+        val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
+        userInfo.status = MicRequestStatus.accepted.value
+        innerUpdateUserRoomRequestStatus(userInfo, {
+            val micIndex = userInfo.micIndex
+            if (micSeatMap.containsKey(micIndex.toString()) && micSeatMap[micIndex.toString()]?.member != null) {
+                return@innerUpdateUserRoomRequestStatus
+            }
+            val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex,
+                userInfo.userId!!
+            )
+            innerUpdateSeat(targetSeatInfo) { e ->
+                if (e == null) {
+                    completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                } else {
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                }
+            }
+        }, {})
     }
 
     /**
      * 拒绝邀请
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
-        // TODO with SyncManager
+        val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
+        userInfo.status = MicRequestStatus.idle.value
+        innerUpdateUserRoomRequestStatus(userInfo, {
+            completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+        }, {})
     }
 
     /**
@@ -709,7 +739,15 @@ class VoiceSyncManagerServiceImp(
                 }
                 innerUpdateSeat(targetSeatInfo) {
                     if (it == null) {
-                        completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        // 重制用户信息
+                        val userInfo = originInfo.member ?: return@innerUpdateSeat
+                        userInfo.micIndex = -1
+                        userInfo.status = MicRequestStatus.idle.value
+                        innerUpdateUserRoomRequestStatus(userInfo, {
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        }, {
+                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                        })
                     } else {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                     }
@@ -734,7 +772,15 @@ class VoiceSyncManagerServiceImp(
                 }
                 innerUpdateSeat(targetSeatInfo) {
                     if (it == null) {
-                        completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        // 重制用户信息
+                        val userInfo = originInfo.member ?: return@innerUpdateSeat
+                        userInfo.micIndex = -1
+                        userInfo.status = MicRequestStatus.idle.value
+                        innerUpdateUserRoomRequestStatus(userInfo, {
+                            completion.invoke(VoiceServiceProtocol.ERR_OK, targetSeatInfo)
+                        }, {
+                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                        })
                     } else {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
                     }
@@ -765,7 +811,7 @@ class VoiceSyncManagerServiceImp(
                 innerUpdateSeat(oldSeatInfo) {
                     if (it == null) {
                         val newSeatInfo = innerGenerateDefaultSeatInfo(newIndex,
-                            oldSeatInfo.member?.userId!!
+                            originInfo.member?.userId!!
                         )
                         innerUpdateSeat(newSeatInfo) { e ->
                             if (e == null) {
@@ -1000,6 +1046,25 @@ class VoiceSyncManagerServiceImp(
             })
     }
 
+    private fun innerUpdateUserRoomRequestStatus(
+        user: VoiceMemberModel,
+        success: () -> Unit,
+        error: (Exception) -> Unit
+    ) {
+        val sceneReference = mSceneReference ?: return
+        val objectId = objIdOfUserId[user.userId] ?: return
+        sceneReference.collection(kCollectionIdUser)
+            ?.update(objectId, user, object : Sync.Callback {
+                override fun onSuccess() {
+                    success.invoke()
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    error.invoke(exception!!)
+                }
+            })
+    }
+
     // 订阅在线用户
     private fun innerSubscribeOnlineUsers(completion: () -> Unit) {
         val listener = object : Sync.EventListener {
@@ -1011,10 +1076,19 @@ class VoiceSyncManagerServiceImp(
                 item ?: return
                 //将用户信息存在本地列表
                 val userInfo = item.toObject(VoiceMemberModel::class.java)
-                if (!userMap.containsKey(userInfo.userId)) {
-                    userMap[userInfo.userId.toString()] = userInfo
-                    objIdOfUserId[userInfo.userId.toString()] = item.id
+                //用户收到上麦邀请
+                if (userInfo.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId() &&
+                    userMap[userInfo.userId.toString()]?.status != MicRequestStatus.waitting.value &&
+                    userInfo.status == MicRequestStatus.waitting.value) {
+                    roomServiceSubscribeDelegates.forEach {
+                        ThreadManager.getInstance().runOnMainThread {
+                            it.onReceiveSeatInvitation()
+                        }
+                    }
                 }
+
+                userMap[userInfo.userId.toString()] = userInfo
+                objIdOfUserId[userInfo.userId.toString()] = item.id
                 //innerUpdateUserCount(userMap.size)
             }
 
