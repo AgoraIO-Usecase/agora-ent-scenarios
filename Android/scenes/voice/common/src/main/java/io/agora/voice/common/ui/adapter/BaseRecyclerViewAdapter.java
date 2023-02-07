@@ -98,8 +98,10 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
 
     @Override
     public void onBindViewHolder(@NonNull H holder, int position) {
-        T data = dataList.get(position);
-        holder.binding(data, selectedIndex);
+        if (dataList.size() > 0){
+            T data = dataList.get(position);
+            holder.binding(data, selectedIndex);
+        }
     }
 
     @Override
