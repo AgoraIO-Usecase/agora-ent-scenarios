@@ -632,7 +632,7 @@ class LiveDetailFragment : Fragment() {
                 when (itemId) {
                     SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
-                    SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.enableLocalVideo(activated)
+                    SettingDialog.ITEM_ID_VIDEO -> mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
                     SettingDialog.ITEM_ID_MIC -> {
                         if (!isRoomOwner) {
                             mService.muteAudio(!activated, interactionInfo!!.userId)
