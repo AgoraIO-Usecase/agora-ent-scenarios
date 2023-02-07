@@ -103,6 +103,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     deinit {
         agoraPrint("deinit-- ShowSyncManagerServiceImp")
+        SyncUtilsWrapper.cleanScene(uniqueId: uniqueId)
     }
     
     // MARK: Private
@@ -205,7 +206,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         room.ownerAvatar = VLUserCenter.user.headUrl
         room.createdAt = Date().millionsecondSince1970()
         let params = room.yy_modelToJSONObject() as? [String: Any]
-
         initScene { [weak self] in
             SyncUtil.joinScene(id: room.roomId!,
                           userId: room.ownerId!,
@@ -250,7 +250,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     @objc func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         let params = room.yy_modelToJSONObject() as? [String: Any]
-
         initScene { [weak self] in
             SyncUtil.joinScene(id: room.roomId!,
                                          userId: room.ownerId!,
@@ -264,6 +263,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
+                SyncUtilsWrapper.syncUtilsInited = false
                 NetworkManager.shared.generateTokens(channelName: channelName,
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token007,
