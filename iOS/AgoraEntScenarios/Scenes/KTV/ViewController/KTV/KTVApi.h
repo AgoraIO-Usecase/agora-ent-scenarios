@@ -80,7 +80,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
          streamId:(NSInteger)streamId
              data:(NSData * _Nonnull)data;
 
-
+- (void)mainRtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats;
 @end
 
 NS_ASSUME_NONNULL_END

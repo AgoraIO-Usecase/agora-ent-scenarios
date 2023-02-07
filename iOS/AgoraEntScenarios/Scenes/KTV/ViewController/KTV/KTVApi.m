@@ -16,6 +16,14 @@ typedef void (^LyricCallback)(NSString* lyricUrl);
 typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 
+time_t uptime() {
+  if (@available(iOS 10.0, *)) {
+    return clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW) / 1000000;
+  } else {
+    return CFAbsoluteTimeGetCurrent() * 1000;
+  }
+}
+
 
 @implementation KTVSongConfiguration
 
@@ -48,9 +56,9 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (atomic, assign) BOOL pushDirectAudioEnable;
 @property (nonatomic, strong) NSString* channelName;
 @property (nonatomic, assign) NSInteger localPlayerPosition;
-@property (nonatomic, assign) NSInteger localPlayerSystemTime;
 @property (nonatomic, assign) NSInteger remotePlayerPosition;
 @property (nonatomic, assign) NSInteger remotePlayerDuration;
+@property (nonatomic, assign) NSInteger audioPlayoutDelay;
 @property (nonatomic, assign) NSInteger dataStreamId;
 @property (nonatomic, strong) KTVSongConfiguration* config;
 
@@ -327,6 +335,16 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     }
 }
 
+- (NSInteger)getNtpTimeInMs {
+    NSInteger localNtpTime = [self.engine getNtpTimeInMs];
+    if (localNtpTime != 0) {
+        localNtpTime -= 2208988800 * 1000;
+    } else {
+        localNtpTime = round([[NSDate date] timeIntervalSince1970] * 1000.0);
+    }
+    return localNtpTime;
+}
+
 #pragma mark - rtc delgate proxies
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
 {
@@ -362,13 +380,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         self.remotePlayerDuration = duration;
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
-                NSInteger localNtpTime = [self.engine getNtpTimeInMs];
-                NSInteger currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
-                NSInteger localPosition = currentSystemTime - self.localPlayerSystemTime + self.localPlayerPosition;
-                NSInteger expectPosition = localNtpTime - remoteNtp + position;
-                NSInteger diff = expectPosition - localPosition;
-                if(labs(diff) > 40) {
-                    self.localPlayerPosition = expectPosition;
+                NSInteger localNtpTime = [self getNtpTimeInMs];
+                NSInteger localPosition = uptime() - self.localPlayerPosition;
+                NSInteger expectPosition = position + localNtpTime - remoteNtp + self.audioPlayoutDelay;
+                NSInteger threshold = expectPosition - localPosition;
+                if(labs(threshold) > 40) {
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
                 }
             }
@@ -410,6 +426,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     [self.lrcView setVoicePitch:@[@(pitch)]];
 }
 
+
+- (void)mainRtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
+    self.audioPlayoutDelay = stats.audioPlayoutDelay;
+}
+
 #pragma mark - setter
 - (void)setLrcView:(AgoraLrcScoreView *)lrcView
 {
@@ -435,6 +456,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [playerKit play];
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
+    } else if (state == AgoraMediaPlayerStatePlaying) {
+        self.localPlayerPosition = 0;
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -446,16 +469,15 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
 {
-    self.localPlayerPosition = position;
-    self.localPlayerSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
+    self.localPlayerPosition = uptime() - position;
     
-    if (self.config.role == KTVSingRoleMainSinger) {
+    if (self.config.role == KTVSingRoleMainSinger && position > self.audioPlayoutDelay) {
         //if i am main singer
         NSDictionary *dict = @{
             @"cmd":@"setLrcTime",
             @"duration":@([self.rtcMediaPlayer getDuration]),
-            @"time":@(position),
-            @"ntp":@([self.engine getNtpTimeInMs]),
+            @"time":@(position - self.audioPlayoutDelay),
+            @"ntp":@([self getNtpTimeInMs]),
             @"playerState":@(self.playerState)
         };
         [self sendStreamMessageWithDict:dict success:nil];
