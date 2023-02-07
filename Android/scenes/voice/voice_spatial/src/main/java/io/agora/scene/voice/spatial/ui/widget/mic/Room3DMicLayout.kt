@@ -437,7 +437,17 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     override fun findMicByUid(uid: String): Int {
         micInfoMap.entries.forEach { entry ->
-            val index = entry.key
+            val index = when (entry.key) {
+                3 -> {
+                    6
+                }
+                2 -> {
+                    5
+                }
+                else -> {
+                    entry.key
+                }
+            }
             val micInfo = entry.value
             if (TextUtils.equals(micInfo.member?.userId, uid)) {
                 return index

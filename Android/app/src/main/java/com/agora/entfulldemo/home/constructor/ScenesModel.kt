@@ -11,4 +11,5 @@ data class ScenesModel constructor(
     @DrawableRes val background: Int,
     @DrawableRes val icon: Int,
     val active: Boolean = false,
+    val tip: String = "",
 )

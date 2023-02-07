@@ -33,10 +33,10 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     // 邀请用户上麦
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?): LiveData<Resource<Boolean>> {
+    fun startMicSeatInvitation(userId: String, micIndex: Int?): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.startMicSeatInvitation(chatUid, micIndex, completion = { error, result ->
+                voiceServiceProtocol.startMicSeatInvitation(userId, micIndex, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {

@@ -58,6 +58,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
         mBinding.apply {
             if (micInfo.member == null) { // 没人
                 ivMicInnerIcon.isVisible = true
+                ivMicInfo.setImageResource(0)
                 mtMicUsername.text = micInfo.micIndex.toString()
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                 when (micInfo.micStatus) {

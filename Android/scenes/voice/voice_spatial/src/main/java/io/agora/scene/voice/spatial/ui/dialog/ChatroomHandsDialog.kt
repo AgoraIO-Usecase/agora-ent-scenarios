@@ -157,6 +157,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
                     })
                 } else if (fragments[position] is ChatroomInviteHandsFragment) {
                     inviteHandsFragment = fragments[position] as ChatroomInviteHandsFragment?
+                    inviteHandsFragment?.setIndex(micIndex)
                     inviteHandsFragment?.setFragmentListener(object : OnFragmentListener {
                         override fun getItemCount(count: Int) {
                             mCount = count
@@ -208,6 +209,11 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>()
 
     fun setFragmentListener(listener: OnFragmentListener?) {
         this.onFragmentListener = listener
+    }
+
+    private var micIndex = 0
+    fun setMicIndex(index: Int) {
+        micIndex = index
     }
 
     interface OnFragmentListener {

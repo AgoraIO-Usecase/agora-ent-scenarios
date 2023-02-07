@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/voice_icon_create_chat_room"
+            android:src="@drawable/voice_icon_create_3d_room"
             app:layout_constraintDimensionRatio="1:1"
             app:shapeAppearance="@style/voice_RoundedStyle"
             />

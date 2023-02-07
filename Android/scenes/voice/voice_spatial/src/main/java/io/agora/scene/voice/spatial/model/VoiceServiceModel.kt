@@ -3,6 +3,14 @@ package io.agora.scene.voice.spatial.model
 import com.google.gson.annotations.SerializedName
 import io.agora.voice.common.constant.ConfigConstants
 
+enum class MicRequestStatus(val value: Int){
+    idle(0),
+    waitting(1),// 等待中
+    accepted(2),//  已接受
+    rejected(3),// 已拒绝
+    ended(4)// 已结束
+}
+
 /**
  *创建房间数据
  */
@@ -29,6 +37,7 @@ data class VoiceMemberModel constructor(
     // 这里用的是user.id
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = -1,
+    @SerializedName("mic_request_status") var status: Int = MicRequestStatus.idle.value
 ) : BaseRoomBean
 
 /**
