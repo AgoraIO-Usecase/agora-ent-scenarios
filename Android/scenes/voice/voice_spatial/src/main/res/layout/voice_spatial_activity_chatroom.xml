@@ -16,16 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicLayout
-        android:id="@+id/rvChatroom2dMicLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/glHorizontal45"
-        app:layout_constraintTop_toBottomOf="@+id/cTopView" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/glHorizontal45"
         android:layout_width="0dp"
