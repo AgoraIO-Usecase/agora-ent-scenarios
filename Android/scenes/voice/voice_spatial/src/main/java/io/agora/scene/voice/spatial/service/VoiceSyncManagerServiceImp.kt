@@ -874,12 +874,12 @@ class VoiceSyncManagerServiceImp(
     override fun enableRobot(enable: Boolean, completion: (error: Int, result:Boolean) -> Unit) {
         val targetSeatInfo = if (enable) {
             VoiceMicInfoModel().apply {
-                this.micIndex = 2
+                this.micIndex = 3
                 micStatus = MicStatus.BotActivated
             }
         } else {
             VoiceMicInfoModel().apply {
-                this.micIndex = 2
+                this.micIndex = 3
                 micStatus = MicStatus.BotInactive
             }
         }
