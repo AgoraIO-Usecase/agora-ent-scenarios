@@ -57,6 +57,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     private boolean isSoftShowing;
     private Window window;
     private View mKeyboardBg;
+    private int roomType;
 
 
     public ChatPrimaryMenuView(Context context) {
@@ -213,6 +214,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     }
 
     public void initMenu(int roomType) {
+        this.roomType = roomType;
         LogTools.e("initMenu","roomType: " + roomType);
         if (roomType == 0){
             normalLayout.setVisibility(VISIBLE);
@@ -413,10 +415,13 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         }
     }
 
-    public void showInput(){
+    public void showInput() {
         inputView.setVisibility(View.GONE);
-        inputLayout.setVisibility(VISIBLE);
-        inputLayout.setEnabled(true);
+        // 1代表空间音频模式   空间音频模式不显示
+        if (this.roomType != 1) {
+            inputLayout.setVisibility(VISIBLE);
+            inputLayout.setEnabled(true);
+        }
     }
 
     public void sendMessage(){
@@ -433,6 +438,9 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             normalLayout.setVisibility(View.VISIBLE);
             menuLayout.setVisibility(View.VISIBLE);
             hideExpressionView(false);
+            if (roomType == 1) {
+                return false;
+            }
             return true;
         }
         return false;
