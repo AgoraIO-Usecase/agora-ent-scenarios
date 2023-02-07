@@ -19,6 +19,7 @@ interface VoiceServiceProtocol {
         const val ERR_LOGIN_SUCCESS = 3
         const val ERR_ROOM_UNAVAILABLE = 4
         const val ERR_ROOM_NAME_INCORRECT = 5
+        const val ERR_ROOM_LIST_EMPTY = 1003
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
@@ -79,11 +80,6 @@ interface VoiceServiceProtocol {
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo?) -> Unit)
 
     /**
-     * 获取排行榜列表
-     */
-    fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit)
-
-    /**
      * 获取用户列表
      */
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
@@ -106,15 +102,15 @@ interface VoiceServiceProtocol {
 
     /**
      * 同意申请
-     * @param chatUid 环信用户id
+     * @param userId 用户id
      */
-    fun acceptMicSeatApply(chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatApply(userId: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
      * 取消上麦
      * @param chatUid im uid
      */
-    fun cancelMicSeatApply(chatUid: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun cancelMicSeatApply(userId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 邀请用户上麦
@@ -208,4 +204,8 @@ interface VoiceServiceProtocol {
      * @param value 音量
      */
     fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit)
+
+    fun subscribeRoomTimeUp(
+        onRoomTimeUp: () -> Unit
+    )
 }

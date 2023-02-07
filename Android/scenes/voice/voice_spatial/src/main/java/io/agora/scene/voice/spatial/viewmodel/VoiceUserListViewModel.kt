@@ -51,18 +51,13 @@ class VoiceUserListViewModel : ViewModel() {
         _inviteListObservable.setSource(mRepository.fetchInvitedList())
     }
 
-    /**贡献排行榜*/
-    fun fetchGiftContribute() {
-        _contributeListObservable.setSource(mRepository.fetchGiftContribute())
-    }
-
     // 邀请用户上麦
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?) {
-        _startMicSeatInvitationObservable.setSource(mRepository.startMicSeatInvitation(chatUid, micIndex))
+    fun startMicSeatInvitation(userId: String, micIndex: Int?) {
+        _startMicSeatInvitationObservable.setSource(mRepository.startMicSeatInvitation(userId, micIndex))
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String) {
-        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(chatUid))
+    fun acceptMicSeatApply(userId: String) {
+        _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(userId))
     }
 }

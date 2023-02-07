@@ -57,19 +57,6 @@ class VoiceBuddyImp : io.agora.scene.voice.spatial.global.IVoiceBuddy {
         return rtcToken
     }
 
-    override fun chatUserName(): String {
-        // 环信 chatUserName 由user.id 生成 与iOS 保持统一
-        return (UserManager.getInstance().user?.id ?: "").toString()
-    }
-
-    override fun chatAppKey(): String {
-        return BuildConfig.im_app_key
-    }
-
-    override fun chatToken(): String {
-        return chatToken
-    }
-
     override fun setupRtcToken(rtcToken: String) {
         this.rtcToken = rtcToken
     }

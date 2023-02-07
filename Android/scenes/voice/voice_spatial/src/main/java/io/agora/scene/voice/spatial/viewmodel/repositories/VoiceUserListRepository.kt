@@ -49,10 +49,10 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     // 同意上麦申请
-    fun acceptMicSeatApply(chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
+    fun acceptMicSeatApply(userId: String): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
-                voiceServiceProtocol.acceptMicSeatApply(chatUid, completion = { error, result ->
+                voiceServiceProtocol.acceptMicSeatApply(userId, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -89,22 +89,6 @@ class VoiceUserListRepository : BaseRepository() {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
                 voiceServiceProtocol.fetchRoomMembers(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
-    // 获取礼物榜单
-    fun fetchGiftContribute(): LiveData<Resource<List<VoiceRankUserModel>>> {
-        val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
-                voiceServiceProtocol.fetchGiftContribute( completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
