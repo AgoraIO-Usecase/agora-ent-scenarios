@@ -47,6 +47,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 //        binding.mtChatroomMembers.setOnClickListener(this)
         binding.mtChatroomNotice.setOnClickListener(this)
         binding.mtChatroomAgoraSound.setOnClickListener(this)
+        binding.mtChatroomWatch.setOnClickListener(this)
 
     }
 
@@ -180,6 +181,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             binding.mtChatroomNotice -> onLiveTopClickListener?.onClickNotice(v)
             //音效
             binding.mtChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
+            //成员数
+            binding.mtChatroomWatch -> onLiveTopClickListener?.onClickMemberCount(v)
         }
     }
 }
