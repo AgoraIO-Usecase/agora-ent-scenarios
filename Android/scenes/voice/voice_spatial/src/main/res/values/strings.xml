@@ -134,6 +134,10 @@
     <string name="voice_room_disclaimer_content_3">It’s your freedom to choose to test this Product or not. But if you decide to do so, and if you download, install, or use this Product, it means that you confirm and agree that under no circumstances shall Agora be liable for any form of loss or injury caused to yourself or others when you use this Product for any reason, in any manner.</string>
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
 
+    <string name="voice_chatroom_welcome">How to use 3D Spatial Audio Seat</string>
+    <string name="voice_chatroom_welcome_tip1">Put on headsets</string>
+    <string name="voice_chatroom_welcome_tip2">Move avatar around to hear different spatial audio effects</string>
+    <string name="voice_chatroom_welcome_gotit">I got it</string>
     <string name="voice_chatroom_notice">Notice</string>
     <string name="voice_chatroom_settings_host_only">Host Only</string>
     <string name="voice_chatroom_own_audio_settings">Personal Audio Settings</string>

@@ -38,6 +38,9 @@
     <string name="app_coming_soon">敬请期待</string>
     <string name="app_voice_chat_spatial">空间音频</string>
 
+    <string name="app_voice_chat_spatialTip">—空间音频模式</string>
+
+
     <string name="app_about_app">关于声动互娱</string>
     <string name="app_about_name">声动互娱</string>
     <string name="app_about_version">版本号</string>
@@ -48,4 +51,5 @@
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>
+
 </resources>

@@ -116,7 +116,7 @@ interface VoiceServiceProtocol {
      * 邀请用户上麦
      * @param chatUid im uid
      */
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
+    fun startMicSeatInvitation(userId: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 接受邀请
