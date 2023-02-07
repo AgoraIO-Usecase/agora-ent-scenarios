@@ -62,9 +62,9 @@ interface VoiceRoomSubscribeDelegate {
     /**
      * 用户加入聊天室回调，带所有用户信息
      *  @param roomId 环信IM SDK聊天室id
-     *  @param user 用户数据
+     *  @param voiceMember 用户数据
      */
-    fun onUserJoinedRoom(roomId: String, user: VoiceMemberModel) {}
+    fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {}
 
     /**
      * 用户离开房间

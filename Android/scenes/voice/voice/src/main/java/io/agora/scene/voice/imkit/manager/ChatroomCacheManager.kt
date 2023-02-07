@@ -196,7 +196,7 @@ class ChatroomCacheManager {
     /**
      * 清除本地申请列表
      */
-    fun clearSubmitList(){
+    private fun clearSubmitList(){
         submitMicMap.clear()
         submitMicList.clear()
     }
@@ -316,7 +316,7 @@ class ChatroomCacheManager {
     /**
      * 清除榜单
      */
-    fun clearRankList(){
+    private fun clearRankList(){
         rankingList.clear()
         rankingMap.clear()
     }
