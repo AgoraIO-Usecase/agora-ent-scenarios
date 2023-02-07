@@ -310,6 +310,7 @@
 		DDEAAC32296D3D9E00D23969 /* VLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = DDEAAC31296D3D9E00D23969 /* VLAlert.m */; };
 		E320DDDB298760BF00C6D7AA /* KTVSkipView.m in Sources */ = {isa = PBXBuildFile; fileRef = E320DDDA298760BF00C6D7AA /* KTVSkipView.m */; };
 		E33622C9296FBAB0002F9341 /* VLKTVAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E33622C8296FBAB0002F9341 /* VLKTVAlert.m */; };
+		E356D5BA2990DB370097303A /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E356D5B92990DB370097303A /* KeyCenter.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
 		E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E36BE99629656C43003FCFBF /* AttributedTextView.m */; };
 		E3D1D83C298CAA5400BDBAC2 /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */; };
@@ -773,6 +774,7 @@
 		E320DDDA298760BF00C6D7AA /* KTVSkipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KTVSkipView.m; sourceTree = "<group>"; };
 		E33622C7296FBAB0002F9341 /* VLKTVAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLKTVAlert.h; sourceTree = "<group>"; };
 		E33622C8296FBAB0002F9341 /* VLKTVAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLKTVAlert.m; sourceTree = "<group>"; };
+		E356D5B92990DB370097303A /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyCenter.swift; path = ../../../../KeyCenter.swift; sourceTree = "<group>"; };
 		E358F7F72934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		E358F7F82934925F00A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -780,7 +782,6 @@
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E36BE99529656C43003FCFBF /* AttributedTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributedTextView.h; sourceTree = "<group>"; };
 		E36BE99629656C43003FCFBF /* AttributedTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AttributedTextView.m; sourceTree = "<group>"; };
-
 		E3D1D837298CAA5400BDBAC2 /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
 		E3D1D838298CAA5400BDBAC2 /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
 		E3D1D839298CAA5400BDBAC2 /* AgoraStringExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraStringExtention.swift; sourceTree = "<group>"; };
@@ -1358,6 +1359,7 @@
 		DD2A43C928FFCEE7004CEDCF /* AgoraEntScenarios */ = {
 			isa = PBXGroup;
 			children = (
+				E356D5B92990DB370097303A /* KeyCenter.swift */,
 				DDA198DC28FFE579009D3E61 /* Common */,
 				DDA1997928FFE579009D3E61 /* ThirdParty */,
 				DDDDDB3228FFD78B005F4E8B /* Context */,
@@ -2501,6 +2503,7 @@
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DD220B6E295B332C00F57F30 /* VMNorSetTableViewCell.swift in Sources */,
 				DD0292C8295BF0DC00485225 /* VLBelcantoModel.m in Sources */,
+				E356D5BA2990DB370097303A /* KeyCenter.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
 				DD0292C4295BF0DC00485225 /* VLRoomSeatModel.m in Sources */,
 				DD220B55295B332C00F57F30 /* VMAudioSettingView.swift in Sources */,

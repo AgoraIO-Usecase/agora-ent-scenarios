@@ -20,7 +20,9 @@
     if(self = [super initWithFrame:frame]){
         self.completion = completion;
         self.bgView = [[UIView alloc]init];
-        self.bgView.backgroundColor = [UIColor clearColor];
+        self.bgView.backgroundColor = [UIColor whiteColor];
+        self.bgView.layer.backgroundColor = [UIColor colorWithRed:0.027 green:0.063 blue:0.192 alpha:0.2].CGColor;
+        self.bgView.layer.borderColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2].CGColor;
         [self addSubview:self.bgView];
         
         self.SkipBtn = [[UIButton alloc]init];
@@ -55,7 +57,6 @@
     self.bgView.frame = self.bounds;
     self.bgView.layer.cornerRadius = self.bounds.size.height / 2.0;
     self.bgView.layer.masksToBounds = true;
-    self.bgView.layer.borderColor = [UIColor whiteColor].CGColor;
     self.bgView.layer.borderWidth = 1;
     self.SkipBtn.frame = CGRectMake(10, 0, self.bounds.size.width / 4.0 * 3 - 10, self.bounds.size.height);
     self.CanCelBtn.frame = CGRectMake(self.bounds.size.width / 4.0 * 3, 0, self.bounds.size.width / 4.0 , self.bounds.size.height);

@@ -55,11 +55,15 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, strong) KTVSongConfiguration* config;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
-@property (nonatomic, assign) NSInteger cumulativeScore;
 @property (nonatomic, assign) NSInteger totalCount;
 @property (nonatomic, strong) AgoraDownLoadManager *downLoadManager;
 @property (nonatomic, strong) NSTimer *timer;
-@property (nonatomic, assign) NSInteger lastTime;
+@property (nonatomic, strong) LyricModel *lyricModel;
+@property (nonatomic, assign) BOOL hasSendPreludeEndPosition;
+@property (nonatomic, assign) BOOL hasSendEndPosition;
+@property (nonatomic, assign) NSInteger totalLines;
+@property (nonatomic, assign) double totalScore;
+@property (nonatomic, assign) BOOL isPause;
 @end
 
 @implementation KTVApi
@@ -85,29 +89,72 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [engine setDirectExternalAudioSource:true];
         [engine setRecordingAudioFrameParametersWithSampleRate:48000 channel:2 mode:0 samplesPerCall:960];
         [engine setAudioFrameDelegate:self];
-        self.cumulativeScore = 0;
-        [self loadTimer];
+        self.lyricModel = nil;
+        self.downLoadManager = [[AgoraDownLoadManager alloc]init];
+        self.downLoadManager.delegate = self;
     }
     return self;
 }
 
--(void)loadTimer {
-    self.lastTime = 0;
+-(void)initTimer {
+    if(self.timer){
+        return;
+    }
     kWeakSelf(self)
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:0.01 block:^(NSTimer * _Nonnull timer) {
-        NSInteger current = weakself.lastTime;
-        if(current % 1000 == 0){
-            current = [self.rtcMediaPlayer getPosition];
+    self.last = 0;
+    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.1 block:^(NSTimer * _Nonnull timer) {
+        NSInteger current = self.last;
+        current += 100;
+        self.last = current;
+        if(self.config.role == KTVSingRoleMainSinger){
+            NSInteger current = [weakself.rtcMediaPlayer getPosition];
+            [self setProgressWith:current];
+            //如果超过前奏时间 自动隐藏前奏View
+            if(!weakself.lyricModel){return;}
+            if(current + 500 >= weakself.lyricModel.preludeEndPosition && weakself.hasSendPreludeEndPosition == false){
+                if([weakself.delegate respondsToSelector:@selector(didSkipViewShowPreludeEndPosition)]){
+                    [weakself.delegate didSkipViewShowPreludeEndPosition];
+                    weakself.hasSendPreludeEndPosition = true;
+                }
+            } else if (current >= weakself.lyricModel.duration && weakself.hasSendEndPosition == false) {
+                if([weakself.delegate respondsToSelector:@selector(didSkipViewShowEndDuration)]){
+                    [weakself.delegate didSkipViewShowEndDuration];
+                    weakself.hasSendEndPosition = true;
+                }
+            }
+        } else {
+            [self setProgressWith:self.last];
         }
-        current += 10;
-        self.lastTime = current;
-        NSInteger time = current;
-        if (time > 250) {
-            time -= 250;
-        }
-        [self.karaokeView setProgressWithProgress:current];
     } repeats:true];
     
+}
+
+-(void)startTimer {
+    if(self.isPause == false){
+        [self.timer fire];
+    } else {
+        [self resumeTimer];
+    }
+}
+
+//恢复定时器
+- (void)resumeTimer {
+    self.isPause = false;
+    [self.timer setFireDate:[NSDate date]];
+}
+
+//暂停定时器
+-(void)pauseTimer {
+    self.isPause = true;
+   [self.timer setFireDate:[NSDate distantFuture]];
+}
+
+//释放定时器
+-(void)freeTimer {
+    if(self.timer){
+        [self.timer invalidate];
+        self.timer = nil;
+    }
 }
 
 -(void)dealloc
@@ -122,6 +169,7 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 {
     self.config = config;
     KTVSingRole role = config.role;
+    [self initTimer];
     NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:songCode]];
     if(loadHistory) {
         KTVLoadSongState state = [loadHistory intValue];
@@ -284,11 +332,13 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 -(void)resumePlay
 {
     [self.rtcMediaPlayer resume];
+    [self resumeTimer];
 }
 
 -(void)pausePlay
 {
     [self.rtcMediaPlayer pause];
+    [self pauseTimer];
 }
 
 -(void)stopSong
@@ -300,6 +350,34 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     }
     [self.karaokeView reset];
     self.config = nil;
+}
+
+-(void)Skip {
+    if(self.rtcMediaPlayer.getPosition < self.lyricModel.preludeEndPosition - 500){//跳过前奏
+        [self SkipPrelude];
+    } else if (self.rtcMediaPlayer.getPosition > self.lyricModel.duration - 500) { //跳过前奏
+        [self SkipTheEpilogue];
+    }
+}
+
+//跳过前奏
+-(void)SkipPrelude{
+    [self.rtcMediaPlayer seekToPosition:self.lyricModel.preludeEndPosition];
+    [self setProgressWith: self.lyricModel.preludeEndPosition - 500];
+}
+
+//跳过前奏
+-(void)SkipTheEpilogue{
+    [self.rtcMediaPlayer seekToPosition:self.rtcMediaPlayer.getDuration - 500];
+    [self setProgressWith: self.rtcMediaPlayer.getDuration];
+}
+
+-(void)setProgressWith:(NSInteger)progress {
+    self.last = progress;
+    kWeakSelf(self)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakself.karaokeView setProgressWithProgress:progress];
+    });
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -353,17 +431,15 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         if (self.playerState != state) {
             KTVLogInfo(@"recv state with setLrcTime : %ld", (long)state);
             self.playerState = state;
-            [self updateCosingerPlayerStatusIfNeed];
-            
             [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
         }
-        
+        [self setProgressWith: position];
         self.remotePlayerPosition = position;
         self.remotePlayerDuration = duration;
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
                 NSInteger localNtpTime = [self.engine getNtpTimeInMs];
-                NSInteger currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
+                NSInteger currentSystemTime = ([[NSDate date] timeIntervalSince1970] * 100.0);
                 NSInteger localPosition = currentSystemTime - self.localPlayerSystemTime + self.localPlayerPosition;
                 NSInteger expectPosition = localNtpTime - remoteNtp + position;
                 NSInteger diff = expectPosition - localPosition;
@@ -386,7 +462,10 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
         int pitch = [dict[@"pitch"] intValue];
         NSInteger time = [dict[@"time"] integerValue];
-        [self.karaokeView setPitchWithPitch:pitch];
+        kWeakSelf(self)
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakself.karaokeView setPitchWithPitch:pitch progress:time];
+        });
         KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 }
@@ -406,8 +485,11 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     };
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
+    kWeakSelf(self)
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakself.karaokeView setPitchWithPitch:pitch progress:[self.rtcMediaPlayer getPosition]];
+    });
     
-    [self.karaokeView setPitchWithPitch:pitch];
 }
 
 #pragma mark - setter
@@ -417,18 +499,20 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 }
 
 - (void)onKaraokeViewWithView:(KaraokeView *)view didDragTo:(NSInteger)position{
+    self.last = position;
     [self.rtcMediaPlayer seekToPosition:position];
-    self.cumulativeScore = [view.scoringView getCumulativeScore];
+    self.totalScore = [view.scoringView getCumulativeScore];
     if([self.delegate respondsToSelector:@selector(didlrcViewDidScrolledWithCumulativeScore:totalScore:)]){
-        [self.delegate didlrcViewDidScrolledWithCumulativeScore:self.cumulativeScore totalScore:self.totalCount];
+        [self.delegate didlrcViewDidScrolledWithCumulativeScore:self.totalScore totalScore:self.totalCount];
     }
-    
+
 }
 
 - (void)onKaraokeViewWithView:(KaraokeView *)view didFinishLineWith:(LyricLineModel *)model score:(NSInteger)score cumulativeScore:(NSInteger)cumulativeScore lineIndex:(NSInteger)lineIndex lineCount:(NSInteger)lineCount{
-    self.cumulativeScore = cumulativeScore;
+    self.totalLines = lineCount;
+    self.totalScore = cumulativeScore                ;
     if([self.delegate respondsToSelector:@selector(didlrcViewDidScrollFinishedWithCumulativeScore:totalScore:)]){
-        [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.cumulativeScore totalScore:lineCount * 100];
+        [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.totalScore totalScore:lineCount * 100];
     }
 }
 
@@ -447,11 +531,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
         [playerKit play];
-        [self.timer fire];
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
-        [self.timer setFireDate:[NSDate date]];
-        self.lastTime = 0;
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -464,8 +545,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
 {
     self.localPlayerPosition = position;
-    self.localPlayerSystemTime = ([[NSDate date] timeIntervalSince1970] * 1000.0);
-    
+    self.localPlayerSystemTime = ([[NSDate date] timeIntervalSince1970] * 100.0);
+    NSLog(@"position:%li", (long)position);
     if (self.config.role == KTVSingRoleMainSinger) {
         //if i am main singer
         NSDictionary *dict = @{
@@ -480,25 +561,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     
     [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:YES];
 }
-
-#pragma mark - AgoraLrcViewDelegate
-//-(NSTimeInterval)getTotalTime {
-//    if (self.config.role == KTVSingRoleMainSinger) {
-//        NSTimeInterval time = [_rtcMediaPlayer getDuration];
-//        return time;
-//    }
-//    return self.remotePlayerDuration;
-//}
-//
-//- (NSTimeInterval)getPlayerCurrentTime {
-//    if (self.config.role == KTVSingRoleMainSinger) {
-//        NSTimeInterval time = [_rtcMediaPlayer getPosition];
-//        return time;
-//    }
-//
-//    return self.remotePlayerPosition;
-//}
-
 
 #pragma mark - AgoraLrcDownloadDelegate
 - (void)downloadLrcFinishedWithUrl:(NSString *)url {
@@ -681,16 +743,28 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         [self.lyricCallbacks setObject:block forKey:url];
     }
     
+    //重置每首歌的前奏尾奏发送状态
+    self.hasSendPreludeEndPosition = false;
+    self.hasSendEndPosition = false;
+    self.totalLines = 0;
+    self.totalScore = 0;
+    
     //判断歌词是zip文件还是本地地址
     bool isLocal = [url hasSuffix:@".zip"];
-    self.downLoadManager = [[AgoraDownLoadManager alloc]init];
     [self.downLoadManager downloadLrcFileWithUrlString:url completion:^(NSString *lrcUrl) {
         NSURL *musicUrl = isLocal ? [NSURL fileURLWithPath:lrcUrl] : [NSURL URLWithString:url];
         NSData *data = [NSData dataWithContentsOfURL:musicUrl];
         LyricModel *model = [KaraokeView parseLyricDataWithData:data];
+        self.lyricModel = model;
+        
+        if([self.delegate respondsToSelector:@selector(didSongLoadedWith:)]){
+            [self.delegate didSongLoadedWith:model];
+        }
+        
         if(model){
             [self.karaokeView setLyricDataWithData:model];
             self.totalCount = model.lines.count;
+            
             block(url);
         } else {
             NSLog(@"歌词解析失败！");
@@ -700,6 +774,16 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
    }];
     
     
+}
+
+- (int)getAvgSongScore
+{
+    if(self.totalLines <= 0) {
+        return 0;
+    }
+    else {
+        return (int)(self.totalScore / self.totalLines);
+    }
 }
 
 - (NSString*)cachedLyricUrl:(NSInteger)songCode

@@ -79,7 +79,7 @@
 - (void)setupView {
     self.bgImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
     self.bgImgView.image = [UIImage sceneImageWithName:@"ktv_mv_tempBg"];
-    self.bgImgView.layer.cornerRadius = 20;
+    self.bgImgView.layer.cornerRadius = 10;
     self.bgImgView.layer.masksToBounds = YES;
     [self addSubview:self.bgImgView];
     
@@ -89,32 +89,34 @@
 
     self.musicTitleLabel.frame = CGRectMake(currentPlayImgView.right+2, currentPlayImgView.centerY-9, 120, 18);
     [self addSubview:self.musicTitleLabel];
+    
+    self.gradeView = [[GradeView alloc]init];
+    self.gradeView.frame = CGRectMake(15, 15, self.width - 30, 30);
+    [self addSubview:self.gradeView];
+    [self layoutIfNeeded];
+    [self.gradeView setup];
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
-    self.karaokeView = [[KaraokeView alloc]initWithFrame:CGRectMake(0, lY, self.width, lH)];
-    [self addSubview:self.karaokeView];
-    
-//    self.gradeView = [[GradeView alloc]init];
-//    self.gradeView.frame = CGRectMake(15, 10, self.width - 30, 30);
-//    [self.karaokeView addSubview:self.gradeView];
+    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 10)];
+    _karaokeView.delegate = self;
+    _karaokeView.lyricsView.textNormalColor = [UIColor whiteColor];
+    _karaokeView.lyricsView.textSelectedColor = [UIColor yellowColor];
+    _karaokeView.lyricsView.textHighlightedColor = [UIColor orangeColor];
+    _karaokeView.lyricsView.textNormalFontSize = [UIFont systemFontOfSize:13];
+    _karaokeView.lyricsView.textHighlightFontSize = [UIFont systemFontOfSize:16];
+    _karaokeView.lyricsView.draggable = true;
+    _karaokeView.scoringView.viewHeight = 50;
+    _karaokeView.scoringView.topSpaces = 5;
+    _karaokeView.scoringView.localPitchCursorOffsetX = 5;
+    _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
+    _karaokeView.scoringView.showDebugView = true;
+    _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
+    [self addSubview:_karaokeView];
     
     self.incentiveView = [[IncentiveView alloc]init];
     self.incentiveView.frame = CGRectMake(15, 55, 192, 45);
     [self.karaokeView addSubview:self.incentiveView];
-//    self.scoreLabel.hidden = YES;
-//    [self.lrcView addSubview:self.scoreLabel];
-//    [self.scoreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.mas_equalTo(10);
-//        make.top.mas_equalTo(35);
-//    }];
-//
-//    self.scoreUnitLabel.hidden = YES;
-//    [self.lrcView addSubview:self.scoreUnitLabel];
-//    [self.scoreUnitLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.left.mas_equalTo(self.scoreLabel.mas_right);
-//        make.bottom.mas_equalTo(self.scoreLabel.mas_bottom).offset(-2.5);
-//    }];
     
     self.pauseBtn.frame = CGRectMake(20, self.height-24-12, 24, 24);
     [self addSubview:self.pauseBtn];
@@ -145,6 +147,9 @@
     
     VL(weakSelf);
     self.skipView = [[KTVSkipView alloc]initWithFrame:CGRectZero completion:^(SkipActionType type) {
+        if([weakSelf.delegate respondsToSelector:@selector(didSkipViewClick)] && type == SkipActionTypeDown){
+            [weakSelf.delegate didSkipViewClick];
+        }
         weakSelf.skipView.hidden = true;
     }];
     [self addSubview:self.skipView];
@@ -399,45 +404,45 @@
 /// @param score 当前行得分
 /// @param cumulativeScore 累计得分
 /// @param totalScore 当前歌曲总得分
--(void)agoraKaraokeScoreWithScore:(double)score cumulativeScore:(double)cumulativeScore totalScore:(double)totalScore {
-    double scale = cumulativeScore / totalScore;
-    double realScore = scale * 100;
-    self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
-    self.totalLines += 1;
-    self.totalScore = cumulativeScore;
-    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
-    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
-        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
-    }
-}
-
-- (int)getSongScore {
-    return [self.scoreLabel.text intValue];
-}
-
-- (int)getAvgSongScore
-{
-    if(self.totalLines <= 0) {
-        return 0;
-    }
-    else {
-        return (int)(self.totalScore / self.totalLines);
-    }
-}
+//-(void)agoraKaraokeScoreWithScore:(double)score cumulativeScore:(double)cumulativeScore totalScore:(double)totalScore {
+//    double scale = cumulativeScore / totalScore;
+//    double realScore = scale * 100;
+//    self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
+//    self.totalLines += 1;
+//    self.totalScore = cumulativeScore;
+//    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
+//    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
+//        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
+//    }
+//}
+//
+//- (int)getSongScore {
+//    return [self.scoreLabel.text intValue];
+//}
+//
+//- (int)getAvgSongScore
+//{
+//    if(self.totalLines <= 0) {
+//        return 0;
+//    }
+//    else {
+//        return (int)(self.totalScore / self.totalLines);
+//    }
+//}
 
 
 #pragma mark -
 
-- (void)loadLrcURL:(NSString *)lrcURL {
-    NSURL *musicUrl = [NSURL URLWithString:lrcURL];
-    NSData *data = [NSData dataWithContentsOfURL:musicUrl];
-    LyricModel *model = [KaraokeView parseLyricDataWithData:data];
-    if(model){
-        [_karaokeView setLyricDataWithData:model];
-    } else {
-        NSLog(@"歌词解析失败！");
-    }
-}
+//- (void)loadLrcURL:(NSString *)lrcURL {
+//    NSURL *musicUrl = [NSURL URLWithString:lrcURL];
+//    NSData *data = [NSData dataWithContentsOfURL:musicUrl];
+//    LyricModel *model = [KaraokeView parseLyricDataWithData:data];
+//    if(model){
+//        [_karaokeView setLyricDataWithData:model];
+//    } else {
+//        NSLog(@"歌词解析失败！");
+//    }
+//}
 
 - (void)start {
    // [_karaokeView start];
@@ -458,33 +463,36 @@
     [_karaokeView reset];
 }
 
-- (void)scrollToTime:(NSTimeInterval)time {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.lrcView setProgressWithProgress:time];
-    });
-}
+//跳过尾奏
+
+
+//- (void)scrollToTime:(NSTimeInterval)time {
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self.lrcView setProgressWithProgress:time];
+//    });
+//}
 
 #pragma mark 
 
-- (KaraokeView *)lrcView {
-    if (!_karaokeView) {
-        _karaokeView = [[KaraokeView alloc] init];
-        _karaokeView.delegate = self;
-        _karaokeView.lyricsView.textNormalColor = [UIColor yellowColor];
-        _karaokeView.lyricsView.textSelectedColor = [UIColor blueColor];
-        _karaokeView.lyricsView.textHighlightedColor = [UIColor yellowColor];
-        _karaokeView.lyricsView.textNormalFontSize = [UIFont systemFontOfSize:16];
-        _karaokeView.lyricsView.textHighlightFontSize = [UIFont systemFontOfSize:23];
-        _karaokeView.lyricsView.draggable = true;
-        _karaokeView.scoringView.viewHeight = 160;
-        _karaokeView.scoringView.topSpaces = 50;
-        _karaokeView.scoringView.localPitchCursorOffsetX = 5;
-        _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
-        _karaokeView.scoringView.showDebugView = true;
-        _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
-    }
-    return _karaokeView;
-}
+//- (KaraokeView *)lrcView {
+//    if (!_karaokeView) {
+//        _karaokeView = [[KaraokeView alloc] init];
+//        _karaokeView.delegate = self;
+//        _karaokeView.lyricsView.textNormalColor = [UIColor yellowColor];
+//        _karaokeView.lyricsView.textSelectedColor = [UIColor blueColor];
+//        _karaokeView.lyricsView.textHighlightedColor = [UIColor yellowColor];
+//        _karaokeView.lyricsView.textNormalFontSize = [UIFont systemFontOfSize:16];
+//        _karaokeView.lyricsView.textHighlightFontSize = [UIFont systemFontOfSize:23];
+//        _karaokeView.lyricsView.draggable = true;
+//        _karaokeView.scoringView.viewHeight = 160;
+//        _karaokeView.scoringView.topSpaces = 50;
+//        _karaokeView.scoringView.localPitchCursorOffsetX = 5;
+//        _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
+//        _karaokeView.scoringView.showDebugView = true;
+//        _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
+//    }
+//    return _karaokeView;
+//}
 
 - (UILabel *)musicTitleLabel {
     if (!_musicTitleLabel) {

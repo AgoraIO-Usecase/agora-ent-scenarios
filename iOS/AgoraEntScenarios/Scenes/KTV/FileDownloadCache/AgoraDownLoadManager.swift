@@ -132,7 +132,7 @@ protocol AgoraLrcDownloadDelegate {
         DispatchQueue.global().async {
             DispatchQueue.main.async {
                 completion(path)
-                self.delegate?.parseLrcFinished?()
+                self.delegate?.downloadLrcFinished?(url: path)
             }
         }
     }
@@ -140,8 +140,8 @@ protocol AgoraLrcDownloadDelegate {
     private func parseLrc(path: String, completion: @escaping (String?) -> Void) {
         DispatchQueue.global().async {
             DispatchQueue.main.async {
-            completion(path)
-                self.delegate?.parseLrcFinished?()
+                completion(path)
+                self.delegate?.downloadLrcFinished?(url: path)
             }
         }
     }

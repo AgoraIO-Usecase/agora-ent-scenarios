@@ -105,6 +105,10 @@ KTVApiDelegate
 @property (nonatomic, strong) KTVApi* ktvApi;
 
 @property (nonatomic, assign) NSUInteger retryCount;
+@property (nonatomic, assign) NSInteger endPosition;
+@property (nonatomic, assign) NSInteger prePosition;
+
+@property (nonatomic, strong) LyricModel *lyricModel;
 @end
 
 @implementation VLKTVViewController
@@ -143,7 +147,7 @@ KTVApiDelegate
     
     //MV视图(显示歌词...)
     CGFloat mvViewTop = topView.bottom;
-    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(0, mvViewTop, SCREEN_WIDTH, musicHeight * 0.5) withDelegate:self];
+    self.MVView = [[VLKTVMVView alloc]initWithFrame:CGRectMake(15, mvViewTop, SCREEN_WIDTH - 30, musicHeight * 0.5) withDelegate:self];
     [self.view addSubview:self.MVView];
     
     //房间麦位视图
@@ -395,7 +399,7 @@ KTVApiDelegate
                 [weakSelf.navigationController popToViewController:vc animated:YES];
             }
         }
-        [[VLAlert shared] dismiss];
+        [[VLKTVAlert shared] dismiss];
     }];
 }
 
@@ -545,9 +549,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
-            [weakSelf.MVView showSkipView:true];
+            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+                [weakSelf.MVView showSkipView:true];
+                [weakSelf.MVView setSkipType:SkipTypePrelude];
+            }
         } else if(state == KTVLoadSongStateNoLyricUrl) {
-            [weakSelf.MVView showSkipView:true];
             //如果歌词加载失败进行三次重试
             if(weakSelf.retryCount < 2) {
                 KTVLogInfo(@"songName: %@, songNo: %@, retryCount: %lu",model.songName, model.songNo,(unsigned long)weakSelf.retryCount);
@@ -911,20 +917,29 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 [self.ktvApi selectTrackMode:self.trackMode];
             }
             [self.MVView start];
+            [self.ktvApi startTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
         } else if(state == AgoraMediaPlayerStatePaused) {
             [self.MVView stop];
+            [self.ktvApi pauseTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
             [self.MVView reset];
+            [self.ktvApi pauseTimer];
+            self.ktvApi.last = 0;
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
+            [self.ktvApi pauseTimer];
+            self.ktvApi.last = 0;
+            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+                [self.MVView showSkipView:false];
+            }
             if(local) {
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
                 if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
                     //将房主实时的分数共享给所有人
-                    [self syncChoruScore:[self.MVView getAvgSongScore]];
-                    [self showScoreViewWithScore: [self.MVView getAvgSongScore]];
+                    [self syncChoruScore:[self.ktvApi getAvgSongScore]];
+                    [self showScoreViewWithScore: [self.ktvApi getAvgSongScore]];
                 }
                 [self removeCurrentSongWithSync:YES];
             }
@@ -934,7 +949,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 -(void)controller:(KTVApi *)controller song:(NSInteger)songCode config:(nonnull KTVSongConfiguration *)config didChangedToPosition:(NSInteger)position local:(BOOL)local
 {
-    
+    [self.ktvApi setProgressWith:position];
 }
 
 #pragma mark -- VLKTVAPIDelegate
@@ -945,6 +960,23 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
     [self.MVView.incentiveView showWithScore:score];
+}
+
+- (void)didSongLoadedWith:(LyricModel *)model{
+    self.lyricModel = model;
+}
+
+- (void)didSkipViewShowPreludeEndPosition {
+    if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+        [self.MVView showSkipView:false];
+    }
+}
+
+-(void)didSkipViewShowEndDuration{
+    if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+        [self.MVView setSkipType:SkipTypeEpilogue];
+        [self.MVView showSkipView:true];
+    }
 }
 
 #pragma mark -- VLKTVTopViewDelegate
@@ -1170,6 +1202,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)onKTVMView:(VLKTVMVView *)view lrcViewDidScrolled:(NSInteger)position {
     [self.rtcMediaPlayer seekToPosition:position];
+}
+
+- (void)didSkipViewClick{
+    [self.ktvApi Skip];
 }
 
 #pragma mark - VLKTVSettingViewDelegate
