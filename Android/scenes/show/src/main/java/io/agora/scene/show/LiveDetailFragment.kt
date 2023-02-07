@@ -102,7 +102,7 @@ class LiveDetailFragment : Fragment() {
     private var isAudioOnlyMode = false
 
     private val timerRoomEndRun = Runnable {
-        if (destroy()) {
+        if (destroy()) {// 20分钟后自动关播
             showLivingEndLayout()
         }
     }
@@ -161,7 +161,7 @@ class LiveDetailFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         ShowLogger.d(TAG, "Fragment Lifecycle: onPause")
-        destroy()
+        if (!isRoomOwner) destroy() // onPause
     }
 
     private fun destroy(): Boolean {
@@ -960,21 +960,18 @@ class LiveDetailFragment : Fragment() {
     //================== Service Operation ===============
 
     private fun initServiceWithJoinRoom() {
-        mService.joinRoom(mRoomInfo.roomId,
-            {
-                if(isResumed){
-                    initService()
+        mService.joinRoom(mRoomInfo.roomId, {
+            if (isResumed) {
+                initService()
+            }
+        }, {
+            if (isResumed && (it is RoomException && it.currRoomNo != mRoomInfo.roomId) && !isRoomOwner) {
+                activity?.runOnUiThread {
+                    destroy() // 进房Error
+                    showLivingEndLayout()
                 }
-            },
-            {
-                ShowLogger.e(TAG, it)
-                if(isResumed){
-                    activity?.runOnUiThread {
-                        destroy()
-                        showLivingEndLayout()
-                    }
-                }
-            })
+            }
+        })
     }
 
     private fun initService() {
@@ -985,7 +982,7 @@ class LiveDetailFragment : Fragment() {
         }
         mService.subscribeCurrRoomEvent { status, _ ->
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
-                if (destroy()) {
+                if (destroy()) {// status == ShowServiceProtocol.ShowSubscribeStatus.deleted
                     showLivingEndLayout()
                 }
             }
