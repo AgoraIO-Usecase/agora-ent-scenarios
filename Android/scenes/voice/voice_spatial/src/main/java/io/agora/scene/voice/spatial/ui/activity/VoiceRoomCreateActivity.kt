@@ -279,9 +279,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceSpatialActivityCreateRoomLay
             return
         }
         binding.inputTip.visibility = View.GONE
-        if (roomType == 0) {
-            VoiceRoomSoundSelectionActivity.startActivity(this, roomName, isPublic, encryption, roomType)
-        } else if (roomType == 1) {
+        if (roomType == 1) {
             createSpatialRoom()
         }
     }
