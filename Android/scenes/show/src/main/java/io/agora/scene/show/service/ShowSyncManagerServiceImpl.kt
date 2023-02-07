@@ -328,7 +328,7 @@ class ShowSyncManagerServiceImpl(
         error: ((Exception) -> Unit)?
     ) {
         if (currRoomNo.isNotEmpty()) {
-            error?.invoke(RuntimeException("There is a room joined or joining now!"))
+            error?.invoke(RoomException("There is a room joined or joining now!", currRoomNo))
             return
         }
         if (roomMap[roomNo] == null) {
