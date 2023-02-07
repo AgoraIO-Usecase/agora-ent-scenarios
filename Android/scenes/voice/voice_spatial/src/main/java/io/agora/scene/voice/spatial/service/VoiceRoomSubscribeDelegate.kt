@@ -9,23 +9,10 @@ import io.agora.scene.voice.spatial.model.VoiceMemberModel
  */
 interface VoiceRoomSubscribeDelegate {
     /**
-     * 收到礼物消息
-     * @param roomId 环信IMSDK聊天室id
-     * @param message
-     */
-    fun onReceiveGift(roomId: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?){}
-
-    /**
-     * 接收到普通消息
-     * @param message
-     */
-    fun onReceiveTextMsg(roomId: String,message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?){}
-
-    /**
      * 收到上麦申请消息
      * @param message 消息对象
      */
-    fun onReceiveSeatRequest( message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData) {}
+    fun onReceiveSeatRequest() {}
 
     /**
      * 收到取消上麦申请消息
@@ -37,13 +24,13 @@ interface VoiceRoomSubscribeDelegate {
      * 接收邀请消息
      * @param message IM消息对象
      */
-    fun onReceiveSeatInvitation(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData) {}
+    fun onReceiveSeatInvitation() {}
 
     /**
      * 接收拒绝邀请消息
      *  @param chatUid
      */
-    fun onReceiveSeatInvitationRejected(chatUid: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {}
+    fun onReceiveSeatInvitationRejected(chatUid: String) {}
 
 //    /**
 //     * 接收拒绝申请消息

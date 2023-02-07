@@ -61,7 +61,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
     /**room viewModel*/
     private lateinit var roomLivingViewModel: VoiceRoomLivingViewModel
-    private lateinit var giftViewDelegate: io.agora.scene.voice.spatial.ui.RoomGiftViewDelegate
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
     /**
@@ -86,8 +85,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         super.onCreate(savedInstanceState)
         StatusBarCompat.setLightStatusBar(this, false)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
-        giftViewDelegate =
-            io.agora.scene.voice.spatial.ui.RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
+
         initListeners()
         initData()
         initView()
@@ -96,14 +94,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
     private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
-        giftViewDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().init(roomKitBean.chatroomId)
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().saveWelcomeMsg(
-            getString(R.string.voice_room_welcome),
-            VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-        )
-        binding.messageView.refreshSelectLast()
-//        roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
     }
 
     private fun initListeners() {
@@ -124,8 +114,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 override fun onSuccess(data: VoiceRoomInfo?) {
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
-                        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().setMemberList(
-                            io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().mySelfModel)
                     }
                 }
             })
@@ -136,18 +124,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 override fun onSuccess(data: Boolean?) {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
-                    io.agora.scene.voice.spatial.imkit.custorm.CustomMsgHelper.getInstance().sendSystemMsg(
-                        roomKitBean.ownerChatUid, object : io.agora.scene.voice.spatial.imkit.custorm.OnMsgCallBack() {
-                            override fun onSuccess(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-                                "sendSystemMsg onSuccess $message".logD()
-                                binding.messageView.refreshSelectLast()
-                            }
-
-                            override fun onError(messageId: String?, code: Int, error: String?) {
-                                "sendSystemMsg onFail $code $error".logE()
-                            }
-                        }
-                    )
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -185,39 +161,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             reset()
             false
         }
-        binding.messageView.setMessageViewListener(object : io.agora.scene.voice.spatial.ui.widget.barrage.ChatroomMessagesView.MessageViewListener {
-            override fun onItemClickListener(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-            }
-
-            override fun onListClickListener() {
-                reset()
-            }
-        })
         voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
-            override fun onReceiveGift(roomId: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-                super.onReceiveGift(roomId, message)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                "onReceiveGift $roomId ${message?.content}".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    binding.chatroomGiftView.refresh()
-                    if (io.agora.scene.voice.spatial.imkit.custorm.CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")) {
-                        giftViewDelegate.showGiftAction()
-                    }
-                    roomObservableDelegate.receiveGift(roomKitBean.roomId,message)
-                }
-            }
 
-            override fun onReceiveTextMsg(roomId: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-                super.onReceiveTextMsg(roomId, message)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
-                "onReceiveTextMsg $roomId ${message?.content}".logD(TAG)
-                ThreadManager.getInstance().runOnMainThread {
-                    binding.messageView.refreshSelectLast()
-                }
-            }
-
-            override fun onReceiveSeatRequest(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData) {
-                super.onReceiveSeatRequest(message)
+            override fun onReceiveSeatRequest() {
+                super.onReceiveSeatRequest()
                 "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     binding.chatBottom.setShowHandStatus(roomKitBean.isOwner, true)
@@ -233,26 +180,21 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onReceiveSeatInvitation(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData) {
-                super.onReceiveSeatInvitation(message)
-                "onReceiveSeatInvitation $message".logD(TAG)
+            override fun onReceiveSeatInvitation() {
+                super.onReceiveSeatInvitation()
                 ThreadManager.getInstance().runOnMainThread {
                     roomObservableDelegate.receiveInviteSite(roomKitBean.roomId, -1)
                 }
             }
 
-            override fun onReceiveSeatInvitationRejected(
-                chatUid: String,
-                message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?
-            ) {
-                super.onReceiveSeatInvitationRejected(chatUid, message)
-                "onReceiveSeatInvitationRejected $chatUid ${message?.content}".logD(TAG)
+            override fun onReceiveSeatInvitationRejected(chatUid: String) {
+                super.onReceiveSeatInvitationRejected(chatUid)
             }
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
                 super.onAnnouncementChanged(roomId, content)
                 "onAnnouncementChanged $content".logD(TAG)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 ThreadManager.getInstance().runOnMainThread {
                     roomObservableDelegate.updateAnnouncement(content)
                 }
@@ -260,36 +202,36 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onUserJoinedRoom $roomId, ${voiceMember.chatUid}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
-                    voiceMember.let {
-                        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().setMemberList(it)
-                    }
-                    binding.messageView.refreshSelectLast()
+//                    voiceMember.let {
+//                        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().setMemberList(it)
+//                    }
+                    //binding.messageView.refreshSelectLast()
                 }
             }
 
             override fun onUserLeftRoom(roomId: String, chatUid: String) {
                 super.onUserLeftRoom(roomId, chatUid)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onUserLeftRoom $roomId, $chatUid".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     chatUid.let {
                         if (roomKitBean.isOwner){
-                            io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeMember(it)
+                            //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeMember(it)
                             //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
-                            io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it)
+                            //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it)
                             //刷新 owner 邀请列表
                             roomObservableDelegate.handsUpdate(1)
                             //刷新 owner 申请列表
                             roomObservableDelegate.handsUpdate(0)
                             roomLivingViewModel.updateRoomMember()
-                            roomObservableDelegate.checkUserLeaveMic(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
+                            //roomObservableDelegate.checkUserLeaveMic(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
                         }
                     }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
@@ -299,7 +241,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
                 super.onUserBeKicked(roomId, reason)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "userBeKicked $reason".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
@@ -319,9 +261,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             ) {
                 super.onSeatUpdated(roomId, attributeMap, fromId)
                 "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logD()
-                if (isFinishing || !TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
                 attributeMap.let {
-                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
+                    //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
                     roomObservableDelegate.onSeatUpdated(it)
                 }
                 attributeMap
@@ -330,28 +272,28 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                         val micInfo =
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
-                            if(it.member?.chatUid != null){
-                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
-                                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
-                                    ThreadManager.getInstance().runOnMainThread {
-                                        //刷新 owner 申请列表
-                                        roomObservableDelegate.handsUpdate(0)
-                                    }
-                                }
-                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
-                                    ThreadManager.getInstance().runOnMainThread {
-                                        //刷新 owner 邀请列表
-                                        roomObservableDelegate.handsUpdate(1)
-                                    }
-                                }
-                            }
+//                            if(it.member?.chatUid != null){
+//                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
+//                                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
+//                                    ThreadManager.getInstance().runOnMainThread {
+//                                        //刷新 owner 申请列表
+//                                        roomObservableDelegate.handsUpdate(0)
+//                                    }
+//                                }
+//                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
+//                                    ThreadManager.getInstance().runOnMainThread {
+//                                        //刷新 owner 邀请列表
+//                                        roomObservableDelegate.handsUpdate(1)
+//                                    }
+//                                }
+//                            }
                         }
                     }
             }
 
             override fun onRoomDestroyed(roomId: String) {
                 super.onRoomDestroyed(roomId)
-                if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
+                if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 "onRoomDestroyed $roomId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
@@ -365,8 +307,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         binding.chatBottom.initMenu(roomKitBean.roomType)
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
             binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
-            binding.chatroomGiftView.init(roomKitBean.chatroomId)
-            binding.messageView.init(roomKitBean.chatroomId, roomKitBean.ownerChatUid)
             binding.rvChatroom2dMicLayout.isVisible = true
             binding.rvChatroom3dMicLayout.isVisible = false
             roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
@@ -458,20 +398,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     R.id.voice_extend_item_hand_up -> {
                         roomObservableDelegate.onClickBottomHandUp()
                     }
-                    R.id.voice_extend_item_gift -> {
-                        giftViewDelegate.showGiftDialog(object : io.agora.scene.voice.spatial.imkit.custorm.OnMsgCallBack() {
-                            override fun onSuccess(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-                                roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
-                            }
-
-                            override fun onError(messageId: String?, code: Int, error: String?) {
-                                ToastTools.show(
-                                    this@ChatroomLiveActivity,
-                                    getString(R.string.voice_chatroom_send_gift_fail)
-                                )
-                            }
-                        })
-                    }
                 }
             }
 
@@ -480,27 +406,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
 
             override fun onSendMessage(content: String?) {
-                if (!content.isNullOrEmpty())
-                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().sendTxtMsg(content,
-                        VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                        object : io.agora.scene.voice.spatial.imkit.custorm.OnMsgCallBack() {
-                            override fun onSuccess(message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-                                ThreadManager.getInstance().runOnMainThread {
-                                    binding.messageView.refreshSelectLast()
-                                    binding.likeView.isVisible = true
-                                }
-                            }
-
-                            override fun onError(code: Int, error: String?) {
-                                "onSendMessage onError  $code $error".logE(TAG)
-                                binding.likeView.isVisible = true
-                                if (code == Error.MODERATION_FAILED){
-                                    ToastTools.show(this@ChatroomLiveActivity,
-                                        getString(R.string.voice_room_content_prohibited,Toast.LENGTH_SHORT)
-                                    )
-                                }
-                            }
-                        })
             }
         })
 
@@ -549,21 +454,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
     }
 
     override fun finish() {
-        binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().clearCache()
-        if (roomKitBean.isOwner) {
-            io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().asyncDestroyChatRoom(roomKitBean.chatroomId, object :
-                CallBack {
-                override fun onSuccess() {}
-
-                override fun onError(code: Int, error: String?) {}
-            })
-        }
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().logout(false)
         super.finish()
     }
 

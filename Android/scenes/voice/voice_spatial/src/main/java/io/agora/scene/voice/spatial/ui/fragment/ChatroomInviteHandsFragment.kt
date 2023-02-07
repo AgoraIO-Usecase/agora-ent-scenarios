@@ -126,10 +126,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         adapter?.setOnActionListener(this)
         binding?.swipeLayout?.setOnRefreshListener { reset() }
         voiceServiceProtocol.subscribeEvent(object : VoiceRoomSubscribeDelegate{
-            override fun onReceiveSeatInvitationRejected(
-                chatUid: String,
-                message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?
-            ) {
+            override fun onReceiveSeatInvitationRejected(chatUid: String) {
                 ThreadManager.getInstance().runOnMainThread {
                     adapter?.removeInvited(chatUid)
                 }
@@ -148,10 +145,10 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         userListViewModel.fetchInviteList()
     }
 
-    override fun onItemActionClick(view: View, position: Int, chatUid: String) {
-        map[chatUid] = true
+    override fun onItemActionClick(view: View, position: Int, userId: String) {
+        map[userId] = true
         adapter?.setInvited(map)
-        userListViewModel.startMicSeatInvitation(chatUid,-1)
+        userListViewModel.startMicSeatInvitation(userId,-1)
     }
 
     fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {

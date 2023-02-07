@@ -15,11 +15,6 @@ object VoiceConfigManager {
 
     @JvmStatic
     fun initMain() {
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomConfigManager.getInstance()
-            .initRoomConfig(
-                VoiceBuddyFactory.get().getVoiceBuddy().application(),
-                VoiceBuddyFactory.get().getVoiceBuddy().chatAppKey()
-            )
         VoiceToolboxRequestApi.get().setBaseUrl(VoiceBuddyFactory.get().getVoiceBuddy().toolboxServiceUrl())
         VoiceBuddyFactory.get().getVoiceBuddy().application().registerActivityLifecycleCallbacks(mLifecycleCallbacks)
         SVGAParser.shareParser().init( VoiceBuddyFactory.get().getVoiceBuddy().application())

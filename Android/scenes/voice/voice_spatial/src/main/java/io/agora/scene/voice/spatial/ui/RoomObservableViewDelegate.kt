@@ -790,61 +790,6 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
-    // 发礼物成功回调
-    fun onSendGiftSuccess(roomId: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-        val voiceGiftModel = io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().getGiftModel(message)
-        val count = voiceGiftModel.gift_count?.toIntOrNull() ?: 0
-        val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
-        val amount = count * price
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance()
-            .updateRankList(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), voiceGiftModel, object : CallBack {
-                override fun onSuccess() {
-                    ThreadManager.getInstance().runOnMainThread {
-                        iRoomTopView.onRankMember(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().rankList)
-                    }
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "onSendGiftSuccess updateAmount success")
-                }
-
-                override fun onError(code: Int, error: String?) {
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "onSendGiftSuccess updateAmount error$code $error")
-                }
-            })
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance()
-            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
-                override fun onSuccess() {
-                    ThreadManager.getInstance().runOnMainThread {
-                        iRoomTopView.onUpdateGiftCount(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().giftAmountCache)
-                    }
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "onSendGiftSuccess updateAmount success")
-                }
-
-                override fun onError(code: Int, error: String) {
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "onSendGiftSuccess updateAmount error$code $error")
-                }
-            })
-    }
-
-    // 收到礼物消息回调
-    fun receiveGift(roomId: String, message: io.agora.scene.voice.spatial.imkit.bean.ChatMessageData?) {
-        val voiceGiftModel = io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().getGiftModel(message)
-        val count = voiceGiftModel.gift_count?.toIntOrNull() ?: 0
-        val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
-        val amount = count * price
-        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance()
-            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
-                override fun onSuccess() {
-                    ThreadManager.getInstance().runOnMainThread {
-                        iRoomTopView.onUpdateGiftCount(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().giftAmountCache)
-                    }
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "receiveGift updateAmount success")
-                }
-
-                override fun onError(code: Int, error: String) {
-                    EMLog.d(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG, "receiveGift updateAmount error$code $error")
-                }
-            })
-    }
-
     /**收到邀请上麦消息*/
     fun receiveInviteSite(roomId: String, micIndex: Int) {
         CommonFragmentAlertDialog().contentText(activity.getString(R.string.voice_chatroom_mic_anchor_invited_you_on_stage))
@@ -914,7 +859,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
+                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
                     } else {
                         roomLivingViewModel.startMicSeatApply(micIndex)
                     }
@@ -962,7 +907,6 @@ class RoomObservableViewDelegate constructor(
         if (attributeMap.containsKey("gift_amount")) {
             attributeMap["gift_amount"]?.toIntOrNull()?.let {
                 voiceRoomModel.giftAmount = it
-                io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().giftAmountCache = it
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onUpdateGiftCount(it)
                 }
@@ -983,9 +927,6 @@ class RoomObservableViewDelegate constructor(
         if (attributeMap.containsKey("ranking_list")) {
             val rankList = GsonTools.toList(attributeMap["ranking_list"], VoiceRankUserModel::class.java)
             rankList?.let { rankUsers ->
-                rankUsers.forEach { rank ->
-                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().setRankList(rank)
-                }
                 ThreadManager.getInstance().runOnMainThread {
                     iRoomTopView.onRankMember(rankUsers)
                 }

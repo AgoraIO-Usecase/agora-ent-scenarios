@@ -39,15 +39,6 @@ interface IVoiceBuddy {
     /** rtc channel token */
     fun rtcToken(): String
 
-    /** im app key */
-    fun chatAppKey(): String
-
-    /** im user login token */
-    fun chatToken(): String
-
-    /** im user id */
-    fun chatUserName(): String
-
     fun setupRtcToken(rtcToken: String)
 
     fun setupChatToken(chatToken: String)

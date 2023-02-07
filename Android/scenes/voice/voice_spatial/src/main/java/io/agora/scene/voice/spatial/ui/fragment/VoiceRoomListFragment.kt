@@ -109,26 +109,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
             parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
                 override fun onSuccess(reslut: VoiceRoomModel?) {
                     curVoiceRoomModel = reslut ?: return
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice room list chat_username:$chatUsername".logD()
-                    "Voice room list im_token:$chatToken".logD()
-                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                        override fun onSuccess() {
-                            goChatroomPage()
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            if (code == EMAError.USER_ALREADY_LOGIN) {
-                                goChatroomPage()
-                            } else {
-                                dismissLoading()
-                                activity?.let {
-                                    ToastTools.show(it, it.getString(R.string.voice_room_login_exception))
-                                }
-                            }
-                        }
-                    })
+                    goChatroomPage()
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -148,20 +129,23 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceSpatialFragmentRoomListLayoutB
     }
 
     private fun gotoJoinRoom(voiceRoomModel: VoiceRoomModel) {
-        VoiceToolboxServerHttpManager.get().requestToolboxService(
-            channelId = voiceRoomModel.channelId,
-            chatroomId = voiceRoomModel.chatroomId,
-            chatroomName = voiceRoomModel.roomName,
-            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
-            completion = { error, _ ->
-                if (error == VoiceServiceProtocol.ERR_OK) {
-                    ThreadManager.getInstance().runOnMainThread {
-                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
-                    }
-                }else{
-                    dismissLoading()
-                }
-            })
+        ThreadManager.getInstance().runOnMainThread {
+            voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
+        }
+//        VoiceToolboxServerHttpManager.get().requestToolboxService(
+//            channelId = voiceRoomModel.channelId,
+//            chatroomId = voiceRoomModel.chatroomId,
+//            chatroomName = voiceRoomModel.roomName,
+//            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
+//            completion = { error, _ ->
+//                if (error == VoiceServiceProtocol.ERR_OK) {
+//                    ThreadManager.getInstance().runOnMainThread {
+//                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
+//                    }
+//                }else{
+//                    dismissLoading()
+//                }
+//            })
     }
 
     private fun onItemClick(voiceRoomModel: VoiceRoomModel) {

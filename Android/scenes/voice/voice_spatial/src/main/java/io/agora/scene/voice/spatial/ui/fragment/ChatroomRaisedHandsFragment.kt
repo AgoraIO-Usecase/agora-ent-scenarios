@@ -118,9 +118,6 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
                             it.member?.chatUid?.let { chatUid ->
-                                io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(
-                                    chatUid
-                                )
                                 adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)
@@ -170,11 +167,11 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
         }
     }
 
-    override fun onItemActionClick(view: View, index: Int, uid: String) {
-        adapter!!.setAccepted(uid, true)
-        map[uid] = true
+    override fun onItemActionClick(view: View, index: Int, userId: String) {
+        adapter!!.setAccepted(userId, true)
+        map[userId] = true
         currentIndex = index
-        userListViewModel.acceptMicSeatApply(uid)
+        userListViewModel.acceptMicSeatApply(userId)
     }
 
     fun setFragmentListener(listener: ChatroomHandsDialog.OnFragmentListener?) {

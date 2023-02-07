@@ -103,90 +103,6 @@ class VoiceToolboxServerHttpManager {
     }
 
     /**
-     * 创建环信聊天室
-     * @param chatroomName 聊天室名称，最大长度为 128 字符。
-     * @param chatroomNameDesc 聊天室描述，最大长度为 512 字符。
-     * @param chatroomOwner 聊天室的管理员。
-     * @param src 来源/请求方
-     * @param traceId 请求ID
-     * @param username 用户 ID，长度不可超过 64 个字节长度。不可设置为空。支持以下字符集：
-     *  - 26 个小写英文字母a-z；
-     *  - 26 个大写英文字母A-Z；
-     *  - 10 个数字 0-9；
-     *  - “_”, “-”,“.”。
-     * @param password 用户的登录密码，长度不可超过 64 个字符。
-     * @param nickname 推送消息时，在消息推送通知栏内显示的用户昵称，并非用户个人信息的昵称。长度不可超过 100 个字符。支持以下字符集：
-     * - 26 个小写英文字母a-z；
-     * - 26 个大写英文字母A-Z；
-     * - 10 个数字 0-9；
-     * - 中文；
-     * - 特殊字符。
-     * @param chatroomId 环信聊天室roomId
-     */
-    fun createImRoom(
-        roomName: String,
-        roomOwner: String,
-        chatroomId: String,
-        callBack: VRValueCallBack<VRCreateRoomResponse>
-    ) {
-        val headers = mutableMapOf<String, String>()
-        headers["Content-Type"] = "application/json"
-        val requestBody = JSONObject()
-        try {
-            requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
-            requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
-            val requestChat = JSONObject()
-            if (chatroomId.isNotEmpty()) {
-                requestChat.putOpt("id", chatroomId)
-            } else {
-                requestChat.putOpt("name", roomName)
-                requestChat.putOpt("description", "Welcome!")
-                requestChat.putOpt("owner", roomOwner)
-            }
-            requestBody.putOpt("chat", requestChat)
-            requestBody.putOpt("src", "Android")
-            requestBody.putOpt("traceId", UUID.randomUUID().toString())
-            val requestUser = JSONObject()
-            requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
-            requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
-            requestUser.putOpt("password", "12345678")
-            requestBody.putOpt("user", requestUser)
-
-            val requestIM = JSONObject()
-            requestIM.putOpt("appKey", io.agora.scene.voice.spatial.BuildConfig.im_app_key)
-            requestIM.putOpt("clientId", io.agora.scene.voice.spatial.BuildConfig.im_client_id)
-            requestIM.putOpt("clientSecret", io.agora.scene.voice.spatial.BuildConfig.im_client_secret)
-            requestBody.putOpt("im", requestIM)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        VRHttpClientManager.Builder(context())
-            .setUrl(VoiceToolboxRequestApi.get().createImRoom())
-            .setHeaders(headers)
-            .setParams(requestBody.toString())
-            .setRequestMethod(VRHttpClientManager.Method_POST)
-            .asyncExecute(object : VRHttpCallback {
-                override fun onSuccess(result: String) {
-                    "voice createImRoom success: $result".logD(TAG)
-                    val bean = GsonTools.toBean<VRCreateRoomResponse>(
-                        result,
-                        object : TypeToken<VRCreateRoomResponse>() {}.type
-                    )
-                    if (bean?.isSuccess() == true) {
-                        callBack.onSuccess(bean.data)
-                    } else {
-                        callBack.onError(bean?.code ?: -1, bean?.msg)
-                    }
-                }
-
-                override fun onError(code: Int, msg: String) {
-                    "voice createImRoom onError: $code msg: $msg".logE(TAG)
-                    callBack.onError(code, msg)
-                }
-            })
-    }
-
-    /**
      * toolbox service api 置换token, 获取im 配置
      * @param channelId rtc 频道号
      * @param chatroomId im roomId
@@ -221,32 +137,6 @@ class VoiceToolboxServerHttpManager {
                         "SyncToolboxService generate token error code:$var1,msg:$var2".logE()
                         latch.countDown()
                         code = VoiceServiceProtocol.ERR_FAILED
-                    }
-                })
-            createImRoom(
-                roomName = chatroomName,
-                roomOwner = chatOwner,
-                chatroomId = chatroomId,
-                callBack = object :
-                    VRValueCallBack<VRCreateRoomResponse> {
-                    override fun onSuccess(response: VRCreateRoomResponse?) {
-                        response?.let {
-                            VoiceBuddyFactory.get().getVoiceBuddy()
-                                .setupChatToken(response.chatToken)
-                            if (roomId.isEmpty()) roomId = response.chatId
-                            code = VoiceServiceProtocol.ERR_OK
-                        }
-                        latch.countDown()
-                    }
-
-                    override fun onError(var1: Int, var2: String?) {
-                        "SyncToolboxService create room error code:$var1,msg:$var2".logE()
-                        if (roomId.isEmpty()) {
-                            code = VoiceServiceProtocol.ERR_ROOM_NAME_INCORRECT
-                        } else {
-                            code = VoiceServiceProtocol.ERR_FAILED
-                        }
-                        latch.countDown()
                     }
                 })
 
