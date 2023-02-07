@@ -201,6 +201,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        if (!canMove()) return super.onInterceptTouchEvent(event)
         val x = event.x.toInt()
         val y = event.y.toInt()
         //拦截3d 座位
@@ -220,6 +221,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!canMove()) return super.onInterceptTouchEvent(event)
         //获取到手指处的横坐标和纵坐标
         val x = event.x.toInt()
         val y = event.y.toInt()

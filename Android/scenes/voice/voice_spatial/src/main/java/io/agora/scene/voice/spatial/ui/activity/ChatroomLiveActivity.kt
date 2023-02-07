@@ -75,6 +75,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
+    private var isRoomOwnerLeave = false
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -216,12 +217,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onUserLeftRoom(roomId: String, chatUid: String) {
-                super.onUserLeftRoom(roomId, chatUid)
+            override fun onUserLeftRoom(roomId: String, userId: String) {
+                super.onUserLeftRoom(roomId, userId)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserLeftRoom $roomId, $chatUid".logD(TAG)
+                "onUserLeftRoom $roomId, $userId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
-                    chatUid.let {
+                    userId.let {
                         if (roomKitBean.isOwner){
                             //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeMember(it)
                             //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
@@ -297,6 +298,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 "onRoomDestroyed $roomId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                    isRoomOwnerLeave = true
                     finish()
                 }
             }
@@ -456,7 +458,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
     override fun finish() {
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
-        roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
+        roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
+        isRoomOwnerLeave = false
         super.finish()
     }
 
