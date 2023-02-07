@@ -38,6 +38,9 @@
     <string name="app_coming_soon">敬请期待</string>
     <string name="app_voice_chat_spatial">空间音频</string>
 
+    <string name="app_voice_chat_spatialTip">—空间音频模式</string>
+
+
     <string name="app_about_app">About us</string>
     <string name="app_about_name">Agora Social Entertainment</string>
     <string name="app_about_version">Version</string>
@@ -48,5 +51,6 @@
     <string name="app_about_customer_service">Customer Service</string>
     <string name="app_about_official_website">Official Website</string>
     <string name="app_about_phone_cancel">Cancel</string>
+
 
 </resources>
