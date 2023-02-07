@@ -324,23 +324,4 @@ class VoiceRoomLivingRepository : BaseRepository() {
         }
         return resource.asLiveData()
     }
-
-    /**
-     * 更新成员列表
-     */
-    fun updateRoomMember(): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.updateRoomMembers(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
 }
