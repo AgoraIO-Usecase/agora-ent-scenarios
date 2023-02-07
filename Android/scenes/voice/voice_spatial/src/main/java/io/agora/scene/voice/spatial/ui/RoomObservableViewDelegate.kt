@@ -681,7 +681,7 @@ class RoomObservableViewDelegate constructor(
                         MicClickAction.Invite -> {
                             // 房主邀请他人
                             if (data.enable) {
-                                showOwnerHandsDialog()
+                                showOwnerHandsDialog(micInfo.micIndex)
                             } else {
                                 ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
                             }
@@ -731,7 +731,7 @@ class RoomObservableViewDelegate constructor(
             ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
             val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
-            if (mineMicIndex > 0) {
+            if (mineMicIndex >= 0) {
                 // 在麦位上，换麦
                 showAlertDialog(activity.getString(R.string.voice_chatroom_exchange_mic),
                     object : CommonSheetAlertDialog.OnClickBottomListener {
@@ -832,7 +832,7 @@ class RoomObservableViewDelegate constructor(
     }
 
     /**房主举手弹框*/
-    fun showOwnerHandsDialog() {
+    fun showOwnerHandsDialog(micIndex: Int) {
         handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
         if (handsDialog == null) {
             handsDialog = ChatroomHandsDialog.newInstance
@@ -845,6 +845,7 @@ class RoomObservableViewDelegate constructor(
                 updateViewByMicMap(newMicMap)
             }
         })
+        handsDialog?.setMicIndex(micIndex)
         handsDialog?.show(activity.supportFragmentManager, "room_hands")
         chatPrimaryMenuView.setShowHandStatus(true, false)
     }
@@ -892,7 +893,7 @@ class RoomObservableViewDelegate constructor(
     // 点击下方举手icon
     fun onClickBottomHandUp() {
         if (roomKitBean.isOwner) {
-            showOwnerHandsDialog()
+            showOwnerHandsDialog(-1)
         } else {
             showMemberHandsDialog(-1)
         }

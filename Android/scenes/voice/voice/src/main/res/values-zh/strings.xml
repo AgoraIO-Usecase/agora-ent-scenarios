@@ -46,6 +46,7 @@
     <string name="voice_room_profile">个人信息</string>
     <string name="voice_room_close">房间销毁</string>
     <string name="voice_room_kick_member">已踢出房间</string>
+    <string name="voice_member_count_action_kick">踢出</string>
 
     <string name="voice_room_welcome">欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。</string>
 
@@ -63,10 +64,11 @@
     <string name="voice_chatroom_gift_title">打赏</string>
     <string name="voice_chatroom_gift_dialog_send">发送</string>
     <string name="voice_gift_sent">赠送 </string>
+    <string name="voice_chatroom_gift_notice"> %1$s 送给 %2$s 一发火箭</string>
 
     <string name="voice_chatroom_send_gift_fail">礼物发送失败</string>
     <string name="voice_chatroom_create_tip1">本应用为测试产品，请勿商用</string>
-    <string name="voice_chatroom_create_tip2">单次语聊房最长10分钟，过时房间将自动解散</string>
+    <string name="voice_chatroom_create_tip2">单次语聊房最长20分钟，过时房间将自动解散</string>
     <string name="voice_chatroom_profile_change_picture">更换头像</string>
 
     <string name="voice_room_agree_success">同意上麦成功!</string>
@@ -74,6 +76,7 @@
     <string name="voice_room_send_invited_fail">邀请失败!</string>
     <string name="voice_room_raised_hands_title">申请上麦</string>
     <string name="voice_room_invite_hands_title">邀请上麦</string>
+    <string name="voice_room_invite_audience_title">观众</string>
     <string name="voice_room_invite">邀请</string>
     <string name="voice_room_invited">已邀请</string>
     <string name="voice_room_accept">同意</string>

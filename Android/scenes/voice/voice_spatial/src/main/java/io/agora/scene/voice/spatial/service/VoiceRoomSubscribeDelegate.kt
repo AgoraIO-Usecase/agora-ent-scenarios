@@ -34,34 +34,34 @@ interface VoiceRoomSubscribeDelegate {
 
 //    /**
 //     * 接收拒绝申请消息
-//     *  @param roomId 环信IM SDK聊天室id
+//     *  @param roomId 语聊房房间id
 //     */
 //    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
 
     /**
      * 聊天室公告更新
-     * @param roomId 环信IM SDK聊天室id
+     * @param roomId 语聊房房间id
      * @param content 公告变化内容
      */
     fun onAnnouncementChanged(roomId: String, content: String) {}
 
     /**
      * 用户加入聊天室回调，带所有用户信息
-     *  @param roomId 环信IM SDK聊天室id
+     *  @param roomId 语聊房房间id
      *  @param user 用户数据
      */
     fun onUserJoinedRoom(roomId: String, user: VoiceMemberModel) {}
 
     /**
      * 用户离开房间
-     * @param roomId 环信IM SDK聊天室id
-     * @param chatUid 离开的环信用户id
+     * @param roomId 语聊房房间id
+     * @param userId 离开的用户id
      */
-    fun onUserLeftRoom(roomId: String, chatUid: String) {}
+    fun onUserLeftRoom(roomId: String, userId: String) {}
 
     /**
      * 聊天室成员被踢出房间
-     * @param roomId 环信IM SDK聊天室id
+     * @param roomId 语聊房房间id
      * @param reason 被踢出房间
      */
     fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {}

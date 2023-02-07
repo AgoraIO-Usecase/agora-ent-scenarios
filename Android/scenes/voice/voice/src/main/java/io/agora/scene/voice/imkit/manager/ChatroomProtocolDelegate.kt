@@ -105,14 +105,18 @@ class ChatroomProtocolDelegate constructor(
                                         override fun onSuccess(value: List<VoiceMemberModel>) {
                                             voiceRoomInfo.roomInfo?.memberList = value
                                             value.forEach { member ->
-                                                ChatroomCacheManager.cacheManager.setMemberList(member)
+                                                if (!member.chatUid.equals(ownerBean.chatUid)){
+                                                    ChatroomCacheManager.cacheManager.setMemberList(member)
+                                                }
                                             }
                                         }
 
                                     override fun onError(code: Int, error: String?) {
                                         voiceRoomInfo.roomInfo?.memberList = memberList
                                         memberList.forEach { member ->
-                                            ChatroomCacheManager.cacheManager.setMemberList(member)
+                                            if (!member.chatUid.equals(ownerBean.chatUid)){
+                                                ChatroomCacheManager.cacheManager.setMemberList(member)
+                                            }
                                         }
                                     }
                                 })
@@ -417,10 +421,17 @@ class ChatroomProtocolDelegate constructor(
     }
 
     /**
-     * 邀请上麦列表
+     * 邀请上麦列表(过滤已在麦位的成员)
+     */
+    fun fetchRoomInviteMembers():MutableList<VoiceMemberModel> {
+        return ChatroomCacheManager.cacheManager.getInvitationList()
+    }
+
+    /**
+     * 获取观众列表
      */
     fun fetchRoomMembers():MutableList<VoiceMemberModel> {
-        return ChatroomCacheManager.cacheManager.getInvitationList()
+        return ChatroomCacheManager.cacheManager.getMemberList()
     }
 
     /**

@@ -71,7 +71,7 @@ interface VoiceServiceProtocol {
      * 离开房间
      * @param roomId 房间id
      */
-    fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 获取房间详情
@@ -116,7 +116,7 @@ interface VoiceServiceProtocol {
      * 邀请用户上麦
      * @param chatUid im uid
      */
-    fun startMicSeatInvitation(chatUid: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
+    fun startMicSeatInvitation(userId: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 接受邀请
