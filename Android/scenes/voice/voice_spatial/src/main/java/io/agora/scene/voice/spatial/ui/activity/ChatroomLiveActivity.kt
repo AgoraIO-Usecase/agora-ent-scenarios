@@ -172,9 +172,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onReceiveSeatRequestRejected(chatUid: String) {
-                super.onReceiveSeatRequestRejected(chatUid)
-                "onReceiveSeatRequestRejected $chatUid".logD(TAG)
+            override fun onReceiveSeatRequestRejected(userId: String) {
+                super.onReceiveSeatRequestRejected(userId)
+                "onReceiveSeatRequestRejected $userId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
@@ -188,8 +188,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onReceiveSeatInvitationRejected(chatUid: String) {
-                super.onReceiveSeatInvitationRejected(chatUid)
+            override fun onReceiveSeatInvitationRejected(userId: String) {
+                super.onReceiveSeatInvitationRejected(userId)
             }
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
