@@ -205,6 +205,8 @@ class VoiceSyncManagerServiceImp(
                         " room is not existent ".logE()
                         return
                     }
+
+                    // 修改房间内人数等信息
                     val curRoomInfo = roomMap[roomId]?: return
                     currRoomNo = curRoomInfo.roomId
                     if (roomChecker.joinRoom(roomId)) {
@@ -212,19 +214,9 @@ class VoiceSyncManagerServiceImp(
                     }
                     curRoomInfo.clickCount = curRoomInfo.clickCount + 1
                     " joinRoom memberCount $curRoomInfo".logD()
-                    val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
-                        putAll(GsonTools.beanToMap(curRoomInfo))
-                    }
-                    mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
-                        override fun onSuccess(result: IObject?) {
-                            "syncManager update onSuccess ${result?.id}".logD()
-                        }
+                    innerUpdateRoomInfo(curRoomInfo, {}, {})
 
-                        override fun onFail(exception: SyncManagerException?) {
-                            "syncManager update onFail ${exception?.message}".logE()
-                        }
-                    })
-
+                    // 订阅
                     innerSubscribeRoomChanged()
                     innerMayAddLocalUser({
                         innerAutoOnSeatIfNeed { _,_ ->
@@ -232,10 +224,9 @@ class VoiceSyncManagerServiceImp(
                                 completion.invoke(VoiceServiceProtocol.ERR_OK, curRoomInfo)
                             }
                         }
-                    }, {
+                    }, {})
 
-                    })
-
+                    // 房间倒计时
                     if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
                         ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
                     } else {
@@ -255,7 +246,7 @@ class VoiceSyncManagerServiceImp(
      * 离开房间
      * @param roomId 房间id
      */
-    override fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
         val cacheRoom = roomMap[roomId] ?: return
         roomChecker.leaveRoom(roomId)
         // 取消所有订阅
@@ -282,28 +273,45 @@ class VoiceSyncManagerServiceImp(
                 }
             })
         } else {
-            val curRoomInfo = roomMap[roomId] ?: return
-            curRoomInfo.memberCount = curRoomInfo.memberCount - 1
-            val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
-                putAll(GsonTools.beanToMap(curRoomInfo))
-            }
-            " leaveRoom memberCount $curRoomInfo".logD()
-            mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
-
-                override fun onSuccess(result: IObject?) {
+            if (isRoomOwnerLeave) {
+                // 移除本地用户信息
+                innerRemoveUser(VoiceBuddyFactory.get().getVoiceBuddy().userId(), {
                     ThreadManager.getInstance().runOnIOThread {
-                        resetCacheInfo(roomId, false)
+                        resetCacheInfo(currRoomNo, false)
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                     }
                     "syncManager update onSuccess".logD()
-                }
-
-                override fun onFail(exception: SyncManagerException?) {
+                }, {
                     ThreadManager.getInstance().runOnIOThread {
                         resetCacheInfo(roomId, false)
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
                     }
-                    "syncManager update onFail：${exception.toString()}".logE()
+                    "syncManager update onFail：${it}".logE()
+                })
+                return
+            }
+
+            val curRoomInfo = roomMap[roomId] ?: return
+            curRoomInfo.memberCount = curRoomInfo.memberCount - 1
+            innerUpdateRoomInfo(curRoomInfo, {
+                // 移除本地用户信息
+                innerRemoveUser(VoiceBuddyFactory.get().getVoiceBuddy().userId(), {
+                    ThreadManager.getInstance().runOnIOThread {
+                        resetCacheInfo(currRoomNo, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_OK, true)
+                    }
+                    "syncManager update onSuccess".logD()
+                }, {
+                    ThreadManager.getInstance().runOnIOThread {
+                        resetCacheInfo(roomId, false)
+                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
+                    }
+                    "syncManager update onFail：${it}".logE()
+                })
+            }, {
+                ThreadManager.getInstance().runOnIOThread {
+                    resetCacheInfo(roomId, false)
+                    completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
                 }
             })
         }
@@ -352,7 +360,20 @@ class VoiceSyncManagerServiceImp(
      * 获取用户列表
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
-        innerGetUserList(completion)
+        innerGetUserList({
+            // 需要排除房主自己
+            val listExceptRoomOwner = mutableListOf<VoiceMemberModel>()
+            it.forEach { user ->
+                if (user.userId != VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+                    listExceptRoomOwner.add(user)
+                }
+            }
+            completion.invoke(VoiceServiceProtocol.ERR_OK, listExceptRoomOwner)
+        }, {
+            ThreadManager.getInstance().runOnMainThread {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED, emptyList())
+            }
+        })
     }
 
     /**
@@ -436,7 +457,7 @@ class VoiceSyncManagerServiceImp(
 
     /**
      * 取消上麦
-     * @param chatUid im uid
+     * @param userId im uid
      */
     override fun cancelMicSeatApply(userId: String, completion: (error: Int, result: Boolean) -> Unit) {
         innerGetAllMicSeatApply { e, list ->
@@ -947,12 +968,30 @@ class VoiceSyncManagerServiceImp(
         mSceneReference = null
     }
 
-    // ------------------------- inner func -------------------------
+    // ============================= inner func =============================
+    // ----------------------------- 房间属性 -----------------------------
+    private fun innerUpdateRoomInfo(curRoomInfo: VoiceRoomModel, success: () -> Unit, error: (error: Int) -> Unit) {
+        val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
+            putAll(GsonTools.beanToMap(curRoomInfo))
+        }
+        " leaveRoom memberCount $curRoomInfo".logD()
+        mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
+            override fun onSuccess(result: IObject?) {
+                success.invoke()
+            }
 
-    private fun innerMayAddLocalUser(success: () -> Unit, error: (error: Int) -> Unit) {
+            override fun onFail(exception: SyncManagerException?) {
+                val e = exception ?: return
+                error.invoke(e.code)
+            }
+        })
+    }
+
+    // ----------------------------- 用户属性 -----------------------------
+    private fun innerMayAddLocalUser(success: () -> Unit, error: (e: Exception?) -> Unit) {
         innerSubscribeOnlineUsers {}
         val uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
-        innerGetUserList { e, list ->
+        innerGetUserList({ list ->
             if (list.none { it.userId == it.toString() }) {
                 innerAddUser(VoiceMemberModel().apply {
                     rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
@@ -964,22 +1003,16 @@ class VoiceSyncManagerServiceImp(
                     {
                         objIdOfUserId[uid] = it
                         success.invoke()
-//                        innerUpdateRoomUserCount(list.size + 1, {
-//                            success.invoke()
-//                        }, { ex ->
-//                            error.invoke(ex)
-//                        })
                     },
-                    {
-                        error.invoke(e)
-                    })
+                    { e -> error.invoke(e) }
+                )
             } else {
                 success.invoke()
             }
-        }
+        }, { e -> error.invoke(e) })
     }
 
-    private fun innerGetUserList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
+    private fun innerGetUserList(success: (List<VoiceMemberModel>) -> Unit, error: (e: Exception?) -> Unit) {
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdUser)
             .get(object : DataListCallback {
@@ -997,13 +1030,13 @@ class VoiceSyncManagerServiceImp(
                         userMap[obj.userId!!] = obj
                     }
                     ThreadManager.getInstance().runOnMainThread {
-                        completion.invoke(VoiceServiceProtocol.ERR_OK, map)
+                        success.invoke(map)
                     }
                 }
 
                 override fun onFail(exception: SyncManagerException?) {
                     ThreadManager.getInstance().runOnMainThread {
-                        completion.invoke(VoiceServiceProtocol.ERR_FAILED, emptyList())
+                        error.invoke(exception)
                     }
                 }
             })
@@ -1087,6 +1120,14 @@ class VoiceSyncManagerServiceImp(
                     }
                 }
 
+                // 房间人数更新
+                if (!userMap.containsKey(userInfo.userId.toString())) {
+                    roomServiceSubscribeDelegates.forEach {
+                        ThreadManager.getInstance().runOnMainThread {
+                            it.onUserJoinedRoom(currRoomNo, userInfo)
+                        }
+                    }
+                }
                 userMap[userInfo.userId.toString()] = userInfo
                 objIdOfUserId[userInfo.userId.toString()] = item.id
                 //innerUpdateUserCount(userMap.size)
@@ -1100,7 +1141,13 @@ class VoiceSyncManagerServiceImp(
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserId.remove(entry.key)
-                        //innerUpdateUserCount(userMap.size)
+
+                        // 房间人数更新
+                        roomServiceSubscribeDelegates.forEach {
+                            ThreadManager.getInstance().runOnMainThread {
+                                it.onUserLeftRoom(currRoomNo, removeUserNo)
+                            }
+                        }
                         return
                     }
                 }
@@ -1147,20 +1194,6 @@ class VoiceSyncManagerServiceImp(
         sceneReference.collection(kCollectionIdSeatApply)
             .add(apply, object : Sync.DataItemCallback {
                 override fun onSuccess(result: IObject?) {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-                }
-
-                override fun onFail(exception: SyncManagerException?) {
-                    completion.invoke(VoiceServiceProtocol.ERR_OK, false)
-                }
-            })
-    }
-
-    private fun innerUpdateMicSeatApply(objId: String, apply: VoiceRoomApply, completion: (error: Int, result: Boolean) -> Unit) {
-        val sceneReference = mSceneReference ?: return
-        sceneReference.collection(kCollectionIdSeatApply)
-            .update(objId, apply, object : Sync.Callback {
-                override fun onSuccess() {
                     completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                 }
 
@@ -1237,6 +1270,7 @@ class VoiceSyncManagerServiceImp(
                     micIndex = 1
                     member = cacheRoom.owner
                     ownerTag = true
+                    micStatus = MicStatus.Normal
                 }
                 innerAddSeatInfo(targetSeatInfo) { error ->
                     if (error != null) {
