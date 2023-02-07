@@ -42,6 +42,9 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
+
+-(void)didSkipViewClick;
+
 @end
 
 @interface VLKTVMVView : UIView
@@ -104,6 +107,7 @@ typedef enum : NSUInteger {
 -(void)setSkipType:(SkipType)type;
 
 -(void)showSkipView:(bool)flag;
+
 @end
 
 NS_ASSUME_NONNULL_END
