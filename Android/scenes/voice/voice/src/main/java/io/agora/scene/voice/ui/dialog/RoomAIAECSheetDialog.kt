@@ -1,17 +1,24 @@
 package io.agora.scene.voice.ui.dialog
 
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.Environment
+import android.os.FileUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.lang.Exception
 
 class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
@@ -28,13 +35,9 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
     var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
-    private val beforeAnim by lazy {
-        binding?.ivBefore?.background as AnimationDrawable
-    }
+    private var beforeDrawable: APNGDrawable? = null
 
-    private val afterAnim by lazy {
-        binding?.ivAfter?.background as AnimationDrawable
-    }
+    private var afterDrawable: APNGDrawable? = null
 
     override fun getViewBinding(
         inflater: LayoutInflater,
@@ -48,6 +51,12 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
 
         setupOnClickPlayButton()
+        beforeDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_before.png")
+        beforeDrawable?.stop()
+        binding?.ivBefore?.setImageDrawable(beforeDrawable)
+        afterDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_after.png")
+        afterDrawable?.stop()
+        binding?.ivAfter?.setImageDrawable(afterDrawable)
         binding?.accbAEC?.isChecked = isOn
         binding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
             onClickCheckBox?.invoke(isChecked)
@@ -56,53 +65,80 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
     fun setupOnClickPlayButton() {
         binding?.btnBefore?.setOnClickListener {
-            tst()
             if (it.isSelected) { // stop play
                 AgoraRtcEngineController.get().resetMediaPlayer()
-                beforeAnim.stop()
-                afterAnim.stop()
+                beforeDrawable?.stop()
+                beforeDrawable?.resume()
+                afterDrawable?.stop()
+                afterDrawable?.resume()
                 it.isSelected = false
             } else { // start play
-                val file = "file:///android_asset/sounds/voice_sample_aec_before.m4a"
-                AgoraRtcEngineController.get().playMusic(beforeSoundId, file, 0)
+                val file = "sounds/voice_sample_aec_before.m4a"
+                copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath)?.apply {
+                    AgoraRtcEngineController.get().playMusic(afterSoundId, this, 0)
+                }
                 it.isSelected = true
                 binding?.btnAfter?.isSelected = false
-                beforeAnim.start()
-                afterAnim.stop()
+                beforeDrawable?.start()
+                afterDrawable?.stop()
+                afterDrawable?.resume()
             }
         }
         binding?.btnAfter?.setOnClickListener {
             if (it.isSelected) { // stop play
                 AgoraRtcEngineController.get().resetMediaPlayer()
-                beforeAnim.stop()
-                afterAnim.stop()
+                beforeDrawable?.stop()
+                afterDrawable?.stop()
                 it.isSelected = false
             } else { // start play
-                val file = "file:///android_asset/sounds/voice_sample_aec_before.m4a"
-                AgoraRtcEngineController.get().playMusic(afterSoundId, file, 0)
+                val file = "sounds/voice_sample_aec_after.m4a"
+                copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath)?.apply {
+                    AgoraRtcEngineController.get().playMusic(afterSoundId, this, 0)
+                }
                 it.isSelected = true
                 binding?.btnBefore?.isSelected = false
-                afterAnim.start()
-                beforeAnim.stop()
+                afterDrawable?.start()
+                beforeDrawable?.stop()
             }
         }
     }
 
-    fun tst() {
-        // SD 卡路径
-        val sdCardPath = System.getenv("EXTERNAL_STORAGE")
-        val path = activity?.applicationContext?.filesDir?.absolutePath
-        Log.e("Dir", path!!)
-        val assets = activity?.applicationContext?.assets
-        val files = assets?.list("sounds")
-        if (files?.count() == 0) {
-//            File.separator
-        } else {
-
+    fun copyFileFromAssets(context: Context, assetsFilePath: String, storagePath: String) : String? {
+        var sPath = storagePath
+        var aPath = assetsFilePath
+        if (sPath.endsWith(File.separator)) {
+            sPath = sPath.substring(0, storagePath.length - 1)
         }
-        Log.e("AssetsLog", "ASSADSADAS------------------")
-        for (str in  files!!) {
-            Log.e("AssetsLog", str)
+        if (aPath.endsWith(File.separator)) {
+            return null
+        }
+        sPath = sPath + File.separator + assetsFilePath
+        val file = File(sPath)
+        if (file.exists()) {
+            return sPath
+        }
+        file.parentFile.mkdirs()
+        val input = context.assets.open(aPath)
+        readInputStream(sPath, input)
+        return sPath
+    }
+
+    fun readInputStream(storagePath: String, inputStream: InputStream) {
+        try {
+            val file = File(storagePath)
+            if (!file.exists()) {
+                val fos = FileOutputStream(file)
+                val buffer = ByteArray(inputStream.available())
+                var lenth = -1
+                while (((inputStream.read(buffer)).also { lenth = it }) != -1) {
+                    fos.write(buffer, 0, lenth)
+                }
+                fos.flush()
+                fos.close()
+                inputStream.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
