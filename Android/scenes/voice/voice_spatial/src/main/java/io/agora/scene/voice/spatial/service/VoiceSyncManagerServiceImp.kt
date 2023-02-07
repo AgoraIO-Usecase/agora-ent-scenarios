@@ -377,13 +377,6 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新用户列表
-     */
-    override fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit){
-        // TODO with SyncManager
-    }
-
-    /**
      * 申请列表
      */
     override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
@@ -433,13 +426,13 @@ class VoiceSyncManagerServiceImp(
                         val objId = objIdOfSeatApply.removeAt(index)
                         innerRemoveMicSeatApply(objId, it) { _,_ -> }
                         // 2、更改麦位状态
-                        val micIndex = it.index
+                        val micIndex = selectEmptySeat(it.index!!)
                         if (micSeatMap.containsKey(micIndex.toString()) &&
                             micSeatMap[micIndex.toString()]?.member != null) {
                             // 麦上有人
                             return@forEach
                         }
-                        val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex!!,
+                        val targetSeatInfo = innerGenerateDefaultSeatInfo(micIndex,
                             it.member?.userId!!
                         )
                         innerUpdateSeat(targetSeatInfo) { e ->
@@ -504,7 +497,7 @@ class VoiceSyncManagerServiceImp(
         val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
         userInfo.status = MicRequestStatus.accepted.value
         innerUpdateUserRoomRequestStatus(userInfo, {
-            val micIndex = userInfo.micIndex
+            val micIndex = selectEmptySeat(userInfo.micIndex)
             if (micSeatMap.containsKey(micIndex.toString()) && micSeatMap[micIndex.toString()]?.member != null) {
                 return@innerUpdateUserRoomRequestStatus
             }
@@ -1217,6 +1210,31 @@ class VoiceSyncManagerServiceImp(
             })
     }
 
+    private fun selectEmptySeat(index: Int) : Int {
+        var micIndex = index
+        for (i in 1 until 5) {
+            if (micIndex == -1 && i != 3) {
+                if (!micSeatMap.containsKey(i.toString())) {
+                    micIndex = i
+                    break
+                }
+                if (micSeatMap[i.toString()]?.member == null) {
+                    micIndex = i
+                    break
+                }
+            }
+        }
+        if (micIndex == -1) {
+            if (!micSeatMap.containsKey("0")) {
+                micIndex = 0
+            }
+            if (micSeatMap["0"]?.member == null) {
+                micIndex = 0
+            }
+        }
+        return micIndex
+    }
+
     // -------------------------------
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
         val mem = userMap[uid]
@@ -1266,6 +1284,7 @@ class VoiceSyncManagerServiceImp(
                 }
             }
             if (!hasMaster && cacheRoom.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+                //房主上麦
                 val targetSeatInfo = VoiceMicInfoModel().apply {
                     micIndex = 1
                     member = cacheRoom.owner
@@ -1337,7 +1356,7 @@ class VoiceSyncManagerServiceImp(
                         val attributeMap = hashMapOf<String, String>()
                         val key = "mic_" + obj.micIndex
                         attributeMap[key] = item.toString()
-                        it.onSeatUpdated(currRoomNo, attributeMap, "")
+                        it.onSeatUpdated(currRoomNo, attributeMap)
                     }
                 }
             }
@@ -1405,7 +1424,7 @@ class VoiceSyncManagerServiceImp(
                             val attributeMap = hashMapOf<String, String>()
                             val key = "robot_volume"
                             attributeMap[key] = roomInfo.robotVolume.toString()
-                            it.onSeatUpdated(currRoomNo, attributeMap, "")
+                            it.onSeatUpdated(currRoomNo, attributeMap)
                         }
                     }
                 }

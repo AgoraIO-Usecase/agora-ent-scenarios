@@ -73,11 +73,10 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      *  聊天室自定义麦位属性发生变化
-     * @param roomId 环信IM SDK聊天室id
+     * @param 语聊房房间id
      * @param attributeMap 变换的属性kv
-     * @param fromId 谁操作发生的变化
      */
-    fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
+    fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>) {}
 }
 
 enum class VoiceRoomServiceKickedReason{

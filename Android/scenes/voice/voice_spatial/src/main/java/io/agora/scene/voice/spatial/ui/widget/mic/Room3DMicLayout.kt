@@ -440,7 +440,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
-                // TODO 需要做一个映射
                 val index = entry.key
                 val micInfo = entry.value
                 // 普通用户
