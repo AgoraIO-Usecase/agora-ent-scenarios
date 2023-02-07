@@ -56,11 +56,31 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.llTitle.layoutParams = layoutParams
     }
 
+    fun setRoomType(roomType: Int) {
+        // 3D空间音频
+        if (roomType == 1) {
+            binding.ivChatroomOwner.visibility = GONE // 头像
+            binding.llTitle.visibility = GONE // 标题栏（包含房间名与房主名）
+            binding.iv3DLogo.visibility = VISIBLE // xxx
+            binding.tvChatroomName.visibility = VISIBLE // xxx
+            binding.mtChatroomGifts.visibility = GONE // 排行榜
+        }
+        // 其他房间类型
+        else {
+            binding.ivChatroomOwner.visibility = VISIBLE // 头像
+            binding.llTitle.visibility = VISIBLE // 标题栏（包含房间名与房主名）
+            binding.iv3DLogo.visibility = GONE // xxx
+            binding.tvChatroomName.visibility = GONE // xxx
+            binding.mtChatroomGifts.visibility = VISIBLE // 排行榜
+        }
+    }
+
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
         this.roomDetailInfo = voiceRoomModel
         binding.apply {
             mtChatroomOwnerName.text = roomDetailInfo.owner?.nickName
             mtChatroomName.text = roomDetailInfo.roomName
+            tvChatroomName.text = roomDetailInfo.roomName
             val memberText = roomDetailInfo.memberCount.number2K()
             mtChatroomMembers.text = memberText
             val giftText = roomDetailInfo.giftAmount.number2K()
