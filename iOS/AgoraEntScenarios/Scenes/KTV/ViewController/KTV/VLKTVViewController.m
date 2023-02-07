@@ -495,6 +495,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"contentInspectResult: %ld", result);
 }
 
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
+    [self.ktvApi mainRtcEngine:engine localAudioStats:stats];
+}
+
 #pragma mark - action utils / business
 - (void)loadAndPlaySong {
     VLRoomSelSongModel* model = [[self selSongsArray] firstObject];
@@ -755,6 +759,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
+    //为了 尽量不超时 设置了1000ms
+    [self.RTCkit setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
+    [self.RTCkit setParameters:@"{\"che.audio.agc.enable\": true}"];
+    [self.RTCkit setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
+    [self.RTCkit setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
     [self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
     [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
