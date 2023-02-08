@@ -85,11 +85,6 @@ interface VoiceServiceProtocol {
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
-     * 更新用户列表
-     */
-    fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit)
-
-    /**
      * 申请列表
      */
     fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)

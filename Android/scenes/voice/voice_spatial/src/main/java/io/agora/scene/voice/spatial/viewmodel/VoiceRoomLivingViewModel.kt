@@ -262,8 +262,4 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun leaveSyncManagerRoom(roomId: String, isRoomOwnerLeave: Boolean) {
         _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId, isRoomOwnerLeave))
     }
-
-    fun updateRoomMember(){
-        _updateRoomMemberObservable.setSource(mRepository.updateRoomMember())
-    }
 }
