@@ -172,9 +172,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onReceiveSeatRequestRejected(chatUid: String) {
-                super.onReceiveSeatRequestRejected(chatUid)
-                "onReceiveSeatRequestRejected $chatUid".logD(TAG)
+            override fun onReceiveSeatRequestRejected(userId: String) {
+                super.onReceiveSeatRequestRejected(userId)
+                "onReceiveSeatRequestRejected $userId".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
@@ -188,8 +188,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
 
-            override fun onReceiveSeatInvitationRejected(chatUid: String) {
-                super.onReceiveSeatInvitationRejected(chatUid)
+            override fun onReceiveSeatInvitationRejected(userId: String) {
+                super.onReceiveSeatInvitationRejected(userId)
             }
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
@@ -210,10 +210,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
-//                    voiceMember.let {
-//                        io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().setMemberList(it)
-//                    }
-                    //binding.messageView.refreshSelectLast()
                 }
             }
 
@@ -224,15 +220,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
                         if (roomKitBean.isOwner){
-                            //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeMember(it)
-                            //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
-                            //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it)
                             //刷新 owner 邀请列表
                             roomObservableDelegate.handsUpdate(1)
                             //刷新 owner 申请列表
                             roomObservableDelegate.handsUpdate(0)
-                            roomLivingViewModel.updateRoomMember()
-                            //roomObservableDelegate.checkUserLeaveMic(io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
                         }
                     }
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
@@ -257,14 +248,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
 
             override fun onSeatUpdated(
                 roomId: String,
-                attributeMap: Map<String, String>,
-                fromId: String
+                attributeMap: Map<String, String>
             ) {
-                super.onSeatUpdated(roomId, attributeMap, fromId)
-                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,fromId:$fromId,map:$attributeMap".logD()
+                super.onSeatUpdated(roomId, attributeMap)
+                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,map:$attributeMap".logD()
                 if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
                 attributeMap.let {
-                    //io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().updateMicInfoCache(it)
                     roomObservableDelegate.onSeatUpdated(it)
                 }
                 attributeMap
@@ -273,21 +262,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                         val micInfo =
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
-//                            if(it.member?.chatUid != null){
-//                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkMember(it.member?.chatUid)){
-//                                    io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().removeSubmitMember(it.member?.chatUid)
-//                                    ThreadManager.getInstance().runOnMainThread {
-//                                        //刷新 owner 申请列表
-//                                        roomObservableDelegate.handsUpdate(0)
-//                                    }
-//                                }
-//                                if (io.agora.scene.voice.spatial.imkit.manager.ChatroomIMManager.getInstance().checkInvitationMember(it.member?.chatUid)){
-//                                    ThreadManager.getInstance().runOnMainThread {
-//                                        //刷新 owner 邀请列表
-//                                        roomObservableDelegate.handsUpdate(1)
-//                                    }
-//                                }
-//                            }
+                            ThreadManager.getInstance().runOnMainThread {
+                                //刷新 owner 申请列表
+                                roomObservableDelegate.handsUpdate(0)
+                                //刷新 owner 邀请列表
+                                roomObservableDelegate.handsUpdate(1)
+                            }
                         }
                     }
             }

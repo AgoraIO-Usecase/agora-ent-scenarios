@@ -16,9 +16,9 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 收到取消上麦申请消息
-     * @param chatUid 环信IM SDK 用户id
+     * @param userId 环信IM SDK 用户id
      */
-    fun onReceiveSeatRequestRejected(chatUid: String) {}
+    fun onReceiveSeatRequestRejected(userId: String) {}
 
     /**
      * 接收邀请消息
@@ -28,9 +28,9 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      * 接收拒绝邀请消息
-     *  @param chatUid
+     *  @param userId
      */
-    fun onReceiveSeatInvitationRejected(chatUid: String) {}
+    fun onReceiveSeatInvitationRejected(userId: String) {}
 
 //    /**
 //     * 接收拒绝申请消息
@@ -73,11 +73,10 @@ interface VoiceRoomSubscribeDelegate {
 
     /**
      *  聊天室自定义麦位属性发生变化
-     * @param roomId 环信IM SDK聊天室id
+     * @param 语聊房房间id
      * @param attributeMap 变换的属性kv
-     * @param fromId 谁操作发生的变化
      */
-    fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
+    fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>) {}
 }
 
 enum class VoiceRoomServiceKickedReason{

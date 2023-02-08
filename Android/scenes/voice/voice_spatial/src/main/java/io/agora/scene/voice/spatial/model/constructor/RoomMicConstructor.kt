@@ -47,14 +47,12 @@ internal object RoomMicConstructor {
 
     fun builderDefault3dMicMap(context: Context, isUserBot: Boolean = false): Map<Int, VoiceMicInfoModel> {
         return mutableMapOf(
+            // mic0 中间座位
             ConfigConstants.MicConstant.KeyIndex0 to VoiceMicInfoModel(micIndex = 0),
             ConfigConstants.MicConstant.KeyIndex1 to VoiceMicInfoModel(micIndex = 1),
-            ConfigConstants.MicConstant.KeyIndex2 to VoiceMicInfoModel(micIndex = 5),
-            ConfigConstants.MicConstant.KeyIndex3 to VoiceMicInfoModel(micIndex = 6),
-            // mic4 中间座位
-            ConfigConstants.MicConstant.KeyIndex4 to VoiceMicInfoModel(micIndex = 4),
-            ConfigConstants.MicConstant.KeyIndex5 to VoiceMicInfoModel(
-                micIndex = 2,
+            ConfigConstants.MicConstant.KeyIndex2 to VoiceMicInfoModel(micIndex = 2),
+            ConfigConstants.MicConstant.KeyIndex3 to VoiceMicInfoModel(
+                micIndex = 3,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
                 member = VoiceMemberModel().apply {
@@ -62,8 +60,10 @@ internal object RoomMicConstructor {
                     portrait = "voice_icon_room_blue_robot"
                 }
             ),
+            ConfigConstants.MicConstant.KeyIndex4 to VoiceMicInfoModel(micIndex = 4),
+            ConfigConstants.MicConstant.KeyIndex5 to VoiceMicInfoModel(micIndex = 5),
             ConfigConstants.MicConstant.KeyIndex6 to VoiceMicInfoModel(
-                micIndex = 3,
+                micIndex = 6,
                 micStatus = if (isUserBot) MicStatus.BotActivated else MicStatus.BotInactive,
                 audioVolumeType = ConfigConstants.VolumeType.Volume_None,
                 member = VoiceMemberModel().apply {
