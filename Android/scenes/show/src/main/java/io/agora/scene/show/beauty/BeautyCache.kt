@@ -44,6 +44,8 @@ object BeautyCache {
 
     fun getItemValue(itemId: Int): Float = cacheItemValueMap[itemId] ?: 0.0f
 
+    fun getItemValue(itemId: Int, def: Float): Float = cacheItemValueMap[itemId] ?: def
+
     internal fun reset(){
         cacheItemValueMap.apply {
             clear()
