@@ -8,21 +8,29 @@
     android:paddingHorizontal="20dp"
     android:theme="@style/Theme.Material3.Dark">
 
+    <TextView
+        android:id="@+id/tvStrength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/show_beauty_strength"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/slider"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        app:trackColorActive="#7A59FB"
-        app:trackColorInactive="@color/white_80_percent"
         android:valueFrom="0"
         android:valueTo="1"
-        tools:value="0.5"
         app:labelBehavior="floating"
         app:labelStyle="@style/show_beauty_slider"
         app:thumbColor="@color/white"
-        app:trackHeight="4dp"/>
+        app:trackColorActive="#7A59FB"
+        app:trackColorInactive="@color/white_80_percent"
+        app:trackHeight="4dp"
+        tools:value="0.5" />
 
     <ImageView
         android:id="@+id/ivCompare"
@@ -31,6 +39,30 @@
         android:layout_marginStart="18dp"
         android:background="@drawable/show_beauty_btn_bg"
         android:padding="6dp"
-        android:src="@mipmap/show_beauty_ic_compare" />
+        android:src="@mipmap/show_beauty_ic_compare"
+        tools:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/llGreenScreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_beauty_green_screen"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/mSwitchMaterial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:thumbTint="@color/white"
+            app:track="@drawable/show_setting_advanch_switch_track" />
+
+    </LinearLayout>
 
 </LinearLayout>
