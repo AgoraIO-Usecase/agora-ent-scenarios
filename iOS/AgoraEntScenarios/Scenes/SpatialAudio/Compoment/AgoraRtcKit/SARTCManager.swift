@@ -113,7 +113,7 @@ public struct SARtcType {
      * @param state MPK当前的状态
      * @param error MPK当前的错误码
      */
-    @objc optional func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) -> Void // MPK 状态回调
+    @objc optional func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) -> Void // MPK 状态回调
 }
 
 // MARK: - VMManagerDelegate
@@ -355,16 +355,21 @@ public let kMPK_RTC_UID_SA: UInt = 1
         return code
     }
     
-    func initSpatialAudio() {
+    func initSpatialAudio(recvRange: Float) {
         localSpatial = AgoraLocalSpatialAudioKit()
         let localSpatialConfig = AgoraLocalSpatialAudioConfig()
         localSpatialConfig.rtcEngine = rtcKit
         localSpatial = AgoraLocalSpatialAudioKit.sharedLocalSpatialAudio(with: localSpatialConfig)
         localSpatial?.muteLocalAudioStream(false)
         localSpatial?.muteAllRemoteAudioStreams(false)
-        localSpatial?.setAudioRecvRange(7.5)
+        localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
-        localSpatial?.setDistanceUnit(10)
+        localSpatial?.setDistanceUnit(1)
+        
+        let config = AgoraDataStreamConfig()
+        config.ordered = false
+        config.syncWithAudio = false
+        rtcKit.createDataStream(&streamId, config: config)
     }
     
     func initMediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
@@ -372,9 +377,19 @@ public let kMPK_RTC_UID_SA: UInt = 1
         mediaPlayer?.setLoopCount(10000)
         return mediaPlayer
     }
-
+    
+    func setPlayerAttenuation(attenuation: Double, playerId: Int32) {
+        localSpatial?.setPlayerAttenuation(attenuation,
+                                           playerId: UInt(playerId),
+                                           forceSet: false)
+    }
+    
     func setMediaPlayerPositionInfo(playerId: Int,
-                                    positionInfo: AgoraRemoteVoicePositionInfo) {
+                                    position: [NSNumber],
+                                    forward: [NSNumber]?) {
+        let positionInfo = AgoraRemoteVoicePositionInfo()
+        positionInfo.position = position
+        positionInfo.forward = forward
         localSpatial?.updatePlayerPositionInfo(playerId,
                                                positionInfo: positionInfo)
     }
@@ -383,10 +398,20 @@ public let kMPK_RTC_UID_SA: UInt = 1
                               axisForward: [NSNumber],
                               axisRight: [NSNumber],
                               axisUp: [NSNumber]) {
-        localSpatial?.updateSelfPosition(position,
+       localSpatial?.updateSelfPosition(position,
                                          axisForward: axisForward,
                                          axisRight: axisRight,
                                          axisUp: axisUp)
+    }
+    
+    func updateRemoteSpetialPostion(uid: String?,
+                                    position: [NSNumber],
+                                    forward: [NSNumber]?) {
+        let positionInfo = AgoraRemoteVoicePositionInfo()
+        positionInfo.position = position
+        positionInfo.forward = forward
+        let uid = UInt(uid ?? "0") ?? 0
+        localSpatial?.updateRemotePosition(uid, positionInfo: positionInfo)
     }
     
     /**
@@ -776,6 +801,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         rtcKit.stopPreview()
         rtcKit.leaveChannel(nil)
         rtcKit.delegate = nil
+        AgoraLocalSpatialAudioKit.destroy()
         AgoraRtcEngineKit.destroy()
         SARTCManager._sharedInstance = nil // 释放单例
     }
@@ -899,11 +925,10 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
     }
 
     // mpk didChangedTo
-    public func agoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
         guard let _ = delegate else {
             return
         }
-
-        playerDelegate?.didMPKChangedTo?(state: state, error: error)
+        playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
     }
 }

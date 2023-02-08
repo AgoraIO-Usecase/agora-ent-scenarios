@@ -20,8 +20,8 @@ public extension UIViewController {
 }
 
 // MARK: -  UIViewControllerTransitioningDelegate
-#if DEBUG
-#else
+//#if DEBUG
+//#else
 extension UIViewController: UIViewControllerTransitioningDelegate {
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         return SAPresentationController(presentedViewController: presented, presenting: presenting)
@@ -37,4 +37,4 @@ extension UIViewController: UIViewControllerTransitioningDelegate {
         return dismissedVC.dismissTransitionType.animation
     }
 }
-#endif
+//#endif

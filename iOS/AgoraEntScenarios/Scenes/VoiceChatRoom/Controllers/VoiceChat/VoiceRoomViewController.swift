@@ -269,7 +269,7 @@ extension VoiceRoomViewController {
         }
         view.addSubview(headerView)
 
-        sRtcView = SA3DRtcView()
+        sRtcView = SA3DRtcView(rtcKit: nil)
         view.addSubview(sRtcView)
 
         rtcView = AgoraChatRoomNormalRtcView()
