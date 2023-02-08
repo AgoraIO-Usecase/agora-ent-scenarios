@@ -62,6 +62,8 @@ time_t uptime() {
 @property (nonatomic, assign) NSInteger dataStreamId;
 @property (nonatomic, strong) KTVSongConfiguration* config;
 
+@property (nonatomic, assign) NSInteger playerDuration;
+
 @property (nonatomic, assign) int playoutVolume;
 @property (nonatomic, assign) int publishSignalVolume;
 
@@ -418,7 +420,7 @@ time_t uptime() {
     NSDictionary *dict = @{
         @"cmd":@"setVoicePitch",
         @"pitch":@(pitch),
-        @"time": @([self.rtcMediaPlayer getPosition])
+        @"time": @([self getPlayerCurrentTime])
     };
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
@@ -456,8 +458,10 @@ time_t uptime() {
         [playerKit play];
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = 0;
+        self.playerDuration = 0;
     } else if (state == AgoraMediaPlayerStatePlaying) {
         self.localPlayerPosition = 0;
+        self.playerDuration = 0;
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -475,7 +479,7 @@ time_t uptime() {
         //if i am main singer
         NSDictionary *dict = @{
             @"cmd":@"setLrcTime",
-            @"duration":@([self.rtcMediaPlayer getDuration]),
+            @"duration":@(self.playerDuration),
             @"time":@(position - self.audioPlayoutDelay),
             @"ntp":@([self getNtpTimeInMs]),
             @"playerState":@(self.playerState)
@@ -489,21 +493,28 @@ time_t uptime() {
 #pragma mark - AgoraLrcViewDelegate
 -(NSTimeInterval)getTotalTime {
     if (self.config.role == KTVSingRoleMainSinger) {
-        NSTimeInterval time = [_rtcMediaPlayer getDuration];
+        NSTimeInterval time = self.playerDuration;
         return time;
     }
     return self.remotePlayerDuration;
 }
 
 - (NSTimeInterval)getPlayerCurrentTime {
-    if (self.config.role == KTVSingRoleMainSinger) {
-        NSTimeInterval time = [_rtcMediaPlayer getPosition];
+    if (self.config.role == KTVSingRoleMainSinger || self.config.role == KTVSingRoleCoSinger) {
+        NSTimeInterval time = uptime() - self.localPlayerPosition;
         return time;
     }
     
     return self.remotePlayerPosition;
 }
 
+- (NSInteger)playerDuration {
+    if (_playerDuration == 0) {
+        _playerDuration = [_rtcMediaPlayer getDuration];
+    }
+    
+    return _playerDuration;
+}
 
 #pragma mark - AgoraLrcDownloadDelegate
 - (void)downloadLrcFinishedWithUrl:(NSString *)url {
@@ -575,11 +586,11 @@ time_t uptime() {
 }
 
 #pragma RTC delegate for chorus channel2
--(void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinChannel:(NSString *)channel withUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
-{
-    KTVLogInfo(@"KTVAPI didJoinChannel: %ld, %@", uid, channel);
-    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
-}
+//-(void)rtcEngine:(AgoraRtcEngineKit *)engine didJoinChannel:(NSString *)channel withUid:(NSUInteger)uid elapsed:(NSInteger)elapsed
+//{
+//    KTVLogInfo(@"KTVAPI didJoinChannel: %ld, %@", uid, channel);
+//    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
+//}
 
 -(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
 {
@@ -645,6 +656,8 @@ time_t uptime() {
     int ret =
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
+        
+        [self.engine setAudioScenario:AgoraAudioScenarioChorus];
         
         if(weakSelf.config.type == KTVSongTypeChorus &&
            weakSelf.config.role == KTVSingRoleMainSinger) {

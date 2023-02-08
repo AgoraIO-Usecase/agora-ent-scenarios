@@ -764,8 +764,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setParameters:@"{\"che.audio.agc.enable\": true}"];
     [self.RTCkit setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
     [self.RTCkit setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
-    [self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
-    [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
+    //[self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
+    //[self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
