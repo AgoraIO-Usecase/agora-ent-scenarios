@@ -250,6 +250,8 @@ time_t uptime() {
             options.publishMicrophoneTrack = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            
+            [self.engine adjustUserPlaybackSignalVolume:self.config.coSingerUid volume:50];
         } else if(role == KTVSingRoleCoSinger) {
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
@@ -675,7 +677,7 @@ time_t uptime() {
             } else {
                 return;
             }
-            [weakSelf.engine adjustUserPlaybackSignalVolumeEx:uid volume:25 connection:connection];
+            [weakSelf.engine adjustUserPlaybackSignalVolumeEx:uid volume:50 connection:connection];
         }
     }];
     if(ret != 0) {
@@ -691,6 +693,7 @@ time_t uptime() {
         options.publishDirectCustomAudioTrack = NO;
         [self.engine updateChannelExWithMediaOptions:options connection:self.subChorusConnection];
         [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
+        [self.engine adjustUserPlaybackSignalVolume:self.config.coSingerUid volume:100];
     } else if(role == KTVSingRoleCoSinger) {
         [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
         [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:NO];
