@@ -118,6 +118,7 @@
     <string name="show_tip1">主播正忙，已拒绝你的邀请</string>
 
 
+
     <!-- pk   -->
     <string name="show_pking_request_message">PK邀请</string>
     <string name="show_online_boardcaster">在线主播</string>
@@ -202,6 +203,8 @@
     <string name="show_beauty_item_beauty_remove_dark_circles">祛黑眼圈</string>
     <string name="show_beauty_item_beauty_remove_nasolabial_folds">祛法令纹</string>
     <string name="show_beauty_group_virtual_bg">背景</string>
+    <string name="show_beauty_green_screen">绿幕</string>
+    <string name="show_beauty_strength">强度</string>
     <string name="show_beauty_item_virtual_bg_blur">模糊</string>
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
     <string name="show_live_detail_living_end">直播已结束</string>
