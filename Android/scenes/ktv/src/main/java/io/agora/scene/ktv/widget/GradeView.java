@@ -7,7 +7,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -161,6 +160,10 @@ public class GradeView extends View {
     }
 
     private void buildDefaultCumulativeScoreBarStyle(int fromColor, int toColor) {
+        if (mHeight <= 0) {
+            return;
+        }
+
         mCumulativeLinearGradient = new LinearGradient(0, 0, mHeight, mHeight, fromColor, toColor, Shader.TileMode.CLAMP);
 
         mCumulativeScoreBarRectF.top = 0;
