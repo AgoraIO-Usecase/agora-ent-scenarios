@@ -1,5 +1,6 @@
 package io.agora.scene.show.beauty
 
+import android.util.Log
 import io.agora.base.VideoFrame
 import io.agora.rtc2.video.IVideoFrameObserver
 import java.util.concurrent.Executors
@@ -42,6 +43,28 @@ abstract class IBeautyProcessor: IVideoFrameObserver {
     }
 
     fun isEnable() = isEnable
+
+    // 设置绿幕强度（0 ～ 1）
+    fun setBg(intensity: Float) {
+        Log.e("liu0208", "setBg    intensity = $intensity")
+        // 保存绿幕强度值
+        BeautyCache.cacheItemValue(GROUP_ID_VIRTUAL_BG, ITEM_ID_VIRTUAL_BG_GREEN_SCREENSTRENGTH, intensity)
+    }
+
+    // 获取绿幕强度（0 ～ 1）
+    fun getGreenScreenStrength(): Float {
+        return BeautyCache.getItemValue(ITEM_ID_VIRTUAL_BG_GREEN_SCREENSTRENGTH, 0.5f)
+    }
+
+    // 设置绿幕开关
+    fun setGreenScreen(greenScreen: Boolean) {
+        BeautyCache.cacheItemValue(GROUP_ID_VIRTUAL_BG, ITEM_ID_VIRTUAL_BG_GREEN_SCREEN, if (greenScreen) 1f else 0f)
+    }
+
+    // 获取绿幕开关
+    fun greenScreen(): Boolean {
+        return BeautyCache.getItemValue(ITEM_ID_VIRTUAL_BG_GREEN_SCREEN) == 1f
+    }
 
     fun setFaceBeautify(itemId: Int, intensity: Float){
         BeautyCache.cacheItemValue(GROUP_ID_BEAUTY, itemId, intensity)

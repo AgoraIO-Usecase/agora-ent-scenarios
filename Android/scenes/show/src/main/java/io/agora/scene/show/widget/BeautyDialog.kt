@@ -330,6 +330,14 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                 setEnable(!isEnable())
             }
         }
+
+        mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { btn, isChecked ->
+            Log.e("liu0208", "OnCheckedChange    $isChecked")
+            beautyProcessor?.setGreenScreen(isChecked)
+            mGroupList[mBottomBinding.tabLayout.selectedTabPosition].apply {
+                onItemSelected(GROUP_ID_VIRTUAL_BG, itemList[selectedIndex].id)
+            }
+        }
     }
 
     override fun onStop() {
@@ -344,7 +352,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
     private fun refreshTopLayout(groupId: Int, itemId: Int) {
         mTopBinding.slider.clearOnChangeListeners()
         mTopBinding.slider.clearOnSliderTouchListeners()
-        Log.e("liu0208","refreshTopLayout    groupId = $groupId    itemId = $itemId")
+        Log.e("liu0208", "refreshTopLayout    groupId = $groupId    itemId = $itemId")
 
         mTopBinding.ivCompare.visibility = if (groupId != GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
         mTopBinding.llGreenScreen.visibility = if (groupId == GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
@@ -354,6 +362,14 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             // 虚拟背景
             GROUP_ID_VIRTUAL_BG -> {
                 mTopBinding.root.isVisible = true
+                mTopBinding.slider.value = beautyProcessor?.let { it.getGreenScreenStrength() } ?: 0.5f
+                mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.let { it.greenScreen() } ?: false
+                mTopBinding.slider.addOnChangeListener { slider, sValure, fromUser ->
+                    beautyProcessor?.setBg(sValure)
+                    mGroupList[mBottomBinding.tabLayout.selectedTabPosition].apply {
+                        onItemSelected(GROUP_ID_VIRTUAL_BG, itemList[selectedIndex].id)
+                    }
+                }
             }
             // 美颜
             GROUP_ID_BEAUTY -> {
@@ -402,41 +418,40 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
         }
     }
 
+
     private fun onItemSelected(groupId: Int, itemId: Int) {
         refreshTopLayout(groupId, itemId)
+        val greenScreenStrength = beautyProcessor?.let { it.getGreenScreenStrength() } ?: 0.5f
+        val greenScreen = beautyProcessor?.let { it.greenScreen() } ?: false
+        Log.e("liu0208", "greenScreenStrength = $greenScreenStrength")
         when (groupId) {
             GROUP_ID_VIRTUAL_BG -> {
                 when (itemId) {
+                    // 无
                     ITEM_ID_VIRTUAL_BG_NONE -> {
                         RtcEngineInstance.rtcEngine.enableVirtualBackground(
                             false,
-                            RtcEngineInstance.virtualBackgroundSource.apply {
-                                backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
-                            },
-                            SegmentationProperty()
+                            RtcEngineInstance.virtualBackgroundSource.apply { backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR },
+                            SegmentationProperty(if (greenScreen) SegmentationProperty.SEG_MODEL_GREEN else SegmentationProperty.SEG_MODEL_AI, greenScreenStrength)
                         )
                     }
+                    // 模糊
                     ITEM_ID_VIRTUAL_BG_BLUR -> {
                         RtcEngineInstance.rtcEngine.enableVirtualBackground(
                             true,
-                            RtcEngineInstance.virtualBackgroundSource.apply {
-                                backgroundSourceType = VirtualBackgroundSource.BACKGROUND_BLUR
-                            },
-                            SegmentationProperty()
+                            RtcEngineInstance.virtualBackgroundSource.apply { backgroundSourceType = VirtualBackgroundSource.BACKGROUND_BLUR },
+                            SegmentationProperty(if (greenScreen) SegmentationProperty.SEG_MODEL_GREEN else SegmentationProperty.SEG_MODEL_AI, greenScreenStrength)
                         )
                     }
+                    // 蜜桃
                     ITEM_ID_VIRTUAL_BG_MITAO -> {
                         RtcEngineInstance.rtcEngine.enableVirtualBackground(
                             true,
                             RtcEngineInstance.virtualBackgroundSource.apply {
                                 backgroundSourceType = VirtualBackgroundSource.BACKGROUND_IMG
-                                source = FileUtils.copyFileFromAssets(
-                                    context,
-                                    "virtualbackgroud_mitao.jpg",
-                                    context.externalCacheDir!!.absolutePath
-                                )
+                                source = FileUtils.copyFileFromAssets(context, "virtualbackgroud_mitao.jpg", context.externalCacheDir!!.absolutePath)
                             },
-                            SegmentationProperty()
+                            SegmentationProperty(if (greenScreen) SegmentationProperty.SEG_MODEL_GREEN else SegmentationProperty.SEG_MODEL_AI, greenScreenStrength)
                         )
                     }
                 }
