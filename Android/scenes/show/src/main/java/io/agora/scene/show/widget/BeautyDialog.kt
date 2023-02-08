@@ -1,7 +1,9 @@
 package io.agora.scene.show.widget
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -201,7 +203,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     R.mipmap.show_beauty_ic_virtual_bg_mitao
                 ),
             ),
-            when(RtcEngineInstance.virtualBackgroundSource.backgroundSourceType){
+            when (RtcEngineInstance.virtualBackgroundSource.backgroundSourceType) {
                 VirtualBackgroundSource.BACKGROUND_BLUR -> 1
                 VirtualBackgroundSource.BACKGROUND_IMG -> 2
                 else -> 0
@@ -342,11 +344,18 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
     private fun refreshTopLayout(groupId: Int, itemId: Int) {
         mTopBinding.slider.clearOnChangeListeners()
         mTopBinding.slider.clearOnSliderTouchListeners()
+        Log.e("liu0208","refreshTopLayout    groupId = $groupId    itemId = $itemId")
+
+        mTopBinding.ivCompare.visibility = if (groupId != GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
+        mTopBinding.llGreenScreen.visibility = if (groupId == GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
+        mTopBinding.tvStrength.visibility = if (groupId == GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
 
         when (groupId) {
+            // 虚拟背景
             GROUP_ID_VIRTUAL_BG -> {
-                mTopBinding.root.isVisible = false
+                mTopBinding.root.isVisible = true
             }
+            // 美颜
             GROUP_ID_BEAUTY -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_BEAUTY_NONE
                 if (itemId != ITEM_ID_BEAUTY_NONE) {
@@ -356,6 +365,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     }
                 }
             }
+            // 滤镜
             GROUP_ID_FILTER -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_FILTER_NONE
                 if (itemId != ITEM_ID_FILTER_NONE) {
@@ -365,6 +375,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     }
                 }
             }
+            // 特效
             GROUP_ID_EFFECT -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_EFFECT_NONE
                 if (itemId != ITEM_ID_EFFECT_NONE) {
@@ -374,6 +385,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     }
                 }
             }
+            // 调整
             GROUP_ID_ADJUST -> {
                 mTopBinding.root.isVisible = itemId != ITEM_ID_ADJUST_NONE
                 if (itemId != ITEM_ID_ADJUST_NONE) {
@@ -383,6 +395,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                     }
                 }
             }
+            // 贴纸
             GROUP_ID_STICKER -> {
                 mTopBinding.root.isVisible = false
             }
