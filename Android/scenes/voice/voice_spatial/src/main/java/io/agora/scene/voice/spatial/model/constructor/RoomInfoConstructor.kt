@@ -15,10 +15,8 @@ object RoomInfoConstructor {
     /** VoiceRoomModel convert RoomKitBean*/
     fun RoomKitBean.convertByVoiceRoomModel(voiceRoomModel: VoiceRoomModel) {
         roomId = voiceRoomModel.roomId
-        chatroomId = voiceRoomModel.chatroomId
         channelId = voiceRoomModel.channelId
         ownerId = voiceRoomModel.owner?.userId ?: ""
-        ownerChatUid = voiceRoomModel.owner?.chatUid?:""
         roomType = voiceRoomModel.roomType
         isOwner = curUserIsHost(voiceRoomModel.owner?.userId)
         soundEffect = voiceRoomModel.soundEffect

@@ -218,6 +218,7 @@ class VoiceSyncManagerServiceImp(
 
                     // 订阅
                     innerSubscribeRoomChanged()
+                    innerSubscribeSeatApply {}
                     innerMayAddLocalUser({
                         innerAutoOnSeatIfNeed { _,_ ->
                             ThreadManager.getInstance().runOnMainThread {
@@ -1233,6 +1234,38 @@ class VoiceSyncManagerServiceImp(
                     completion.invoke(VoiceServiceProtocol.ERR_OK, false)
                 }
             })
+    }
+
+    private fun innerSubscribeSeatApply(completion: () -> Unit) {
+        val listener = object : Sync.EventListener {
+            override fun onCreated(item: IObject?) {
+                // do Nothing
+            }
+
+            override fun onUpdated(item: IObject?) {
+                item?.toObject(VoiceRoomApply::class.java) ?: return
+                roomServiceSubscribeDelegates.forEach {
+                    ThreadManager.getInstance().runOnMainThread {
+                        it.onReceiveSeatRequest()
+                    }
+                }
+            }
+
+            override fun onDeleted(item: IObject?) {
+                item ?: return
+                roomServiceSubscribeDelegates.forEach {
+                    ThreadManager.getInstance().runOnMainThread {
+                        it.onReceiveSeatRequestRejected("")
+                    }
+                }
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException?) {
+                completion()
+            }
+        }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.collection(kCollectionIdSeatApply)?.subscribe(listener)
     }
 
     // -------------------------------

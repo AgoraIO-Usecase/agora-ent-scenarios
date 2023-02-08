@@ -204,7 +204,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserJoinedRoom $roomId, ${voiceMember.chatUid}".logD(TAG)
+                "onUserJoinedRoom $roomId, ${voiceMember.userId}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1

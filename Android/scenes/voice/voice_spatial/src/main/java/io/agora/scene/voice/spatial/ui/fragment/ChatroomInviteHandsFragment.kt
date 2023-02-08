@@ -94,7 +94,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                     isRefreshing = false
                     adapter?.data?.let {
                         for (datum in it) {
-                            if (map.containsKey(datum.chatUid)) {
+                            if (map.containsKey(datum.userId)) {
                                 adapter?.setInvited(map)
                             }
                         }
@@ -171,7 +171,7 @@ class ChatroomInviteHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                 dataList.addAll(it)
                 for (key in data.keys) {
                     for (datum in it) {
-                        if (data[key].toString() == datum.chatUid) {
+                        if (data[key].toString() == datum.userId) {
                             reset()
                             return
                         }
