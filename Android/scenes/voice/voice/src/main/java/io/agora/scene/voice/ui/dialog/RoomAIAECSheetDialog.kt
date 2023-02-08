@@ -52,11 +52,13 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
         setupOnClickPlayButton()
         beforeDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_before.png")
-        beforeDrawable?.stop()
+        beforeDrawable?.setAutoPlay(false)
         binding?.ivBefore?.setImageDrawable(beforeDrawable)
+
         afterDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_after.png")
-        afterDrawable?.stop()
+        afterDrawable?.setAutoPlay(false)
         binding?.ivAfter?.setImageDrawable(afterDrawable)
+
         binding?.accbAEC?.isChecked = isOn
         binding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
             onClickCheckBox?.invoke(isChecked)
