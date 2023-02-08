@@ -27,11 +27,12 @@ class SAAudioSettingViewController: UIViewController {
 //    private var settingName: [String] = ["\(sceneLocalized( "blue")) & \(sceneLocalized( "red"))", sceneLocalized( "Robot Volume"), sceneLocalized( "Best Sound"), "AINS", "Spatial Audio"]
 //    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
     
-    private var settingName: [String] = [sceneLocalized( "AINS"),sceneLocalized( "AIAEC"),sceneLocalized( "AGC"),sceneLocalized( "Agora Blue & Red Bot"), sceneLocalized( "Robot Volume"), sceneLocalized( "Best Agora Sound"), "Spatial Audio"]
+    private var settingName: [String] = [sceneLocalized( "Agora Blue&Agora Red"),
+                                         sceneLocalized( "Robot volume"),
+                                         sceneLocalized( "Spatial Audio")]
     
     
-    
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／3D"]
 
 
     private var soundTitle: [String] = []
@@ -121,17 +122,12 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 3
-        }  else if section == 1 {
             return 2
-        } else {
+        }  else if section == 1 {
             return 1
+        } else {
+            return 0
         }
-//        if section == 0 {
-//            return 2
-//        } else {
-//            return roomInfo?.room?.type == 1 ? 3 : 2
-//        }
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -314,8 +310,8 @@ extension SAAudioSettingViewController: UITableViewDelegate, UITableViewDataSour
             if indexPath.row == 0 {
                 let cell: SASwitchTableViewCell = tableView.dequeueReusableCell(withIdentifier: swIdentifier) as! SASwitchTableViewCell
                 guard !settingImage.isEmpty else { return cell}
-                cell.iconView.image = UIImage.sceneImage(name:settingImage[3])
-                cell.titleLabel.text = settingName[3]
+                cell.iconView.image = UIImage.sceneImage(name:settingImage[2])
+                cell.titleLabel.text = settingName[2]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
                 cell.swith.isOn = roomInfo?.room?.use_robot ?? false

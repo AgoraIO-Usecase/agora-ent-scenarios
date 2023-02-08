@@ -30,8 +30,17 @@ public class SAAlertViewController: UIViewController, SAPresentedViewType {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 10
+        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        view.layer.masksToBounds = true
         if customView != nil {
             view.addSubview(customView!)
+            customView?.translatesAutoresizingMaskIntoConstraints = false
+            customView?.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            customView?.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            customView?.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            customView?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
     }
 }

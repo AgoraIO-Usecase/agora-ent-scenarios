@@ -13,98 +13,100 @@ import ZSwiftBaseLib
 extension SARoomViewController {
     
     func showEQView() {
-        //更新为不等高弹窗视图 全都是控制器 方便业务更新
-        let audioSetVC: SAAudioSettingViewController = SAAudioSettingViewController()
-        audioSetVC.roomInfo = roomInfo
-        audioSetVC.isAudience = !isOwner
-        audioSetVC.ains_state = ains_state
-        audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
-        audioSetVC.useRobotBlock = { [weak self] flag in
-            if self?.alienCanPlay == true && flag == true {
-                self?.roomInfo?.room?.use_robot = true
-                self?.rtckit.playMusic(with: .alien)
-            }
-            if flag == false {
-                self?.roomInfo?.room?.use_robot = false
-                self?.rtckit.stopPlayMusic()
-            }
-            self?.activeAlien(flag)
-            self?.roomInfo?.room?.use_robot = flag
-        }
+        guard let micInfos = sRtcView.micInfos else { return }
+        let isOpenSpatial = micInfos[5].status == 5
 
-        audioSetVC.volBlock = { [weak self] vol in
-            self?.updateVolume(vol)
+        let actionView = ActionSheetManager()
+        actionView
+            .section(section: 2)
+            .rows(rows: [2, 1])
+            .title(title: "Audio Settings")
+            .sectionHeader(title: "Bot Settings", desc: "Host Only")
+            .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red", isOn: isOpenSpatial, isEnabel: isOwner)
+            .sliderCell(iconName: "icons／set／laba", title: "Robot volume", value: 0.45, isEnable: isOwner)
+            .sectionHeader(iconName: "new", title: "Spatial Audio", desc: nil)
+            .textCell(iconName: "icons／set／3D", title: "Spatial Audio", desc: nil, isShowArrow: true)
+            .config()
+        actionView.didCellItemClosure = { [weak self] indexPath in
+            guard indexPath.section == 1 && indexPath.row == 0 else { return }
+            self?.showSpatialAudioView()
         }
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            guard let self = self else { return }
+            let blue = micInfos[5]
+            let red = micInfos[6]
+            blue.status = isOn ? 5 : -1
+            red.status = isOn ? 5 : -1
+            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[6] = red
+        }
+        actionView.didSliderValueChangeClosure = { [weak self] _, value in
+            self?.sRtcView.updatePlayerVolume(value: value)
+        }
+        actionView.show()
+    }
+    
+    func showSpatialAudioView() {
+        guard let micInfos = sRtcView.micInfos else { return }
+        let red = micInfos[6]
+        let blue = micInfos[5]
         
-        audioSetVC.selBlock = { [weak self] state in
-            self?.ains_state = state
-            self?.rtckit.setAINS(with: state)
-            if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
-            if state == .high {
-                self?.rtckit.playMusic(with: .ainsHigh)
-            } else if state == .mid {
-                self?.rtckit.playMusic(with: .ainsMid)
+        let actionView = ActionSheetManager()
+        actionView
+            .section(section: 2)
+            .rows(rows: [3, 3])
+            .title(title: "Spatial Audio")
+            .sectionHeader(iconName: "new", title: "Agora Blue Bot", desc: "Host Only")
+            .sliderCell(title: "Attenuation factor volume", value: 0.8, isEnable: isOwner)
+            .switchCell(title: "Air Absorb", isOn: blue.airAbsorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur", isOn: blue.voiceBlur, isEnabel: isOwner)
+            .sectionHeader(iconName: "new", title: "Agora Red Bot", desc: "Host Only")
+            .sliderCell(title: "Attenuation factor volume", value: 0.8, isEnable: isOwner)
+            .switchCell(title: "Air Absorb", isOn: red.airAbsorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur", isOn: red.voiceBlur, isEnabel: isOwner)
+            .config()
+        actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
+            guard let self = self else { return }
+            if indexPath.section == 0 {
+                switch indexPath.row {
+                case 1:
+                    blue.airAbsorb = isOn
+                    
+                case 2:
+                    blue.voiceBlur = isOn
+                    
+                default: break
+                }
             } else {
-                self?.rtckit.playMusic(with: .ainsOff)
-            }
-        }
-        
-        audioSetVC.turnAIAECBlock = {[weak self] flag in
-            self?.rtckit.setAIAECOn(isOn: flag);
-        }
-        audioSetVC.turnAGCBlock = {[weak self] flag in
-            self?.rtckit.setAGCOn(isOn: flag);
-        }
-        
-        audioSetVC.effectClickBlock = { [weak self] type in
-
-            /**
-             1.如果是观众，则toast 提示
-             2.如果是主播先要判断是否开启机器人
-             */
-            if self!.isOwner == false {
-                self?.view.makeToast("Host Sound".localized())
-                return
-            }
-            if self?.roomInfo?.room?.use_robot == false {
-                self?.view.makeToast("Active First".localized())
-                return
-            }
-
-            if type == .none {
-                // 如果选择的是其他音效。弹窗确认是否需要退出
-                self?.showExitRoomView()
-                return
-            }
-            self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 1) ?? .social)
-        }
-        audioSetVC.soundBlock = { [weak self] index in
-            if self?.isOwner == false {
-                self?.view.makeToast("Host Bot".localized())
-                return
-            }
-            if let use_robot = self?.roomInfo?.room?.use_robot {
-                if use_robot == false {
-                    self?.view.makeToast("Active First".localized())
-                    return
+                switch indexPath.row {
+                case 1:
+                    red.airAbsorb = isOn
+                    
+                case 2:
+                    red.voiceBlur = isOn
+                    
+                default: break
                 }
             }
-            let count = (index - 1000) / 10
-            let tag = (index - 1000) % 10
-            self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
-            self?.rtcView.updateAlienMic(.blue)
+            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[6] = red
         }
-        audioSetVC.visitBlock = { [weak self] in
-            let VC: SAHelpViewController = .init()
-            self?.navigationController?.pushViewController(VC, animated: true)
+        actionView.didSliderValueChangeClosure = { [weak self] indexPath, value in
+            guard let self = self, let micInfos = self.sRtcView.micInfos else { return }
+            let red = micInfos[6]
+            let blue = micInfos[5]
+            if indexPath.section == 0 {
+                blue.attenuation = value
+                
+            } else {
+                red.attenuation = value
+            }
+            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[6] = red
         }
-        
-        let presentView: SARoomPresentView = SARoomPresentView.shared
-        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 372~), vc: audioSetVC)
-        view.addSubview(presentView)
-        
+        actionView.show()
     }
-
+    
     func applyMembersAlert(position: SASwitchBarDirection) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {

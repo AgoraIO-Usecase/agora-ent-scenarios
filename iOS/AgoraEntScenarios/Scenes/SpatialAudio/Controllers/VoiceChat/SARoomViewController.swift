@@ -40,6 +40,7 @@ class SARoomViewController: SABaseViewController {
                                                       width: ScreenWidth,
                                                       height: 50),
                                         style: .spatialAudio)
+    private lazy var tipsView = SASpatialTipsView()
 
     var preView: SAVMPresentView!
     var noticeView: SANoticeView!
@@ -52,9 +53,6 @@ class SARoomViewController: SABaseViewController {
     var local_index: Int?
     var alienCanPlay: Bool = true
     var vmType: SARtcType.VMMUSIC_TYPE = .social
-    
-    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
-    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
 
     public var roomInfo: SARoomInfo? {
         didSet {
@@ -94,6 +92,11 @@ class SARoomViewController: SABaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tipsView.show()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigation.isHidden = false
@@ -117,11 +120,8 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        
-        rtckit.initSpatialAudio()
-        
-        redMediaPlayer = rtckit.initMediaPlayer()
-        blueMediaPlayer = rtckit.initMediaPlayer()
+        let rate = sRtcView.width / sRtcView.height * 10
+        rtckit.initSpatialAudio(recvRange: Float(sRtcView.height * 0.5 / rate))
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -272,7 +272,7 @@ extension SARoomViewController {
         }
         view.addSubview(headerView)
 
-        sRtcView = SA3DRtcView(frame: .zero)
+        sRtcView = SA3DRtcView(rtcKit: rtckit)
         view.addSubview(sRtcView)
 
         rtcView = SANormalRtcView()
@@ -304,6 +304,8 @@ extension SARoomViewController {
             make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
         }
         view.addSubViews([chatBar])
+        
+        view.layoutIfNeeded()
     }
 
 

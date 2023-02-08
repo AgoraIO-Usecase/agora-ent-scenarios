@@ -26,6 +26,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.snp.updateConstraints { make in
                 make.top.equalTo(self.contentView).offset(directionType == .AgoraChatRoom3DUserDirectionTypeUp ? 0~ : 40~)
             }
+            contentView.layoutIfNeeded()
         }
     }
 
@@ -63,7 +64,8 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             make.left.right.bottom.equalTo(self.contentView)
             make.top.equalTo(self.contentView).offset(-20~)
         }
-
+        layoutIfNeeded()
+        
         rtcUserView.clickBlock = { [weak self] in
             guard let clickBlock = self?.clickBlock else { return }
             clickBlock()

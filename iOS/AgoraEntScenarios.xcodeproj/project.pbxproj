@@ -516,6 +516,9 @@
 		DDDDDC3828FFD78C005F4E8B /* SceneLocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */; };
 		E320DE0F2988C42A00C6D7AA /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E320DE0E2988C42A00C6D7AA /* KeyCenter.swift */; };
 		E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E358F802293494BC00A7EBD1 /* InfoPlist.strings */; };
+		E70B4B0D299235FA00A7FB7F /* SAPositionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B0C299235FA00A7FB7F /* SAPositionInfo.swift */; };
+		E70B4B142992527D00A7FB7F /* ActionSheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */; };
+		E70B4B162993AC5D00A7FB7F /* SASpatialTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1184,6 +1187,9 @@
 		E358F7FC293493AD00A7EBD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E358F801293494BC00A7EBD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E358F803293494C100A7EBD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		E70B4B0C299235FA00A7FB7F /* SAPositionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAPositionInfo.swift; sourceTree = "<group>"; };
+		E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetManager.swift; sourceTree = "<group>"; };
+		E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SASpatialTipsView.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2459,6 +2465,7 @@
 		DDC51C68298C141B00D837AC /* Compoment */ = {
 			isa = PBXGroup;
 			children = (
+				E70B4B0E2992516A00A7FB7F /* ActionSheetKit */,
 				DDC51C69298C141B00D837AC /* VoiceRoomIMKit */,
 				DDC51C6B298C141B00D837AC /* AgoraRtcKit */,
 			);
@@ -2492,6 +2499,7 @@
 				DDC51C73298C141B00D837AC /* SAMenuBarEntity.swift */,
 				DDC51C74298C141B00D837AC /* SARoomEntity.swift */,
 				DDC51C75298C141B00D837AC /* SAAudiencesEntity.swift */,
+				E70B4B0C299235FA00A7FB7F /* SAPositionInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2624,6 +2632,7 @@
 				DDC51CC8298C141C00D837AC /* SASoundView.swift */,
 				DDC51CC9298C141C00D837AC /* SAPopTip.swift */,
 				DDC51CCA298C141C00D837AC /* SA3DRtcView.swift */,
+				E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */,
 			);
 			path = VoiceChat;
 			sourceTree = "<group>";
@@ -2919,6 +2928,14 @@
 				DDDDDB3528FFD78B005F4E8B /* SceneLocalizedString.swift */,
 			);
 			path = Context;
+			sourceTree = "<group>";
+		};
+		E70B4B0E2992516A00A7FB7F /* ActionSheetKit */ = {
+			isa = PBXGroup;
+			children = (
+				E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */,
+			);
+			path = ActionSheetKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3279,6 +3296,7 @@
 				DD4DFA13298BCBE5000AF053 /* VLKTVTonesView.m in Sources */,
 				DDC51E16298C1D8900D837AC /* VoiceServiceProtocol.swift in Sources */,
 				DDC51D2C298C141C00D837AC /* SAAlertContainer.swift in Sources */,
+				E70B4B142992527D00A7FB7F /* ActionSheetManager.swift in Sources */,
 				DD4DFA1C298BCBE5000AF053 /* VLChoosedSongView.m in Sources */,
 				DDC51CE1298C141C00D837AC /* SAFlipHorizontalAnimation.swift in Sources */,
 				DDC51D15298C141C00D837AC /* SAHorizontalCardCell.swift in Sources */,
@@ -3332,6 +3350,7 @@
 				DDC51D42298C141C00D837AC /* SAEmojiListView.swift in Sources */,
 				DDC51D1B298C141C00D837AC /* SAEndLiveAlert.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
+				E70B4B162993AC5D00A7FB7F /* SASpatialTipsView.swift in Sources */,
 				DDC51D1E298C141C00D837AC /* SASliderTableViewCell.swift in Sources */,
 				DD4DFA23298BCBE5000AF053 /* VLRoomPersonView.m in Sources */,
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
@@ -3405,6 +3424,7 @@
 				DDC51E2C298C1D8900D837AC /* HorizontalCardCell.swift in Sources */,
 				DDC51D20298C141C00D837AC /* SAMuteView.swift in Sources */,
 				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
+				E70B4B0D299235FA00A7FB7F /* SAPositionInfo.swift in Sources */,
 				DDC51D2B298C141C00D837AC /* SAGiftCell.swift in Sources */,
 				DDC51CDB298C141C00D837AC /* SwiftyFitSizeSA.swift in Sources */,
 				DDA19A2E28FFE57A009D3E61 /* EKWindowProvider.swift in Sources */,
@@ -3428,7 +3448,6 @@
 				DD84178729090C520026B624 /* VLMineTCell.m in Sources */,
 				DD4DFA25298BCBE5000AF053 /* VLNoBodyOnLineView.m in Sources */,
 				DDA19A6F28FFE57A009D3E61 /* EKMessageContentView.swift in Sources */,
-				DDA19A1828FFE579009D3E61 /* RtmSyncManager+ISyncManager.swift in Sources */,
 				DDA19A4F28FFE57A009D3E61 /* EKAttributes+Animation.swift in Sources */,
 				DD84178029090C520026B624 /* VLDiscoveryHeaderView.m in Sources */,
 				DD4DF9FE298BCBE4000AF053 /* AgoraRtm.m in Sources */,
