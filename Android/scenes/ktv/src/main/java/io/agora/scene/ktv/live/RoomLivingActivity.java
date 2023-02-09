@@ -362,7 +362,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                 getBinding().ivResultLevel.setImageResource(R.mipmap.ic_s);
             } else if (score >= 80) {
                 getBinding().ivResultLevel.setImageResource(R.mipmap.ic_a);
-            } else if (score >= 60) {
+            } else if (score >= 70) {
                 getBinding().ivResultLevel.setImageResource(R.mipmap.ic_b);
             } else {
                 getBinding().ivResultLevel.setImageResource(R.mipmap.ic_c);

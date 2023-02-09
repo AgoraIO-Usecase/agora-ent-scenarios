@@ -39,9 +39,14 @@ public class GradeView extends View {
     private final Paint mDefaultBackgroundPaint = new Paint();
 
     /**
-     * We separator this view by 5 parts(->C, C->B, B->A, A->S, S->)
-     * 0.3, 0.55, 0.725, 0.9
+     * Separate this view by 5 parts(->C, C->B, B->A, A->S, S->)
+     * 0.6, 0.7, 0.8, 0.9 by PRD
      */
+    private static final float xRadioOfGradeC = 0.6f;
+    private static final float xRadioOfGradeB = 0.7f;
+    private static final float xRadioOfGradeA = 0.8f;
+    private static final float xRadioOfGradeS = 0.9f;
+
     private final Paint mGradeSeparatorIndicatorPaint = new Paint();
     private final Paint mGradeSeparatorLabelIndicatorPaint = new Paint();
 
@@ -106,14 +111,14 @@ public class GradeView extends View {
 
         canvas.drawRoundRect(mDefaultBackgroundRectF, mHeight / 2, mHeight / 2, mDefaultBackgroundPaint);
 
-        canvas.drawLine((float) (mWidth * 0.3), 0, (float) (mWidth * 0.3), mHeight, mGradeSeparatorIndicatorPaint);
-        canvas.drawText("C", (float) ((mWidth * 0.3) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
-        canvas.drawLine((float) (mWidth * 0.55), 0, (float) (mWidth * 0.55), mHeight, mGradeSeparatorIndicatorPaint);
-        canvas.drawText("B", (float) ((mWidth * 0.55) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
-        canvas.drawLine((float) (mWidth * 0.725), 0, (float) (mWidth * 0.725), mHeight, mGradeSeparatorIndicatorPaint);
-        canvas.drawText("A", (float) ((mWidth * 0.725) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
-        canvas.drawLine((float) (mWidth * 0.9), 0, (float) (mWidth * 0.9), mHeight, mGradeSeparatorIndicatorPaint);
-        canvas.drawText("S", (float) ((mWidth * 0.9) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
+        canvas.drawLine((float) (mWidth * xRadioOfGradeC), 0, (float) (mWidth * xRadioOfGradeC), mHeight, mGradeSeparatorIndicatorPaint);
+        canvas.drawText("C", (float) ((mWidth * xRadioOfGradeC) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
+        canvas.drawLine((float) (mWidth * xRadioOfGradeB), 0, (float) (mWidth * xRadioOfGradeB), mHeight, mGradeSeparatorIndicatorPaint);
+        canvas.drawText("B", (float) ((mWidth * xRadioOfGradeB) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
+        canvas.drawLine((float) (mWidth * xRadioOfGradeA), 0, (float) (mWidth * xRadioOfGradeA), mHeight, mGradeSeparatorIndicatorPaint);
+        canvas.drawText("A", (float) ((mWidth * xRadioOfGradeA) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
+        canvas.drawLine((float) (mWidth * xRadioOfGradeS), 0, (float) (mWidth * xRadioOfGradeS), mHeight, mGradeSeparatorIndicatorPaint);
+        canvas.drawText("S", (float) ((mWidth * xRadioOfGradeS) + offsetForLabelX), baseLineForLabel, mGradeSeparatorLabelIndicatorPaint);
 
         if (mCumulativeLinearGradient == null) {
             buildDefaultCumulativeScoreBarStyle(Color.parseColor("#FF99f5FF"), Color.parseColor("#FF1B6FFF"));
@@ -127,19 +132,24 @@ public class GradeView extends View {
         mCumulativeScore = cumulativeScore;
         mPerfectScore = perfectScore;
 
-        if (mCumulativeScore < 500) {
-            int fromColor = Color.parseColor("#FF99f5FF");
-            int toColor = Color.parseColor("#FF1B6FFF");
-            buildDefaultCumulativeScoreBarStyle(fromColor, toColor);
+        int startColor = Color.parseColor("#FF99F5FF");
+        if (mCumulativeScore <= perfectScore * 0.1) {
+            buildDefaultCumulativeScoreBarStyle(startColor, startColor);
         } else {
-            int fromColor = Color.parseColor("#FF99F5FF");
-            int toColor = Color.parseColor("#FFFFEB6E");
-            mCumulativeLinearGradient = new LinearGradient(0, 0, mWidth, mHeight, fromColor, toColor, Shader.TileMode.CLAMP);
+            float currentWidthOfScoreBar = mWidth * cumulativeScore / perfectScore;
+            int middleColor = Color.parseColor("#FF1B6FFF");
+
+            if (mCumulativeScore > perfectScore * 0.1 && mCumulativeScore < perfectScore * 0.8) {
+                mCumulativeLinearGradient = new LinearGradient(0, 0, currentWidthOfScoreBar, mHeight, startColor, middleColor, Shader.TileMode.CLAMP);
+            } else {
+                int endColor = Color.parseColor("#FFD598FF");
+                mCumulativeLinearGradient = new LinearGradient(0, 0, currentWidthOfScoreBar, mHeight, new int[]{startColor, middleColor, endColor}, null, Shader.TileMode.CLAMP);
+            }
 
             mCumulativeScoreBarRectF.top = 0;
             mCumulativeScoreBarRectF.bottom = mHeight;
             mCumulativeScoreBarRectF.left = 0;
-            mCumulativeScoreBarRectF.right = mWidth * cumulativeScore / perfectScore;
+            mCumulativeScoreBarRectF.right = currentWidthOfScoreBar;
         }
 
         invalidate();
@@ -148,11 +158,11 @@ public class GradeView extends View {
     protected int getCumulativeDrawable() {
         int res = R.drawable.ktv_ic_grade_c;
 
-        if (mCumulativeScore >= mPerfectScore * 0.9) {
+        if (mCumulativeScore >= mPerfectScore * xRadioOfGradeS) {
             res = R.drawable.ktv_ic_grade_s;
-        } else if (mCumulativeScore >= mPerfectScore * 0.7) {
+        } else if (mCumulativeScore >= mPerfectScore * xRadioOfGradeA) {
             res = R.drawable.ktv_ic_grade_a;
-        } else if (mCumulativeScore >= mPerfectScore * 0.55) {
+        } else if (mCumulativeScore >= mPerfectScore * xRadioOfGradeB) {
             res = R.drawable.ktv_ic_grade_b;
         }
 
