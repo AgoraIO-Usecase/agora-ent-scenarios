@@ -1161,6 +1161,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
+    } else if (type == VLKTVValueDidChangedTypeRemoteValue) {
+        [self.ktvApi adjustChorusRemoteUserPlaybackVoulme:setting.remoteVolume];
     }
 }
 
