@@ -242,7 +242,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         setupSelectorItem(
             ITEM_ID_SELECTOR_RESOLUTION,
             binding.resolution,
-            R.string.show_setting_advance_resolution,
+            R.string.show_setting_advance_encode_resolution,
             VideoSetting.ResolutionList.map {
                 "${it.width}x${it.height}"
             }

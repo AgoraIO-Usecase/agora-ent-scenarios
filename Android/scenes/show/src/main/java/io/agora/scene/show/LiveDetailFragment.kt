@@ -125,6 +125,8 @@ class LiveDetailFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(enabled = isVisible) {
             onBackPressed()
         }
+        // 需求：打开直播显示
+        changeStatisticVisible(true)
     }
 
     override fun onDestroyView() {
@@ -429,8 +431,12 @@ class LiveDetailFragment : Fragment() {
         activity?.runOnUiThread { mBinding.topLayout.tvUserCount.text = count.toString() }
 
     private fun changeStatisticVisible() {
+        val visible = !mBinding.topLayout.tlStatistic.isVisible
+        changeStatisticVisible(visible)
+    }
+
+    private fun changeStatisticVisible(visible: Boolean) {
         val topBinding = mBinding.topLayout
-        val visible = !topBinding.tlStatistic.isVisible
         topBinding.tlStatistic.isVisible = visible
         topBinding.ivStatisticClose.isVisible = visible
         refreshStatisticInfo(0, 0, 0, 0, 0, 0)

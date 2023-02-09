@@ -159,6 +159,7 @@
     <string name="show_setting_advance_bitrate_save">码率节省</string>
     <string name="show_setting_advance_bitrate_save_tip">打开开关后，将自动实现在同等画质情况下降低码率的效果</string>
     <string name="show_setting_advance_resolution">分辨率</string>
+    <string name="show_setting_advance_encode_resolution">编码分辨率</string>
     <string name="show_setting_advance_bitrate">码率</string>
     <string name="show_setting_advance_ear_back">耳返</string>
     <string name="show_setting_advance_ear_back_tip">耳返</string>
