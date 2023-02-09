@@ -13,7 +13,10 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
-    
+    func onRoomExpired() {
+        ToastView.show(text: ChatRoomServiceKickedReason.destroyed.errorDesc())
+        fetchDetailError()
+    }
     
     func chatTokenWillExpire() {
         AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
@@ -96,14 +99,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        var message = ""
-        switch reason {
-        case .removed: message = "you are removed by owner!"
-        case .destroyed: message = "VoiceRoom was destroyed!"
-        case .offLined: message = "you are offline!"
-        @unknown default:
-            break
-        }
+        var message = reason.errorDesc()
         self.view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
         var destroyed = false
         if reason == .destroyed {

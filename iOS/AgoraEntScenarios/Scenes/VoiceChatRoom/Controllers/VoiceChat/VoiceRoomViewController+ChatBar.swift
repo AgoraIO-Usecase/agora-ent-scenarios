@@ -11,13 +11,32 @@ import KakaJSON
 import ZSwiftBaseLib
 
 extension VoiceRoomViewController {
+    
     func showEQView() {
-        preView = VMPresentView(frame: CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: 280~))
-        preView.isAudience = !isOwner
-        preView.roomInfo = roomInfo
-        preView.ains_state = ains_state
-        preView.isTouchAble = roomInfo?.room?.use_robot ?? false
-        preView.selBlock = { [weak self] state in
+        //更新为不等高弹窗视图 全都是控制器 方便业务更新
+        let audioSetVC: VoiceRoomAudioSettingViewController = VoiceRoomAudioSettingViewController()
+        audioSetVC.roomInfo = roomInfo
+        audioSetVC.isAudience = !isOwner
+        audioSetVC.ains_state = ains_state
+        audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
+        audioSetVC.useRobotBlock = { [weak self] flag in
+            if self?.alienCanPlay == true && flag == true {
+                self?.roomInfo?.room?.use_robot = true
+                self?.rtckit.playMusic(with: .alien)
+            }
+            if flag == false {
+                self?.roomInfo?.room?.use_robot = false
+                self?.rtckit.stopPlayMusic()
+            }
+            self?.activeAlien(flag)
+            self?.roomInfo?.room?.use_robot = flag
+        }
+
+        audioSetVC.volBlock = { [weak self] vol in
+            self?.updateVolume(vol)
+        }
+        
+        audioSetVC.selBlock = { [weak self] state in
             self?.ains_state = state
             self?.rtckit.setAINS(with: state)
             if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
@@ -29,26 +48,15 @@ extension VoiceRoomViewController {
                 self?.rtckit.playMusic(with: .ainsOff)
             }
         }
-        preView.useRobotBlock = { [weak self] flag in
-            if self?.alienCanPlay == true && flag == true {
-                self?.roomInfo?.room?.use_robot = true
-                self?.rtckit.playMusic(with: .alien)
-            }
-//            if self?.alienCanPlay == true && flag == false {
-//                self?.rtckit.stopPlayMusic()
-//            }
-//
-            if flag == false {
-                self?.roomInfo?.room?.use_robot = false
-                self?.rtckit.stopPlayMusic()
-            }
-            self?.preView.isTouchAble = flag
-            self?.activeAlien(flag)
+        
+        audioSetVC.turnAIAECBlock = {[weak self] flag in
+            self?.rtckit.setAIAECOn(isOn: flag);
         }
-        preView.volBlock = { [weak self] vol in
-            self?.updateVolume(vol)
+        audioSetVC.turnAGCBlock = {[weak self] flag in
+            self?.rtckit.setAGCOn(isOn: flag);
         }
-        preView.eqView.effectClickBlock = { [weak self] type in
+        
+        audioSetVC.effectClickBlock = { [weak self] type in
 
             /**
              1.如果是观众，则toast 提示
@@ -70,7 +78,7 @@ extension VoiceRoomViewController {
             }
             self?.rtckit.playMusic(with: self?.getSceneType(self?.roomInfo?.room?.sound_effect ?? 1) ?? .social)
         }
-        preView.eqView.soundBlock = { [weak self] index in
+        audioSetVC.soundBlock = { [weak self] index in
             if self?.isOwner == false {
                 self?.view.makeToast("Host Bot".localized())
                 return
@@ -86,21 +94,17 @@ extension VoiceRoomViewController {
             self?.rtckit.playSound(with: count, type: tag == 1 ? .ainsOff : .ainsHigh)
             self?.rtcView.updateAlienMic(.blue)
         }
-        preView.eqView.visitBlock = { [weak self] in
+        audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
             self?.navigationController?.pushViewController(VC, animated: true)
         }
-        view.addSubview(preView)
-        isShowPreSentView = true
-        sRtcView.isUserInteractionEnabled = false
-        rtcView.isUserInteractionEnabled = false
-        headerView.isUserInteractionEnabled = false
-
-        UIView.animate(withDuration: 0.5, animations: {
-            self.preView.frame = CGRect(x: 0, y: ScreenHeight - 360~, width: ScreenWidth, height: 360~)
-        }, completion: nil)
+        
+        let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 372), vc: audioSetVC, maxHeight: 500)
+        view.addSubview(presentView)
+        
     }
-
+                           
     func applyMembersAlert(position: VoiceRoomSwitchBarDirection) {
         let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {

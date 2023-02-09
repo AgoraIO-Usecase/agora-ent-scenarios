@@ -9,9 +9,16 @@ import Foundation
 import KakaJSON
 import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
+import AgoraSyncManager
 
 private let cSceneId = "scene_chatRoom"
 
+
+private func agoraPrint(_ message: String) {
+    voiceLogger.info(message, context: "Service")
+}
+
+let voiceLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 public class ChatRoomServiceImp: NSObject {
     static var _sharedInstance: ChatRoomServiceImp?
     var roomId: String?
@@ -28,8 +35,36 @@ public class ChatRoomServiceImp: NSObject {
         self.mics.removeAll()
         self.applicants.removeAll()
     }
+    
+    
+    fileprivate func _checkRoomExpire() {
+        guard let room = self.roomList?.filter({$0.room_id == roomId}).first, let created_at = room.created_at else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+        guard currentTs - Int64(created_at) > expiredDuration else { return }
+        
+        self.roomServiceDelegate?.onRoomExpired()
+    }
+    
+    fileprivate func _startCheckExpire() {
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomId == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
+    }
 }
 
+//MARK: VoiceRoomIMDelegate
 extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     
     public func chatTokenWillExpire(code: AgoraChatErrorCode) {
@@ -161,6 +196,7 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     
 }
 
+//MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
@@ -213,13 +249,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         roomInfo.room = entity
         VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: keys, completion: { error, map in
             if let ranking_list = map?["ranking_list"]?.toArray() {
-                print("ranking_list: \(ranking_list)")
+                agoraPrint("ranking_list: \(ranking_list)")
                 roomInfo.room?.ranking_list = ranking_list.kj.modelArray(VRUser.self)
             } else {
                 roomInfo.room?.ranking_list = [VRUser]()
             }
             if let member_list = map?["member_list"]?.toArray() {
-                print("member_list: \(member_list)")
+                agoraPrint("member_list: \(member_list)")
                 roomInfo.room?.member_list = member_list.kj.modelArray(VRUser.self)
             } else {
                 roomInfo.room?.member_list = [VRUser]()
@@ -395,6 +431,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func leaveMic(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void) {
+        guard mic_index < mics.count else {return}
         let mic = VRRoomMic()
         guard let oldMic = self.mics[safe: mic_index] else { return }
         mic.mic_index = mic_index
@@ -620,7 +657,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
 
-        SyncUtil.initSyncManager(sceneId: cSceneId) { [weak self] in
+        SyncUtil.initSyncManager(sceneId: cSceneId) {
 //            guard let self = self else {
 //                return
 //            }
@@ -634,7 +671,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 return
             }
             
-            print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
+            agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
 //            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: UInt(state.rawValue)))
             guard state == .open else { return }
             guard !self.syncUtilsInited else {
@@ -655,7 +692,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                      completion: @escaping (Error?, [VRRoomEntity]?) -> Void) {
         initScene { [weak self] in
             SyncUtil.fetchAll { [weak self] results in
-                print("result == \(results.compactMap { $0.toJson() })")
+                agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 
                 let dataArray = results.map({ info in
                     return model(from: info.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
@@ -685,7 +722,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let owner: VRUser = VRUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.userNo
+        owner.uid = VLUserCenter.user.id
         owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
         
@@ -693,13 +730,16 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId:VLUserCenter.user.userNo,
-                               property: params) { result in
+                               userId:VLUserCenter.user.id,
+                               isOwner: true,
+                               property: params) {[weak self] result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
                 completion(nil,model)
+                self?.roomId = room.channel_id
+                self?._startCheckExpire()
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
-                    print("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
+                    agoraPrint("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
                 }
             } fail: { error in
                 completion(error, nil)
@@ -735,21 +775,23 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
                         VLUserCenter.user.im_token = im_token
                         VLUserCenter.user.chat_uid = chat_uid
+                        
+                        //TODO(chenpan):  waitting for join scene success & error handler?
                         completion(nil, updateRoom)
                     }
-                    
                     initScene{
-                        SyncUtil
-                            .scene(id: roomId)?
-                            .update(key: "",
-                                    data: params,
-                                    success: { obj in
-                                print("updateUserCount success")
-                            },
-                                    fail: { error in
-                                print("updateUserCount fail")
-                                completion(error, nil)
-                            })
+                        SyncUtil.joinScene(id: roomId,
+                                           userId: VLUserCenter.user.id,
+                                           isOwner: VLUserCenter.user.id == room.owner?.uid,
+                                           property: params) {[weak self] result in
+//                            let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], VRRoomEntity.self)
+                            self?.roomId = roomId
+                            self?._startCheckExpire()
+//                            completion(nil, model)
+                            //TODO(chenpan): without callback
+                        } fail: { error in
+                            completion(error, nil)
+                        }
                     }
                     break
                 }
@@ -761,7 +803,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     
     // todo 去掉owner
     func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
-        
+        self.roomId = nil
         /**
          先拿到对应的房间信息
          1.如果是房主需要销毁房间，普通成员需要click_count - 1. 同时需要退出RTC+IM
@@ -772,7 +814,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 if room.room_id == roomId {
                     var isOwner = false
                     if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.userNo
+                        isOwner = owner_uid == VLUserCenter.user.id
                     }
                     if isOwner {
                         self.roomList?.remove(at: index)
@@ -787,11 +829,11 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                             .update(key: "",
                                     data: params,
                                     success: { obj in
-                                print("updateUserCount success")
+                                agoraPrint("updateUserCount success")
                                 
                             },
                                     fail: { error in
-                                print("updateUserCount fail")
+                                agoraPrint("updateUserCount fail")
                             })
                         VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
                     }
@@ -806,7 +848,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         mic.mic_index = 0
         mic.status = 0
         mic.member = VRUser()
-        mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
