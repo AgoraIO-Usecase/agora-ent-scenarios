@@ -31,7 +31,7 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-    var sRtcView: AgoraChatRoom3DRtcView!
+    var sRtcView: SA3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
@@ -59,7 +59,7 @@ class VoiceRoomViewController: VRBaseViewController {
                     if type == 0 && self.rtcView != nil {
                         self.rtcView.micInfos = mics
                     } else if type == 1 && self.sRtcView != nil {
-                        self.sRtcView.micInfos = mics
+//                        self.sRtcView.micInfos = mics
                     }
                 }
             }
@@ -269,7 +269,7 @@ extension VoiceRoomViewController {
         }
         view.addSubview(headerView)
 
-        sRtcView = AgoraChatRoom3DRtcView()
+        sRtcView = SA3DRtcView(rtcKit: nil)
         view.addSubview(sRtcView)
 
         rtcView = AgoraChatRoomNormalRtcView()
