@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:voice_titleBarDisplayHomeAsUpEnabled="true"
         app:voice_titleBarRightVisible="false"
-        app:voice_titleBarTitle="@string/voice_room_list_title_name"
+        app:voice_titleBarTitle="@string/voice_spatial_room_list_title_name"
         app:voice_titleBarTitleTextColor="@color/voice_black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
