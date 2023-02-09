@@ -13,8 +13,7 @@ import ZSwiftBaseLib
 extension SARoomViewController {
     
     func showEQView() {
-        guard let micInfos = sRtcView.micInfos else { return }
-        let isOpenSpatial = micInfos[5].status == 5
+        let isOpenSpatial = roomInfo?.room?.use_robot == true
 
         let actionView = ActionSheetManager()
         actionView
@@ -33,15 +32,12 @@ extension SARoomViewController {
         }
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             guard let self = self else { return }
-            let blue = micInfos[5]
-            let red = micInfos[6]
-            blue.status = isOn ? 5 : -1
-            red.status = isOn ? 5 : -1
-            self.sRtcView.micInfos?[5] = blue
-            self.sRtcView.micInfos?[6] = red
+            self.roomInfo?.room?.use_robot = isOn
+            self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
-            self?.sRtcView.updatePlayerVolume(value: value)
+            self?.sRtcView.updatePlayerVolume(value: Double(value * 400))
+            self?.updateVolume(Int(value * 400.0))
         }
         actionView.show()
     }

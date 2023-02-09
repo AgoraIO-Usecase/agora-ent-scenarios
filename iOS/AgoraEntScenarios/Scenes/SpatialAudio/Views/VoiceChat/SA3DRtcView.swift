@@ -63,8 +63,8 @@ class SA3DRtcView: UIView {
     }
     
     func updatePlayerVolume(value: Double) {
-        redMediaPlayer?.adjustPlayoutVolume(Int32(value * 400))
-        blueMediaPlayer?.adjustPlayoutVolume(Int32(value * 400))
+        redMediaPlayer?.adjustPlayoutVolume(Int32(value))
+        blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
     }
     
     private func setupSpatialAudio() {
