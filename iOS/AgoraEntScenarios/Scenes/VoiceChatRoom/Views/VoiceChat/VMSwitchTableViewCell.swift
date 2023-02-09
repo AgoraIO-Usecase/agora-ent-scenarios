@@ -13,12 +13,12 @@ class VMSwitchTableViewCell: UITableViewCell {
     public var titleLabel: UILabel = .init()
     public var swith: UISwitch = .init()
     var useRobotBlock: ((Bool) -> Void)?
-    var isAudience: Bool = false {
-        didSet {
-            swith.alpha = isAudience ? 0.5 : 1
-            swith.isUserInteractionEnabled = !isAudience
-        }
-    }
+//    var isAudience: Bool = false {
+//        didSet {
+//            swith.alpha = isAudience ? 0.5 : 1
+//            swith.isUserInteractionEnabled = !isAudience
+//        }
+//    }
 
     public var isNoiseSet: Bool = false {
         didSet {

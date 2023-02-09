@@ -5,6 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
+import YYCategories
 
 @objc
 class NetworkManager:NSObject {
@@ -179,12 +180,13 @@ class NetworkManager:NSObject {
         ]
         
         let payload: String = getPlayloadWithSceneType(.voice) ?? ""
+        let traceId = UUID().uuidString.md5Encrypt
         let params = ["appId": KeyCenter.AppId,
                       "chat": chatParams,
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
-                      "traceId": NSString.withUUID().md5() as Any,
+                      "traceId": traceId,
                       "user": userParams] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
@@ -213,7 +215,7 @@ class NetworkManager:NSObject {
                       "channelName": channelName,
                       "channelType": channelType,
                       "src": "iOS",
-                      "traceId": NSString.withUUID().md5() as Any,
+                      "traceId": UUID().uuidString.md5Encrypt,
                       "payload": payload] as [String: Any]
                       
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)moderation/audio",
