@@ -200,6 +200,8 @@ interface VoiceServiceProtocol {
      */
     fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit)
 
+
+
     fun subscribeRoomTimeUp(
         onRoomTimeUp: () -> Unit
     )

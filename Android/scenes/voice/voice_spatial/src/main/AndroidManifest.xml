@@ -31,12 +31,6 @@
             android:theme="@style/voice_Theme.AgoraScenesChatroom"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity
-            android:name=".ui.activity.VoiceRoomSoundSelectionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
-
     </application>
 
 </manifest>

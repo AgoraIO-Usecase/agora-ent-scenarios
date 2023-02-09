@@ -97,6 +97,7 @@
     <string name="voice_chatroom_open_bot_to_sound_effect">添加机器人试听音效？</string>
     <string name="voice_chatroom_end_live">结束直播？</string>
     <string name="voice_chatroom_end_live_tips">在你离开后房间将会关闭。</string>
+    <string name="voice_chatroom_time_up_tips">房间体验时间已耗尽。</string>
     <string name="voice_chatroom_exit">离开语聊房？</string>
     <string name="voice_chatroom_exit_and_create_one">离开并重新创建⼀个新的语聊房？</string>
     <string name="voice_chatroom_open_bot_prompt">添加机器人？</string>

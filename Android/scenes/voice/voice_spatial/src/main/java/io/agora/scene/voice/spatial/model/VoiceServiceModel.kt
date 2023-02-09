@@ -31,8 +31,6 @@ data class VoiceMemberModel constructor(
 
     // 这里用的是user.userNo
     @SerializedName("uid") var userId: String? = null,
-    // 这里用的是user.id
-    @SerializedName("chat_uid") var chatUid: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,
     // 这里用的是user.id
@@ -64,15 +62,21 @@ data class VoiceRoomModel constructor(
     @SerializedName("name") var roomName: String = "",
     @SerializedName("sound_effect") var soundEffect: Int = 0,
     @SerializedName("channel_id") var channelId: String = "",
-    @SerializedName("chatroom_id") var chatroomId: String = "",
     @SerializedName("created_at") var createdAt: Long = 0,
     @SerializedName("roomPassword") var roomPassword: String = "",
     @Transient var rankingList: List<VoiceRankUserModel>? = null,
     @Transient var memberList: List<VoiceMemberModel>? = null,
     @Transient var giftAmount: Int = 0,
-    @SerializedName("useRobot") var useRobot: Boolean = false,
-    @SerializedName("robotVolume") var robotVolume: Int = 50,
     @SerializedName("announcement") var announcement: String = "",
+) : BaseRoomBean
+
+data class RobotSpatialAudioModel constructor(
+    @SerializedName("use_robot") var useRobot: Boolean = false,
+    @SerializedName("robot_volume") var robotVolume: Int = 50,
+    @SerializedName("red_robot_absorb") var redRobotAbsorb: Boolean = false,
+    @SerializedName("red_robot_blur") var redRobotBlur: Boolean = false,
+    @SerializedName("blue_robot_absorb") var blueRobotAbsorb: Boolean = false,
+    @SerializedName("blue_robot_blur") var blueRobotBlur: Boolean = false,
 ) : BaseRoomBean
 
 /**
@@ -105,7 +109,8 @@ data class VoiceRoomApply constructor(
  */
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
-    var micInfo: List<VoiceMicInfoModel>? = null
+    var micInfo: List<VoiceMicInfoModel>? = null,
+    var robotInfo: RobotSpatialAudioModel? = null
 ) : BaseRoomBean
 
 /**
