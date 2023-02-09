@@ -24,7 +24,9 @@ import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.ui.dialog.*
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
+import io.agora.scene.voice.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.ui.dialog.common.CommonSheetAlertDialog
+import io.agora.scene.voice.ui.dialog.common.CommonSheetSingleDialog
 import io.agora.scene.voice.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.ui.widget.top.IRoomLiveTopView
@@ -706,14 +708,13 @@ class RoomObservableViewDelegate constructor(
     /**
      * 超时退出房间
      */
-    fun onTimeUpExitRoom(title: String, content: String, finishBack: () -> Unit) {
-        CommonFragmentAlertDialog().titleText(title).contentText(content)
-            .rightText(activity.getString(R.string.voice_room_confirm))
-            .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
+    fun onTimeUpExitRoom(content: String, finishBack: () -> Unit) {
+        CommonFragmentContentDialog().contentText(content)
+            .setOnClickListener(object : CommonFragmentContentDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     finishBack.invoke()
                 }
-            }).show(activity.supportFragmentManager, "mtCenterDialog")
+            }).show(activity.supportFragmentManager, "mtTimeOutDialog")
     }
 
     /**

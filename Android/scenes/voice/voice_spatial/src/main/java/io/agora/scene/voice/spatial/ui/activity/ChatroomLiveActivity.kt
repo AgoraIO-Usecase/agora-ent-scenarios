@@ -284,6 +284,18 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
         })
+
+        voiceServiceProtocol.subscribeRoomTimeUp {
+            roomObservableDelegate.onTimeUpExitRoom(
+                getString(R.string.voice_chatroom_time_up_tips), finishBack = {
+                    if (roomKitBean.isOwner) {
+                        finish()
+                    } else {
+                        roomObservableDelegate.checkUserLeaveMic()
+                        finish()
+                    }
+                })
+        }
     }
 
     private fun initView() {

@@ -19,6 +19,7 @@ import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.ui.dialog.*
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonFragmentAlertDialog
+import io.agora.scene.voice.spatial.ui.dialog.common.CommonFragmentContentDialog
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.spatial.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.spatial.ui.widget.top.IRoomLiveTopView
@@ -659,6 +660,18 @@ class RoomObservableViewDelegate constructor(
                     finishBack.invoke()
                 }
             }).show(activity.supportFragmentManager, "mtCenterDialog")
+    }
+
+    /**
+     * 超时退出房间
+     */
+    fun onTimeUpExitRoom(content: String, finishBack: () -> Unit) {
+        CommonFragmentContentDialog().contentText(content)
+            .setOnClickListener(object : CommonFragmentContentDialog.OnClickBottomListener {
+                override fun onConfirmClick() {
+                    finishBack.invoke()
+                }
+            }).show(activity.supportFragmentManager, "mtTimeOutDialog")
     }
 
     /**
