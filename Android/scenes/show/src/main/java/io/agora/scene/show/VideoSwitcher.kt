@@ -76,4 +76,19 @@ interface VideoSwitcher {
      */
     fun setupLocalVideo(container: VideoCanvasContainer)
 
+    /**
+     * 开启混音
+     *
+     * @param filePath 文件路径，assets下文件以/assets/开头
+     * @param loopbackOnly 是否仅本地播放，true: 仅本地播放不推给远端，false: 本地播放并推给远端
+     * @param cycle ≥ 0: 播放次数。-1: 无限循环播放。
+     *
+     */
+    fun startAudioMixing(connection: RtcConnection, filePath: String, loopbackOnly: Boolean, cycle: Int)
+
+    /**
+     * 停止混音
+     */
+    fun stopAudioMixing(connection: RtcConnection)
+
 }
