@@ -92,6 +92,14 @@
     <string name="show_statistic_up_net_speech">上行网络: %s KB/s</string>
     <string name="show_statistic_down_net_speech">下行网络: %s KB/s</string>
     <string name="show_statistic_resolution">分辨率: %s</string>
+    <string name="show_statistic_up">上行</string>
+    <string name="show_statistic_encode_resolution">编码分辨率: %s</string>
+    <string name="show_statistic_encode_fps">编码帧率: %s fps</string>
+    <string name="show_statistic_up_loss_package">上行丢包率: %s ％</string>
+    <string name="show_statistic_down">下行</string>
+    <string name="show_statistic_receive_resolution">接收分辨率: %s</string>
+    <string name="show_statistic_receive_fps">接收帧率: %s fps</string>
+    <string name="show_statistic_down_loss_package">下行丢包率: %s ％</string>
     <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
     <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
     <string name="show_music_effect_beauty_voice_mohuan">魔幻</string>
