@@ -439,7 +439,7 @@ class LiveDetailFragment : Fragment() {
         val topBinding = mBinding.topLayout
         topBinding.tlStatistic.isVisible = visible
         topBinding.ivStatisticClose.isVisible = visible
-        refreshStatisticInfo(0, 0, 0, 0, 0, 0)
+        refreshStatisticInfo(0, 0)
         topBinding.ivStatisticClose.setOnClickListener {
             topBinding.tlStatistic.isVisible = false
             topBinding.ivStatisticClose.isVisible = false
@@ -447,15 +447,19 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun refreshStatisticInfo(
-        bitrate: Int? = null, fps: Int? = null, delay: Int? = null,
-        lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null,
+        upLinkBps: Int? = null, downLinkBps: Int? = null,
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
         cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,
-        videoSize: Size? = null,
         // 编码分辨率、接收分辨率
         encodeVideoSize: Size? = null, receiveVideoSize: Size? = null,
         // 编码帧率、接收帧率
-        encodeFps: Int? = null, receiveFPS: Int? = null
+        encodeFps: Int? = null, receiveFPS: Int? = null,
+        // 上行延迟、下行延迟
+        upDelay: Int? = null, downDelay: Int? = null,
+        // 上行丢包率、下行丢包率
+        upLossPackage: Int? = null, downLossPackage: Int? = null,
+        // 上行码率、下行码率
+        upBitrate: Int? = null, downBitrate: Int? = null
     ) {
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
@@ -471,80 +475,24 @@ class LiveDetailFragment : Fragment() {
         encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
         // 接收帧率
         receiveFPS?.let { topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString()) }
-
-
-        // 房主
-        if (isRoomOwner) {
-            // 音频
-            if (isAudioOnlyMode) {
-                // xxx
-                delay?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_delay, it.toString()) }
-                // xxx
-                //audioBitrate?.let { topBinding.tvStatisticFPS.text = "ASend: $it bps" }
-                // xxx
-                cpuAppUsage?.let { cpuTotalUsage?.let { topBinding.tvStatisticDelay.text = "CPU: ${cpuAppUsage}%/${cpuTotalUsage}%" } }
-                // xxx
-                audioLossPackage?.let { topBinding.tvStatisticLossPackage.text = "ASend Loss: $it" }
-                // 上行网络
-                topBinding.tvStatisticUpNet.isVisible = false
-                // 下行网络
-                topBinding.tvStatisticDownNet.isVisible = false
-            }
-            // 视频
-            else {
-                // xxx
-                bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
-                // xxx
-                //fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
-                // xxx
-                delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-                // xxx
-                lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
-                // 上行网络
-                topBinding.tvStatisticUpNet.isVisible = true
-                upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
-                // 下行网络
-                topBinding.tvStatisticDownNet.isVisible = true
-                downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
-            }
-        }
-        // 观众
-        else {
-            // 音频
-            if (isAudioOnlyMode) {
-                // xxx
-                audioBitrate?.let { topBinding.tvStatisticBitrate.text = "ARecv: $it bps" }
-                // xxx
-                audioLossPackage?.let { topBinding.tvStatisticDelay.text = "ALoss: $it %" }
-                // xxx
-                //topBinding.tvStatisticFPS.isVisible = false
-                // xxx
-                topBinding.tvStatisticLossPackage.isVisible = false
-                // 上行网络
-                topBinding.tvStatisticUpNet.isVisible = false
-                // 下行网络
-                topBinding.tvStatisticDownNet.isVisible = false
-            }
-            // 视频
-            else {
-                // xxx
-                bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
-                // xxx
-                //topBinding.tvStatisticFPS.isVisible = true
-                //fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
-                // xxx
-                delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-                // xxx
-                topBinding.tvStatisticLossPackage.isVisible = true
-                lossPackage?.let { topBinding.tvStatisticLossPackage.text = getString(R.string.show_statistic_loss_package, it.toString()) }
-                // 上行网络
-                topBinding.tvStatisticUpNet.isVisible = true
-                upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
-                // 下行网络
-                topBinding.tvStatisticDownNet.isVisible = true
-                downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
-            }
-        }
+        // 上行延迟
+        upDelay?.let { topBinding.tvStatisticUpDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
+        // 下行延迟
+        downDelay?.let { topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
+        // 上行丢包率
+        upLossPackage?.let { topBinding.tvStatisticUpLossPackage.text = getString(R.string.show_statistic_up_loss_package, it.toString()) }
+        // 下行丢包率
+        downLossPackage?.let { topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, it.toString()) }
+        // 上行码率
+        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        // 下行码率
+        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        // 上行网络
+        topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
+        upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
+        // 下行网络
+        topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
+        downLinkBps?.let { topBinding.tvStatisticDownNet.text = getString(R.string.show_statistic_down_net_speech, (it / 1000).toString()) }
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -1212,7 +1160,7 @@ class LiveDetailFragment : Fragment() {
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
-                            delay = stats.lastmileDelay,
+                            upDelay = stats.lastmileDelay,
                             cpuAppUsage = stats.cpuAppUsage,
                             cpuTotalUsage = stats.cpuTotalUsage,
                         )
@@ -1223,9 +1171,9 @@ class LiveDetailFragment : Fragment() {
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
-                            bitrate = stats.sentBitrate,
+                            upBitrate = stats.sentBitrate,
                             encodeFps = stats.sentFrameRate,
-                            lossPackage = stats.txPacketLossRate,
+                            upLossPackage = stats.txPacketLossRate,
                             encodeVideoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
                         )
                     }
@@ -1246,10 +1194,10 @@ class LiveDetailFragment : Fragment() {
                 if (stats.uid == mRoomInfo.ownerId.toInt()) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
-                            bitrate = stats.receivedBitrate,
+                            downBitrate = stats.receivedBitrate,
                             receiveFPS = stats.decoderOutputFrameRate,
-                            lossPackage = stats.packetLossRate,
-                            delay = stats.delay,
+                            downLossPackage = stats.packetLossRate,
+                            downDelay = stats.delay,
                             receiveVideoSize = Size(stats.width, stats.height)
                         )
                     }
