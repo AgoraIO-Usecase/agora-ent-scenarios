@@ -27,6 +27,7 @@ import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.conver
 import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
+import io.agora.scene.voice.spatial.ui.dialog.Room3DWelcomeSheetDialog
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.voice.common.constant.ConfigConstants
@@ -353,6 +354,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
 
             override fun onClickSoundSocial(view: View) {
+                if (roomKitBean.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
+                    Room3DWelcomeSheetDialog.needShow = true
+                    roomObservableDelegate.showRoom3DWelcomeSheetDialog()
+                    return
+                }
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
                     finish()
                 })
