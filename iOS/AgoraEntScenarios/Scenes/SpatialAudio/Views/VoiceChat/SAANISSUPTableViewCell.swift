@@ -49,7 +49,7 @@ class SAANISSUPTableViewCell: UITableViewCell {
         didSet {
             if btn_state == .off {
                 noneBtn.backgroundColor = .white
-                noneBtn.layer.borderColor = UIColor(hex: "0x0A7AFF").cgColor
+                noneBtn.layer.borderColor = UIColor(hex: "0x0A7AFF")?.cgColor
                 noneBtn.setTitleColor(UIColor(hex: "0x0A7AFF"), for: .normal)
                 noneBtn.layer.borderWidth = 1
 
@@ -61,7 +61,7 @@ class SAANISSUPTableViewCell: UITableViewCell {
                 selBtn = noneBtn
             } else if btn_state == .middle {
                 anisBtn.backgroundColor = .white
-                anisBtn.layer.borderColor = UIColor(hex: "0x0A7AFF").cgColor
+                anisBtn.layer.borderColor = UIColor(hex: "0x0A7AFF")?.cgColor
                 anisBtn.setTitleColor(UIColor(hex: "0x0A7AFF"), for: .normal)
                 anisBtn.layer.borderWidth = 1
 
@@ -144,7 +144,7 @@ class SAANISSUPTableViewCell: UITableViewCell {
         if !isTouchAble || isAudience { return }
 
         sender.backgroundColor = .white
-        sender.layer.borderColor = UIColor(hex: "0x0A7AFF").cgColor
+        sender.layer.borderColor = UIColor(hex: "0x0A7AFF")?.cgColor
         sender.setTitleColor(UIColor(hex: "0x0A7AFF"), for: .normal)
         sender.layer.borderWidth = 1
         if selBtn != nil {

@@ -147,8 +147,8 @@ class SABaseRtcUserView: UIView {
     public var bgIconView: UIImageView = .init()
     public var micView: SAMicVolView = .init()
     public var nameBtn: UIButton = .init()
-    private var coverView: UIView = .init()
-    private var activeButton: UIButton = .init()
+    public var coverView: UIView = .init()
+    public var activeButton: UIButton = .init()
     private var targetBtn: UIButton = .init()
     private lazy var arrowImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_up_arrow"))
@@ -180,7 +180,7 @@ class SABaseRtcUserView: UIView {
         bgIconView.layer.masksToBounds = true
         bgView.addSubview(bgIconView)
 
-        iconView.image = UIImage("avatar1")
+        iconView.image = UIImage("")
         iconView.layer.cornerRadius = 30
         iconView.layer.masksToBounds = true
         bgView.addSubview(iconView)
@@ -221,8 +221,7 @@ class SABaseRtcUserView: UIView {
         nameBtn.isUserInteractionEnabled = false
         addSubview(nameBtn)
 
-//        targetBtn.addTargetFor(self, action: #selector(tapClick), for: .touchUpInside)
-        targetBtn.isUserInteractionEnabled = false
+        targetBtn.addTargetFor(self, action: #selector(tapClick), for: .touchUpInside)
         addSubview(targetBtn)
 
         bgView.snp.makeConstraints { make in
