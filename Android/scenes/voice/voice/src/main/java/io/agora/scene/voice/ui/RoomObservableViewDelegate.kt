@@ -69,7 +69,7 @@ class RoomObservableViewDelegate constructor(
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
 
-    /**本地mute标志*/
+    /**本地 座位 mute标志*/
     private var isLocalAudioMute: Boolean = true
 
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
@@ -1083,10 +1083,16 @@ class RoomObservableViewDelegate constructor(
         }
         kvLocalUser?.let { localUserMicInfo = it }
         AgoraRtcEngineController.get().switchRole(localUserIndex() >= 0)
+        //如果麦位状态正常 则需要打开麦克风 并且开启本地音频
         if (localUserMicInfo?.micStatus == MicStatus.Normal) {   // 状态正常
-            if (!isLocalAudioMute) return
-            isLocalAudioMute = false
-            AgoraRtcEngineController.get().enableLocalAudio(true)
+            if (localUserMicInfo?.member?.micStatus == 1){ //user麦位状态 打开
+                if (!isLocalAudioMute) return
+                isLocalAudioMute = false
+                AgoraRtcEngineController.get().enableLocalAudio(true)
+            }else{ //user 麦位状态 关闭
+                isLocalAudioMute = true
+                AgoraRtcEngineController.get().enableLocalAudio(false)
+            }
         } else {  // 其他状态
             if (isLocalAudioMute) return
             isLocalAudioMute = true
