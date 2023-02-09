@@ -626,7 +626,6 @@ class LiveDetailFragment : Fragment() {
         AdvanceSettingDialog(requireContext()).apply {
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_BITRATE_SAVE, true)
-            setItemInvisible(AdvanceSettingDialog.ITEM_ID_SEEKBAR_BITRATE, true)
             show()
         }
     }
