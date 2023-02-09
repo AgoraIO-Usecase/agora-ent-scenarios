@@ -451,7 +451,8 @@ class LiveDetailFragment : Fragment() {
         lossPackage: Int? = null, upLinkBps: Int? = null, downLinkBps: Int? = null,
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
         cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,
-        videoSize: Size? = null
+        videoSize: Size? = null,
+        encodeFps: Int? = null, receiveFPS: Int? = null
     ) {
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
@@ -460,6 +461,12 @@ class LiveDetailFragment : Fragment() {
             return
         }
         videoSize?.let { topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, "${it.width}x${it.height}") }
+        // 编码帧率
+        encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
+        // 接收帧率
+        receiveFPS?.let { topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString()) }
+
+
         // 房主
         if (isRoomOwner) {
             // 音频
@@ -467,7 +474,7 @@ class LiveDetailFragment : Fragment() {
                 // xxx
                 delay?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_delay, it.toString()) }
                 // xxx
-                audioBitrate?.let { topBinding.tvStatisticFPS.text = "ASend: $it bps" }
+                //audioBitrate?.let { topBinding.tvStatisticFPS.text = "ASend: $it bps" }
                 // xxx
                 cpuAppUsage?.let { cpuTotalUsage?.let { topBinding.tvStatisticDelay.text = "CPU: ${cpuAppUsage}%/${cpuTotalUsage}%" } }
                 // xxx
@@ -482,7 +489,7 @@ class LiveDetailFragment : Fragment() {
                 // xxx
                 bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
                 // xxx
-                fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
+                //fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
                 // xxx
                 delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
                 // xxx
@@ -504,7 +511,7 @@ class LiveDetailFragment : Fragment() {
                 // xxx
                 audioLossPackage?.let { topBinding.tvStatisticDelay.text = "ALoss: $it %" }
                 // xxx
-                topBinding.tvStatisticFPS.isVisible = false
+                //topBinding.tvStatisticFPS.isVisible = false
                 // xxx
                 topBinding.tvStatisticLossPackage.isVisible = false
                 // 上行网络
@@ -517,8 +524,8 @@ class LiveDetailFragment : Fragment() {
                 // xxx
                 bitrate?.let { topBinding.tvStatisticBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
                 // xxx
-                topBinding.tvStatisticFPS.isVisible = true
-                fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
+                //topBinding.tvStatisticFPS.isVisible = true
+                //fps?.let { topBinding.tvStatisticFPS.text = getString(R.string.show_statistic_fps, it.toString()) }
                 // xxx
                 delay?.let { topBinding.tvStatisticDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
                 // xxx
@@ -1211,7 +1218,7 @@ class LiveDetailFragment : Fragment() {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
                             bitrate = stats.sentBitrate,
-                            fps = stats.sentFrameRate,
+                            encodeFps = stats.sentFrameRate,
                             lossPackage = stats.txPacketLossRate,
                             videoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
                         )
@@ -1234,7 +1241,7 @@ class LiveDetailFragment : Fragment() {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
                             bitrate = stats.receivedBitrate,
-                            fps = stats.decoderOutputFrameRate,
+                            receiveFPS = stats.decoderOutputFrameRate,
                             lossPackage = stats.packetLossRate,
                             delay = stats.delay,
                             videoSize = Size(stats.width, stats.height)
