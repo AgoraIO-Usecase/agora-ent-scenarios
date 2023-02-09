@@ -2,6 +2,7 @@ package io.agora.scene.show.widget
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -233,34 +234,35 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
             R.string.show_setting_advance_video_noise_reduce,
             R.string.show_setting_advance_video_noise_reduce_tip
         )
+        // 码率节省
         setupSwitchItem(
             ITEM_ID_SWITCH_BITRATE_SAVE,
             binding.bitrateSave,
             R.string.show_setting_advance_bitrate_save,
             R.string.show_setting_advance_bitrate_save_tip
         )
+        // 编码分辨率
         setupSelectorItem(
             ITEM_ID_SELECTOR_RESOLUTION,
             binding.resolution,
             R.string.show_setting_advance_encode_resolution,
-            VideoSetting.ResolutionList.map {
-                "${it.width}x${it.height}"
-            }
+            R.string.show_setting_advance_encode_resolution_tip,
+            VideoSetting.ResolutionList.map { "${it.width}x${it.height}" }
         )
+        // 编码帧率
         setupSelectorItem(
             ITEM_ID_SELECTOR_FRAME_RATE,
             binding.frameRate,
-            R.string.show_setting_advance_framerate,
-            VideoSetting.FrameRateList.map {
-                "${it.fps} fps"
-            }
+            R.string.show_setting_advance_encode_framerate,
+            R.string.show_setting_advance_encode_framerate_tip,
+            VideoSetting.FrameRateList.map { "${it.fps} fps" }
         )
         setupSeekbarItem(
             ITEM_ID_SEEKBAR_BITRATE,
             binding.bitrate,
             R.string.show_setting_advance_bitrate,
             "%d kbps",
-            200, 2000
+            200, 4000
         )
     }
 
@@ -302,10 +304,15 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
         itemId: Int,
         binding: ShowSettingAdvanceItemSelectorBinding,
         @StringRes title: Int,
+        @StringRes tip: Int = -1,
         selectList: List<String>
     ) {
         binding.root.isVisible = itemInVisibleMap[itemId]?.not() ?: true
         binding.tvTitle.text = context.getString(title)
+        binding.ivTip.visibility = if (tip == -1) View.GONE else View.VISIBLE
+        binding.ivTip.setOnClickListener {
+            ToastDialog(context).showTip(context.getString(tip))
+        }
         val selectPosition = defaultItemValues[itemId] ?: 0
         binding.tvValue.text = selectList.getOrNull(selectPosition)
         onSelectorChanged(itemId, selectPosition)

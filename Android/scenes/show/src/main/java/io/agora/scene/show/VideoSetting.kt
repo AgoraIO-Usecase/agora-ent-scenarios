@@ -34,8 +34,7 @@ object VideoSetting {
         Resolution.V_360P,
         Resolution.V_480P,
         Resolution.V_540P,
-        Resolution.V_720P,
-        Resolution.V_1080P
+        Resolution.V_720P
     )
 
     enum class FrameRate(val fps: Int) {
