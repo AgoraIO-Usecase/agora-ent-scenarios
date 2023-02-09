@@ -30,7 +30,7 @@ class SARoomViewController: SABaseViewController {
     }
 
     var headerView: SARoomHeaderView!
-    var rtcView: SANormalRtcView!
+   // var rtcView: SANormalRtcView!
     var sRtcView: SA3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
@@ -120,8 +120,7 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        let rate = sRtcView.width / sRtcView.height * 10
-        rtckit.initSpatialAudio(recvRange: Float(sRtcView.height * 0.5 / rate))
+        rtckit.initSpatialAudio(recvRange: 10)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -279,17 +278,12 @@ extension SARoomViewController {
         sRtcView = SA3DRtcView(rtcKit: rtckit)
         view.addSubview(sRtcView)
 
-        rtcView = SANormalRtcView()
-        rtcView.isOwner = isOwner
-        rtcView.clickBlock = { [weak self] type, tag in
-            self?.didRtcAction(with: type, tag: tag)
-        }
-//        view.addSubview(rtcView)
-
         if let entity = roomInfo?.room {
             sRtcView.isHidden = entity.type == 0
-            rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
+        }
+        sRtcView.clickBlock = {[weak self] type, tag in
+            self?.didRtcAction(with: type, tag: tag)
         }
 
         bgImgView.snp.makeConstraints { make in
@@ -343,7 +337,7 @@ extension SARoomViewController {
         let index: Int = tag - 200
         //TODO: remove as!
         guard let mic: SARoomMic = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[safe:index] else { return }
-        if index == 6 { // 操作机器人
+        if index == 6 || index == 5 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
             }
@@ -399,7 +393,7 @@ extension SARoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-                self.rtcView.isUserInteractionEnabled = true
+               // self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
             }
@@ -480,7 +474,22 @@ extension SARoomViewController {
                 mic_info.status = flag == true ? 5 : -2
                 self.roomInfo?.room?.use_robot = flag
                 self.roomInfo?.mic_info![6] = mic_info
-                self.rtcView.updateAlien(mic_info.status)
+                
+                let blue_micInfo = mic_info
+                let red_micInfo = mic_info
+                
+                //更新红蓝机器人的信息
+                let blue: SAUser = SAUser()
+                blue.portrait = "blue"
+                blue.name = "Agora Blue"
+                blue_micInfo.member = blue
+                self.sRtcView.updateUser(blue_micInfo)
+                
+                let red: SAUser = SAUser()
+                red.portrait = "blue"
+                red.name = "Agora Blue"
+                red_micInfo.member = blue
+                self.sRtcView.updateUser(red_micInfo)
             } else {
                 print("激活机器人失败")
             }
@@ -571,7 +580,7 @@ extension SARoomViewController {
     
     @objc func updateMicInfo(noti: Notification){
         guard let obj: SARoomMic = noti.object as? SARoomMic else {return}
-        self.rtcView.updateUser(obj)
+        self.sRtcView.updateUser(obj)
     }
     
     func textHeight(text: String, fontSize: CGFloat, width: CGFloat) -> CGFloat {
@@ -621,7 +630,7 @@ extension SARoomViewController: SAManagerDelegate {
     func didRtcUserOfflineOfUid(uid: UInt) {}
 
     func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
-        rtcView.updateAlienMic(type)
+        sRtcView.updateAlienMic(with: type)
     }
 
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
@@ -631,7 +640,7 @@ extension SARoomViewController: SAManagerDelegate {
                 let user = mic.member
                 guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
-//                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    sRtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
                     break
                 }
             }

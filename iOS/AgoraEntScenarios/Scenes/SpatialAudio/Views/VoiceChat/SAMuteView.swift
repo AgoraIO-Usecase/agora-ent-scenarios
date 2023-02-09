@@ -48,7 +48,7 @@ class SAMuteView: UIView {
             sepView.isHidden = isOwner
             roleBtn.isHidden = !isOwner
             muteBtn.frame = isOwner ? CGRect(x: 0, y: 170, width: bounds.size.width, height: 40) : CGRect(x: bounds.size.width / 2.0, y: 170, width: bounds.size.width / 2.0, height: 40)
-            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder"), context: nil)
+            iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
             if m_type == 0 {
                 iconView.isHidden = false
                 nameLabel.text = username
@@ -101,7 +101,7 @@ class SAMuteView: UIView {
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage.sceneImage(name:"avatar1")
+        iconView.image = UIImage.sceneImage(name:"")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
