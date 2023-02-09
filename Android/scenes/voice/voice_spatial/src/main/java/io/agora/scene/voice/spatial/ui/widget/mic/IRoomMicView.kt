@@ -1,5 +1,6 @@
 package io.agora.scene.voice.spatial.ui.widget.mic
 
+import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 
 /**
@@ -20,10 +21,13 @@ interface IRoomMicView {
     fun updateBotVolume(speakerType: Int, volume: Int)
 
     /**多麦位更新*/
-    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, each: ((VoiceMicInfoModel) -> Unit)?)
 
     /**是否在麦位上,-1 不在*/
     fun findMicByUid(uid: String): Int
 
     fun myRtcUid(): Int
+
+    /** 更新空间音频麦位位置*/
+    fun updateSpatialPosition(info: SeatPositionInfo)
 }

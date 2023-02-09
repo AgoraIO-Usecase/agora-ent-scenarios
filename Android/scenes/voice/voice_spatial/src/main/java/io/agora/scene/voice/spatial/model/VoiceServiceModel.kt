@@ -1,5 +1,6 @@
 package io.agora.scene.voice.spatial.model
 
+import android.graphics.PointF
 import com.google.gson.annotations.SerializedName
 import io.agora.voice.common.constant.ConfigConstants
 
@@ -84,6 +85,9 @@ data class VoiceMicInfoModel constructor(
     @Transient var userStatus: Int = -1, // 用户状态，备用
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
+    @Transient var position: PointF? = null,
+    @Transient var forward: PointF? = null,
+    @Transient var isSpatialSet: Boolean = false,
 ) : BaseRoomBean
 
 /**
