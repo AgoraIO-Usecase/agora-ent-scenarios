@@ -1,15 +1,12 @@
 package io.agora.scene.voice.ui.dialog
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Environment
-import android.os.FileUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
@@ -18,7 +15,6 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.lang.Exception
 
 class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
@@ -52,11 +48,29 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
         setupOnClickPlayButton()
         beforeDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_before.png")
-        beforeDrawable?.setAutoPlay(false)
+        beforeDrawable?.registerAnimationCallback(object: Animatable2Compat.AnimationCallback(){
+            var firstStart = true
+            override fun onAnimationStart(drawable: Drawable?) {
+                super.onAnimationStart(drawable)
+                if(firstStart){
+                    beforeDrawable?.pause()
+                    firstStart = false
+                }
+            }
+        })
         binding?.ivBefore?.setImageDrawable(beforeDrawable)
 
         afterDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_after.png")
-        afterDrawable?.setAutoPlay(false)
+        afterDrawable?.registerAnimationCallback(object: Animatable2Compat.AnimationCallback(){
+            var firstStart = true
+            override fun onAnimationStart(drawable: Drawable?) {
+                super.onAnimationStart(drawable)
+                if(firstStart){
+                    afterDrawable?.pause()
+                    firstStart = false
+                }
+            }
+        })
         binding?.ivAfter?.setImageDrawable(afterDrawable)
 
         binding?.accbAEC?.isChecked = isOn
@@ -70,9 +84,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
             if (it.isSelected) { // stop play
                 AgoraRtcEngineController.get().resetMediaPlayer()
                 beforeDrawable?.stop()
-                beforeDrawable?.resume()
                 afterDrawable?.stop()
-                afterDrawable?.resume()
                 it.isSelected = false
             } else { // start play
                 val file = "sounds/voice_sample_aec_before.m4a"
@@ -82,8 +94,8 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 it.isSelected = true
                 binding?.btnAfter?.isSelected = false
                 beforeDrawable?.start()
+                beforeDrawable?.resume()
                 afterDrawable?.stop()
-                afterDrawable?.resume()
             }
         }
         binding?.btnAfter?.setOnClickListener {
@@ -100,6 +112,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 it.isSelected = true
                 binding?.btnBefore?.isSelected = false
                 afterDrawable?.start()
+                afterDrawable?.resume()
                 beforeDrawable?.stop()
             }
         }
