@@ -30,8 +30,6 @@ data class VoiceMemberModel constructor(
 
     // 这里用的是user.userNo
     @SerializedName("uid") var userId: String? = null,
-    // 这里用的是user.id
-    @SerializedName("chat_uid") var chatUid: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,
     // 这里用的是user.id
@@ -63,7 +61,6 @@ data class VoiceRoomModel constructor(
     @SerializedName("name") var roomName: String = "",
     @SerializedName("sound_effect") var soundEffect: Int = 0,
     @SerializedName("channel_id") var channelId: String = "",
-    @SerializedName("chatroom_id") var chatroomId: String = "",
     @SerializedName("created_at") var createdAt: Long = 0,
     @SerializedName("roomPassword") var roomPassword: String = "",
     @Transient var rankingList: List<VoiceRankUserModel>? = null,

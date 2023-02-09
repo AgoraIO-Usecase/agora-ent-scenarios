@@ -71,7 +71,7 @@ interface VoiceServiceProtocol {
      * 离开房间
      * @param roomId 房间id
      */
-    fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit)
+    fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 获取房间详情
@@ -83,11 +83,6 @@ interface VoiceServiceProtocol {
      * 获取用户列表
      */
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
-
-    /**
-     * 更新用户列表
-     */
-    fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 申请列表

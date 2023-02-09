@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicView
-        android:id="@+id/micV0"
+        android:id="@+id/micV2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicView
-        android:id="@+id/micV2Blue"
+        android:id="@+id/micV6Red"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="53dp"
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicView
-        android:id="@+id/micV3Red"
+        android:id="@+id/micV3Blue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
@@ -41,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicView
-        android:id="@+id/micV5"
+        android:id="@+id/micV4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +49,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room2DMicView
-        android:id="@+id/micV6"
+        android:id="@+id/micV5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
@@ -59,7 +59,7 @@
 
     <!-- 可移动座位-->
     <io.agora.scene.voice.spatial.ui.widget.mic.Room3DMicView
-        android:id="@+id/micV4Center"
+        android:id="@+id/micV0Center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -259,11 +259,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _changeMicObservable.setSource(mRepository.changeMic(oldIndex, newIndex))
     }
 
-    fun leaveSyncManagerRoom(roomId: String) {
-        _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId))
-    }
-
-    fun updateRoomMember(){
-        _updateRoomMemberObservable.setSource(mRepository.updateRoomMember())
+    fun leaveSyncManagerRoom(roomId: String, isRoomOwnerLeave: Boolean) {
+        _leaveSyncRoomObservable.setSource(mRepository.leaveSyncManagerRoom(roomId, isRoomOwnerLeave))
     }
 }
