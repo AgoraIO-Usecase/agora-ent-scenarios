@@ -74,7 +74,7 @@ public class SAChatBar: UIView, UICollectionViewDelegate, UICollectionViewDataSo
         chatRaiser.contentHorizontalAlignment = .left
         if eqShow {
             eqShow = false
-            let pop = SAPopTip().tag(191).backgroundColor(UIColor(hex: "0x0CA5FD"))
+            let pop = SAPopTip().tag(191).backgroundColor(UIColor(hex: "0x0CA5FD") ?? .white)
             pop.bubbleColor = UIColor(0x0CA5FD)
             pop.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.12)
             pop.shadowOpacity = 1
