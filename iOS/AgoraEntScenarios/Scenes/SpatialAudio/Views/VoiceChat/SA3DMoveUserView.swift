@@ -109,15 +109,19 @@ class SA3DMoveUserView: UIView {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_middle_arrow"))
         return imageView
     }()
-    public var angle: Double = 0 {
-        didSet {
-            UIView.animate(withDuration: 0.25) {
-                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: self.angle)
-            }
-        }
-    }
+    private var lastAngle: Double = 0
 
     private var lineView: UIView = .init()
+    
+    var angle: Double = 0 {
+        didSet {
+            let value = (angle - 90) / 180.0 * Double.pi
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: value - self.lastAngle)
+            }
+            lastAngle = value
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -129,7 +133,7 @@ class SA3DMoveUserView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     fileprivate func layoutUI() {
         lineView.backgroundColor = .clear
         lineView.layer.bounds = CGRect(x: 0, y: 0, width: 30~, height: 82~)
