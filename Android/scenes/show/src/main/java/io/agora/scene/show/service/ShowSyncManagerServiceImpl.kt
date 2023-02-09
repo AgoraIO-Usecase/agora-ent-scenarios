@@ -467,7 +467,7 @@ class ShowSyncManagerServiceImpl(
             || TimeUtils.currentTimeMillis() - roomDetail.createdAt.toLong() >= ROOM_AVAILABLE_DURATION
         ) {
             Log.d(TAG, "leaveRoom delete room")
-            Sync.Instance().deleteScene(roomId, object : Sync.Callback {
+            sceneReference.delete(object : Sync.Callback {
                 override fun onSuccess() {
                     roomMap.remove(roomId)
                 }
