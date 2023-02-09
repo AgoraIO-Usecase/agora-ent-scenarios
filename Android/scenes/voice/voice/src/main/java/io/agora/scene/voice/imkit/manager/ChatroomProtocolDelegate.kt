@@ -624,6 +624,7 @@ class ChatroomProtocolDelegate constructor(
             // 关麦（麦位用户操作包括房主操作自己）
             MicClickAction.Mute -> {
                 micInfo.micStatus = MicStatus.Mute
+                micInfo.member?.micStatus = 0
             }
             // 开麦（麦位用户操作包括房主操作自己）
             MicClickAction.UnMute -> {
@@ -631,6 +632,7 @@ class ChatroomProtocolDelegate constructor(
                     micInfo.micStatus = MicStatus.Idle
                 } else {
                     micInfo.micStatus = MicStatus.Normal
+                    micInfo.member?.micStatus = 1
                 }
             }
             // 关闭座位（房主操作）
