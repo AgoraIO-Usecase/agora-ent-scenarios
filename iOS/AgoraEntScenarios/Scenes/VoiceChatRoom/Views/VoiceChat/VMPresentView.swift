@@ -89,10 +89,11 @@ class VMPresentView: UIView {
         }
         eqView.turnAIAECBlock = {[weak self] flag in
             guard let turnAIAECBlock = self?.turnAIAECBlock else {return}
-                    
+
             turnAIAECBlock(flag);
             self?.roomInfo?.room?.turn_AIAEC = flag;
             self?.audioSetView.tableView.reloadData()
+
         }
         eqView.turnAGCBlock = {[weak self] flag in
             guard let turnAGCBlock = self?.turnAGCBlock else {return}
