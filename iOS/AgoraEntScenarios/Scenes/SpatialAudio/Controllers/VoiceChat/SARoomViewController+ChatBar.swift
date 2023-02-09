@@ -13,8 +13,7 @@ import ZSwiftBaseLib
 extension SARoomViewController {
     
     func showEQView() {
-        guard let micInfos = sRtcView.micInfos else { return }
-        let isOpenSpatial = micInfos[5].status == 5
+        let isOpenSpatial = roomInfo?.room?.use_robot == true
 
         let actionView = ActionSheetManager()
         actionView
@@ -33,15 +32,12 @@ extension SARoomViewController {
         }
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             guard let self = self else { return }
-            let blue = micInfos[5]
-            let red = micInfos[6]
-            blue.status = isOn ? 5 : -1
-            red.status = isOn ? 5 : -1
-            self.sRtcView.micInfos?[5] = blue
-            self.sRtcView.micInfos?[6] = red
+            self.roomInfo?.room?.use_robot = isOn
+            self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
-            self?.sRtcView.updatePlayerVolume(value: value)
+            self?.sRtcView.updatePlayerVolume(value: Double(value * 400))
+            self?.updateVolume(Int(value * 400.0))
         }
         actionView.show()
     }
@@ -109,9 +105,9 @@ extension SARoomViewController {
     
     func applyMembersAlert(position: SASwitchBarDirection) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
-        apply.agreeApply = {
-            self.rtcView.updateUser($0)
-        }
+        //apply.agreeApply = {
+           // self.rtcView.updateUser($0)
+        //}
         let invite = SAInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
         let userAlert = SAUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [sceneLocalized( "Raised Hands"), sceneLocalized( "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
