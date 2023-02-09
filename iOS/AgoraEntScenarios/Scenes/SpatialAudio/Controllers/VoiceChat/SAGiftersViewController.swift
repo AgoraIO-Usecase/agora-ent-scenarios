@@ -66,7 +66,7 @@ extension SAGiftersViewController {
     }
 
     @objc private func fetchList() {
-        SpatialAudioServiceImp.getSharedInstance().fetchGiftContribute { error, users in
+        AppContext.saServiceImp().fetchGiftContribute { error, users in
             if error == nil, users != nil {
                 self.tableView.refreshControl?.endRefreshing()
                 if users?.count ?? 0 > 0 {
