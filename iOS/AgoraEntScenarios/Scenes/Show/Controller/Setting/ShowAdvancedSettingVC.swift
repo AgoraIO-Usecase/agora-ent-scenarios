@@ -120,6 +120,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .PVC,
             .videoEncodeSize,
             .FPS,
+            .videoBitRate
         ]
         let insideSettings: [ShowSettingKey] = [
             .H265,
@@ -129,6 +130,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
             .PVC,
             .videoEncodeSize,
             .FPS,
+            .videoBitRate
         ]
         let broadcasterVideoSettings: [ShowSettingKey] = isOutside ? outsideSettings : insideSettings
         // 观众端设置

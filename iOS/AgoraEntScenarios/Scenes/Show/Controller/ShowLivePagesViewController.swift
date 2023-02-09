@@ -17,6 +17,8 @@ class ShowLivePagesViewController: ViewController {
     
     var focusIndex: Int = 0
     
+    private var currentVC: ShowLiveViewController?
+    
     lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
         manager.defaultSetting()

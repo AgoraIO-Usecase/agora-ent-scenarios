@@ -109,7 +109,10 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                 self?.present(vc, animated: true, completion: {
                     vc.showBgView()
                 })
+            } detailButtonAction: {[weak self] in
+                self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
+
             return cell
         }else {
             cell = UITableViewCell()

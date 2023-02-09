@@ -27,6 +27,7 @@ class ShowPresettingHeaderView: UITableViewHeaderFooterView {
     private lazy var iconImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage.show_sceneImage(name: "show_preset_douyin")
+        imgView.isHidden = true
         return imgView
     }()
     
