@@ -77,6 +77,7 @@ object BeautyCache {
                 ITEM_ID_ADJUST_SHARPEN,
                 ITEM_ID_ADJUST_CLARITY,
                 ITEM_ID_ADJUST_CONTRAST,
+                ITEM_ID_ADJUST_NONE
             ))
         }
     }
