@@ -13,7 +13,9 @@ import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
 
 object RtcEngineInstance {
 
-    val videoEncoderConfiguration = VideoEncoderConfiguration()
+    val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
+        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+    }
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
