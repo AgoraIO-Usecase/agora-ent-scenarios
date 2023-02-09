@@ -134,6 +134,7 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
+                android:id="@+id/tvEncodeResolution"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
@@ -190,6 +191,7 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
+                android:id="@+id/tvReceiveResolution"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
@@ -246,11 +248,6 @@
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_bitrate" />
 
-            <TextView
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_fps" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -270,16 +267,6 @@
                 tools:text="@string/show_statistic_loss_package" />
         </TableRow>
 
-        <TableRow android:paddingVertical="3dp">
-
-            <TextView
-                android:id="@+id/tvResolution"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_resolution" />
-
-        </TableRow>
     </TableLayout>
 
     <ImageView

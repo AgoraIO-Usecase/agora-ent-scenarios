@@ -452,6 +452,9 @@ class LiveDetailFragment : Fragment() {
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
         cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,
         videoSize: Size? = null,
+        // 编码分辨率、接收分辨率
+        encodeVideoSize: Size? = null, receiveVideoSize: Size? = null,
+        // 编码帧率、接收帧率
         encodeFps: Int? = null, receiveFPS: Int? = null
     ) {
         val topBinding = mBinding.topLayout
@@ -460,7 +463,10 @@ class LiveDetailFragment : Fragment() {
         if (!visible) {
             return
         }
-        videoSize?.let { topBinding.tvResolution.text = getString(R.string.show_statistic_resolution, "${it.width}x${it.height}") }
+        // 编码分辨率
+        encodeVideoSize?.let { topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "${it.width}x${it.height}") }
+        // 接收分辨率
+        receiveVideoSize?.let { topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "${it.width}x${it.height}") }
         // 编码帧率
         encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
         // 接收帧率
@@ -1220,7 +1226,7 @@ class LiveDetailFragment : Fragment() {
                             bitrate = stats.sentBitrate,
                             encodeFps = stats.sentFrameRate,
                             lossPackage = stats.txPacketLossRate,
-                            videoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
+                            encodeVideoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
                         )
                     }
                 }
@@ -1244,7 +1250,7 @@ class LiveDetailFragment : Fragment() {
                             receiveFPS = stats.decoderOutputFrameRate,
                             lossPackage = stats.packetLossRate,
                             delay = stats.delay,
-                            videoSize = Size(stats.width, stats.height)
+                            receiveVideoSize = Size(stats.width, stats.height)
                         )
                     }
                 }
