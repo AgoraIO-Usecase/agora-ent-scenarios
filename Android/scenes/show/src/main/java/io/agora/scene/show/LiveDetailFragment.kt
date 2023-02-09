@@ -172,6 +172,12 @@ class LiveDetailFragment : Fragment() {
         return destroyRtcEngine()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        destroy()
+        mBeautyProcessor.reset()
+    }
+
     private fun onBackPressed() {
         if (isRoomOwner) {
             showEndRoomDialog()
