@@ -66,6 +66,7 @@ time_t uptime() {
 
 @property (nonatomic, assign) int playoutVolume;
 @property (nonatomic, assign) int publishSignalVolume;
+@property (nonatomic, assign) int chorusRemoteUserVolume;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
 @end
@@ -76,6 +77,7 @@ time_t uptime() {
 {
     if (self = [super init]) {
         self.delegate = delegate;
+        self.chorusRemoteUserVolume = 15;
         self.lyricCallbacks = [NSMutableDictionary dictionary];
         self.musicCallbacks = [NSMutableDictionary dictionary];
         self.loadDict = [NSMutableDictionary dictionary];
@@ -251,7 +253,7 @@ time_t uptime() {
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
             
-            [self.engine adjustUserPlaybackSignalVolume:self.config.coSingerUid volume:50];
+            [self updateRemotePlayBackVolumeIfNeed];
         } else if(role == KTVSingRoleCoSinger) {
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
@@ -319,6 +321,12 @@ time_t uptime() {
     [self.rtcMediaPlayer adjustPublishSignalVolume:volume];
 }
 
+- (void)adjustChorusRemoteUserPlaybackVoulme:(int)volume {
+    self.chorusRemoteUserVolume = volume;
+    
+    [self updateRemotePlayBackVolumeIfNeed];
+}
+
 #pragma mark private
 - (void)updateCosingerPlayerStatusIfNeed {
     if (self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
@@ -336,6 +344,31 @@ time_t uptime() {
             default:
                 break;
         }
+    }
+}
+
+- (void)updateRemotePlayBackVolumeIfNeed {
+    if (self.config.type != KTVSongTypeChorus) {
+        KTVLogInfo(@"updateRemotePlayBackVolumeIfNeed: %d, role: %ld", 100, self.config.role);
+        [self.engine adjustPlaybackSignalVolume:100];
+        return;
+    }
+    
+    /*
+     合唱的时候，建议把接受远端人声的音量降低（建议是25或者50，后续这个值可以根据 端到端延迟来自动确认，比如150ms内可以50。 否则音量25），相应的api是adjustUserPlaybackSignalVolume(remoteUid, volume)；一是可以解决在aec nlp等级降低的情况下出现小音量回声问题，二是可以减小远端固有延迟的合唱者声音给本地k歌带来的影响
+     */
+    int volume = self.playerState == AgoraMediaPlayerStatePlaying ? self.chorusRemoteUserVolume : 100;
+    KTVLogInfo(@"updateRemotePlayBackVolumeIfNeed: %d, role: %ld", volume, self.config.role);
+    if (self.config.role == KTVSingRoleMainSinger) {
+        [self.engine adjustPlaybackSignalVolume:volume];
+    } else if (self.config.role == KTVSingRoleCoSinger) {
+        [self.engine adjustPlaybackSignalVolume:volume];
+        if (self.subChorusConnection == nil) {
+            KTVLogWarn(@"updateRemotePlayBackVolumeIfNeed fail, connection = nil");
+            return;
+        }
+        int uid = [VLLoginModel mediaPlayerUidWithUid:[NSString stringWithFormat:@"%ld", self.config.mainSingerUid]];
+        [self.engine adjustUserPlaybackSignalVolumeEx:uid volume:volume connection:self.subChorusConnection];
     }
 }
 
@@ -441,6 +474,11 @@ time_t uptime() {
     _lrcView = lrcView;
     lrcView.downloadDelegate = self;
     lrcView.delegate = self;
+}
+
+- (void)setPlayerState:(AgoraMediaPlayerState)playerState {
+    _playerState = playerState;
+    [self updateRemotePlayBackVolumeIfNeed];
 }
 
 #pragma mark - AgoraAudioFrameDelegate
@@ -667,18 +705,7 @@ time_t uptime() {
             weakSelf.pushDirectAudioEnable = YES;
         }
         
-        /*
-         合唱的时候，建议把接受远端人声的音量降低（建议是25或者50，后续这个值可以根据 端到端延迟来自动确认，比如150ms内可以50。 否则音量25），相应的api是adjustUserPlaybackSignalVolume(remoteUid, volume)；一是可以解决在aec nlp等级降低的情况下出现小音量回声问题，二是可以减小远端固有延迟的合唱者声音给本地k歌带来的影响
-         */
-        if(weakSelf.config.type == KTVSongTypeChorus) {
-            NSUInteger uid = 0;
-            if (weakSelf.config.role == KTVSingRoleCoSinger){
-                uid = [VLLoginModel mediaPlayerUidWithUid:[NSString stringWithFormat:@"%ld", weakSelf.config.mainSingerUid]];
-            } else {
-                return;
-            }
-            [weakSelf.engine adjustUserPlaybackSignalVolumeEx:uid volume:50 connection:connection];
-        }
+        [weakSelf updateRemotePlayBackVolumeIfNeed];
     }];
     if(ret != 0) {
         KTVLogError(@"joinChannelExByToken status: %d channelId: %@ uid: %ld, token:%@ ", ret, connection.channelId, connection.localUid, VLUserCenter.user.agoraPlayerRTCToken);
@@ -693,7 +720,6 @@ time_t uptime() {
         options.publishDirectCustomAudioTrack = NO;
         [self.engine updateChannelExWithMediaOptions:options connection:self.subChorusConnection];
         [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
-        [self.engine adjustUserPlaybackSignalVolume:self.config.coSingerUid volume:100];
     } else if(role == KTVSingRoleCoSinger) {
         [self.engine leaveChannelEx:self.subChorusConnection leaveChannelBlock:nil];
         [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:NO];
