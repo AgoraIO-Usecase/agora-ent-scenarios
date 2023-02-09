@@ -5,6 +5,7 @@
     <string name="voice_agora_chat_room_create">Create Room</string>
 
     <string name="voice_room_list_title_name">Agora Chat Room</string>
+    <string name="voice_spatial_room_list_title_name">Spatial Audio Chat Mode Room</string>
     <string name="voice_tab_layout_all">All</string>
     <string name="voice_tab_layout_chat_room">Chat Room</string>
     <string name="voice_tab_layout_audio_room">Spatial Audio Room</string>

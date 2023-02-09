@@ -5,6 +5,7 @@
     <string name="voice_agora_chat_room_create">创建聊天室</string>
 
     <string name="voice_room_list_title_name">声网语聊房</string>
+    <string name="voice_spatial_room_list_title_name">空间音频语聊房</string>
     <string name="voice_tab_layout_all">全部</string>
     <string name="voice_tab_layout_chat_room">语聊房</string>
     <string name="voice_tab_layout_audio_room">空间音频房</string>
