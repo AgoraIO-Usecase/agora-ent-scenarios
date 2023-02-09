@@ -12,12 +12,12 @@
 NS_ASSUME_NONNULL_BEGIN
 typedef void (^sendStreamSuccess)(BOOL ifSuccess);
 typedef enum : NSUInteger {
-    KTVSongTypeUnknown,
+    KTVSongTypeUnknown = 0,
     KTVSongTypeSolo,
     KTVSongTypeChorus
 } KTVSongType;
 typedef enum : NSUInteger {
-    KTVSingRoleUnknown,
+    KTVSingRoleUnknown = 0,
     KTVSingRoleMainSinger,
     KTVSingRoleCoSinger,
     KTVSingRoleAudience
@@ -69,6 +69,8 @@ typedef enum : NSUInteger {
 
 - (void)adjustPlayoutVolume:(int)volume;
 - (void)adjustPublishSignalVolume:(int)volume;
+
+- (void)adjustChorusRemoteUserPlaybackVoulme:(int)volume;
 
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed;
