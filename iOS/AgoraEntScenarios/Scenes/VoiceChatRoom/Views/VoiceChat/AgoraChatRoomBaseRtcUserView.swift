@@ -70,7 +70,7 @@ class AgoraChatRoomBaseRtcUserView: UIView {
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
-                micView.isHidden = false
+                micView.isHidden = true
                 nameBtn.setImage(UIImage("guanfang"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true

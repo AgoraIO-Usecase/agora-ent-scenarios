@@ -126,7 +126,24 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         mic_info.status = enable ? 5 : -2
         self.roomInfo?.room?.use_robot = enable
         self.roomInfo?.mic_info![6] = mic_info
-        self.rtcView.updateAlien(mic_info.status)
+        //机器人开关涉及到两个同时开关
+        
+        let blue_micInfo = mic_info
+        let red_micInfo = mic_info
+        
+        //更新红蓝机器人的信息
+        let blue: SAUser = SAUser()
+        blue.portrait = "blue"
+        blue.name = "Agora Blue"
+        blue_micInfo.member = blue
+        self.sRtcView.updateUser(blue_micInfo)
+        
+        let red: SAUser = SAUser()
+        red.portrait = "blue"
+        red.name = "Agora Blue"
+        red_micInfo.member = blue
+        self.sRtcView.updateUser(red_micInfo)
+
     }
     
     func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
@@ -150,7 +167,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         let memeber = mic
                         memeber.member = nil
                         memeber.status = -1
-                        rtcView.updateUser(memeber)
+                        sRtcView.updateUser(memeber)
                         break
                     }
                 }
@@ -186,8 +203,8 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[first.mic_index] = first
             (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[last.mic_index] = last
             roomInfo?.mic_info = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics
-            rtcView.updateUser(first)
-            rtcView.updateUser(last)
+            sRtcView.updateUser(first)
+            sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
                 let status = first.status
@@ -262,10 +279,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         rtckit.muteLocalAudioStream(mute: true)
                     }
                 }
-                //TODO: remove as!
+                
                 (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[first.mic_index] = first
                 roomInfo?.mic_info = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics
-                rtcView.updateUser(first)
+                sRtcView.updateUser(first)
                 refreshApplicants(chat_uid: fromId)
             }
         }

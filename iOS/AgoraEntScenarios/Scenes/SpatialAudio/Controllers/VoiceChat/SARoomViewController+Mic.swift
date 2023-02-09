@@ -14,7 +14,7 @@ extension SARoomViewController {
     func mute(with index: Int) {
         AppContext.saServiceImp().forbidMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             }
         }
     }
@@ -28,7 +28,7 @@ extension SARoomViewController {
             if error == nil {
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
                 if let mic = mic {
-                    self.rtcView.updateUser(mic)
+                    self.sRtcView.updateUser(mic)
                 }
             }
         }
@@ -38,7 +38,7 @@ extension SARoomViewController {
     func kickoff(with index: Int) {
         AppContext.saServiceImp().kickOff(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             }
         }
     }
@@ -47,7 +47,7 @@ extension SARoomViewController {
     func lock(with index: Int) {
         AppContext.saServiceImp().lockMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             }
         }
 
@@ -57,7 +57,7 @@ extension SARoomViewController {
     func unLock(with index: Int) {
         AppContext.saServiceImp().unLockMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             }
         }
     }
@@ -67,7 +67,7 @@ extension SARoomViewController {
         chatBar.refresh(event: .mic, state: .selected, asCreator: false)
         AppContext.saServiceImp().leaveMic(mic_index: index) { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
@@ -84,7 +84,7 @@ extension SARoomViewController {
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")",point: self.toastPoint, title: nil, image: nil, completion: nil)
             }
@@ -108,7 +108,7 @@ extension SARoomViewController {
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: false)
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
             }
         }
 
@@ -126,9 +126,9 @@ extension SARoomViewController {
                 self.local_index = to
                 self.roomInfo?.mic_info?[from] = old_mic
                 self.roomInfo?.mic_info?[to] = new_mic
-                self.rtcView.updateUser(old_mic)
-                self.rtcView.updateUser(new_mic)
-                //TODO: remove as!
+                self.sRtcView.updateUser(old_mic)
+                self.sRtcView.updateUser(new_mic)
+                    //TODO: remove as!
                 guard let mic = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics.first(where: {
                                     SAUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
                                 }) else { return }
@@ -177,7 +177,7 @@ extension SARoomViewController {
     func agreeInvite() {
         AppContext.saServiceImp().acceptMicSeatInvitation(completion: { error, mic in
             if error == nil,let mic = mic {
-                self.rtcView.updateUser(mic)
+                self.sRtcView.updateUser(mic)
                 self.local_index = mic.mic_index
                 self.rtckit.setClientRole(role: .owner)
                 self.chatBar.refresh(event: .handsUp, state: .disable, asCreator: self.isOwner)
