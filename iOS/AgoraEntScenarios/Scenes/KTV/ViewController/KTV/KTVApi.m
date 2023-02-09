@@ -363,12 +363,12 @@ time_t uptime() {
         [self.engine adjustPlaybackSignalVolume:volume];
     } else if (self.config.role == KTVSingRoleCoSinger) {
         [self.engine adjustPlaybackSignalVolume:volume];
-        if (self.subChorusConnection == nil) {
-            KTVLogWarn(@"updateRemotePlayBackVolumeIfNeed fail, connection = nil");
-            return;
-        }
-        int uid = [VLLoginModel mediaPlayerUidWithUid:[NSString stringWithFormat:@"%ld", self.config.mainSingerUid]];
-        [self.engine adjustUserPlaybackSignalVolumeEx:uid volume:volume connection:self.subChorusConnection];
+//        if (self.subChorusConnection == nil) {
+//            KTVLogWarn(@"updateRemotePlayBackVolumeIfNeed fail, connection = nil");
+//            return;
+//        }
+//        int uid = [VLLoginModel mediaPlayerUidWithUid:[NSString stringWithFormat:@"%ld", self.config.mainSingerUid]];
+//        [self.engine adjustUserPlaybackSignalVolumeEx:uid volume:volume connection:self.subChorusConnection];
     }
 }
 

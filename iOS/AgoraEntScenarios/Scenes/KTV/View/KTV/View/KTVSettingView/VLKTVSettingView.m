@@ -8,11 +8,18 @@
 #import "VLKTVTonesView.h"
 #import "VLKTVSliderView.h"
 #import "VLKTVKindsView.h"
+#import "VLKTVRemoteVolumeView.h"
 #import "VLFontUtils.h"
 #import "KTVMacro.h"
 @import Masonry;
 
-@interface VLKTVSettingView() <VLKTVSwitcherViewDelegate, VLKTVSliderViewDelegate, VLKTVKindsViewDelegate, VLKTVTonesViewDelegate>
+@interface VLKTVSettingView() <
+VLKTVSwitcherViewDelegate,
+VLKTVSliderViewDelegate,
+VLKTVKindsViewDelegate,
+VLKTVTonesViewDelegate,
+VLKTVRemoteVolumeViewDelegate
+>
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) VLKTVSwitcherView *soundSwitcher;
@@ -20,6 +27,7 @@
 @property (nonatomic, strong) VLKTVSliderView *soundSlider;
 @property (nonatomic, strong) VLKTVSliderView *accSlider;
 @property (nonatomic, strong) VLKTVKindsView *kindsView;
+@property (nonatomic, strong) VLKTVRemoteVolumeView* remoteVolumeView;
 @property (nonatomic, strong, readonly) VLKTVSettingModel *setting;
 
 @end
@@ -56,6 +64,7 @@
     [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
+    [self addSubview:self.remoteVolumeView];
     [self addSubview:self.kindsView];
 }
 
@@ -88,8 +97,14 @@
         make.height.mas_equalTo(22);
     }];
     
+    [self.remoteVolumeView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.mas_equalTo(self);
+        make.top.mas_equalTo(self.accSlider.mas_bottom).offset(25);
+        make.height.mas_equalTo(22);
+    }];
+    
     [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.accSlider.mas_bottom).offset(35);
+        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
         make.left.right.mas_equalTo(self);
         make.bottom.mas_equalTo(self).offset(-64);
     }];
@@ -145,6 +160,14 @@
     }
 }
 
+#pragma mark VLKTVRemoteVolumeViewDelegate
+- (void)view:(VLKTVRemoteVolumeView *)view remoteVolumeValueChanged:(int)value {
+    self.setting.remoteVolume = value;
+    if ([self.delegate respondsToSelector:@selector(settingViewSettingChanged:valueDidChangedType:)]) {
+        [self.delegate settingViewSettingChanged:self.setting valueDidChangedType:VLKTVValueDidChangedTypeRemoteValue];
+    }
+}
+
 #pragma mark - Lazy
 
 - (UILabel *)titleLabel {
@@ -192,6 +215,15 @@
         _accSlider.delegate = self;
     }
     return _accSlider;
+}
+
+- (VLKTVRemoteVolumeView*)remoteVolumeView {
+    if (!_remoteVolumeView) {
+        _remoteVolumeView = [[VLKTVRemoteVolumeView alloc] initWithMin:0 withMax:100 withCurrent:15];
+        _remoteVolumeView.titleLabel.text = KTVLocalizedString(@"RemoteVolume");
+        _remoteVolumeView.delegate = self;
+    }
+    return _remoteVolumeView;
 }
 
 - (VLKTVKindsView *)kindsView {
