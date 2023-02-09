@@ -206,7 +206,7 @@ class AgoraRtcEngineController {
     }
     /**
      * 更新远端音源的位置
-     * @param position 位置[x, y, z]
+     * @param pos 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
     public fun updateRemotePosition(uid: Int, pos: Array<Float>, forward: Array<Float>) {
@@ -214,6 +214,19 @@ class AgoraRtcEngineController {
         position.position = pos.toFloatArray()
         position.forward = forward.toFloatArray()
         spatial?.updateRemotePosition(uid, position)
+    }
+    /**
+     * 更新播放器音源位置
+     * @param pos 位置[x, y, z]
+     * @param forward 朝向[x, y, z]
+     */
+    public fun updatePlayerPosition(pos: Array<Float>, forward: Array<Float>) {
+        val position = RemoteVoicePositionInfo()
+        position.position = pos.toFloatArray()
+        position.forward = forward.toFloatArray()
+        mediaPlayer?.mediaPlayerId?.let {
+            spatial?.updatePlayerPositionInfo(it, position)
+        }
     }
     /**
      * 处理远端空间位置变化产生的回调

@@ -444,17 +444,23 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             }
         }
     }
-
+    private var speaker: Int? = null
     /**更新机器人提示音量*/
-    override fun updateBotVolume(speakerType: Int, volume: Int) {
+    override fun updateBotVolume(speakerType: Int, volume: Int): Pair<PointF, PointF>? {
+        var speakerView = binding.micV3Blue
+        var forward = PointF(1f, 1f)
         when (speakerType) {
             ConfigConstants.BotSpeaker.BotBlue -> {
+                speakerView = binding.micV3Blue
+                forward = PointF(1f, 1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
                     this.audioVolumeType = volume
                     binding.micV3Blue.binding(this)
                 }
             }
             ConfigConstants.BotSpeaker.BotRed -> {
+                speakerView = binding.micV6Red
+                forward = PointF(-1f, -1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                     this.audioVolumeType = volume
                     binding.micV6Red.binding(this)
@@ -470,6 +476,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                     binding.micV6Red.binding(this)
                 }
             }
+        }
+        // 检查机器人位置更新
+        return if (speaker != speakerType) {
+            speaker = speakerType
+            Pair(getPositon(speakerView), forward)
+        } else {
+            null
         }
     }
 
@@ -496,6 +509,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         binding(micInfo)
                         micInfo.position = getPositon(this as View)
                     }
+                }
+                when (index) {
+                    0 -> micInfo.forward = PointF(1f, 0f)
+                    1 -> micInfo.forward = PointF(0f, -1f)
+                    2 -> micInfo.forward = PointF(1f, -1f)
+                    4 -> micInfo.forward = PointF(0f, 1f)
+                    5 -> micInfo.forward = PointF(1f, -1f)
                 }
                 each?.invoke(micInfo)
             }

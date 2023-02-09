@@ -68,6 +68,8 @@ class RoomObservableViewDelegate constructor(
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
     private var robotInfo: RobotSpatialAudioModel = RobotSpatialAudioModel()
 
+    private var robotSpeaker: Int? = null
+
     private fun localUserIndex(): Int {
         return localUserMicInfo?.micIndex ?: -1
     }
@@ -142,7 +144,13 @@ class RoomObservableViewDelegate constructor(
                 if (finished) {
                     iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_None)
                 } else {
-                    iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_Medium)
+                    iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_Medium)?.let {
+                        // 机器人位置产生变化，更新空间音效
+                        AgoraRtcEngineController.get().updatePlayerPosition(
+                            arrayOf(it.first.x, it.first.y, 0f),
+                            arrayOf(it.second.x, it.second.y, 0f)
+                        )
+                    }
                 }
             }
 
