@@ -393,6 +393,13 @@ class BeautyModel: BeautyBaseModel {
         var dataArray = [BeautyModel]()
         if beautyType == .sense {
             var model = BeautyModel()
+            model.name = "无"
+            model.icon = "show_beauty_none"
+            model.isSelected = true
+            model.path = ""
+            dataArray.append(model)
+            
+            model = BeautyModel()
             model.name = "对比度".show_localized
             model.icon = "show_beauty_ic_adjust_contrast"
             model.path = ""

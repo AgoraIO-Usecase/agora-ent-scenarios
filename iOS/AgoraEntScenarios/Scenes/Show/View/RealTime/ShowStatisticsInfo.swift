@@ -123,38 +123,36 @@ struct ShowStatisticsInfo {
     }
     
     private func localDescription(info: LocalInfo, audioOnly: Bool) -> (String, String) {
-        
-        let videoSend = "码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
-        let lastmile = "延迟".show_localized+": \(info.channelStats.lastmileDelay) ms"
+        let sendTitle = "发送\n".show_localized
+        let videoSize = "编码分辨率"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
+        let videoSend = "发送码率".show_localized+": \(info.videoStats.sentBitrate) kbps"
         let uplink = "上行网络".show_localized+": \(uplink) KB/s"
-        let videoSize = "分辨率"+": \(info.videoStats.encodedFrameWidth) x \(info.videoStats.encodedFrameHeight)"
         
-        let fps = "帧率".show_localized+": \(fps) fps"
-        let vSendLoss = "丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"
-        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
+        let fps = "编码帧率".show_localized+": \(fps) fps"
+        let vSendLoss = "上行丢包率".show_localized+": \(info.videoStats.txPacketLossRate) %"
         
         let audioSend = "ASend: \(info.audioStats.sentBitrate) kbps"
         let cpu = "CPU: \(info.channelStats.cpuAppUsage)%/\(info.channelStats.cpuTotalUsage) %"
         let aSendLoss = "ASend Loss: \(info.audioStats.txPacketLossRate) %"
         
         if audioOnly {
-            return ([lastmile, audioSend, cpu, aSendLoss].joined(separator: "\n"), "")
+            return ([audioSend, cpu, aSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo = [videoSend, lastmile, uplink, videoSize].joined(separator: "\n\n")
-        let rightInfo = [fps, vSendLoss, downlink,"  "].joined(separator: "\n\n")
+        let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n")
+        let rightInfo = [" \n",     fps,       vSendLoss,   " " ].joined(separator: "\n")
 
         return (leftInfo, rightInfo)
     }
     
     private func remoteDescription(info: RemoteInfo, audioOnly: Bool) -> (String, String) {
+        let sendTitle = "接受\n".show_localized
+        let videoSize = "接收分辨率"+": \(info.videoStats.width) x \(info.videoStats.height)"
         let videoSend = "码率".show_localized+": \(info.videoStats.receivedBitrate) kbps"
-        let lastmile = "延迟".show_localized+": \(info.videoStats.avSyncTimeMs) ms"
-        let uplink = "上行网络".show_localized+": \(uplink) KB/s"
-        let videoSize = "分辨率"+": \(info.videoStats.width) x \(info.videoStats.height)"
-        
-        let fps = "帧率".show_localized+": \(fps) fps"
-        let vSendLoss = "丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
         let downlink = "下行网络".show_localized+": \(downlink) KB/s"
+
+        let fps = "接收帧率".show_localized+": \(fps) fps"
+        let vSendLoss = "下行丢包率".show_localized+": \(info.videoStats.packetLossRate) %"
+        let lastmile = "延迟".show_localized+": \(info.audioStats.networkTransportDelay) ms"
         
         let audioRecv = "ARecv: \(info.audioStats.receivedBitrate) kbps"
         let audioLoss = "ALoss: \(info.audioStats.audioLossRate) %"
@@ -162,8 +160,8 @@ struct ShowStatisticsInfo {
         if audioOnly {
             return ([audioRecv, audioLoss, vSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo = [videoSend, lastmile, uplink, videoSize].joined(separator: "\n\n")
-        let rightInfo = [fps, vSendLoss, downlink, "  "].joined(separator: "\n\n")
+        let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n")
+        let rightInfo = [" \n",     fps,        vSendLoss,  lastmile].joined(separator: "\n")
 
         return (leftInfo, rightInfo)
     }

@@ -186,6 +186,9 @@ class ShowAgoraKitManager: NSObject {
 //            mediaOptions.publishCameraTrack = false
 //            mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
             mediaOptions.clientRoleType = role
+            // 极速直播
+            mediaOptions.audienceLatencyLevel = .ultraLowLatency
+            
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
@@ -203,6 +206,8 @@ class ShowAgoraKitManager: NSObject {
                 showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
             exConnectionMap[targetChannelId] = connection
+            
+            showLogger.info(" updateLoadingType -----[ exConnectionMap ] == \(exConnectionMap.debugDescription) ")
             
             if ret == 0 {
                 showLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
@@ -428,7 +433,7 @@ class ShowAgoraKitManager: NSObject {
     
     func updateLoadingType(roomId: String, channelId: String, loadingType: ShowRTCLoadingType) {
         guard let _ = exConnectionMap[channelId] else {
-//            assert(false, "updateLoadingType fail, mediaOptions not found")
+            showLogger.error("updateLoadingType fail, mediaOptions not found")
             return
         }
         
