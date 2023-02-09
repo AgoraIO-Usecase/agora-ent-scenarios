@@ -109,9 +109,9 @@ extension SARoomViewController {
     
     func applyMembersAlert(position: SASwitchBarDirection) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
-        apply.agreeApply = {
-            self.rtcView.updateUser($0)
-        }
+        //apply.agreeApply = {
+           // self.rtcView.updateUser($0)
+        //}
         let invite = SAInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
         let userAlert = SAUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [sceneLocalized( "Raised Hands"), sceneLocalized( "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)

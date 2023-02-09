@@ -169,7 +169,7 @@ class SA3DMoveUserView: UIView {
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
-        iconView.image = UIImage(named: "avatar1")
+        iconView.image = UIImage(named: "")
         iconView.layer.cornerRadius = 37~
         iconView.layer.masksToBounds = true
         addSubview(iconView)
