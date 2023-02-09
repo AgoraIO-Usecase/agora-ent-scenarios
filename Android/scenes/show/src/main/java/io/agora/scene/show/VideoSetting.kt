@@ -1,6 +1,7 @@
 package io.agora.scene.show
 
 import io.agora.rtc2.video.*
+import io.agora.scene.base.utils.SPUtil
 
 object VideoSetting {
 
@@ -230,19 +231,38 @@ object VideoSetting {
     }
 
     private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
-    private var currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
+    private var currBroadcastSetting: BroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
 
     // 当前观众设备等级（高、中、低）
-    private var currAudienceDeviceLevel = DeviceLevel.Low
+    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(SPUtil.getString("currAudienceDeviceLevel", DeviceLevel.Low.toString()))
 
     // 观众看播设置
-    var currAudiencePlaySetting = AudiencePlaySetting.BASE_LOW
+    private var currAudiencePlaySetting: Int = SPUtil.getInt("currAudiencePlaySetting", AudiencePlaySetting.BASE_LOW)
 
     // 超分开关
-    var currAudienceEnhanceSwitch = true
+    private var currAudienceEnhanceSwitch = SPUtil.getBoolean("currAudienceEnhanceSwitch", true)
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
+
+    fun getCurrAudiencePlaySetting() = currAudiencePlaySetting
+
+    fun getCurrAudienceEnhanceSwitch() = currAudienceEnhanceSwitch
+
+    fun setCurrAudienceDeviceLevel(deviceLevel: DeviceLevel) {
+        currAudienceDeviceLevel = deviceLevel
+        SPUtil.putString("currAudienceDeviceLevel", deviceLevel.toString())
+    }
+
+    fun setCurrAudiencePlaySetting(currAudiencePlaySetting: Int) {
+        this.currAudiencePlaySetting = currAudiencePlaySetting
+        SPUtil.putInt("currAudiencePlaySetting", currAudiencePlaySetting)
+    }
+
+    fun setCurrAudienceEnhanceSwitch(currAudienceEnhanceSwitch: Boolean) {
+        this.currAudienceEnhanceSwitch = currAudienceEnhanceSwitch
+        SPUtil.putBoolean("currAudienceEnhanceSwitch", currAudienceEnhanceSwitch)
+    }
 
     fun resetBroadcastSetting() {
         currBroadcastSetting = when (currAudienceDeviceLevel) {
@@ -268,7 +288,7 @@ object VideoSetting {
     fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false, isByAudience: Boolean = false) {
         var liveMode = LiveMode.OneVOne
         if (isByAudience) {
-            currAudienceDeviceLevel = deviceLevel
+            setCurrAudienceDeviceLevel(deviceLevel)
         } else {
             liveMode = when (currBroadcastSetting) {
                 RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne

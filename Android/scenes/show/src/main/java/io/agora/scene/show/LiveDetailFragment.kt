@@ -1285,7 +1285,7 @@ class LiveDetailFragment : Fragment() {
         var showTip = false
         var superResolution: VideoSetting.SuperResolution = VideoSetting.SuperResolution.SR_NONE
         when (VideoSetting.getCurrBroadcastSetting()) {
-            VideoSetting.RecommendBroadcastSetting.LowDevice1v1, VideoSetting.RecommendBroadcastSetting.MediumDevice1v1, VideoSetting.RecommendBroadcastSetting.HighDevice1v1 -> when (VideoSetting.currAudiencePlaySetting) {
+            VideoSetting.RecommendBroadcastSetting.LowDevice1v1, VideoSetting.RecommendBroadcastSetting.MediumDevice1v1, VideoSetting.RecommendBroadcastSetting.HighDevice1v1 -> when (VideoSetting.getCurrAudiencePlaySetting()) {
                 // 画质增强、高端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
                     // 1080P
@@ -1327,7 +1327,7 @@ class LiveDetailFragment : Fragment() {
                     superResolution = VideoSetting.SuperResolution.SR_NONE
                 }
             }
-            VideoSetting.RecommendBroadcastSetting.LowDevicePK, VideoSetting.RecommendBroadcastSetting.MediumDevicePK, VideoSetting.RecommendBroadcastSetting.HighDevicePK -> when (VideoSetting.currAudiencePlaySetting) {
+            VideoSetting.RecommendBroadcastSetting.LowDevicePK, VideoSetting.RecommendBroadcastSetting.MediumDevicePK, VideoSetting.RecommendBroadcastSetting.HighDevicePK -> when (VideoSetting.getCurrAudiencePlaySetting()) {
                 // 画质增强、高端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
                     superResolution = VideoSetting.SuperResolution.SR_1_33
