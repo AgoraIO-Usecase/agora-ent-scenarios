@@ -66,9 +66,16 @@ data class VoiceRoomModel constructor(
     @Transient var rankingList: List<VoiceRankUserModel>? = null,
     @Transient var memberList: List<VoiceMemberModel>? = null,
     @Transient var giftAmount: Int = 0,
-    @SerializedName("useRobot") var useRobot: Boolean = false,
-    @SerializedName("robotVolume") var robotVolume: Int = 50,
     @SerializedName("announcement") var announcement: String = "",
+) : BaseRoomBean
+
+data class RobotSpatialAudioModel constructor(
+    @SerializedName("use_robot") var useRobot: Boolean = false,
+    @SerializedName("robot_volume") var robotVolume: Int = 50,
+    @SerializedName("red_robot_absorb") var redRobotAbsorb: Boolean = false,
+    @SerializedName("red_robot_blur") var redRobotBlur: Boolean = false,
+    @SerializedName("blue_robot_absorb") var blueRobotAbsorb: Boolean = false,
+    @SerializedName("blue_robot_blur") var blueRobotBlur: Boolean = false,
 ) : BaseRoomBean
 
 /**
@@ -98,7 +105,8 @@ data class VoiceRoomApply constructor(
  */
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
-    var micInfo: List<VoiceMicInfoModel>? = null
+    var micInfo: List<VoiceMicInfoModel>? = null,
+    var robotInfo: RobotSpatialAudioModel? = null
 ) : BaseRoomBean
 
 /**

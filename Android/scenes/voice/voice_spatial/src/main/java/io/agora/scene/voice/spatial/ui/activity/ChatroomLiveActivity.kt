@@ -283,6 +283,12 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     finish()
                 }
             }
+
+            override fun onRobotUpdate(roomId: String, robotInfo: RobotSpatialAudioModel) {
+                super.onRobotUpdate(roomId, robotInfo)
+                if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
+                roomObservableDelegate.onRobotUpdated(robotInfo)
+            }
         })
 
         voiceServiceProtocol.subscribeRoomTimeUp {
