@@ -64,6 +64,8 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
 @property (nonatomic, assign) NSInteger totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) BOOL isPause;
+
+@property (nonatomic, strong) NSString *currentLoadUrl;//当前正在请求的歌词url
 @end
 
 @implementation KTVApi
@@ -558,7 +560,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         };
         [self sendStreamMessageWithDict:dict success:nil];
     }
-    
     [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:YES];
 }
 
@@ -748,10 +749,21 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
     self.hasSendEndPosition = false;
     self.totalLines = 0;
     self.totalScore = 0;
+    self.currentLoadUrl = url;
     
     //判断歌词是zip文件还是本地地址
     bool isLocal = [url hasSuffix:@".zip"];
     [self.downLoadManager downloadLrcFileWithUrlString:url completion:^(NSString *lrcUrl) {
+        
+        //因为歌词下载是异步操作 需要特殊处理一下如果歌词还没下载下来。但是点击了下一首歌 会出现下载的是上一首的歌词。但是需要的是下一首的
+        NSString *curStr = [self.currentLoadUrl componentsSeparatedByString:@"/"].lastObject;
+        NSString *loadStr = [lrcUrl componentsSeparatedByString:@"/"].lastObject;
+        NSString *curSongStr = [curStr componentsSeparatedByString:@"."].firstObject;
+        NSString *loadSongStr = [loadStr componentsSeparatedByString:@"."].firstObject;
+        if(![curSongStr isEqualToString:loadSongStr]){
+            KTVLogInfo(@"load lrc is not equal to download lrc");
+            return;
+        }
         NSURL *musicUrl = isLocal ? [NSURL fileURLWithPath:lrcUrl] : [NSURL URLWithString:url];
         NSData *data = [NSData dataWithContentsOfURL:musicUrl];
         LyricModel *model = [KaraokeView parseLyricDataWithData:data];
@@ -764,7 +776,6 @@ typedef void (^LoadMusicCallback)(AgoraMusicContentCenterPreloadStatus);
         if(model){
             [self.karaokeView setLyricDataWithData:model];
             self.totalCount = model.lines.count;
-            
             block(url);
         } else {
             NSLog(@"歌词解析失败！");
