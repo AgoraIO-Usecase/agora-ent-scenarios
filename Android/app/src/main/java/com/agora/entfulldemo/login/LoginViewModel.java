@@ -3,9 +3,6 @@ package com.agora.entfulldemo.login;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Random;
-import java.util.UUID;
-
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
@@ -27,45 +24,33 @@ public class LoginViewModel extends BaseRequestViewModel {
      * @param vCode   验证码
      */
     public void requestLogin(String account, String vCode) {
-        User user = new User();
-        user.headUrl = "http://10.80.1.129:8080/static/0a9d349b/images/headshot.png";
-        user.mobile = "12345678900";
-        user.name = "User-" + new Random().nextInt(1000);
-        user.sex = "1";
-        user.status = 1;
-        user.userNo = UUID.randomUUID().toString();
-        user.token = UUID.randomUUID().toString();
-        user.id = (long) (new Random(System.currentTimeMillis()).nextInt(10000) + 100000);
-        UserManager.getInstance().saveUserInfo(user);
-        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+        if (!account.equals(phone)) {
+            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL, null);
+            ToastUtils.showToast("验证码错误");
+            return;
+        }
+        ApiManager.getInstance().requestLogin(account, vCode)
+                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
+                new ApiSubscriber<BaseResponse<User>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        addDispose(d);
+                    }
 
-//        if (!account.equals(phone)) {
-//            getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL, null);
-//            ToastUtils.showToast("验证码错误");
-//            return;
-//        }
-//        ApiManager.getInstance().requestLogin(account, vCode)
-//                .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-//                new ApiSubscriber<BaseResponse<User>>() {
-//                    @Override
-//                    public void onSubscribe(@NonNull Disposable d) {
-//                        addDispose(d);
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(BaseResponse<User> data) {
-//                        ToastUtils.showToast("登录成功");
-//                        ApiManager.token = (data.getData().token);
-//                        UserManager.getInstance().saveUserInfo(data.getData());
-//                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
-//                    }
-//
-//                    @Override
-//                    public void onFailure(@Nullable ApiException t) {
-//                        ToastUtils.showToast(t.getMessage());
-//                    }
-//                }
-//        );
+                    @Override
+                    public void onSuccess(BaseResponse<User> data) {
+                        ToastUtils.showToast("登录成功");
+                        ApiManager.token = (data.getData().token);
+                        UserManager.getInstance().saveUserInfo(data.getData());
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS, null);
+                    }
+
+                    @Override
+                    public void onFailure(@Nullable ApiException t) {
+                        ToastUtils.showToast(t.getMessage());
+                    }
+                }
+        );
     }
 
     private String phone;

@@ -310,10 +310,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 离开syncManager 房间
      */
-    fun leaveSyncManagerRoom(roomId: String): LiveData<Resource<Boolean>> {
+    fun leaveSyncManagerRoom(roomId: String, isRoomOwnerLeave: Boolean): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.leaveRoom(roomId, completion = { error, result ->
+                voiceServiceProtocol.leaveRoom(roomId, isRoomOwnerLeave, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -324,23 +324,4 @@ class VoiceRoomLivingRepository : BaseRepository() {
         }
         return resource.asLiveData()
     }
-
-    /**
-     * 更新成员列表
-     */
-    fun updateRoomMember(): LiveData<Resource<Boolean>> {
-        val resource = object : NetworkOnlyResource<Boolean>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.updateRoomMembers(completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
-                    } else {
-                        callBack.onError(error)
-                    }
-                })
-            }
-        }
-        return resource.asLiveData()
-    }
-
 }

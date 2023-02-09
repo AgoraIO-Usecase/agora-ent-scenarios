@@ -117,7 +117,7 @@ class ChatroomRaisedHandsFragment : BaseUiFragment<VoiceSpatialFragmentHandsList
                     override fun onSuccess(data: VoiceMicInfoModel?) {
                         "accept mic seat apply：${data?.micIndex}".logD()
                         data?.let {
-                            it.member?.chatUid?.let { chatUid ->
+                            it.member?.userId?.let {
                                 adapter?.notifyItemRemoved(currentIndex)
                             }
                             onFragmentListener?.onAcceptMicSeatApply(it)

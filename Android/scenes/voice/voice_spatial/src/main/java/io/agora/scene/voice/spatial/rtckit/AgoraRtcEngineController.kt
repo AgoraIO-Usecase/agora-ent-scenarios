@@ -6,10 +6,17 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.model.DataStreamInfo
+import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.SoundAudioBean
 import io.agora.scene.voice.spatial.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
+import io.agora.spatialaudio.ILocalSpatialAudioEngine
+import io.agora.spatialaudio.LocalSpatialAudioConfig
+import io.agora.spatialaudio.RemoteVoicePositionInfo
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.utils.LogTools.logD
@@ -37,8 +44,16 @@ class AgoraRtcEngineController {
 
     private var micVolumeListener: RtcMicVolumeListener? = null
 
+    private var spatialListener: RtcSpatialPositionListener? = null
+
+    private var spatial: ILocalSpatialAudioEngine? = null
+
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
+    }
+
+    fun setSpatialListener(spatialListener: RtcSpatialPositionListener) {
+        this.spatialListener = spatialListener
     }
 
     private var joinCallback: VRValueCallBack<Boolean>? = null
@@ -83,6 +98,15 @@ class AgoraRtcEngineController {
                     joinCallback?.onSuccess(true)
                 }
 
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    val dataStreamInfo =
+                        GsonUtil.getInstance().fromJson(data.toString(), DataStreamInfo::class.java)
+                    if(dataStreamInfo.code == 101){
+                        onRemoteSpatialStreamMessage(uid, streamId, dataStreamInfo)
+                    }
+                }
+
                 override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
                     super.onAudioVolumeIndication(speakers, totalVolume)
                     if (speakers.isNullOrEmpty()) return
@@ -125,6 +149,76 @@ class AgoraRtcEngineController {
             }
             return true
         }
+    }
+    /**
+     * 初始化空间音频
+     * 设置声音最大距离为 10
+     * 最大接收人数为 6
+     * 距离单位1值为 1f
+     */
+    private fun setupSpatialAudio() {
+        val localSpatial = ILocalSpatialAudioEngine.create()
+        val localSpatialAudioConfig = LocalSpatialAudioConfig()
+        localSpatialAudioConfig.mRtcEngine = rtcEngine
+        localSpatial.initialize(localSpatialAudioConfig)
+        localSpatial.setMaxAudioRecvCount(6)
+        localSpatial.setAudioRecvRange(10f)
+        localSpatial.setDistanceUnit(1f)
+        spatial = localSpatial
+    }
+    /**
+     * 更新自己空间音频位置
+     * @param position 位置[x, y, z]
+     * @param forward 朝向[x, y, z]
+     */
+    public fun updateSelfPosition(position: SeatPositionInfo) {
+        spatial?.updateSelfPosition(
+            position.pos.toFloatArray(),
+            position.forward.toFloatArray(),
+            position.right.toFloatArray(),
+            position.up.toFloatArray())
+    }
+    /**
+     * 发送本地位置到远端
+     */
+    private fun sendSelfPosition(position: SeatPositionInfo) {
+        val dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())!!
+        val steamInfo = DataStreamInfo(101, GsonUtil.getInstance().toJson(position))
+        rtcEngine?.sendStreamMessage(
+            dataStreamId,
+            GsonUtil.getInstance().toJson(steamInfo).toByteArray()
+        )
+    }
+    /**
+     * 更新远端音源的配置
+     * 人声模糊关闭，空气衰减开启，衰减系数为0.5
+     * @param uid 远端音源的uid
+     */
+    public fun setupRemoteSpatialAudio(uid: Int) {
+        val spatialAudioParams = SpatialAudioParams()
+        spatialAudioParams.enable_blur = false
+        spatialAudioParams.enable_air_absorb = true
+        rtcEngine?.setRemoteUserSpatialAudioParams(uid, spatialAudioParams)
+        spatial?.setRemoteAudioAttenuation(uid, 0.5, false)
+    }
+    /**
+     * 更新远端音源的位置
+     * @param position 位置[x, y, z]
+     * @param forward 朝向[x, y, z]
+     */
+    public fun updateRemotePosition(uid: Int, position: Float, forward: Float) {
+        val position = RemoteVoicePositionInfo()
+        position.position = floatArrayOf(0.0f, 0.0f, 0.0f)
+        position.forward = floatArrayOf(1.0f, 0.0f, 0.0f)
+        spatial?.updateRemotePosition(uid, position)
+    }
+    /**
+     * 处理远端空间位置变化产生的回调
+     */
+    private fun onRemoteSpatialStreamMessage(uid: Int, streamId: Int, info: DataStreamInfo) {
+        val seatPositionInfo = GsonUtil.getInstance()
+            .fromJson(info.message, SeatPositionInfo::class.java)
+        spatialListener?.onRemoteSpatialChanged(seatPositionInfo)
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {

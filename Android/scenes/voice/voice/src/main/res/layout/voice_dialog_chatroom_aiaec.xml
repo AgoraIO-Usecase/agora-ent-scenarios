@@ -84,4 +84,104 @@
         app:layout_constraintTop_toTopOf="@+id/mtAECIntroduce"
         />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvAuditionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:paddingStart="@dimen/voice_sp_20"
+        android:textColor="@color/voice_dark_grey_color_6c7192"
+        android:gravity="center_vertical"
+        android:text="@string/voice_chatroom_turnon_aiaec"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtAECIntroduce" />
+
+    <!-- Before -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvBeforeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="53dp"
+        android:paddingStart="@dimen/voice_sp_20"
+        style="@style/voice_bottom_sheet_text_style"
+        android:text="#Before"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAuditionTitle" />
+
+    <ImageButton
+        android:id="@+id/btnBefore"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_marginEnd="@dimen/voice_sp_10"
+        android:src="@drawable/voice_sound_sample_play_selector"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="@+id/tvBeforeTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvBeforeTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivBefore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/voice_sp_10"
+        android:background="@drawable/voice_aiaec_sample_after"
+        app:layout_constraintTop_toTopOf="@+id/tvBeforeTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvBeforeTitle"
+        app:layout_constraintStart_toEndOf="@+id/tvBeforeTitle"
+        app:layout_constraintEnd_toStartOf="@+id/btnBefore" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="@dimen/voice_sp_20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvBeforeTitle" />
+
+    <!-- After -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvAfterTitle"
+        style="@style/voice_bottom_sheet_text_style"
+        android:layout_width="@+id/tvBeforeTitle"
+        android:layout_height="53dp"
+        android:paddingStart="@dimen/voice_sp_20"
+        android:text="#After"
+        app:layout_constraintTop_toBottomOf="@+id/tvBeforeTitle"
+        app:layout_constraintLeft_toLeftOf="@+id/tvBeforeTitle"
+        app:layout_constraintRight_toRightOf="@+id/tvBeforeTitle" />
+
+    <ImageButton
+        android:id="@+id/btnAfter"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
+        android:layout_marginEnd="@dimen/voice_sp_10"
+        android:src="@drawable/voice_sound_sample_play_selector"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="@+id/tvAfterTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAfterTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <ImageView
+        android:id="@+id/ivAfter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/voice_sp_10"
+        android:background="@drawable/voice_aiaec_sample_after"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAfterTitle"
+        app:layout_constraintEnd_toStartOf="@+id/btnBefore"
+        app:layout_constraintStart_toEndOf="@+id/tvAfterTitle"
+        app:layout_constraintTop_toTopOf="@+id/tvAfterTitle" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/voice_bottom_sheet_divider_style"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAfterTitle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAfterTitle" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
