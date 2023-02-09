@@ -48,6 +48,7 @@
     <string name="voice_room_kick_member">Kicked Out</string>
 
     <string name="voice_room_welcome">Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.</string>
+    <string name="voice_chatroom_time_up_tips">The room experience time has been exhausted.</string>
 
     <!-- gift -->
     <string name="voice_gift_default_name_1">Sweet Heart</string>

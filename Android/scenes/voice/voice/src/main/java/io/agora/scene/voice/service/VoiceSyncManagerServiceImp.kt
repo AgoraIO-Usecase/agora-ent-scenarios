@@ -265,7 +265,7 @@ class VoiceSyncManagerServiceImp(
      * 离开房间
      * @param roomId 房间id
      */
-    override fun leaveRoom(roomId: String, completion: (error: Int, result: Boolean) -> Unit) {
+    override fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
         val cacheRoom = roomMap[roomId] ?: return
         roomChecker.leaveRoom(roomId)
         // 取消所有订阅
@@ -292,6 +292,7 @@ class VoiceSyncManagerServiceImp(
                 }
             })
         } else {
+            if (isRoomOwnerLeave) return
             val curRoomInfo = roomMap[roomId] ?: return
             curRoomInfo.memberCount = curRoomInfo.memberCount - 1
             val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {

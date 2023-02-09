@@ -48,6 +48,7 @@
     <string name="voice_room_kick_member">已踢出房间</string>
 
     <string name="voice_room_welcome">欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。</string>
+    <string name="voice_chatroom_time_up_tips">房间体验时间已耗尽。</string>
 
     <!-- gift -->
     <string name="voice_gift_default_name_1">甜心</string>
