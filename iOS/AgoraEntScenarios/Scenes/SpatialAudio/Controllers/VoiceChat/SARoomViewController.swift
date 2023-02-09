@@ -120,8 +120,7 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        let rate = sRtcView.width / sRtcView.height * 10
-        rtckit.initSpatialAudio(recvRange: Float(sRtcView.height * 0.5 / rate))
+        rtckit.initSpatialAudio(recvRange: 10)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false

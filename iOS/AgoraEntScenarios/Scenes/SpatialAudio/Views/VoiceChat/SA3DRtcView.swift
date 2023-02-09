@@ -20,9 +20,7 @@ class SA3DRtcView: UIView {
     private let nIdentifier = "normal"
     private var rtcUserView: SA3DMoveUserView = .init()
 
-    private var _lastPointAngle: Double = 0
     private var lastPoint: CGPoint = .zero
-    fileprivate var sendTS: CLongLong = 0
     private var lastPrePoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastCenterPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
@@ -105,56 +103,59 @@ class SA3DRtcView: UIView {
             make.width.height.equalTo(150~)
         }
         
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(pan))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(pan(pan:)))
         rtcUserView.addGestureRecognizer(pan)
-        
-        
-        rtcKit?.updateSpetialPostion(position: viewCenterPostion(center: CGPoint(x: Screen.width * 0.5,
-                                                                                 y: Screen.height * 0.5)),
-                                     axisForward: [0, 1, 0],
-                                     axisRight: [1, 0, 0],
-                                     axisUp: [0, 0, 1])
     }
 }
 
 extension SA3DRtcView {
+    
+    private func checkEdgeRange(point: CGPoint) -> CGPoint {
+        var moveCenter: CGPoint = point
+        // 处理边界
+        if moveCenter.x <= 50~ {
+            moveCenter.x = 50~
+        }
+        if moveCenter.y <= frame.origin.y - rtcUserView.height * 0.5 {
+            moveCenter.y = frame.origin.y - rtcUserView.height * 0.5
+        }
+        if moveCenter.x >= frame.size.width - 50~ {
+            moveCenter.x = frame.size.width - 50~
+        }
+
+        if moveCenter.y >= frame.height - rtcUserView.height * 0.5 {
+            moveCenter.y = frame.height - rtcUserView.height * 0.5
+        }
+        return moveCenter
+    }
+    
+    private func updateRtcUserViewPosition() {
+        let pos = viewCenterPostion(view: rtcUserView)
+        let realPosition = calcuRealPositon(angle: rtcUserView.angle)
+        rtcKit?.updateSpetialPostion(position: pos,
+                                     axisForward: realPosition.0,
+                                     axisRight: realPosition.1,
+                                     axisUp: [0, 0, 1])
+    }
+    
     @objc private func pan(pan: UIPanGestureRecognizer) {
         let translation = pan.translation(in: self)
-
-        var moveCenter = CGPoint(x: rtcUserView.center.x + translation.x, y: rtcUserView.center.y + translation.y)
-
-        // 处理边界
-        if moveCenter.x <= 75~ {
-            moveCenter.x = 75~
-        }
-
-        if moveCenter.y <= 75~ {
-            moveCenter.y = 75~
-        }
-
-        if moveCenter.x >= bounds.size.width - 75~ {
-            moveCenter.x = bounds.size.width - 75~
-        }
-
-        if moveCenter.y >= bounds.size.height - 75~ {
-            moveCenter.y = bounds.size.height - 75~
-        }
-
-        rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
-        pan.setTranslation(.zero, in: self)
-
-        let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
-        rtcUserView.angle = angle - _lastPointAngle
-        _lastPointAngle = angle
-        lastCenterPoint = rtcUserView.center
+        var moveCenter = CGPoint(x: rtcUserView.center.x + translation.x,
+                                 y: rtcUserView.center.y + translation.y)
         
-        if pan.state == .ended {
-            let pos = viewCenterPostion(view: rtcUserView)
-            rtcKit?.updateSpetialPostion(position: pos,
-                                         axisForward: [0, 1, 0],
-                                         axisRight: [1, 0, 0],
-                                         axisUp: [0, 0, 1])
+        moveCenter = checkEdgeRange(point: moveCenter)
+        let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
+        if pan.state == .changed {
+            rtcUserView.angle = angle
+            lastCenterPoint = rtcUserView.center
             
+            rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
+            pan.setTranslation(.zero, in: self)
+        } else if pan.state == .ended {
+            rtcUserView.angle = angle
+            updateRtcUserViewPosition()
+            
+            let pos = viewCenterPostion(view: rtcUserView)
             let info = SAPositionInfo()
             // TODO: 待完善uid
             info.uid = 0
@@ -173,28 +174,63 @@ extension SA3DRtcView {
         let changeY = curP.y - preP.y
         let radina = atan2(changeY, changeX)
         let angle = 180.0 / Double.pi * radina
-        return (angle - 90) / 180.0 * Double.pi
+        return angle
     }
-
-    fileprivate func getCurrentTimeStamp() -> CLongLong {
-        // 当前时间戳
-        let timestamp = Date().timeIntervalSince1970
-        // 毫秒级时间戳
-        let timeStamp_now = CLongLong(round(timestamp * 1000))
-        return timeStamp_now
+    
+    private func calcuRealPositon(angle: Double) -> ([NSNumber], [NSNumber])  {
+        let fx = cos(angle)
+        let fy = sin(angle)
+        let forward = [NSNumber(value: Double(fx)),
+                       NSNumber(value: Double(fy)),
+                       NSNumber(0.0)]
+        let right = [NSNumber(value: Double(-fy)),
+                     NSNumber(value: Double(fx)),
+                     NSNumber(0.0)]
+        return (forward, right)
+    }
+    
+    //  获取视图在笛卡尔坐标系中的位置
+    private func viewConvertToPoint(rect: CGRect) -> CGPoint {
+        let axisLength = 20.0
+        let fullWidth = collectionView.frame.width
+        let fullHeight = collectionView.frame.height
+        let oPoint = CGPoint(x: fullWidth * 0.5, y: fullHeight * 0.5)
+        
+        // 翻转Y轴
+        let turnY = fullHeight - rect.origin.y
+        let vPoint = CGPoint(x: rect.width * 0.5 + rect.origin.x,
+                             y: turnY - (rect.height * 0.5))
+        // 相对坐标
+        let relativePoint = CGPoint(x: oPoint.x - vPoint.x,
+                                    y: oPoint.y - vPoint.y)
+        // 屏幕相对坐标转化为坐标系坐标
+        return CGPoint(x: relativePoint.x / fullWidth * axisLength,
+                       y: relativePoint.y / fullWidth * axisLength)
+    }
+    
+    // 将笛卡尔坐标转换成视图中的坐标
+    private func pointConvertToView(point: CGPoint) -> CGPoint {
+        let axisLength = 20.0
+        let fullWidth = collectionView.frame.width
+        let fullHeight = collectionView.frame.height
+        let oPoint = CGPoint(x: fullWidth * 0.5, y: fullHeight * 0.5)
+        // 笛卡尔屏幕坐标
+        let vPoint = CGPoint(x: point.x / axisLength * fullWidth,
+                             y: point.y / axisLength * fullHeight)
+        let x = oPoint.x - vPoint.x
+        let y = oPoint.y + vPoint.y
+        return CGPoint(x: x, y: y)
     }
     
     private func viewCenterPostion(view: UIView) -> [NSNumber] {
-        let rate = frame.width / frame.height * 10
-        let pos = [NSNumber(value: Double(view.center.x / rate)),
-                   NSNumber(value: Double(view.center.y / rate)),
+        let pos = [NSNumber(value: Double(viewConvertToPoint(rect: view.frame).x)),
+                   NSNumber(value: Double(viewConvertToPoint(rect: view.frame).y)),
                    NSNumber(0.0)]
         return pos
     }
-    private func viewCenterPostion(center: CGPoint) -> [NSNumber] {
-        let rate = frame.width / frame.height * 10
-        let pos = [NSNumber(value: Double(center.x) / rate),
-                   NSNumber(value: Double(center.y) / rate),
+    private func viewCenterPostion(rect: CGRect) -> [NSNumber] {
+        let pos = [NSNumber(value: Double(viewConvertToPoint(rect: rect).x)),
+                   NSNumber(value: Double(viewConvertToPoint(rect: rect).y)),
                    NSNumber(0.0)]
         return pos
     }
@@ -313,8 +349,8 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let rtcUserView = (cell as? SA3DUserCollectionViewCell)?.rtcUserView.iconView else { return }
-        let point = rtcUserView.convert(rtcUserView.center, toViewOrWindow: collectionView)
-        let pos = viewCenterPostion(center: point)
+        let rect = rtcUserView.convert(rtcUserView.frame, to: collectionView)
+        let pos = viewCenterPostion(rect: rect)
         switch indexPath.item {
         case 0:
             if let mic_info = micInfos?[0] {
@@ -451,11 +487,10 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
         rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
                                            position: pos,
                                            forward: forward)
-        let rate = frame.width / frame.height * 10
-        let x = info.x * rate
-        let y = info.y * rate
+        var point = pointConvertToView(point: CGPoint(x: info.x, y: info.y))
+        point = checkEdgeRange(point: point)
         UIView.animate(withDuration: 0.25) {
-            self.rtcUserView.frame.origin = CGPoint(x: x, y: y)
+            self.rtcUserView.center = point
         }
         rtcUserView.angle = info.angle
     }
