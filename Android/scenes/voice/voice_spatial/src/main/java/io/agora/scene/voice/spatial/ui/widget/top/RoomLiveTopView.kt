@@ -46,7 +46,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.llChatroomMemberRank.setOnClickListener(this)
 //        binding.mtChatroomMembers.setOnClickListener(this)
         binding.mtChatroomNotice.setOnClickListener(this)
-        binding.mtChatroomAgoraSound.setOnClickListener(this)
+        binding.llChatroomAgoraSound.setOnClickListener(this)
 
     }
 
@@ -89,15 +89,22 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             mtChatroomWatch.text = watchText
             // 普通房间显示 最佳音效
             if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-                mtChatroomAgoraSound.isVisible = true
+                llChatroomAgoraSound.isVisible = true
+                ivIcon.isVisible = false
                 mtChatroomAgoraSound.text = when (roomDetailInfo.soundEffect) {
                     ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
                     ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
                     ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
                     else -> root.context.getString(R.string.voice_chatroom_social_chat)
                 }
+            }
+            // 空间音频
+            else if (roomDetailInfo.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
+                llChatroomAgoraSound.isVisible = true
+                ivIcon.isVisible = true
+                mtChatroomAgoraSound.text = "Beginner's Guide"
             } else {
-                mtChatroomAgoraSound.isVisible = false
+                llChatroomAgoraSound.isVisible = false
             }
 
             // 房主头像
@@ -199,7 +206,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             // 公告
             binding.mtChatroomNotice -> onLiveTopClickListener?.onClickNotice(v)
             //音效
-            binding.mtChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
+            binding.llChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
         }
     }
 }

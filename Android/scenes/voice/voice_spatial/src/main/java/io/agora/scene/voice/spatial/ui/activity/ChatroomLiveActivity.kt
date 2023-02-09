@@ -27,6 +27,7 @@ import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.conver
 import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
+import io.agora.scene.voice.spatial.ui.dialog.Room3DWelcomeSheetDialog
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.voice.common.constant.ConfigConstants
@@ -289,34 +290,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
         binding.chatBottom.initMenu(roomKitBean.roomType)
         if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
             binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
-            binding.rvChatroom2dMicLayout.isVisible = true
             binding.rvChatroom3dMicLayout.isVisible = false
-            roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
-                this,
-                roomLivingViewModel,
-                roomKitBean,
-                binding.cTopView,
-                binding.rvChatroom2dMicLayout,
-                binding.chatBottom
-            )
-            binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
-            binding.rvChatroom2dMicLayout.onItemClickListener(
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onUserMicClick(data)
-                    }
-                },
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
-                    }
-                }
-            ).setUpInitAdapter()
         } else { // 空间音效房间
             binding.likeView.isVisible = false
-            binding.rvChatroom2dMicLayout.isVisible = false
             binding.rvChatroom3dMicLayout.isVisible = true
             roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
                 this,
@@ -360,6 +336,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
 
             override fun onClickSoundSocial(view: View) {
+                if (roomKitBean.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
+                    Room3DWelcomeSheetDialog.needShow = true
+                    roomObservableDelegate.showRoom3DWelcomeSheetDialog()
+                    return
+                }
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
                     finish()
                 })
