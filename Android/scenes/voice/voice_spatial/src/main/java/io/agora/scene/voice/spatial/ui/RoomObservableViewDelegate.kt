@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
-import io.agora.CallBack
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
@@ -17,13 +16,13 @@ import io.agora.scene.voice.spatial.model.constructor.RoomSoundAudioConstructor
 import io.agora.scene.voice.spatial.model.constructor.RoomSoundSelectionConstructor
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
+import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
 import io.agora.scene.voice.spatial.ui.dialog.*
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonFragmentAlertDialog
 import io.agora.scene.voice.spatial.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.spatial.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.spatial.ui.widget.top.IRoomLiveTopView
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
-import io.agora.util.EMLog
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
@@ -158,6 +157,16 @@ class RoomObservableViewDelegate constructor(
                         iRoomMicView.updateVolume(micIndex, volume)
                     }
                 }
+            }
+        })
+        AgoraRtcEngineController.get().setSpatialListener(object : RtcSpatialPositionListener() {
+            override fun onRemoteSpatialChanged(position: SeatPositionInfo) {
+                iRoomMicView.updateSpatialPosition(position)
+                AgoraRtcEngineController.get().updateRemotePosition(
+                    position.uid,
+                    arrayOf(position.x, position.y, 0f),
+                    position.forward
+                )
             }
         })
         // 申请上麦
@@ -985,7 +994,27 @@ class RoomObservableViewDelegate constructor(
      * 根据麦位数据更新ui
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
-        iRoomMicView.onSeatUpdated(newMicMap)
+        iRoomMicView.onSeatUpdated(newMicMap) {
+            it.member?.rtcUid?.let { uid ->
+                if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                    AgoraRtcEngineController.get().updateSelfPosition(
+                        arrayOf(it.position?.x ?: 0f, it.position?.y ?: 0f, 0f),
+                        arrayOf(it.forward?.x ?: 0f, it.forward?.y ?: 0f, 0f),
+                        arrayOf(-(it.forward?.y ?: 0f), it.forward?.x ?: 0f, 0f),
+                    )
+                } else {
+                    if (!it.isSpatialSet) {
+                        AgoraRtcEngineController.get().setupRemoteSpatialAudio(uid)
+                        it.isSpatialSet = true
+                    }
+                    AgoraRtcEngineController.get().updateRemotePosition(
+                        uid,
+                        arrayOf(it.position?.x ?: 0f, it.position?.y ?: 0f, 0f),
+                        arrayOf(it.forward?.x ?: 0f, it.forward?.y ?: 0f, 0f),
+                    )
+                }
+            }
+        }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()

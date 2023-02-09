@@ -1,12 +1,11 @@
 package io.agora.scene.voice.spatial.model
 
 data class SeatPositionInfo(
-    val pos: Array<Float>,
+    val uid: Int,
     val forward: Array<Float>,
-    // 右手，默认forward顺时针偏转90°
-    val right: Array<Float>,
-    // 头顶，默认朝上，z轴方向
-    val up: Array<Float>
+    val x: Float,
+    val y: Float,
+    val angle: Float
 )
 
 data class DataStreamInfo(

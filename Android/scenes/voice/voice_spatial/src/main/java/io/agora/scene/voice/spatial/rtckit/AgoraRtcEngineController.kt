@@ -1,6 +1,7 @@
 package io.agora.scene.voice.spatial.rtckit
 
 import android.content.Context
+import android.graphics.PointF
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -64,6 +65,7 @@ class AgoraRtcEngineController {
         joinCallback: VRValueCallBack<Boolean>
     ) {
         initRtcEngine(context)
+        setupSpatialAudio()
         this.joinCallback = joinCallback
         VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
@@ -169,14 +171,15 @@ class AgoraRtcEngineController {
     /**
      * 更新自己空间音频位置
      * @param position 位置[x, y, z]
-     * @param forward 朝向[x, y, z]
+     * @param froward 朝向[x, y, z]
+     * @param right 朝向[x, y, z]
      */
-    public fun updateSelfPosition(position: SeatPositionInfo) {
+    public fun updateSelfPosition(pos: Array<Float>, froward: Array<Float>, right: Array<Float>) {
         spatial?.updateSelfPosition(
-            position.pos.toFloatArray(),
-            position.forward.toFloatArray(),
-            position.right.toFloatArray(),
-            position.up.toFloatArray())
+            pos.toFloatArray(),
+            froward.toFloatArray(),
+            right.toFloatArray(),
+            arrayListOf<Float>(0f, 0f, 1f).toFloatArray())
     }
     /**
      * 发送本地位置到远端
@@ -206,10 +209,10 @@ class AgoraRtcEngineController {
      * @param position 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
-    public fun updateRemotePosition(uid: Int, position: Float, forward: Float) {
+    public fun updateRemotePosition(uid: Int, pos: Array<Float>, forward: Array<Float>) {
         val position = RemoteVoicePositionInfo()
-        position.position = floatArrayOf(0.0f, 0.0f, 0.0f)
-        position.forward = floatArrayOf(1.0f, 0.0f, 0.0f)
+        position.position = pos.toFloatArray()
+        position.forward = forward.toFloatArray()
         spatial?.updateRemotePosition(uid, position)
     }
     /**

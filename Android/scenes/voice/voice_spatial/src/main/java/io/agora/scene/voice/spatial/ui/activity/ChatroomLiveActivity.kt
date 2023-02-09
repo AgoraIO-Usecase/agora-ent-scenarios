@@ -24,6 +24,7 @@ import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBind
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
+import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
@@ -341,7 +342,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                         roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
                     }
                 },
+                object : OnItemMoveListener<VoiceMicInfoModel> {
+                    override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
+                        super.onItemMove(data, position, viewType)
+                        val right = arrayOf(-position.forward[1], -position.forward[0], 0f)
+                        AgoraRtcEngineController.get().updateSelfPosition(
+                            arrayOf(position.x, position.y, 0f),
+                            position.forward,
+                            right
+                        )
+                    }
+                }
             ).setUpInitMicInfoMap()
+//            binding.rvChatroom3dMicLayout
         }
         binding.cTopView.setTitleMaxWidth()
 //        roomObservableDelegate.onRoomModel(voiceRoomModel)

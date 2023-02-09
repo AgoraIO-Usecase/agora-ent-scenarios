@@ -13,6 +13,7 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom2dMicLayoutBinding
 import io.agora.scene.voice.spatial.model.BotMicInfoBean
+import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
 import io.agora.scene.voice.spatial.ui.adapter.Room2DBotMicAdapter
@@ -134,7 +135,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
         return -1
     }
 
-    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, each: ((VoiceMicInfoModel) -> Unit)?) {
         room2DMicAdapter?.onSeatUpdated(newMicMap)
     }
 
@@ -146,5 +147,9 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
 
     override fun myRtcUid(): Int {
         return myRtcUid
+    }
+
+    override fun updateSpatialPosition(info: SeatPositionInfo) {
+        // For 3D Mic View, Do Noting
     }
 }
