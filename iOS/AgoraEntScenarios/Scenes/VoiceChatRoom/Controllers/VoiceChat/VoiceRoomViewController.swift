@@ -630,7 +630,9 @@ extension VoiceRoomViewController: VMManagerDelegate {
                 let user = mic.member
                 guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
-                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    DispatchQueue.main.async {
+                        self.rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    }
                     break
                 }
             }

@@ -100,11 +100,11 @@ extension VoiceRoomViewController {
         }
         
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared
-        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 372~), vc: audioSetVC)
+        presentView.showView(with: CGRect(x: 0, y: 0, width: ScreenWidth, height: 372), vc: audioSetVC, maxHeight: 500)
         view.addSubview(presentView)
         
     }
-
+                           
     func applyMembersAlert(position: VoiceRoomSwitchBarDirection) {
         let apply = VoiceRoomApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
         apply.agreeApply = {
