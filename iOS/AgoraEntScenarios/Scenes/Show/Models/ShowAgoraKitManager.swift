@@ -97,7 +97,8 @@ class ShowAgoraKitManager: NSObject {
         return config
     }()
     
-    private lazy var captureConfig: AgoraCameraCapturerConfiguration = {
+//    let captureConfig = AgoraCameraCapturerConfiguration()
+    lazy var captureConfig: AgoraCameraCapturerConfiguration = {
         let config = AgoraCameraCapturerConfiguration()
         config.cameraDirection = .front
         config.dimensions = CGSize(width: 1280, height: 720)
@@ -186,6 +187,10 @@ class ShowAgoraKitManager: NSObject {
 //            mediaOptions.publishCameraTrack = false
 //            mediaOptions.publishMicrophoneTrack = options.publishMicrophoneTrack//role == .broadcaster
             mediaOptions.clientRoleType = role
+            // 极速直播
+            if role == .audience {
+                mediaOptions.audienceLatencyLevel = .lowLatency
+            }
         
             let connection = AgoraRtcConnection()
             connection.channelId = targetChannelId
@@ -194,6 +199,11 @@ class ShowAgoraKitManager: NSObject {
             //TODO: retain cycle in joinChannelEx
             let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
             let date = Date()
+            let encoderRet = agoraKit.setVideoEncoderConfigurationEx(videoEncoderConfig, connection: connection)
+            showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(videoEncoderConfig.dimensions), bitrate = \(videoEncoderConfig.bitrate), fps = \(videoEncoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
+            let captrueRet = agoraKit.setCameraCapturerConfiguration(captureConfig)
+            showLogger.info("setCameraCapturerConfiguration  dimensions = \(captureConfig.dimensions), fps = \(captureConfig.frameRate),  captrueRet = \(captrueRet)", context: kShowLogBaseContext)
+
             let ret =
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
@@ -208,7 +218,7 @@ class ShowAgoraKitManager: NSObject {
                 showLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
                                 context: "AgoraKitManager")
             }else{
-                showLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId), \(ret)",
+                showLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId) token = \(token), \(ret)",
                                  context: kShowLogBaseContext)
             }
         }
@@ -256,10 +266,11 @@ class ShowAgoraKitManager: NSObject {
     /// - Parameter canvasView: 画布
     func startPreview(canvasView: UIView) {
         agoraKit.setClientRole(.broadcaster)
-        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        let encodeRet = agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        showLogger.info("----setVideoEncoderConfiguration width = \(videoEncoderConfig.dimensions.width), height = \(videoEncoderConfig.dimensions.height), ret = \(encodeRet)")
         agoraKit.setVideoFrameDelegate(self)
-        agoraKit.setCameraCapturerConfiguration(captureConfig)
-        
+        let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
+        showLogger.info("----setCaptureVideoDimensions width = \(captureConfig.dimensions.width), height = \(captureConfig.dimensions.height), ret = \(ret)")
         canvas.view = canvasView
         agoraKit.setupLocalVideo(canvas)
         agoraKit.enableVideo()
@@ -336,9 +347,9 @@ class ShowAgoraKitManager: NSObject {
     func setCaptureVideoDimensions(_ size: CGSize){
         agoraKit.disableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
-        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height)")
-        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
         agoraKit.enableVideo()
+        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height), ret = \(ret)")
     }
     
     /// 设置编码分辨率
@@ -428,7 +439,7 @@ class ShowAgoraKitManager: NSObject {
     
     func updateLoadingType(roomId: String, channelId: String, loadingType: ShowRTCLoadingType) {
         guard let _ = exConnectionMap[channelId] else {
-//            assert(false, "updateLoadingType fail, mediaOptions not found")
+            showLogger.error("updateLoadingType fail, mediaOptions not found")
             return
         }
         

@@ -70,6 +70,7 @@ class SyncUtil: NSObject {
     }
 
     class func leaveScene(id: String) {
+        manager?.leaveScene(roomId: id)
         sceneRefs.removeValue(forKey: id)
     }
     
@@ -80,13 +81,15 @@ class SyncUtil: NSObject {
 
 
 class SyncUtilsWrapper {
-    static private var syncUtilsInited: Bool = false
+    static var syncUtilsInited: Bool = false
     static private var subscribeConnectStateMap: [String: (SocketConnectState?, Bool)->Void] = [:]
     
     class func initScene(uniqueId: String, sceneId: String, completion: @escaping (SocketConnectState?, Bool)->Void) {
+        let state: SocketConnectState? = subscribeConnectStateMap[uniqueId] == nil ? .open : nil
+        let inited: Bool = state == nil ? true : false
         subscribeConnectStateMap[uniqueId] = completion
         if syncUtilsInited {
-            completion(nil, true)
+            completion(state, inited)
             return
         }
         
@@ -109,6 +112,10 @@ class SyncUtilsWrapper {
             
             syncUtilsInited = true
         }
+    }
+    
+    class func cleanScene(uniqueId: String) {
+        subscribeConnectStateMap.removeValue(forKey: uniqueId)
     }
     
     class func cleanScene() {

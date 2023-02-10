@@ -61,7 +61,7 @@ class ShowSelectQualityVC: UIViewController {
         let marginLeft: CGFloat = 20
         let interSpacing: CGFloat = 15
         let countFowRow: CGFloat = 3
-        let cellWidth: CGFloat = (Screen.width - marginLeft * 2  - (countFowRow - 1) * interSpacing) / countFowRow
+        let cellWidth: CGFloat = (Screen.width - marginLeft * 2  - (countFowRow - 1) * interSpacing) / countFowRow - 2
         layout.minimumInteritemSpacing = interSpacing
         layout.minimumLineSpacing = lineSpacing
         layout.sectionInset = UIEdgeInsets(top: 0, left: marginLeft, bottom: 0, right: marginLeft)

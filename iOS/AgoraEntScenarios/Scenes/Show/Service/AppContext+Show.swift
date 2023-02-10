@@ -32,6 +32,7 @@ extension AppContext {
     
     static func unloadShowServiceImp() {
         _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
+        SyncUtilsWrapper.cleanScene()
     }
     
     public var showRoomList: [ShowRoomListModel]? {
