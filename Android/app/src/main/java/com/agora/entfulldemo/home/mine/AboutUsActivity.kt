@@ -30,14 +30,14 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         setupClickPhoneAction()
         setupClickWebAction()
         // set versions
-        binding.tvVersion.text = "#2.1.0"
+        binding.tvVersion.text = "2.1.0"
         binding.tvServiceNumber.text = servicePhone
         binding.tvHomeWebSite.text = webSite
-        binding.tvChatRoomVersion.text = "1.0.1"
-        binding.tvSpaceVoiceVersion.text = "2.0.1"
-        binding.tvOnlineKTVVersion.text = "3.0.1"
-        binding.tvLiveShowVersion.text = "4.0.1"
-        binding.tvGameRoomVersion.text = "5.0.1"
+        binding.tvChatRoomVersion.text = "2.1.0"
+        binding.tvSpaceVoiceVersion.text = "2.1.0"
+        binding.tvOnlineKTVVersion.text = "2.1.0"
+//        binding.tvLiveShowVersion.text = "2.1.0"
+//        binding.tvGameRoomVersion.text = "2.1.0"
     }
 
     fun setupClickWebAction() {
