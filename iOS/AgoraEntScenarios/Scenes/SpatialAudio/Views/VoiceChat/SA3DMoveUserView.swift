@@ -21,7 +21,7 @@ class SA3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add")
+                bgIconView.image = UIImage("icons／solid／add")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -33,7 +33,7 @@ class SA3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock")
+                bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -43,19 +43,19 @@ class SA3DMoveUserView: UIView {
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock")
+                bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang"), for: .normal)
+                nameBtn.setImage(UIImage("guanfang"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
                 micView.isHidden = false
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang"), for: .normal)
+                nameBtn.setImage(UIImage("guanfang"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
             }
