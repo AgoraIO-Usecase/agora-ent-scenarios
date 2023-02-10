@@ -163,13 +163,13 @@ extension SARoomViewController {
     }
     
     private func setChatroomAttributes() {
-        SAIMManager.shared?.setChatroomAttributes(attributes: AppContext.saTmpServiceImp().createMics() , completion: { error in
-            if error == nil {
+//        SAIMManager.shared?.setChatroomAttributes(attributes: AppContext.saTmpServiceImp().createMics() , completion: { error in
+//            if error == nil {
                 self.refreshRoomInfo()
-            } else {
-                self.view.makeToast("Set chatroom attributes failed!")
-            }
-        })
+//            } else {
+//                self.view.makeToast("Set chatroom attributes failed!")
+//            }
+//        })
     }
     
     private func sendJoinedMessage() {

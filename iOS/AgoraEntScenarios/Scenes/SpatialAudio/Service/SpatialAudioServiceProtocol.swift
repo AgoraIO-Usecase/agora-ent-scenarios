@@ -136,7 +136,7 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: SARoomEntity, completion: @escaping (SyncError?, SARoomEntity?) -> Void)
+    func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void)
 
     /// 加入房间
     /// - Parameters:
