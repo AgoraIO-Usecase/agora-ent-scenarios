@@ -78,6 +78,7 @@
 		DD4DFA32298BCBE5000AF053 /* TemplateServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4DF9F5298BCBE4000AF053 /* TemplateServiceModel.swift */; };
 		DD4DFA33298BCBE5000AF053 /* TemplateServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4DF9F6298BCBE4000AF053 /* TemplateServiceImp.swift */; };
 		DD4DFA34298BCBE5000AF053 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4DF9F7298BCBE4000AF053 /* TemplateServiceProtocol.swift */; };
+		DD83FEA22992158C00A949D3 /* SpatialAudioSyncSerciceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD83FEA12992158C00A949D3 /* SpatialAudioSyncSerciceImp.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
 		DD84176429090C520026B624 /* intro.css in Resources */ = {isa = PBXBuildFile; fileRef = DD84168B29090C520026B624 /* intro.css */; };
@@ -127,6 +128,8 @@
 		DD84179029090C520026B624 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD8416E029090C520026B624 /* Media.xcassets */; };
 		DD84179129090C520026B624 /* WMZCodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416E229090C520026B624 /* WMZCodeView.m */; };
 		DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416E329090C520026B624 /* VLLoginInputPhoneView.m */; };
+		DD9E54592994DE21007CB3C0 /* AppContext+SpatialAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9E54582994DE21007CB3C0 /* AppContext+SpatialAudio.swift */; };
+		DD9E545D2995301A007CB3C0 /* SpatialAudioServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C78298C141B00D837AC /* SpatialAudioServiceImp.swift */; };
 		DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198DF28FFE579009D3E61 /* ToastView.swift */; };
 		DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E028FFE579009D3E61 /* AlertManager.swift */; };
 		DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */; };
@@ -295,7 +298,6 @@
 		DDC51CFB298C141C00D837AC /* SARoomEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C74298C141B00D837AC /* SARoomEntity.swift */; };
 		DDC51CFC298C141C00D837AC /* SAAudiencesEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C75298C141B00D837AC /* SAAudiencesEntity.swift */; };
 		DDC51CFD298C141C00D837AC /* SpatialAudioServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C77298C141B00D837AC /* SpatialAudioServiceProtocol.swift */; };
-		DDC51CFE298C141C00D837AC /* SpatialAudioServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C78298C141B00D837AC /* SpatialAudioServiceImp.swift */; };
 		DDC51CFF298C141C00D837AC /* SpatialAudioServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C79298C141B00D837AC /* SpatialAudioServiceModel.swift */; };
 		DDC51D00298C141C00D837AC /* SABaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C7B298C141B00D837AC /* SABaseViewController.swift */; };
 		DDC51D01298C141C00D837AC /* SARoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC51C7D298C141B00D837AC /* SARoomViewController.swift */; };
@@ -669,6 +671,7 @@
 		DD4DF9F5298BCBE4000AF053 /* TemplateServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceModel.swift; sourceTree = "<group>"; };
 		DD4DF9F6298BCBE4000AF053 /* TemplateServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceImp.swift; sourceTree = "<group>"; };
 		DD4DF9F7298BCBE4000AF053 /* TemplateServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceProtocol.swift; sourceTree = "<group>"; };
+		DD83FEA12992158C00A949D3 /* SpatialAudioSyncSerciceImp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialAudioSyncSerciceImp.swift; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
 		DD84168B29090C520026B624 /* intro.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = intro.css; sourceTree = "<group>"; };
@@ -741,6 +744,7 @@
 		DD8416E129090C520026B624 /* WMZCodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMZCodeView.h; sourceTree = "<group>"; };
 		DD8416E229090C520026B624 /* WMZCodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMZCodeView.m; sourceTree = "<group>"; };
 		DD8416E329090C520026B624 /* VLLoginInputPhoneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLLoginInputPhoneView.m; sourceTree = "<group>"; };
+		DD9E54582994DE21007CB3C0 /* AppContext+SpatialAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+SpatialAudio.swift"; sourceTree = "<group>"; };
 		DDA198DF28FFE579009D3E61 /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		DDA198E028FFE579009D3E61 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		DDA198E228FFE579009D3E61 /* VLHotSpotBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLHotSpotBtn.m; sourceTree = "<group>"; };
@@ -2510,6 +2514,8 @@
 				DDC51C77298C141B00D837AC /* SpatialAudioServiceProtocol.swift */,
 				DDC51C78298C141B00D837AC /* SpatialAudioServiceImp.swift */,
 				DDC51C79298C141B00D837AC /* SpatialAudioServiceModel.swift */,
+				DD83FEA12992158C00A949D3 /* SpatialAudioSyncSerciceImp.swift */,
+				DD9E54582994DE21007CB3C0 /* AppContext+SpatialAudio.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -3153,7 +3159,6 @@
 				DDA199E528FFE579009D3E61 /* UILabel+Font.m in Sources */,
 				DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */,
 				8ECA60972976C630008FFCD8 /* AgoraEntLog.swift in Sources */,
-				DDC51CFE298C141C00D837AC /* SpatialAudioServiceImp.swift in Sources */,
 				DDC51DF6298C1D8900D837AC /* Throttle.swift in Sources */,
 				DDC51D25298C141C00D837AC /* SAEQSettingView.swift in Sources */,
 				DD4DFA0A298BCBE4000AF053 /* LEEAlert+KTVModal.m in Sources */,
@@ -3206,6 +3211,7 @@
 				DDA19A6928FFE57A009D3E61 /* EKRatingSymbolView.swift in Sources */,
 				DDA199FD28FFE579009D3E61 /* UIView+VL.m in Sources */,
 				DD4DFA10298BCBE4000AF053 /* VLSoloSongView.m in Sources */,
+				DD9E545D2995301A007CB3C0 /* SpatialAudioServiceImp.swift in Sources */,
 				DDC51CFC298C141C00D837AC /* SAAudiencesEntity.swift in Sources */,
 				DDA19A3328FFE57A009D3E61 /* EKContentView.swift in Sources */,
 				DDA19A3A28FFE57A009D3E61 /* UIApplication+EKAppearance.swift in Sources */,
@@ -3435,6 +3441,7 @@
 				DD4DFA2A298BCBE5000AF053 /* AppContext+KTV.m in Sources */,
 				DDC51E40298C1D8900D837AC /* VoiceRoomGiftView.swift in Sources */,
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
+				DD9E54592994DE21007CB3C0 /* AppContext+SpatialAudio.swift in Sources */,
 				DDC51E1F298C1D8900D837AC /* VoiceRoomViewController.swift in Sources */,
 				DD4DFA22298BCBE5000AF053 /* VLKTVTopView.m in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
@@ -3519,6 +3526,7 @@
 				DDA199FC28FFE579009D3E61 /* UISplitViewController+JKQuickAccess.m in Sources */,
 				DDC51D0C298C141C00D837AC /* SARoomViewController+IM.swift in Sources */,
 				DDA19A0728FFE579009D3E61 /* Config.swift in Sources */,
+				DD83FEA22992158C00A949D3 /* SpatialAudioSyncSerciceImp.swift in Sources */,
 				DDC51D52298C141C00D837AC /* SAHorizontalCardsView.swift in Sources */,
 				DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */,
 				DDA199F728FFE579009D3E61 /* Array+Extension.swift in Sources */,
