@@ -163,8 +163,7 @@ extension SARoomViewController {
     }
     
     private func setChatroomAttributes() {
-        //TODO: remove as! SpatialAudioSyncSerciceImp
-        SAIMManager.shared?.setChatroomAttributes(attributes: (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).createMics() , completion: { error in
+        SAIMManager.shared?.setChatroomAttributes(attributes: AppContext.saTmpServiceImp().createMics() , completion: { error in
             if error == nil {
                 self.refreshRoomInfo()
             } else {
@@ -190,12 +189,10 @@ extension SARoomViewController {
         roomInfo?.room?.member_list = [SAUser]()
         roomInfo?.room?.ranking_list = [SAUser]()
         if let info = roomInfo {
-            //TODO: remove as!
-            info.mic_info = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics
+            info.mic_info = AppContext.saTmpServiceImp().mics
             roomInfo = info
             headerView.updateHeader(with: info.room)
-            //TODO: remove as!
-            (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).userList = roomInfo?.room?.member_list ?? []
+            AppContext.saTmpServiceImp().userList = roomInfo?.room?.member_list ?? []
         }
     }
 
@@ -234,9 +231,9 @@ extension SARoomViewController {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
-        //TODO: remove as!
-        (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics = mics
-        (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).userList = roomInfo?.room?.member_list ?? []
+        
+        AppContext.saTmpServiceImp().mics = mics
+        AppContext.saTmpServiceImp().userList = roomInfo?.room?.member_list ?? []
         roomInfo?.room?.ranking_list = info.room?.ranking_list
         if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid }) {
             SAUserInfo.shared.user?.amount = first.amount
@@ -336,7 +333,7 @@ extension SARoomViewController {
     func didRtcAction(with type: SABaseUserCellType, tag: Int) {
         let index: Int = tag - 200
         //TODO: remove as!
-        guard let mic: SARoomMic = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[safe:index] else { return }
+        guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
         if index == 6 || index == 5 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
@@ -377,8 +374,7 @@ extension SARoomViewController {
         if self.local_index == nil {
             AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
         } else {
-            //TODO: remove as! SpatialAudioSyncSerciceImp
-            AppContext.saServiceImp().leaveMic(mic_index: self.local_index ?? (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).findMicIndex()) { error, result in
+            AppContext.saServiceImp().leaveMic(mic_index: self.local_index ?? AppContext.saTmpServiceImp().findMicIndex()) { error, result in
                 AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
             }
         }

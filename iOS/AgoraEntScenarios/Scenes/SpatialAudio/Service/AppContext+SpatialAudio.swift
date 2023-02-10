@@ -11,6 +11,11 @@ let saLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "
 extension AppContext {
     static private var _saServiceImp: SpatialAudioServiceProtocol?
     
+    //TODO: need to remove
+    static func saTmpServiceImp() -> SpatialAudioSyncSerciceImp {
+        return saServiceImp() as! SpatialAudioSyncSerciceImp
+    }
+    
     static func saServiceImp() -> SpatialAudioServiceProtocol {
         if let imp = _saServiceImp {
             return imp

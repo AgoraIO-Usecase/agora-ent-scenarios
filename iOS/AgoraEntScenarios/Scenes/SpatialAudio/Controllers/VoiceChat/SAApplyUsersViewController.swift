@@ -40,8 +40,7 @@ public class SAApplyUsersViewController: UITableViewController {
     // MARK: - Table view data source
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //TODO: remove as!
-        (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).micApplys.count
+        AppContext.saTmpServiceImp().micApplys.count
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -52,11 +51,10 @@ public class SAApplyUsersViewController: UITableViewController {
         // Configure the cell...
         cell?.selectionStyle = .none
         //TODO: remove as!
-        cell?.refresh(item: (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).micApplys[safe: indexPath.row])
+        cell?.refresh(item: AppContext.saTmpServiceImp().micApplys[safe: indexPath.row])
         cell?.agreeClosure = { [weak self] in
             self?.agreeUserApply(user: $0)
-            //TODO: remove as!
-            (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).micApplys[safe: indexPath.row]?.member?.invited = true
+            AppContext.saTmpServiceImp().micApplys[safe: indexPath.row]?.member?.invited = true
             self?.tableView.reloadData()
         }
         return cell ?? SAApplyCell()

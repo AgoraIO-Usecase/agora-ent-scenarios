@@ -129,7 +129,7 @@ extension SARoomViewController {
                 self.sRtcView.updateUser(old_mic)
                 self.sRtcView.updateUser(new_mic)
                     //TODO: remove as!
-                guard let mic = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics.first(where: {
+                guard let mic = AppContext.saTmpServiceImp().mics.first(where: {
                                     SAUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
                                 }) else { return }
                 self.rtckit.setClientRole(role: mic.status == 0 ? .owner : .audience)
