@@ -86,7 +86,7 @@ class SA3DRtcView: UIView {
     
     //因为麦位顺序的特殊性 需要对数据进行调整
     private func getRealIndex(with index: Int) -> Int {//4表示中间的用户
-        let realIndexs: [Int] = [2, 1, 6, 0, 3, 4, 5]
+        let realIndexs: [Int] = [3, 1, 0, 4, 5, 6, 2]
         return realIndexs[index]
     }
     
@@ -105,14 +105,17 @@ class SA3DRtcView: UIView {
                 guard let mic_index = member.mic_index else { return }
                 let realIndex = getRealIndex(with: mic_index)
                 let indexPath = IndexPath(item: realIndex, section: 0)
-                if realIndex != 0 {
+                if realIndex != 3 {
                     DispatchQueue.main.async {[weak self] in
                         guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                         cell.refreshVolume(vol: vol)
                     }
                 } else {
                     //更新可移动view的数据
-                    
+                    let micInfo = micInfos[0]
+                    rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
+                    rtcUserView.tag = 200
+                    rtcUserView.user = micInfo.member
                 }
             }
         }
@@ -121,26 +124,36 @@ class SA3DRtcView: UIView {
     public func updateVolume(with index: Int, vol: Int) {
         let realIndex: Int = getRealIndex(with: index)
         let indexPath = IndexPath(item: index, section: 0)
-        if realIndex != 0 {
+        if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
                 guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshVolume(vol: vol)
             }
         } else {
             //更新可移动view的数据
+            guard let micInfos = micInfos else { return }
+            let micInfo = micInfos[0]
+            rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
+            rtcUserView.tag = 200
+            rtcUserView.user = micInfo.member
         }
     }
 
     public func updateUser(_ mic: SARoomMic) {
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         let indexPath = IndexPath(item: realIndex, section: 0)
-        if realIndex != 0 {
+        if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
                 guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshUser(with: mic)
             }
         } else {
             //更新可移动view的数据
+            guard let micInfos = micInfos else { return }
+            let micInfo = micInfos[0]
+            rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
+            rtcUserView.tag = 200
+            rtcUserView.user = micInfo.member
         }
     }
 
@@ -591,26 +604,26 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     }
     
     private func getCellTypeWithStatus(_ status: Int) -> SABaseUserCellType {
-//        switch status {
-//            case -2:
-//                return .AgoraChatRoomBaseUserCellTypeAlienNonActive
-//            case -1:
-//                return .AgoraChatRoomBaseUserCellTypeAdd
-//            case 0:
-//                return .AgoraChatRoomBaseUserCellTypeNormalUser
-//            case 1:
-//                return .AgoraChatRoomBaseUserCellTypeMute
-//            case 2:
-//                return .AgoraChatRoomBaseUserCellTypeForbidden
-//            case 3:
-//                return .AgoraChatRoomBaseUserCellTypeLock
-//            case 4:
-//                return .AgoraChatRoomBaseUserCellTypeMuteAndLock
-//            case 5:
-//                return .AgoraChatRoomBaseUserCellTypeAlienActive
-//            default:
-//                return .AgoraChatRoomBaseUserCellTypeAdd
-//        }
+        switch status {
+            case -2:
+                return .AgoraChatRoomBaseUserCellTypeAlienNonActive
+            case -1:
+                return .AgoraChatRoomBaseUserCellTypeAdd
+            case 0:
+                return .AgoraChatRoomBaseUserCellTypeNormalUser
+            case 1:
+                return .AgoraChatRoomBaseUserCellTypeMute
+            case 2:
+                return .AgoraChatRoomBaseUserCellTypeForbidden
+            case 3:
+                return .AgoraChatRoomBaseUserCellTypeLock
+            case 4:
+                return .AgoraChatRoomBaseUserCellTypeMuteAndLock
+            case 5:
+                return .AgoraChatRoomBaseUserCellTypeAlienActive
+            default:
+                return .AgoraChatRoomBaseUserCellTypeAdd
+        }
         return .AgoraChatRoomBaseUserCellTypeAdd
     }
 }
