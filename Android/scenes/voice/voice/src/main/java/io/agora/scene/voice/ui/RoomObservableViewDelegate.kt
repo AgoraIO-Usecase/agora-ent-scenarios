@@ -79,6 +79,7 @@ class RoomObservableViewDelegate constructor(
     }
 
     private var memberCountDialog: RoomMemberCountDialog? = null
+    private var robotDialog: RoomRobotEnableDialog? = null
 
     init {
         // 更新公告
@@ -440,10 +441,6 @@ class RoomObservableViewDelegate constructor(
             }
         }).apply {
             memberCountDialog = this
-            arguments = Bundle().apply {
-                putString(RoomMemberCountDialog.OWNER_CHAT_UID, voiceRoomModel.owner?.chatUid)
-            }
-
         }.show(activity.supportFragmentManager, "mtClickMemberCount")
     }
 
@@ -568,7 +565,7 @@ class RoomObservableViewDelegate constructor(
                                 AgoraRtcEngineController.get().playMusic(it)
                             }
                         } else {
-                            onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
+                            onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect),finishBack)
                         }
                     } else {
                         onExitRoom(
@@ -624,7 +621,7 @@ class RoomObservableViewDelegate constructor(
                 }
             } else {
                 ainsDialog.updateAnisSoundsAdapter(position, false)
-                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
+                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect), finishBack = {})
             }
         }
 
@@ -807,7 +804,7 @@ class RoomObservableViewDelegate constructor(
     /**
      * 点击机器人
      */
-    fun onBotMicClick(content: String) {
+    fun onBotMicClick(content: String,finishBack: () -> Unit) {
         if (roomKitBean.isOwner) { // 房主
             if (!voiceRoomModel.useRobot) {
                 CommonFragmentAlertDialog().titleText(activity.getString(R.string.voice_chatroom_prompt))
@@ -820,6 +817,17 @@ class RoomObservableViewDelegate constructor(
                     }).show(activity.supportFragmentManager, "botActivatedDialog")
             } else {
                 // nothing
+                RoomRobotEnableDialog(object : RoomRobotEnableDialog.OnClickBtnListener {
+                    override fun onClickCloseBtn() {
+                        roomLivingViewModel.enableRobot(false)
+                    }
+
+                    override fun onClickSettingBtn() {
+                        onAudioSettingsDialog(finishBack)
+                    }
+                }).apply {
+                    robotDialog = this
+                }.show(activity.supportFragmentManager, "mtClickRobotDialog")
             }
         } else { // 成员
             ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_only_host_can_change_robot))

@@ -238,4 +238,8 @@
     <string name="voice_room_content_prohibited">内容禁止发送</string>
     <string name="voice_room_send_tip">发送</string>
     <string name="voice_room_name_rule">房间名不合规</string>
+
+    <string name="voice_room_robot_left">关闭机器人</string>
+    <string name="voice_room_robot_right">音效设置</string>
+
 </resources>

@@ -519,7 +519,7 @@ class ChatroomProtocolDelegate constructor(
                 roomId, attributeMap, true
             ) { code, result ->
                 if (code == 0 && result.isEmpty()) {
-                    var map = mutableMapOf<Int, VoiceMicInfoModel>()
+                    val map = mutableMapOf<Int, VoiceMicInfoModel>()
                     map[6] = robot6
                     map[7] = robot7
                     ChatroomCacheManager.cacheManager.setMicInfo(attributeMap)

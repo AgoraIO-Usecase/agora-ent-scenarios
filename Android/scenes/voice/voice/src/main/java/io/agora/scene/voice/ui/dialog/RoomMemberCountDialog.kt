@@ -23,10 +23,6 @@ class RoomMemberCountDialog constructor(
     private val onClickKickListener:OnClickKickMemberListener
 ): BaseFixedHeightSheetDialog<VoiceDialogRoomSoundSelectionBinding>(){
 
-    companion object {
-        const val OWNER_CHAT_UID = "owner_chat_uid"
-    }
-
     private var roomMemberList = mutableListOf<VoiceMemberModel>()
     private var adapter: BaseRecyclerViewAdapter<VoiceItemHandsRaisedBinding,VoiceMemberModel, RoomMemberCountViewHolder>? = null
     private var currentMemberCount:Int = 0
