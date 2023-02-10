@@ -232,7 +232,7 @@ object VideoSetting {
 
     }
 
-    private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
+    private var currAudienceSetting: AudienceSetting = getCurrAudienceSetting()
     private var currBroadcastSetting: BroadcastSetting = getCurrBroadcastSetting()
 
     // 当前观众设备等级（高、中、低）
@@ -244,14 +244,26 @@ object VideoSetting {
     // 超分开关
     private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
-    fun getCurrAudienceSetting() = currAudienceSetting
+    fun getCurrAudienceSetting(): AudienceSetting {
+        //
+        val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
+        try {
+            return GsonUtil.getInstance().fromJson(jsonStr, AudienceSetting::class.java)
+        }
+        catch (e: java.lang.Exception) {
+            val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
+            setCurrAudienceSetting(result)
+            return result
+        }
+    }
+
     fun getCurrBroadcastSetting(): BroadcastSetting {
         val jsonStr = SPUtil.getString(Constant.CURR_BROADCAST_SETTING, "")
         try {
             return GsonUtil.getInstance().fromJson(jsonStr, BroadcastSetting::class.java)
         }
         catch (e: java.lang.Exception) {
-            val result = RecommendBroadcastSetting.LowDevice1v1;
+            val result = RecommendBroadcastSetting.LowDevice1v1
             setCurrBroadcastSetting(result)
             return result
         }
@@ -260,6 +272,11 @@ object VideoSetting {
     fun getCurrAudiencePlaySetting() = currAudiencePlaySetting
 
     fun getCurrAudienceEnhanceSwitch() = currAudienceEnhanceSwitch
+
+    fun setCurrAudienceSetting(audienceSetting: AudienceSetting) {
+        SPUtil.putString(Constant.CURR_AUDIENCE_SETTING, GsonUtil.instance.toJson(audienceSetting))
+        currAudienceSetting = audienceSetting
+    }
 
     fun setCurrBroadcastSetting(broadcastSetting: BroadcastSetting) {
         SPUtil.putString(Constant.CURR_BROADCAST_SETTING, GsonUtil.instance.toJson(broadcastSetting))
@@ -298,7 +315,7 @@ object VideoSetting {
     }
 
     fun updateAudioSetting(isJoinedRoom: Boolean = false, SR: SuperResolution? = null) {
-        currAudienceSetting = AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR))
+        setCurrAudienceSetting(AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR)))
         updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
