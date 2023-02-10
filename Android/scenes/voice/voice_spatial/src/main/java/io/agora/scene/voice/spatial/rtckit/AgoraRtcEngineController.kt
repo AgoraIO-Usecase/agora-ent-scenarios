@@ -184,7 +184,7 @@ class AgoraRtcEngineController {
     /**
      * 发送本地位置到远端
      */
-    private fun sendSelfPosition(position: SeatPositionInfo) {
+    public fun sendSelfPosition(position: SeatPositionInfo) {
         val dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())!!
         val steamInfo = DataStreamInfo(101, GsonUtil.getInstance().toJson(position))
         rtcEngine?.sendStreamMessage(
