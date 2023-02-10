@@ -12,15 +12,15 @@ extension AppContext {
     static private var _saServiceImp: SpatialAudioServiceProtocol?
     
     //TODO: need to remove
-    static func saTmpServiceImp() -> SpatialAudioSyncSerciceImp {
-        return saServiceImp() as! SpatialAudioSyncSerciceImp
+    static func saTmpServiceImp() -> SpatialAudioServiceImp {
+        return saServiceImp() as! SpatialAudioServiceImp
     }
     
     static func saServiceImp() -> SpatialAudioServiceProtocol {
         if let imp = _saServiceImp {
             return imp
         }
-        _saServiceImp = SpatialAudioSyncSerciceImp()
+        _saServiceImp = SpatialAudioServiceImp()
         return _saServiceImp!
     }
     
