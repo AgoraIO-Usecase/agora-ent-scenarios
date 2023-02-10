@@ -63,9 +63,9 @@ import KakaJSON
         property.name
     }
     
-    var attenuation: Double = 0
-    var airAbsorb: Bool = true
-    var voiceBlur: Bool = true
+    var attenuation: Double = 0.2
+    var airAbsorb: Bool = false
+    var voiceBlur: Bool = false
     var forward: [NSNumber]?
     var right: [NSNumber]?
     var up: [NSNumber] = [0, 0, 1]
