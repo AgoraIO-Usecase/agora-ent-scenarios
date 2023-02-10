@@ -211,7 +211,7 @@ extension SARoomViewController {
         AppContext.saServiceImp().fetchRoomDetail(entity: roomInfo?.room ?? SARoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
-                self?.roomInfoUpdateUI(info: info)
+                 self?.roomInfoUpdateUI(info: info)
             } else {
                 self?.fetchDetailError()
             }

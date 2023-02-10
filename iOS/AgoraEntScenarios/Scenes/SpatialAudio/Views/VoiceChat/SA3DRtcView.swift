@@ -106,8 +106,8 @@ class SA3DRtcView: UIView {
                 let realIndex = getRealIndex(with: mic_index)
                 let indexPath = IndexPath(item: realIndex, section: 0)
                 if realIndex != 0 {
-                    guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async {[weak self] in
+                        guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                         cell.refreshVolume(vol: vol)
                     }
                 } else {
@@ -122,8 +122,8 @@ class SA3DRtcView: UIView {
         let realIndex: Int = getRealIndex(with: index)
         let indexPath = IndexPath(item: index, section: 0)
         if realIndex != 0 {
-            guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async {[weak self] in
+                guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshVolume(vol: vol)
             }
         } else {
@@ -135,8 +135,8 @@ class SA3DRtcView: UIView {
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 0 {
-            guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async {[weak self] in
+                guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshUser(with: mic)
             }
         } else {
@@ -146,8 +146,8 @@ class SA3DRtcView: UIView {
 
     public func updateAlienMic(_ index: Int, flag: Bool) {
         let indexPath = IndexPath(item: index, section: 0)
-        guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
-        DispatchQueue.main.async {
+        DispatchQueue.main.async {[weak self] in
+            guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
             cell.updateAlienMic(flag: flag)
         }
     }

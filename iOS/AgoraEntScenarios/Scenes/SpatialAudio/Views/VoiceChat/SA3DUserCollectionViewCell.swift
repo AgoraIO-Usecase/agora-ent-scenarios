@@ -90,7 +90,6 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         default:
             break
         }
-
         
         rtcUserView.iconView.isHidden = mic.member == nil
         if status != 5 && status != -2 {
