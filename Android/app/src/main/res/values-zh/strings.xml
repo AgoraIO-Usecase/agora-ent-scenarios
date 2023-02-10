@@ -30,6 +30,7 @@
     <string name="app_logout">退出登录</string>
     <string name="app_logoff_account">注销账号</string>
     <string name="app_logoff">注销</string>
+    <string name="app_debug_mode">开发者模式</string>
 
     <string name="app_meta_live">元直播</string>
     <string name="app_meta_chatting">元语聊</string>
