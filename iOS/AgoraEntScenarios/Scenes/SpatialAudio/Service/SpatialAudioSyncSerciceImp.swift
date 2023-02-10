@@ -187,11 +187,12 @@ extension SpatialAudioSyncSerciceImp {
                     }
                 }
                 group.enter()
-                self._addMicSeat(roomId: roomId, mic: item) { error in
+                self._addMicSeat(roomId: roomId, mic: item) { error, mic in
                     if let _ = error {
                         group.leave()
                         return
                     }
+                    item.objectId = mic?.objectId
                     mics.append(item)
                     group.leave()
                 }
@@ -885,7 +886,7 @@ extension SpatialAudioSyncSerciceImp {
             })
     }
     
-    fileprivate func _addMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?) -> Void) {
+    fileprivate func _addMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?, SARoomMic?) -> Void) {
         let params = mic.kj.JSONObject()
         agoraPrint("imp seat add...")
         SyncUtil
@@ -893,10 +894,11 @@ extension SpatialAudioSyncSerciceImp {
             .collection(className: kCollectionIdSeatInfo)
             .add(data: params, success: { object in
                 agoraPrint("imp seat add success...")
-                completion(nil)
+                let seat = model(from: (object.toJson() ?? "").z.jsonToDictionary(), SARoomMic.self)
+                completion(nil, seat)
             }, fail: { error in
                 agoraPrint("imp seat add fail :\(error.message)...")
-                completion(SAErrorType.unknown("add seat", error.message).error())
+                completion(SAErrorType.unknown("add seat", error.message).error(), nil)
             })
     }
     
