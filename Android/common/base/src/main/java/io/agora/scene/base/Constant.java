@@ -18,4 +18,22 @@ public class Constant {
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS = 403;
     /* 登录成功*/
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL = 404;
+
+    // 是否设置了超分
+    public static final String IS_SET_SETTING = "isSetSetting";
+
+    // 当前观众设备等级（高、中、低）
+    public static final String CURR_AUDIENCE_DEVICE_LEVEL = "currAudienceDeviceLevel";
+
+    // 观众看播设置
+    public static final String CURR_AUDIENCE_PLAY_SETTING = "currAudiencePlaySetting";
+
+    // 超分开关
+    public static final String CURR_AUDIENCE_ENHANCE_SWITCH ="currAudienceEnhanceSwitch";
+
+    // xxx
+    public static final String CURR_BROADCAST_SETTING = "currBroadcastSetting";
+
+    // xxx
+    public static final String CURR_AUDIENCE_SETTING = "currAudienceSetting";
 }

@@ -123,38 +123,46 @@
         app:layout_constraintTop_toBottomOf="@id/clRoomTitle"
         tools:visibility="visible">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_statistic_up"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticBitrate"
+                android:id="@+id/tvEncodeResolution"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_bitrate" />
+                tools:text="@string/show_statistic_encode_resolution" />
 
             <TextView
-                android:id="@+id/tvStatisticFPS"
+                android:id="@+id/tvStatisticEncodeFPS"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_fps" />
+                tools:text="@string/show_statistic_encode_fps" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticDelay"
+                android:id="@+id/tvStatisticUpBitrate"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_delay" />
+                tools:text="@string/show_statistic_up_bitrate" />
 
             <TextView
-                android:id="@+id/tvStatisticLossPackage"
+                android:id="@+id/tvStatisticUpLossPackage"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_loss_package" />
+                tools:text="@string/show_statistic_up_loss_package" />
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
@@ -165,6 +173,52 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_up_net_speech" />
+        </TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/show_statistic_down"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvReceiveResolution"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_receive_resolution" />
+
+            <TextView
+                android:id="@+id/tvStatisticReceiveFPS"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_receive_fps" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvStatisticDownBitrate"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_bitrate" />
+
+            <TextView
+                android:id="@+id/tvStatisticDownLossPackage"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_down_loss_package" />
+        </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
 
             <TextView
                 android:id="@+id/tvStatisticDownNet"
@@ -172,18 +226,16 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_down_net_speech" />
-        </TableRow>
-
-        <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvResolution"
+                android:id="@+id/tvStatisticDownDelay"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_resolution" />
+                tools:text="@string/show_statistic_delay" />
 
         </TableRow>
+
     </TableLayout>
 
     <ImageView
@@ -191,10 +243,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:src="@mipmap/close"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/tlStatistic"
         app:layout_constraintTop_toTopOf="@id/tlStatistic"
-        android:src="@mipmap/close"
         tools:visibility="visible" />
 
 

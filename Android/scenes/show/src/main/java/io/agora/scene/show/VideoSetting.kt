@@ -1,6 +1,9 @@
 package io.agora.scene.show
 
 import io.agora.rtc2.video.*
+import io.agora.scene.base.Constant
+import io.agora.scene.base.utils.GsonUtil
+import io.agora.scene.base.utils.SPUtil
 
 object VideoSetting {
 
@@ -34,8 +37,7 @@ object VideoSetting {
         Resolution.V_360P,
         Resolution.V_480P,
         Resolution.V_540P,
-        Resolution.V_720P,
-        Resolution.V_1080P
+        Resolution.V_720P
     )
 
     enum class FrameRate(val fps: Int) {
@@ -230,27 +232,78 @@ object VideoSetting {
 
     }
 
-    private var currAudienceSetting = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
-    private var currBroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
+    private var currAudienceSetting: AudienceSetting = getCurrAudienceSetting()
+    private var currBroadcastSetting: BroadcastSetting = getCurrBroadcastSetting()
 
     // 当前观众设备等级（高、中、低）
-    private var currAudienceDeviceLevel = DeviceLevel.Low
+    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString()))
 
     // 观众看播设置
-    var currAudiencePlaySetting = AudiencePlaySetting.BASE_LOW
+    private var currAudiencePlaySetting: Int = SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
 
     // 超分开关
-    var currAudienceEnhanceSwitch = true
+    private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
-    fun getCurrAudienceSetting() = currAudienceSetting
-    fun getCurrBroadcastSetting() = currBroadcastSetting
+    fun getCurrAudienceSetting(): AudienceSetting {
+        //
+        val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
+        try {
+            return GsonUtil.getInstance().fromJson(jsonStr, AudienceSetting::class.java)
+        }
+        catch (e: java.lang.Exception) {
+            val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
+            setCurrAudienceSetting(result)
+            return result
+        }
+    }
+
+    fun getCurrBroadcastSetting(): BroadcastSetting {
+        val jsonStr = SPUtil.getString(Constant.CURR_BROADCAST_SETTING, "")
+        try {
+            return GsonUtil.getInstance().fromJson(jsonStr, BroadcastSetting::class.java)
+        }
+        catch (e: java.lang.Exception) {
+            val result = RecommendBroadcastSetting.LowDevice1v1
+            setCurrBroadcastSetting(result)
+            return result
+        }
+    }
+
+    fun getCurrAudiencePlaySetting() = currAudiencePlaySetting
+
+    fun getCurrAudienceEnhanceSwitch() = currAudienceEnhanceSwitch
+
+    fun setCurrAudienceSetting(audienceSetting: AudienceSetting) {
+        SPUtil.putString(Constant.CURR_AUDIENCE_SETTING, GsonUtil.instance.toJson(audienceSetting))
+        currAudienceSetting = audienceSetting
+    }
+
+    fun setCurrBroadcastSetting(broadcastSetting: BroadcastSetting) {
+        SPUtil.putString(Constant.CURR_BROADCAST_SETTING, GsonUtil.instance.toJson(broadcastSetting))
+        currBroadcastSetting = broadcastSetting
+    }
+
+    fun setCurrAudienceDeviceLevel(deviceLevel: DeviceLevel) {
+        currAudienceDeviceLevel = deviceLevel
+        SPUtil.putString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, deviceLevel.toString())
+    }
+
+    fun setCurrAudiencePlaySetting(currAudiencePlaySetting: Int) {
+        this.currAudiencePlaySetting = currAudiencePlaySetting
+        SPUtil.putInt(Constant.CURR_AUDIENCE_PLAY_SETTING, currAudiencePlaySetting)
+    }
+
+    fun setCurrAudienceEnhanceSwitch(currAudienceEnhanceSwitch: Boolean) {
+        this.currAudienceEnhanceSwitch = currAudienceEnhanceSwitch
+        SPUtil.putBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, currAudienceEnhanceSwitch)
+    }
 
     fun resetBroadcastSetting() {
-        currBroadcastSetting = when (currAudienceDeviceLevel) {
+        setCurrBroadcastSetting(when (currAudienceDeviceLevel) {
             DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
             DeviceLevel.Medium -> RecommendBroadcastSetting.MediumDevice1v1
             DeviceLevel.High -> RecommendBroadcastSetting.HighDevice1v1
-        }
+        })
     }
 
     fun updateAudienceSetting(
@@ -262,14 +315,14 @@ object VideoSetting {
     }
 
     fun updateAudioSetting(isJoinedRoom: Boolean = false, SR: SuperResolution? = null) {
-        currAudienceSetting = AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR))
+        setCurrAudienceSetting(AudienceSetting(AudienceSetting.Video(SR ?: currAudienceSetting.video.SR)))
         updateRTCAudioSetting(isJoinedRoom, SR)
     }
 
     fun updateBroadcastSetting(deviceLevel: DeviceLevel, isJoinedRoom: Boolean = false, isByAudience: Boolean = false) {
         var liveMode = LiveMode.OneVOne
         if (isByAudience) {
-            currAudienceDeviceLevel = deviceLevel
+            setCurrAudienceDeviceLevel(deviceLevel)
         } else {
             liveMode = when (currBroadcastSetting) {
                 RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
@@ -321,7 +374,7 @@ object VideoSetting {
     }
 
     private fun updateBroadcastSetting(recommendSetting: BroadcastSetting, isJoinedRoom: Boolean) {
-        currBroadcastSetting = recommendSetting
+        setCurrBroadcastSetting(recommendSetting)
         updateRTCBroadcastSetting(
             isJoinedRoom,
             currBroadcastSetting.video.H265,
@@ -357,7 +410,7 @@ object VideoSetting {
         recordingSignalVolume: Int? = null,
         audioMixingVolume: Int? = null
     ) {
-        currBroadcastSetting = BroadcastSetting(
+        setCurrBroadcastSetting(BroadcastSetting(
             BroadcastSetting.Video(
                 h265 ?: currBroadcastSetting.video.H265,
                 colorEnhance ?: currBroadcastSetting.video.colorEnhance,
@@ -374,7 +427,7 @@ object VideoSetting {
                 recordingSignalVolume ?: currBroadcastSetting.audio.recordingSignalVolume,
                 audioMixingVolume ?: currBroadcastSetting.audio.audioMixingVolume
             )
-        )
+        ))
 
         updateRTCBroadcastSetting(
             isJoinedRoom,
