@@ -32,6 +32,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         giftList?.cellAnimation()
         if gift.gift_id ?? "" == "VoiceRoomGift9" {
             rocketAnimation()
+            self.notifyHorizontalTextCarousel(gift: gift)
         }
         if var gift_amount = self.roomInfo?.room?.gift_amount {
             gift_amount += Int(gift.gift_price ?? "1")!*Int(gift.gift_count ?? "1")!
@@ -43,13 +44,18 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         //刷新礼物贡献总数，头部
 //        self.requestRankList()
     }
+        
     
-    func fetchGiftContribution() {
-//        let seconds: [Double] = [0,1,2,3]
-//        guard let refreshSeconds = seconds.randomElement() else { return }
-//        Throttler.throttle(queue:.main,delay: .seconds(refreshSeconds)) {
-//            self.requestRankList()
-//        }
+    func notifyHorizontalTextCarousel(gift: VoiceRoomGiftEntity) {
+        let string = NSAttributedString {
+            AttributedText("\(gift.userName ?? "" )").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
+            AttributedText("gifts".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+            AttributedText(" \(VoiceRoomUserInfo.shared.user?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
+            AttributedText("a rocket".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
+        }
+        let text = HorizontalTextCarousel(frame: CGRect(x: 15, y: self.headerView.frame.maxY-10, width: string.string.z.sizeWithText(font: .systemFont(ofSize: 12, weight: .semibold), size: CGSize(width: ScreenWidth-60, height: 15)).width, height: 20)).cornerRadius(10)
+        self.view.addSubview(text)
+        text.textAnimation(text: string)
     }
     
     func onReceiveSeatRequest(roomId: String, applicant: VoiceRoomApply) {
@@ -186,14 +192,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if let first = mics.first {
                 let status = first.status
                 let mic_index = first.mic_index
+                guard let micStatus = first.member?.micStatus else { return }
                 //刷新底部✋🏻状态
                 if !isOwner {
                     refreshHandsUp(status: status)
                 }
-                //                if fromId != self.roomInfo?.room?.owner?.chat_uid ?? "",!isOwner {
-                //                    refreshHandsUp(status: status)
-                //                }
-                //将userList中的上麦用户做标记，便于后续过滤
                 var micUser = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
                     $0.chat_uid ?? "" == fromId
                 })
@@ -208,11 +211,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     }
                 }
                 if !isOwner {
-                    var state: VoiceRoomChatBarState = .selected
-                    if status == 0 || status != -1 {
-                        state = .unSelected
-                    }
-                    self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
                     }
@@ -245,7 +243,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                             self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
                         }
                         //如果当前是0的状态  就设置成主播
-                        self.rtckit.muteLocalAudioStream(mute: status != 0)
+                        self.rtckit.muteLocalAudioStream(mute: (status != 0 && micStatus != 0))
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {

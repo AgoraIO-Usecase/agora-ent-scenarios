@@ -42,7 +42,7 @@ class SARoomHeaderView: UIView {
     func updateHeader(with room_entity: SARoomEntity?) {
         guard let room = room_entity else {return}
         guard let owner = room.owner else { return }
-        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
+        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
         self.titleLabel.text = owner.name
         self.roomLabel.text = room.name
         self.lookBtn.setTitle(" \(room.click_count ?? 0)", for: .normal)

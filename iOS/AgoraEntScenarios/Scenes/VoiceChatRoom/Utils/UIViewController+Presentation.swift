@@ -10,7 +10,7 @@ import Foundation
 /// 遵守PresentationViewType协议的UIViewController
 public typealias PresentationViewController = UIViewController & PresentedViewType
 
-public extension UIViewController {
+public extension VRBaseViewController {
     /// 自定义present方法
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
         viewController.modalPresentationStyle = .custom
@@ -21,18 +21,18 @@ public extension UIViewController {
 
 // MARK: -  UIViewControllerTransitioningDelegate
 
-//extension UIViewController: UIViewControllerTransitioningDelegate {
-//    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-//        return PresentationController(presentedViewController: presented, presenting: presenting)
-//    }
-//
-//    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let presentedVC = presented as? PresentedViewType else { return nil }
-//        return presentedVC.presentTransitionType.animation
-//    }
-//
-//    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let dismissedVC = dismissed as? PresentedViewType else { return nil }
-//        return dismissedVC.dismissTransitionType.animation
-//    }
-//}
+extension VRBaseViewController: UIViewControllerTransitioningDelegate {
+    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        return PresentationController(presentedViewController: presented, presenting: presenting)
+    }
+
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let presentedVC = presented as? PresentedViewType else { return nil }
+        return presentedVC.presentTransitionType.animation
+    }
+
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let dismissedVC = dismissed as? PresentedViewType else { return nil }
+        return dismissedVC.dismissTransitionType.animation
+    }
+}

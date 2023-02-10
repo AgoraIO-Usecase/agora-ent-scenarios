@@ -38,6 +38,8 @@ let page_size = 15
     
     private var initialError: AgoraChatError?
     
+    private var loginError: AgoraChatError?
+    
     @objc convenience init(user: VLLoginModel) {
         self.init()
         currentUser = user
@@ -59,6 +61,7 @@ let page_size = 15
         view.addSubViews([background, container, create])
         view.bringSubviewToFront(navigation)
         viewsAction()
+        self.fetchIMConfig()
         childViewControllersEvent()
     }
     
@@ -73,6 +76,32 @@ let page_size = 15
 }
 
 extension VRRoomsViewController {
+    
+    private func fetchIMConfig(completion: ((Bool) -> ())? = nil) {
+        SVProgressHUD.show()
+        self.view.isUserInteractionEnabled = false
+        NetworkManager.shared.generateIMConfig(type: 1, channelName: "", nickName: VLUserCenter.user.name, chatId: "", imUid: VLUserCenter.user.id, password: "12345678", uid:  VLUserCenter.user.id, sceneType: .voice) { [weak self] uid, room_id, token in
+            self?.view.isUserInteractionEnabled = true
+            VLUserCenter.user.chat_uid = uid ?? ""
+            VLUserCenter.user.im_token = token ?? ""
+            SVProgressHUD.dismiss()
+            if let userId = uid,let im_token = token {
+                if self?.initialError == nil {
+                    VoiceRoomIMManager.shared?.loginIM(userName: userId, token: im_token, completion: { userName, error in
+                        if error == nil {
+                            if (completion != nil) {
+                                completion!(error == nil)
+                            }
+                        } else {
+                            self?.loginError = error
+                            self?.view.makeToast("login failed!".localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
+                        }
+                    })
+                }
+            }
+        }
+    }
+    
     private func mapUser(user: VLLoginModel?) {
         let current = VRUser()
         current.chat_uid = user?.chat_uid
@@ -107,7 +136,15 @@ extension VRRoomsViewController {
             alert.actionEvents = {
                 if $0 == 31 {
                     if room.roomPassword == alert.code {
-                        self.loginIMThenPush(room: room)
+                        if self.loginError == nil {
+                            self.loginIMThenPush(room: room)
+                        } else {
+                            self.fetchIMConfig { success in
+                                if success {
+                                    self.loginIMThenPush(room: room)
+                                }
+                            }
+                        }
                     } else {
                         self.view.makeToast("Incorrect Password".localized())
                     }
@@ -115,7 +152,15 @@ extension VRRoomsViewController {
                 vc.dismiss(animated: true)
             }
         } else {
-            loginIMThenPush(room: room)
+            if self.loginError == nil {
+                self.loginIMThenPush(room: room)
+            } else {
+                self.fetchIMConfig { success in
+                    if success {
+                        self.loginIMThenPush(room: room)
+                    }
+                }
+            }
         }
     }
 
@@ -128,28 +173,20 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
-            SVProgressHUD.dismiss()
-            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
-                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
-                return
-            }
-            if error == nil, room_entity != nil {
-                VoiceRoomIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
-                    if error == nil {
-                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
-                        self.mapUser(user: VLUserCenter.user)
-                        let info: VRRoomInfo = VRRoomInfo()
-                        info.room = room
-                        info.mic_info = nil
-                        let vc = VoiceRoomViewController(info: info)
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    } else {
-                        SVProgressHUD.showError(withStatus: "IM login failed!")
-                    }
-                })
-            } else {
-                SVProgressHUD.showError(withStatus: "Members reach limit!")
+        NetworkManager.shared.generateToken(channelName: room.channel_id ?? "", uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
+            VLUserCenter.user.agoraRTCToken = token ?? ""
+            ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
+                SVProgressHUD.dismiss()
+                if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
+                    SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                    return
+                }
+                self.mapUser(user: VLUserCenter.user)
+                let info: VRRoomInfo = VRRoomInfo()
+                info.room = room
+                info.mic_info = nil
+                let vc = VoiceRoomViewController(info: info)
+                self.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }
@@ -165,10 +202,8 @@ extension VRRoomsViewController {
 //        }
 
         normal.didSelected = { [weak self] room in
-            Throttler.throttle(queue:.main,delay: .seconds(1)) {
-                DispatchQueue.main.async {
-                    self?.entryRoom(room: room)
-                }
+            Throttler.throttle(queue:.main,shouldRunLatest: true) {
+                self?.entryRoom(room: room)
             }
         }
 //        self.normal.totalCountClosure = { [weak self] in
