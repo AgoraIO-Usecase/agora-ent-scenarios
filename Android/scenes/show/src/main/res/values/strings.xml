@@ -86,6 +86,8 @@
     <string name="show_beauty_item_sticker_huahua">花花</string>
     <string name="show_beauty_item_sticker_wochaotian">我超甜</string>
     <string name="show_statistic_bitrate">码率: %s kbps</string>
+    <string name="show_statistic_up_bitrate">发送码率: %s kbps</string>
+    <string name="show_statistic_down_bitrate">接收码率: %s kbps</string>
     <string name="show_statistic_fps">帧率: %s fps</string>
     <string name="show_statistic_delay">延迟: %s ms</string>
     <string name="show_statistic_loss_package">丢包率: %s ％</string>

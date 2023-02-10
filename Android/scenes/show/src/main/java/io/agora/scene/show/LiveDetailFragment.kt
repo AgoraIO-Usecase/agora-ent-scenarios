@@ -456,8 +456,8 @@ class LiveDetailFragment : Fragment() {
         encodeVideoSize: Size? = null, receiveVideoSize: Size? = null,
         // 编码帧率、接收帧率
         encodeFps: Int? = null, receiveFPS: Int? = null,
-        // 上行延迟、下行延迟
-        upDelay: Int? = null, downDelay: Int? = null,
+        // 下行延迟
+        downDelay: Int? = null,
         // 上行丢包率、下行丢包率
         upLossPackage: Int? = null, downLossPackage: Int? = null,
         // 上行码率、下行码率
@@ -481,9 +481,6 @@ class LiveDetailFragment : Fragment() {
         // 接收帧率
         receiveFPS?.let { topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, it.toString()) }
         if (topBinding.tvStatisticReceiveFPS.text.isEmpty()) topBinding.tvStatisticReceiveFPS.text = getString(R.string.show_statistic_receive_fps, "--")
-        // 上行延迟
-        upDelay?.let { topBinding.tvStatisticUpDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
-        if (topBinding.tvStatisticUpDelay.text.isEmpty()) topBinding.tvStatisticUpDelay.text = getString(R.string.show_statistic_delay, "--")
         // 下行延迟
         downDelay?.let { topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, it.toString()) }
         if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text = getString(R.string.show_statistic_delay, "--")
@@ -495,10 +492,10 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, "--")
         // 上行码率
         upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
-        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_bitrate, "--")
+        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, "--")
         // 下行码率
         downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
-        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_bitrate, "--")
+        if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
         upLinkBps?.let { topBinding.tvStatisticUpNet.text = getString(R.string.show_statistic_up_net_speech, (it / 1000).toString()) }
@@ -1173,7 +1170,6 @@ class LiveDetailFragment : Fragment() {
                 if (isRoomOwner) {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
-                            upDelay = stats.lastmileDelay,
                             cpuAppUsage = stats.cpuAppUsage,
                             cpuTotalUsage = stats.cpuTotalUsage,
                         )

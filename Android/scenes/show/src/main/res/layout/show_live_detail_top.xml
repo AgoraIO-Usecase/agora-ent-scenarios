@@ -151,11 +151,11 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticUpDelay"
+                android:id="@+id/tvStatisticUpBitrate"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_delay" />
+                tools:text="@string/show_statistic_up_bitrate" />
 
             <TextView
                 android:id="@+id/tvStatisticUpLossPackage"
@@ -166,13 +166,6 @@
         </TableRow>
 
         <TableRow android:paddingVertical="3dp">
-
-            <TextView
-                android:id="@+id/tvStatisticUpBitrate"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_bitrate" />
 
             <TextView
                 android:id="@+id/tvStatisticUpNet"
@@ -211,11 +204,11 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticDownDelay"
+                android:id="@+id/tvStatisticDownBitrate"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="@string/show_statistic_delay" />
+                tools:text="@string/show_statistic_down_bitrate" />
 
             <TextView
                 android:id="@+id/tvStatisticDownLossPackage"
@@ -228,18 +221,19 @@
         <TableRow android:paddingVertical="3dp">
 
             <TextView
-                android:id="@+id/tvStatisticDownBitrate"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_bitrate" />
-
-            <TextView
                 android:id="@+id/tvStatisticDownNet"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_statistic_down_net_speech" />
+
+            <TextView
+                android:id="@+id/tvStatisticDownDelay"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_delay" />
+
         </TableRow>
 
     </TableLayout>
