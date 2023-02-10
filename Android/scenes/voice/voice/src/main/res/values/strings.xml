@@ -243,4 +243,8 @@
     <string name="voice_room_content_prohibited">Content prohibited</string>
     <string name="voice_room_send_tip">Send</string>
     <string name="voice_room_name_rule">Incorrect room name</string>
+    
+    <string name="voice_room_robot_left">Close Bot</string>
+    <string name="voice_room_robot_right">Other Settings</string>
+
 </resources>
