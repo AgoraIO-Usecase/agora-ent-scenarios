@@ -246,13 +246,18 @@ extension ShowAgoraKitManager {
            break
         case .videoEncodeSize:
             videoEncoderConfig.dimensions = dimensionsItems[index]
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            let ret = agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            showLogger.info(" videoEncoderConfig.dimensions = \(videoEncoderConfig.dimensions) ret = \(ret)")
         case .videoBitRate:
             videoEncoderConfig.bitrate = Int(sliderValue)
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
         case .FPS:
             videoEncoderConfig.frameRate = fpsItems[index]
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            // 采集帧率
+//            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+//            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            
         case .H265:
             agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
             agoraKit.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")

@@ -18,7 +18,7 @@ class ShowRealTimeDataView: UIView {
     }()
     private lazy var rightInfoLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .small)
-        label.textAlignment = .left
+        label.textAlignment = .right
         label.numberOfLines = 0
         label.text = nil
         return label
