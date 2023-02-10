@@ -28,6 +28,7 @@ extension SARoomViewController {
             if error == nil {
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
                 if let mic = mic {
+                    self.roomInfo?.mic_info?[index] = mic
                     self.sRtcView.updateUser(mic)
                 }
             }

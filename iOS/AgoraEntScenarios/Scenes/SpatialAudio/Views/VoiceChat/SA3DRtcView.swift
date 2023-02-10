@@ -152,7 +152,7 @@ class SA3DRtcView: UIView {
             //更新可移动view的数据
             guard let micInfos = micInfos else { return }
             let micInfo = micInfos[0]
-            rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
+            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
         }
@@ -623,7 +623,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             default:
                 return .AgoraChatRoomBaseUserCellTypeAdd
         }
-        return .AgoraChatRoomBaseUserCellTypeAdd
     }
 }
 extension SA3DRtcView: SAMusicPlayerDelegate {
