@@ -67,13 +67,8 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             mcbAgoraBot.isChecked = audioSettingsInfo.botOpen
             pbAgoraBotVolume.progress = audioSettingsInfo.botVolume
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
-            mtBestSoundEffectArrow.text =
-                RoomAudioSettingsConstructor.getSoundEffectName(view.context, audioSettingsInfo.soundSelection)
 
             mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
-            updateAINSView()
-            updateAIAECView()
-            updateAIAGCView()
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 "isChecked：$isChecked".logD("mcbAgoraBot")
@@ -87,21 +82,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
                     ToastTools.showTips(it, getString(R.string.voice_chatroom_only_host_can_change_robot))
                 }
             }
-            mtAINSArrow.setOnClickListener {
-                audioSettingsListener?.onAINS(audioSettingsInfo.AINSMode, audioSettingsInfo.enable)
-            }
-            mtAECArrow.setOnClickListener {
-                audioSettingsListener?.onAIAEC(audioSettingsInfo.isAIAECOn, audioSettingsInfo.enable)
-            }
-            mtAGCArrow.setOnClickListener {
-                audioSettingsListener?.onAGC(audioSettingsInfo.isAIAGCOn, audioSettingsInfo.enable)
-            }
-//            mtVoiceChanger.setOnClickListener {
-//                audioSettingsListener?.onVoiceChanger(audioSettingsInfo.voiceChangerMode, audioSettingsInfo.enable)
-//            }
-            mtBestSoundEffectArrow.setOnClickListener {
-                audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
-            }
             mtSpatialAudioArrow.setOnClickListener {
                 audioSettingsListener?.onSpatialAudio(audioSettingsInfo.spatialOpen, audioSettingsInfo.enable)
             }
@@ -110,41 +90,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
                     mtAgoraBotVolumeValue.text = progress.toString()
                     audioSettingsListener?.onBotVolumeChange(progress)
                 }
-            }
-        }
-    }
-    /**
-     * 更新AINS
-     */
-    fun updateAINSView() {
-        binding?.apply {
-            mtAINSArrow.text = view?.let {
-                RoomAudioSettingsConstructor.getAINSName(it.context, audioSettingsInfo.AINSMode)
-            }
-        }
-    }
-    /**
-     * 更新AIAEC
-     */
-    fun updateAIAECView() {
-        binding?.apply {
-            if (audioSettingsInfo.isAIAECOn) {
-                mtAECArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
-            } else {
-                mtAECArrow.text = view?.context?.getString(R.string.voice_chatroom_off)
-            }
-        }
-    }
-
-    /**
-     * 更新AIAGC
-     */
-    fun updateAIAGCView() {
-        binding?.apply {
-            if (audioSettingsInfo.isAIAGCOn) {
-                mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
-            } else {
-                mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_off)
             }
         }
     }
@@ -175,15 +120,6 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
     }
 
     interface OnClickAudioSettingsListener {
-        /**AI降噪*/
-        fun onAINS(mode: Int, isEnable: Boolean)
-
-        /**AI回声消除*/
-        fun onAIAEC(isOn: Boolean, isEnable: Boolean)
-
-        /**人声自动增益*/
-        fun onAGC(isOn: Boolean, isEnable: Boolean)
-
         /**变声*/
         fun onVoiceChanger(mode: Int, isEnable: Boolean)
 

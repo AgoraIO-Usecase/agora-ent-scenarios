@@ -150,6 +150,10 @@
     <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
+    <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
+    <string name="voice_chatroom_aiagc_audition">AGC Audition</string>
+    <string name="voice_chatroom_audition_before">Before</string>
+    <string name="voice_chatroom_audition_after">After</string>
     <string name="voice_chatroom_turnon_aiaec">Turn on AIAEC</string>
     <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;When you turn on accompaniment singing, AIAEC can greatly improve your singing effect. It is strongly recommended that you turn it on when singing</string>
     <string name="voice_chatroom_turnon_aiagc">Turn on AGC</string>

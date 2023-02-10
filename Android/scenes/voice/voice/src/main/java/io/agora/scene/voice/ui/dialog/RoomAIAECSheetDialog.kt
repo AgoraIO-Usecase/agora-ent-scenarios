@@ -3,6 +3,8 @@ package io.agora.scene.voice.ui.dialog
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.FileUtils
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,7 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util.*
 
 class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
 
@@ -32,14 +35,21 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     var onClickCheckBox: ((isOn: Boolean) -> Unit)? = null
 
     private var beforeDrawable: APNGDrawable? = null
+    private var beforeTimer: Timer? = null
 
     private var afterDrawable: APNGDrawable? = null
+    private var afterTimer: Timer? = null
 
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): VoiceDialogChatroomAiaecBinding? {
         return VoiceDialogChatroomAiaecBinding.inflate(inflater, container, false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        resetTimer()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,8 +89,20 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         }
     }
 
+    fun resetTimer() {
+        if (beforeTimer != null) {
+            beforeTimer?.cancel()
+            beforeTimer = null
+        }
+        if (afterTimer != null) {
+            afterTimer?.cancel()
+            afterTimer = null
+        }
+    }
+
     fun setupOnClickPlayButton() {
         binding?.btnBefore?.setOnClickListener {
+            resetTimer()
             if (it.isSelected) { // stop play
                 AgoraRtcEngineController.get().resetMediaPlayer()
                 beforeDrawable?.stop()
@@ -88,9 +110,19 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 it.isSelected = false
             } else { // start play
                 val file = "sounds/voice_sample_aec_before.m4a"
-                copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath)?.apply {
-                    AgoraRtcEngineController.get().playMusic(afterSoundId, this, 0)
+                io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
+                    AgoraRtcEngineController.get().playMusic(beforeSoundId, this, 0)
                 }
+                val timer = Timer()
+                beforeTimer = timer
+                timer.schedule(object: TimerTask() {
+                    override fun run() {
+                        if (beforeDrawable?.isRunning == true) {
+                            beforeDrawable?.stop()
+                            binding?.btnBefore?.isSelected = false
+                        }
+                    }
+                }, 9500)
                 it.isSelected = true
                 binding?.btnAfter?.isSelected = false
                 beforeDrawable?.start()
@@ -99,6 +131,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
             }
         }
         binding?.btnAfter?.setOnClickListener {
+            resetTimer()
             if (it.isSelected) { // stop play
                 AgoraRtcEngineController.get().resetMediaPlayer()
                 beforeDrawable?.stop()
@@ -106,54 +139,25 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 it.isSelected = false
             } else { // start play
                 val file = "sounds/voice_sample_aec_after.m4a"
-                copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath)?.apply {
+                io.agora.scene.base.utils.FileUtils.copyFileFromAssets(this.context!!, file, context?.externalCacheDir!!.absolutePath).apply {
                     AgoraRtcEngineController.get().playMusic(afterSoundId, this, 0)
                 }
+                val timer = Timer()
+                afterTimer = timer
+                timer.schedule(object: TimerTask() {
+                    override fun run() {
+                        if (afterDrawable?.isRunning == true) {
+                            afterDrawable?.stop()
+                            binding?.btnAfter?.isSelected = false
+                        }
+                    }
+                }, 9500)
                 it.isSelected = true
                 binding?.btnBefore?.isSelected = false
                 afterDrawable?.start()
                 afterDrawable?.resume()
                 beforeDrawable?.stop()
             }
-        }
-    }
-
-    fun copyFileFromAssets(context: Context, assetsFilePath: String, storagePath: String) : String? {
-        var sPath = storagePath
-        var aPath = assetsFilePath
-        if (sPath.endsWith(File.separator)) {
-            sPath = sPath.substring(0, storagePath.length - 1)
-        }
-        if (aPath.endsWith(File.separator)) {
-            return null
-        }
-        sPath = sPath + File.separator + assetsFilePath
-        val file = File(sPath)
-        if (file.exists()) {
-            return sPath
-        }
-        file.parentFile.mkdirs()
-        val input = context.assets.open(aPath)
-        readInputStream(sPath, input)
-        return sPath
-    }
-
-    fun readInputStream(storagePath: String, inputStream: InputStream) {
-        try {
-            val file = File(storagePath)
-            if (!file.exists()) {
-                val fos = FileOutputStream(file)
-                val buffer = ByteArray(inputStream.available())
-                var lenth = -1
-                while (((inputStream.read(buffer)).also { lenth = it }) != -1) {
-                    fos.write(buffer, 0, lenth)
-                }
-                fos.flush()
-                fos.close()
-                inputStream.close()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 }

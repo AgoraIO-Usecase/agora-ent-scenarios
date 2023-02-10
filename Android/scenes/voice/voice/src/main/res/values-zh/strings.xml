@@ -150,6 +150,10 @@
     <string name="voice_chatroom_noise_suppression">AI降噪</string>
     <string name="voice_chatroom_aiaec">AI回声消除</string>
     <string name="voice_chatroom_aiagc">人声自动增益</string>
+    <string name="voice_chatroom_aiaec_audition">AIAEC试听</string>
+    <string name="voice_chatroom_aiagc_audition">AGC试听</string>
+    <string name="voice_chatroom_audition_before">之前</string>
+    <string name="voice_chatroom_audition_after">之后</string>
     <string name="voice_chatroom_turnon_aiaec">开启AI回声消除</string>
     <string name="voice_chatroom_aiaec_introduce">&#160;&#160;&#160;&#160;当您开启伴奏唱歌的时候，AI回声消除能极大提升您的唱歌效果，强烈建议您在唱歌时候开启</string>
     <string name="voice_chatroom_turnon_aiagc">开启人声自动增益</string>

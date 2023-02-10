@@ -89,8 +89,8 @@ data class VoiceMicInfoModel constructor(
     @Transient var userStatus: Int = -1, // 用户状态，备用
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
-    @Transient var position: PointF? = null,
-    @Transient var forward: PointF? = null,
+    @Transient var position: PointF = PointF(0f, 0f),
+    @Transient var forward: PointF = PointF(0f, 0f),
     @Transient var isSpatialSet: Boolean = false,
 ) : BaseRoomBean
 

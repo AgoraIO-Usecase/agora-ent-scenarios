@@ -44,6 +44,7 @@ import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
+import java.util.*
 
 class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>(), EasyPermissions.PermissionCallbacks,
     EasyPermissions.RationaleCallbacks, VoiceRoomSubscribeDelegate {
@@ -78,10 +79,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
     private var isRoomOwnerLeave = false
+    /** 空间位置信息 */
+    private var spatialSeatInfo: SeatPositionInfo? = null
+    /** 空间位置同步timer */
+    private var spatialTimer: Timer? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         return VoiceSpatialActivityChatroomBinding.inflate(inflater)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        setSpatialSeatInfo(null)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,7 +138,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
-
                 override fun onError(code: Int, message: String?) {
                     ToastTools.show(
                         this@ChatroomLiveActivity,
@@ -345,6 +354,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                             position.forward,
                             right
                         )
+                        setSpatialSeatInfo(position)
                     }
                 }
             ).setUpInitMicInfoMap()
@@ -429,6 +439,30 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
         }, true)
+    }
+
+    fun setSpatialSeatInfo(info: SeatPositionInfo?) {
+        val oldValue = spatialSeatInfo
+        spatialSeatInfo = info
+        if (oldValue == null && info != null) {
+            spatialTimer = Timer().apply {
+                schedule(object: TimerTask() {
+                    override fun run() {
+                        AgoraRtcEngineController.get().sendSelfPosition(spatialSeatInfo!!)
+                    }
+                }, 0, 2000)
+            }
+        } else if (oldValue != null && info == null) {
+            spatialTimer?.cancel()
+            val defaultSeat = SeatPositionInfo(
+                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                arrayOf(0f, -1f, 0f),
+                0f,
+                0f,
+                0f
+            )
+            AgoraRtcEngineController.get().sendSelfPosition(defaultSeat)
+        }
     }
 
     override fun onBackPressed() {

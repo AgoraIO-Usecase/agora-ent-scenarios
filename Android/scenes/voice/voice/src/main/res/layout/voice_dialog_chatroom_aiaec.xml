@@ -90,8 +90,10 @@
         android:layout_height="32dp"
         android:paddingStart="@dimen/voice_sp_20"
         android:textColor="@color/voice_dark_grey_color_6c7192"
+        android:background="@color/voice_color_f7f8fb"
         android:gravity="center_vertical"
-        android:text="@string/voice_chatroom_turnon_aiaec"
+        android:text="@string/voice_chatroom_aiagc_audition"
+        android:textSize="@dimen/voice_sp_13"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtAECIntroduce" />
 
@@ -102,7 +104,7 @@
         android:layout_height="53dp"
         android:paddingStart="@dimen/voice_sp_20"
         style="@style/voice_bottom_sheet_text_style"
-        android:text="#Before"
+        android:text="@string/voice_chatroom_audition_before"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvAuditionTitle" />
 
@@ -143,7 +145,7 @@
         android:layout_width="@+id/tvBeforeTitle"
         android:layout_height="53dp"
         android:paddingStart="@dimen/voice_sp_20"
-        android:text="#After"
+        android:text="@string/voice_chatroom_audition_after"
         app:layout_constraintTop_toBottomOf="@+id/tvBeforeTitle"
         app:layout_constraintLeft_toLeftOf="@+id/tvBeforeTitle"
         app:layout_constraintRight_toRightOf="@+id/tvBeforeTitle" />
