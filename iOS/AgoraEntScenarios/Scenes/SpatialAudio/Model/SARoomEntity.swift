@@ -67,9 +67,12 @@ import KakaJSON
         property.name
     }
     
+    // TODO: shengtao
     var attenuation: Double = 0.2
     var airAbsorb: Bool = false
     var voiceBlur: Bool = false
+    
+    
     var forward: [NSNumber]?
     var right: [NSNumber]?
     var up: [NSNumber] = [0, 0, 1]
