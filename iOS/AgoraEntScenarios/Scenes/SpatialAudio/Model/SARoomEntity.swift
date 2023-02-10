@@ -42,6 +42,8 @@ import KakaJSON
     public var turn_AGC: Bool? = false
     public var robot_volume: UInt?
     public var sound_effect: Int = 1
+    
+    public var objectId: String?
 
     override public required init() {}
 
@@ -56,6 +58,8 @@ import KakaJSON
     var status: Int = 0 // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5: -1:空闲
 
     var member: SAUser?
+    
+    var objectId: String?
 
     override public required init() {}
 

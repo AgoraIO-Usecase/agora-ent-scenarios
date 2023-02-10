@@ -238,7 +238,8 @@ extension SARoomViewController {
     func showApplyAlert(_ index: Int) {
         let isHairScreen = SwiftyFitsize.isFullScreen
         let manageView = SAVMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
-        let mic_info = SpatialAudioServiceImp.getSharedInstance().mics[safe: index]
+        //TODO: remove as!
+        let mic_info = AppContext.saTmpServiceImp().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
             self?.dismiss(animated: true)
@@ -293,7 +294,7 @@ extension SARoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        SpatialAudioServiceImp.getSharedInstance().startMicSeatApply(index: index) { error, flag in
+        AppContext.saServiceImp().startMicSeatApply(index: index) { error, flag in
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
@@ -308,7 +309,7 @@ extension SARoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        SpatialAudioServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
+        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
             if error == nil {
                 self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
