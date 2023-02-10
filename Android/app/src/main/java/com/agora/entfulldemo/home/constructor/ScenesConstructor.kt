@@ -36,7 +36,7 @@ object ScenesConstructor {
             ),
             ScenesModel(
                 SceneType.Voice_Chat_Spatial,
-                context.getString(R.string.app_voice_chat_spatial),
+                context.getString(R.string.app_voice_chat),
                 R.mipmap.bg_btn_home5,
                 0,
                 true,

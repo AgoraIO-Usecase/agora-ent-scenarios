@@ -97,6 +97,7 @@
     <string name="voice_chatroom_open_bot_to_sound_effect">Add bot to listen to sound effect?</string>
     <string name="voice_chatroom_end_live">End Live?</string>
     <string name="voice_chatroom_end_live_tips">The room will close after you leave.</string>
+    <string name="voice_chatroom_time_up_tips">The room experience time has been exhausted.</string>
     <string name="voice_chatroom_exit">Exit the chatroom?</string>
     <string name="voice_chatroom_exit_and_create_one">Exit the chatroom and recreate a new one?</string>
     <string name="voice_chatroom_open_bot_prompt">Add bot?</string>

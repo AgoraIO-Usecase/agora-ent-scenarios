@@ -15,6 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom3dMicLayoutBinding
+import io.agora.scene.voice.spatial.model.OnItemMoveListener
+import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
@@ -22,9 +24,7 @@ import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ThreadManager
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.hypot
+import kotlin.math.*
 
 class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
@@ -83,6 +83,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     private var onItemClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
     private var onBotClickListener: OnItemClickListener<VoiceMicInfoModel>? = null
+    private var onSpatialMoveListener: OnItemMoveListener<VoiceMicInfoModel>? = null
 
     /**麦位数据信息*/
     private val micInfoMap = mutableMapOf<Int, VoiceMicInfoModel>()
@@ -92,10 +93,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     fun onItemClickListener(
         onItemClickListener: OnItemClickListener<VoiceMicInfoModel>,
-        onBotClickListener: OnItemClickListener<VoiceMicInfoModel>
+        onBotClickListener: OnItemClickListener<VoiceMicInfoModel>,
+        onSpatialMoveListener: OnItemMoveListener<VoiceMicInfoModel>
     ) = apply {
         this.onItemClickListener = onItemClickListener
         this.onBotClickListener = onBotClickListener
+        this.onSpatialMoveListener = onSpatialMoveListener
     }
 
     constructor(context: Context) : this(context, null)
@@ -155,6 +158,40 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             view.x + view.width,
             view.y + rootView.y + view.height
         )
+    }
+
+    /**
+     * 获取视图在笛卡尔坐标系中的位置
+     */
+    private fun getPositon(view: View): PointF {
+        val axisLength = 20f
+        val fullWidth = binding.cl3DMicLayoutRoot.width
+        val fullHeight = binding.cl3DMicLayoutRoot.height
+        val oPoint = PointF(fullWidth * 0.5f, fullHeight * 0.5f)
+        // 翻转Y轴
+        val turnY = fullHeight - view.y
+        val vPoint = PointF(view.width * 0.5f + view.x, turnY - (view.height * 0.5f))
+        // 相对坐标
+        val relativePoint = PointF(oPoint.x - vPoint.x, oPoint.y - vPoint.y)
+        // 屏幕相对坐标转化为坐标系坐标
+        return PointF(
+            relativePoint.x / fullWidth * axisLength,
+            relativePoint.y / fullWidth * axisLength
+        )
+    }
+    /**
+     * 将笛卡尔坐标转换成视图中的坐标
+     */
+    private fun convertPoint(point: PointF): PointF {
+        val axisLength = 20f
+        val fullWidth = binding.cl3DMicLayoutRoot.width
+        val fullHeight = binding.cl3DMicLayoutRoot.height
+        val oPoint = PointF(fullWidth * 0.5f, fullHeight * 0.5f)
+        // 笛卡尔屏幕坐标
+        val vPoint = PointF(point.x / axisLength * fullWidth, point.y / axisLength * fullHeight)
+        val x = oPoint.x + vPoint.x
+        val y = oPoint.y - vPoint.y
+        return PointF(x, y)
     }
 
     override fun onClick(v: View?) {
@@ -259,7 +296,8 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         binding.micV0Center.top + nextTransitionY.toInt() + micViewSize.height / 2
                     )
                     // 移动的角度
-                    val angle = getAngle(curPoint, preMovePoint)
+                    val generalAngle = getAngle(curPoint, preMovePoint)
+                    val angle = generalAngle + 90f
                     if (abs(angle - preAngle) > OFFSET_ANGLE) {
                         binding.micV0Center.changeAngle(angle.toFloat())
                         preMovePoint.x = curPoint.x
@@ -267,6 +305,17 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         preAngle = angle
                     }
                     "onTouchEvent ACTION_MOVE x:${x} y:${y} dx:${dx} dy:${dy} angle:${angle}".logD(TAG)
+                    micInfoMap[ConfigConstants.MicConstant.KeyIndex0]?.let {
+                        val point = getPositon(binding.micV0Center)
+                        val p = SeatPositionInfo(
+                            it.member?.rtcUid ?: -1,
+                            arrayOf(cos(angle).toFloat(), sin(angle).toFloat(), 0f),
+                            point.x,
+                            point.y,
+                            generalAngle.toFloat()
+                        )
+                        onSpatialMoveListener?.onItemMove(it, p, -1)
+                    }
                 }
                 return true
             }
@@ -298,7 +347,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                     // 当前移动的坐标圆点
                     val curPoint = Point(correctedX, correctedY)
                     // 移动的角度
-                    val angle = getAngle(curPoint, preMovePoint)
+                    val angle = getAngle(curPoint, preMovePoint) + 90
                     binding.micV0Center.changeAngle(angle.toFloat())
                     preMovePoint.x = curPoint.x
                     preMovePoint.y = curPoint.y
@@ -330,9 +379,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         val changeY = curP.y - preP.y
         // 用反三角函数求弧度
         val radina = atan2(changeY.toDouble(), changeX.toDouble())
-        // 将弧度转换成角度,需要加90
-        val angle = 180.0 / Math.PI * radina
-        return angle + 90
+        return 180.0 / Math.PI * radina
     }
 
     private fun ignoreSmallOffsets(dx: Float, dy: Float): Boolean {
@@ -397,17 +444,23 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             }
         }
     }
-
+    private var speaker: Int? = null
     /**更新机器人提示音量*/
-    override fun updateBotVolume(speakerType: Int, volume: Int) {
+    override fun updateBotVolume(speakerType: Int, volume: Int): Pair<PointF, PointF>? {
+        var speakerView = binding.micV3Blue
+        var forward = PointF(1f, 1f)
         when (speakerType) {
             ConfigConstants.BotSpeaker.BotBlue -> {
+                speakerView = binding.micV3Blue
+                forward = PointF(1f, 1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
                     this.audioVolumeType = volume
                     binding.micV3Blue.binding(this)
                 }
             }
             ConfigConstants.BotSpeaker.BotRed -> {
+                speakerView = binding.micV6Red
+                forward = PointF(-1f, -1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                     this.audioVolumeType = volume
                     binding.micV6Red.binding(this)
@@ -424,6 +477,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 }
             }
         }
+        // 检查机器人位置更新
+        return if (speaker != speakerType) {
+            speaker = speakerType
+            Pair(getPositon(speakerView), forward)
+        } else {
+            null
+        }
     }
 
     override fun findMicByUid(uid: String): Int {
@@ -437,7 +497,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         return -1
     }
 
-    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, each: ((VoiceMicInfoModel) -> Unit)?) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
                 val index = entry.key
@@ -447,8 +507,17 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                     micInfoMap[index] = micInfo
                     micViewMap[index]?.apply {
                         binding(micInfo)
+                        micInfo.position = getPositon(this as View)
                     }
                 }
+                when (index) {
+                    0 -> micInfo.forward = PointF(1f, 0f)
+                    1 -> micInfo.forward = PointF(0f, -1f)
+                    2 -> micInfo.forward = PointF(1f, -1f)
+                    4 -> micInfo.forward = PointF(0f, 1f)
+                    5 -> micInfo.forward = PointF(1f, -1f)
+                }
+                each?.invoke(micInfo)
             }
             // 机器人
             if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex3)) {
@@ -466,5 +535,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     override fun myRtcUid(): Int {
         return myRtcUid
+    }
+
+    override fun updateSpatialPosition(info: SeatPositionInfo) {
+        val view = binding.micV0Center
+        val p = convertPoint(PointF(info.x, info.y))
+        view.translationX = p.x - view.width * 0.5f
+        view.translationY = p.y - view.height * 0.5f
+        binding.micV0Center.changeAngle(info.angle + 90)
     }
 }

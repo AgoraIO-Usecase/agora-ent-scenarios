@@ -1,5 +1,6 @@
 package io.agora.scene.voice.spatial.service
 
+import io.agora.scene.voice.spatial.model.RobotSpatialAudioModel
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 
 /**
@@ -77,6 +78,8 @@ interface VoiceRoomSubscribeDelegate {
      * @param attributeMap 变换的属性kv
      */
     fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>) {}
+
+    fun onRobotUpdate(roomId: String, robotInfo: RobotSpatialAudioModel) {}
 }
 
 enum class VoiceRoomServiceKickedReason{
