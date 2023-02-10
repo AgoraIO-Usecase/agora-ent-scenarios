@@ -139,8 +139,7 @@ extension SpatialAudioSyncSerciceImp {
         return mic_index
     }
     
-    func createMics() -> [String:String] {
-        var mics = [SARoomMic]()
+    fileprivate func _getOwnerSeat() -> SARoomMic {
         let mic = SARoomMic()
         mic.mic_index = 0
         mic.status = 0
@@ -153,25 +152,56 @@ extension SpatialAudioSyncSerciceImp {
         mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
         mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
-        mics.append(mic)
-        for i in 1...7 {
-            let item = SARoomMic()
-            item.mic_index = i
-            if i < 6 {
-                item.status = -1
-            } else {
-                item.status = -2
+        
+        return mic
+    }
+    
+    fileprivate func createMics(roomId: String, completion: @escaping (Error?, [SARoomMic]?)->Void) {
+        
+        _getMicSeatList(roomId: roomId) {[weak self] error, micList in
+            guard let self = self else {return}
+            if let err = error {
+                completion(err, nil)
+                return
             }
-            mics.append(item)
+            
+            var mics = micList ?? []
+            
+            let group = DispatchGroup()
+            
+            var existMicIdxs: [Int] = []
+            mics.forEach { mic in
+                existMicIdxs.append(mic.mic_index)
+            }
+            for i in 0...6 {
+                if existMicIdxs.contains(i) {
+                    continue
+                }
+                let item = i == 1 ? self._getOwnerSeat() : SARoomMic()
+                if i != 1 {
+                    item.mic_index = i
+                    if i != 3, i != 6 {
+                        item.status = -1   //normal seat
+                    } else {
+                        item.status = -2   //robot seat
+                    }
+                }
+                group.enter()
+                self._addMicSeat(roomId: roomId, mic: item) { error in
+                    if let _ = error {
+                        group.leave()
+                        return
+                    }
+                    mics.append(item)
+                    group.leave()
+                }
+            }
+            group.notify(queue: DispatchQueue.main) {
+                mics = mics.sorted {$0.mic_index < $1.mic_index}
+                self.mics = mics
+                completion(nil, mics)
+            }
         }
-        self.mics = mics
-        var micsMap = [String:String]()
-        for (idx,item) in mics.enumerated() {
-            micsMap["mic_\(idx)"] = item.kj.JSONString()
-        }
-        micsMap["use_robot"] = "0"
-        micsMap["robot_volume"] = "50"
-        return micsMap
     }
 }
 
@@ -182,7 +212,6 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         self.subscribeDelegate = delegate
         _subscribeMicSeatApplyChanged()
         _subscribeUsersChanged()
-        
     }
     
     func unsubscribeEvent() {
@@ -209,7 +238,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
     }
     
-    func createRoom(room: SARoomEntity, completion: @escaping (SyncError?, SARoomEntity?) -> Void) {
+    func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
@@ -218,15 +247,18 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         owner.portrait = VLUserCenter.user.headUrl
         
         self.roomList.append(room)
-        var params = room.kj.JSONObject()
+        let params = room.kj.JSONObject()
+        let room_id = room.room_id ?? ""
         self.initScene {
-            SyncUtil.joinScene(id: room.room_id ?? "",
+            SyncUtil.joinScene(id: room_id,
                                userId:VLUserCenter.user.userNo,
                                isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 self.roomId = model.room_id!
-                completion(nil,model)
+                self.createMics(roomId: room_id) { error, micList in
+                    completion(error, model)
+                }
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
                     print("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
@@ -238,7 +270,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?) -> Void) {
-        guard let room = _roomInfo() else {
+        guard let room = _roomInfo(roomId: roomId) else {
             agoraAssert("join room fail, \(roomId) not found")
             completion(SAErrorType.roomInfoNotFound("join room", roomId).error(), nil)
             return
@@ -249,18 +281,21 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
         let params = updateRoom.kj.JSONObject()
         let userId = room.owner?.uid ?? ""
-        SyncUtil.joinScene(id: room.room_id!,
+        let room_id = room.room_id!
+        SyncUtil.joinScene(id: room_id,
                            userId: userId,
                            isOwner: userId == VLUserCenter.user.id,
                            property: params) {[weak self] result in
             guard let self = self else {return}
-            self.roomId = room.room_id!
+            self.roomId = room_id
             //获取IM信息
             let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
             self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
                 VLUserCenter.user.im_token = im_token
                 VLUserCenter.user.chat_uid = chat_uid
-                completion(nil, updateRoom)
+                self.createMics(roomId: room_id) { error, miclist in
+                    completion(error, updateRoom)
+                }
             }
         } fail: { error in
             completion(error, nil)
@@ -726,8 +761,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 
 //MARK: room info
 extension SpatialAudioSyncSerciceImp {
-    fileprivate func _roomInfo() -> SARoomEntity? {
-        return self.roomList.filter {$0.room_id == self.roomId}.first
+    fileprivate func _roomInfo(roomId: String? = nil) -> SARoomEntity? {
+        let room_id = roomId ?? self.roomId
+        return self.roomList.filter {$0.room_id == room_id}.first
     }
     
     func subscribeRoomStatusChanged() {
@@ -846,6 +882,21 @@ extension SpatialAudioSyncSerciceImp {
             }, fail: { error in
                 agoraPrint("imp mics seat list get fail :\(error.message)...")
                 completion(SAErrorType.unknown("get mic list", error.message).error(), nil)
+            })
+    }
+    
+    fileprivate func _addMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?) -> Void) {
+        let params = mic.kj.JSONObject()
+        agoraPrint("imp seat add...")
+        SyncUtil
+            .scene(id: roomId)?
+            .collection(className: kCollectionIdSeatInfo)
+            .add(data: params, success: { object in
+                agoraPrint("imp seat add success...")
+                completion(nil)
+            }, fail: { error in
+                agoraPrint("imp seat add fail :\(error.message)...")
+                completion(SAErrorType.unknown("add seat", error.message).error())
             })
     }
     
