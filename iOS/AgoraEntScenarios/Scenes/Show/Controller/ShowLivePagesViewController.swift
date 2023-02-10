@@ -17,6 +17,8 @@ class ShowLivePagesViewController: ViewController {
     
     var focusIndex: Int = 0
     
+    private var currentVC: ShowLiveViewController?
+    
     lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
         manager.defaultSetting()
@@ -57,6 +59,7 @@ class ShowLivePagesViewController: ViewController {
         self.view.addSubview(collectionView)
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
         scroll(to: fakeCellIndex(with: focusIndex))
+        preloadEnterRoom()
         updateAudiencePresetType()
     }
 }
@@ -65,6 +68,27 @@ class ShowLivePagesViewController: ViewController {
 private let kPageCacheHalfCount = 5
 //MARK: private
 extension ShowLivePagesViewController {
+    fileprivate func preloadEnterRoom() {
+        guard let roomList = roomList, roomList.count > 2 else {return}
+        let prevIdx = (focusIndex + roomList.count - 1) % roomList.count
+        let nextIdx = (focusIndex + 1) % roomList.count
+        let preloadIdxs = [prevIdx, nextIdx]
+        showLogger.info("preloadEnterRoom: \(prevIdx) and \(nextIdx)", context: kShowLogBaseContext)
+        preloadIdxs.forEach { idx in
+            let room = roomList[idx]
+            guard let roomId = room.roomId else {return}
+            let vc = ShowLiveViewController(agoraKitManager: self.agoraKitManager)
+            vc.audiencePresetType = self.audiencePresetType
+//            vc?.selectedResolution = self.selectedResolution
+            vc.room = room
+            vc.loadingType = .preload
+            vc.pagesVC = self
+            self.roomVCMap[roomId] = vc
+            //TODO: invoke viewdidload to join channel
+            vc.view.frame = self.view.bounds
+        }
+    }
+    
     fileprivate func fakeCellCount() -> Int {
         guard let count = roomList?.count else {
             return 0
@@ -157,6 +181,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            vc?.selectedResolution = self.selectedResolution
             vc?.room = room
             vc?.loadingType = .preload
+            vc?.pagesVC = self
         }
         
         guard let vc = vc else {
@@ -214,5 +239,16 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         showLogger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
         
         scroll(to: toIndex)
+    }
+}
+
+extension ShowLivePagesViewController {
+    var isScrollEnable: Bool {
+        set{
+            collectionView.isScrollEnabled = newValue
+        }
+        get{
+            return collectionView.isScrollEnabled
+        }
     }
 }

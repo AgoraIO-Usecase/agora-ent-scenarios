@@ -13,12 +13,14 @@ class ShowRealTimeDataView: UIView {
         let label = AGELabel(colorStyle: .white, fontStyle: .small)
         label.textAlignment = .left
         label.numberOfLines = 0
+        label.text = nil
         return label
     }()
     private lazy var rightInfoLabel: AGELabel = {
         let label = AGELabel(colorStyle: .white, fontStyle: .small)
         label.textAlignment = .right
         label.numberOfLines = 0
+        label.text = nil
         return label
     }()
     private lazy var closeButton: AGEButton = {
@@ -29,21 +31,44 @@ class ShowRealTimeDataView: UIView {
     
     private var audioOnly: Bool = false
     
-    var statsInfo: ShowStatisticsInfo? {
+//    var statsInfo: ShowStatisticsInfo? {
+//        didSet{
+//            leftInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).0
+//            rightInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).1
+//        }
+//    }
+    
+    var remoteStatsInfo: ShowStatisticsInfo? {
         didSet{
-            leftInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).0
-            rightInfoLabel.text = statsInfo?.description(audioOnly: audioOnly).1
+            updateStatistisInfo()
         }
+    }
+    
+    var localStatsInfo: ShowStatisticsInfo? {
+        didSet{
+            updateStatistisInfo()
+        }
+    }
+    
+    private func updateStatistisInfo(){
+        let localLeftStr = localStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let localRightStr = localStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        let remoteLeftStr = remoteStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let remoteRightStr = remoteStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
     }
     
     init(audioOnly: Bool = false, isLocal: Bool) {
         super.init(frame: .zero)
         self.audioOnly = audioOnly
-        if isLocal {
-            statsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
-        } else {
-            statsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
-        }
+//        if isLocal {
+//            statsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
+//        } else {
+//            statsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
+//        }
+        localStatsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
+        remoteStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
         setupUI()
     }
     

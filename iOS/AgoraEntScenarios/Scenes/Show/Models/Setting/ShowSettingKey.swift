@@ -15,7 +15,7 @@ enum ShowAgoraVideoDimensions: String, CaseIterable {
     case _480x854 = "480x854"
     case _540x960 = "540x960"
     case _720x1280 = "720x1280"
-    case _1080x1920 = "1080x1920"
+//    case _1080x1920 = "1080x1920"
      
     var sizeValue: CGSize {
         let arr: [String] = rawValue.split(separator: "x").compactMap{"\($0)"}
@@ -186,6 +186,10 @@ enum ShowSettingKey: String, CaseIterable {
             return "show_advance_setting_SR_tips".show_localized
         case .H265:
             return "show_advance_setting_H265_tips".show_localized
+        case .videoEncodeSize:
+            return "show_advance_setting_videoEncodeSize_tips".show_localized
+        case .FPS:
+            return "show_advance_setting_fps_tips".show_localized
         default:
             return ""
         }
@@ -195,7 +199,7 @@ enum ShowSettingKey: String, CaseIterable {
     var sliderValueScope: (Float, Float) {
         switch self {
         case .videoBitRate:
-            return (200, 2000)
+            return (200, 4000)
         case .recordingSignalVolume:
             return (0, 100)
         case .musincVolume:
@@ -216,8 +220,6 @@ enum ShowSettingKey: String, CaseIterable {
                     AgoraVideoFrameRate.fps10.stringValue(),
                     AgoraVideoFrameRate.fps15.stringValue(),
                     AgoraVideoFrameRate.fps24.stringValue(),
-                    AgoraVideoFrameRate.fps30.stringValue(),
-                    AgoraVideoFrameRate.fps60.stringValue()
             ]
         case .audioBitRate:
             return ["2","3","5"]

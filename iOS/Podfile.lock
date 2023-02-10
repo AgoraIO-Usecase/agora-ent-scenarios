@@ -20,11 +20,9 @@ PODS:
     - Zip
   - AgoraRtcEngine_iOS (1.0)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (1.1.3):
+  - AgoraSyncManager (1.1.4):
     - SocketRocket
   - Bugly (2.5.93)
-  - BytedEffect (4.3.0):
-    - SSZipArchive
   - ChameleonFramework (2.1.0):
     - ChameleonFramework/Default (= 2.1.0)
   - ChameleonFramework/Default (2.1.0)
@@ -349,6 +347,7 @@ PODS:
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
+  - SenseLib (1.0)
   - SnapKit (5.6.0)
   - SocketRocket (0.6.0)
   - SSZipArchive (2.4.3)
@@ -372,15 +371,14 @@ PODS:
   - ZSwiftBaseLib (0.1.6.1)
 
 DEPENDENCIES:
-  - AFNetworking (~> 4.0.1)
+  - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (~> 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraLyricsScore (= 1.0.8.8)
   - AgoraRtcEngine_iOS (from `./libs`)
   - AgoraRtm_iOS
-  - AgoraSyncManager (= 1.1.3)
+  - AgoraSyncManager (= 1.1.4)
   - Bugly (= 2.5.93)
-  - BytedEffect (from `bytedEffect.podspec`)
   - ChameleonFramework
   - CRBoxInputView
   - CYLTabBarController
@@ -397,6 +395,7 @@ DEPENDENCIES:
   - MJRefresh (~> 3.2.0)
   - QMUIKit (= 4.5.1)
   - SDWebImage (~> 5.0.3)
+  - SenseLib (from `sense.podspec`)
   - SnapKit
   - SocketRocket
   - SVGAPlayer
@@ -451,8 +450,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AgoraRtcEngine_iOS:
     :path: "./libs"
-  BytedEffect:
-    :path: bytedEffect.podspec
+  SenseLib:
+    :path: sense.podspec
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
@@ -461,9 +460,8 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
   AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: ee9b8af10559986f82a3c98308fa60603aedfa25
+  AgoraSyncManager: f52eed4494ddf4c0517fe403b03494cd230ba924
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
-  BytedEffect: 74b0bd8150ff1ab9c443d210a7ff7eb49ad3da44
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
   CYLTabBarController: db44b5901a28693a8a4279e4721b3aafdd36c178
@@ -482,6 +480,7 @@ SPEC CHECKSUMS:
   Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
   QMUIKit: 3e717c45730ecdf5011ca76751990ad1a23ba7e1
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
+  SenseLib: 6b0a54e6057dc62f2c1aa8227bd095bcaba2e268
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -495,6 +494,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 2ad6d74909a462af1d6ae469aa1cec3bba92b4e3
+PODFILE CHECKSUM: c5c457dc9042fcef34fe1244aba752c41cbdbb1d
 
 COCOAPODS: 1.11.3
