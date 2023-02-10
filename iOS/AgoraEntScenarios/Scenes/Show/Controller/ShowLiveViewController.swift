@@ -10,7 +10,7 @@ import AgoraRtcKit
 import SwiftUI
 
 class ShowLiveViewController: UIViewController {
-    var onPking: (()->())?
+    weak var pagesVC: ShowLivePagesViewController?
     var room: ShowRoomListModel?
     var loadingType: ShowRTCLoadingType = .preload {
         didSet {
@@ -19,7 +19,6 @@ class ShowLiveViewController: UIViewController {
             }
             
             self.joinStartDate = Date()
-            showLogger.info("room(\(roomId)) ---loadingType---- updateLoadingType: \(loadingType.rawValue)", context: kShowLogBaseContext)
             updateLoadingType(loadingType: loadingType)
         }
     }
@@ -89,7 +88,16 @@ class ShowLiveViewController: UIViewController {
     }()
     
     private lazy var beautyVC = ShowBeautySettingVC()
-    private lazy var realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
+    private lazy var realTimeView: ShowRealTimeDataView = {
+        let realTimeView = ShowRealTimeDataView(isLocal: role == .broadcaster)
+        view.addSubview(realTimeView)
+        realTimeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(Screen.safeAreaTopHeight() + 50)
+        }
+        return realTimeView
+    }()
+    
     private lazy var applyAndInviteView = ShowApplyAndInviteView(roomId: roomId)
     private lazy var applyView = ShowApplyView(roomId: roomId)
     
@@ -263,12 +271,6 @@ class ShowLiveViewController: UIViewController {
         view.addSubview(liveView)
         liveView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        
-        view.addSubview(realTimeView)
-        realTimeView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(Screen.safeAreaTopHeight() + 50)
         }
     }
     
@@ -685,6 +687,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.bottomBar.linkButton.isSelected = true
             liveView.bottomBar.linkButton.isShowRedDot = false
             AlertManager.hiddenView()
+            if role == .broadcaster {
+                pagesVC?.isScrollEnable = false
+            }
         default:
             break
         }
@@ -717,6 +722,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                                        options: self.channelOptions,
                                        uid: uid,
                                        canvasView: canvasView)
+            pagesVC?.isScrollEnable = true
             
         default:
             break
@@ -842,7 +848,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             if state == .decoding /*2*/,
                ( reason == .remoteUnmuted /*6*/ || reason == .localUnmuted /*4*/ || reason == .localMuted /*3*/ )   {
                 let costTs = -(self.joinStartDate?.timeIntervalSinceNow ?? 0) * 1000
-                showLogger.info("show first frame  ----updateLoadingType ------- (\(channelId)) cost: \(Int(costTs)) ms", context: kShowLogBaseContext)
+                showLogger.info("show first frame (\(channelId)) cost: \(Int(costTs)) ms", context: kShowLogBaseContext)
+            }
+            if self.loadingType != .loading {
                 self.updateLoadingType(loadingType: self.loadingType)
             }
         }

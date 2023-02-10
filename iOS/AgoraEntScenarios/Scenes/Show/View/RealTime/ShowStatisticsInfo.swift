@@ -138,8 +138,8 @@ struct ShowStatisticsInfo {
         if audioOnly {
             return ([audioSend, cpu, aSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n")
-        let rightInfo = [" \n",     fps,       vSendLoss,   " " ].joined(separator: "\n")
+        let leftInfo =  [sendTitle, videoSize, videoSend,   uplink ].joined(separator: "\n\n")
+        let rightInfo = [" \n",     fps,       vSendLoss,   " " ].joined(separator: "\n\n")
 
         return (leftInfo, rightInfo)
     }
@@ -160,8 +160,8 @@ struct ShowStatisticsInfo {
         if audioOnly {
             return ([audioRecv, audioLoss, vSendLoss].joined(separator: "\n"), "")
         }
-        let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n")
-        let rightInfo = [" \n",     fps,        vSendLoss,  lastmile].joined(separator: "\n")
+        let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n\n")
+        let rightInfo = [" \n",     fps,        vSendLoss,  lastmile].joined(separator: "\n\n")
 
         return (leftInfo, rightInfo)
     }

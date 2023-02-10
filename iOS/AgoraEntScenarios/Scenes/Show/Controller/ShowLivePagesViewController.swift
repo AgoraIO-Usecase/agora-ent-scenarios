@@ -82,6 +82,7 @@ extension ShowLivePagesViewController {
 //            vc?.selectedResolution = self.selectedResolution
             vc.room = room
             vc.loadingType = .preload
+            vc.pagesVC = self
             self.roomVCMap[roomId] = vc
             //TODO: invoke viewdidload to join channel
             vc.view.frame = self.view.bounds
@@ -180,6 +181,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            vc?.selectedResolution = self.selectedResolution
             vc?.room = room
             vc?.loadingType = .preload
+            vc?.pagesVC = self
         }
         
         guard let vc = vc else {
@@ -237,5 +239,16 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
         showLogger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
         
         scroll(to: toIndex)
+    }
+}
+
+extension ShowLivePagesViewController {
+    var isScrollEnable: Bool {
+        set{
+            collectionView.isScrollEnabled = newValue
+        }
+        get{
+            return collectionView.isScrollEnabled
+        }
     }
 }
