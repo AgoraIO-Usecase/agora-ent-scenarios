@@ -180,11 +180,13 @@ extension SpatialAudioSyncSerciceImp {
                 let item = i == 1 ? self._getOwnerSeat() : SARoomMic()
                 if i != 1 {
                     item.mic_index = i
-                    if i != 3, i != 6 {
-                        item.status = -1   //normal seat
+                    if i == 3 || i == 6 {
+                        item.status = -2   //robot
                     } else {
-                        item.status = -2   //robot seat
+                        item.status = -1   //mormal
                     }
+                } else {
+                    item.status = 0
                 }
                 group.enter()
                 self._addMicSeat(roomId: roomId, mic: item) { error, mic in

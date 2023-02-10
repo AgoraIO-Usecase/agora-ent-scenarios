@@ -689,7 +689,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
         owner.uid = VLUserCenter.user.userNo
-        owner.mic_index = 0
+        owner.mic_index = 1
         owner.portrait = VLUserCenter.user.headUrl
         
         self.roomList?.append(room)

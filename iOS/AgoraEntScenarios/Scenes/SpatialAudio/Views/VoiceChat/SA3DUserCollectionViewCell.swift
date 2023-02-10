@@ -77,16 +77,16 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             rtcUserView.micView.setState(.forbidden)
             rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
             rtcUserView.bgIconView.isHidden = false
-//        case 5:
-//            rtcUserView.iconView.isHidden = true
-//            rtcUserView.micView.isHidden = true
-//            rtcUserView.coverView.isHidden = true
-//            rtcUserView.activeButton.isHidden = false
-//        case -2:
-//            rtcUserView.iconView.isHidden = true
-//            rtcUserView.micView.isHidden = true
-//            rtcUserView.coverView.isHidden = false
-//            rtcUserView.activeButton.isHidden = false
+        case 5:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.coverView.isHidden = true
+            rtcUserView.activeButton.isHidden = true
+        case -2:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.coverView.isHidden = false
+            rtcUserView.activeButton.isHidden = false
         default:
             break
         }
@@ -98,7 +98,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         } else {
             rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index > 4) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 1 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }
 
