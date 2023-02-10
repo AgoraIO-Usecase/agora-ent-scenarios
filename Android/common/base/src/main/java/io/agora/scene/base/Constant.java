@@ -30,4 +30,7 @@ public class Constant {
 
     // 超分开关
     public static final String CURR_AUDIENCE_ENHANCE_SWITCH ="currAudienceEnhanceSwitch";
+
+    // xxx
+    public static final String CURR_BROADCAST_SETTING = "currBroadcastSetting";
 }
