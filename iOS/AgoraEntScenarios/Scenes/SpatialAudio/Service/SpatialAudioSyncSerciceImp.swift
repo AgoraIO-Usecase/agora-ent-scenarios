@@ -149,7 +149,7 @@ extension SpatialAudioSyncSerciceImp {
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
         mic.member?.name = VLUserCenter.user.name
-        mic.member?.portrait = VoiceRoomUserInfo.shared.currentRoomOwner?.portrait
+        mic.member?.portrait = VLUserCenter.user.headUrl
         mic.member?.rtc_uid = VLUserCenter.user.id
         mic.member?.channel_id = ""
         
@@ -464,6 +464,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
         mic.status = oldMic.status == 2 ? 2:-1
+        mic.objectId = oldMic.objectId
         self._cleanUserMicIndex(mic: self.mics[mic_index])
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
