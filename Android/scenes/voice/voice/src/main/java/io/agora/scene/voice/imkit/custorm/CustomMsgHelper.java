@@ -282,6 +282,7 @@ public class CustomMsgHelper implements MessageListener {
             jsonObject.put("portrait",VoiceBuddyFactory.get().getVoiceBuddy().headUrl());
             jsonObject.put("rtc_uid",VoiceBuddyFactory.get().getVoiceBuddy().rtcUid());
             jsonObject.put("mic_index",TextUtils.equals(ownerId,VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())? "0" : "-1");
+            jsonObject.put("micStatus",1);
             params.put("user",jsonObject.toString());
             sendSystemMsg(params, callBack);
         } catch (JSONException e) {

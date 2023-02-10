@@ -578,7 +578,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
                 VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
                 VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
-                0);
+                0,1);
         LogTools.d(TAG,"initMicInfo:" + voiceMemberModel);
         delegate.initMicInfo(roomType,voiceMemberModel,callBack);
     }
