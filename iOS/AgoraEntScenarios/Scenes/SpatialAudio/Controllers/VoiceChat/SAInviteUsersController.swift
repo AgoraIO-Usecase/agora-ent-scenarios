@@ -76,7 +76,7 @@ extension SAInviteUsersController {
     }
 
     @objc private func fetchUsers() {
-        SpatialAudioServiceImp.getSharedInstance().fetchRoomMembers { error, users in
+        AppContext.saServiceImp().fetchRoomMembers { error, users in
             self.tableView.refreshControl?.endRefreshing()
             if users != nil, error == nil {
                 if self.apply == nil {
@@ -100,7 +100,7 @@ extension SAInviteUsersController {
     private func inviteUser(user: SAUser?) {
         SVProgressHUD.show()
         let chat_uid: String = user?.chat_uid ?? ""
-        SpatialAudioServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
+        AppContext.saServiceImp().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
             SVProgressHUD.dismiss()
             self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
         }

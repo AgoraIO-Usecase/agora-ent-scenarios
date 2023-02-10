@@ -112,6 +112,8 @@ class SA3DMoveUserView: UIView {
     private var lastAngle: Double = 0
 
     private var lineView: UIView = .init()
+
+    public var tapClickBlock:(() -> Void)?
     
     var angle: Double = 270 {
         didSet {
@@ -229,5 +231,7 @@ class SA3DMoveUserView: UIView {
 
     @objc private func tapClick(tap: UITapGestureRecognizer) {
         print("3D 头像点击")
+        guard let tapClickBlock = tapClickBlock else {return}
+        tapClickBlock()
     }
 }
