@@ -84,6 +84,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
+    private var isRoomOwnerLeave = false
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -364,6 +365,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 super.onRoomDestroyed(roomId)
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 "onRoomDestroyed $roomId".logD(TAG)
+                isRoomOwnerLeave = true
                 ThreadManager.getInstance().runOnMainThread {
                     ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
                     finish()
@@ -373,8 +375,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
 
         voiceServiceProtocol.subscribeRoomTimeUp {
             roomObservableDelegate.onTimeUpExitRoom(
-                getString(R.string.voice_chatroom_end_live),
-                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
+                getString(R.string.voice_chatroom_time_up_tips), finishBack = {
                     if (roomKitBean.isOwner) {
                         finish()
                     } else {
@@ -593,7 +594,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
             })
         }
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
-        roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId)
+        roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
+        isRoomOwnerLeave = false
         ChatroomIMManager.getInstance().logout(false)
         binding.subtitle.clearTask()
         super.finish()

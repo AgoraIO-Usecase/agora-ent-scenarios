@@ -27,6 +27,7 @@ class VoiceSyncManagerServiceImp(
     private val kCollectionIdUser = "user_collection"
     private val kCollectionIdSeatInfo = "seat_info_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
+    private val kCollectionIdRobotInfo = "robot_info_collection"
 
     private val roomChecker = RoomChecker(context)
 
@@ -56,6 +57,10 @@ class VoiceSyncManagerServiceImp(
     // seat info
     private val micSeatMap = mutableMapOf<String, VoiceMicInfoModel>() // key: seatIndex
     private val objIdOfSeatInfo = HashMap<Int, String>() // objectId of seat index
+
+    // robot info
+    private var robotInfo = RobotSpatialAudioModel()
+    private var objIdOfRobotInfo: String? = null
 
     // time limit
     private var roomTimeUpSubscriber: (() -> Unit)? = null
@@ -218,6 +223,7 @@ class VoiceSyncManagerServiceImp(
 
                     // 订阅
                     innerSubscribeRoomChanged()
+                    innerAddRobotInfo({}, {})
                     innerSubscribeSeatApply {}
                     innerMayAddLocalUser({
                         innerAutoOnSeatIfNeed { _,_ ->
@@ -333,12 +339,15 @@ class VoiceSyncManagerServiceImp(
                         val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
                         if (voiceRoom.roomId == currRoomNo) {
                             innerGetAllSeatInfo { list ->
-                                val info = VoiceRoomInfo().apply {
-                                    roomInfo = voiceRoom
-                                    micInfo = list
-                                }
-                                ThreadManager.getInstance().runOnIOThread {
-                                    completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+                                innerGetRobotInfo {
+                                    val info = VoiceRoomInfo().apply {
+                                        roomInfo = voiceRoom
+                                        micInfo = list
+                                        robotInfo = it
+                                    }
+                                    ThreadManager.getInstance().runOnIOThread {
+                                        completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+                                    }
                                 }
                             }
                         }
@@ -880,9 +889,8 @@ class VoiceSyncManagerServiceImp(
 
         innerUpdateSeat(targetSeatInfo) {
             if (it == null) {
-                val roomInfo = roomMap[currRoomNo] ?: return@innerUpdateSeat
-                roomInfo.useRobot = enable
-                innerUpdateRoomInfo(GsonTools.beanToMap(roomInfo)) { e ->
+                robotInfo.useRobot = enable
+                innerUpdateRobotInfo(robotInfo) { e ->
                     if (e == null) {
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                     } else {
@@ -900,10 +908,9 @@ class VoiceSyncManagerServiceImp(
      * @param value 音量
      */
     override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
-        val roomInfo = roomMap[currRoomNo] ?: return
-        roomInfo.robotVolume = value
-        innerUpdateRoomInfo(GsonTools.beanToMap(roomInfo)) {
-            if (it == null) {
+        robotInfo.robotVolume = value
+        innerUpdateRobotInfo(robotInfo) { e ->
+            if (e == null) {
                 completion.invoke(VoiceServiceProtocol.ERR_OK, true)
             } else {
                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
@@ -1268,7 +1275,7 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatApply)?.subscribe(listener)
     }
 
-    // -------------------------------
+    // ----------------------------- 麦位状态 -----------------------------
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
         val mem = userMap[uid]
         mem?.micIndex = index
@@ -1279,6 +1286,7 @@ class VoiceSyncManagerServiceImp(
             micStatus = MicStatus.Normal
         }
     }
+
     private fun innerGetAllSeatInfo(success: (List<VoiceMicInfoModel>) -> Unit) {
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdSeatInfo).get(object: DataListCallback {
@@ -1415,6 +1423,96 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatInfo)?.subscribe(listener)
     }
 
+    // ----------------------------- 机器人信息 -----------------------------
+    private fun innerAddRobotInfo(success: () -> Unit, error: (e: Exception?) -> Unit) {
+        innerSubscribeRobotInfo {}
+
+        if (roomMap[currRoomNo]?.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+            val robotSpatialAudioInfo = RobotSpatialAudioModel()
+            val sceneReference = mSceneReference ?: return
+            sceneReference.collection(kCollectionIdRobotInfo)
+                .add(robotSpatialAudioInfo, object : Sync.DataItemCallback {
+                    override fun onSuccess(result: IObject?) {
+                        success.invoke()
+                    }
+
+                    override fun onFail(exception: SyncManagerException?) {
+                        error.invoke(exception!!)
+                    }
+                })
+        }
+    }
+
+    private fun innerGetRobotInfo(success: (RobotSpatialAudioModel) -> Unit) {
+        val sceneReference = mSceneReference ?: return
+        sceneReference.collection(kCollectionIdRobotInfo).get(object: DataListCallback {
+            override fun onSuccess(result: MutableList<IObject>?) {
+                result?.forEach {
+                    val obj = it.toObject(RobotSpatialAudioModel::class.java)
+                    objIdOfRobotInfo = it.id
+                    robotInfo = obj
+                    success.invoke(obj)
+                }
+            }
+
+            override fun onFail(exception: SyncManagerException?) {
+
+            }
+        })
+    }
+
+    private fun innerUpdateRobotInfo(
+        robotSpatialAudioInfo: RobotSpatialAudioModel,
+        completion: (error: Exception?) -> Unit) {
+        val objectId = objIdOfRobotInfo ?: return
+        mSceneReference?.collection(kCollectionIdRobotInfo)
+            ?.update(objectId, robotSpatialAudioInfo, object : Sync.Callback {
+                override fun onSuccess() {
+                    ThreadManager.getInstance().runOnMainThread { completion.invoke(null) }
+                }
+
+                override fun onFail(exception: SyncManagerException?) {
+                    ThreadManager.getInstance().runOnMainThread { completion.invoke(exception) }
+                }
+            })
+    }
+
+    private fun innerSubscribeRobotInfo(completion: () -> Unit) {
+        val listener = object : Sync.EventListener {
+            override fun onCreated(item: IObject?) {
+                // do Nothing
+            }
+
+            override fun onUpdated(item: IObject?) {
+                val obj = item?.toObject(RobotSpatialAudioModel::class.java) ?: return
+
+                if (obj.robotVolume != robotInfo.robotVolume) {
+                    roomServiceSubscribeDelegates.forEach {
+                        ThreadManager.getInstance().runOnMainThread {
+//                            val attributeMap = hashMapOf<String, String>()
+//                            val key = "robot_volume"
+//                            attributeMap[key] = obj.robotVolume.toString()
+//                            it.onSeatUpdated(currRoomNo, attributeMap)
+                            it.onRobotUpdate(currRoomNo, obj)
+                        }
+                    }
+                }
+                robotInfo = obj
+                objIdOfRobotInfo = item.id
+            }
+
+            override fun onDeleted(item: IObject?) {
+                item ?: return
+            }
+
+            override fun onSubscribeError(ex: SyncManagerException?) {
+                completion()
+            }
+        }
+        roomSubscribeListener.add(listener)
+        mSceneReference?.collection(kCollectionIdRobotInfo)?.subscribe(listener)
+    }
+    // ----------------------------- 房间信息 -----------------------------
     private fun innerUpdateRoomInfo(data : Map<String, Any>, completion: (error: Exception?) -> Unit) {
         val dataMap = hashMapOf<String, Any>()
         data.forEach {
@@ -1448,16 +1546,6 @@ class VoiceSyncManagerServiceImp(
                     roomServiceSubscribeDelegates.forEach {
                         ThreadManager.getInstance().runOnMainThread {
                             it.onAnnouncementChanged(roomInfo.roomId, roomInfo.announcement)
-                        }
-                    }
-                }
-                if (originRoomInfo.robotVolume != roomInfo.robotVolume) {
-                    roomServiceSubscribeDelegates.forEach {
-                        ThreadManager.getInstance().runOnMainThread {
-                            val attributeMap = hashMapOf<String, String>()
-                            val key = "robot_volume"
-                            attributeMap[key] = roomInfo.robotVolume.toString()
-                            it.onSeatUpdated(currRoomNo, attributeMap)
                         }
                     }
                 }
