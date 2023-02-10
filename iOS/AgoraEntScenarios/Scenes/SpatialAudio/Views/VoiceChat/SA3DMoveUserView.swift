@@ -113,6 +113,8 @@ class SA3DMoveUserView: UIView {
 
     private var lineView: UIView = .init()
     
+    public var tapClickBlock:(() -> Void)?
+    
     var angle: Double = 0 {
         didSet {
             let value = (angle - 90) / 180.0 * Double.pi
@@ -229,5 +231,7 @@ class SA3DMoveUserView: UIView {
 
     @objc private func tapClick(tap: UITapGestureRecognizer) {
         print("3D 头像点击")
+        guard let tapClickBlock = tapClickBlock else {return}
+        tapClickBlock()
     }
 }
