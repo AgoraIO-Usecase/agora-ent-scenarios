@@ -239,7 +239,7 @@ extension SARoomViewController {
         let isHairScreen = SwiftyFitsize.isFullScreen
         let manageView = SAVMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
         //TODO: remove as!
-        let mic_info = (AppContext.saServiceImp() as! SpatialAudioSyncSerciceImp).mics[safe: index]
+        let mic_info = AppContext.saTmpServiceImp().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
             self?.dismiss(animated: true)
