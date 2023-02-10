@@ -33,4 +33,7 @@ public class Constant {
 
     // xxx
     public static final String CURR_BROADCAST_SETTING = "currBroadcastSetting";
+
+    // xxx
+    public static final String CURR_AUDIENCE_SETTING = "currAudienceSetting";
 }
