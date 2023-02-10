@@ -84,9 +84,9 @@ time_t uptime() {
         self.lyricUrlDict = [NSMutableDictionary dictionary];
         
         // 调节本地播放音量。0-100
-        [self adjustPlayoutVolume:200];
+        [self adjustPlayoutVolume:100];
         // 调节远端用户听到的音量。0-400
-        [self adjustPublishSignalVolume:200];
+        [self adjustPublishSignalVolume:100];
         
         self.engine = engine;
         self.channelName = channelName;
@@ -94,12 +94,14 @@ time_t uptime() {
         self.musicCenter = musicCenter;
         self.rtcMediaPlayer = rtcMediaPlayer;
         
+        [self.rtcMediaPlayer setPlayerOption:@"play_pos_change_callback" value:100];
+        
         [[AppContext shared] registerEventDelegate:self];
         [[AppContext shared] registerPlayerEventDelegate:self];
         
-        [engine setDirectExternalAudioSource:true];
-        [engine setRecordingAudioFrameParametersWithSampleRate:48000 channel:2 mode:0 samplesPerCall:960];
-        [engine setAudioFrameDelegate:self];
+//        [self.engine setDirectExternalAudioSource:YES];
+//        [self.engine setAudioFrameDelegate:self];
+        
     }
     return self;
 }
@@ -250,6 +252,7 @@ time_t uptime() {
             options.publishMediaPlayerId = [self.rtcMediaPlayer getMediaPlayerId];
             options.publishMediaPlayerAudioTrack = YES;
             options.publishMicrophoneTrack = YES;
+            options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
             
@@ -284,6 +287,7 @@ time_t uptime() {
 
 -(void)resumePlay
 {
+    self.localPlayerPosition = [self.rtcMediaPlayer getPosition];
     [self.rtcMediaPlayer resume];
 }
 
@@ -302,6 +306,8 @@ time_t uptime() {
     [self.lrcView stop];
     [self.lrcView reset];
     self.config = nil;
+    
+    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -416,13 +422,24 @@ time_t uptime() {
         self.remotePlayerPosition = position;
         self.remotePlayerDuration = duration;
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
+            if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStateOpenCompleted) {
+                [self.rtcMediaPlayer play];
+                self.localPlayerPosition = uptime();
+                self.playerDuration = 0;
+            }
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
                 NSInteger localNtpTime = [self getNtpTimeInMs];
                 NSInteger localPosition = uptime() - self.localPlayerPosition;
+                NSInteger localPosition2 = [self.rtcMediaPlayer getPosition];
                 NSInteger expectPosition = position + localNtpTime - remoteNtp + self.audioPlayoutDelay;
                 NSInteger threshold = expectPosition - localPosition;
                 if(labs(threshold) > 40) {
+                    KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition, localPosition2, localPosition2 - localPosition);
+//                    NSDate*date = [NSDate date];
+//                    NSInteger pos1 = [self.rtcMediaPlayer getPosition];
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
+//                    NSInteger pos2 = [self.rtcMediaPlayer getPosition];
+//                    NSLog(@"seekToPosition: %.fms, %ld/%ld/%ld", -[date timeIntervalSinceNow] * 1000, pos1, pos2, expectPosition);
                 }
             }
         }
@@ -491,16 +508,35 @@ time_t uptime() {
     return true;
 }
 
+- (AgoraAudioFramePosition)getObservedAudioFramePosition {
+    return AgoraAudioFramePositionRecord;
+}
+
+- (AgoraAudioParams*)getRecordAudioParams {
+    AgoraAudioParams* params = [AgoraAudioParams new];
+    params.channel = 2;
+    params.samplesPerCall = 960;
+    params.sampleRate = 48000;
+    params.mode = AgoraAudioRawFrameOperationModeReadOnly;
+    return params;
+}
+
 #pragma mark - AgoraRtcMediaPlayerDelegate
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
-        [playerKit play];
+        self.localPlayerPosition = uptime();
+        self.playerDuration = 0;
+        if (self.config.role == KTVSingRoleMainSinger) {
+            [playerKit play];
+//            [playerKit pause];
+//            [playerKit play];
+        }
     } else if (state == AgoraMediaPlayerStateStopped) {
-        self.localPlayerPosition = 0;
+        self.localPlayerPosition = uptime();
         self.playerDuration = 0;
     } else if (state == AgoraMediaPlayerStatePlaying) {
-        self.localPlayerPosition = 0;
+        self.localPlayerPosition = uptime();
         self.playerDuration = 0;
     }
     if (self.config.role == KTVSingRoleMainSinger) {
@@ -693,11 +729,12 @@ time_t uptime() {
     
     KTVLogInfo(@"will joinChannelExByToken: channelId: %@, enableAudioRecordingOrPlayout: %d, role: %ld", connection.channelId, options.enableAudioRecordingOrPlayout, role);
     VL(weakSelf);
+    [self.engine setDirectExternalAudioSource:YES];
+    [self.engine setAudioFrameDelegate:self];
+    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
     int ret =
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
-        
-        [self.engine setAudioScenario:AgoraAudioScenarioChorus];
         
         if(weakSelf.config.type == KTVSongTypeChorus &&
            weakSelf.config.role == KTVSingRoleMainSinger) {
@@ -714,6 +751,8 @@ time_t uptime() {
 
 - (void)leaveChorus2ndChannel
 {
+    [self.engine setDirectExternalAudioSource:NO];
+    [self.engine setAudioFrameDelegate:nil];
     KTVSingRole role = self.config.role;
     if(role == KTVSingRoleMainSinger) {
         AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
