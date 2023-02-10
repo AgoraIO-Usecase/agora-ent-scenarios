@@ -1,6 +1,7 @@
 package io.agora.scene.show
 
 import io.agora.rtc2.video.*
+import io.agora.scene.base.Constant
 import io.agora.scene.base.utils.SPUtil
 
 object VideoSetting {
@@ -234,13 +235,13 @@ object VideoSetting {
     private var currBroadcastSetting: BroadcastSetting = RecommendBroadcastSetting.LowDevice1v1
 
     // 当前观众设备等级（高、中、低）
-    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(SPUtil.getString("currAudienceDeviceLevel", DeviceLevel.Low.toString()))
+    private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString()))
 
     // 观众看播设置
-    private var currAudiencePlaySetting: Int = SPUtil.getInt("currAudiencePlaySetting", AudiencePlaySetting.BASE_LOW)
+    private var currAudiencePlaySetting: Int = SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
 
     // 超分开关
-    private var currAudienceEnhanceSwitch = SPUtil.getBoolean("currAudienceEnhanceSwitch", true)
+    private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
     fun getCurrAudienceSetting() = currAudienceSetting
     fun getCurrBroadcastSetting() = currBroadcastSetting
@@ -251,17 +252,17 @@ object VideoSetting {
 
     fun setCurrAudienceDeviceLevel(deviceLevel: DeviceLevel) {
         currAudienceDeviceLevel = deviceLevel
-        SPUtil.putString("currAudienceDeviceLevel", deviceLevel.toString())
+        SPUtil.putString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, deviceLevel.toString())
     }
 
     fun setCurrAudiencePlaySetting(currAudiencePlaySetting: Int) {
         this.currAudiencePlaySetting = currAudiencePlaySetting
-        SPUtil.putInt("currAudiencePlaySetting", currAudiencePlaySetting)
+        SPUtil.putInt(Constant.CURR_AUDIENCE_PLAY_SETTING, currAudiencePlaySetting)
     }
 
     fun setCurrAudienceEnhanceSwitch(currAudienceEnhanceSwitch: Boolean) {
         this.currAudienceEnhanceSwitch = currAudienceEnhanceSwitch
-        SPUtil.putBoolean("currAudienceEnhanceSwitch", currAudienceEnhanceSwitch)
+        SPUtil.putBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, currAudienceEnhanceSwitch)
     }
 
     fun resetBroadcastSetting() {
