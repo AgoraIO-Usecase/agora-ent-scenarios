@@ -713,16 +713,16 @@ class LiveDetailFragment : Fragment() {
         mMusicEffectDialog.setOnItemSelectedListener { musicEffectDialog, itemId ->
             when (itemId) {
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE -> {
-                    mRtcEngine.stopAudioMixing()
+                    mRtcVideoSwitcher.stopAudioMixing(mMainRtcConnection)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcEngine.startAudioMixing("/assets/romantic.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
