@@ -334,13 +334,13 @@ extension SARoomViewController {
         let index: Int = tag - 200
         //TODO: remove as!
         guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
-        if index == 6 || index == 5 { // 操作机器人
+        if index == 6 || index == 3 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
             }
         } else {
             if isOwner {
-                if index == 0 {
+                if index == 1 {
                     showMuteView(with: index)
                 } else {
                     showApplyAlert(index)
@@ -457,7 +457,8 @@ extension SARoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+        guard let mic_blue: SARoomMic = roomInfo?.mic_info![3] else { return }
+        guard let mic_red: SARoomMic = roomInfo?.mic_info![6] else { return }
         AppContext.saServiceImp().enableRobot(enable: flag) { error in
             if error == nil {
                 if self.alienCanPlay {
@@ -465,27 +466,15 @@ extension SARoomViewController {
                     self.rtckit.playMusic(with: .alien)
                     self.alienCanPlay = false
                 }
-
-                let mic_info = mic
-                mic_info.status = flag == true ? 5 : -2
+                
+                mic_blue.status = flag == true ? 5 : -2
+                mic_red.status = flag == true ? 5 : -2
                 self.roomInfo?.room?.use_robot = flag
-                self.roomInfo?.mic_info![6] = mic_info
-                
-                let blue_micInfo = mic_info
-                let red_micInfo = mic_info
-                
-                //更新红蓝机器人的信息
-                let blue: SAUser = SAUser()
-                blue.portrait = "blue"
-                blue.name = "Agora Blue"
-                blue_micInfo.member = blue
-                self.sRtcView.updateUser(blue_micInfo)
-                
-                let red: SAUser = SAUser()
-                red.portrait = "blue"
-                red.name = "Agora Blue"
-                red_micInfo.member = blue
-                self.sRtcView.updateUser(red_micInfo)
+                self.roomInfo?.mic_info![3] = mic_blue
+                self.roomInfo?.mic_info![6] = mic_red
+                self.sRtcView.updateUser(mic_blue)
+                self.sRtcView.updateUser(mic_red)
+
             } else {
                 print("激活机器人失败")
             }
