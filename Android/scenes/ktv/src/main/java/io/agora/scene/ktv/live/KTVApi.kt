@@ -114,5 +114,5 @@ interface KTVApi {
      */
     fun setLycView(view: LrcControlView)
 
-
+    fun adjustRemoteVolume(volume: Int)
 }

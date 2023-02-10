@@ -1057,6 +1057,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mRtcEngine.setParameters("{\"rtc.audio_resend\":false}");
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\":128000}");
         mRtcEngine.setParameters("{\"che.audio.custom_payload_type\":78}");
+
+        mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}");
+        mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}");
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}");
+        mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}");
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         int ret = mRtcEngine.joinChannel(
                 roomInfoLiveData.getValue().getAgoraRTCToken(),
@@ -1155,6 +1160,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             @Override
             public void onToneChanged(int newToneValue) {
                 mPlayer.setAudioPitch(newToneValue);
+            }
+
+            @Override
+            public void onRemoteVolumeChanged(int volume) {
+                ktvApiProtocol.adjustRemoteVolume(volume);
             }
         });
 
