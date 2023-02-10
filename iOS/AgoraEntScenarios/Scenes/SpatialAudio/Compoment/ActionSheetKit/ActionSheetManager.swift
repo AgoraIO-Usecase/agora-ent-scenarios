@@ -216,7 +216,7 @@ class ActionSheetManager: UIView {
         layoutIfNeeded()
     }
     func show() {
-        guard let vc = UIViewController.cl_topViewController() else { return }
+        guard let vc = UIViewController.cl_topViewController() as? SABaseViewController else { return }
         let maxH = Screen.height * 0.75
         let tableViewH = tableView.contentSize.height >= maxH ? maxH : tableView.contentSize.height
         tableViewHCons?.constant = tableViewH

@@ -474,8 +474,17 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func normalError() -> VoiceRoomError {
         let error = VoiceRoomError()
         error.code = "403"
-        error.message = "Dose't support!"
+        error.message = "Doesn't support!" 
         return error
+    }
+    
+    func changeMicUserStatus(status: Int,completion: @escaping (Error?, VRRoomMic?) -> Void) {
+        guard let mic = self.mics.first(where: { $0.member?.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
+        }) else { return }
+        mic.member?.micStatus = status
+        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic.mic_index)":mic.kj.JSONString()], completion: { error in
+            completion(self.convertError(error: error),mic)
+        })
     }
     
     func changeMic(old_index: Int,new_index:Int,completion: @escaping (Error?, [Int:VRRoomMic]?) -> Void) {
@@ -771,14 +780,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                     let params = updateRoom.kj.JSONObject()
                     
                     //获取IM信息
-                    let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-                    self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
-                        VLUserCenter.user.im_token = im_token
-                        VLUserCenter.user.chat_uid = chat_uid
-                        
-                        //TODO(chenpan):  waitting for join scene success & error handler?
-                        completion(nil, updateRoom)
-                    }
+//                    let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+//                    self.initIM(with: room.name ?? "", type: <#T##Int#>,chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
+//                        VLUserCenter.user.im_token = im_token
+//                        VLUserCenter.user.chat_uid = chat_uid
+//
+//                    }
+                    completion(nil, updateRoom)
                     initScene{
                         SyncUtil.joinScene(id: roomId,
                                            userId: VLUserCenter.user.id,
@@ -877,7 +885,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return micsMap
     }
     
-    func initIM(with roomName: String, chatId: String?, channelId: String, imUid: String?, pwd: String, completion: @escaping (String, String, String) -> Void) {
+    func initIM(with roomName: String, type: Int,chatId: String?, channelId: String, imUid: String?, pwd: String, completion: @escaping (String, String, String) -> Void) {
 
         var im_token = ""
         var im_uid = ""
@@ -889,7 +897,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
 
         impGroup.enter()
         imQueue.async {
-            NetworkManager.shared.generateIMConfig(channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id, sceneType: .voice) { uid, room_id, token in
+            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName, nickName: VLUserCenter.user.name, chatId: chatId, imUid: imUid, password: pwd, uid:  VLUserCenter.user.id, sceneType: .voice) { uid, room_id, token in
                 im_uid = uid ?? ""
                 chatroom_id = room_id ?? ""
                 im_token = token ?? ""

@@ -31,7 +31,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-//    var sRtcView: SA3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
@@ -56,11 +55,9 @@ class VoiceRoomViewController: VRBaseViewController {
             VoiceRoomUserInfo.shared.currentRoomOwner = self.roomInfo?.room?.owner
             if let mics = roomInfo?.mic_info {
                 if let type = roomInfo?.room?.type {
-                    if type == 0 && self.rtcView != nil {
+                    if type == 0 {
                         self.rtcView.micInfos = mics
-                    } /*else if type == 1 && self.sRtcView != nil {
-//                        self.sRtcView.micInfos = mics
-                    }*/
+                    }
                 }
             }
         }
@@ -263,14 +260,11 @@ extension VoiceRoomViewController {
         bgImgView.image = UIImage("lbg")
         view.addSubview(bgImgView)
 
-        headerView = AgoraChatRoomHeaderView()
+        headerView = AgoraChatRoomHeaderView() 
         headerView.completeBlock = { [weak self] action in
             self?.didHeaderAction(with: action, destroyed: false)
         }
         view.addSubview(headerView)
-
-//        sRtcView = SA3DRtcView(rtcKit: nil)
-//        view.addSubview(sRtcView)
 
         rtcView = AgoraChatRoomNormalRtcView()
         rtcView.isOwner = isOwner
@@ -280,7 +274,6 @@ extension VoiceRoomViewController {
         view.addSubview(rtcView)
 
         if let entity = roomInfo?.room {
-//            sRtcView.isHidden = entity.type == 0
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
         }
@@ -294,12 +287,6 @@ extension VoiceRoomViewController {
             make.left.top.right.equalTo(self.view)
             make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
         }
-
-//        sRtcView.snp.makeConstraints { make in
-//            make.top.equalTo(self.headerView.snp.bottom)
-//            make.left.right.equalTo(self.view)
-//            make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
-//        }
 
         rtcView.snp.makeConstraints { make in
             make.top.equalTo(self.headerView.snp.bottom)
@@ -340,9 +327,11 @@ extension VoiceRoomViewController {
             showNoticeView(with: isOwner ? .owner : .audience)
         } else if action == .rank {
             // 展示土豪榜
-            showUsers()
+            showUsers(position: .left)
         } else if action == .soundClick {
             showSoundView()
+        } else if action == .members {
+            showUsers(position: .right)
         }
     }
 
@@ -352,6 +341,8 @@ extension VoiceRoomViewController {
         if index == 6 { // 操作机器人
             if roomInfo?.room?.use_robot == false {
                 showActiveAlienView(true)
+            } else {
+                self.showEQOperation()
             }
         } else {
             if isOwner {
@@ -371,10 +362,8 @@ extension VoiceRoomViewController {
                     }
                 } else {
                     if local_index != nil {
-                        Throttler.throttle(queue:.main,delay: .seconds(1)) {
-                            DispatchQueue.main.async {
-                                self.changeMic(from: self.local_index!, to: tag - 200)
-                            }
+                        Throttler.throttle(queue:.main,shouldRunLatest: true) {
+                            self.changeMic(from: self.local_index!, to: tag - 200)
                         }
                     } else {
                         userApplyAlert(tag - 200)
@@ -382,6 +371,27 @@ extension VoiceRoomViewController {
                 }
             }
         }
+    }
+    
+    func showEQOperation() {
+        if !isOwner {
+            view.makeToast("Host Bot".localized())
+            return
+        }
+        let confirmView = VREQOperationAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: (254/375.0)*ScreenWidth)).backgroundColor(.white).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+        var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: (254/375.0)*ScreenWidth))
+        compent.destination = .bottomBaseline
+        let vc = VoiceRoomAlertViewController(compent: compent, custom: confirmView)
+        confirmView.actionClosure = { [weak self] in
+            self?.dismiss(animated: true)
+            switch $0 {
+            case .close:
+                self?.activeAlien(false)
+            default:
+                self?.showEQView()
+            }
+        }
+        presentViewController(vc)
     }
 
     func notifySeverLeave() {
@@ -405,7 +415,6 @@ extension VoiceRoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-//                self.sRtcView.isUserInteractionEnabled = true
                 self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
