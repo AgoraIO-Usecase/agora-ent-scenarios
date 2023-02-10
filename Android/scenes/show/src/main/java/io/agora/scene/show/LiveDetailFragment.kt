@@ -479,10 +479,10 @@ class LiveDetailFragment : Fragment() {
             return
         }
         // 编码分辨率
-        encodeVideoSize?.let { topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "${it.width}x${it.height}") }
+        encodeVideoSize?.let { topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}") }
         if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text = getString(R.string.show_statistic_encode_resolution, "--")
         // 接收分辨率
-        receiveVideoSize?.let { topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "${it.width}x${it.height}") }
+        receiveVideoSize?.let { topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "${it.height}x${it.width}") }
         if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text = getString(R.string.show_statistic_receive_resolution, "--")
         // 编码帧率
         encodeFps?.let { topBinding.tvStatisticEncodeFPS.text = getString(R.string.show_statistic_encode_fps, it.toString()) }
@@ -1198,7 +1198,7 @@ class LiveDetailFragment : Fragment() {
                             upBitrate = stats.sentBitrate,
                             encodeFps = stats.sentFrameRate,
                             upLossPackage = stats.txPacketLossRate,
-                            encodeVideoSize = Size(stats.captureFrameWidth, stats.captureFrameHeight)
+                            encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
                         )
                     }
                 }
