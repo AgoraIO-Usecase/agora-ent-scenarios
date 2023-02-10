@@ -71,7 +71,7 @@ class RoomObservableViewDelegate constructor(
     /**申请上麦标志*/
     private var isRequesting: Boolean = false
 
-    /**本地mute标志*/
+    /**本地 座位 mute标志*/
     private var isLocalAudioMute: Boolean = true
 
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
@@ -81,6 +81,7 @@ class RoomObservableViewDelegate constructor(
     }
 
     private var memberCountDialog: RoomMemberCountDialog? = null
+    private var robotDialog: RoomRobotEnableDialog? = null
 
     init {
         // 更新公告
@@ -442,10 +443,6 @@ class RoomObservableViewDelegate constructor(
             }
         }).apply {
             memberCountDialog = this
-            arguments = Bundle().apply {
-                putString(RoomMemberCountDialog.OWNER_CHAT_UID, voiceRoomModel.owner?.chatUid)
-            }
-
         }.show(activity.supportFragmentManager, "mtClickMemberCount")
     }
 
@@ -570,7 +567,7 @@ class RoomObservableViewDelegate constructor(
                                 AgoraRtcEngineController.get().playMusic(it)
                             }
                         } else {
-                            onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
+                            onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect),finishBack)
                         }
                     } else {
                         onExitRoom(
@@ -626,7 +623,7 @@ class RoomObservableViewDelegate constructor(
                 }
             } else {
                 ainsDialog.updateAnisSoundsAdapter(position, false)
-                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
+                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect), finishBack = {})
             }
         }
 
@@ -808,7 +805,7 @@ class RoomObservableViewDelegate constructor(
     /**
      * 点击机器人
      */
-    fun onBotMicClick(content: String) {
+    fun onBotMicClick(content: String,finishBack: () -> Unit) {
         if (roomKitBean.isOwner) { // 房主
             if (!voiceRoomModel.useRobot) {
                 CommonFragmentAlertDialog().titleText(activity.getString(R.string.voice_chatroom_prompt))
@@ -821,6 +818,17 @@ class RoomObservableViewDelegate constructor(
                     }).show(activity.supportFragmentManager, "botActivatedDialog")
             } else {
                 // nothing
+                RoomRobotEnableDialog(object : RoomRobotEnableDialog.OnClickBtnListener {
+                    override fun onClickCloseBtn() {
+                        roomLivingViewModel.enableRobot(false)
+                    }
+
+                    override fun onClickSettingBtn() {
+                        onAudioSettingsDialog(finishBack)
+                    }
+                }).apply {
+                    robotDialog = this
+                }.show(activity.supportFragmentManager, "mtClickRobotDialog")
             }
         } else { // 成员
             ToastTools.showTips(activity, activity.getString(R.string.voice_chatroom_only_host_can_change_robot))
@@ -1084,10 +1092,16 @@ class RoomObservableViewDelegate constructor(
         }
         kvLocalUser?.let { localUserMicInfo = it }
         AgoraRtcEngineController.get().switchRole(localUserIndex() >= 0)
+        //如果麦位状态正常 则需要打开麦克风 并且开启本地音频
         if (localUserMicInfo?.micStatus == MicStatus.Normal) {   // 状态正常
-            if (!isLocalAudioMute) return
-            isLocalAudioMute = false
-            AgoraRtcEngineController.get().enableLocalAudio(true)
+            if (localUserMicInfo?.member?.micStatus == 1){ //user麦位状态 打开
+                if (!isLocalAudioMute) return
+                isLocalAudioMute = false
+                AgoraRtcEngineController.get().enableLocalAudio(true)
+            }else{ //user 麦位状态 关闭
+                isLocalAudioMute = true
+                AgoraRtcEngineController.get().enableLocalAudio(false)
+            }
         } else {  // 其他状态
             if (isLocalAudioMute) return
             isLocalAudioMute = true

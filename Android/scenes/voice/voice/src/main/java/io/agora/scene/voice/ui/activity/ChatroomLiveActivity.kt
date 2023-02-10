@@ -414,7 +414,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 object :
                     OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt)
+                        ) { finish() }
                     }
                 }
             ).setUpInitAdapter()
@@ -442,7 +443,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 object :
                     OnItemClickListener<VoiceMicInfoModel> {
                     override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt))
+                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_chatroom_open_bot_prompt),
+                            { finish() })
                     }
                 },
             ).setUpInitMicInfoMap()
