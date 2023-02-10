@@ -53,7 +53,11 @@ class SpatialAudioSyncSerciceImp: NSObject {
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false
-    public var mics: [SARoomMic] = [SARoomMic]()
+    public var mics: [SARoomMic] = [SARoomMic]() {
+        didSet {
+            print("===")
+        }
+    }
     public var userList: [SAUser] = [SAUser]()
     public var micApplys: [SAApply] = [SAApply]()
 }
@@ -859,8 +863,11 @@ extension SpatialAudioSyncSerciceImp {
                            defer {
                                self.subscribeDelegate?.onSeatUpdated(roomId: self.roomId!, mics: [seat], from: "")
                            }
-                           self.mics.removeAll { $0.objectId == seat.objectId}
-                           self.mics.append(seat)
+                           if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
+                               self.mics[index] = seat
+                           }
+//                           self.mics.removeAll { $0.objectId == seat.objectId}
+//                           self.mics.append(seat)
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp seat info subscribe onDeleted...")
 //                           guard let self = self else {return}

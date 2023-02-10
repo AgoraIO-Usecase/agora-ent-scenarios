@@ -40,12 +40,13 @@ class SA3DRtcView: UIView {
                 return
             }
             collectionView.reloadData()
-
+            
             guard let micInfos = micInfos else { return }
             let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
+            rtcUserView.isUserInteractionEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
         }
     }
 
@@ -182,23 +183,19 @@ class SA3DRtcView: UIView {
     }
 
     func updateCenterUserPosition() {
-//        guard let micInfo = micInfos?[4] else { return }
+        guard let micInfo = micInfos?.first else { return }
         let pos = viewCenterPostion(view: rtcUserView)
         let realPosition = calcuRealPositon(angle: rtcUserView.angle)
-//        if micInfo.member?.uid == VLUserCenter.user.userNo {
-//            rtcKit?.updateSpetialPostion(position: pos,
-//                                         axisForward: realPosition.0,
-//                                         axisRight: realPosition.1,
-//                                         axisUp: [0, 0, 1])
-//        } else {
-//            rtcKit?.updateRemoteSpetialPostion(uid: micInfo.member?.uid ?? "0",
-//                                               position: pos,
-//                                               forward: realPosition.0)
-//        }
-        rtcKit?.updateSpetialPostion(position: pos,
-                                     axisForward: realPosition.0,
-                                     axisRight: realPosition.1,
-                                     axisUp: [0, 0, 1])
+        if micInfo.member?.uid == VLUserCenter.user.userNo {
+            rtcKit?.updateSpetialPostion(position: pos,
+                                         axisForward: realPosition.0,
+                                         axisRight: realPosition.1,
+                                         axisUp: [0, 0, 1])
+        } else {
+            rtcKit?.updateRemoteSpetialPostion(uid: micInfo.member?.uid ?? "0",
+                                               position: pos,
+                                               forward: realPosition.0)
+        }
         
         print("pos == \(pos)  forward == \(realPosition.0) right == \(realPosition.1) angle == \(rtcUserView.angle)")
     }
@@ -304,17 +301,18 @@ extension SA3DRtcView {
             rtcUserView.angle = angle
             updateCenterUserPosition()
             
-            let pos = viewCenterPostion(view: rtcUserView)
-            let info = SAPositionInfo()
-            // TODO: 待完善uid
-            info.uid = 0
-            info.position = pos.map({ $0.doubleValue })
-            info.forward = [0, 1, 0]
-            info.x = pos.first?.doubleValue ?? 0
-            info.y = pos[1].doubleValue
-            info.angle = angle
-            guard let streamData = JSONObject.toData(info) else { return }
-            rtcKit?.sendStreamMessage(with: streamData)
+            if let user = micInfos?.first?.member {
+                let pos = viewCenterPostion(view: rtcUserView)
+                let info = SAPositionInfo()
+                info.uid = Int(user.uid ?? "0") ?? 0
+                info.position = pos.map({ $0.doubleValue })
+                info.forward = [0, 1, 0]
+                info.x = pos.first?.doubleValue ?? 0
+                info.y = pos[1].doubleValue
+                info.angle = angle
+                guard let streamData = JSONObject.toData(info) else { return }
+                rtcKit?.sendStreamMessage(with: streamData)
+            }
         }
     }
 
@@ -327,6 +325,7 @@ extension SA3DRtcView {
     }
     
     private func calcuRealPositon(angle: Double) -> ([NSNumber], [NSNumber])  {
+        let angle = angle < 0 ? 90 : angle == 90 ? 270 : angle
         let fx = cos(angle)
         let fy = sin(angle)
         let forward = [NSNumber(value: Double(fx)),
@@ -635,7 +634,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
-        // TODO: 待过滤自己
+        guard "\(uid)" != VLUserCenter.user.userNo else { return }
         let result = String(data: data, encoding: .utf8)
         guard let info = JSONObject.toModel(SAPositionInfo.self, value: result) else { return }
         
