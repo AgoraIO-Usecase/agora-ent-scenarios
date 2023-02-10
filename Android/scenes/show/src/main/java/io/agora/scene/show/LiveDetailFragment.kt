@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
@@ -1384,6 +1385,10 @@ class LiveDetailFragment : Fragment() {
         channelMediaOptions.autoSubscribeAudio = true
         channelMediaOptions.publishCameraTrack = isRoomOwner
         channelMediaOptions.publishMicrophoneTrack = isRoomOwner
+        // 如果是观众 把ChannelMediaOptions的audienceLatencyLevel设置为AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY（超低延时）
+        if (!isRoomOwner) {
+            channelMediaOptions.audienceLatencyLevel = AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
+        }
         mRtcVideoSwitcher.joinChannel(
             rtcConnection,
             channelMediaOptions,
