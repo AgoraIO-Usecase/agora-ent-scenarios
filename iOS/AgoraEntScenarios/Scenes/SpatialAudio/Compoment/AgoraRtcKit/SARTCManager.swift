@@ -261,7 +261,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @objc public func setClientRole(role: SARtcType.ASRoleType) {
         rtcKit.setClientRole(role == .audience ? .audience : .broadcaster)
-        rtcKit.setParameters("{\"rtc.enable_debug_log\":true}")
         self.role = role
     }
 
@@ -366,6 +365,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
         localSpatial?.setDistanceUnit(1)
+        rtcKit.setParameters("{\"che.audio.force_bluetooth_a2dp\":true}")
         
         let config = AgoraDataStreamConfig()
         config.ordered = false

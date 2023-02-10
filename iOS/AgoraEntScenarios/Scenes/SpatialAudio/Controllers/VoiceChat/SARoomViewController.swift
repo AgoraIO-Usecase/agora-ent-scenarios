@@ -457,21 +457,20 @@ extension SARoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        guard let mic_blue: SARoomMic = roomInfo?.mic_info![3] else { return }
-        guard let mic_red: SARoomMic = roomInfo?.mic_info![6] else { return }
+        guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
+        guard let mic_red: SARoomMic = roomInfo?.mic_info?[6] else { return }
         AppContext.saServiceImp().enableRobot(enable: flag) { error in
             if error == nil {
                 if self.alienCanPlay {
-                    self.rtckit.adjustAudioMixingVolume(with: 50)
-                    self.rtckit.playMusic(with: .alien)
+                    self.sRtcView.playMusic()
                     self.alienCanPlay = false
                 }
                 
                 mic_blue.status = flag == true ? 5 : -2
                 mic_red.status = flag == true ? 5 : -2
                 self.roomInfo?.room?.use_robot = flag
-                self.roomInfo?.mic_info![3] = mic_blue
-                self.roomInfo?.mic_info![6] = mic_red
+                self.roomInfo?.mic_info?[3] = mic_blue
+                self.roomInfo?.mic_info?[6] = mic_red
                 self.sRtcView.updateUser(mic_blue)
                 self.sRtcView.updateUser(mic_red)
 
