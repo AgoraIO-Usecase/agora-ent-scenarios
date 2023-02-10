@@ -120,7 +120,7 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        rtckit.initSpatialAudio(recvRange: 10)
+        rtckit.initSpatialAudio(recvRange: 15)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -514,7 +514,7 @@ extension SARoomViewController {
                 let newRoom = room
                 newRoom.robot_volume = UInt(Vol)
                 self.roomInfo?.room = newRoom
-                self.rtckit.adjustAudioMixingVolume(with: Vol)
+                self.sRtcView.updatePlayerVolume(value: Double(Vol))
             }
         }
     }

@@ -45,7 +45,7 @@ extension SARoomViewController {
     func showSpatialAudioView() {
         guard let micInfos = sRtcView.micInfos else { return }
         let red = micInfos[6]
-        let blue = micInfos[5]
+        let blue = micInfos[3]
         
         let actionView = ActionSheetManager()
         actionView
@@ -84,20 +84,20 @@ extension SARoomViewController {
                 default: break
                 }
             }
-            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
         }
         actionView.didSliderValueChangeClosure = { [weak self] indexPath, value in
             guard let self = self, let micInfos = self.sRtcView.micInfos else { return }
             let red = micInfos[6]
-            let blue = micInfos[5]
+            let blue = micInfos[3]
             if indexPath.section == 0 {
                 blue.attenuation = value
                 
             } else {
                 red.attenuation = value
             }
-            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
         }
         actionView.show()
