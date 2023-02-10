@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
@@ -14,9 +15,11 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
+import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.show.widget.BeautyDialog
@@ -75,7 +78,11 @@ class LivePrepareActivity : ComponentActivity() {
             showPictureQualityDialog()
         }
         mBinding.tvSetting.setOnClickListener {
-            showPresetDialog()
+            if (AgoraApplication.the().isDebugModeOpen) {
+                showDebugModeDialog()
+            } else {
+                showPresetDialog()
+            }
         }
 
         checkRequirePerms {
@@ -86,6 +93,7 @@ class LivePrepareActivity : ComponentActivity() {
     }
 
     private fun showPresetDialog() = PresetDialog(this).show()
+    private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     private fun checkRequirePerms(force: Boolean = false, granted: () -> Unit) {
         mPermissionHelp.checkCameraPerm(

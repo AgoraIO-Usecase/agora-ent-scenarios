@@ -30,12 +30,14 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
+import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.*
 import io.agora.scene.show.widget.*
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
@@ -91,6 +93,7 @@ class LiveDetailFragment : Fragment() {
     private val mPermissionHelp by lazy { (requireActivity() as? LiveDetailActivity)?.mPermissionHelp!! }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
+    private fun showDebugModeDialog() = DebugSettingDialog(requireContext()).show()
 
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
@@ -620,7 +623,13 @@ class LiveDetailFragment : Fragment() {
                         }
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
-                    SettingDialog.ITEM_ID_SETTING -> if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
+                    SettingDialog.ITEM_ID_SETTING -> {
+                        if (AgoraApplication.the().isDebugModeOpen) {
+                            showDebugModeDialog()
+                        } else {
+                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
+                        }
+                    }
                 }
             }
             show()

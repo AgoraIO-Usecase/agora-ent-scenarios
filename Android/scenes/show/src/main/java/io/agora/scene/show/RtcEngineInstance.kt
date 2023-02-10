@@ -4,12 +4,14 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
+import io.agora.scene.show.debugSettings.DebugSettingModel
 
 object RtcEngineInstance {
 
@@ -19,6 +21,10 @@ object RtcEngineInstance {
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
+    val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
+        followEncodeDimensionRatio = false
+    }
+    val debugSettingModel = DebugSettingModel().apply {  }
 
     private var innerBeautyProcessor: IBeautyProcessor? = null
     val beautyProcessor: IBeautyProcessor
