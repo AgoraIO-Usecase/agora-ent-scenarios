@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import io.agora.scene.base.Constant
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.show.databinding.ShowRoomItemBinding
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -18,11 +20,6 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class RoomListActivity : AppCompatActivity() {
-
-    companion object {
-        // 是否设置了超分
-        var isSetSetting: Boolean = false
-    }
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private lateinit var mRoomAdapter: BindingSingleAdapter<ShowRoomDetailModel, ShowRoomItemBinding>
@@ -92,11 +89,11 @@ class RoomListActivity : AppCompatActivity() {
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
         // 进房前设置一些必要的设置
-        if (!isSetSetting) {
+        if (!SPUtil.getBoolean(Constant.IS_SET_SETTING, false)) {
             PresetAudienceDialog(this, false).apply {
                 callBack = object : OnPresetAudienceDialogCallBack {
                     override fun onClickConfirm() {
-                        isSetSetting = true
+                        SPUtil.putBoolean(Constant.IS_SET_SETTING, true)
                         goLiveDetailActivity(list, position, roomInfo)
                     }
                 }
