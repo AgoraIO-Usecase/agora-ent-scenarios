@@ -44,7 +44,7 @@ PODS:
   - AgoraRtcEngine_iOS/VirtualBackground (4.1.1)
   - AgoraRtcEngine_iOS/VQA (4.1.1)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (1.1.3):
+  - AgoraSyncManager (1.1.4):
     - SocketRocket
   - Bugly (2.5.93)
   - ChameleonFramework (2.1.0):
@@ -401,7 +401,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.0.8.8)
   - AgoraRtcEngine_iOS (~> 4.1.1)
   - AgoraRtm_iOS
-  - AgoraSyncManager (= 1.1.3)
+  - AgoraSyncManager (= 1.1.4)
   - Bugly (= 2.5.93)
   - ChameleonFramework
   - CRBoxInputView
@@ -480,7 +480,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
   AgoraRtcEngine_iOS: df216a18a01c30fba926565d889c9542319252ac
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: ee9b8af10559986f82a3c98308fa60603aedfa25
+  AgoraSyncManager: f52eed4494ddf4c0517fe403b03494cd230ba924
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
@@ -514,6 +514,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: 736a54ccbd1e0a3ce7cb9896ee68888fc3486cd6
+PODFILE CHECKSUM: e30f824f02636c71f6677f807d830c7d74fa0e10
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

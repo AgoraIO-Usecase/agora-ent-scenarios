@@ -332,7 +332,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
     public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: SARtcType.VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
         rtcKit.delegate = self
-        
+        rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)

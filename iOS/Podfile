@@ -63,7 +63,7 @@ def all_pods
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
-  pod 'AgoraSyncManager', '1.1.3'
+  pod 'AgoraSyncManager', '1.1.4'
   
   
   # Swift Code Formatter

@@ -141,13 +141,13 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _getOwnerSeat() -> SARoomMic {
         let mic = SARoomMic()
-        mic.mic_index = 0
+        mic.mic_index = 1
         mic.status = 0
         mic.member = SAUser()
         mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
-        mic.member?.mic_index = 0
+        mic.member?.mic_index = 1
         mic.member?.name = VLUserCenter.user.name
         mic.member?.portrait = VLUserCenter.user.headUrl
         mic.member?.rtc_uid = VLUserCenter.user.id
@@ -215,6 +215,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         self.subscribeDelegate = delegate
         _subscribeMicSeatApplyChanged()
         _subscribeUsersChanged()
+        _subscribeMicSeatInfoChanged()
     }
     
     func unsubscribeEvent() {
