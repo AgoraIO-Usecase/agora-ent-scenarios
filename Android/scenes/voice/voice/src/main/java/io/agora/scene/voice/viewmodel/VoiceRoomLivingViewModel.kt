@@ -194,12 +194,14 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     private fun checkJoinRoom() {
-        if (joinRtcChannel.get() && joinImRoom.get()) {
-            _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
-                override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                    callBack.onSuccess(MutableLiveData(true))
-                }
-            }.asLiveData())
+        ThreadManager.getInstance().runOnMainThread{
+            if (joinRtcChannel.get() && joinImRoom.get()) {
+                _joinObservable.setSource(object : NetworkOnlyResource<Boolean>() {
+                    override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                        callBack.onSuccess(MutableLiveData(true))
+                    }
+                }.asLiveData())
+            }
         }
     }
 

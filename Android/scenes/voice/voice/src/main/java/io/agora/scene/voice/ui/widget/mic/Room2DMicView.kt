@@ -98,7 +98,11 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                             ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
                         }
                         else -> {
-                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                            if (micInfo.member?.micStatus == 0){
+                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                            }else{
+                                ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                            }
                         }
                     }
                 }
@@ -108,7 +112,11 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 when (micInfo.audioVolumeType) {
                     ConfigConstants.VolumeType.Volume_None -> {
                         ivMicTag.isVisible = true
-                        ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                        if (micInfo.member?.micStatus == 1){
+                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)
+                        }else{
+                            ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_mute_tag)
+                        }
                     }
                     ConfigConstants.VolumeType.Volume_Low -> {
                         ivMicTag.isVisible = true
