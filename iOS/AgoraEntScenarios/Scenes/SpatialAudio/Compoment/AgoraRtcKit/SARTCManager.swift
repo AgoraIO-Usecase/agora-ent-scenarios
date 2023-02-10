@@ -261,6 +261,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
      */
     @objc public func setClientRole(role: SARtcType.ASRoleType) {
         rtcKit.setClientRole(role == .audience ? .audience : .broadcaster)
+        rtcKit.setParameters("{\"rtc.enable_debug_log\":true}")
         self.role = role
     }
 
@@ -390,18 +391,20 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let positionInfo = AgoraRemoteVoicePositionInfo()
         positionInfo.position = position
         positionInfo.forward = forward
-        localSpatial?.updatePlayerPositionInfo(playerId,
+        let ret = localSpatial?.updatePlayerPositionInfo(playerId,
                                                positionInfo: positionInfo)
+        print("player == \(ret)")
     }
     
     func updateSpetialPostion(position: [NSNumber],
                               axisForward: [NSNumber],
                               axisRight: [NSNumber],
                               axisUp: [NSNumber]) {
-       localSpatial?.updateSelfPosition(position,
+        let ret = localSpatial?.updateSelfPosition(position,
                                          axisForward: axisForward,
                                          axisRight: axisRight,
                                          axisUp: axisUp)
+        print("position == \(ret)")
     }
     
     func updateRemoteSpetialPostion(uid: String?,

@@ -113,7 +113,7 @@ class SA3DMoveUserView: UIView {
 
     private var lineView: UIView = .init()
     
-    var angle: Double = 0 {
+    var angle: Double = 270 {
         didSet {
             let value = (angle - 90) / 180.0 * Double.pi
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {

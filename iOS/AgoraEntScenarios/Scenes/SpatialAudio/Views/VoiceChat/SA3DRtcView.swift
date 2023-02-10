@@ -67,6 +67,13 @@ class SA3DRtcView: UIView {
         blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
     }
     
+    func playMusic() {
+        let redMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[1])"
+        let blueMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[0])"
+        redMediaPlayer?.open(redMusicPath, startPos: 0)
+        blueMediaPlayer?.open(blueMusicPath, startPos: 0)
+    }
+    
     private func setupSpatialAudio() {
         rtcKit?.playerDelegate = self
         redMediaPlayer = rtcKit?.initMediaPlayer()
@@ -161,6 +168,28 @@ class SA3DRtcView: UIView {
         }
     }
 
+    func updateCenterUserPosition() {
+//        guard let micInfo = micInfos?[4] else { return }
+        let pos = viewCenterPostion(view: rtcUserView)
+        let realPosition = calcuRealPositon(angle: rtcUserView.angle)
+//        if micInfo.member?.uid == VLUserCenter.user.userNo {
+//            rtcKit?.updateSpetialPostion(position: pos,
+//                                         axisForward: realPosition.0,
+//                                         axisRight: realPosition.1,
+//                                         axisUp: [0, 0, 1])
+//        } else {
+//            rtcKit?.updateRemoteSpetialPostion(uid: micInfo.member?.uid ?? "0",
+//                                               position: pos,
+//                                               forward: realPosition.0)
+//        }
+        rtcKit?.updateSpetialPostion(position: pos,
+                                     axisForward: realPosition.0,
+                                     axisRight: realPosition.1,
+                                     axisUp: [0, 0, 1])
+        
+        print("pos == \(pos)  forward == \(realPosition.0) right == \(realPosition.1) angle == \(rtcUserView.angle)")
+    }
+    
     private func layoutUI() {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.itemSize = CGSize(width: bounds.size.width / 4.0, height: 120)
@@ -213,15 +242,6 @@ extension SA3DRtcView {
         return moveCenter
     }
     
-    private func updateRtcUserViewPosition() {
-        let pos = viewCenterPostion(view: rtcUserView)
-        let realPosition = calcuRealPositon(angle: rtcUserView.angle)
-        rtcKit?.updateSpetialPostion(position: pos,
-                                     axisForward: realPosition.0,
-                                     axisRight: realPosition.1,
-                                     axisUp: [0, 0, 1])
-    }
-    
     @objc private func pan(pan: UIPanGestureRecognizer) {
         let translation = pan.translation(in: self)
         var moveCenter = CGPoint(x: rtcUserView.center.x + translation.x,
@@ -237,7 +257,7 @@ extension SA3DRtcView {
             pan.setTranslation(.zero, in: self)
         } else if pan.state == .ended {
             rtcUserView.angle = angle
-            updateRtcUserViewPosition()
+            updateCenterUserPosition()
             
             let pos = viewCenterPostion(view: rtcUserView)
             let info = SAPositionInfo()
@@ -384,12 +404,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 2:
                 if let mic_info = micInfos?[6] {
                     cell.tag = 205
-                    let member: SAUser = SAUser()
-                    member.name = "Agora Red"
-                    member.portrait = "red"
-                    mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
-                    mic_info.status = mic_info.status == 5 ? 5 : -2
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
@@ -402,12 +417,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 4:
                 if let mic_info = micInfos?[5] {
                     cell.tag = 204
-                    let member: SAUser = SAUser()
-                    member.name = "Agora Blue"
-                    member.portrait = "blue"
-                    mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
-                    mic_info.status = mic_info.status == 5 ? 5 : -2
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
@@ -487,6 +497,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
                                        playerId: Int(redMediaPlayer?.getMediaPlayerId() ?? 0))
+                print("pos red == \(pos) rect = \(rect)")
             }
             
         case 4:
@@ -497,6 +508,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
                                        playerId: Int(blueMediaPlayer?.getMediaPlayerId() ?? 0))
+                print("pos blue == \(pos) rect = \(rect)")
             }
         case 5:
             if let mic_info = micInfos?[2] {
@@ -536,11 +548,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("index === \(indexPath.item)")
         
-        if indexPath.item == 2 {
-            redMediaPlayer?.open("https://webdemo.agora.io/audiomixing.mp3", startPos: 0)
-        } else if indexPath.item == 4 {
-            blueMediaPlayer?.open("https://webdemo.agora.io/dang.mp3", startPos: 0)
-        }
     }
     
     private func getCellTypeWithStatus(_ status: Int) -> SABaseUserCellType {
