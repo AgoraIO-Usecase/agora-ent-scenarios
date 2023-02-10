@@ -448,6 +448,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
         mic.status = (oldMic.status == 2 ? 2:-1)
+        mic.objectId = oldMic.objectId
         self._cleanUserMicIndex(mic: oldMic)
         
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
@@ -506,6 +507,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             return
         }
         let old_mic = SARoomMic()
+        old_mic.objectId = self.mics[old_index].objectId
         switch self.mics[old_index].status {
         case 2:
             old_mic.status = self.mics[old_index].status
@@ -516,7 +518,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             old_mic.status = -1
         }
         old_mic.mic_index = old_index
+        
         let new_mic = SARoomMic()
+        new_mic.objectId = self.mics[new_index].objectId
         switch self.mics[new_index].status {
         case 2:
             new_mic.status = self.mics[new_index].status
@@ -601,6 +605,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             mic.status = 0
         }
         mic.member = user
+        mic.objectId = self.mics[user.mic_index ?? 0].objectId
         
         let impGroup = DispatchGroup()
         impGroup.enter()
@@ -705,6 +710,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             mic.status = 0
         }
         mic.member = apply.member
+        mic.objectId = mics[mic_index].objectId
 
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if let error = error {
