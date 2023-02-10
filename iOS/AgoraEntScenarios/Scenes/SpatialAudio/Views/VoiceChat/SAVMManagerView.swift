@@ -56,7 +56,7 @@ class SAVMManagerView: UIView {
                 // micView.isHidden = true
                 addView.image = UIImage.sceneImage(name: "icons／solid／lock")
                 lockBtn.setTitle(sceneLocalized( "Unblock"), for: .normal)
-                inviteBtn.setTitleColor(UIColor(hex: "0x979cbb"), for: .normal)
+                inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
             } else if m_type == 4 {
@@ -67,7 +67,7 @@ class SAVMManagerView: UIView {
                 addView.image = UIImage.sceneImage(name:"icons／solid／lock")
                 lockBtn.setTitle(sceneLocalized( "Unblock"), for: .normal)
                 muteBtn.setTitle(sceneLocalized( "Unmute"), for: .normal)
-                inviteBtn.setTitleColor(UIColor(hex: "0x979cbb"), for: .normal)
+                inviteBtn.setTitleColor(UIColor.HexColor(hex: 0x979cbb, alpha: 1), for: .normal)
                 inviteBtn.isUserInteractionEnabled = false
                 nameLabel.text = username
             } else if m_type == 1 {
