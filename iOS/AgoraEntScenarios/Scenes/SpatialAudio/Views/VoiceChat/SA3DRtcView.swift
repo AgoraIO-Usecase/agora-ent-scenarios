@@ -42,9 +42,9 @@ class SA3DRtcView: UIView {
             collectionView.reloadData()
 
             guard let micInfos = micInfos else { return }
-            let micInfo = micInfos[4]
+            let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
-            rtcUserView.tag = 204
+            rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
         }
     }
@@ -86,7 +86,7 @@ class SA3DRtcView: UIView {
     
     //因为麦位顺序的特殊性 需要对数据进行调整
     private func getRealIndex(with index: Int) -> Int {//4表示中间的用户
-        let realIndexs: [Int] = [1, 0, 6, 4, 5, 2, 3]
+        let realIndexs: [Int] = [2, 1, 6, 0, 3, 4, 5]
         return realIndexs[index]
     }
     
@@ -105,7 +105,7 @@ class SA3DRtcView: UIView {
                 guard let mic_index = member.mic_index else { return }
                 let realIndex = getRealIndex(with: mic_index)
                 let indexPath = IndexPath(item: realIndex, section: 0)
-                if realIndex != 4 {
+                if realIndex != 0 {
                     guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                     DispatchQueue.main.async {
                         cell.refreshVolume(vol: vol)
@@ -121,7 +121,7 @@ class SA3DRtcView: UIView {
     public func updateVolume(with index: Int, vol: Int) {
         let realIndex: Int = getRealIndex(with: index)
         let indexPath = IndexPath(item: index, section: 0)
-        if realIndex != 4 {
+        if realIndex != 0 {
             guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
             DispatchQueue.main.async {
                 cell.refreshVolume(vol: vol)
@@ -134,7 +134,7 @@ class SA3DRtcView: UIView {
     public func updateUser(_ mic: SARoomMic) {
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         let indexPath = IndexPath(item: realIndex, section: 0)
-        if realIndex != 4 {
+        if realIndex != 0 {
             guard let cell: SA3DUserCollectionViewCell = collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
             DispatchQueue.main.async {
                 cell.refreshUser(with: mic)
@@ -211,6 +211,14 @@ class SA3DRtcView: UIView {
         }
 
         addSubview(rtcUserView)
+        rtcUserView.tapClickBlock = {[weak self] in
+            guard let clickBlock = self?.clickBlock else {return}
+            if let micinfo: SARoomMic = self?.micInfos?[0] {
+                clickBlock(self?.getCellType(With: micinfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd, 200)
+            } else {
+                clickBlock(.AgoraChatRoomBaseUserCellTypeAdd, 200)
+            }
+        }
         rtcUserView.snp.makeConstraints { make in
             make.center.equalTo(self)
             make.width.height.equalTo(150~)
@@ -218,6 +226,30 @@ class SA3DRtcView: UIView {
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(pan(pan:)))
         rtcUserView.addGestureRecognizer(pan)
+    }
+    
+    func getCellType(With status: Int) -> SABaseUserCellType {
+        if let _ = self.micInfos?[0] {
+            switch status {
+                case 0:
+                    return .AgoraChatRoomBaseUserCellTypeNormalUser
+                case 1:
+                    return .AgoraChatRoomBaseUserCellTypeMute
+                case 2:
+                    return .AgoraChatRoomBaseUserCellTypeForbidden
+                case 3:
+                    return .AgoraChatRoomBaseUserCellTypeLock
+                case 4:
+                    return .AgoraChatRoomBaseUserCellTypeMuteAndLock
+                case -1:
+                    return .AgoraChatRoomBaseUserCellTypeAdd
+                default:
+                    break
+            }
+        } else {
+            return .AgoraChatRoomBaseUserCellTypeAdd
+        }
+        return .AgoraChatRoomBaseUserCellTypeAdd
     }
 }
 
@@ -386,16 +418,16 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             }
             switch indexPath.item {
             case 0:
-                if let mic_info = micInfos?[1] {
-                    cell.tag = 201
+                if let mic_info = micInfos?[2] {
+                    cell.tag = 202
                     cell.setArrowInfo(imageName: "sa_downright_arrow", margin: 6)
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                 }
             case 1:
-                if let mic_info = micInfos?[0] {
-                    cell.tag = 200
+                if let mic_info = micInfos?[1] {
+                    cell.tag = 201
                     cell.setArrowInfo(imageName: "sa_down_arrow", margin: 6)
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
@@ -403,7 +435,11 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 }
             case 2:
                 if let mic_info = micInfos?[6] {
-                    cell.tag = 205
+                    cell.tag = 206
+                    let member: SAUser = SAUser()
+                    member.name = "Agora Red"
+                    member.portrait = "red"
+                    mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_downleft_arrow", margin: 6)
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
@@ -415,8 +451,12 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 }
                 
             case 4:
-                if let mic_info = micInfos?[5] {
-                    cell.tag = 204
+                if let mic_info = micInfos?[3] {
+                    cell.tag = 203
+                    let member: SAUser = SAUser()
+                    member.name = "Agora Blue"
+                    member.portrait = "blue"
+                    mic_info.member = member
                     cell.setArrowInfo(imageName: "sa_upright_arrow", margin: -6)
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
@@ -427,8 +467,8 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     setPlayerAttenuation(mediaPlayer: blueMediaPlayer, attenuation: mic_info.attenuation)
                 }
             case 5:
-                if let mic_info = micInfos?[2] {
-                    cell.tag = 202
+                if let mic_info = micInfos?[4] {
+                    cell.tag = 204
                     cell.setArrowInfo(imageName: "sa_up_arrow", margin: -6)
                     
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
@@ -436,8 +476,8 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.refreshUser(with: mic_info)
                 }
             case 6:
-                if let mic_info = micInfos?[3] {
-                    cell.tag = 203
+                if let mic_info = micInfos?[5] {
+                    cell.tag = 205
                     cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -6)
                     
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
@@ -460,7 +500,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
         let pos = viewCenterPostion(rect: rect)
         switch indexPath.item {
         case 0:
-            if let mic_info = micInfos?[0] {
+            if let mic_info = micInfos?[2] {
                 mic_info.forward = [1, -1, 0]
                 mic_info.right = [-1, -1, 0]
                 if mic_info.member?.uid == VLUserCenter.user.userNo {
@@ -501,7 +541,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             }
             
         case 4:
-            if let mic_info = micInfos?[5] {
+            if let mic_info = micInfos?[3] {
                 mic_info.forward = [1, 1, 0]
                 mic_info.right = [1, -1, 0]
                 
@@ -511,7 +551,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 print("pos blue == \(pos) rect = \(rect)")
             }
         case 5:
-            if let mic_info = micInfos?[2] {
+            if let mic_info = micInfos?[4] {
                 mic_info.forward = [0, 1, 0]
                 mic_info.right = [1, 0, 0]
                 if mic_info.member?.uid == VLUserCenter.user.userNo {
@@ -526,7 +566,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 }
             }
         case 6:
-            if let mic_info = micInfos?[3] {
+            if let mic_info = micInfos?[5] {
                 mic_info.forward = [-1, 1, 0]
                 mic_info.right = [1, 1, 0]
                 if mic_info.member?.uid == VLUserCenter.user.userNo {

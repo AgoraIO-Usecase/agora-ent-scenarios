@@ -56,6 +56,8 @@ import KakaJSON
     var member: SAUser?
 
     var created_at: UInt64?
+    
+    var objectId: String?
 
     override public required init() {}
 

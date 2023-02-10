@@ -87,7 +87,7 @@ class SAVMManagerView: UIView {
                 inviteBtn.setTitle(sceneLocalized( "Kick"), for: .normal)
             } else if m_type == 2 {
                 iconView.isHidden = iconStr.count == 0
-                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage(named: ""), context: nil)
                 nameLabel.text = username
 //                micView.setState(.forbidden)
 //                micView.isHidden = false

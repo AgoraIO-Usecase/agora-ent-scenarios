@@ -26,7 +26,7 @@
     
     [self setUpUI];
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, kStatusBarHeight, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ic_back_b"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage imageNamed:@"ic_back_b"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:backBtn];
 }
