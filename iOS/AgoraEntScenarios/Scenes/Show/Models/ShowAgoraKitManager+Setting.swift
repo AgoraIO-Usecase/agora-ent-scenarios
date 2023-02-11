@@ -67,6 +67,8 @@ extension ShowAgoraKitManager {
         updateSettingForkey(.musincVolume)
         updateSettingForkey(.audioBitRate)
         updateSettingForkey(.captureVideoSize)
+        updateSettingForkey(.FPS)
+        updateSettingForkey(.videoBitRate)
     }
     
     /// 设置超分 不保存数据
@@ -255,8 +257,8 @@ extension ShowAgoraKitManager {
             videoEncoderConfig.frameRate = fpsItems[index]
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             // 采集帧率
-//            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-//            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+            agoraKit.setCameraCapturerConfiguration(captureConfig)
             
         case .H265:
             agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
@@ -271,6 +273,9 @@ extension ShowAgoraKitManager {
             break
         case .captureVideoSize:
             setCaptureVideoDimensions(captureDimensionsItems[index])
+        case .captureFrameRate:
+            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+            agoraKit.setCameraCapturerConfiguration(captureConfig)
         }
     }
 

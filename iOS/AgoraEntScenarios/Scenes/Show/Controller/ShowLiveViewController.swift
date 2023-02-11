@@ -1041,13 +1041,20 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
-            let vc = ShowAdvancedSettingVC()
-            vc.isOutside = false
-            vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
-            vc.isBroadcaster = wSelf.role == .broadcaster
-            vc.settingManager = wSelf.agoraKitManager
-            vc.audiencePresetType = wSelf.audiencePresetType
-            wSelf.navigationController?.pushViewController(vc, animated: true)
+            if AppContext.shared.isDebugMode {
+                let vc = ShowDebugSettingVC()
+                vc.isOutside = true
+                vc.settingManager = wSelf.agoraKitManager
+                wSelf.navigationController?.pushViewController(vc, animated: true)
+            }else {
+                let vc = ShowAdvancedSettingVC()
+                vc.isOutside = false
+                vc.mode = wSelf.interactionStatus == .pking ? .pk : .single // 根据当前模式设置
+                vc.isBroadcaster = wSelf.role == .broadcaster
+                vc.settingManager = wSelf.agoraKitManager
+                vc.audiencePresetType = wSelf.audiencePresetType
+                wSelf.navigationController?.pushViewController(vc, animated: true)
+            }
         }
     }
     

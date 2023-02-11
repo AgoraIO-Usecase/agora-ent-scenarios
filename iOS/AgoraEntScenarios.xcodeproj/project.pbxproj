@@ -10,6 +10,12 @@
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
 		A8889DB62990DB04004BAA1C /* VLMineSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DB52990DB04004BAA1C /* VLMineSwitchCell.swift */; };
 		A8889DBC2990E0A7004BAA1C /* VLMineCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A8889DBB2990E0A7004BAA1C /* VLMineCellModel.m */; };
+		A8889DC12996960C004BAA1C /* ShowDebugSettingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC02996960C004BAA1C /* ShowDebugSettingVC.swift */; };
+		A8889DC32996A45F004BAA1C /* ShowDebugSetting1TFCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC22996A45F004BAA1C /* ShowDebugSetting1TFCell.swift */; };
+		A8889DC52996A47F004BAA1C /* ShowDebugSetting2TFCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC42996A47F004BAA1C /* ShowDebugSetting2TFCell.swift */; };
+		A8889DC72997092A004BAA1C /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC629970929004BAA1C /* ShowDebug1TFModel.swift */; };
+		A8889DC92997093D004BAA1C /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC82997093D004BAA1C /* ShowDebug2TFModel.swift */; };
+		A8889DCD29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DCC29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift */; };
 		A8E630BD298520CF002EADA4 /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E630BC298520CF002EADA4 /* KeyCenter.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
@@ -338,6 +344,12 @@
 		A8889DB52990DB04004BAA1C /* VLMineSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineSwitchCell.swift; sourceTree = "<group>"; };
 		A8889DBA2990E0A7004BAA1C /* VLMineCellModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLMineCellModel.h; sourceTree = "<group>"; };
 		A8889DBB2990E0A7004BAA1C /* VLMineCellModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLMineCellModel.m; sourceTree = "<group>"; };
+		A8889DC02996960C004BAA1C /* ShowDebugSettingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugSettingVC.swift; sourceTree = "<group>"; };
+		A8889DC22996A45F004BAA1C /* ShowDebugSetting1TFCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugSetting1TFCell.swift; sourceTree = "<group>"; };
+		A8889DC42996A47F004BAA1C /* ShowDebugSetting2TFCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugSetting2TFCell.swift; sourceTree = "<group>"; };
+		A8889DC629970929004BAA1C /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
+		A8889DC82997093D004BAA1C /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
+		A8889DCC29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+DebugSetting.swift"; sourceTree = "<group>"; };
 		A8E630BC298520CF002EADA4 /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1748,6 +1760,7 @@
 			children = (
 				DDE855A0296BB34E00982E52 /* Music */,
 				DDE855A3296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift */,
+				A8889DCC29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift */,
 				DDE855A6296BB34E00982E52 /* ShowAgoraKitManager.swift */,
 				DDE855A7296BB34E00982E52 /* ShowChatModel.swift */,
 				DDE855A8296BB34E00982E52 /* ShowAgoraKitManager+Music.swift */,
@@ -1780,6 +1793,8 @@
 			children = (
 				DDE855AA296BB34E00982E52 /* ShowSettingKey.swift */,
 				DDE855AC296BB34E00982E52 /* ShowPresettingModel.swift */,
+				A8889DC629970929004BAA1C /* ShowDebug1TFModel.swift */,
+				A8889DC82997093D004BAA1C /* ShowDebug2TFModel.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1826,6 +1841,7 @@
 				DDE855BC296BB34E00982E52 /* ShowAdvancedSettingVC.swift */,
 				DDE855BD296BB34E00982E52 /* ShowPresettingVC.swift */,
 				DDE855BE296BB34E00982E52 /* ShowVideoSettingVC.swift */,
+				A8889DC02996960C004BAA1C /* ShowDebugSettingVC.swift */,
 				DDE855BF296BB34E00982E52 /* ShowCunstomNaviBar.swift */,
 			);
 			path = Setting;
@@ -1983,6 +1999,8 @@
 				DDE85607296BB34E00982E52 /* ShowPresettingFooterView.swift */,
 				DDE85608296BB34E00982E52 /* ShowSettingLabelCell.swift */,
 				DDE85609296BB34E00982E52 /* ShowSettingBaseCell.swift */,
+				A8889DC22996A45F004BAA1C /* ShowDebugSetting1TFCell.swift */,
+				A8889DC42996A47F004BAA1C /* ShowDebugSetting2TFCell.swift */,
 				DDE8560A296BB34E00982E52 /* ShowSettingSwitchCell.swift */,
 				DDE8560B296BB34E00982E52 /* ShowSettingSegmentCell.swift */,
 				DDE8560C296BB34E00982E52 /* ShowPresettingHeaderView.swift */,
@@ -2301,6 +2319,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8889DC32996A45F004BAA1C /* ShowDebugSetting1TFCell.swift in Sources */,
 				DDA199DD28FFE579009D3E61 /* ToastView.swift in Sources */,
 				DDA199E528FFE579009D3E61 /* UILabel+Font.m in Sources */,
 				DDA19A6C28FFE57A009D3E61 /* EKRatingSymbolsContainerView.swift in Sources */,
@@ -2367,6 +2386,7 @@
 				DDA199F928FFE579009D3E61 /* NSDictionary+dictToModel.m in Sources */,
 				DDA19A3D28FFE57A009D3E61 /* UIViewArray+QuickLayout.swift in Sources */,
 				DDA19A0428FFE579009D3E61 /* CALayer+JKBorderColor.m in Sources */,
+				A8889DC12996960C004BAA1C /* ShowDebugSettingVC.swift in Sources */,
 				DDA19A4828FFE57A009D3E61 /* EKAttributes.swift in Sources */,
 				DDE8562A296BB34E00982E52 /* ShowAgoraKitManager+Setting.swift in Sources */,
 				DDA19A3528FFE57A009D3E61 /* UIView+Responder.swift in Sources */,
@@ -2396,6 +2416,7 @@
 				DDE85623296BB34E00982E52 /* Date+Show.swift in Sources */,
 				DDA199F428FFE579009D3E61 /* String+Extension.swift in Sources */,
 				DDA19A6E28FFE57A009D3E61 /* EKPopUpMessageView.swift in Sources */,
+				A8889DC72997092A004BAA1C /* ShowDebug1TFModel.swift in Sources */,
 				DDA19A2A28FFE57A009D3E61 /* UIImageEffects.m in Sources */,
 				E75B151D296FE59100C33678 /* EffectsProcess.m in Sources */,
 				DDA199DE28FFE579009D3E61 /* AlertManager.swift in Sources */,
@@ -2454,6 +2475,7 @@
 				DDA19A7128FFE57A009D3E61 /* _swiftYGViewDisplayer.swift in Sources */,
 				DDA19A6628FFE57A009D3E61 /* EKProcessingNoteMessageView.swift in Sources */,
 				DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */,
+				A8889DCD29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift in Sources */,
 				DDE85645296BB34E00982E52 /* ShowNavigationBar.swift in Sources */,
 				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */,
@@ -2465,6 +2487,7 @@
 				DDA199E028FFE579009D3E61 /* VLEmptyView.m in Sources */,
 				DDE8563F296BB34E00982E52 /* ShowVideoSettingVC.swift in Sources */,
 				DD84177F29090C520026B624 /* UIWindow+Router.m in Sources */,
+				A8889DC92997093D004BAA1C /* ShowDebug2TFModel.swift in Sources */,
 				DDA19A4D28FFE57A009D3E61 /* EKAttributes+StatusBar.swift in Sources */,
 				DDA19A4328FFE57A009D3E61 /* SwiftEntryKit.swift in Sources */,
 				DDA19A5E28FFE57A009D3E61 /* EKRatingMessageView.swift in Sources */,
@@ -2563,6 +2586,7 @@
 				DD84178B29090C520026B624 /* VLLoginViewController.m in Sources */,
 				DDE8567D296BB34E00982E52 /* AppContext+Show.swift in Sources */,
 				DDE8567C296BB34E00982E52 /* ShowServiceModel.swift in Sources */,
+				A8889DC52996A47F004BAA1C /* ShowDebugSetting2TFCell.swift in Sources */,
 				DDA19A6428FFE57A009D3E61 /* EKXStatusBarMessageView.swift in Sources */,
 				DDA19A5D28FFE57A009D3E61 /* EKNotificationMessage.swift in Sources */,
 				E75B151F296FE59100C33678 /* EffectsAnimal.m in Sources */,
