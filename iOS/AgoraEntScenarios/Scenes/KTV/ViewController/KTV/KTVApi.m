@@ -265,6 +265,9 @@ time_t uptime() {
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            
+            //mute main Singer player audio
+            [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -284,11 +287,6 @@ time_t uptime() {
 {
     self.localPlayerPosition = [self.rtcMediaPlayer getPosition];
     [self.rtcMediaPlayer resume];
-    
-    if (self.config.role == KTVSingRoleCoSinger) {
-        //mute main Singer player audio
-        [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
-    }
 }
 
 -(void)pausePlay
@@ -298,6 +296,7 @@ time_t uptime() {
 
 -(void)stopSong
 {
+    KTVLogInfo(@"stop song");
     [self.rtcMediaPlayer stop];
     [self cancelAsyncTasks];
     if(self.config.type == KTVSongTypeChorus) {
@@ -710,6 +709,11 @@ time_t uptime() {
 
 - (void)joinChorus2ndChannel
 {
+    if(self.subChorusConnection) {
+        KTVLogWarn(@"joinChorus2ndChannel fail! rejoin!");
+        return;
+    }
+    
     KTVSingRole role = self.config.role;
     AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
     // main singer do not subscribe 2nd channel
@@ -751,6 +755,11 @@ time_t uptime() {
 
 - (void)leaveChorus2ndChannel
 {
+    if(self.subChorusConnection == nil) {
+        KTVLogWarn(@"aaaaaa leaveChorus2ndChannel fail connection = nil");
+        return;
+    }
+    
     [self.engine setDirectExternalAudioSource:NO];
     [self.engine setAudioFrameDelegate:nil];
     KTVSingRole role = self.config.role;
@@ -767,6 +776,7 @@ time_t uptime() {
     [self adjustPlayoutVolume:self.playoutVolume];
     [self adjustPublishSignalVolume:self.publishSignalVolume];
     self.pushDirectAudioEnable = NO;
+    self.subChorusConnection = nil;
 }
 
 - (void)cancelAsyncTasks
