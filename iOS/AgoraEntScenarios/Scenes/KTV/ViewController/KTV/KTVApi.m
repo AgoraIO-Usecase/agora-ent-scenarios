@@ -255,8 +255,6 @@ time_t uptime() {
             options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
-            
-            [self updateRemotePlayBackVolumeIfNeed];
         } else if(role == KTVSingRoleCoSinger) {
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
@@ -267,9 +265,6 @@ time_t uptime() {
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
-            
-            //mute main Singer player audio
-            [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
@@ -289,6 +284,11 @@ time_t uptime() {
 {
     self.localPlayerPosition = [self.rtcMediaPlayer getPosition];
     [self.rtcMediaPlayer resume];
+    
+    if (self.config.role == KTVSingRoleCoSinger) {
+        //mute main Singer player audio
+        [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
+    }
 }
 
 -(void)pausePlay
@@ -354,7 +354,7 @@ time_t uptime() {
 }
 
 - (void)updateRemotePlayBackVolumeIfNeed {
-    if (self.config.type != KTVSongTypeChorus) {
+    if (self.config.type != KTVSongTypeChorus || self.config.role == KTVSingRoleAudience) {
         KTVLogInfo(@"updateRemotePlayBackVolumeIfNeed: %d, role: %ld", 100, self.config.role);
         [self.engine adjustPlaybackSignalVolume:100];
         return;
