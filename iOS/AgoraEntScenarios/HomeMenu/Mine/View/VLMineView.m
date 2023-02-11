@@ -11,11 +11,12 @@
 #import "UIView+VL.h"
 #import "MenuUtils.h"
 #import "VLMineCellModel.h"
+#import "AgoraEntScenarios-Bridging-Header.h"
+
 @import SDWebImage;
 @import QMUIKit;
 @import YYCategories;
 
-static NSString * const kDevelopModeIsOn = @"kDevelopModeIsOn";
 static NSString * const kSwitchCellID = @"switchCellID";
 static NSString * const kDefaultCellID = @"kDefaultCellID";
 
@@ -56,7 +57,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 
 - (void)setupData {
     self.dataArray = [self.itemsArray mutableCopy];
-    BOOL developIsOn = [[NSUserDefaults standardUserDefaults] boolForKey:kDevelopModeIsOn];
+    BOOL developIsOn = [AppContext shared].isDebugMode;
     if (developIsOn) {
         VLMineCellModel *model = [VLMineCellModel modelWithItemImg:@"mine_quit_icon" title:AGLocalizedString(@"开发者模式") style:VLMineCellStyleSwitch];
         [self.dataArray addObject:model];
@@ -95,11 +96,11 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     VLMineCellModel *model = self.dataArray[indexPath.row];
     if (model.style == VLMineCellStyleSwitch) {
         VLMineSwitchCell *switchCell = [tableView dequeueReusableCellWithIdentifier:kSwitchCellID forIndexPath:indexPath];
-        BOOL developIsOn = [[NSUserDefaults standardUserDefaults] boolForKey:kDevelopModeIsOn];
+        BOOL developIsOn = [AppContext shared].isDebugMode;
         @weakify(self)
         [switchCell setTitle:model.titleStr isOn:developIsOn valueChangedAction:^(BOOL isOn) {
             @strongify(self)
-            [[NSUserDefaults standardUserDefaults] setValue:@(isOn) forKey:kDevelopModeIsOn];
+            [AppContext shared].isDebugMode = isOn;
             [self setupData];
             [self.mineTable reloadData];
         }];
@@ -212,14 +213,9 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
     return _itemsArray;
 }
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = touches.anyObject;
-    if (touch.tapCount >= 5) {
-        [[NSUserDefaults standardUserDefaults] setValue:@(YES) forKey:kDevelopModeIsOn];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [self setupData];
-        [self.mineTable reloadData];
-    }
+- (void)refreshTableView {
+    [self setupData];
+    [self.mineTable reloadData];
 }
 
 @end
