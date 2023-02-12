@@ -596,7 +596,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         ChatroomIMManager.getInstance().leaveChatRoom(roomKitBean.chatroomId)
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
         isRoomOwnerLeave = false
-        ChatroomIMManager.getInstance().logout(false)
         binding.subtitle.clearTask()
         super.finish()
     }
