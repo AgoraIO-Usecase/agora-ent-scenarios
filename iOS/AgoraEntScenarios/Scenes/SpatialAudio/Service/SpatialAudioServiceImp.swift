@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let cSceneId = "scene_spatialAudio"
+private let cSceneId = "scene_spatialAudio1"
 
 //let saLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "SpatialAudio"))
 public class SpatialAudioServiceImp: NSObject {
@@ -165,6 +165,14 @@ extension SpatialAudioServiceImp: SAIMDelegate {
 }
 
 extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
+    func updateRobotInfo(info: SARobotAudioInfo, completion: @escaping ((Error?) -> ())) {
+        assert(false, "not implemented updateRobotInfo")
+    }
+    
+    func updateRobotInfo(info: SARobotAudioInfo) {
+        assert(false, "not implemented updateRobotInfo")
+    }
+    
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         SAIMManager.shared?.updateAnnouncement(content: content, completion: completion)
     }
@@ -230,14 +238,14 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
                 roomInfo.room?.gift_amount = Int(gift_amount)
             }
             if let use_robot = map?["use_robot"] as? String {
-                roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
+//                roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
             } else {
-                roomInfo.room?.use_robot = false
+//                roomInfo.room?.use_robot = false
             }
             if let robot_volume = map?["robot_volume"] as? String {
-                roomInfo.room?.robot_volume = UInt(robot_volume) ?? 50
+//                roomInfo.room?.robot_volume = UInt(robot_volume) ?? 50
             } else {
-                roomInfo.room?.robot_volume = 50
+//                roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
                 $0.key.hasPrefix("mic_")

@@ -317,7 +317,7 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 cell.titleLabel.text = settingName[3]
                 cell.isAudience = isAudience
                 cell.selectionStyle = .none
-                cell.swith.isOn = roomInfo?.room?.use_robot ?? false
+                cell.swith.isOn = roomInfo?.robotInfo.use_robot ?? false
                 cell.useRobotBlock = { [weak self] flag in
                     guard let useRobotBlock = self?.useRobotBlock else { return }
                     useRobotBlock(flag)
@@ -336,7 +336,7 @@ extension SAAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                     volBlock(vol)
                 }
                 
-                let volume = roomInfo?.room?.robot_volume ?? 50
+                let volume = roomInfo?.robotInfo.robot_volume ?? 50
                 cell.slider.value = Float(volume) / 100.0
                 cell.countLabel.text = "\(volume)"
                 return cell

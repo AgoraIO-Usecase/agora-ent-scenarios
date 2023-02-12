@@ -13,7 +13,7 @@ import ZSwiftBaseLib
 extension SARoomViewController {
     
     func showEQView() {
-        let isOpenSpatial = roomInfo?.room?.use_robot == true
+        let isOpenSpatial = roomInfo?.robotInfo.use_robot == true
 
         let actionView = ActionSheetManager()
         actionView
@@ -32,7 +32,7 @@ extension SARoomViewController {
         }
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             guard let self = self else { return }
-            self.roomInfo?.room?.use_robot = isOn
+            self.roomInfo?.robotInfo.use_robot = isOn
             self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
@@ -43,7 +43,6 @@ extension SARoomViewController {
     }
     
     func showSpatialAudioView() {
-        // TODO: shengtao 
         guard let micInfos = sRtcView.micInfos else { return }
         let red = micInfos[6]
         let blue = micInfos[3]
@@ -64,13 +63,15 @@ extension SARoomViewController {
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
             guard let self = self else { return }
+            let robotInfo = self.roomInfo?.robotInfo ?? SARobotAudioInfo()
             if indexPath.section == 0 {
                 switch indexPath.row {
                 case 1:
                     blue.airAbsorb = isOn
-                    
+                    robotInfo.blue_robot_absorb = isOn
                 case 2:
                     blue.voiceBlur = isOn
+                    robotInfo.blue_robot_blur = isOn
                     
                 default: break
                 }
@@ -78,12 +79,17 @@ extension SARoomViewController {
                 switch indexPath.row {
                 case 1:
                     red.airAbsorb = isOn
+                    robotInfo.red_robot_absorb = isOn
                     
                 case 2:
                     red.voiceBlur = isOn
+                    robotInfo.red_robot_blur = isOn
                     
                 default: break
                 }
+            }
+            AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
+                
             }
             self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red

@@ -37,10 +37,10 @@ import KakaJSON
     public var ranking_list: [SAUser]? = [SAUser]() // 土豪榜
     public var member_list: [SAUser]? = [SAUser]() // 用户榜
     public var rtc_uid: Int? = 0
-    public var use_robot: Bool? = false
+//    public var use_robot: Bool? = false
     public var turn_AIAEC: Bool? = false
     public var turn_AGC: Bool? = false
-    public var robot_volume: UInt?
+//    public var robot_volume: UInt?
     public var sound_effect: Int = 1
     
     public var objectId: String?
@@ -91,6 +91,7 @@ import KakaJSON
 @objc open class SARoomInfo: NSObject, Convertible {
     var room: SARoomEntity?
     var mic_info: [SARoomMic]?
+    var robotInfo: SARobotAudioInfo = SARobotAudioInfo()
 
     override public required init() {}
 
