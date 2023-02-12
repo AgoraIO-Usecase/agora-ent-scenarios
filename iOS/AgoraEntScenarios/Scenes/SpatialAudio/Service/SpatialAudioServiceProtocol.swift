@@ -114,6 +114,10 @@ public enum SAUpdateRoomState {
     ///   - userName: 离开的环信用户id
     func onUserLeftRoom(roomId: String, userName: String)
     
+    
+    /// 机器人相关设置
+    /// - Parameter robotInfo: <#robotInfo description#>
+    func onRobotUpdate(robotInfo: SARobotAudioInfo)
 }
 
 /// 房间内部需要用到环信KV
@@ -261,9 +265,16 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     
     /// Description 是否启用机器人
     /// - Parameter enable: true or false
+    @available(*, deprecated, message: "Parse use updateRobotInfo")
     func enableRobot(enable: Bool,completion: @escaping (Error?) -> Void)
     
     /// Description 更新机器人音量
     /// - Parameter value: 音量值
+    @available(*, deprecated, message: "Parse use updateRobotInfo")
     func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
+    
+    
+    /// 更新机器人设置
+    /// - Parameter info: <#info description#>
+    func updateRobotInfo(info: SARobotAudioInfo, completion: @escaping ((Error?)->()))
 }
