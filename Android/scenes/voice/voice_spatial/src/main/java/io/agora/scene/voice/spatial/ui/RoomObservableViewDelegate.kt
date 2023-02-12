@@ -495,18 +495,6 @@ class RoomObservableViewDelegate constructor(
         roomAudioSettingDialog?.audioSettingsListener =
             object : RoomAudioSettingsSheetDialog.OnClickAudioSettingsListener {
 
-                override fun onAINS(mode: Int, isEnable: Boolean) {
-                    onAINSDialog(mode)
-                }
-
-                override fun onAIAEC(isOn: Boolean, isEnable: Boolean) {
-                    onAIAECDialog(isOn)
-                }
-
-                override fun onAGC(isOn: Boolean, isEnable: Boolean) {
-                    onAIAGCDialog(isOn)
-                }
-
                 override fun onVoiceChanger(mode: Int, isEnable: Boolean) {
                     onVoiceChangerDialog(mode)
                 }
@@ -564,90 +552,6 @@ class RoomObservableViewDelegate constructor(
                 putInt(RoomSoundSelectionSheetDialog.KEY_CURRENT_SELECTION, soundSelection)
             }
         }.show(activity.supportFragmentManager, "mtSoundSelection")
-    }
-
-    /**
-     * AI降噪弹框
-     */
-    fun onAINSDialog(ainsMode: Int) {
-        val ainsDialog = RoomAINSSheetDialog().apply {
-            arguments = Bundle().apply {
-                putInt(RoomAINSSheetDialog.KEY_AINS_MODE, ainsMode)
-                putBoolean(RoomAINSSheetDialog.KEY_IS_ENABLE, roomKitBean.isOwner)
-            }
-        }
-        ainsDialog.anisModeCallback = {
-            VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
-            AgoraRtcEngineController.get().deNoise(it.anisMode)
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.AINSMode = it.anisMode
-                updateAINSView()
-            }
-            if (roomKitBean.isOwner && robotInfo.useRobot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
-                VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
-                RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
-                    // 播放AI 降噪介绍
-                    AgoraRtcEngineController.get().playMusic(soundAudioList)
-                }
-            }
-        }
-        ainsDialog.anisSoundCallback = { position, ainsSoundBean ->
-            "onAINSDialog anisSoundCallback：$ainsSoundBean".logD(io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate.Companion.TAG)
-            if (robotInfo.useRobot) {
-                ainsDialog.updateAnisSoundsAdapter(position, true)
-                RoomSoundAudioConstructor.AINSSoundMap[ainsSoundBean.soundType]?.let { soundAudioBean ->
-                    val audioUrl =
-                        if (ainsSoundBean.soundMode == ConfigConstants.AINSMode.AINS_High) soundAudioBean.audioUrlHigh else soundAudioBean.audioUrl
-                    // 试听降噪音效
-                    AgoraRtcEngineController.get()
-                        .playMusic(soundAudioBean.soundId, audioUrl, soundAudioBean.speakerType)
-                }
-            } else {
-                ainsDialog.updateAnisSoundsAdapter(position, false)
-                onBotMicClick(activity.getString(R.string.voice_chatroom_open_bot_to_sound_effect))
-            }
-        }
-
-        ainsDialog.show(activity.supportFragmentManager, "mtAnis")
-    }
-
-    /**
-     * 回声消除弹框
-     */
-    fun onAIAECDialog(isOn: Boolean) {
-        val dialog = RoomAIAECSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomAIAECSheetDialog.KEY_IS_ON, isOn)
-            }
-        }
-        dialog.onClickCheckBox = { isOn ->
-            AgoraRtcEngineController.get().setAIAECOn(isOn)
-            VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn = isOn
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.isAIAECOn = isOn
-                updateAIAECView()
-            }
-        }
-        dialog.show(activity.supportFragmentManager, "mtAIAEC")
-    }
-    /**
-     * 人声增强弹框
-     */
-    fun onAIAGCDialog(isOn: Boolean) {
-        val dialog = RoomAIAGCSheetDialog().apply {
-            arguments = Bundle().apply {
-                putBoolean(RoomAIAGCSheetDialog.KEY_IS_ON, isOn)
-            }
-        }
-        dialog.onClickCheckBox = { isOn ->
-            AgoraRtcEngineController.get().setAIAGCOn(isOn)
-            VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn
-            roomAudioSettingDialog?.apply {
-                audioSettingsInfo.isAIAGCOn = isOn
-                updateAIAGCView()
-            }
-        }
-        dialog.show(activity.supportFragmentManager, "mtAIAGC")
     }
     /**
      * 变声器弹框
@@ -1030,9 +934,9 @@ class RoomObservableViewDelegate constructor(
             it.member?.rtcUid?.let { uid ->
                 if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     AgoraRtcEngineController.get().updateSelfPosition(
-                        arrayOf(it.position?.x ?: 0f, it.position?.y ?: 0f, 0f),
-                        arrayOf(it.forward?.x ?: 0f, it.forward?.y ?: 0f, 0f),
-                        arrayOf(-(it.forward?.y ?: 0f), it.forward?.x ?: 0f, 0f),
+                        arrayOf(it.position.x, it.position.y),
+                        arrayOf(it.forward.x, it.forward.y),
+                        arrayOf(-(it.forward.y), it.forward.x),
                     )
                 } else {
                     if (!it.isSpatialSet) {
@@ -1041,8 +945,8 @@ class RoomObservableViewDelegate constructor(
                     }
                     AgoraRtcEngineController.get().updateRemotePosition(
                         uid,
-                        arrayOf(it.position?.x ?: 0f, it.position?.y ?: 0f, 0f),
-                        arrayOf(it.forward?.x ?: 0f, it.forward?.y ?: 0f, 0f),
+                        arrayOf(it.position.x, it.position.y),
+                        arrayOf(it.forward.x, it.forward.y),
                     )
                 }
             }

@@ -20,6 +20,7 @@ import io.agora.spatialaudio.LocalSpatialAudioConfig
 import io.agora.spatialaudio.RemoteVoicePositionInfo
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.net.callback.VRValueCallBack
+import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
@@ -102,10 +103,12 @@ class AgoraRtcEngineController {
 
                 override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
                     super.onStreamMessage(uid, streamId, data)
-                    val dataStreamInfo =
-                        GsonUtil.getInstance().fromJson(data.toString(), DataStreamInfo::class.java)
-                    if(dataStreamInfo.code == 101){
-                        onRemoteSpatialStreamMessage(uid, streamId, dataStreamInfo)
+                    data?.let {
+                        GsonTools.toBean(String(it), DataStreamInfo::class.java)?.apply {
+                            if(code == 101){
+                                onRemoteSpatialStreamMessage(uid, streamId, this)
+                            }
+                        }
                     }
                 }
 
@@ -170,7 +173,7 @@ class AgoraRtcEngineController {
     }
     /**
      * 更新自己空间音频位置
-     * @param position 位置[x, y, z]
+     * @param pos 位置[x, y, z]
      * @param froward 朝向[x, y, z]
      * @param right 朝向[x, y, z]
      */
@@ -184,13 +187,16 @@ class AgoraRtcEngineController {
     /**
      * 发送本地位置到远端
      */
-    private fun sendSelfPosition(position: SeatPositionInfo) {
+    public fun sendSelfPosition(position: SeatPositionInfo) {
         val dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())!!
-        val steamInfo = DataStreamInfo(101, GsonUtil.getInstance().toJson(position))
-        rtcEngine?.sendStreamMessage(
-            dataStreamId,
-            GsonUtil.getInstance().toJson(steamInfo).toByteArray()
-        )
+        GsonTools.beanToString(position)?.also {
+            val steamInfo = DataStreamInfo(101, it)
+            rtcEngine?.sendStreamMessage(
+                dataStreamId,
+                GsonTools.beanToString(steamInfo)?.toByteArray()
+            )
+        }
+
     }
     /**
      * 更新远端音源的配置
@@ -232,9 +238,9 @@ class AgoraRtcEngineController {
      * 处理远端空间位置变化产生的回调
      */
     private fun onRemoteSpatialStreamMessage(uid: Int, streamId: Int, info: DataStreamInfo) {
-        val seatPositionInfo = GsonUtil.getInstance()
-            .fromJson(info.message, SeatPositionInfo::class.java)
-        spatialListener?.onRemoteSpatialChanged(seatPositionInfo)
+        GsonTools.toBean(info.message, SeatPositionInfo::class.java)?.apply {
+            spatialListener?.onRemoteSpatialChanged(this)
+        }
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
