@@ -69,6 +69,11 @@ time_t uptime() {
 @property (nonatomic, assign) int chorusRemoteUserVolume;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
+
+#if DEBUG
+@property (nonatomic, strong) NSDate* seekDate;
+@property (nonatomic, assign) NSInteger seekTs;
+#endif
 @end
 
 @implementation KTVApi
@@ -429,13 +434,18 @@ time_t uptime() {
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
                 NSInteger localNtpTime = [self getNtpTimeInMs];
                 NSInteger localPosition = uptime() - self.localPlayerPosition;
-                NSInteger localPosition2 = [self.rtcMediaPlayer getPosition];
+//                NSInteger localPosition2 = [self.rtcMediaPlayer getPosition];
                 NSInteger expectPosition = position + localNtpTime - remoteNtp + self.audioPlayoutDelay;
                 NSInteger threshold = expectPosition - localPosition;
                 if(labs(threshold) > 40) {
-                    KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition, localPosition2, localPosition2 - localPosition);
+                    KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition);
+//                    KTVLogInfo(@"localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", localPosition, localPosition2, localPosition2 - localPosition);
 //                    NSDate*date = [NSDate date];
 //                    NSInteger pos1 = [self.rtcMediaPlayer getPosition];
+#if DEBUG
+                    self.seekDate = [NSDate date];
+                    self.seekTs = expectPosition;
+#endif
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
 //                    NSInteger pos2 = [self.rtcMediaPlayer getPosition];
 //                    NSLog(@"seekToPosition: %.fms, %ld/%ld/%ld", -[date timeIntervalSinceNow] * 1000, pos1, pos2, expectPosition);
@@ -454,9 +464,9 @@ time_t uptime() {
         
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
         int pitch = [dict[@"pitch"] intValue];
-        NSInteger time = [dict[@"time"] integerValue];
+//        NSInteger time = [dict[@"time"] integerValue];
         [self.lrcView setVoicePitch:@[@(pitch)]];
-        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+//        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 }
 
@@ -548,6 +558,12 @@ time_t uptime() {
 
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
 {
+#if DEBUG
+    if (self.seekDate) {
+        KTVLogInfo(@"seek cost: %.f ms, expectPosition: %ld, position: %ld", -[self.seekDate timeIntervalSinceNow] * 1000, self.seekTs, position);
+        self.seekDate = nil;
+    }
+#endif
     self.localPlayerPosition = uptime() - position;
     
     if (self.config.role == KTVSingRoleMainSinger && position > self.audioPlayoutDelay) {
