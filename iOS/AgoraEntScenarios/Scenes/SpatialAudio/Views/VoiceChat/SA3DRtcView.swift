@@ -47,7 +47,7 @@ class SA3DRtcView: UIView {
             rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
-            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
+
         }
     }
 
@@ -126,18 +126,18 @@ class SA3DRtcView: UIView {
     public func updateVolume(with index: Int, vol: Int) {
         let realIndex: Int = getRealIndex(with: index)
         let indexPath = IndexPath(item: index, section: 0)
-        if realIndex != 3 {
-            DispatchQueue.main.async {[weak self] in
+        DispatchQueue.main.async {[weak self] in
+            if realIndex != 3 {
                 guard let cell: SA3DUserCollectionViewCell = self?.collectionView.cellForItem(at: indexPath) as? SA3DUserCollectionViewCell else { return }
                 cell.refreshVolume(vol: vol)
+            } else {
+                //更新可移动view的数据
+                guard let micInfos = self?.micInfos else { return }
+                let micInfo = micInfos[0]
+                self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
+                self?.rtcUserView.tag = 200
+                self?.rtcUserView.user = micInfo.member
             }
-        } else {
-            //更新可移动view的数据
-            guard let micInfos = micInfos else { return }
-            let micInfo = micInfos[0]
-            rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
-            rtcUserView.tag = 200
-            rtcUserView.user = micInfo.member
         }
     }
 
@@ -156,6 +156,7 @@ class SA3DRtcView: UIView {
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
+            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
         }
     }
 
@@ -634,7 +635,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
-        guard "\(uid)" != VLUserCenter.user.userNo else { return }
+        guard let micinfo = micInfos?.first, "\(uid)" != micinfo.member?.uid else { return }
         let result = String(data: data, encoding: .utf8)
         guard let info = JSONObject.toModel(SAPositionInfo.self, value: result) else { return }
         

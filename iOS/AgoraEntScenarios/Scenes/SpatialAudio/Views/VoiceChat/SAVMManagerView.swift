@@ -79,14 +79,14 @@ class SAVMManagerView: UIView {
                 nameLabel.text = username
             } else if m_type == 0 {
                 iconView.isHidden = false
-                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder"))
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 nameLabel.text = username
 //                micView.setState(.on)
 //                micView.setVolume(100)
                 // micView.isHidden = false
                 inviteBtn.setTitle(sceneLocalized( "Kick"), for: .normal)
             } else if m_type == 2 {
-                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: UIImage.sceneImage(name: "mine_avatar_placeHolder"))
+                iconView.sd_setImage(with: URL(string: iconStr), placeholderImage: nil)
                 iconView.isHidden = iconStr.count == 0
                 nameLabel.text = username
 //                micView.setState(.forbidden)

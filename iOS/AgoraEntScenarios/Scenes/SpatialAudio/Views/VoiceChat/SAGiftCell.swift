@@ -53,7 +53,7 @@ public class SAGiftCell: UITableViewCell {
         if gift == nil {
             gift = item
         }
-        avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
+        avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: nil)
         userName.text = gift?.userName ?? ""
         giftName.text = "Sent ".localized() + (gift?.gift_name ?? "")
         giftIcon.image = UIImage.sceneImage(name:"\(gift?.gift_id ?? "")")

@@ -72,7 +72,11 @@ class SA3DMoveUserView: UIView {
 
     public var iconImgUrl: String = "" {
         didSet {
-            iconView.image = UIImage.sceneImage(name: iconImgUrl)
+            if iconImgUrl.hasPrefix("http") {
+                iconView.sd_setImage(with: URL(string: iconImgUrl))
+            } else {
+                iconView.image = UIImage.sceneImage(name: iconImgUrl)
+            }
         }
     }
 

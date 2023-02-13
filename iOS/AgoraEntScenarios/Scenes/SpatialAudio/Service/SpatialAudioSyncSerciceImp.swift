@@ -999,7 +999,7 @@ extension SpatialAudioSyncSerciceImp {
             .collection(className: kCollectionIdSeatApply)
             .get(success: { [weak self] list in
                 agoraPrint("imp seat apply list get success...")
-                let applys = list.kj.modelArray(SAApply.self)
+                let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
                 self?.micApplys = applys
                 completion(nil, applys)
             }, fail: { error in
@@ -1269,7 +1269,7 @@ extension SpatialAudioSyncSerciceImp {
             .get(success: { [weak self] list in
                 guard let self = self else {return}
                 agoraPrint("imp robot get success...")
-                let robotList = list.kj.modelArray(SARobotAudioInfo.self)
+                let robotList = list.map({$0.toJson()}).kj.modelArray(SARobotAudioInfo.self)
                 self.robotInfo = robotList.first
                 completion(nil, self.robotInfo)
             }, fail: { error in

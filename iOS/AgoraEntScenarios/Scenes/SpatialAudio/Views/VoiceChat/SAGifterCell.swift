@@ -52,6 +52,6 @@ public class SAGifterCell: UITableViewCell {
     func refresh(item: SAUser?) {
         userName.text = item?.name ?? ""
         total.setTitle("  \(item?.amount ?? 0)", for: .normal)
-        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
+        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: nil)
     }
 }
