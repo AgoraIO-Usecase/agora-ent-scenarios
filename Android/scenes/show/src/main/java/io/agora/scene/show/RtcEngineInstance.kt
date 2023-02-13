@@ -80,5 +80,23 @@ object RtcEngineInstance {
             processor.release()
             innerBeautyProcessor = null
         }
+        debugSettingModel.apply {
+            pvcEnabled = true
+            autoFocusFaceModeEnabled = true
+            exposurePositionX = null
+            exposurePositionY = null
+            cameraSelect = null
+            videoFullrangeExt = null
+            matrixCoefficientsExt = null
+            enableHWEncoder = true
+            codecType = 3     // 2 -> h264, 3 -> h265
+            mirrorMode = false
+            fitMode = 0       // 0 -> hidden, 1 -> fix
+            colorEnhance = false
+            dark = false
+            noise = false
+            srEnabled = false
+            srType = 1.0
+        }
     }
 }
