@@ -37,11 +37,13 @@ import KakaJSON
     public var ranking_list: [SAUser]? = [SAUser]() // 土豪榜
     public var member_list: [SAUser]? = [SAUser]() // 用户榜
     public var rtc_uid: Int? = 0
-    public var use_robot: Bool? = false
+//    public var use_robot: Bool? = false
     public var turn_AIAEC: Bool? = false
     public var turn_AGC: Bool? = false
-    public var robot_volume: UInt?
+//    public var robot_volume: UInt?
     public var sound_effect: Int = 1
+    
+    public var objectId: String?
 
     override public required init() {}
 
@@ -56,6 +58,8 @@ import KakaJSON
     var status: Int = 0 // 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 5: -1:空闲
 
     var member: SAUser?
+    
+    var objectId: String?
 
     override public required init() {}
 
@@ -63,9 +67,12 @@ import KakaJSON
         property.name
     }
     
-    var attenuation: Double = 0
-    var airAbsorb: Bool = true
-    var voiceBlur: Bool = true
+    // TODO: shengtao
+    var attenuation: Double = 0.2
+    var airAbsorb: Bool = false
+    var voiceBlur: Bool = false
+    
+    
     var forward: [NSNumber]?
     var right: [NSNumber]?
     var up: [NSNumber] = [0, 0, 1]
@@ -84,6 +91,7 @@ import KakaJSON
 @objc open class SARoomInfo: NSObject, Convertible {
     var room: SARoomEntity?
     var mic_info: [SARoomMic]?
+    var robotInfo: SARobotAudioInfo = SARobotAudioInfo()
 
     override public required init() {}
 

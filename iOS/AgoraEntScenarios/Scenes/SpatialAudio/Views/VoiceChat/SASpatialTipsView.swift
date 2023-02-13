@@ -25,7 +25,7 @@ class SASpatialTipsView: UIView {
         label.textColor = UIColor(hex: "#009FFF", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.cornerRadius(10)
-        label.layer.borderColor = UIColor(hex: "#009FFF", alpha: 1.0).cgColor
+        label.layer.borderColor = UIColor(hex: "#009FFF", alpha: 1.0)?.cgColor
         label.layer.borderWidth = 1
         label.textAlignment = .center
         return label
@@ -36,7 +36,7 @@ class SASpatialTipsView: UIView {
         label.textColor = UIColor(hex: "#009FFF", alpha: 1.0)
         label.font = UIFont.boldSystemFont(ofSize: 13)
         label.cornerRadius(10)
-        label.layer.borderColor = UIColor(hex: "#009FFF", alpha: 1.0).cgColor
+        label.layer.borderColor = UIColor(hex: "#009FFF", alpha: 1.0)?.cgColor
         label.layer.borderWidth = 1
         label.textAlignment = .center
         return label
