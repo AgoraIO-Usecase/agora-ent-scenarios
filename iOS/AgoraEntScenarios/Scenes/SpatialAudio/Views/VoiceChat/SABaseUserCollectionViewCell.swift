@@ -95,7 +95,7 @@ class SABaseUserCollectionViewCell: UICollectionViewCell {
         }
 
         rtcUserView.iconView.isHidden = mic.member == nil
-        rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage(named:"mine_avatar_placeHolder"), context: nil)
+        rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage(named:"mine_avatar_placeHolder"))
         rtcUserView.nameBtn.setImage(UIImage.sceneImage(name:mic.mic_index == 0 ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }

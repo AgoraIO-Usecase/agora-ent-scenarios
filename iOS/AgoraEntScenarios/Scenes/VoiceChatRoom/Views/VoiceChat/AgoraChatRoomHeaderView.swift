@@ -14,6 +14,7 @@ public enum HEADER_ACTION {
     case soundClick
     case rank
     case popBack
+    case members
 }
 
 class AgoraChatRoomHeaderView: UIView {
@@ -42,7 +43,7 @@ class AgoraChatRoomHeaderView: UIView {
     func updateHeader(with room_entity: VRRoomEntity?) {
         guard let room = room_entity else {return}
         guard let owner = room.owner else { return }
-        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+        self.iconImgView.sd_setImage(with: URL(string: owner.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
         self.titleLabel.text = owner.name
         self.roomLabel.text = room.name
         self.lookBtn.setTitle(" \(room.click_count ?? 0)", for: .normal)
@@ -95,6 +96,8 @@ class AgoraChatRoomHeaderView: UIView {
         totalCountLabel.textColor = .white
         totalCountLabel.textAlignment = .center
         totalCountLabel.layer.masksToBounds = true
+        totalCountLabel.isUserInteractionEnabled = true
+        totalCountLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(members)))
         addSubview(totalCountLabel)
 
         rankFBtn.layer.cornerRadius = 13~
@@ -291,6 +294,11 @@ class AgoraChatRoomHeaderView: UIView {
         let suffixValue = doubleVal / 100
         let newValue = "\(intVal)" + "." + "\(suffixValue)" + "K"
         return newValue
+    }
+    
+    @objc private func members() {
+        guard let block = completeBlock else { return }
+        block(.members)
     }
 
     @objc private func back() {
