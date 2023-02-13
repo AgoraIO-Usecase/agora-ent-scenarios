@@ -124,7 +124,7 @@ AgoraMusicContentCenterEventDelegate
         self.requestId =
         [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
                                                                     page:self.page
-                                                                pageSize:30
+                                                                pageSize:50
                                                               jsonOption:nil];
     }];
 }
