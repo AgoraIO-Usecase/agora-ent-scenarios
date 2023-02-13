@@ -25,6 +25,8 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
 
         self.sRtcView.updateUser(blue_mic)
         self.sRtcView.updateUser(red_mic)
+        
+        sRtcView.playMusic(isPlay: robotInfo.use_robot && !isOwner)
     }
     
     func chatTokenWillExpire() {

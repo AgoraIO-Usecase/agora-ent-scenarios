@@ -464,7 +464,7 @@ extension SARoomViewController {
         AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
             if error == nil {
                 if self.alienCanPlay {
-                    self.sRtcView.playMusic()
+                    self.sRtcView.playMusic(isPlay: flag)
                     self.alienCanPlay = false
                 }
                 
