@@ -127,14 +127,13 @@ class VoiceToolboxServerHttpManager {
         roomName: String,
         roomOwner: String,
         chatroomId: String,
+        type:Int? = 0,
         callBack: VRValueCallBack<VRCreateRoomResponse>
     ) {
         val headers = mutableMapOf<String, String>()
         headers["Content-Type"] = "application/json"
         val requestBody = JSONObject()
         try {
-            requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
-            requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
             val requestChat = JSONObject()
             if (chatroomId.isNotEmpty()) {
                 requestChat.putOpt("id", chatroomId)
@@ -143,21 +142,36 @@ class VoiceToolboxServerHttpManager {
                 requestChat.putOpt("description", "Welcome!")
                 requestChat.putOpt("owner", roomOwner)
             }
-            requestBody.putOpt("chat", requestChat)
-            requestBody.putOpt("src", "Android")
-            requestBody.putOpt("traceId", UUID.randomUUID().toString())
+
             val requestUser = JSONObject()
             requestUser.putOpt("nickname", VoiceBuddyFactory.get().getVoiceBuddy().nickName())
             requestUser.putOpt("username", VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())
             requestUser.putOpt("password", "12345678")
-            requestBody.putOpt("user", requestUser)
 
             val requestIM = JSONObject()
             requestIM.putOpt("appKey", io.agora.scene.voice.BuildConfig.im_app_key)
             requestIM.putOpt("clientId", io.agora.scene.voice.BuildConfig.im_client_id)
             requestIM.putOpt("clientSecret", io.agora.scene.voice.BuildConfig.im_client_secret)
             requestBody.putOpt("im", requestIM)
-            requestBody.putOpt("type",0)
+
+            requestBody.putOpt("appId", BuildConfig.AGORA_APP_ID)
+            requestBody.putOpt("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
+            requestBody.putOpt("src", "Android")
+            requestBody.putOpt("traceId", UUID.randomUUID().toString())
+            requestBody.putOpt("type",type)
+
+            when (type) {
+                1 -> {
+                    requestBody.putOpt("user", requestUser)
+                }
+                2 -> {
+                    requestBody.putOpt("chat", requestChat)
+                }
+                else -> {
+                    requestBody.putOpt("user", requestUser)
+                    requestBody.putOpt("chat", requestChat)
+                }
+            }
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -228,12 +242,11 @@ class VoiceToolboxServerHttpManager {
                 roomName = chatroomName,
                 roomOwner = chatOwner,
                 chatroomId = chatroomId,
+                type = 2,
                 callBack = object :
                     VRValueCallBack<VRCreateRoomResponse> {
                     override fun onSuccess(response: VRCreateRoomResponse?) {
                         response?.let {
-                            VoiceBuddyFactory.get().getVoiceBuddy()
-                                .setupChatToken(response.chatToken)
                             if (roomId.isEmpty()) roomId = response.chatId
                             code = VoiceServiceProtocol.ERR_OK
                         }

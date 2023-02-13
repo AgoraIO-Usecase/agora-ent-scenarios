@@ -16,6 +16,7 @@ import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.netkit.VRCreateRoomResponse
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
@@ -25,10 +26,12 @@ import io.agora.scene.voice.ui.widget.recyclerview.EmptyRecyclerView
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.voice.common.net.OnResourceParseCallback
 import io.agora.voice.common.net.Resource
+import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
 
@@ -52,6 +55,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             initAdapter(it.recycler)
             it.swipeLayout.setOnRefreshListener(this)
         }
+        beforeLoginIm()
         voiceRoomObservable()
     }
 
@@ -163,6 +167,40 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                     dismissLoading()
                 }
             })
+    }
+
+    private fun beforeLoginIm(){
+        if (!ChatroomIMManager.getInstance().isLoggedIn){
+            showLoading(false)
+            VoiceToolboxServerHttpManager.get().createImRoom(
+                roomName = "",
+                roomOwner = "",
+                chatroomId = "",
+                type = 1,
+                object : VRValueCallBack<VRCreateRoomResponse>{
+                    override fun onSuccess(response: VRCreateRoomResponse?) {
+                        response?.let {
+                            VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(response.chatToken)
+                            "beforeLoginIm userName:$it.userName,chatToken:$it.chatToken".logD()
+                            ChatroomIMManager.getInstance().login(it.userName,it.chatToken, object : CallBack {
+                                override fun onSuccess() {
+                                    dismissLoading()
+                                }
+
+                                override fun onError(code: Int, desc: String) {
+                                    dismissLoading()
+                                    "beforeLoginIm sdk error code:$code,msg:$desc".logE()
+                                }
+                            })
+                        }
+                    }
+
+                    override fun onError(code: Int, error: String?) {
+                        dismissLoading()
+                        "beforeLoginIm server error code:$code,msg:$error".logE()
+                    }
+                })
+        }
     }
 
     private fun onItemClick(voiceRoomModel: VoiceRoomModel) {
