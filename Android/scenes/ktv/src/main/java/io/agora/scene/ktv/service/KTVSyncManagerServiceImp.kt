@@ -172,7 +172,7 @@ class KTVSyncManagerServiceImp(
         }
         initSync {
             val isRoomOwner = cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()
-            Instance().joinScene(isRoomOwner, inputModel.roomNo, object : JoinSceneCallback {
+            Instance().joinScene(isRoomOwner, true, inputModel.roomNo, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
