@@ -69,11 +69,16 @@ class SA3DRtcView: UIView {
         blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
     }
     
-    func playMusic() {
+    func playMusic(isPlay: Bool) {
         let redMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[1])"
         let blueMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[0])"
-        redMediaPlayer?.open(redMusicPath, startPos: 0)
-        blueMediaPlayer?.open(blueMusicPath, startPos: 0)
+        if isPlay {
+            redMediaPlayer?.open(redMusicPath, startPos: 0)
+            blueMediaPlayer?.open(blueMusicPath, startPos: 0)
+        } else {
+            redMediaPlayer?.stop()
+            blueMediaPlayer?.stop()
+        }
     }
     
     private func setupSpatialAudio() {
@@ -351,8 +356,8 @@ extension SA3DRtcView {
         let vPoint = CGPoint(x: rect.width * 0.5 + rect.origin.x,
                              y: turnY - (rect.height * 0.5))
         // 相对坐标
-        let relativePoint = CGPoint(x: oPoint.x - vPoint.x,
-                                    y: oPoint.y - vPoint.y)
+        let relativePoint = CGPoint(x: vPoint.x - oPoint.x,
+                                    y: vPoint.y - oPoint.y)
         // 屏幕相对坐标转化为坐标系坐标
         return CGPoint(x: relativePoint.x / fullWidth * axisLength,
                        y: relativePoint.y / fullWidth * axisLength)
@@ -367,8 +372,8 @@ extension SA3DRtcView {
         // 笛卡尔屏幕坐标
         let vPoint = CGPoint(x: point.x / axisLength * fullWidth,
                              y: point.y / axisLength * fullHeight)
-        let x = oPoint.x - vPoint.x
-        let y = oPoint.y + vPoint.y
+        let x = oPoint.x + vPoint.x
+        let y = oPoint.y - vPoint.y
         return CGPoint(x: x, y: y)
     }
     
@@ -635,7 +640,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
-        guard let micinfo = micInfos?.first, "\(uid)" != micinfo.member?.uid else { return }
+        guard "\(uid)" != VLUserCenter.user.userNo else { return }
         let result = String(data: data, encoding: .utf8)
         guard let info = JSONObject.toModel(SAPositionInfo.self, value: result) else { return }
         
