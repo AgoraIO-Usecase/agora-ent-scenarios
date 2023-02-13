@@ -51,55 +51,49 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         if name.isEmpty {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
-        Throttler.throttle {
-            DispatchQueue.main.async {
-                self.entryRoom()
-            }
+        Throttler.throttle(queue:.main,shouldRunLatest: true) {
+            self.entryRoom()
         }
     }
 
     @objc private func entryRoom() {
-        AgoraChatClient.shared().logout(false)
         SVProgressHUD.show(withStatus: "Loading".localized())
         self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
-        ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+        print("fetch IMConfig begin:\(Date().timeIntervalSince1970)")
+        ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", type:2, chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+            print("fetch IMConfig end:\(Date().timeIntervalSince1970)")
             entity.chatroom_id = room_id
             entity.owner = VoiceRoomUserInfo.shared.user
             entity.owner?.chat_uid = uid
-            VLUserCenter.user.im_token = im_token
-            VLUserCenter.user.chat_uid = uid
-            if im_token.isEmpty || uid.isEmpty || room_id.isEmpty {
-                SVProgressHUD.dismiss()
-                var showMessage = "Fetch IMConfig failed!"
-                if room_id.isEmpty {
-                    showMessage = "Incorrect room name".localized()
-                }
-                SVProgressHUD.showError(withStatus: showMessage)
-                self.view.window?.isUserInteractionEnabled = true
-                return
-            }
-            let error = VoiceRoomIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
-            if error == nil,VoiceRoomIMManager.shared != nil {
+            if !AgoraChatClient.shared().isLoggedIn {
                 VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
+                    print("login IM end:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                     if error == nil {
-                        ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
-                            SVProgressHUD.dismiss()
-                            self.view.window?.isUserInteractionEnabled = true
-                            if let room = room,error == nil {
-                                self.entryRoom(room: room)
-                            } else {
-                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
-                            }
-                        }
+                        print("create room begin:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
+                        self.createVoiceChatRoom(entity: entity)
                     }else {
                         self.view.window?.isUserInteractionEnabled = true
                         SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
                     }
-                    
                 })
+            } else  {
+                self.createVoiceChatRoom(entity: entity)
+            }
+        }
+    }
+    
+    private func createVoiceChatRoom(entity: VRRoomEntity) {
+        ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
+            SVProgressHUD.dismiss()
+            print("create room end:\(Date().timeIntervalSince1970)")
+            self.view.window?.isUserInteractionEnabled = true
+            if let room = room,error == nil {
+                self.entryRoom(room: room)
+            } else {
+                SVProgressHUD.showError(withStatus: "Create failed!".localized())
             }
         }
     }

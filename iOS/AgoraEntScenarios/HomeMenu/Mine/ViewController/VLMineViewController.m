@@ -20,6 +20,7 @@
 #import "MenuUtils.h"
 #import "KTVMacro.h"
 #import <Photos/Photos.h>
+#import "AgoraEntScenarios-Swift.h"
 @import AgoraRtcKit;
 @import Masonry;
 @import LEEAlert;
@@ -96,9 +97,9 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)pushWebView:(NSString *)string {
-    VLCommonWebViewController *webVC = [[VLCommonWebViewController alloc] init];
-    webVC.urlString = string;
-    [self.navigationController pushViewController:webVC animated:YES];
+    AboutAgoraEntertainmentViewController *vc = [[AboutAgoraEntertainmentViewController alloc] init];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)userLogout {

@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053998C4290A83E0005143C7 /* HomeMenuCell.swift */; };
+		05A491DA2994A064007B1ABB /* HorizontalTextCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491D92994A064007B1ABB /* HorizontalTextCarousel.swift */; };
+		05A491DC2994A07C007B1ABB /* VREQOperationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491DB2994A07C007B1ABB /* VREQOperationAlert.swift */; };
+		05A491DE2994A102007B1ABB /* AboutAgoraEntertainmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491DD2994A102007B1ABB /* AboutAgoraEntertainmentViewController.swift */; };
+		05A491E22994A10E007B1ABB /* ContactInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491DF2994A10E007B1ABB /* ContactInfoCell.swift */; };
+		05A491E32994A10E007B1ABB /* SceneVersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491E02994A10E007B1ABB /* SceneVersionCell.swift */; };
+		05A491E42994A10E007B1ABB /* AboutAgoraHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A491E12994A10E007B1ABB /* AboutAgoraHeader.swift */; };
+		05A492012994A2D2007B1ABB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 05A492032994A2D2007B1ABB /* Localizable.strings */; };
+		05A492062994CEE9007B1ABB /* AuditionEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A492052994CEE9007B1ABB /* AuditionEffectView.swift */; };
 		8ECA60972976C630008FFCD8 /* AgoraEntLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECA60962976C630008FFCD8 /* AgoraEntLog.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
@@ -542,6 +550,15 @@
 
 /* Begin PBXFileReference section */
 		053998C4290A83E0005143C7 /* HomeMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMenuCell.swift; sourceTree = "<group>"; };
+		05A491D92994A064007B1ABB /* HorizontalTextCarousel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalTextCarousel.swift; sourceTree = "<group>"; };
+		05A491DB2994A07C007B1ABB /* VREQOperationAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VREQOperationAlert.swift; sourceTree = "<group>"; };
+		05A491DD2994A102007B1ABB /* AboutAgoraEntertainmentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutAgoraEntertainmentViewController.swift; sourceTree = "<group>"; };
+		05A491DF2994A10E007B1ABB /* ContactInfoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactInfoCell.swift; sourceTree = "<group>"; };
+		05A491E02994A10E007B1ABB /* SceneVersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneVersionCell.swift; sourceTree = "<group>"; };
+		05A491E12994A10E007B1ABB /* AboutAgoraHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutAgoraHeader.swift; sourceTree = "<group>"; };
+		05A492022994A2D2007B1ABB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		05A492042994A2D7007B1ABB /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		05A492052994CEE9007B1ABB /* AuditionEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditionEffectView.swift; sourceTree = "<group>"; };
 		4A3B186B38A56ACA440591ED /* Pods-AgoraEntScenarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.debug.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.debug.xcconfig"; sourceTree = "<group>"; };
 		563C78B601810D421A3F783A /* Pods-AgoraEntScenarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEntScenarios.release.xcconfig"; path = "Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios.release.xcconfig"; sourceTree = "<group>"; };
 		8ECA60962976C630008FFCD8 /* AgoraEntLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraEntLog.swift; sourceTree = "<group>"; };
@@ -1281,6 +1298,7 @@
 				DD8416E429090C520026B624 /* Scenes */,
 				DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */,
 				DD2A43CE28FFCEE7004CEDCF /* ViewController.swift */,
+				05A492032994A2D2007B1ABB /* Localizable.strings */,
 				DD2A43D028FFCEE7004CEDCF /* Main.storyboard */,
 				DD2A43D328FFCEE7004CEDCF /* Assets.xcassets */,
 				E358F7FC293493AD00A7EBD1 /* Info.plist */,
@@ -1723,6 +1741,9 @@
 		DD8416C229090C520026B624 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				05A491E12994A10E007B1ABB /* AboutAgoraHeader.swift */,
+				05A491DF2994A10E007B1ABB /* ContactInfoCell.swift */,
+				05A491E02994A10E007B1ABB /* SceneVersionCell.swift */,
 				DD8416C329090C520026B624 /* VLMineView.m */,
 				DD8416C429090C520026B624 /* VLMineTCell.m */,
 				DD8416C529090C520026B624 /* VLMineView.h */,
@@ -1734,6 +1755,7 @@
 		DD8416C729090C520026B624 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				05A491DD2994A102007B1ABB /* AboutAgoraEntertainmentViewController.swift */,
 				DD8416C829090C520026B624 /* VLMineViewController.h */,
 				DD8416C929090C520026B624 /* VLMineViewController.m */,
 			);
@@ -2690,6 +2712,7 @@
 		DDC51D5A298C1D8800D837AC /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				05A491D92994A064007B1ABB /* HorizontalTextCarousel.swift */,
 				DDC51D5B298C1D8800D837AC /* PresentationController.swift */,
 				DDC51D5C298C1D8800D837AC /* LanguageManager.swift */,
 				DDC51D5D298C1D8800D837AC /* VRVerifyCodeView.swift */,
@@ -2856,6 +2879,7 @@
 		DDC51DAC298C1D8800D837AC /* VoiceChat */ = {
 			isa = PBXGroup;
 			children = (
+				05A491DB2994A07C007B1ABB /* VREQOperationAlert.swift */,
 				DDC51DAD298C1D8800D837AC /* VoiceRoomApplyAlert.swift */,
 				DDC51DAE298C1D8800D837AC /* VoiceRoomSendGiftCell.swift */,
 				DDC51DB1298C1D8800D837AC /* VMUserListView.swift */,
@@ -2904,6 +2928,7 @@
 				DDC51DDC298C1D8800D837AC /* VoiceRoomPraiseEmitterView.swift */,
 				DDC51DDD298C1D8800D837AC /* AgoraChatRoomBaseRtcUserView.swift */,
 				DDC51DDE298C1D8800D837AC /* VMConfirmView.swift */,
+				05A492052994CEE9007B1ABB /* AuditionEffectView.swift */,
 			);
 			path = VoiceChat;
 			sourceTree = "<group>";
@@ -3065,6 +3090,7 @@
 				DD84177529090C520026B624 /* product1.png in Resources */,
 				DD84176929090C520026B624 /* banner1.png in Resources */,
 				DD84176B29090C520026B624 /* tab_home.png in Resources */,
+				05A492012994A2D2007B1ABB /* Localizable.strings in Resources */,
 				DD84176829090C520026B624 /* ic_back_b.png in Resources */,
 				DD84177329090C520026B624 /* product2.png in Resources */,
 				DD2A43D728FFCEE7004CEDCF /* LaunchScreen.storyboard in Resources */,
@@ -3160,6 +3186,7 @@
 				DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */,
 				8ECA60972976C630008FFCD8 /* AgoraEntLog.swift in Sources */,
 				DDC51DF6298C1D8900D837AC /* Throttle.swift in Sources */,
+				05A491DE2994A102007B1ABB /* AboutAgoraEntertainmentViewController.swift in Sources */,
 				DDC51D25298C141C00D837AC /* SAEQSettingView.swift in Sources */,
 				DD4DFA0A298BCBE4000AF053 /* LEEAlert+KTVModal.m in Sources */,
 				DD4DFA02298BCBE4000AF053 /* VLRoomSelSongModel.m in Sources */,
@@ -3177,6 +3204,7 @@
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DDC51D0F298C141C00D837AC /* SASoundEffectsViewController.swift in Sources */,
 				DDC51CF9298C141C00D837AC /* SAChatModel.swift in Sources */,
+				05A491E42994A10E007B1ABB /* AboutAgoraHeader.swift in Sources */,
 				DDC51E48298C1D8900D837AC /* VoiceRoomChatBar.swift in Sources */,
 				DDC51E6C298C1D8900D837AC /* VRCreateRoomView.swift in Sources */,
 				DDC51D41298C141C00D837AC /* SABaseAlienCollectionViewCell.swift in Sources */,
@@ -3249,6 +3277,7 @@
 				DDA19A5928FFE57A009D3E61 /* EKSimpleMessage.swift in Sources */,
 				DDC51D08298C141C00D837AC /* SAAudioSettingDetailViewController.swift in Sources */,
 				DDC51DFC298C1D8900D837AC /* VRVerifyCodeNumberView.swift in Sources */,
+				05A491DA2994A064007B1ABB /* HorizontalTextCarousel.swift in Sources */,
 				DDA19A6328FFE57A009D3E61 /* EKNoteMessageView.swift in Sources */,
 				DDA19A3028FFE57A009D3E61 /* EntryCachingHeuristic.swift in Sources */,
 				DDC51CFB298C141C00D837AC /* SARoomEntity.swift in Sources */,
@@ -3310,6 +3339,7 @@
 				DDC51E26298C1D8900D837AC /* VRRoomsViewController.swift in Sources */,
 				DDC51E57298C1D8900D837AC /* AgoraChatRoomHeaderView.swift in Sources */,
 				DDC51D07298C141C00D837AC /* SAInviteUsersController.swift in Sources */,
+				05A491E32994A10E007B1ABB /* SceneVersionCell.swift in Sources */,
 				DDC51E0E298C1D8900D837AC /* VoiceRoomGiftEntity.swift in Sources */,
 				DDC51D18298C141C00D837AC /* SABaseNavigationView.swift in Sources */,
 				DD84179229090C520026B624 /* VLLoginInputPhoneView.m in Sources */,
@@ -3362,6 +3392,7 @@
 				DDDDDC3628FFD78C005F4E8B /* UIImage+Scene.swift in Sources */,
 				DDA19A0328FFE579009D3E61 /* NSArray+JKSafeAccess.m in Sources */,
 				DD4DFA21298BCBE5000AF053 /* VLPopChooseSongView.m in Sources */,
+				05A491E22994A10E007B1ABB /* ContactInfoCell.swift in Sources */,
 				DDC51E31298C1D8900D837AC /* VoiceRoomApplyAlert.swift in Sources */,
 				DD4DFA24298BCBE5000AF053 /* VLRobMicrophoneView.m in Sources */,
 				053998C5290A83E0005143C7 /* HomeMenuCell.swift in Sources */,
@@ -3403,6 +3434,7 @@
 				DDC51D3D298C141C00D837AC /* SASwitchTableViewCell.swift in Sources */,
 				DD4DFA03298BCBE4000AF053 /* VLRoomPersonIteimCCell.m in Sources */,
 				DDA19A4B28FFE57A009D3E61 /* EKAttributes+DisplayMode.swift in Sources */,
+				05A491DC2994A07C007B1ABB /* VREQOperationAlert.swift in Sources */,
 				DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */,
 				DDC51D4F298C141C00D837AC /* SAEmptyView.swift in Sources */,
 				DD4DFA0B298BCBE4000AF053 /* VLPopScoreView.m in Sources */,
@@ -3427,6 +3459,7 @@
 				DDA199E828FFE579009D3E61 /* UITextField+Font.m in Sources */,
 				DDC51E43298C1D8900D837AC /* PopTip+Draw.swift in Sources */,
 				DDA199DF28FFE579009D3E61 /* VLHotSpotBtn.m in Sources */,
+				05A492062994CEE9007B1ABB /* AuditionEffectView.swift in Sources */,
 				DDC51E2C298C1D8900D837AC /* HorizontalCardCell.swift in Sources */,
 				DDC51D20298C141C00D837AC /* SAMuteView.swift in Sources */,
 				DDA19A0128FFE579009D3E61 /* NSObject+Extension.m in Sources */,
@@ -3664,6 +3697,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		05A492032994A2D2007B1ABB /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				05A492022994A2D2007B1ABB /* en */,
+				05A492042994A2D7007B1ABB /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		DD2A43D028FFCEE7004CEDCF /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -3822,7 +3864,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3841,7 +3883,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = "-8811508760-139.com.OpenAIChat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3862,7 +3904,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgoraEntScenarios/Info.plist;
@@ -3881,7 +3923,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
+				PRODUCT_BUNDLE_IDENTIFIER = "-8811508760-139.com.OpenAIChat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

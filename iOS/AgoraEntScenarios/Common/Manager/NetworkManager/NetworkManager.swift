@@ -144,8 +144,11 @@ class NetworkManager:NSObject {
     ///   - nickName: <#nickName description#>
     ///   - password: <#password description#>
     ///   - uid: <#uid description#>
+    ///   - type: 0: 同时处理用户注册/返回用户token和创建聊天室 1: 只处理用户注册/返回用户token 2: 只处理创建聊天室
+
     ///   - success: success description {roomid, uid}
-    func generateIMConfig(channelName: String,
+    func generateIMConfig(type: Int,
+                          channelName: String,
                           nickName: String,
                           chatId: String?,
                           imUid: String?,
@@ -186,8 +189,9 @@ class NetworkManager:NSObject {
                       "src": "iOS",
                       "im": imConfig,
                       "payload": payload,
-                      "traceId": traceId,
-                      "user": userParams] as [String: Any]
+                      "traceId": NSString.withUUID().md5() as Any,
+                      "user": userParams,
+                      "type":type] as [String: Any]
  
         NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)webdemo/im/chat/create",
                                           params: params,

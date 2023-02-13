@@ -8,10 +8,11 @@ import Foundation
 import UIKit
 
 public class SAPresentationSegue: UIStoryboardSegue {
-    override public func perform() {
-        guard let destination = destination as? SAPresentationViewController else {
-            fatalError("destination must comfirm to protocol PresentedViewType")
-        }
-        source.sa_presentViewController(destination)
-    }
+//    override public func perform() {
+//        guard let destination = destination as? SAPresentationViewController else {
+//            fatalError("destination must comfirm to protocol PresentedViewType")
+//        }
+//        guard let sourceVC = source as? SABaseViewController else { fatalError("destination must comfirm to protocol PresentedViewType") }
+//        sourceVC.sa_presentViewController(destination)
+//    }
 }
