@@ -30,7 +30,7 @@ class SARoomViewController: SABaseViewController {
     }
 
     var headerView: SARoomHeaderView!
-    var rtcView: SANormalRtcView!
+   // var rtcView: SANormalRtcView!
     var sRtcView: SA3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
@@ -81,7 +81,7 @@ class SARoomViewController: SABaseViewController {
         guard let type = roomInfo?.room?.sound_effect else { return }
         local_index = isOwner ? 0 : nil
         vmType = getSceneType(type)
-        SpatialAudioServiceImp.getSharedInstance().subscribeEvent(with: self)
+        AppContext.saServiceImp().subscribeEvent(with: self)
         // 布局UI
         layoutUI()
         // 加载RTC+IM
@@ -107,8 +107,8 @@ class SARoomViewController: SABaseViewController {
         print("\(String(describing: self.swiftClassName)) is destroyed!")
         SAUserInfo.shared.currentRoomOwner = nil
         SAUserInfo.shared.user?.amount = 0
-        SpatialAudioServiceImp.getSharedInstance().cleanCache()
-        SpatialAudioServiceImp.getSharedInstance().unsubscribeEvent()
+//        AppContext.saServiceImp().cleanCache()
+        AppContext.saServiceImp().unsubscribeEvent()
     }
 }
 
@@ -120,8 +120,7 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        let rate = sRtcView.width / sRtcView.height * 10
-        rtckit.initSpatialAudio(recvRange: Float(sRtcView.height * 0.5 / rate))
+        rtckit.initSpatialAudio(recvRange: 15)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -164,13 +163,13 @@ extension SARoomViewController {
     }
     
     private func setChatroomAttributes() {
-        SAIMManager.shared?.setChatroomAttributes(attributes: SpatialAudioServiceImp.getSharedInstance().createMics() , completion: { error in
-            if error == nil {
+//        SAIMManager.shared?.setChatroomAttributes(attributes: AppContext.saTmpServiceImp().createMics() , completion: { error in
+//            if error == nil {
                 self.refreshRoomInfo()
-            } else {
-                self.view.makeToast("Set chatroom attributes failed!")
-            }
-        })
+//            } else {
+//                self.view.makeToast("Set chatroom attributes failed!")
+//            }
+//        })
     }
     
     private func sendJoinedMessage() {
@@ -190,10 +189,10 @@ extension SARoomViewController {
         roomInfo?.room?.member_list = [SAUser]()
         roomInfo?.room?.ranking_list = [SAUser]()
         if let info = roomInfo {
-            info.mic_info = SpatialAudioServiceImp.getSharedInstance().mics
+            info.mic_info = AppContext.saTmpServiceImp().mics
             roomInfo = info
             headerView.updateHeader(with: info.room)
-            SpatialAudioServiceImp.getSharedInstance().userList = roomInfo?.room?.member_list
+            AppContext.saTmpServiceImp().userList = roomInfo?.room?.member_list ?? []
         }
     }
 
@@ -209,10 +208,10 @@ extension SARoomViewController {
     // 加入房间获取房间详情
     func requestRoomDetail() {
         // 如果不是房主。需要主动获取房间详情
-        SpatialAudioServiceImp.getSharedInstance().fetchRoomDetail(entity: roomInfo?.room ?? SARoomEntity()) { [weak self] error, room_info in
+        AppContext.saServiceImp().fetchRoomDetail(entity: roomInfo?.room ?? SARoomEntity()) { [weak self] error, room_info in
             if error == nil {
                 guard let info = room_info else { return }
-                self?.roomInfoUpdateUI(info: info)
+                 self?.roomInfoUpdateUI(info: info)
             } else {
                 self?.fetchDetailError()
             }
@@ -232,8 +231,9 @@ extension SARoomViewController {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
-        SpatialAudioServiceImp.getSharedInstance().mics = mics
-        SpatialAudioServiceImp.getSharedInstance().userList = roomInfo?.room?.member_list
+        
+        AppContext.saTmpServiceImp().mics = mics
+        AppContext.saTmpServiceImp().userList = roomInfo?.room?.member_list ?? []
         roomInfo?.room?.ranking_list = info.room?.ranking_list
         if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid }) {
             SAUserInfo.shared.user?.amount = first.amount
@@ -250,7 +250,7 @@ extension SARoomViewController {
     }
 
     func requestRankList() {
-        SpatialAudioServiceImp.getSharedInstance().fetchGiftContribute { error, users in
+        AppContext.saServiceImp().fetchGiftContribute { error, users in
             if error == nil, users != nil {
                 let info = self.roomInfo
                 info?.room?.ranking_list = users
@@ -275,17 +275,12 @@ extension SARoomViewController {
         sRtcView = SA3DRtcView(rtcKit: rtckit)
         view.addSubview(sRtcView)
 
-        rtcView = SANormalRtcView()
-        rtcView.isOwner = isOwner
-        rtcView.clickBlock = { [weak self] type, tag in
-            self?.didRtcAction(with: type, tag: tag)
-        }
-//        view.addSubview(rtcView)
-
         if let entity = roomInfo?.room {
             sRtcView.isHidden = entity.type == 0
-            rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
+        }
+        sRtcView.clickBlock = {[weak self] type, tag in
+            self?.didRtcAction(with: type, tag: tag)
         }
 
         bgImgView.snp.makeConstraints { make in
@@ -337,14 +332,15 @@ extension SARoomViewController {
 
     func didRtcAction(with type: SABaseUserCellType, tag: Int) {
         let index: Int = tag - 200
-        guard let mic: SARoomMic = SpatialAudioServiceImp.getSharedInstance().mics[safe:index] else { return }
-        if index == 6 { // 操作机器人
-            if roomInfo?.room?.use_robot == false {
+        //TODO: remove as!
+        guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
+        if index == 6 || index == 3 { // 操作机器人
+            if roomInfo?.robotInfo.use_robot == false {
                 showActiveAlienView(true)
             }
         } else {
             if isOwner {
-                if index == 0 {
+                if index == 1 {
                     showMuteView(with: index)
                 } else {
                     showApplyAlert(index)
@@ -376,10 +372,10 @@ extension SARoomViewController {
     func notifySeverLeave() {
         guard let roomId = roomInfo?.room?.room_id else { return }
         if self.local_index == nil {
-            SpatialAudioServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
+            AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
         } else {
-            SpatialAudioServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? SpatialAudioServiceImp.getSharedInstance().findMicIndex()) { error, result in
-                SpatialAudioServiceImp.getSharedInstance().leaveRoom(roomId) { error, flag in }
+            AppContext.saServiceImp().leaveMic(mic_index: self.local_index ?? AppContext.saTmpServiceImp().findMicIndex()) { error, result in
+                AppContext.saServiceImp().leaveRoom(roomId) { error, flag in }
             }
         }
 
@@ -393,7 +389,7 @@ extension SARoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-                self.rtcView.isUserInteractionEnabled = true
+               // self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
             }
@@ -461,20 +457,25 @@ extension SARoomViewController {
             view.makeToast("Host Bot".localized())
             return
         }
-        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        SpatialAudioServiceImp.getSharedInstance().enableRobot(enable: flag) { error in
+        guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
+        guard let mic_red: SARoomMic = roomInfo?.mic_info?[6] else { return }
+        let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
+        robotInfo.use_robot = flag
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
             if error == nil {
                 if self.alienCanPlay {
-                    self.rtckit.adjustAudioMixingVolume(with: 50)
-                    self.rtckit.playMusic(with: .alien)
+                    self.sRtcView.playMusic()
                     self.alienCanPlay = false
                 }
+                
+                mic_blue.status = flag == true ? 5 : -2
+                mic_red.status = flag == true ? 5 : -2
+                self.roomInfo?.robotInfo.use_robot = flag
+                self.roomInfo?.mic_info?[3] = mic_blue
+                self.roomInfo?.mic_info?[6] = mic_red
+                self.sRtcView.updateUser(mic_blue)
+                self.sRtcView.updateUser(mic_red)
 
-                let mic_info = mic
-                mic_info.status = flag == true ? 5 : -2
-                self.roomInfo?.room?.use_robot = flag
-                self.roomInfo?.mic_info![6] = mic_info
-                self.rtcView.updateAlien(mic_info.status)
             } else {
                 print("激活机器人失败")
             }
@@ -483,7 +484,7 @@ extension SARoomViewController {
 
     // announcement
     func updateNotice(with str: String) {
-        SpatialAudioServiceImp.getSharedInstance().updateAnnouncement(content: str) { result in
+        AppContext.saServiceImp().updateAnnouncement(content: str) { result in
             if result {
                 // 如果返回的结果为true 表示上麦成功
                 self.view.makeToast("Notice Posted".localized())
@@ -496,14 +497,15 @@ extension SARoomViewController {
 
     func updateVolume(_ Vol: Int) {
         if isOwner == false { return }
-        SpatialAudioServiceImp.getSharedInstance().updateRobotVolume(value: Vol) { error in
+        let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
+        robotInfo.robot_volume = UInt(Vol)
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
             if error == nil {
                 // 如果返回的结果为true 表示上麦成功
-                guard let room = self.roomInfo?.room else { return }
-                let newRoom = room
-                newRoom.robot_volume = UInt(Vol)
-                self.roomInfo?.room = newRoom
-                self.rtckit.adjustAudioMixingVolume(with: Vol)
+                guard let robotInfo = self.roomInfo?.robotInfo else { return }
+                robotInfo.robot_volume = UInt(Vol)
+                self.roomInfo?.robotInfo = robotInfo
+                self.sRtcView.updatePlayerVolume(value: Double(Vol))
             }
         }
     }
@@ -565,7 +567,7 @@ extension SARoomViewController {
     
     @objc func updateMicInfo(noti: Notification){
         guard let obj: SARoomMic = noti.object as? SARoomMic else {return}
-        self.rtcView.updateUser(obj)
+        self.sRtcView.updateUser(obj)
     }
     
     func textHeight(text: String, fontSize: CGFloat, width: CGFloat) -> CGFloat {
@@ -615,7 +617,7 @@ extension SARoomViewController: SAManagerDelegate {
     func didRtcUserOfflineOfUid(uid: UInt) {}
 
     func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
-        rtcView.updateAlienMic(type)
+        sRtcView.updateAlienMic(with: type)
     }
 
     func reportAudioVolumeIndicationOfSpeakers(speakers: [AgoraRtcAudioVolumeInfo]) {
@@ -625,7 +627,7 @@ extension SARoomViewController: SAManagerDelegate {
                 let user = mic.member
                 guard let rtcUid = Int(user?.rtc_uid ?? "0") else { return }
                 if rtcUid == speaker.uid {
-//                    rtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
+                    sRtcView.updateVolume(with: mic.mic_index, vol: Int(speaker.volume))
                     break
                 }
             }

@@ -127,7 +127,7 @@ extension SARoomsViewController {
 
     private func loginIMThenPush(room: SARoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        SpatialAudioServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
+        AppContext.saServiceImp().joinRoom(room.room_id ?? "") { error, room_entity in
             SVProgressHUD.dismiss()
             if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
                 SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")

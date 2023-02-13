@@ -71,7 +71,7 @@ class SAANISSetTableViewCell: UITableViewCell {
         midBtn.backgroundColor = .white
         midBtn.layer.cornerRadius = 3
         midBtn.layer.masksToBounds = true
-        midBtn.layer.borderColor = UIColor(hex: "0x0A7AFF").cgColor
+        midBtn.layer.borderColor = UIColor(hex: "0x0A7AFF")?.cgColor
         midBtn.layer.borderWidth = 1
         midBtn.tag = 101
         midBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
@@ -132,7 +132,7 @@ class SAANISSetTableViewCell: UITableViewCell {
     private func setBtnStateWith(_ btn: UIButton) {
         if selBtn == btn { return }
         btn.backgroundColor = .white
-        btn.layer.borderColor = UIColor(hex: "0x0A7AFF").cgColor
+        btn.layer.borderColor = UIColor(hex: "0x0A7AFF")?.cgColor
         btn.setTitleColor(UIColor(hex: "0x0A7AFF"), for: .normal)
         btn.layer.borderWidth = 1
 

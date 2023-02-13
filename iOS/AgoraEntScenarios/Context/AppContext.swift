@@ -11,7 +11,7 @@ import Bugly
 @objc class AppContext: NSObject {
     @objc static let shared: AppContext = .init()
     @objc var sceneLocalizeBundleName: String?
-    @objc var sceneImageBundleName: String?
+    @objc var sceneImageBundleName: String? = "KtvResource"
     @objc var extDic: NSMutableDictionary = NSMutableDictionary()
     
     override init() {
