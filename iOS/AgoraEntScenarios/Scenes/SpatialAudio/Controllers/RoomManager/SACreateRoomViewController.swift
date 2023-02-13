@@ -8,6 +8,7 @@
 import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
+import AgoraChat
 
 public final class SACreateRoomViewController: SABaseViewController {
     lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage("roomList")!)
@@ -23,11 +24,11 @@ public final class SACreateRoomViewController: SABaseViewController {
         container.createAction = { [weak self] in
             guard let self = self else { return }
             print("idx:\(self.container.idx)")
-            if self.container.idx <= 0 {
-                self.settingSound()
-            } else {
+//            if self.container.idx <= 0 {
+//                self.settingSound()
+//            } else {
                 self.goLive()
-            }
+//            }
         }
     }
     
@@ -44,35 +45,87 @@ extension SACreateRoomViewController {
         vc.name = container.roomInput.name
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    
+    private func entryRoom(room: SARoomEntity) {
+        let info: SARoomInfo = SARoomInfo()
+        info.room = room
+        info.mic_info = nil
+        let vc = SARoomViewController(info: info)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func createEntity() -> SARoomEntity {
+        let code = container.roomInput.code
+//        let type = container.idx
+        let name = container.roomInput.name
+        
+        let entity: SARoomEntity = SARoomEntity()
+        entity.sound_effect = 1
+        entity.is_private = !code.isEmpty
+        entity.name = name
+        entity.roomPassword = code
+        entity.rtc_uid = Int(VLUserCenter.user.id)
+        let timeInterval: TimeInterval = Date().timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        entity.room_id = String(millisecond)
+        entity.channel_id = String(millisecond)
+        entity.created_at = UInt(millisecond)
+        entity.click_count = 3
+        entity.member_count = 3
+        return entity
+    }
+    
+    private func entryRoom() {
+        AgoraChatClient.shared().logout(false)
+        SVProgressHUD.show(withStatus: "Loading".localized())
+        self.view.window?.isUserInteractionEnabled = false
+        let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
+        let entity = self.createEntity()
+        SpatialAudioServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
+            entity.chatroom_id = room_id
+            entity.owner = SAUserInfo.shared.user
+            entity.owner?.chat_uid = uid
+            VLUserCenter.user.im_token = im_token
+            VLUserCenter.user.chat_uid = uid
+            if im_token.isEmpty || uid.isEmpty || room_id.isEmpty {
+                SVProgressHUD.dismiss()
+                var showMessage = "Fetch IMConfig failed!"
+                if room_id.isEmpty {
+                    showMessage = "Incorrect room name".localized()
+                }
+                SVProgressHUD.showError(withStatus: showMessage)
+                self.view.window?.isUserInteractionEnabled = true
+                return
+            }
+            let error = SAIMManager.shared?.configIM(appkey: KeyCenter.IMAppKey ?? "")
+            if error == nil,SAIMManager.shared != nil {
+                SAIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
+                    SVProgressHUD.dismiss()
+                    if error == nil {
+                        AppContext.saServiceImp().createRoom(room: entity) { error, room in
+                            SVProgressHUD.dismiss()
+                            self.view.window?.isUserInteractionEnabled = true
+                            if let room = room,error == nil {
+                                self.entryRoom(room: room)
+                            } else {
+                                SVProgressHUD.showError(withStatus: "Create failed!".localized())
+                            }
+                        }
+                    }else {
+                        self.view.window?.isUserInteractionEnabled = true
+                        SVProgressHUD.showError(withStatus: "LoginIM failed!".localized())
+                    }
+                    
+                })
+            }
+        }
+    }
 
     private func goLive() {
         if container.roomInput.name.isEmpty {
             view.makeToast("No Room Name".localized(), point: view.center, title: nil, image: nil, completion: nil)
         }
-        SVProgressHUD.show()
-        SABusinessRequest.shared.sendPOSTRequest(api: .createRoom(()), params: ["name": container.roomInput.name, "is_private": container.roomInput.code.isEmpty, "password": container.roomInput.code, "type": container.idx, "allow_free_join_mic": false, "sound_effect": 1], classType: SARoomInfo.self) { info, error in
-            SVProgressHUD.dismiss()
-            if error == nil, info != nil {
-                self.view.makeToast("Room Created".localized(), point: self.view.center, title: nil, image: nil, completion: nil)
-                let vc = SARoomViewController(info: info!)
-                self.navigationController?.pushViewController(vc, animated: true)
-            } else {
-                self.view.makeToast("\(error?.localizedDescription ?? "")", point: self.view.center, title: nil, image: nil, completion: nil)
-            }
-        }
-    }
-
-    private func entryRoom() {
-        SVProgressHUD.show(withStatus: "Loading".localized())
-        SAIMManager.shared?.loginIM(userName: SAUserInfo.shared.user?.chat_uid ?? "", token: VLUserCenter.user.im_token, completion: { userName, error in
-            SVProgressHUD.dismiss()
-            if error == nil {
-                SAThrottler.throttle {
-                    self.goLive()
-                }
-            } else {
-                self.view.makeToast("AgoraChat Login failed!", point: self.view.center, title: nil, image: nil, completion: nil)
-            }
-        })
+        entryRoom()
     }
 }
