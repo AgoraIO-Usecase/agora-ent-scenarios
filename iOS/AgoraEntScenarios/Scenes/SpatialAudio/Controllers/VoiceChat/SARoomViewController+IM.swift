@@ -15,30 +15,16 @@ import ZSwiftBaseLib
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onRobotUpdate(robotInfo: SARobotAudioInfo) {
         roomInfo?.robotInfo = robotInfo
-        
+
         //update user robot
-        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        let mic_info = mic
-        mic_info.status = robotInfo.use_robot ? 5 : -2
-//        self.roomInfo?.room?.use_robot = robotInfo.use_robot
-        self.roomInfo?.mic_info![6] = mic_info
-        //机器人开关涉及到两个同时开关
-        
-        let blue_micInfo = mic_info
-        let red_micInfo = mic_info
-        
-        //更新红蓝机器人的信息
-        let blue: SAUser = SAUser()
-        blue.portrait = "blue"
-        blue.name = "Agora Blue"
-        blue_micInfo.member = blue
-        self.sRtcView.updateUser(blue_micInfo)
-        
-        let red: SAUser = SAUser()
-        red.portrait = "blue"
-        red.name = "Agora Blue"
-        red_micInfo.member = blue
-        self.sRtcView.updateUser(red_micInfo)
+        guard let red_mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+        guard let blue_mic: SARoomMic = roomInfo?.mic_info![3] else { return }
+
+        red_mic.status = robotInfo.use_robot ? 5 : -2
+        blue_mic.status = robotInfo.use_robot ? 5 : -2
+
+        self.sRtcView.updateUser(blue_mic)
+        self.sRtcView.updateUser(red_mic)
     }
     
     func chatTokenWillExpire() {
