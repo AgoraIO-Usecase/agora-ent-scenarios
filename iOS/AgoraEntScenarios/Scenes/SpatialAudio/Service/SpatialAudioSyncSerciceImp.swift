@@ -381,7 +381,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func fetchRoomMembers(completion: @escaping (Error?, [SAUser]?) -> Void) {
-        agoraPrint("nor")
+        _getUserList(roomId: self.roomId!, finished: completion)
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
