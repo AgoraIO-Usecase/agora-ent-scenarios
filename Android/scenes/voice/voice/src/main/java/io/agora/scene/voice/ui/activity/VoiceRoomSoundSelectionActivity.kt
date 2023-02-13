@@ -11,9 +11,12 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.CallBack
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
+import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.global.VoiceConfigManager.getLifecycleCallbacks
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.SoundSelectionBean
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.builderSoundSelectionList
@@ -27,6 +30,7 @@ import io.agora.voice.common.ui.BaseUiActivity
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.FastClickTools
 import io.agora.voice.common.utils.LogTools.logD
+import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.StatusBarCompat
 import io.agora.voice.common.utils.ThreadManager
 import io.agora.voice.common.utils.ToastTools
@@ -165,7 +169,22 @@ class VoiceRoomSoundSelectionActivity : BaseUiActivity<VoiceActivitySoundSelecti
     private fun checkPrivate(sound_effect: Int){
         showLoading(false)
         if (isPublic) {
-            voiceRoomViewModel.createRoom(roomName, sound_effect, "")
+            if (ChatroomIMManager.getInstance().isLoggedIn){
+                voiceRoomViewModel.createRoom(roomName, sound_effect, "")
+            }else{
+                ChatroomIMManager.getInstance().login(
+                    VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+                    VoiceBuddyFactory.get().getVoiceBuddy().chatToken(), object : CallBack {
+                    override fun onSuccess() {
+                        voiceRoomViewModel.createRoom(roomName, sound_effect, "")
+                    }
+
+                    override fun onError(code: Int, desc: String) {
+                        dismissLoading()
+                        "checkPrivate login error code:$code,msg:$desc".logE()
+                    }
+                })
+            }
         } else {
             if (!TextUtils.isEmpty(encryption) && encryption.length == 4) {
                 voiceRoomViewModel.createRoom(roomName, sound_effect, encryption)
