@@ -31,7 +31,7 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var headerView: AgoraChatRoomHeaderView!
     var rtcView: AgoraChatRoomNormalRtcView!
-    var sRtcView: SA3DRtcView!
+//    var sRtcView: SA3DRtcView!
 
     @UserDefault("VoiceRoomUserAvatar", defaultValue: "") var userAvatar
 
@@ -58,9 +58,9 @@ class VoiceRoomViewController: VRBaseViewController {
                 if let type = roomInfo?.room?.type {
                     if type == 0 && self.rtcView != nil {
                         self.rtcView.micInfos = mics
-                    } else if type == 1 && self.sRtcView != nil {
+                    } /*else if type == 1 && self.sRtcView != nil {
 //                        self.sRtcView.micInfos = mics
-                    }
+                    }*/
                 }
             }
         }
@@ -269,8 +269,8 @@ extension VoiceRoomViewController {
         }
         view.addSubview(headerView)
 
-        sRtcView = SA3DRtcView(rtcKit: nil)
-        view.addSubview(sRtcView)
+//        sRtcView = SA3DRtcView(rtcKit: nil)
+//        view.addSubview(sRtcView)
 
         rtcView = AgoraChatRoomNormalRtcView()
         rtcView.isOwner = isOwner
@@ -280,7 +280,7 @@ extension VoiceRoomViewController {
         view.addSubview(rtcView)
 
         if let entity = roomInfo?.room {
-            sRtcView.isHidden = entity.type == 0
+//            sRtcView.isHidden = entity.type == 0
             rtcView.isHidden = entity.type == 1
             headerView.updateHeader(with: entity)
         }
@@ -295,11 +295,11 @@ extension VoiceRoomViewController {
             make.height.equalTo(isHairScreen ? 140~ : 140~ - 25)
         }
 
-        sRtcView.snp.makeConstraints { make in
-            make.top.equalTo(self.headerView.snp.bottom)
-            make.left.right.equalTo(self.view)
-            make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
-        }
+//        sRtcView.snp.makeConstraints { make in
+//            make.top.equalTo(self.headerView.snp.bottom)
+//            make.left.right.equalTo(self.view)
+//            make.bottom.equalTo(self.view.snp.bottom).offset(isHairScreen ? -84 : -50)
+//        }
 
         rtcView.snp.makeConstraints { make in
             make.top.equalTo(self.headerView.snp.bottom)
@@ -405,7 +405,7 @@ extension VoiceRoomViewController {
                 if self.preView == nil {return}
                 self.preView.removeFromSuperview()
                 self.preView = nil
-                self.sRtcView.isUserInteractionEnabled = true
+//                self.sRtcView.isUserInteractionEnabled = true
                 self.rtcView.isUserInteractionEnabled = true
                 self.headerView.isUserInteractionEnabled = true
                 self.isShowPreSentView = false
