@@ -52,17 +52,18 @@ time_t uptime(void) {
 }
 
 - (int)getDelayTs {
-    if (self.seekTimes <= 0 || -[self.delayDate timeIntervalSinceNow] * 1000 < 500) {
+    if (self.seekTimes <= 0 || -[self.delayDate timeIntervalSinceNow] * 1000 < 1000) {
         return 0;
     }
     self.delayDate = [NSDate date];
     self.seekTimes --;
-    return 25;
+    return 20;
 }
 
-- (void)markSeekingWithExpectPosition:(NSInteger)expectPosition {
+- (NSInteger)calcExpectPosition:(NSInteger)expectPosition {
     self.seekDate = [NSDate date];
     self.seekToPosition = expectPosition;
+    return self.seekToPosition;
 }
 
 - (void)showSeekCostIfNeedWithPosition:(NSInteger)position {
@@ -494,7 +495,7 @@ time_t uptime(void) {
 //                    KTVLogInfo(@"localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", localPosition, localPosition2, localPosition2 - localPosition);
 //                    NSDate*date = [NSDate date];
 //                    NSInteger pos1 = [self.rtcMediaPlayer getPosition];
-                    [self.chorusSeekHelper markSeekingWithExpectPosition:expectPosition];
+                    expectPosition = [self.chorusSeekHelper calcExpectPosition:expectPosition];
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
 //                    NSInteger pos2 = [self.rtcMediaPlayer getPosition];
 //                    NSLog(@"seekToPosition: %.fms, %ld/%ld/%ld", -[date timeIntervalSinceNow] * 1000, pos1, pos2, expectPosition);
