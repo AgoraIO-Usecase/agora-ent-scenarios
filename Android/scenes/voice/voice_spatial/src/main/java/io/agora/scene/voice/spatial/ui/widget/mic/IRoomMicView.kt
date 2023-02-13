@@ -13,7 +13,7 @@ interface IRoomMicView {
     fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean)
 
     /**开关机器人*/
-    fun activeBot(active: Boolean)
+    fun activeBot(active: Boolean, each: ((Int, Pair<PointF, PointF>) -> Unit)?)
 
     /**音量指示*/
     fun updateVolume(index: Int, volume: Int)
@@ -21,10 +21,10 @@ interface IRoomMicView {
     /**机器人音量指示
      * @return 机器人空间位置更新
      */
-    fun updateBotVolume(speakerType: Int, volume: Int): Pair<PointF, PointF>?
+    fun updateBotVolume(speakerType: Int, volume: Int)
 
     /**多麦位更新*/
-    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, each: ((VoiceMicInfoModel) -> Unit)?)
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
 
     /**是否在麦位上,-1 不在*/
     fun findMicByUid(uid: String): Int

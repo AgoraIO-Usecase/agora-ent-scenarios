@@ -408,21 +408,26 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             micInfoMap[index] = micInfo
             micViewMap[index]?.apply {
                 binding(micInfo)
+                micInfo.position = getPositon(this as View)
+                micInfo.forward = getForward(index)
             }
         }
-        activeBot(isBotActive)
+        activeBot(isBotActive, null)
     }
 
-    override fun activeBot(active: Boolean) {
+    override fun activeBot(active: Boolean, each: ((Int, Pair<PointF, PointF>) -> Unit)?) {
         if (active) {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 binding.micV3Blue.binding(this)
                 micViewMap[ConfigConstants.MicConstant.KeyIndex3]?.binding(this)
+                // BotSpeaker Type Position
+                each?.invoke(1, Pair(getPositon(binding.micV3Blue), PointF(1f, 1f)))
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
+                each?.invoke(0, Pair(getPositon(binding.micV6Red), PointF(-1f, -1f)))
             }
         } else {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
@@ -444,23 +449,16 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             }
         }
     }
-    private var speaker: Int? = null
     /**更新机器人提示音量*/
-    override fun updateBotVolume(speakerType: Int, volume: Int): Pair<PointF, PointF>? {
-        var speakerView = binding.micV3Blue
-        var forward = PointF(1f, 1f)
+    override fun updateBotVolume(speakerType: Int, volume: Int) {
         when (speakerType) {
             ConfigConstants.BotSpeaker.BotBlue -> {
-                speakerView = binding.micV3Blue
-                forward = PointF(1f, 1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
                     this.audioVolumeType = volume
                     binding.micV3Blue.binding(this)
                 }
             }
             ConfigConstants.BotSpeaker.BotRed -> {
-                speakerView = binding.micV6Red
-                forward = PointF(-1f, -1f)
                 micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                     this.audioVolumeType = volume
                     binding.micV6Red.binding(this)
@@ -477,13 +475,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 }
             }
         }
-        // 检查机器人位置更新
-        return if (speaker != speakerType) {
-            speaker = speakerType
-            Pair(getPositon(speakerView), forward)
-        } else {
-            null
-        }
     }
 
     override fun findMicByUid(uid: String): Int {
@@ -497,7 +488,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         return -1
     }
 
-    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, each: ((VoiceMicInfoModel) -> Unit)?) {
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
                 val index = entry.key
@@ -508,21 +499,14 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                     micViewMap[index]?.apply {
                         binding(micInfo)
                         micInfo.position = getPositon(this as View)
+                        micInfo.forward = getForward(index)
                     }
                 }
-                when (index) {
-                    0 -> micInfo.forward = PointF(1f, 0f)
-                    1 -> micInfo.forward = PointF(0f, -1f)
-                    2 -> micInfo.forward = PointF(1f, -1f)
-                    4 -> micInfo.forward = PointF(0f, 1f)
-                    5 -> micInfo.forward = PointF(1f, -1f)
-                }
-                each?.invoke(micInfo)
             }
             // 机器人
             if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex3)) {
                 val value = newMicMap[ConfigConstants.MicConstant.KeyIndex3]
-                activeBot(value?.micStatus == MicStatus.BotActivated)
+                activeBot(value?.micStatus == MicStatus.BotActivated, null)
             }
         }
     }
@@ -541,9 +525,20 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         post {
             val view = binding.micV0Center
             val p = convertPoint(PointF(info.x, info.y))
-            view?.translationX = p.x - view.width * 0.5f
-            view?.translationY = p.y - view.height * 0.5f
+            view.x = p.x - view.width * 0.5f
+            view.y = p.y - view.height * 0.5f
             binding.micV0Center.changeAngle(info.angle + 90)
+        }
+    }
+
+    private fun getForward(index: Int): PointF {
+        return when (index) {
+            0 -> PointF(1f, 0f)
+            1 -> PointF(0f, -1f)
+            2 -> PointF(1f, -1f)
+            4 -> PointF(0f, 1f)
+            5 -> PointF(1f, -1f)
+            else -> PointF(0f, 0f)
         }
     }
 }
