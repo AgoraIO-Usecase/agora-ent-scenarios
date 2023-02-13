@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -522,7 +523,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         return ret;
     }
 
+    private boolean showChorusSongDialogTag = false;
     private void showChorusSongDialog() {
+        if (showChorusSongDialogTag) {
+            return;
+        }
+        showChorusSongDialogTag = true;
+
         if (mChorusSongDialog == null) {
             mChorusSongDialog = new SongDialog();
             mChorusSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
@@ -538,15 +545,32 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 0);
                         mChorusSongDialog.setChooseSongListener(chooseSongListener);
                         hideLoadingView();
-                        showChorusSongDialog();
+
+                        if (!mChorusSongDialog.isAdded()) {
+                            roomLivingViewModel.getSongChosenList();
+                            mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+                        }
+
+                        getBinding().getRoot().post(() -> showChorusSongDialogTag = false);
                     });
             return;
         }
-        roomLivingViewModel.getSongChosenList();
-        mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+
+        if (!mChorusSongDialog.isAdded()) {
+            roomLivingViewModel.getSongChosenList();
+            mChorusSongDialog.show(getSupportFragmentManager(), "ChorusSongDialog");
+        }
+
+        getBinding().getRoot().post(() -> showChorusSongDialogTag = false);
     }
 
+    private boolean showChooseSongDialogTag = false;
     private void showChooseSongDialog() {
+        if (showChooseSongDialogTag) {
+            return;
+        }
+        showChooseSongDialogTag = true;
+
         if (mChooseSongDialog == null) {
             mChooseSongDialog = new SongDialog();
             mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
@@ -562,12 +586,25 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                                 0);
                         mChooseSongDialog.setChooseSongListener(chooseSongListener);
                         hideLoadingView();
-                        showChooseSongDialog();
+
+                        if (!mChooseSongDialog.isAdded()) {
+                            roomLivingViewModel.getSongChosenList();
+                            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+                        }
+
+                        getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
                     });
             return;
         }
-        roomLivingViewModel.getSongChosenList();
-        mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+
+        if (!mChooseSongDialog.isAdded()) {
+            roomLivingViewModel.getSongChosenList();
+            mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+        }
+
+        getBinding().getRoot().post(() -> {
+            showChooseSongDialogTag = false;
+        });
     }
 
     private void showMoreDialog(View view) {
