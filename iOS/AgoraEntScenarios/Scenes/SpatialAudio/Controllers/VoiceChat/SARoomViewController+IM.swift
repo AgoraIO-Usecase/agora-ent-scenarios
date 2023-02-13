@@ -13,7 +13,33 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
-    
+    func onRobotUpdate(robotInfo: SARobotAudioInfo) {
+        roomInfo?.robotInfo = robotInfo
+        
+        //update user robot
+        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+        let mic_info = mic
+        mic_info.status = robotInfo.use_robot ? 5 : -2
+//        self.roomInfo?.room?.use_robot = robotInfo.use_robot
+        self.roomInfo?.mic_info![6] = mic_info
+        //机器人开关涉及到两个同时开关
+        
+        let blue_micInfo = mic_info
+        let red_micInfo = mic_info
+        
+        //更新红蓝机器人的信息
+        let blue: SAUser = SAUser()
+        blue.portrait = "blue"
+        blue.name = "Agora Blue"
+        blue_micInfo.member = blue
+        self.sRtcView.updateUser(blue_micInfo)
+        
+        let red: SAUser = SAUser()
+        red.portrait = "blue"
+        red.name = "Agora Blue"
+        red_micInfo.member = blue
+        self.sRtcView.updateUser(red_micInfo)
+    }
     
     func chatTokenWillExpire() {
         AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
@@ -91,7 +117,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
-        roomInfo?.room?.robot_volume = UInt(volume)
+//        roomInfo?.room?.robot_volume = UInt(volume)
     }
     
     func onUserBeKicked(roomId: String, reason: SAServiceKickedReason) {
@@ -119,33 +145,33 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onRobotSwitch(roomId: String, enable: Bool, from fromId: String) {
-        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        let mic_info = mic
-        mic_info.status = enable ? 5 : -2
-        self.roomInfo?.room?.use_robot = enable
-        self.roomInfo?.mic_info![6] = mic_info
-        //机器人开关涉及到两个同时开关
-        
-        let blue_micInfo = mic_info
-        let red_micInfo = mic_info
-        
-        //更新红蓝机器人的信息
-        let blue: SAUser = SAUser()
-        blue.portrait = "blue"
-        blue.name = "Agora Blue"
-        blue_micInfo.member = blue
-        self.sRtcView.updateUser(blue_micInfo)
-        
-        let red: SAUser = SAUser()
-        red.portrait = "blue"
-        red.name = "Agora Blue"
-        red_micInfo.member = blue
-        self.sRtcView.updateUser(red_micInfo)
+//        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+//        let mic_info = mic
+//        mic_info.status = enable ? 5 : -2
+//        self.roomInfo?.room?.use_robot = enable
+//        self.roomInfo?.mic_info![6] = mic_info
+//        //机器人开关涉及到两个同时开关
+//
+//        let blue_micInfo = mic_info
+//        let red_micInfo = mic_info
+//
+//        //更新红蓝机器人的信息
+//        let blue: SAUser = SAUser()
+//        blue.portrait = "blue"
+//        blue.name = "Agora Blue"
+//        blue_micInfo.member = blue
+//        self.sRtcView.updateUser(blue_micInfo)
+//
+//        let red: SAUser = SAUser()
+//        red.portrait = "blue"
+//        red.name = "Agora Blue"
+//        red_micInfo.member = blue
+//        self.sRtcView.updateUser(red_micInfo)
 
     }
     
     func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
-        roomInfo?.room?.robot_volume = volume
+//        roomInfo?.room?.robot_volume = volume
     }
     
     func onContributionListChanged(roomId: String, ranking_list: [SAUser], from fromId: String) {

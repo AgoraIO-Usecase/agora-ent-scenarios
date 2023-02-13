@@ -335,7 +335,7 @@ extension SARoomViewController {
         //TODO: remove as!
         guard let mic: SARoomMic = AppContext.saTmpServiceImp().mics[safe:index] else { return }
         if index == 6 || index == 3 { // 操作机器人
-            if roomInfo?.room?.use_robot == false {
+            if roomInfo?.robotInfo.use_robot == false {
                 showActiveAlienView(true)
             }
         } else {
@@ -459,7 +459,9 @@ extension SARoomViewController {
         }
         guard let mic_blue: SARoomMic = roomInfo?.mic_info?[3] else { return }
         guard let mic_red: SARoomMic = roomInfo?.mic_info?[6] else { return }
-        AppContext.saServiceImp().enableRobot(enable: flag) { error in
+        let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
+        robotInfo.use_robot = flag
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
             if error == nil {
                 if self.alienCanPlay {
                     self.sRtcView.playMusic()
@@ -468,7 +470,7 @@ extension SARoomViewController {
                 
                 mic_blue.status = flag == true ? 5 : -2
                 mic_red.status = flag == true ? 5 : -2
-                self.roomInfo?.room?.use_robot = flag
+                self.roomInfo?.robotInfo.use_robot = flag
                 self.roomInfo?.mic_info?[3] = mic_blue
                 self.roomInfo?.mic_info?[6] = mic_red
                 self.sRtcView.updateUser(mic_blue)
@@ -495,13 +497,14 @@ extension SARoomViewController {
 
     func updateVolume(_ Vol: Int) {
         if isOwner == false { return }
-        AppContext.saServiceImp().updateRobotVolume(value: Vol) { error in
+        let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
+        robotInfo.robot_volume = UInt(Vol)
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
             if error == nil {
                 // 如果返回的结果为true 表示上麦成功
-                guard let room = self.roomInfo?.room else { return }
-                let newRoom = room
-                newRoom.robot_volume = UInt(Vol)
-                self.roomInfo?.room = newRoom
+                guard let robotInfo = self.roomInfo?.robotInfo else { return }
+                robotInfo.robot_volume = UInt(Vol)
+                self.roomInfo?.robotInfo = robotInfo
                 self.sRtcView.updatePlayerVolume(value: Double(Vol))
             }
         }
