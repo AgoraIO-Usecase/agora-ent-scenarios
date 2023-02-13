@@ -97,7 +97,7 @@ AgoraMusicContentCenterEventDelegate
     self.requestId =
     [[AppContext shared].agoraMcc searchMusicWithKeyWord:keyWord ? keyWord : @""
                                                     page:self.page
-                                                pageSize:100
+                                                pageSize:50
                                               jsonOption:nil];
 }
 
