@@ -433,7 +433,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
-    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+//    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
     if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         int leftSecond = [dict[@"time"] intValue];
         [self.MVView setCoundDown:leftSecond];
