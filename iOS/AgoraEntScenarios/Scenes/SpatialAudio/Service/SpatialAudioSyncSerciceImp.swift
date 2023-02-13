@@ -274,8 +274,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 self.roomId = model.room_id!
-                self.createMics(roomId: room_id) { error, micList in
-                    completion(error, model)
+                
+                self._addUserIfNeed(roomId: room_id) { err in
+                    self.createMics(roomId: room_id) { error, micList in
+                        completion(error, model)
+                    }
                 }
                 //添加鉴黄接口
                 NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: .voice) { msg in
@@ -311,8 +314,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
                 VLUserCenter.user.im_token = im_token
                 VLUserCenter.user.chat_uid = chat_uid
-                self.createMics(roomId: room_id) { error, miclist in
-                    completion(error, updateRoom)
+                self._addUserIfNeed(roomId: room_id) { err in
+                    self.createMics(roomId: room_id) { error, miclist in
+                        completion(error, updateRoom)
+                    }
                 }
             }
         } fail: { error in
@@ -1073,7 +1078,7 @@ extension SpatialAudioSyncSerciceImp {
             .collection(className: kCollectionIdUser)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
-                let users = list.kj.modelArray(SAUser.self)
+                let users = list.map({ $0.toJson()}).kj.modelArray(SAUser.self)
                 self?.userList = users
                 self?._updateUserCount(completion: { error in
                 })

@@ -9,7 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 
 public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCardsDataSource {
-    private let datas = [["title": sceneLocalized( "Chat Room"), "detail": sceneLocalized( "Multi-audio chat scenario where anyone can unmute their mic and speak") + "\n" + sceneLocalized( "Co-Watch / Team Chat / Gaming Buddy Chat"), "image": "chat_room"]]
+    private let datas = [["title": sceneLocalized("SA MODE"), "detail": sceneLocalized("SA MODE DETAIL") + "\n" + sceneLocalized(""), "image": "sa_mode"]]
 //    ,["title":sceneLocalized( "Spatial Audio Mode Room"),"detail":sceneLocalized( "Power natural conversations that make people feel like they're 'in the room' together"),"image":"sa_mode"]
 
     var velocity = CGPoint.zero
