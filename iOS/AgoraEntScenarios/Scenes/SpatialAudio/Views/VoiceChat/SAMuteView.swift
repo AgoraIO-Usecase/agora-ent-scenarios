@@ -101,7 +101,7 @@ class SAMuteView: UIView {
         addSubview(addView)
 
         iconView.frame = CGRect(x: ScreenWidth / 2 - 32, y: 40, width: 64, height: 64)
-        iconView.image = UIImage.sceneImage(name:"avatar1")
+        iconView.image = UIImage.sceneImage(name:"")
         iconView.layer.cornerRadius = 32
         iconView.layer.masksToBounds = true
         addSubview(iconView)
@@ -123,7 +123,7 @@ class SAMuteView: UIView {
         roleBtn.isHidden = true
 
         lineView.frame = CGRect(x: 0, y: 160, width: ScreenWidth, height: 1)
-        lineView.backgroundColor = UIColor(hex: "0x979797")
+        lineView.backgroundColor = UIColor.HexColor(hex: 0x979797, alpha: 0.12)
         addSubview(lineView)
 
 //        micView.frame = CGRect(x: self.bounds.size.width / 2.0 + 10, y: 85, width: 20, height: 20)

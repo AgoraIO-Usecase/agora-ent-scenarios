@@ -29,16 +29,87 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             contentView.layoutIfNeeded()
         }
     }
-
-    public var user: SAUser? {
-        didSet {
-            rtcUserView.iconImgUrl = user?.portrait ?? ""
-            rtcUserView.nameStr = user?.name ?? "\(tag - 200)"
-            rtcUserView.volume = user?.volume ?? 0
+    
+    public func refreshUser(with mic: SARoomMic) {
+        let status = mic.status
+        var bgIcon = ""
+        switch status {
+        case -1:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.bgIconView.isHidden = false
+            rtcUserView.bgIconView.image = UIImage("icons／solid／add")
+        case 0:
+            rtcUserView.iconView.isHidden = false
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.on)
+            rtcUserView.bgIconView.isHidden = true
+            rtcUserView.nameBtn.setImage(UIImage(""), for: .normal)
+        case 1:
+            // 需要区分有用户还是没有用户
+            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
+            if mic.member != nil {
+                rtcUserView.micView.isHidden = false
+                rtcUserView.micView.setState(.off)
+            } else {
+                rtcUserView.micView.isHidden = true
+            }
+            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.isHidden = mic.member != nil
+        case 2:
+            bgIcon = mic.member == nil ? "icons／solid／mute" : ""
+            if mic.member != nil {
+                rtcUserView.micView.isHidden = false
+                rtcUserView.micView.setState(.off)
+            } else {
+                rtcUserView.micView.isHidden = true
+            }
+            rtcUserView.bgIconView.image = UIImage(bgIcon)
+            rtcUserView.bgIconView.isHidden = mic.member != nil
+        case 3:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.isHidden = false
+        case 4:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = false
+            rtcUserView.micView.setState(.forbidden)
+            rtcUserView.bgIconView.image = UIImage("icons／solid／lock")
+            rtcUserView.bgIconView.isHidden = false
+        case 5:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.coverView.isHidden = true
+            rtcUserView.activeButton.isHidden = true
+        case -2:
+            rtcUserView.iconView.isHidden = true
+            rtcUserView.micView.isHidden = true
+            rtcUserView.coverView.isHidden = false
+            rtcUserView.activeButton.isHidden = false
+        default:
+            break
         }
+        
+        rtcUserView.iconView.isHidden = mic.member == nil
+        if status != 5 && status != -2 {
+            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+        } else {
+            rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
+        }
+        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 1 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
+    }
+
+    public func refreshVolume(vol: Int) {
+        rtcUserView.volume = vol
     }
     
-    public var clickBlock: (() -> Void)?
+    public func updateAlienMic( flag: Bool) {
+        rtcUserView.micView.isHidden = !flag
+    }
+    
+    public var clickBlock: ((Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
 
     override init(frame: CGRect) {
@@ -67,15 +138,10 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         layoutIfNeeded()
         
         rtcUserView.clickBlock = { [weak self] in
-            guard let clickBlock = self?.clickBlock else { return }
-            clickBlock()
+            guard let clickBlock = self?.clickBlock else {
+                return
+            }
+            clickBlock(self!.tag)
         }
-
-//        rtcUserView.activeVBlock = {[weak self] type in
-//            guard let activeBlock = self?.activeBlock else {
-//                return
-//            }
-//            activeBlock(type)
-//        }
     }
 }

@@ -114,6 +114,10 @@ public enum SAUpdateRoomState {
     ///   - userName: 离开的环信用户id
     func onUserLeftRoom(roomId: String, userName: String)
     
+    
+    /// 机器人相关设置
+    /// - Parameter robotInfo: <#robotInfo description#>
+    func onRobotUpdate(robotInfo: SARobotAudioInfo)
 }
 
 /// 房间内部需要用到环信KV
@@ -125,6 +129,18 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     /// 取消订阅
     /// - Parameter delegate: ChatRoomServiceSubscribeDelegate 聊天室内IM回调处理
     func unsubscribeEvent()
+    
+    /// 获取房间列表
+    /// - Parameters:
+    ///   - page: 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
+    ///   - completion: 完成回调   (错误信息， 房间列表)
+    func fetchRoomList(page: Int, completion: @escaping (Error?, [SARoomEntity]?) -> Void)
+    
+    /// 创建房间
+    /// - Parameters:
+    ///   - room: 房间对象信息
+    ///   - completion: 完成回调   (错误信息)
+    func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void)
 
     /// 加入房间
     /// - Parameters:
@@ -240,18 +256,6 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     ///   - user: VRUser instance
     ///   - completion: 回调
     func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,SARoomMic?) -> Void)
-
-    /// 获取房间列表
-    /// - Parameters:
-    ///   - page: 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
-    ///   - completion: 完成回调   (错误信息， 房间列表)
-    func fetchRoomList(page: Int, completion: @escaping (Error?, [SARoomEntity]?) -> Void)
-    
-    /// 创建房间
-    /// - Parameters:
-    ///   - room: 房间对象信息
-    ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: SARoomEntity, completion: @escaping (SyncError?, SARoomEntity?) -> Void)
     
     /// Description 更新公告
     /// - Parameters:
@@ -261,9 +265,16 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     
     /// Description 是否启用机器人
     /// - Parameter enable: true or false
+    @available(*, deprecated, message: "Parse use updateRobotInfo")
     func enableRobot(enable: Bool,completion: @escaping (Error?) -> Void)
     
     /// Description 更新机器人音量
     /// - Parameter value: 音量值
+    @available(*, deprecated, message: "Parse use updateRobotInfo")
     func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
+    
+    
+    /// 更新机器人设置
+    /// - Parameter info: <#info description#>
+    func updateRobotInfo(info: SARobotAudioInfo, completion: @escaping ((Error?)->()))
 }

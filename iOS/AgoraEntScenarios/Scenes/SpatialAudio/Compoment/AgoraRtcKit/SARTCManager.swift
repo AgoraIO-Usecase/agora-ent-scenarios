@@ -331,7 +331,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
     public func joinVoicRoomWith(with channelName: String,token: String?, rtcUid: Int?, type: SARtcType.VMMUSIC_TYPE) -> Int32 {
         self.type = .VoiceChat
         rtcKit.delegate = self
-        
+        rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         setParametersWithMD()
         if type == .ktv || type == .social {
             rtcKit.setChannelProfile(.liveBroadcasting)
@@ -365,6 +365,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
         localSpatial?.setAudioRecvRange(recvRange)
         localSpatial?.setMaxAudioRecvCount(6)
         localSpatial?.setDistanceUnit(1)
+        rtcKit.setParameters("{\"che.audio.force_bluetooth_a2dp\":true}")
         
         let config = AgoraDataStreamConfig()
         config.ordered = false
@@ -390,18 +391,20 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let positionInfo = AgoraRemoteVoicePositionInfo()
         positionInfo.position = position
         positionInfo.forward = forward
-        localSpatial?.updatePlayerPositionInfo(playerId,
+        let ret = localSpatial?.updatePlayerPositionInfo(playerId,
                                                positionInfo: positionInfo)
+        print("player == \(ret)")
     }
     
     func updateSpetialPostion(position: [NSNumber],
                               axisForward: [NSNumber],
                               axisRight: [NSNumber],
                               axisUp: [NSNumber]) {
-       localSpatial?.updateSelfPosition(position,
+        let ret = localSpatial?.updateSelfPosition(position,
                                          axisForward: axisForward,
                                          axisRight: axisRight,
                                          axisUp: axisUp)
+        print("position == \(ret)")
     }
     
     func updateRemoteSpetialPostion(uid: String?,

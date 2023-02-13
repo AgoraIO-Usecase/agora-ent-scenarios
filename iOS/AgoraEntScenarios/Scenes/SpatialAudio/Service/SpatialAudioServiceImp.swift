@@ -11,24 +11,24 @@ import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
 import AgoraSyncManager
 
-private let cSceneId = "scene_spatialAudio"
+private let cSceneId = "scene_spatialAudio1"
 
-let saLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "SpatialAudio"))
+//let saLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "SpatialAudio"))
 public class SpatialAudioServiceImp: NSObject {
     static var _sharedInstance: SpatialAudioServiceImp?
     var roomId: String?
     var roomList: [SARoomEntity]?
-    var userList: [SAUser]?
+    var userList: [SAUser] = []
     public var mics: [SARoomMic] = [SARoomMic]()
-    public var applicants: [SAApply] = [SAApply]()
+    public var micApplys: [SAApply] = [SAApply]()
     var syncUtilsInited: Bool = false
     @objc public weak var roomServiceDelegate:SpatialAudioServiceSubscribeDelegate?
     
     func cleanCache() {
-        self.userList = nil
+        self.userList = []
         self.roomId = nil
         self.mics.removeAll()
-        self.applicants.removeAll()
+        self.micApplys.removeAll()
     }
     
 }
@@ -62,11 +62,11 @@ extension SpatialAudioServiceImp: SAIMDelegate {
                     return
                 }
                 let apply = model(from: map, type: SAApply.self) as! SAApply
-                let user = self.applicants.first {
+                let user = self.micApplys.first {
                     $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
                 }
                 if user == nil {
-                    self.applicants.append(apply)
+                    self.micApplys.append(apply)
                 }
                 self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
             }
@@ -165,6 +165,13 @@ extension SpatialAudioServiceImp: SAIMDelegate {
 }
 
 extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
+    func updateRobotInfo(info: SARobotAudioInfo, completion: @escaping ((Error?) -> ())) {
+        assert(false, "not implemented updateRobotInfo")
+    }
+    
+    func updateRobotInfo(info: SARobotAudioInfo) {
+        assert(false, "not implemented updateRobotInfo")
+    }
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
         SAIMManager.shared?.updateAnnouncement(content: content, completion: completion)
@@ -231,14 +238,14 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
                 roomInfo.room?.gift_amount = Int(gift_amount)
             }
             if let use_robot = map?["use_robot"] as? String {
-                roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
+//                roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
             } else {
-                roomInfo.room?.use_robot = false
+//                roomInfo.room?.use_robot = false
             }
             if let robot_volume = map?["robot_volume"] as? String {
-                roomInfo.room?.robot_volume = UInt(robot_volume) ?? 50
+//                roomInfo.room?.robot_volume = UInt(robot_volume) ?? 50
             } else {
-                roomInfo.room?.robot_volume = 50
+//                roomInfo.room?.robot_volume = 50
             }
             let mics = map?.filter({
                 $0.key.hasPrefix("mic_")
@@ -269,7 +276,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     }
     
     func fetchRoomMembers(completion: @escaping (Error?, [SAUser]?) -> Void) {
-        if self.userList?.count ?? 0 > 0 {
+        if self.userList.count > 0 {
             var mics_id = ""
             for i in 1...6 {
                 let mic = self.mics[safe: i]
@@ -277,7 +284,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
                     mics_id += mic?.member?.chat_uid ?? ""
                 }
             }
-            let list = self.userList?.filter({
+            let list = self.userList.filter({
                 mics_id.z.rangeOfString($0.chat_uid ?? "").length <= 0
             })
             completion(nil,list)
@@ -292,13 +299,13 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
-        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList?.kj.JSONString() ?? ""], completion: { error in
+        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList.kj.JSONString() ?? ""], completion: { error in
             completion(self.convertError(error: error))
         })
     }
 
     func fetchApplicantsList(completion: @escaping (Error?, [SAApply]?) -> Void) {
-        completion(nil,self.applicants)
+        completion(nil,self.micApplys)
     }
     
     func forbidMic(mic_index: Int, completion: @escaping (Error?, SARoomMic?) -> Void) {
@@ -338,7 +345,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     }
     
     func cleanUserMicIndex(mic: SARoomMic) {
-        let user = self.userList?.first(where: {
+        let user = self.userList.first(where: {
             $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
         })
         user?.mic_index = -1
@@ -489,7 +496,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     }
     
     func startMicSeatInvitation(chatUid: String,index: Int?,completion: @escaping (Error?, Bool) -> Void) {
-            let user = self.userList?.first(where: { $0.chat_uid == chatUid })
+            let user = self.userList.first(where: { $0.chat_uid == chatUid })
             user?.mic_index = index
             SAIMManager.shared?.sendChatCustomMessage(to_uid: chatUid, event: SAInviteSite, customExt: ["user" : user?.kj.JSONString() ?? "","chatroomId":SAIMManager.shared?.currentRoomId ?? ""], completion: { message, error in
                 completion(self.convertError(error: error),error == nil)
@@ -498,7 +505,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     
     func acceptMicSeatInvitation(completion: @escaping (Error?, SARoomMic?) -> Void) {
         let mic = SARoomMic()
-        let user = SpatialAudioServiceImp.getSharedInstance().userList?.first(where: {
+        let user = SpatialAudioServiceImp.getSharedInstance().userList.first(where: {
             $0.uid == SAUserInfo.shared.user?.uid ?? ""
         })
         if user?.mic_index ?? 0 > 1 {
@@ -518,10 +525,10 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         mic.member = user
         SAIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic.mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
-                self.userList?.first(where: {
+                self.userList.first(where: {
                     $0.chat_uid ?? "" == SAUserInfo.shared.user?.uid ?? ""
                 })?.mic_index = mic.mic_index
-                self.applicants.removeAll {
+                self.micApplys.removeAll {
                     $0.member?.chat_uid ?? "" == user?.chat_uid ?? ""
                 }
                 let currentMic = self.mics[safe: mic.mic_index]
@@ -565,7 +572,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     
     func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,SARoomMic?) -> Void) {
         var mic_index = 1
-        let user = self.applicants.first(where: {
+        let user = self.micApplys.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
         })
         if user?.index ?? 0 < 1 {
@@ -587,10 +594,10 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         mic.member = user?.member
         SAIMManager.shared?.setChatroomAttributes(attributes: ["mic_\(mic_index)":mic.kj.JSONString()], completion: { error in
             if error == nil {
-                self.applicants.removeAll {
+                self.micApplys.removeAll {
                     $0.member?.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                 }
-                self.userList?.first(where: { $0.chat_uid ?? "" == user?.member?.chat_uid ?? ""
+                self.userList.first(where: { $0.chat_uid ?? "" == user?.member?.chat_uid ?? ""
                                 })?.mic_index = mic_index
                 let currentMic = self.mics[safe: mic_index]
                 if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
@@ -684,13 +691,13 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: SARoomEntity, completion: @escaping (SyncError?, SARoomEntity?) -> Void) {
+    func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
         
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
         owner.uid = VLUserCenter.user.userNo
-        owner.mic_index = 0
+        owner.mic_index = 1
         owner.portrait = VLUserCenter.user.headUrl
         
         self.roomList?.append(room)

@@ -39,7 +39,7 @@ extension SAAllRoomsViewController {
     }
 
     private func fetchRooms(cursor: String) {
-        SpatialAudioServiceImp.getSharedInstance().fetchRoomList(page: 0) { error, rooms in
+        AppContext.saServiceImp().fetchRoomList(page: 0) { error, rooms in
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}
