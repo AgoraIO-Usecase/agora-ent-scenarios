@@ -172,7 +172,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         val turnY = fullHeight - view.y
         val vPoint = PointF(view.width * 0.5f + view.x, turnY - (view.height * 0.5f))
         // 相对坐标
-        val relativePoint = PointF(oPoint.x - vPoint.x, oPoint.y - vPoint.y)
+        val relativePoint = PointF(vPoint.x - oPoint.x, vPoint.y - oPoint.y)
         // 屏幕相对坐标转化为坐标系坐标
         return PointF(
             relativePoint.x / fullWidth * axisLength,
@@ -538,10 +538,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     }
 
     override fun updateSpatialPosition(info: SeatPositionInfo) {
-        val view = binding.micV0Center
-        val p = convertPoint(PointF(info.x, info.y))
-        view.translationX = p.x - view.width * 0.5f
-        view.translationY = p.y - view.height * 0.5f
-        binding.micV0Center.changeAngle(info.angle + 90)
+        post {
+            val view = binding.micV0Center
+            val p = convertPoint(PointF(info.x, info.y))
+            view?.translationX = p.x - view.width * 0.5f
+            view?.translationY = p.y - view.height * 0.5f
+            binding.micV0Center.changeAngle(info.angle + 90)
+        }
     }
 }

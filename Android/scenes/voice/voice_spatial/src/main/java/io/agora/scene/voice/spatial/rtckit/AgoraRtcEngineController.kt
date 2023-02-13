@@ -7,7 +7,6 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
-import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.DataStreamInfo
 import io.agora.scene.voice.spatial.model.SeatPositionInfo
@@ -49,6 +48,10 @@ class AgoraRtcEngineController {
     private var spatialListener: RtcSpatialPositionListener? = null
 
     private var spatial: ILocalSpatialAudioEngine? = null
+
+    private val dataStreamId: Int by lazy {
+        rtcEngine?.createDataStream(DataStreamConfig())?: 0
+    }
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
@@ -188,7 +191,6 @@ class AgoraRtcEngineController {
      * 发送本地位置到远端
      */
     public fun sendSelfPosition(position: SeatPositionInfo) {
-        val dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())!!
         GsonTools.beanToString(position)?.also {
             val steamInfo = DataStreamInfo(101, it)
             rtcEngine?.sendStreamMessage(
@@ -196,7 +198,6 @@ class AgoraRtcEngineController {
                 GsonTools.beanToString(steamInfo)?.toByteArray()
             )
         }
-
     }
     /**
      * 更新远端音源的配置
