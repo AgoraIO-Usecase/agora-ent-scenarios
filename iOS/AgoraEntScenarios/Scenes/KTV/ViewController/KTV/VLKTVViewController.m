@@ -296,7 +296,7 @@ KTVApiDelegate
     
     [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
         if (status != KTVServiceNetworkStatusOpen) {
-            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
+//            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
         
