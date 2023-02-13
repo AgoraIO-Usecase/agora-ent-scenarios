@@ -10,6 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @class VLRoomListModel;
 @interface VLSelectSongTableItemView : UIView <JXCategoryListContentViewDelegate>
+@property (nonatomic, strong) NSArray *selSongsArray;
 
 - (instancetype)initWithFrame:(CGRect)frame
                     withRooNo:(NSString *)roomNo

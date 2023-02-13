@@ -21,9 +21,8 @@ AgoraMusicContentCenterEventDelegate
 >
 @property (nonatomic, strong) UITableView    *tableView;
 @property (nonatomic, strong) NSMutableArray *songsMuArray;
-@property (nonatomic, assign) NSInteger        page;
+@property (nonatomic, assign) NSInteger page;
 
-@property (nonatomic, strong) NSArray *selSongsArray;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
@@ -33,6 +32,13 @@ AgoraMusicContentCenterEventDelegate
 @end
 
 @implementation VLSelectSongTableItemView
+
+- (void)setSelSongsArray:(NSArray *)selSongsArray {
+    _selSongsArray = selSongsArray;
+    
+    [self calcSelectedStatus];
+    [self.tableView reloadData];
+}
 
 - (void)dealloc {
     [[AppContext shared] unregisterEventDelegate:self];
@@ -64,12 +70,23 @@ AgoraMusicContentCenterEventDelegate
     _refreshControl = [[UIRefreshControl alloc]init];
     self.tableView.refreshControl = _refreshControl;
     [_refreshControl addTarget:self action:@selector(loadData) forControlEvents:UIControlEventValueChanged];
-
 }
 
 -(void)loadData {
     [self.tableView.refreshControl beginRefreshing];
     [self loadDatasWithIndex:self.pageType ifRefresh:YES];
+}
+
+- (void)calcSelectedStatus {
+    for (VLSongItmModel *itemModel in self.songsMuArray) {
+        itemModel.ifChoosed = NO;
+        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
+            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
+                itemModel.ifChoosed = YES;
+                break;
+            }
+        }
+    }
 }
 
 - (void)appendDatasWithSongList:(NSArray<VLSongItmModel*>*)songList {
@@ -89,16 +106,9 @@ AgoraMusicContentCenterEventDelegate
         }
     }
     
-    for (VLSongItmModel *itemModel in self.songsMuArray) {
-        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
-            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
-                itemModel.ifChoosed = YES;
-            }
-        }
-    }
+    [self calcSelectedStatus];
     
     [self.tableView reloadData];
-
 }
 
 
@@ -111,22 +121,13 @@ AgoraMusicContentCenterEventDelegate
                  ifRefresh:(BOOL)ifRefresh {
     self.pageType = pageType;
     self.page = ifRefresh ? 1 : self.page;
-    
-    [[AppContext ktvServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        self.selSongsArray = songArray;
-       
-        NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
-        NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
-        self.requestId =
-        [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
-                                                                    page:self.page
-                                                                pageSize:50
-                                                              jsonOption:nil];
-    }];
+    NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
+    NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
+    self.requestId =
+    [[AppContext shared].agoraMcc getMusicCollectionWithMusicChartId:chartId
+                                                                page:self.page
+                                                            pageSize:50
+                                                          jsonOption:nil];
 }
 
 #pragma mark -- UITableViewDataSource UITableViewDelegate
