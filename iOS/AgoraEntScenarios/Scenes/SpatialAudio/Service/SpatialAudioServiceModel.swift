@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import KakaJSON
 
 @objcMembers
 class SABaseInfo: NSObject {
@@ -79,4 +80,22 @@ class SAGift: SABaseInfo {
     var giftId: String?           //对应礼物id
     var userNo: String?           //邀请上麦用户id
     var createAt: Double = 0      //创建时间，与19700101时间比较的毫秒数
+}
+
+
+@objcMembers
+public class SARobotAudioInfo: NSObject, Convertible {
+    var use_robot: Bool = false
+    var robot_volume: UInt = 50
+    var red_robot_absorb: Bool = false
+    var red_robot_blur: Bool = false
+    var blue_robot_absorb: Bool = false
+    var blue_robot_blur: Bool = false
+    
+    var objectId: String = ""
+    
+    override public required init() {}
+    public func kj_modelKey(from property: Property) -> ModelPropertyKey {
+        property.name
+    }
 }

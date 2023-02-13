@@ -21,7 +21,7 @@ class SA3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeAdd:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／add")
+                bgIconView.image = UIImage("icons／solid／add")
             case .AgoraChatRoomBaseUserCellTypeMute:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -33,7 +33,7 @@ class SA3DMoveUserView: UIView {
             case .AgoraChatRoomBaseUserCellTypeLock:
                 iconView.isHidden = true
                 micView.isHidden = true
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock")
+                bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
                 iconView.isHidden = false
                 micView.isHidden = false
@@ -43,19 +43,19 @@ class SA3DMoveUserView: UIView {
                 iconView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
-                bgIconView.image = UIImage.sceneImage(name: "icons／solid／lock")
+                bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
                 iconView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang"), for: .normal)
+                nameBtn.setImage(UIImage("guanfang"), for: .normal)
                 coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
                 iconView.isHidden = false
                 micView.isHidden = false
-                nameBtn.setImage(UIImage.sceneImage(name: "guanfang"), for: .normal)
+                nameBtn.setImage(UIImage("guanfang"), for: .normal)
                 coverView.isHidden = true
                 activeButton.isHidden = true
             }
@@ -109,15 +109,21 @@ class SA3DMoveUserView: UIView {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_middle_arrow"))
         return imageView
     }()
-    public var angle: Double = 0 {
-        didSet {
-            UIView.animate(withDuration: 0.25) {
-                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: self.angle)
-            }
-        }
-    }
+    private var lastAngle: Double = 0
 
     private var lineView: UIView = .init()
+
+    public var tapClickBlock:(() -> Void)?
+    
+    var angle: Double = 270 {
+        didSet {
+            let value = (angle - 90) / 180.0 * Double.pi
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
+                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: value - self.lastAngle)
+            }
+            lastAngle = value
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -129,7 +135,7 @@ class SA3DMoveUserView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     fileprivate func layoutUI() {
         lineView.backgroundColor = .clear
         lineView.layer.bounds = CGRect(x: 0, y: 0, width: 30~, height: 82~)
@@ -165,7 +171,7 @@ class SA3DMoveUserView: UIView {
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
-        iconView.image = UIImage(named: "avatar1")
+        iconView.image = UIImage(named: "")
         iconView.layer.cornerRadius = 37~
         iconView.layer.masksToBounds = true
         addSubview(iconView)
@@ -225,5 +231,7 @@ class SA3DMoveUserView: UIView {
 
     @objc private func tapClick(tap: UITapGestureRecognizer) {
         print("3D 头像点击")
+        guard let tapClickBlock = tapClickBlock else {return}
+        tapClickBlock()
     }
 }

@@ -13,8 +13,7 @@ import ZSwiftBaseLib
 extension SARoomViewController {
     
     func showEQView() {
-        guard let micInfos = sRtcView.micInfos else { return }
-        let isOpenSpatial = micInfos[5].status == 5
+        let isOpenSpatial = roomInfo?.robotInfo.use_robot == true
 
         let actionView = ActionSheetManager()
         actionView
@@ -33,15 +32,12 @@ extension SARoomViewController {
         }
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             guard let self = self else { return }
-            let blue = micInfos[5]
-            let red = micInfos[6]
-            blue.status = isOn ? 5 : -1
-            red.status = isOn ? 5 : -1
-            self.sRtcView.micInfos?[5] = blue
-            self.sRtcView.micInfos?[6] = red
+            self.roomInfo?.robotInfo.use_robot = isOn
+            self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
-            self?.sRtcView.updatePlayerVolume(value: value)
+            self?.sRtcView.updatePlayerVolume(value: Double(value * 400))
+            self?.updateVolume(Int(value * 400.0))
         }
         actionView.show()
     }
@@ -49,7 +45,7 @@ extension SARoomViewController {
     func showSpatialAudioView() {
         guard let micInfos = sRtcView.micInfos else { return }
         let red = micInfos[6]
-        let blue = micInfos[5]
+        let blue = micInfos[3]
         
         let actionView = ActionSheetManager()
         actionView
@@ -57,23 +53,25 @@ extension SARoomViewController {
             .rows(rows: [3, 3])
             .title(title: "Spatial Audio")
             .sectionHeader(iconName: "new", title: "Agora Blue Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: 0.8, isEnable: isOwner)
+            .sliderCell(title: "Attenuation factor volume", value: blue.attenuation, isEnable: isOwner)
             .switchCell(title: "Air Absorb", isOn: blue.airAbsorb, isEnabel: isOwner)
             .switchCell(title: "Voice Blur", isOn: blue.voiceBlur, isEnabel: isOwner)
             .sectionHeader(iconName: "new", title: "Agora Red Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: 0.8, isEnable: isOwner)
+            .sliderCell(title: "Attenuation factor volume", value: red.attenuation, isEnable: isOwner)
             .switchCell(title: "Air Absorb", isOn: red.airAbsorb, isEnabel: isOwner)
             .switchCell(title: "Voice Blur", isOn: red.voiceBlur, isEnabel: isOwner)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
             guard let self = self else { return }
+            let robotInfo = self.roomInfo?.robotInfo ?? SARobotAudioInfo()
             if indexPath.section == 0 {
                 switch indexPath.row {
                 case 1:
                     blue.airAbsorb = isOn
-                    
+                    robotInfo.blue_robot_absorb = isOn
                 case 2:
                     blue.voiceBlur = isOn
+                    robotInfo.blue_robot_blur = isOn
                     
                 default: break
                 }
@@ -81,27 +79,32 @@ extension SARoomViewController {
                 switch indexPath.row {
                 case 1:
                     red.airAbsorb = isOn
+                    robotInfo.red_robot_absorb = isOn
                     
                 case 2:
                     red.voiceBlur = isOn
+                    robotInfo.red_robot_blur = isOn
                     
                 default: break
                 }
             }
-            self.sRtcView.micInfos?[5] = blue
+            AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
+                
+            }
+            self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
         }
         actionView.didSliderValueChangeClosure = { [weak self] indexPath, value in
             guard let self = self, let micInfos = self.sRtcView.micInfos else { return }
             let red = micInfos[6]
-            let blue = micInfos[5]
+            let blue = micInfos[3]
             if indexPath.section == 0 {
                 blue.attenuation = value
                 
             } else {
                 red.attenuation = value
             }
-            self.sRtcView.micInfos?[5] = blue
+            self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
         }
         actionView.show()
@@ -109,9 +112,9 @@ extension SARoomViewController {
     
     func applyMembersAlert(position: SASwitchBarDirection) {
         let apply = SAApplyUsersViewController(roomId: roomInfo?.room?.room_id ?? "")
-        apply.agreeApply = {
-            self.rtcView.updateUser($0)
-        }
+        //apply.agreeApply = {
+           // self.rtcView.updateUser($0)
+        //}
         let invite = SAInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
         let userAlert = SAUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [sceneLocalized( "Raised Hands"), sceneLocalized( "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
@@ -242,7 +245,8 @@ extension SARoomViewController {
     func showApplyAlert(_ index: Int) {
         let isHairScreen = SwiftyFitsize.isFullScreen
         let manageView = SAVMManagerView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: isHairScreen ? 264~ : 264~ - 34))
-        let mic_info = SpatialAudioServiceImp.getSharedInstance().mics[safe: index]
+        //TODO: remove as!
+        let mic_info = AppContext.saTmpServiceImp().mics[safe: index]
         manageView.micInfo = mic_info
         manageView.resBlock = { [weak self] state, flag in
             self?.dismiss(animated: true)
@@ -297,7 +301,7 @@ extension SARoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        SpatialAudioServiceImp.getSharedInstance().startMicSeatApply(index: index) { error, flag in
+        AppContext.saServiceImp().startMicSeatApply(index: index) { error, flag in
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
@@ -312,7 +316,7 @@ extension SARoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        SpatialAudioServiceImp.getSharedInstance().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
+        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
             if error == nil {
                 self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)

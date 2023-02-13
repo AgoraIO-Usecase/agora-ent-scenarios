@@ -9,7 +9,7 @@ import UIKit
 
 extension UIColor {
     static var blueColor: UIColor {
-        .init(hex: "#2397FE")
+        .init(hex: "#2397FE") ?? .white
     }
 }
 
@@ -19,27 +19,33 @@ public extension UIColor {
     /// - Parameters:
     ///   - string: hex值
     ///   - alpha: alpha值，默认1.0
-    convenience init(hex string: String, alpha: CGFloat = 1.0) {
-        var hex = string.hasPrefix("#") ? String(string.dropFirst()) : string
-        guard hex.count == 3 || hex.count == 6 else {
-            self.init(white: 1.0, alpha: 0.0)
-            return
-        }
-
-        if hex.count == 3 {
-            for (indec, char) in hex.enumerated() {
-                hex.insert(char, at: hex.index(hex.startIndex, offsetBy: indec * 2))
+    convenience init?(hex string: String, alpha: CGFloat = 1.0) {
+        let r, g, b, a: CGFloat
+        
+        if string.hasPrefix("#") {
+            let start = string.index(string.startIndex, offsetBy: 1)
+            let hexColor = String(string[start...])
+            
+            if hexColor.count == 8 {
+                let scanner = Scanner(string: hexColor)
+                var hexNumber: UInt64 = 0
+                
+                // #ffe700ff  分别代表 red, green, blue 以及 alpha
+                if scanner.scanHexInt64(&hexNumber) {
+                    r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
+                    g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
+                    b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
+                    a = CGFloat(hexNumber & 0x000000ff) / 255
+                    
+                    self.init(red: r, green: g, blue: b, alpha: a)
+                    return
+                }
             }
         }
-
-        self.init(
-            red: CGFloat((Int(hex, radix: 16)! >> 16) & 0xFF) / 255.0,
-            green: CGFloat((Int(hex, radix: 16)! >> 8) & 0xFF) / 255.0,
-            blue: CGFloat(Int(hex, radix: 16)! & 0xFF) / 255.0,
-            alpha: alpha
-        )
+        
+        return nil
     }
-
+    
     var randomColor: UIColor {
         UIColor(red: CGFloat(arc4random() % 256) / 255.0,
                 green: CGFloat(arc4random() % 256) / 255.0,

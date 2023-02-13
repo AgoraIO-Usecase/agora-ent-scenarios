@@ -13,7 +13,33 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
-    
+    func onRobotUpdate(robotInfo: SARobotAudioInfo) {
+        roomInfo?.robotInfo = robotInfo
+        
+        //update user robot
+        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+        let mic_info = mic
+        mic_info.status = robotInfo.use_robot ? 5 : -2
+//        self.roomInfo?.room?.use_robot = robotInfo.use_robot
+        self.roomInfo?.mic_info![6] = mic_info
+        //机器人开关涉及到两个同时开关
+        
+        let blue_micInfo = mic_info
+        let red_micInfo = mic_info
+        
+        //更新红蓝机器人的信息
+        let blue: SAUser = SAUser()
+        blue.portrait = "blue"
+        blue.name = "Agora Blue"
+        blue_micInfo.member = blue
+        self.sRtcView.updateUser(blue_micInfo)
+        
+        let red: SAUser = SAUser()
+        red.portrait = "blue"
+        red.name = "Agora Blue"
+        red_micInfo.member = blue
+        self.sRtcView.updateUser(red_micInfo)
+    }
     
     func chatTokenWillExpire() {
         AgoraChatClient.shared().renewToken(VLUserCenter.user.im_token)
@@ -60,7 +86,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     /// Description 刷新申请人列表
     /// - Parameter chat_uid: 环信userName
     func refreshApplicants(chat_uid: String) {
-        SpatialAudioServiceImp.getSharedInstance().applicants = SpatialAudioServiceImp.getSharedInstance().applicants.filter({
+        AppContext.saTmpServiceImp().micApplys = AppContext.saTmpServiceImp().micApplys.filter({
             ($0.member?.chat_uid ?? "") != chat_uid
         })
     }
@@ -70,7 +96,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onReceiveCancelSeatInvitation(roomId: String, chat_uid: String) {
-        SpatialAudioServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == chat_uid
+        AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == chat_uid
         })?.mic_index = -1
     }
     
@@ -81,7 +107,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         info?.room?.click_count = (info?.room?.click_count ?? 0) + 1
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
-        SpatialAudioServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
@@ -91,11 +117,11 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onRobotVolumeUpdated(roomId: String, volume: String) {
-        roomInfo?.room?.robot_volume = UInt(volume)
+//        roomInfo?.room?.robot_volume = UInt(volume)
     }
     
     func onUserBeKicked(roomId: String, reason: SAServiceKickedReason) {
-        SpatialAudioServiceImp.getSharedInstance().unsubscribeEvent()
+        AppContext.saServiceImp().unsubscribeEvent()
         var message = ""
         switch reason {
         case .removed: message = "you are removed by owner!"
@@ -110,7 +136,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
-        SpatialAudioServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in }
+        AppContext.saServiceImp().leaveRoom(roomId) { _, _ in }
         self.didHeaderAction(with: .back, destroyed: destroyed)
     }
     
@@ -119,16 +145,33 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
     
     func onRobotSwitch(roomId: String, enable: Bool, from fromId: String) {
-        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
-        let mic_info = mic
-        mic_info.status = enable ? 5 : -2
-        self.roomInfo?.room?.use_robot = enable
-        self.roomInfo?.mic_info![6] = mic_info
-        self.rtcView.updateAlien(mic_info.status)
+//        guard let mic: SARoomMic = roomInfo?.mic_info![6] else { return }
+//        let mic_info = mic
+//        mic_info.status = enable ? 5 : -2
+//        self.roomInfo?.room?.use_robot = enable
+//        self.roomInfo?.mic_info![6] = mic_info
+//        //机器人开关涉及到两个同时开关
+//
+//        let blue_micInfo = mic_info
+//        let red_micInfo = mic_info
+//
+//        //更新红蓝机器人的信息
+//        let blue: SAUser = SAUser()
+//        blue.portrait = "blue"
+//        blue.name = "Agora Blue"
+//        blue_micInfo.member = blue
+//        self.sRtcView.updateUser(blue_micInfo)
+//
+//        let red: SAUser = SAUser()
+//        red.portrait = "blue"
+//        red.name = "Agora Blue"
+//        red_micInfo.member = blue
+//        self.sRtcView.updateUser(red_micInfo)
+
     }
     
     func onRobotVolumeChanged(roomId: String, volume: UInt, from fromId: String) {
-        roomInfo?.room?.robot_volume = volume
+//        roomInfo?.room?.robot_volume = volume
     }
     
     func onContributionListChanged(roomId: String, ranking_list: [SAUser], from fromId: String) {
@@ -148,7 +191,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                         let memeber = mic
                         memeber.member = nil
                         memeber.status = -1
-                        rtcView.updateUser(memeber)
+                        sRtcView.updateUser(memeber)
                         break
                     }
                 }
@@ -158,9 +201,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
             $0.chat_uid != userName
         })
         self.refreshApplicants(chat_uid: userName)
-        SpatialAudioServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
         if isOwner {
-            SpatialAudioServiceImp.getSharedInstance().updateRoomMembers { error in
+            AppContext.saServiceImp().updateRoomMembers { error in
                 if error != nil {
                     self.view.makeToast("\(error?.localizedDescription ?? "")")
                 }
@@ -174,15 +217,16 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
 
     private func updateMic(_ mics: [SARoomMic], fromId: String) {
         for mic in mics {
-            SpatialAudioServiceImp.getSharedInstance().mics[mic.mic_index] = mic
+            AppContext.saTmpServiceImp().mics[mic.mic_index] = mic
         }
         //如果有两个mic对象来自同一个人证明是换麦 否则是上下麦或者被禁用静音等
         if mics.count == 2,let first = mics.first,let last = mics.last {
-            SpatialAudioServiceImp.getSharedInstance().mics[first.mic_index] = first
-            SpatialAudioServiceImp.getSharedInstance().mics[last.mic_index] = last
-            roomInfo?.mic_info = SpatialAudioServiceImp.getSharedInstance().mics
-            rtcView.updateUser(first)
-            rtcView.updateUser(last)
+            //TODO: remove as!
+            AppContext.saTmpServiceImp().mics[first.mic_index] = first
+            AppContext.saTmpServiceImp().mics[last.mic_index] = last
+            roomInfo?.mic_info = AppContext.saTmpServiceImp().mics
+            sRtcView.updateUser(first)
+            sRtcView.updateUser(last)
         } else {
             if let first = mics.first {
                 let status = first.status
@@ -195,13 +239,13 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 //                    refreshHandsUp(status: status)
                 //                }
                 //将userList中的上麦用户做标记，便于后续过滤
-                var micUser = SpatialAudioServiceImp.getSharedInstance().userList?.first(where: {
+                var micUser = AppContext.saTmpServiceImp().userList.first(where: {
                     $0.chat_uid ?? "" == fromId
                 })
                 if status == -1 {
                     micUser?.mic_index = -1
                 } else {
-                    micUser = SpatialAudioServiceImp.getSharedInstance().userList?.first(where: {
+                    micUser = AppContext.saTmpServiceImp().userList.first(where: {
                         $0.chat_uid ?? "" == first.member?.chat_uid ?? ""
                     })
                     if micUser != nil {
@@ -223,7 +267,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                  */
                 if let host: SAUser = roomInfo?.room?.owner {
                     if host.uid == fromId && status == -1 {
-                        SpatialAudioServiceImp.getSharedInstance().userList?.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
+                        AppContext.saTmpServiceImp().userList.first(where: { $0.chat_uid ?? "" == fromId })?.mic_index = -1
                         view.makeToast("Removed Stage".localized())
                     }  else {
                         self.refreshApplicants(chat_uid: fromId)
@@ -255,9 +299,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     }
                 }
                 
-                SpatialAudioServiceImp.getSharedInstance().mics[first.mic_index] = first
-                roomInfo?.mic_info = SpatialAudioServiceImp.getSharedInstance().mics
-                rtcView.updateUser(first)
+                AppContext.saTmpServiceImp().mics[first.mic_index] = first
+                roomInfo?.mic_info = AppContext.saTmpServiceImp().mics
+                sRtcView.updateUser(first)
                 refreshApplicants(chat_uid: fromId)
             }
         }

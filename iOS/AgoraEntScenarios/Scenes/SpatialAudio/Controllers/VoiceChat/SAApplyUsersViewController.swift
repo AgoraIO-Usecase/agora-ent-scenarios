@@ -40,7 +40,7 @@ public class SAApplyUsersViewController: UITableViewController {
     // MARK: - Table view data source
 
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        SpatialAudioServiceImp.getSharedInstance().applicants.count
+        AppContext.saTmpServiceImp().micApplys.count
     }
 
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -50,10 +50,11 @@ public class SAApplyUsersViewController: UITableViewController {
         }
         // Configure the cell...
         cell?.selectionStyle = .none
-        cell?.refresh(item: SpatialAudioServiceImp.getSharedInstance().applicants[safe: indexPath.row])
+        //TODO: remove as!
+        cell?.refresh(item: AppContext.saTmpServiceImp().micApplys[safe: indexPath.row])
         cell?.agreeClosure = { [weak self] in
             self?.agreeUserApply(user: $0)
-            SpatialAudioServiceImp.getSharedInstance().applicants[safe: indexPath.row]?.member?.invited = true
+            AppContext.saTmpServiceImp().micApplys[safe: indexPath.row]?.member?.invited = true
             self?.tableView.reloadData()
         }
         return cell ?? SAApplyCell()
@@ -68,7 +69,7 @@ public class SAApplyUsersViewController: UITableViewController {
 
 extension SAApplyUsersViewController {
     @objc func refresh() {
-        SpatialAudioServiceImp.getSharedInstance().fetchApplicantsList { error, applicants in
+        AppContext.saServiceImp().fetchApplicantsList { error, applicants in
             self.refreshEnd()
             guard let datas = applicants else {
                 return
@@ -85,7 +86,7 @@ extension SAApplyUsersViewController {
     private func agreeUserApply(user: SAApply?) {
         SVProgressHUD.show()
         guard let user1 = user?.member else { return }
-        SpatialAudioServiceImp.getSharedInstance().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: { error,mic  in
+        AppContext.saServiceImp().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: { error,mic  in
             SVProgressHUD.dismiss()
             if self.agreeApply != nil,let mic = mic {
                 self.agreeApply!(mic)
