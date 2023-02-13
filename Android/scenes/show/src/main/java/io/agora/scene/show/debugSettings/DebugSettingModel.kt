@@ -11,7 +11,7 @@ data class DebugSettingModel(
     var enableHWEncoder: Boolean = true,
     var codecType: Int = 3,     // 2 -> h264, 3 -> h265
     var mirrorMode: Boolean = false,
-    var fitMode: Int = 0,       // 0 -> hidden, 1 -> fix
+    var renderMode: Int = 0,       // 0 -> hidden, 1 -> fix
     var colorEnhance: Boolean = false,
     var dark: Boolean = false,
     var noise: Boolean = false,

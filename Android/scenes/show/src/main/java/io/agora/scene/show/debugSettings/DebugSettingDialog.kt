@@ -7,6 +7,7 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
 import com.google.android.material.switchmaterial.SwitchMaterial
+import io.agora.rtc2.Constants.*
 import io.agora.rtc2.video.ColorEnhanceOptions
 import io.agora.rtc2.video.LowLightEnhanceOptions
 import io.agora.rtc2.video.VideoDenoiserOptions
@@ -71,7 +72,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
         // 镜像
         setEnable(mBinding.mirrorSwitchCompat, RtcEngineInstance.debugSettingModel.mirrorMode)
         // hit / hidden
-        if (RtcEngineInstance.debugSettingModel.fitMode == 0) {
+        if (RtcEngineInstance.debugSettingModel.renderMode == 0) {
             setSelect(mBinding.fixModeRadioBox, 0)
         } else {
             setSelect(mBinding.fixModeRadioBox, 1)
@@ -101,6 +102,11 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
             RtcEngineInstance.debugSettingModel.colorEnhance = mBinding.colorSwitchCompat.isChecked
             RtcEngineInstance.debugSettingModel.dark = mBinding.darkSwitchCompat.isChecked
             RtcEngineInstance.debugSettingModel.noise = mBinding.noiseSwitchCompat.isChecked
+
+            // 镜像+ renderMode
+            val mirrorMode = if (RtcEngineInstance.debugSettingModel.mirrorMode)  VIDEO_MIRROR_MODE_ENABLED else VIDEO_MIRROR_MODE_DISABLED
+            val renderMode = if (RtcEngineInstance.debugSettingModel.renderMode == 0)  RENDER_MODE_HIDDEN else RENDER_MODE_FIT
+            RtcEngineInstance.rtcEngine.setLocalRenderMode(mirrorMode, renderMode)
 
             // 曝光区域 TODO
             val exposureX = mBinding.etExposureX.text.toString().toFloatOrNull()
@@ -181,19 +187,20 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
 
         // 镜像
         mBinding.mirrorSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
-
+            // setUpLocalVideo videoCanvas mirrorMode
         }
 
 
         // 渲染模式
         mBinding.fixModeRadioBox.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                // setUpLocalVideo videoCanvas renderMode
                 if (p2 == 0) {
                     // hidden
-                    RtcEngineInstance.debugSettingModel.fitMode = 0
+                    RtcEngineInstance.debugSettingModel.renderMode = 0
                 } else if (p2 == 1) {
                     // fit
-                    RtcEngineInstance.debugSettingModel.fitMode = 1
+                    RtcEngineInstance.debugSettingModel.renderMode = 1
                 }
             }
 

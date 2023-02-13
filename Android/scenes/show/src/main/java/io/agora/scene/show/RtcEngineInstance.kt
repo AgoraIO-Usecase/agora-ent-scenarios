@@ -91,7 +91,7 @@ object RtcEngineInstance {
             enableHWEncoder = true
             codecType = 3     // 2 -> h264, 3 -> h265
             mirrorMode = false
-            fitMode = 0       // 0 -> hidden, 1 -> fix
+            renderMode = 0       // 0 -> hidden, 1 -> fix
             colorEnhance = false
             dark = false
             noise = false
