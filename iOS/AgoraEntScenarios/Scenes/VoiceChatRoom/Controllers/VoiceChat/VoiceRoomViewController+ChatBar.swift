@@ -113,7 +113,7 @@ extension VoiceRoomViewController {
         let invite = VoiceRoomInviteUsersController(roomId: roomInfo?.room?.room_id ?? "", mic_index:nil)
         let userAlert = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [apply, invite], titles: [LanguageManager.localValue(key: "Raised Hands"), LanguageManager.localValue(key: "Invite On-Stage")], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: userAlert)
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
 
     func showGiftAlert() {
@@ -126,7 +126,7 @@ extension VoiceRoomViewController {
                 self?.rocketAnimation()
             }
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
 
     func sendGift(gift: VoiceRoomGiftEntity) {
@@ -226,13 +226,21 @@ extension VoiceRoomViewController {
         }
         chatBar.micState = !chatBar.micState
         chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
-        // 需要根据麦位特殊处理
-        chatBar.micState == true ? muteLocal(with: idx) : unmuteLocal(with: idx)
-        rtckit.muteLocalAudioStream(mute: chatBar.micState)
+        let status = (chatBar.micState == true ? 0:1)
+        VoiceRoomUserInfo.shared.user?.micStatus = status
+        ChatRoomServiceImp.getSharedInstance().changeMicUserStatus(status: status) { [weak self] error, mic in
+            guard let `self` = self else { return }
+            if error == nil,mic?.mic_index == self.local_index {
+                self.rtckit.muteLocalAudioStream(mute: self.chatBar.micState)
+                self.rtcView.updateUser(mic!)
+            } else {
+                self.view.makeToast("Mute local mic failed!")
+            }
+        }
     }
 
-    func showUsers() {
-        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? "")], titles: [LanguageManager.localValue(key: "Contribution List")], position: .left).cornerRadius(20, [.topLeft, .topRight], .white, 0)
+    func showUsers(position: VoiceRoomSwitchBarDirection) {
+        let contributes = VoiceRoomUserView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 420), controllers: [VoiceRoomGiftersViewController(roomId: roomInfo?.room?.room_id ?? ""),VoiceRoomAudiencesViewController()], titles: ["Contribution List".localized(),"Audience".localized()], position: position).cornerRadius(20, [.topLeft, .topRight], .white, 0)
         let vc = VoiceRoomAlertViewController(compent: PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: 420)), custom: contributes)
         presentViewController(vc)
     }
@@ -291,7 +299,7 @@ extension VoiceRoomViewController {
             }
             vc.dismiss(animated: true)
         }
-        presentViewController(vc)
+        presentViewController(vc,animated: true)
     }
 
     func requestSpeak(index: Int?) {
@@ -329,7 +337,7 @@ extension VoiceRoomViewController {
             }
             vc.dismiss(animated: true)
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
 
     func showExitRoomView() {
@@ -343,7 +351,7 @@ extension VoiceRoomViewController {
                 self?.didHeaderAction(with: .popBack, destroyed: false)
             }
         }
-        presentViewController(vc)
+        presentViewController(vc, animated: true)
     }
     
     func giftList() -> VoiceRoomGiftView {

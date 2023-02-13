@@ -81,7 +81,7 @@ class SASpatialTipsView: UIView {
     }
     
     func show() {
-        guard let vc = UIViewController.cl_topViewController() else { return }
+        guard let vc = UIViewController.cl_topViewController() as? SABaseViewController else { return }
         let controller = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
                                                                                                      height: 480)),
                                                custom: self)

@@ -176,6 +176,8 @@ public let kMPK_RTC_UID: UInt = 1
     @objc public weak var delegate: VMManagerDelegate?
 
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
+    
+    var stopMixingClosure: (() -> ())?
 
     // 单例
     @objc public class func getSharedInstance() -> VoiceRoomRTCManager {
@@ -248,7 +250,7 @@ public let kMPK_RTC_UID: UInt = 1
     }
 
     // init rtc
-    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
+    let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
 
     /**
      * 设置RTC角色
@@ -870,6 +872,9 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
 extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, audioMixingStateChanged state: AgoraAudioMixingStateType, reasonCode: AgoraAudioMixingReasonCode) {
         if state == .stopped {
+            if self.stopMixingClosure != nil {
+                self.stopMixingClosure!()
+            }
             guard let musicType = musicType else { return }
             var count = 0
             switch musicType {

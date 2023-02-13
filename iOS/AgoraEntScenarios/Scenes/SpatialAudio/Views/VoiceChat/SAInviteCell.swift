@@ -44,7 +44,7 @@ public class SAInviteCell: UITableViewCell {
         user = item
         userName.text = item?.name
         item?.invited = (item?.mic_index ?? 0 != -1)
-        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"), context: nil)
+        avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
         operation.setTitle(item?.invited == true ? sceneLocalized("Invited") : sceneLocalized("Invite"), for: .normal)
         operation.setBackgroundImage(UIImage.sceneImage(name:item?.invited == true ? "" : "blue_btn_bg"), for: .normal)
         var color = UIColor.white

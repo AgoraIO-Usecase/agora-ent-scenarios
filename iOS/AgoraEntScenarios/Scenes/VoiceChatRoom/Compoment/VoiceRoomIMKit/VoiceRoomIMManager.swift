@@ -252,7 +252,6 @@ public extension VoiceRoomIMManager {
             }
         })
         self.removeListener()
-        AgoraChatClient.shared().logout(false)
     }
     
     func userDestroyedChatroom() {
@@ -277,6 +276,12 @@ public extension VoiceRoomIMManager {
     
     func updateAnnouncement(content: String,completion: @escaping (Bool) -> Void) {
         AgoraChatClient.shared().roomManager?.updateChatroomAnnouncement(withId: self.currentRoomId, announcement: content,completion: { room, error in
+            completion(error == nil)
+        })
+    }
+    
+    func kickUser(chat_uid: String,completion: @escaping (Bool) -> Void) {
+        AgoraChatClient.shared().roomManager?.removeMembers([chat_uid], fromChatroom: self.currentRoomId,completion: { room, error in
             completion(error == nil)
         })
     }
