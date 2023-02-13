@@ -151,7 +151,7 @@ class SA3DRtcView: UIView {
             }
         } else {
             //更新可移动view的数据
-            guard let micInfos = micInfos else { return }
+            guard let micInfos = micInfos, micInfos.isEmpty == false else { return }
             let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.tag = 200

@@ -216,6 +216,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     }
 
     private func updateMic(_ mics: [SARoomMic], fromId: String) {
+        guard AppContext.saTmpServiceImp().mics.isEmpty == false else { return }
         for mic in mics {
             AppContext.saTmpServiceImp().mics[mic.mic_index] = mic
         }

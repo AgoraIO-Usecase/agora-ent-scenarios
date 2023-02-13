@@ -234,7 +234,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func unsubscribeEvent() {
         agoraPrint("imp all unsubscribe...")
-        self.subscribeDelegate = nil
+//        self.subscribeDelegate = nil
         SyncUtil
             .scene(id: self.roomId ?? "")?
             .unsubscribeScene()
@@ -906,7 +906,7 @@ extension SpatialAudioSyncSerciceImp {
             .collection(className: kCollectionIdSeatInfo)
             .get(success: { [weak self] list in
                 agoraPrint("imp mics seat list get success...")
-                let mics = list.kj.modelArray(SARoomMic.self).sorted(by: {
+                let mics = list.map({ $0.toJson() }).kj.modelArray(SARoomMic.self).sorted(by: {
                     $0.mic_index < $1.mic_index
                 })
                 self?.mics = mics
