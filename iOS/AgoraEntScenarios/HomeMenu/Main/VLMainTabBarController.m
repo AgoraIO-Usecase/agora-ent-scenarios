@@ -89,11 +89,11 @@
     homeViewController.hidesBottomBarWhenPushed = false;
     BaseNavigationController *homeNavigationController = [[BaseNavigationController alloc]
                                                   initWithRootViewController:homeViewController];
-    
-    VLDiscoveryViewController *discoveryVC = [[VLDiscoveryViewController alloc] init];
-    discoveryVC.hidesBottomBarWhenPushed = false;
-    BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
-                                                  initWithRootViewController:discoveryVC];
+//
+//    VLDiscoveryViewController *discoveryVC = [[VLDiscoveryViewController alloc] init];
+//    discoveryVC.hidesBottomBarWhenPushed = false;
+//    BaseNavigationController *discoveryNavigationController = [[BaseNavigationController alloc]
+//                                                  initWithRootViewController:discoveryVC];
 
     VLMineViewController *mineViewController = [[VLMineViewController alloc] init];
     mineViewController.hidesBottomBarWhenPushed = false;
@@ -102,7 +102,7 @@
 
    NSArray *viewControllers = @[
                                    homeNavigationController,
-                                   discoveryNavigationController,
+//                                   discoveryNavigationController,
                                    mineNavigationController,
                                 ];
    return viewControllers;
@@ -114,11 +114,11 @@
                                                 CYLTabBarItemImage : @"Tab_home_normal",
                                                 CYLTabBarItemSelectedImage : @"Tab_home_sel",
                                                 };
-   NSDictionary *discoveryTabBarItemsAttributes = @{
-                                                 CYLTabBarItemTitle : AGLocalizedString(@"发现"),
-                                                 CYLTabBarItemImage : @"Tab_discovery_normal",
-                                                 CYLTabBarItemSelectedImage : @"Tab_discovery_sel",
-                                                 };
+//   NSDictionary *discoveryTabBarItemsAttributes = @{
+//                                                 CYLTabBarItemTitle : AGLocalizedString(@"发现"),
+//                                                 CYLTabBarItemImage : @"Tab_discovery_normal",
+//                                                 CYLTabBarItemSelectedImage : @"Tab_discovery_sel",
+//                                                 };
 
     NSDictionary *mineTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : AGLocalizedString(@"我的"),
@@ -129,7 +129,7 @@
 
    NSArray *tabBarItemsAttributes = @[
                                        homeTabBarItemsAttributes,
-                                       discoveryTabBarItemsAttributes,
+//                                       discoveryTabBarItemsAttributes,
                                        mineTabBarItemsAttributes,
                                       ];
    return tabBarItemsAttributes;
