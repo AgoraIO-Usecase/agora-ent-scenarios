@@ -229,22 +229,26 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)requestAuthorizationForPhotoLibrary {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        if (status == PHAuthorizationStatusAuthorized) {
-            //操作图片
-            [self presentviewcontrollerWithSourceType: UIImagePickerControllerSourceTypePhotoLibrary];
-        }else{
-            [self showAlertWithMessage:@"相册权限未设置,请开启相册权限"];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (status == PHAuthorizationStatusAuthorized) {
+                //操作图片
+                [self presentviewcontrollerWithSourceType: UIImagePickerControllerSourceTypePhotoLibrary];
+            }else{
+                [self showAlertWithMessage:@"相册权限未设置,请开启相册权限"];
+            }
+        });
     }];
 }
 
 - (void)requestAuthorizationForCamera{
     [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-        if(granted == true){
-            [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
-        } else {
-            [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(granted == true){
+                [self presentviewcontrollerWithSourceType:UIImagePickerControllerSourceTypeCamera];
+            } else {
+                [self showAlertWithMessage:@"相机权限未设置,请开启相机权限"];
+            }
+        });
     }];
 }
 
