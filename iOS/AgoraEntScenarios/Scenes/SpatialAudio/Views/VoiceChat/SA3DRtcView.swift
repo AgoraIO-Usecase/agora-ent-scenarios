@@ -156,7 +156,7 @@ class SA3DRtcView: UIView {
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
-            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
+            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.id
         }
     }
 
@@ -188,7 +188,7 @@ class SA3DRtcView: UIView {
         guard let micInfo = micInfos?.first else { return }
         let pos = viewCenterPostion(view: rtcUserView)
         let realPosition = calcuRealPositon(angle: rtcUserView.angle)
-        if micInfo.member?.uid == VLUserCenter.user.userNo {
+        if micInfo.member?.uid == VLUserCenter.user.id {
             rtcKit?.updateSpetialPostion(position: pos,
                                          axisForward: realPosition.0,
                                          axisRight: realPosition.1,
@@ -517,7 +517,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             if let mic_info = micInfos?[2] {
                 mic_info.forward = [1, -1, 0]
                 mic_info.right = [-1, -1, 0]
-                if mic_info.member?.uid == VLUserCenter.user.userNo {
+                if mic_info.member?.uid == VLUserCenter.user.id {
                     rtcKit?.updateSpetialPostion(position: pos,
                                                  axisForward: mic_info.forward ?? [],
                                                  axisRight: mic_info.right ?? [],
@@ -532,7 +532,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             if let mic_info = micInfos?[1] {
                 mic_info.forward = [0, -1, 0]
                 mic_info.right = [-1, 0, 0]
-                if mic_info.member?.uid == VLUserCenter.user.userNo {
+                if mic_info.member?.uid == VLUserCenter.user.id {
                     rtcKit?.updateSpetialPostion(position: pos,
                                                  axisForward: mic_info.forward ?? [],
                                                  axisRight: mic_info.right ?? [],
@@ -568,7 +568,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             if let mic_info = micInfos?[4] {
                 mic_info.forward = [0, 1, 0]
                 mic_info.right = [1, 0, 0]
-                if mic_info.member?.uid == VLUserCenter.user.userNo {
+                if mic_info.member?.uid == VLUserCenter.user.id {
                     rtcKit?.updateSpetialPostion(position: pos,
                                                  axisForward: mic_info.forward ?? [],
                                                  axisRight: mic_info.right ?? [],
@@ -583,7 +583,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             if let mic_info = micInfos?[5] {
                 mic_info.forward = [-1, 1, 0]
                 mic_info.right = [1, 1, 0]
-                if mic_info.member?.uid == VLUserCenter.user.userNo {
+                if mic_info.member?.uid == VLUserCenter.user.id {
                     rtcKit?.updateSpetialPostion(position: pos,
                                                  axisForward: mic_info.forward ?? [],
                                                  axisRight: mic_info.right ?? [],

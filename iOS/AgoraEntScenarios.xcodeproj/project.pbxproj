@@ -3883,7 +3883,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "-8811508760-139.com.OpenAIChat";
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3923,7 +3923,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "-8811508760-139.com.OpenAIChat";
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.entfull;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

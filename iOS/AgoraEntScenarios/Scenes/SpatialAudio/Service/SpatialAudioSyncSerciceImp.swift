@@ -25,6 +25,7 @@ private func agoraPrint(_ message: String) {
 
 enum SAErrorType {
     case unknown(String, String)
+    case userNotFound(String)
     case roomInfoNotFound(String, String)
     case notImplemented(String)
     
@@ -34,6 +35,8 @@ enum SAErrorType {
         switch self {
         case .unknown(let context, let msg):
             saError.message = "[\(context)] error occurred: \(msg)"
+        case .userNotFound(let context):
+            saError.message = "[\(context)] user not found"
         case .roomInfoNotFound(let context, let roomId):
             saError.message = "[\(context)] room not found: \(roomId)"
         case .notImplemented(let context):
@@ -44,7 +47,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom"
+private let cSceneId = "scene_spatialChatRoom1"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -269,7 +272,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         let room_id = room.room_id ?? ""
         self.initScene {
             SyncUtil.joinScene(id: room_id,
-                               userId:VLUserCenter.user.userNo,
+                               userId:VLUserCenter.user.id,
                                isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
@@ -335,7 +338,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         
         var isOwner = false
         if let owner_uid = room.owner?.uid {
-            isOwner = owner_uid == VLUserCenter.user.userNo
+            isOwner = owner_uid == VLUserCenter.user.id
         }
         if isOwner {
             SAIMManager.shared?.userDestroyedChatroom()
@@ -691,7 +694,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         } else {
             apply.index = self.findMicIndex()
         }
-        
+        guard let user = self.userList.filter({$0.uid == VLUserCenter.user.id}).first else {
+            completion(SAErrorType.userNotFound("startMicSeatApply").error(), false)
+            return
+        }
+        apply.member = user
         _addMicSeatApply(roomId: self.roomId!, apply: apply) { error in
             completion(error, error == nil)
         }
@@ -733,7 +740,6 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         mic.member = apply.member
         mic.objectId = mics[mic_index].objectId
-
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if let error = error {
                 completion(error, nil)
@@ -940,7 +946,6 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _updateMicSeat(roomId: String, mic: SARoomMic, completion: @escaping (Error?) -> Void) {
         agoraPrint("imp mic seat update... ")
-
         let params = mic.kj.JSONObject()
         SyncUtil
             .scene(id: self.roomId!)?
@@ -1065,7 +1070,10 @@ extension SpatialAudioSyncSerciceImp {
                 finished(nil)
                 return
             }
-            self._addUserInfo(roomId: roomId) {
+            self._addUserInfo(roomId: roomId) { [weak self] user in
+                if let user = user {
+                    self?.userList.append(user)
+                }
                 finished(nil)
             }
         }
@@ -1089,11 +1097,11 @@ extension SpatialAudioSyncSerciceImp {
             })
     }
 
-    fileprivate func _addUserInfo(roomId: String, finished: @escaping () -> Void) {
+    fileprivate func _addUserInfo(roomId: String, finished: @escaping (SAUser?) -> Void) {
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.userNo
+        owner.uid = VLUserCenter.user.id
 //        owner.mic_index = 0
         owner.portrait = VLUserCenter.user.headUrl
 
@@ -1103,11 +1111,12 @@ extension SpatialAudioSyncSerciceImp {
             .scene(id: roomId)?
             .collection(className: kCollectionIdUser)
             .add(data: params, success: { object in
+                owner.objectId = object.getId()
                 agoraPrint("imp user add success...")
-                finished()
+                finished(owner)
             }, fail: { error in
                 agoraPrint("imp user add fail :\(error.message)...")
-                finished()
+                finished(nil)
             })
     }
     
