@@ -47,7 +47,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom1"
+private let cSceneId = "scene_spatialChatRoom"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -746,9 +746,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 return
             }
             
-            self.micApplys.removeAll {
-                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
-            }
+//            self.micApplys.removeAll {
+//                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+//            }
             self.userList.first(where: { $0.chat_uid ?? "" == apply.member?.chat_uid ?? ""
                             })?.mic_index = mic_index
             let currentMic = self.mics[safe: mic_index]
@@ -759,6 +759,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 completion(SAErrorType.unknown("acceptMicSeatApply", "currentMic.status != -1/2").error(), nil)
                 return
             }
+        }
+        
+        _removeMicSeatApply(roomId: self.roomId!, apply: apply) { error in
+            
         }
     }
     
