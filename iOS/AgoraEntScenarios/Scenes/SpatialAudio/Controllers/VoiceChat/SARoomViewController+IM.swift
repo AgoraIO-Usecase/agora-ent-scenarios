@@ -94,8 +94,9 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         info?.room?.member_count = (info?.room?.member_count ?? 0) + 1
         info?.room?.click_count = (info?.room?.click_count ?? 0) + 1
         headerView.updateHeader(with: info?.room)
-        self.roomInfo?.room?.member_list?.append(user)
-        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
+        self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
+//        self.roomInfo?.room?.member_list?.append(user)
+//        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
@@ -185,11 +186,12 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 }
             }
         }
-        self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
-            $0.chat_uid != userName
-        })
+//        self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
+//            $0.chat_uid != userName
+//        })
         self.refreshApplicants(chat_uid: userName)
-        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
+//        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
+        self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
         if isOwner {
             AppContext.saServiceImp().updateRoomMembers { error in
                 if error != nil {
