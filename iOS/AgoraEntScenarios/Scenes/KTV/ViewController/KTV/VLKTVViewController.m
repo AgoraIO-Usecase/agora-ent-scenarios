@@ -271,7 +271,7 @@ KTVApiDelegate
         }
     }];
     
-    //callback if choose song list didchanged
+    //callback if choose song list did changed
     [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
