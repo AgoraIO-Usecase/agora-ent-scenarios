@@ -696,7 +696,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.userNo
+        owner.uid = VLUserCenter.user.id
         owner.mic_index = 1
         owner.portrait = VLUserCenter.user.headUrl
         
@@ -704,7 +704,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         let params = room.kj.JSONObject()
         self.initScene {
             SyncUtil.joinScene(id: room.room_id ?? "",
-                               userId:VLUserCenter.user.userNo,
+                               userId:VLUserCenter.user.id,
                                isOwner: true,
                                property: params) { result in
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
@@ -784,7 +784,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
                 if room.room_id == roomId {
                     var isOwner = false
                     if let owner_uid = room.owner?.uid {
-                        isOwner = owner_uid == VLUserCenter.user.userNo
+                        isOwner = owner_uid == VLUserCenter.user.id
                     }
                     if isOwner {
                         self.roomList?.remove(at: index)
@@ -818,7 +818,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
         mic.mic_index = 0
         mic.status = 0
         mic.member = SAUser()
-        mic.member?.uid = VLUserCenter.user.userNo
+        mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = ""
         mic.member?.mic_index = 0
