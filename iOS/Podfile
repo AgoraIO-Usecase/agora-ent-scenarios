@@ -38,7 +38,7 @@ def all_pods
   
   pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+#  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
 #  pod 'sdk', :path => 'sdk.podspec'
 
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'
@@ -64,7 +64,7 @@ def all_pods
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'f0613f7a8e11aa4e333f1dba2cfb2516d1140367'
   pod 'AgoraRtm_iOS'
   
-  pod 'AgoraSyncManager', '1.1.4'
+  pod 'AgoraSyncManager', '1.1.7'
   
   
   # Swift Code Formatter

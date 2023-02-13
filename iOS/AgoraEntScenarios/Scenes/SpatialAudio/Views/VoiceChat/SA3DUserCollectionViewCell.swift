@@ -93,7 +93,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         
         rtcUserView.iconView.isHidden = mic.member == nil
         if status != 5 && status != -2 {
-            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"), context: nil)
+            rtcUserView.iconView.sd_setImage(with: URL(string: mic.member?.portrait ?? ""), placeholderImage: UIImage("mine_avatar_placeHolder"))
         } else {
             rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
         }
