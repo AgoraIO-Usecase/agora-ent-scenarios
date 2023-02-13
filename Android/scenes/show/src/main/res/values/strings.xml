@@ -239,4 +239,11 @@
         <item>fix</item>
     </string-array>
 
+    <string-array name="show_sr_type">
+        <item>1倍超分</item>
+        <item>1.33倍超分</item>
+        <item>1.5倍超分</item>
+        <item>2 倍超分</item>
+    </string-array>
+
 </resources>
