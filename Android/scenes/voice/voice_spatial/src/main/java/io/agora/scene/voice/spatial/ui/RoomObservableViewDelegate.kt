@@ -68,8 +68,6 @@ class RoomObservableViewDelegate constructor(
     private var voiceRoomModel: VoiceRoomModel = VoiceRoomModel()
     private var robotInfo: RobotSpatialAudioModel = RobotSpatialAudioModel()
 
-    private var robotSpeaker: Int? = null
-
     private fun localUserIndex(): Int {
         return localUserMicInfo?.micIndex ?: -1
     }
@@ -95,7 +93,13 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     "robot open：$data".logD()
                     if (data != true) return
-                    iRoomMicView.activeBot(true)
+                    iRoomMicView.activeBot(true) { type, points ->
+                        AgoraRtcEngineController.get().updatePlayerPosition(
+                            arrayOf(points.first.x, points.first.y, 0f),
+                            arrayOf(points.second.x, points.second.y, 0f),
+                            type
+                        )
+                    }
                     robotInfo.useRobot = true
                     roomAudioSettingDialog?.updateBoxCheckBoxView(true)
                     // 创建房间，第⼀次启动机器⼈后播放音效：
@@ -116,7 +120,7 @@ class RoomObservableViewDelegate constructor(
                 override fun onSuccess(data: Boolean?) {
                     "robot close：$data".logD()
                     if (data != true) return
-                    iRoomMicView.activeBot(false)
+                    iRoomMicView.activeBot(false, null)
                     // 关闭机器人，暂停所有音效播放
                     robotInfo.useRobot = false
                     AgoraRtcEngineController.get().resetMediaPlayer()
@@ -144,13 +148,7 @@ class RoomObservableViewDelegate constructor(
                 if (finished) {
                     iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_None)
                 } else {
-                    iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_Medium)?.let {
-                        // 机器人位置产生变化，更新空间音效
-                        AgoraRtcEngineController.get().updatePlayerPosition(
-                            arrayOf(it.first.x, it.first.y, 0f),
-                            arrayOf(it.second.x, it.second.y, 0f)
-                        )
-                    }
+                    iRoomMicView.updateBotVolume(speaker, ConfigConstants.VolumeType.Volume_Medium)
                 }
             }
 
@@ -845,7 +843,7 @@ class RoomObservableViewDelegate constructor(
     fun onRobotUpdated(robotInfo: RobotSpatialAudioModel) {
         this.robotInfo = robotInfo
         ThreadManager.getInstance().runOnMainThread {
-            iRoomMicView.activeBot(robotInfo.useRobot)
+            iRoomMicView.activeBot(robotInfo.useRobot, null)
         }
     }
 
@@ -930,27 +928,8 @@ class RoomObservableViewDelegate constructor(
      * 根据麦位数据更新ui
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
-        iRoomMicView.onSeatUpdated(newMicMap) {
-            it.member?.rtcUid?.let { uid ->
-                if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
-                    AgoraRtcEngineController.get().updateSelfPosition(
-                        arrayOf(it.position.x, it.position.y),
-                        arrayOf(it.forward.x, it.forward.y),
-                        arrayOf(-(it.forward.y), it.forward.x),
-                    )
-                } else {
-                    if (!it.isSpatialSet) {
-                        AgoraRtcEngineController.get().setupRemoteSpatialAudio(uid)
-                        it.isSpatialSet = true
-                    }
-                    AgoraRtcEngineController.get().updateRemotePosition(
-                        uid,
-                        arrayOf(it.position.x, it.position.y),
-                        arrayOf(it.forward.x, it.forward.y),
-                    )
-                }
-            }
-        }
+        iRoomMicView.onSeatUpdated(newMicMap)
+        updateSpatialPosition(newMicMap)
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
@@ -961,6 +940,30 @@ class RoomObservableViewDelegate constructor(
         } else {
             chatPrimaryMenuView.setEnableHand(localUserIndex() >= 0)
             isRequesting = false
+        }
+    }
+
+    private fun updateSpatialPosition(map: Map<Int, VoiceMicInfoModel>) {
+        map.forEach{ (_, model) ->
+            model.member?.rtcUid?.let { uid ->
+                if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                    AgoraRtcEngineController.get().updateSelfPosition(
+                        arrayOf(model.position.x, model.position.y),
+                        arrayOf(model.forward.x, model.forward.y),
+                        arrayOf(-(model.forward.y), model.forward.x),
+                    )
+                } else {
+                    if (!model.isSpatialSet) {
+                        AgoraRtcEngineController.get().setupRemoteSpatialAudio(uid)
+                        model.isSpatialSet = true
+                    }
+                    AgoraRtcEngineController.get().updateRemotePosition(
+                        uid,
+                        arrayOf(model.position.x, model.position.y),
+                        arrayOf(model.forward.x, model.forward.y),
+                    )
+                }
+            }
         }
     }
 

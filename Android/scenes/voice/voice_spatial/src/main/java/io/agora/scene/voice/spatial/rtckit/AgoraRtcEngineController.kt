@@ -1,7 +1,6 @@
 package io.agora.scene.voice.spatial.rtckit
 
 import android.content.Context
-import android.graphics.PointF
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -227,12 +226,24 @@ class AgoraRtcEngineController {
      * @param pos 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
-    public fun updatePlayerPosition(pos: Array<Float>, forward: Array<Float>) {
-        val position = RemoteVoicePositionInfo()
-        position.position = pos.toFloatArray()
-        position.forward = forward.toFloatArray()
-        mediaPlayer?.mediaPlayerId?.let {
-            spatial?.updatePlayerPositionInfo(it, position)
+    public fun updatePlayerPosition(pos: Array<Float>, forward: Array<Float>, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
+        when (soundSpeaker) {
+            ConfigConstants.BotSpeaker.BotBlue -> {
+                val position = RemoteVoicePositionInfo()
+                position.position = pos.toFloatArray()
+                position.forward = forward.toFloatArray()
+                botBluePlayer?.mediaPlayerId?.let {
+                    spatial?.updatePlayerPositionInfo(it, position)
+                }
+            }
+            ConfigConstants.BotSpeaker.BotRed -> {
+                val position = RemoteVoicePositionInfo()
+                position.position = pos.toFloatArray()
+                position.forward = forward.toFloatArray()
+                botRedPlayer?.mediaPlayerId?.let {
+                    spatial?.updatePlayerPositionInfo(it, position)
+                }
+            }
         }
     }
     /**
@@ -288,6 +299,22 @@ class AgoraRtcEngineController {
         }
         if (isBroadcaster){
             mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
+            botBluePlayer =  rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
+            botRedPlayer =  rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
@@ -419,11 +446,19 @@ class AgoraRtcEngineController {
     fun resetMediaPlayer() {
         soundAudioQueue.clear()
         mediaPlayer?.stop()
+        botBluePlayer?.stop()
+        botRedPlayer?.stop()
     }
 
     fun updateEffectVolume(volume: Int) {
         mediaPlayer?.adjustPlayoutVolume(volume)
         mediaPlayer?.adjustPublishSignalVolume(volume)
+
+        botBluePlayer?.adjustPlayoutVolume(volume)
+        botBluePlayer?.adjustPublishSignalVolume(volume)
+
+        botRedPlayer?.adjustPlayoutVolume(volume)
+        botRedPlayer?.adjustPublishSignalVolume(volume)
     }
 
     /**
@@ -440,6 +475,16 @@ class AgoraRtcEngineController {
             mediaPlayer?.destroy()
             mediaPlayer = null
         }
+        if (botBluePlayer != null) {
+            botBluePlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
+            botBluePlayer?.destroy()
+            botBluePlayer = null
+        }
+        if (botRedPlayer != null) {
+            botRedPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
+            botRedPlayer?.destroy()
+            botRedPlayer = null
+        }
         if (rtcEngine != null) {
             rtcEngine?.leaveChannel()
             RtcEngineEx.destroy()
@@ -449,7 +494,11 @@ class AgoraRtcEngineController {
 
     private var soundSpeakerType = ConfigConstants.BotSpeaker.BotBlue
 
-    private var mediaPlayer:IMediaPlayer?=null
+    private var mediaPlayer: IMediaPlayer? = null
+
+    private var botBluePlayer: IMediaPlayer? = null
+
+    private var botRedPlayer: IMediaPlayer? = null
 
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
@@ -457,7 +506,17 @@ class AgoraRtcEngineController {
 
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
-                    mediaPlayer?.play()
+                    when (soundSpeakerType) {
+                        ConfigConstants.BotSpeaker.BotBlue -> botBluePlayer?.play()
+                        ConfigConstants.BotSpeaker.BotRed -> botRedPlayer?.play()
+                        ConfigConstants.BotSpeaker.BotBoth -> {
+                            botBluePlayer?.play()
+                            botRedPlayer?.play()
+                        }
+                        else -> {
+                            mediaPlayer?.play()
+                        }
+                    }
                 }
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
                     // 结束播放回调--->> 播放下一个，取队列第一个播放
@@ -480,7 +539,17 @@ class AgoraRtcEngineController {
     }
 
     private fun openMediaPlayer(url: String, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
-        mediaPlayer?.open(url, 0)
+        when (soundSpeaker) {
+            ConfigConstants.BotSpeaker.BotBlue -> botBluePlayer?.open(url, 0)
+            ConfigConstants.BotSpeaker.BotRed -> botRedPlayer?.open(url, 0)
+            ConfigConstants.BotSpeaker.BotBoth -> {
+                botBluePlayer?.open(url, 0)
+                botRedPlayer?.open(url, 0)
+            }
+            else -> {
+                mediaPlayer?.open(url, 0)
+            }
+        }
         this.soundSpeakerType = soundSpeaker
     }
 }
