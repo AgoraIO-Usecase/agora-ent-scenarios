@@ -133,7 +133,7 @@
     [self addSubview:self.idleView];
     
     self.lrcView.config = self.config;
-    [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+    [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
 }
 
 - (void)_refreshOriginButton {
@@ -196,20 +196,22 @@
 }
 
 - (void)configPlayerControls:(VLRoomSelSongModel *)song {
-    // 是自己点的歌曲
+    // 是主唱/伴唱
     if (song.isSongOwner) {
-        [self setPlayerViewsHidden:NO nextButtonHidden:NO];
-    }
-    else if(VLUserCenter.user.ifMaster) {
-        [self setPlayerViewsHidden:YES nextButtonHidden:NO];
-    }
-    else {
-        [self setPlayerViewsHidden:YES nextButtonHidden:YES];
+        [self setPlayerViewsHidden:NO nextButtonHidden:NO playButtonHidden:NO];
+    } else if ([song isSongCoSinger]) {
+        [self setPlayerViewsHidden:NO nextButtonHidden:YES playButtonHidden:YES];
+    } else if(VLUserCenter.user.ifMaster) {
+        [self setPlayerViewsHidden:YES nextButtonHidden:NO playButtonHidden:YES];
+    } else {
+        [self setPlayerViewsHidden:YES nextButtonHidden:YES playButtonHidden:YES];
     }
 }
 
-- (void)setPlayerViewsHidden:(BOOL)hidden nextButtonHidden:(BOOL)nextButtonHidden{
-    self.pauseBtn.hidden = hidden;
+- (void)setPlayerViewsHidden:(BOOL)hidden
+            nextButtonHidden:(BOOL)nextButtonHidden
+            playButtonHidden:(BOOL)playButtonHidden {
+    self.pauseBtn.hidden = playButtonHidden;
     self.nextButton.hidden = nextButtonHidden;
     self.originBtn.hidden = hidden;
     self.settingBtn.hidden = hidden;

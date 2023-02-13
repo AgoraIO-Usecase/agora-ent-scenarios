@@ -46,6 +46,10 @@ typedef enum : NSUInteger {
 /// 是否是自己点的歌曲
 - (BOOL)isSongOwner;
 
+
+/// 自己是伴唱
+- (BOOL)isSongCoSinger;
+
 - (BOOL)readyToPlay;
 
 - (BOOL)waittingForChorusMatch;
