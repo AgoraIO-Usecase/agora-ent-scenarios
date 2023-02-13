@@ -61,11 +61,11 @@ public class SACreateRoomView: UIView, SAHorizontalCardsDelegate, SAHorizontalCa
 
 public extension SACreateRoomView {
     private func refreshBottom(index: Int) {
-        if index > 0 {
+//        if index > 0 {
             roomInput.create.setTitle(sceneLocalized( "Go Live"), for: .normal)
-        } else {
-            roomInput.create.setTitle(sceneLocalized( "Next"), for: .normal)
-        }
+//        } else {
+//            roomInput.create.setTitle(sceneLocalized( "Next"), for: .normal)
+//        }
     }
 
     @objc private func randomRoomName() {
