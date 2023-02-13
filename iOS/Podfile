@@ -18,7 +18,8 @@ def all_pods
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD'
   # 加载图片
-  pod 'SDWebImage', '~> 5.0.3'
+  pod 'SDWebImage', '~> 4.2'
+  pod 'SDWebImageAPNGCoder'
   # Model
   pod 'YYModel', '~> 1.0.4'
   pod 'YYCache', '~> 1.0.4'
@@ -37,7 +38,7 @@ def all_pods
   
   pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
 #pod 'AgoraRtcEngine_iOS', '4.0.0-rc.1'
- # pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
+  pod 'AgoraRtcEngine_Special_iOS', '4.0.1.4.full'
 #  pod 'sdk', :path => 'sdk.podspec'
 
 #  pod 'AgoraAudio_Special_iOS', '4.0.0.9'

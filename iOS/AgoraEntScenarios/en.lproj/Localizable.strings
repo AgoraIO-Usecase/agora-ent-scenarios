@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  AgoraEntScenarios
+
+  Created by 朱继超 on 2023/2/9.
+  
+*/
+"AboutAgoraEntertainment" = "About Agora Entertainment";
+"AgoraEntertainment" = "Agora Entertainment";
+"Version" = "Version";
+"SceneVersion" = "Scene Version";
+"ContactCustomerService" = "Contact Customer Service";
+"OfficialWebsiteAddress" = "Official Website Address";

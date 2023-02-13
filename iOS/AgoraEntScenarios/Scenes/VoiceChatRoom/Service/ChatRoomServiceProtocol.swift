@@ -219,7 +219,13 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///
     func unmuteLocal(mic_index: Int, completion: @escaping (Error?, VRRoomMic?) -> Void)
-
+    
+    
+    /// Description  更新当前上麦用户对自己麦克状态
+    /// - Parameters:
+    ///   - status: 0 自主静麦 1主动开麦
+    ///   - completion: 回调
+    func changeMicUserStatus(status: Int,completion: @escaping (Error?, VRRoomMic?) -> Void)
     /// 换麦
     /// - Parameters:
     ///
