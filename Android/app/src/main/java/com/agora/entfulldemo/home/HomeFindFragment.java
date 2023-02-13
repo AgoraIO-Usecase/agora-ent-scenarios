@@ -63,7 +63,8 @@ public class HomeFindFragment extends BaseViewBindingFragment<AppFragmentHomeFin
         customViewCallback = callback;
         fullscreenContainer.addView(view);
         FrameLayout decorView = (FrameLayout) requireActivity().getWindow().getDecorView();
-        requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        // 收到需求，WebView不允许横屏
+        requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         decorView.addView(fullscreenContainer);
     }
 
