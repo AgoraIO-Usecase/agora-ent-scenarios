@@ -28,7 +28,8 @@ class SA3DRtcView: UIView {
     
     private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
     private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
-
+    private var panGesture: UIPanGestureRecognizer?
+    
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
     
@@ -41,12 +42,12 @@ class SA3DRtcView: UIView {
             }
             collectionView.reloadData()
             
-            guard let micInfos = micInfos else { return }
+            guard let micInfos = micInfos, !micInfos.isEmpty else { return }
             let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
             rtcUserView.tag = 200
             rtcUserView.user = micInfo.member
-            rtcUserView.isUserInteractionEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
+            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.userNo
         }
     }
 
@@ -234,8 +235,8 @@ class SA3DRtcView: UIView {
             make.width.height.equalTo(150~)
         }
         
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(pan(pan:)))
-        rtcUserView.addGestureRecognizer(pan)
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(pan(pan:)))
+        rtcUserView.addGestureRecognizer(panGesture!)
     }
     
     func getCellType(With status: Int) -> SABaseUserCellType {
@@ -408,7 +409,7 @@ extension SA3DRtcView {
 
 extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        micInfos == nil ? 0 : 7
+        (micInfos == nil || micInfos?.isEmpty == true) ? 0 : 7
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

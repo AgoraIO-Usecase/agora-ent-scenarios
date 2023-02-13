@@ -44,7 +44,7 @@ PODS:
   - AgoraRtcEngine_iOS/VirtualBackground (4.1.1)
   - AgoraRtcEngine_iOS/VQA (4.1.1)
   - AgoraRtm_iOS (1.5.1)
-  - AgoraSyncManager (1.1.4):
+  - AgoraSyncManager (1.1.7):
     - SocketRocket
   - Bugly (2.5.93)
   - ChameleonFramework (2.1.0):
@@ -369,9 +369,11 @@ PODS:
     - QMUIKit/QMUILog
   - QMUIKit/QMUIResources (4.5.1)
   - QMUIKit/QMUIWeakObjectContainer (4.5.1)
-  - SDWebImage (5.0.6):
-    - SDWebImage/Core (= 5.0.6)
-  - SDWebImage/Core (5.0.6)
+  - SDWebImage (4.4.8):
+    - SDWebImage/Core (= 4.4.8)
+  - SDWebImage/Core (4.4.8)
+  - SDWebImageAPNGCoder (0.1.1):
+    - SDWebImage/Core (~> 4.2)
   - SnapKit (5.6.0)
   - SocketRocket (0.6.0)
   - SSZipArchive (2.4.3)
@@ -401,7 +403,7 @@ DEPENDENCIES:
   - AgoraLyricsScore (= 1.0.8.8)
   - AgoraRtcEngine_iOS (~> 4.1.1)
   - AgoraRtm_iOS
-  - AgoraSyncManager (= 1.1.4)
+  - AgoraSyncManager (= 1.1.7)
   - Bugly (= 2.5.93)
   - ChameleonFramework
   - CRBoxInputView
@@ -419,7 +421,8 @@ DEPENDENCIES:
   - MJExtension
   - MJRefresh (~> 3.2.0)
   - QMUIKit (= 4.5.1)
-  - SDWebImage (~> 5.0.3)
+  - SDWebImage (~> 4.2)
+  - SDWebImageAPNGCoder
   - SnapKit
   - SocketRocket
   - SVGAPlayer
@@ -460,6 +463,7 @@ SPEC REPOS:
     - Protobuf
     - QMUIKit
     - SDWebImage
+    - SDWebImageAPNGCoder
     - SnapKit
     - SocketRocket
     - SSZipArchive
@@ -480,7 +484,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: dac68d57abe2f80c977ccc7580ed769922f38d6b
   AgoraRtcEngine_iOS: df216a18a01c30fba926565d889c9542319252ac
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
-  AgoraSyncManager: f52eed4494ddf4c0517fe403b03494cd230ba924
+  AgoraSyncManager: 804b2a38f740486cc81b3fc188143a5f76ce6ed2
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
   CRBoxInputView: 2380c292aabbf786fe923776f111ba3053438fba
@@ -500,7 +504,8 @@ SPEC CHECKSUMS:
   MJRefresh: 2b1214a2dc8f4df4c5dcb028ea2ad4e245425fb7
   Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
   QMUIKit: 3e717c45730ecdf5011ca76751990ad1a23ba7e1
-  SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
+  SDWebImage: 783af2c3fa36291a250030c4752ee370a9a51d13
+  SDWebImageAPNGCoder: 3e4c684c8223eef2f45a50bdd0beaab345e4eb24
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -514,6 +519,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: e30f824f02636c71f6677f807d830c7d74fa0e10
+PODFILE CHECKSUM: 9214e0892e74f6f3c452af0ecd9aafac731d64c5
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.11.2
