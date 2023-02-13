@@ -307,6 +307,17 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             for (RoomSeatModel roomSeatModel : seatsArray) {
                 if (roomSeatModel.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                     seatLocalLiveData.setValue(roomSeatModel);
+                    isOnSeat = true;
+                    if (mRtcEngine != null) {
+                        mainChannelMediaOption.publishCameraTrack = false;
+                        mainChannelMediaOption.publishMicrophoneTrack = true;
+                        mainChannelMediaOption.publishCustomAudioTrack = false;
+                        mainChannelMediaOption.enableAudioRecordingOrPlayout = true;
+                        mainChannelMediaOption.autoSubscribeVideo = true;
+                        mainChannelMediaOption.autoSubscribeAudio = true;
+                        mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+                        mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
+                    }
                     break;
                 }
             }
@@ -703,7 +714,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         Log.d(TAG, "RoomLivingViewModel.searchSong() called, condition:" + condition);
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
 
-        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 100);
+        String requestId = iAgoraMusicContentCenter.searchMusic(condition, 0, 50);
         rtcMusicHandlerMap.put(requestId, new IMusicContentCenterEventHandler() {
             @Override
             public void onPreLoadEvent(long songCode, int percent, int status, String msg, String lyricUrl) {
@@ -873,7 +884,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                                 // 加入合唱
                                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner joined");
                                 songPlayingLiveData.postValue(songPlaying);
-                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo().equals("0")) {
+                            } else if (value.isChorus() && value.getChorusNo() != null && songPlaying.getChorusNo() != null && songPlaying.getChorusNo().equals("0")) {
                                 // 伴唱退出合唱
                                 Log.d(TAG, "RoomLivingViewModel.getSongChosenList() partner exited");
                                 if (value.getChorusNo().equals(UserManager.getInstance().getUser().id.toString())) {
@@ -1052,11 +1063,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mRtcEngine.enableAudio();
         mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
         mRtcEngine.enableAudioVolumeIndication(30, 10, true);
-        mRtcEngine.setParameters("{\"rtc.audio.opensl.mode\":0}");
-        mRtcEngine.setParameters("{\"rtc.audio_fec\":[3,2]}");
-        mRtcEngine.setParameters("{\"rtc.audio_resend\":false}");
-        mRtcEngine.setParameters("{\"che.audio.custom_bitrate\":128000}");
-        mRtcEngine.setParameters("{\"che.audio.custom_payload_type\":78}");
 
         mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}");
         mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}");
@@ -1106,7 +1112,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mPlayer = iAgoraMusicContentCenter.createMusicPlayer();
 
         // ------------------ 初始化音乐播放设置面版 ------------------
-        mSetting = new MusicSettingBean(false, 40, 40, 0, new MusicSettingDialog.Callback() {
+        mSetting = new MusicSettingBean(false, 100, 50, 0, new MusicSettingDialog.Callback() {
             @Override
             public void onEarChanged(boolean isEar) {
                 int isMuted = seatLocalLiveData.getValue().isAudioMuted();
@@ -1169,8 +1175,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         });
 
         // ------------------ 初始化音量 ------------------
-        mPlayer.adjustPlayoutVolume(40);
-        mPlayer.adjustPublishSignalVolume(40);
+        mPlayer.adjustPlayoutVolume(50);
+        mPlayer.adjustPublishSignalVolume(50);
         updateVolumeStatus(false);
 
         if (streamId == 0) {
@@ -1210,8 +1216,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     // ------------------ 音量调整 ------------------
-    private int micVolume = 40;
-    private int micOldVolume = 40;
+    private int micVolume = 100;
+    private int micOldVolume = 100;
 
     private void setMusicVolume(int v) {
         mPlayer.adjustPlayoutVolume(v);
@@ -1285,11 +1291,15 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
         boolean isOwnSong = Objects.equals(music.getUserNo(), UserManager.getInstance().getUser().id.toString());
         boolean isChorus = music.isChorus();
+        boolean isChorusMem = false;
+        if (isChorus && music.getChorusNo() != null) {
+            isChorusMem = music.getChorusNo().equals(UserManager.getInstance().getUser().id.toString());
+        }
         Long songCode = Long.parseLong(music.getSongNo());
         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PREPARE);
 
         KTVSongType type = isChorus ? KTVSongType.KTVSongTypeChorus : KTVSongType.KTVSongTypeSolo;
-        KTVSingRole role = isChorus ? (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleCoSinger) : (isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : KTVSingRole.KTVSingRoleAudience);
+        KTVSingRole role =  isOwnSong ? KTVSingRole.KTVSingRoleMainSinger : (isChorusMem ? KTVSingRole.KTVSingRoleCoSinger : KTVSingRole.KTVSingRoleAudience);
         int mainSingerUid = music.getUserNo() == null ? 0 : Integer.parseInt(music.getUserNo());
         int coSingerUid = music.getChorusNo() == null ? 0 : Integer.parseInt(music.getChorusNo());
 
