@@ -63,7 +63,7 @@ public final class SARoomListCell: UITableViewCell {
         ownerName.setTitle("\(room.owner?.name ?? "")", for: .normal)
         seenCount.setTitle("\(room.member_count ?? 0)", for: .normal)
         
-        ownerName.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), for: .normal, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
+        ownerName.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), for: .normal, placeholderImage: nil)
 //        ownerName.setImage(UIImage.sceneImage(name:room.owner?.portrait ?? ""), for: .normal)
 //        ownerName.setImage(UIImage(named: "mine_avatar_placeHolder"), for: .normal)
 //        ownerName.imageView?.sd_setImage(with: URL(string: room.owner?.portrait ?? ""), completed: { image, error, type, url in
