@@ -1120,7 +1120,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                     isOpnEar = isEar;
                     return;
                 }
-                mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
+                if (mRtcEngine != null) {
+                    mRtcEngine.enableInEarMonitoring(isEar, Constants.EAR_MONITORING_FILTER_NONE);
+                }
             }
 
             @Override
@@ -1135,37 +1137,45 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
             @Override
             public void onEffectChanged(int effect) {
-                mRtcEngine.setAudioEffectPreset(getEffectIndex(effect));
+                if (mRtcEngine != null) {
+                    mRtcEngine.setAudioEffectPreset(getEffectIndex(effect));
+                }
             }
 
             @Override
             public void onBeautifierPresetChanged(int effect) {
-                switch (effect) {
-                    case 0:
-                        mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
-                    case 1:
-                        mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
-                    case 2:
-                        mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
-                    case 3:
-                        mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
-                    case 4:
-                        mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
+                if (mRtcEngine != null) {
+                    switch (effect) {
+                        case 0:
+                            mRtcEngine.setVoiceBeautifierParameters(Constants.VOICE_BEAUTIFIER_OFF, 0, 0);
+                        case 1:
+                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 2);
+                        case 2:
+                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 1, 1);
+                        case 3:
+                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 2);
+                        case 4:
+                            mRtcEngine.setVoiceBeautifierParameters(Constants.SINGING_BEAUTIFIER, 2, 1);
+                    }
                 }
             }
 
             @Override
             public void setAudioEffectParameters(int param1, int param2) {
-                if (param1 == 0) {
-                    mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
-                } else {
-                    mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
+                if (mRtcEngine != null) {
+                    if (param1 == 0) {
+                        mRtcEngine.setAudioEffectParameters(Constants.VOICE_CONVERSION_OFF, param1, param2);
+                    } else {
+                        mRtcEngine.setAudioEffectParameters(Constants.PITCH_CORRECTION, param1, param2);
+                    }
                 }
             }
 
             @Override
             public void onToneChanged(int newToneValue) {
-                mPlayer.setAudioPitch(newToneValue);
+                if (mPlayer != null) {
+                    mPlayer.setAudioPitch(newToneValue);
+                }
             }
 
             @Override
@@ -1177,7 +1187,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         // ------------------ 初始化音量 ------------------
         mPlayer.adjustPlayoutVolume(50);
         mPlayer.adjustPublishSignalVolume(50);
-        updateVolumeStatus(false);
 
         if (streamId == 0) {
             DataStreamConfig cfg = new DataStreamConfig();
@@ -1234,7 +1243,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         }
         Log.d(TAG, "unmute! setMicVolume: " + v);
         micVolume = v;
-        mRtcEngine.adjustRecordingSignalVolume(v);
+        if (mRtcEngine != null) {
+            mRtcEngine.adjustRecordingSignalVolume(v);
+        }
     }
 
     // ------------------ 原唱/伴奏 ------------------
