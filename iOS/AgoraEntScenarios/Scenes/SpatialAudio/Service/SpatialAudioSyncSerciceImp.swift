@@ -274,10 +274,12 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             SyncUtil.joinScene(id: room_id,
                                userId:VLUserCenter.user.id,
                                isOwner: true,
-                               property: params) { result in
+                               property: params) {[weak self] result in
+                guard let self = self else {return}
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 self.roomId = model.room_id!
                 
+                self._startCheckExpire()
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, micList in
                         completion(error, model)
@@ -312,6 +314,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                            property: params) {[weak self] result in
             guard let self = self else {return}
             self.roomId = room_id
+            
+            self._startCheckExpire()
             //获取IM信息
             let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
             self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
@@ -805,6 +809,35 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func updateRobotInfo(info: SARobotAudioInfo, completion: @escaping ((Error?)->())) {
         _updateRobot(info: info, completion: completion)
+    }
+}
+
+//MARK: timer
+extension SpatialAudioSyncSerciceImp {
+    fileprivate func _checkRoomExpire() {
+        guard let room = self.roomList.filter({$0.room_id == roomId}).first, let created_at = room.created_at else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+        guard currentTs - Int64(created_at) > expiredDuration else { return }
+        
+        self.subscribeDelegate?.onRoomExpired()
+    }
+    
+    fileprivate func _startCheckExpire() {
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomId == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
     }
 }
 

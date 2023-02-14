@@ -13,6 +13,11 @@ import ZSwiftBaseLib
 
 // MARK: - ChatRoomServiceSubscribeDelegate
 extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
+    func onRoomExpired() {
+        ToastView.show(text: SAServiceKickedReason.destroyed.errorDesc())
+        fetchDetailError()
+    }
+    
     func onRobotUpdate(robotInfo: SARobotAudioInfo) {
         roomInfo?.robotInfo = robotInfo
 
