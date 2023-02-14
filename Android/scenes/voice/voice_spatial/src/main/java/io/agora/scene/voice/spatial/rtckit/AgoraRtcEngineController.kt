@@ -164,6 +164,7 @@ class AgoraRtcEngineController {
      * 距离单位1值为 1f
      */
     private fun setupSpatialAudio() {
+        "spatial setup spatial audio".logD("Spatial Voice")
         val localSpatial = ILocalSpatialAudioEngine.create()
         val localSpatialAudioConfig = LocalSpatialAudioConfig()
         localSpatialAudioConfig.mRtcEngine = rtcEngine
@@ -176,13 +177,14 @@ class AgoraRtcEngineController {
     /**
      * 更新自己空间音频位置
      * @param pos 位置[x, y, z]
-     * @param froward 朝向[x, y, z]
+     * @param forward 朝向[x, y, z]
      * @param right 朝向[x, y, z]
      */
-    public fun updateSelfPosition(pos: Array<Float>, froward: Array<Float>, right: Array<Float>) {
+    public fun updateSelfPosition(pos: Array<Float>, forward: Array<Float>, right: Array<Float>) {
+        "spatial update self position: p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]} r: ${right[0]} ${right[1]}".logD("Spatial Voice")
         spatial?.updateSelfPosition(
             pos.toFloatArray(),
-            froward.toFloatArray(),
+            forward.toFloatArray(),
             right.toFloatArray(),
             arrayListOf<Float>(0f, 0f, 1f).toFloatArray())
     }
@@ -204,6 +206,7 @@ class AgoraRtcEngineController {
      * @param uid 远端音源的uid
      */
     public fun setupRemoteSpatialAudio(uid: Int) {
+        "spatial setup remote: u: $uid".logD("Spatial Voice")
         val spatialAudioParams = SpatialAudioParams()
         spatialAudioParams.enable_blur = false
         spatialAudioParams.enable_air_absorb = true
@@ -216,6 +219,7 @@ class AgoraRtcEngineController {
      * @param forward 朝向[x, y, z]
      */
     public fun updateRemotePosition(uid: Int, pos: Array<Float>, forward: Array<Float>) {
+        "spatial update remote position: u: $uid p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
         val position = RemoteVoicePositionInfo()
         position.position = pos.toFloatArray()
         position.forward = forward.toFloatArray()
@@ -234,7 +238,9 @@ class AgoraRtcEngineController {
                 position.forward = forward.toFloatArray()
                 botBluePlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
+                    "spatial update player blue: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
                 }
+
             }
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
@@ -242,6 +248,7 @@ class AgoraRtcEngineController {
                 position.forward = forward.toFloatArray()
                 botRedPlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
+                    "spatial update player red: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
                 }
             }
         }
@@ -539,17 +546,27 @@ class AgoraRtcEngineController {
     }
 
     private fun openMediaPlayer(url: String, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
+        "sound player open $soundSpeaker".logD("hzq_player")
+        this.soundSpeakerType = soundSpeaker
         when (soundSpeaker) {
-            ConfigConstants.BotSpeaker.BotBlue -> botBluePlayer?.open(url, 0)
-            ConfigConstants.BotSpeaker.BotRed -> botRedPlayer?.open(url, 0)
+            ConfigConstants.BotSpeaker.BotBlue -> {
+                botBluePlayer?.stop()
+                botBluePlayer?.open(url, 0)
+            }
+            ConfigConstants.BotSpeaker.BotRed -> {
+                botRedPlayer?.stop()
+                botRedPlayer?.open(url, 0)
+            }
             ConfigConstants.BotSpeaker.BotBoth -> {
+                botBluePlayer?.stop()
+                botRedPlayer?.stop()
                 botBluePlayer?.open(url, 0)
                 botRedPlayer?.open(url, 0)
             }
             else -> {
+                mediaPlayer?.stop()
                 mediaPlayer?.open(url, 0)
             }
         }
-        this.soundSpeakerType = soundSpeaker
     }
 }

@@ -422,12 +422,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 binding.micV3Blue.binding(this)
                 micViewMap[ConfigConstants.MicConstant.KeyIndex3]?.binding(this)
                 // BotSpeaker Type Position
-                each?.invoke(1, Pair(getPositon(binding.micV3Blue), PointF(1f, 1f)))
+                each?.invoke(0, Pair(getPositon(binding.micV3Blue), PointF(1f, 1f)))
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
-                each?.invoke(0, Pair(getPositon(binding.micV6Red), PointF(-1f, -1f)))
+                each?.invoke(1, Pair(getPositon(binding.micV6Red), PointF(-1f, -1f)))
             }
         } else {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {
