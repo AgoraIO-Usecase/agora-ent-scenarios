@@ -86,9 +86,12 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     /// Description 刷新申请人列表
     /// - Parameter chat_uid: 环信userName
     func refreshApplicants(chat_uid: String) {
-        AppContext.saTmpServiceImp().micApplys = AppContext.saTmpServiceImp().micApplys.filter({
-            ($0.member?.chat_uid ?? "") != chat_uid
-        })
+//        AppContext.saTmpServiceImp().micApplys = AppContext.saTmpServiceImp().micApplys.filter({
+//            ($0.member?.chat_uid ?? "") != chat_uid
+//        })
+//        AppContext.saServiceImp().fetchApplicantsList { error, list in
+//            
+//        }
     }
     
     func onReceiveSeatInvitation(roomId: String, user: SAUser) {
