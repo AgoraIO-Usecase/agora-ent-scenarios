@@ -144,9 +144,6 @@ class AgoraRtcEngineController {
                     }
                 }
             }
-            // 加载ai 降噪so
-            config.addExtension("agora_ai_noise_suppression_extension")
-            config.addExtension("agora_ai_echo_cancellation_extension")
             try {
                 rtcEngine = RtcEngineEx.create(config) as RtcEngineEx?
             } catch (e: Exception) {
@@ -240,7 +237,6 @@ class AgoraRtcEngineController {
                     spatial?.updatePlayerPositionInfo(it, position)
                     "spatial update player blue: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
                 }
-
             }
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
@@ -510,7 +506,6 @@ class AgoraRtcEngineController {
     private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
             "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error".logD(TAG)
-
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     when (soundSpeakerType) {
@@ -546,7 +541,6 @@ class AgoraRtcEngineController {
     }
 
     private fun openMediaPlayer(url: String, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
-        "sound player open $soundSpeaker".logD("hzq_player")
         this.soundSpeakerType = soundSpeaker
         when (soundSpeaker) {
             ConfigConstants.BotSpeaker.BotBlue -> {
