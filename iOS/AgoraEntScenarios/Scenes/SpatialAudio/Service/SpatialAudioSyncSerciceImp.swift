@@ -847,6 +847,7 @@ extension SpatialAudioSyncSerciceImp {
                                return
                            }
                            agoraPrint("imp room subscribe onDeleted...")
+                           self?.subscribeDelegate?.onUserBeKicked(roomId: channelName, reason: .destroyed)
 //                           self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
                        }, onSubscribed: {}, fail: { error in
                        })
