@@ -882,7 +882,7 @@ extension SpatialAudioSyncSerciceImp {
                                self.subscribeDelegate?.onRobotVolumeChanged(roomId: channelName, volume: room.robot_volume ?? 0, from: room.owner?.name ?? "")
                            }*/
                        }, onDeleted: { [weak self] object in
-                           guard let model = self?.roomList.filter({ $0.objectId == object.getId()}).first,
+                           guard let model = self?.roomList.filter({ $0.room_id == object.getId() }).first,
                                  model.room_id == channelName,
                                  model.owner?.uid != VLUserCenter.user.id else {
                                return
