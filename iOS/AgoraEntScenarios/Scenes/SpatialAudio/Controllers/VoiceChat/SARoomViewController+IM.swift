@@ -27,7 +27,14 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
 
         red_mic.status = robotInfo.use_robot ? 5 : -2
         blue_mic.status = robotInfo.use_robot ? 5 : -2
-
+        
+        red_mic.attenuation = robotInfo.red_robot_attenuation
+        red_mic.airAbsorb = robotInfo.red_robot_absorb
+        red_mic.voiceBlur = robotInfo.red_robot_blur
+        blue_mic.attenuation = robotInfo.blue_robot_attenuation
+        blue_mic.airAbsorb = robotInfo.red_robot_absorb
+        blue_mic.voiceBlur = robotInfo.red_robot_blur
+        
         self.sRtcView.updateUser(blue_mic)
         self.sRtcView.updateUser(red_mic)
         
