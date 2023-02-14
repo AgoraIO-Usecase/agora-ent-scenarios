@@ -63,29 +63,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/mtBlueBotSpatialAudio"
-                style="@style/voice_bottom_sheet_text_style"
-                android:paddingStart="20dp"
-                android:text="@string/voice_chatroom_spatial_audio"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSettingTitle" />
+<!--            <com.google.android.material.textview.MaterialTextView-->
+<!--                android:id="@+id/mtBlueBotSpatialAudio"-->
+<!--                style="@style/voice_bottom_sheet_text_style"-->
+<!--                android:paddingStart="20dp"-->
+<!--                android:text="@string/voice_chatroom_spatial_audio"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSettingTitle" />-->
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/mcbBlueBotSpatialAudio"
-                style="@style/voice_bottom_sheet_checkbox"
-                android:checked="false"
-                app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotSpatialAudio"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/mtBlueBotSpatialAudio" />
+<!--            <androidx.appcompat.widget.AppCompatCheckBox-->
+<!--                android:id="@+id/mcbBlueBotSpatialAudio"-->
+<!--                style="@style/voice_bottom_sheet_checkbox"-->
+<!--                android:checked="false"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotSpatialAudio"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/mtBlueBotSpatialAudio" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/voice_bottom_sheet_divider_style"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSpatialAudio" />
+<!--            <com.google.android.material.divider.MaterialDivider-->
+<!--                style="@style/voice_bottom_sheet_divider_style"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSpatialAudio" />-->
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotAttenuationFactor"
@@ -94,7 +94,7 @@
                 android:paddingStart="20dp"
                 android:text="@string/voice_chatroom_attenuation_factor"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSpatialAudio" />
+                app:layout_constraintTop_toBottomOf="@+id/mtBlueBotSettingTitle" />
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/pbBlueBotAttenuationFactor"
@@ -167,29 +167,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mtBlueBotVoiceBlur" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/mtRedBotSpatialAudio"
-                style="@style/voice_bottom_sheet_text_style"
-                android:paddingStart="20dp"
-                android:text="@string/voice_chatroom_spatial_audio"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSettingTitle" />
+<!--            <com.google.android.material.textview.MaterialTextView-->
+<!--                android:id="@+id/mtRedBotSpatialAudio"-->
+<!--                style="@style/voice_bottom_sheet_text_style"-->
+<!--                android:paddingStart="20dp"-->
+<!--                android:text="@string/voice_chatroom_spatial_audio"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSettingTitle" />-->
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/mcbRedBotSpatialAudio"
-                style="@style/voice_bottom_sheet_checkbox"
-                android:checked="false"
-                app:layout_constraintBottom_toBottomOf="@+id/mtRedBotSpatialAudio"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/mtRedBotSpatialAudio" />
+<!--            <androidx.appcompat.widget.AppCompatCheckBox-->
+<!--                android:id="@+id/mcbRedBotSpatialAudio"-->
+<!--                style="@style/voice_bottom_sheet_checkbox"-->
+<!--                android:checked="false"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/mtRedBotSpatialAudio"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/mtRedBotSpatialAudio" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/voice_bottom_sheet_divider_style"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSpatialAudio" />
+<!--            <com.google.android.material.divider.MaterialDivider-->
+<!--                style="@style/voice_bottom_sheet_divider_style"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSpatialAudio" />-->
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotAttenuationFactor"
@@ -198,7 +198,7 @@
                 android:paddingStart="20dp"
                 android:text="@string/voice_chatroom_attenuation_factor"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSpatialAudio" />
+                app:layout_constraintTop_toBottomOf="@+id/mtRedBotSettingTitle" />
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/pbRedBotAttenuationFactor"
@@ -223,7 +223,7 @@
                 android:id="@+id/mtRedBotAirAbsorb"
                 style="@style/voice_bottom_sheet_text_style"
                 android:paddingStart="20dp"
-                android:text="@string/voice_chatroom_spatial_audio"
+                android:text="@string/voice_chatroom_air_absorb"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mtRedBotAttenuationFactor" />
 

@@ -1,6 +1,7 @@
 package io.agora.scene.voice.spatial.viewmodel.repositories
 
 import androidx.lifecycle.LiveData
+import io.agora.scene.voice.spatial.model.RobotSpatialAudioModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.VoiceRoomInfo
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
@@ -18,6 +19,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
      * voice chat protocol
      */
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceRobotInfo: RobotSpatialAudioModel = RobotSpatialAudioModel()
 
     /**
      * 获取详情
@@ -41,11 +43,108 @@ class VoiceRoomLivingRepository : BaseRepository() {
      * 开启/关闭机器人
      */
     fun enableRobot(useRobot: Boolean): LiveData<Resource<Boolean>> {
+        voiceRobotInfo.useRobot = useRobot
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.enableRobot(useRobot, completion = { error, result ->
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun enableBlueRobotAirAbsorb(active: Boolean): LiveData<Resource<Boolean>> {
+        voiceRobotInfo.blueRobotAbsorb = active
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun enableRedRobotAirAbsorb(active: Boolean): LiveData<Resource<Boolean>> {
+        voiceRobotInfo.redRobotAbsorb = active
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun enableBlueRobotBlur(active: Boolean): LiveData<Resource<Boolean>> {
+        voiceRobotInfo.blueRobotBlur = active
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun enableRedRobotBlur(active: Boolean): LiveData<Resource<Boolean>> {
+        voiceRobotInfo.redRobotBlur = active
+        val resource = object : NetworkOnlyResource<Boolean>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun updateBlueRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+        voiceRobotInfo.blueRobotAttenuation = (attenuation / 100).toFloat()
+        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(Pair(attenuation, result)))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+    fun updateRedRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+        voiceRobotInfo.redRobotAttenuation = (attenuation / 100).toFloat()
+        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(Pair(attenuation, result)))
                     } else {
                         callBack.onError(error)
                     }
@@ -77,9 +176,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
      * 更新机器人音量
      */
     fun updateRobotVolume(value: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+        voiceRobotInfo.robotVolume = value
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
-                voiceServiceProtocol.updateRobotVolume(value, completion = { error, result ->
+                voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(Pair(value, result)))
                     } else {

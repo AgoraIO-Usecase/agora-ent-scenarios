@@ -68,7 +68,11 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
             pbAgoraBotVolume.progress = audioSettingsInfo.botVolume
             mtAgoraBotVolumeValue.text = audioSettingsInfo.botVolume.toString()
 
-            mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
+            if (audioSettingsInfo.botOpen) {
+                mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_on)
+            } else {
+                mtSpatialAudioArrow.text = view.context.getString(R.string.voice_chatroom_off)
+            }
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 "isChecked：$isChecked".logD("mcbAgoraBot")
