@@ -179,7 +179,7 @@ extension SARoomViewController {
     }
 
     func refuse() {
-        AppContext.saServiceImp().refuseInvite(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { _, _ in
+        AppContext.saServiceImp().refuseInvite(chat_uid: self.roomInfo?.room?.owner?.uid ?? "") { _, _ in
             
         }
     }

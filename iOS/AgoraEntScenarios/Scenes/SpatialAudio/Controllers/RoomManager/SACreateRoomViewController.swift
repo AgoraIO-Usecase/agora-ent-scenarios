@@ -85,7 +85,7 @@ extension SACreateRoomViewController {
 //        SpatialAudioServiceImp.getSharedInstance().initIM(with: entity.name ?? "", chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
         entity.chatroom_id = entity.room_id
             entity.owner = SAUserInfo.shared.user
-            entity.owner?.chat_uid = SAUserInfo.shared.user?.uid
+            entity.owner?.chat_uid = SAUserInfo.shared.user?.rtc_uid
 //            VLUserCenter.user.im_token = im_token
 //            if im_token.isEmpty || uid.isEmpty || room_id.isEmpty {
 //                SVProgressHUD.dismiss()
