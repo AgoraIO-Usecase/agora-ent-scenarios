@@ -53,7 +53,7 @@ private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
 private let kCollectionIdRobotInfo = "robot_info_collection"
 class SpatialAudioSyncSerciceImp: NSObject {
-    fileprivate var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
+    fileprivate weak var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false

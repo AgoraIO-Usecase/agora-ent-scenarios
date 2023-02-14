@@ -17,6 +17,11 @@ public class SANormalRoomsViewController: UIViewController {
     
     lazy var roomList: SARoomListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30), style: .plain)
     
+    deinit {
+        saLogger.info("deinit----- SANormalRoomsViewController")
+        AppContext.unloadSaServiceImp()
+    }
+    
     override public func viewDidLoad() {
         super.viewDidLoad()
         view.addSubViews([empty, roomList])
@@ -41,7 +46,8 @@ extension SANormalRoomsViewController {
     }
 
     @objc private func fetchRooms(cursor: String) {
-        AppContext.saServiceImp().fetchRoomList(page: 0) { error, rooms in
+        AppContext.saServiceImp().fetchRoomList(page: 0) {[weak self] error, rooms in
+            guard let self = self else {return}
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}
