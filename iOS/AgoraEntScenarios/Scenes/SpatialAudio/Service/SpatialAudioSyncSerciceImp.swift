@@ -53,7 +53,7 @@ private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
 private let kCollectionIdRobotInfo = "robot_info_collection"
 class SpatialAudioSyncSerciceImp: NSObject {
-    fileprivate var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
+    fileprivate weak var subscribeDelegate: SpatialAudioServiceSubscribeDelegate?
     fileprivate var roomId: String?
     fileprivate var roomList: [SARoomEntity] = [SARoomEntity]()
     fileprivate var syncUtilsInited: Bool = false
@@ -173,7 +173,6 @@ extension SpatialAudioSyncSerciceImp {
     }
     
     fileprivate func createMics(roomId: String, completion: @escaping (Error?, [SARoomMic]?)->Void) {
-        
         _getMicSeatList(roomId: roomId) {[weak self] error, micList in
             guard let self = self else {return}
             if let err = error {
@@ -222,6 +221,14 @@ extension SpatialAudioSyncSerciceImp {
             }
         }
     }
+    
+    fileprivate func _subscribeAll() {
+        _subscribeRoomStatusChanged()
+        _subscribeMicSeatApplyChanged()
+        _subscribeUsersChanged()
+        _subscribeMicSeatInfoChanged()
+        _subscribeRobotChanged()
+    }
 }
 
 
@@ -229,14 +236,10 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func subscribeEvent(with delegate: SpatialAudioServiceSubscribeDelegate) {
         self.subscribeDelegate = delegate
-        _subscribeMicSeatApplyChanged()
-        _subscribeUsersChanged()
-        _subscribeMicSeatInfoChanged()
-        _subscribeRobotChanged()
     }
     
     func unsubscribeEvent() {
-        agoraPrint("imp all unsubscribe...")
+        agoraPrint("imp all unsubscribe ...")
 //        self.subscribeDelegate = nil
         SyncUtil
             .scene(id: self.roomId ?? "")?
@@ -260,12 +263,12 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
-        let owner: SAUser = SAUser()
-        owner.rtc_uid = VLUserCenter.user.id
-        owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.id
-        owner.mic_index = 0
-        owner.portrait = VLUserCenter.user.headUrl
+//        let owner: SAUser = SAUser()
+//        owner.rtc_uid = VLUserCenter.user.id
+//        owner.name = VLUserCenter.user.name
+//        owner.uid = VLUserCenter.user.id
+//        owner.mic_index = 0
+//        owner.portrait = VLUserCenter.user.headUrl
         
         self.roomList.append(room)
         let params = room.kj.JSONObject()
@@ -274,10 +277,13 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             SyncUtil.joinScene(id: room_id,
                                userId:VLUserCenter.user.id,
                                isOwner: true,
-                               property: params) { result in
+                               property: params) {[weak self] result in
+                guard let self = self else {return}
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 self.roomId = model.room_id!
-                
+                self.roomList.append(model)
+                self._startCheckExpire()
+                self._subscribeAll()
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, micList in
                         completion(error, model)
@@ -312,6 +318,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                            property: params) {[weak self] result in
             guard let self = self else {return}
             self.roomId = room_id
+            
+            self._startCheckExpire()
+            self._subscribeAll()
             //获取IM信息
             let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
             self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
@@ -341,24 +350,29 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             isOwner = owner_uid == VLUserCenter.user.id
         }
         if isOwner {
-            SAIMManager.shared?.userDestroyedChatroom()
+//            SAIMManager.shared?.userDestroyedChatroom()
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
-            let updateRoom: SARoomEntity = room
-            updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
-            let params = updateRoom.kj.JSONObject()
-            SyncUtil
-                .scene(id: roomId)?
-                .update(key: "",
-                        data: params,
-                        success: { obj in
-                    agoraPrint("imp updateUserCount success")
-                    
-                },
-                        fail: { error in
-                    agoraPrint("imp updateUserCount fail")
-                })
-            SAIMManager.shared?.userQuitRoom(completion: nil)
+//            let updateRoom: SARoomEntity = room
+//            updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
+//            let params = updateRoom.kj.JSONObject()
+//            SyncUtil
+//                .scene(id: roomId)?
+//                .update(key: "",
+//                        data: params,
+//                        success: { obj in
+//                    agoraPrint("imp updateUserCount success")
+//
+//                },
+//                        fail: { error in
+//                    agoraPrint("imp updateUserCount fail")
+//                })
+//            SAIMManager.shared?.userQuitRoom(completion: nil)
+            
+            _removeUser(roomId: self.roomId!) { error in
+            }
+            
+            SyncUtil.leaveScene(id: self.roomId!)
         }
     }
     
@@ -375,13 +389,15 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(nil, roomInfo)
         }
     }
-    
+   
     func fetchGiftContribute(completion: @escaping (Error?, [SAUser]?) -> Void) {
         completion(SAErrorType.notImplemented("fetchGiftContribute").error(), nil)
     }
     
     func fetchRoomMembers(completion: @escaping (Error?, [SAUser]?) -> Void) {
-        _getUserList(roomId: self.roomId!, finished: completion)
+        _getUserList(roomId: self.roomId!) { error, users in
+            completion(error, users?.filter({$0.uid != VLUserCenter.user.id}))
+        }
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
@@ -803,6 +819,35 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
 }
 
+//MARK: timer
+extension SpatialAudioSyncSerciceImp {
+    fileprivate func _checkRoomExpire() {
+        guard let room = self.roomList.filter({$0.room_id == roomId}).first, let created_at = room.created_at else { return }
+        
+        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
+        let expiredDuration = 20 * 60 * 1000
+        agoraPrint("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+        guard currentTs - Int64(created_at) > expiredDuration else { return }
+        
+        self.subscribeDelegate?.onRoomExpired()
+    }
+    
+    fileprivate func _startCheckExpire() {
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            self._checkRoomExpire()
+            if self.roomId == nil {
+                timer.invalidate()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self._checkRoomExpire()
+        }
+    }
+}
+
 //MARK: room info
 extension SpatialAudioSyncSerciceImp {
     fileprivate func _roomInfo(roomId: String? = nil) -> SARoomEntity? {
@@ -810,7 +855,7 @@ extension SpatialAudioSyncSerciceImp {
         return self.roomList.filter {$0.room_id == room_id}.first
     }
     
-    func subscribeRoomStatusChanged() {
+    func _subscribeRoomStatusChanged() {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
@@ -823,6 +868,7 @@ extension SpatialAudioSyncSerciceImp {
                        }, onUpdated: { [weak self] object in
                            guard let self = self, let jsonStr = object.toJson() else { return }
                            let room = model(from: jsonStr.z.jsonToDictionary(), SARoomEntity.self)
+                           guard room.room_id == channelName else {return}
                            let origRoom = self.roomList.filter({ $0.room_id == room.room_id }).first
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
@@ -837,11 +883,12 @@ extension SpatialAudioSyncSerciceImp {
                            }*/
                        }, onDeleted: { [weak self] object in
                            guard let model = self?.roomList.filter({ $0.objectId == object.getId()}).first,
-                                 model.room_id == channelName
-                           else {
+                                 model.room_id == channelName,
+                                 model.owner?.uid != VLUserCenter.user.id else {
                                return
                            }
                            agoraPrint("imp room subscribe onDeleted...")
+                           self?.subscribeDelegate?.onUserBeKicked(roomId: channelName, reason: .destroyed)
 //                           self?.roomStatusDidChanged?(KTVSubscribeDeleted.rawValue, model)
                        }, onSubscribed: {}, fail: { error in
                        })
@@ -1211,6 +1258,15 @@ extension SpatialAudioSyncSerciceImp {
 
     fileprivate func _updateUserCount(completion: @escaping (NSError?) -> Void) {
 //        _updateUserCount(with: userList.count)
+        guard let channelName = roomId,
+              let roomInfo = roomList.filter({ $0.room_id == channelName }).first else {
+            return
+        }
+        
+        roomInfo.member_count = self.roomList.count + 2
+        _updateRoom(with: roomInfo) { error in
+            
+        }
     }
 
     fileprivate func _updateUserCount(with count: Int) {

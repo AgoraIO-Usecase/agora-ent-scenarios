@@ -24,7 +24,7 @@ extension AppContext {
         return _saServiceImp!
     }
     
-    static func unloadShowServiceImp() {
+    static func unloadSaServiceImp() {
         _saServiceImp = nil
     }
 }

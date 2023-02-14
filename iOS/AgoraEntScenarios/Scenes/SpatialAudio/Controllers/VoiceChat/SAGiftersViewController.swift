@@ -66,7 +66,8 @@ extension SAGiftersViewController {
     }
 
     @objc private func fetchList() {
-        AppContext.saServiceImp().fetchGiftContribute { error, users in
+        AppContext.saServiceImp().fetchGiftContribute {[weak self] error, users in
+            guard let self = self else {return}
             if error == nil, users != nil {
                 self.tableView.refreshControl?.endRefreshing()
                 if users?.count ?? 0 > 0 {

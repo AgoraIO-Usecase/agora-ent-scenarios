@@ -145,6 +145,10 @@ class SA3DRtcView: UIView {
     }
 
     public func updateUser(_ mic: SARoomMic) {
+        
+        // 更新micinfos数组
+        self.micInfos?[mic.mic_index] = mic
+        
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         micInfos?[mic.mic_index] = mic
         let indexPath = IndexPath(item: realIndex, section: 0)
@@ -157,8 +161,7 @@ class SA3DRtcView: UIView {
             //更新可移动view的数据
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
-            
-            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
+            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.userNo
         }
     }
 
