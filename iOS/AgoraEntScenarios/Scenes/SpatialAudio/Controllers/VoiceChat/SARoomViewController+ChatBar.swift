@@ -301,7 +301,8 @@ extension SARoomViewController {
     }
 
     func requestSpeak(index: Int?) {
-        AppContext.saServiceImp().startMicSeatApply(index: index) { error, flag in
+        AppContext.saServiceImp().startMicSeatApply(index: index) {[weak self] error, flag in
+            guard let self = self else {return}
             if error == nil {
                 if flag {
                     self.chatBar.refresh(event: .handsUp, state: .selected, asCreator: false)
@@ -316,7 +317,8 @@ extension SARoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") { error, flag in
+        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") {[weak self] error, flag in
+            guard let self = self else {return}
             if error == nil {
                 self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)

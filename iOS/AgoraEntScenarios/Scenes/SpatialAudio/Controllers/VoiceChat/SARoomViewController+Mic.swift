@@ -12,7 +12,8 @@ extension SARoomViewController {
     
     // 禁言指定麦位
     func mute(with index: Int) {
-        AppContext.saServiceImp().forbidMic(mic_index: index) { error, mic in
+        AppContext.saServiceImp().forbidMic(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
             }
@@ -24,7 +25,8 @@ extension SARoomViewController {
         if let user = roomInfo?.mic_info?[index] {
             if user.status == 1 && index != 0 && isOwner { return }
         }
-        AppContext.saServiceImp().unForbidMic(mic_index: index) { error, mic in
+        AppContext.saServiceImp().unForbidMic(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil {
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: false)
                 if let mic = mic {
@@ -37,7 +39,8 @@ extension SARoomViewController {
 
     // 踢用户下麦
     func kickoff(with index: Int) {
-        AppContext.saServiceImp().kickOff(mic_index: index) { error, mic in
+        AppContext.saServiceImp().kickOff(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
             }
@@ -46,7 +49,8 @@ extension SARoomViewController {
 
     // 锁麦
     func lock(with index: Int) {
-        AppContext.saServiceImp().lockMic(mic_index: index) { error, mic in
+        AppContext.saServiceImp().lockMic(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
             }
@@ -56,7 +60,8 @@ extension SARoomViewController {
 
     // 取消锁麦
     func unLock(with index: Int) {
-        AppContext.saServiceImp().unLockMic(mic_index: index) { error, mic in
+        AppContext.saServiceImp().unLockMic(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
             }
@@ -66,7 +71,8 @@ extension SARoomViewController {
     // 下麦
     func leaveMic(with index: Int) {
         chatBar.refresh(event: .mic, state: .selected, asCreator: false)
-        AppContext.saServiceImp().leaveMic(mic_index: index) { error, mic in
+        AppContext.saServiceImp().leaveMic(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
                 self.rtckit.setClientRole(role: .audience)
@@ -81,7 +87,8 @@ extension SARoomViewController {
 
     // mute自己
     func muteLocal(with index: Int) {
-        AppContext.saServiceImp().muteLocal(mic_index: index) { error, mic in
+        AppContext.saServiceImp().muteLocal(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: true)
@@ -105,7 +112,8 @@ extension SARoomViewController {
             }
         }
         
-        AppContext.saServiceImp().unmuteLocal(mic_index: index) { error, mic in
+        AppContext.saServiceImp().unmuteLocal(mic_index: index) {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
                 self.rtckit.muteLocalAudioStream(mute: false)
@@ -122,7 +130,8 @@ extension SARoomViewController {
                 return
             }
         }
-        AppContext.saServiceImp().changeMic(old_index: from, new_index: to) { error, micMap in
+        AppContext.saServiceImp().changeMic(old_index: from, new_index: to) {[weak self] error, micMap in
+            guard let self = self else {return}
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
                 self.roomInfo?.mic_info?[from] = old_mic
@@ -176,7 +185,8 @@ extension SARoomViewController {
     }
 
     func agreeInvite() {
-        AppContext.saServiceImp().acceptMicSeatInvitation(completion: { error, mic in
+        AppContext.saServiceImp().acceptMicSeatInvitation(completion: {[weak self] error, mic in
+            guard let self = self else {return}
             if error == nil,let mic = mic {
                 self.sRtcView.updateUser(mic)
                 self.local_index = mic.mic_index
