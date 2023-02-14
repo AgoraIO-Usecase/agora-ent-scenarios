@@ -380,6 +380,7 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
     
     func setPlayerAttenuation(attenuation: Double, playerId: Int32) {
+        guard playerId > 0 else { return }
         localSpatial?.setPlayerAttenuation(attenuation,
                                            playerId: UInt(playerId),
                                            forceSet: false)
@@ -391,20 +392,18 @@ public let kMPK_RTC_UID_SA: UInt = 1
         let positionInfo = AgoraRemoteVoicePositionInfo()
         positionInfo.position = position
         positionInfo.forward = forward
-        let ret = localSpatial?.updatePlayerPositionInfo(playerId,
+        localSpatial?.updatePlayerPositionInfo(playerId,
                                                positionInfo: positionInfo)
-        print("player == \(ret)")
     }
     
     func updateSpetialPostion(position: [NSNumber],
                               axisForward: [NSNumber],
                               axisRight: [NSNumber],
                               axisUp: [NSNumber]) {
-        let ret = localSpatial?.updateSelfPosition(position,
+        localSpatial?.updateSelfPosition(position,
                                          axisForward: axisForward,
                                          axisRight: axisRight,
                                          axisUp: axisUp)
-        print("position == \(ret)")
     }
     
     func updateRemoteSpetialPostion(uid: String?,

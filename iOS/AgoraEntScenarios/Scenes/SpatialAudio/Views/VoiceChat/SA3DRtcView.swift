@@ -42,12 +42,10 @@ class SA3DRtcView: UIView {
             }
             collectionView.reloadData()
             
-            guard let micInfos = micInfos, !micInfos.isEmpty else { return }
-            let micInfo = micInfos[0]
-            rtcUserView.cellType = getCellTypeWithStatus(micInfo.status)
-            rtcUserView.tag = 200
-            rtcUserView.user = micInfo.member
-
+            guard let mic = micInfos?.first else { return }
+            rtcUserView.cellType = getCellTypeWithStatus(mic.status)
+            rtcUserView.user = mic.member
+            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
         }
     }
 
@@ -148,6 +146,7 @@ class SA3DRtcView: UIView {
 
     public func updateUser(_ mic: SARoomMic) {
         let realIndex: Int = getRealIndex(with: mic.mic_index)
+        micInfos?[mic.mic_index] = mic
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
@@ -156,12 +155,10 @@ class SA3DRtcView: UIView {
             }
         } else {
             //更新可移动view的数据
-            guard let micInfos = micInfos, micInfos.isEmpty == false else { return }
-            let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
-            rtcUserView.tag = 200
-            rtcUserView.user = micInfo.member
-            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.id
+            rtcUserView.user = mic.member
+            
+            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
         }
     }
 
@@ -189,8 +186,9 @@ class SA3DRtcView: UIView {
         }
     }
 
-    func updateCenterUserPosition() {
-        guard let micInfo = micInfos?.first else { return }
+    @discardableResult
+    func updateCenterUserPosition() -> [Double] {
+        guard let micInfo = micInfos?.first else { return [] }
         let pos = viewCenterPostion(view: rtcUserView)
         let realPosition = calcuRealPositon(angle: rtcUserView.angle)
         if micInfo.member?.uid == VLUserCenter.user.id {
@@ -203,8 +201,8 @@ class SA3DRtcView: UIView {
                                                position: pos,
                                                forward: realPosition.0)
         }
-        
         print("pos == \(pos)  forward == \(realPosition.0) right == \(realPosition.1) angle == \(rtcUserView.angle)")
+        return realPosition.0.map({ $0.doubleValue })
     }
     
     private func layoutUI() {
@@ -228,6 +226,7 @@ class SA3DRtcView: UIView {
         }
 
         addSubview(rtcUserView)
+        rtcUserView.tag = 200
         rtcUserView.tapClickBlock = {[weak self] in
             guard let clickBlock = self?.clickBlock else {return}
             if let micinfo: SARoomMic = self?.micInfos?[0] {
@@ -306,19 +305,20 @@ extension SA3DRtcView {
             pan.setTranslation(.zero, in: self)
         } else if pan.state == .ended {
             rtcUserView.angle = angle
-            updateCenterUserPosition()
+            let forward = updateCenterUserPosition()
             
             if let user = micInfos?.first?.member {
                 let pos = viewCenterPostion(view: rtcUserView)
                 let info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
                 info.position = pos.map({ $0.doubleValue })
-                info.forward = [0, 1, 0]
+                info.forward = forward
                 info.x = pos.first?.doubleValue ?? 0
                 info.y = pos[1].doubleValue
                 info.angle = angle
                 guard let streamData = JSONObject.toData(info) else { return }
-                rtcKit?.sendStreamMessage(with: streamData)
+                let ret = rtcKit?.sendStreamMessage(with: streamData)
+                print("ret == \(ret)")
             }
         }
     }
