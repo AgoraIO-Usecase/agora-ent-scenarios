@@ -341,24 +341,29 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             isOwner = owner_uid == VLUserCenter.user.id
         }
         if isOwner {
-            SAIMManager.shared?.userDestroyedChatroom()
+//            SAIMManager.shared?.userDestroyedChatroom()
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
-            let updateRoom: SARoomEntity = room
-            updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
-            let params = updateRoom.kj.JSONObject()
-            SyncUtil
-                .scene(id: roomId)?
-                .update(key: "",
-                        data: params,
-                        success: { obj in
-                    agoraPrint("imp updateUserCount success")
-                    
-                },
-                        fail: { error in
-                    agoraPrint("imp updateUserCount fail")
-                })
-            SAIMManager.shared?.userQuitRoom(completion: nil)
+//            let updateRoom: SARoomEntity = room
+//            updateRoom.member_count = (updateRoom.member_count ?? 0) - 1
+//            let params = updateRoom.kj.JSONObject()
+//            SyncUtil
+//                .scene(id: roomId)?
+//                .update(key: "",
+//                        data: params,
+//                        success: { obj in
+//                    agoraPrint("imp updateUserCount success")
+//
+//                },
+//                        fail: { error in
+//                    agoraPrint("imp updateUserCount fail")
+//                })
+//            SAIMManager.shared?.userQuitRoom(completion: nil)
+            
+            _removeUser(roomId: self.roomId!) { error in
+            }
+            
+            SyncUtil.leaveScene(id: self.roomId!)
         }
     }
     
@@ -1211,6 +1216,15 @@ extension SpatialAudioSyncSerciceImp {
 
     fileprivate func _updateUserCount(completion: @escaping (NSError?) -> Void) {
 //        _updateUserCount(with: userList.count)
+        guard let channelName = roomId,
+              let roomInfo = roomList.filter({ $0.room_id == channelName }).first else {
+            return
+        }
+        
+        roomInfo.member_count = self.roomList.count + 2
+        _updateRoom(with: roomInfo) { error in
+            
+        }
     }
 
     fileprivate func _updateUserCount(with count: Int) {
