@@ -772,9 +772,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             }
         }
         
-        _removeMicSeatApply(roomId: self.roomId!, apply: apply) { error in
-            
-        }
+//        _removeMicSeatApply(roomId: self.roomId!, apply: apply) { error in
+//
+//        }
     }
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
@@ -1055,7 +1055,14 @@ extension SpatialAudioSyncSerciceImp {
             .get(success: { [weak self] list in
                 agoraPrint("imp seat apply list get success...")
                 let applys = list.map({$0.toJson()}).kj.modelArray(SAApply.self)
-                self?.micApplys = applys
+                self?.micApplys = applys.filter({ apply in
+                    for mic in self?.mics ?? [] {
+                        if mic.member?.uid == apply.member?.uid {
+                            return false
+                        }
+                    }
+                    return true
+                })
                 completion(nil, applys)
             }, fail: { error in
                 agoraPrint("imp seat apply list get fail :\(error.message)...")
