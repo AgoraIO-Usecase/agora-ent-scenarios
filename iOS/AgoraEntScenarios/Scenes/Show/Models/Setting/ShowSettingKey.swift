@@ -10,7 +10,7 @@ import AgoraRtcKit
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
     
-    case _240x360 = "240x360"
+//    case _240x360 = "240x360"
     case _360x640 = "360x640"
     case _480x854 = "480x854"
     case _540x960 = "540x960"

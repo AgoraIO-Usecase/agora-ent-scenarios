@@ -301,7 +301,7 @@ class ShowAgoraKitManager: NSObject {
             seg?.greenCapacity = greenCapacity
         }
         let ret = agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
-        showLogger.info("enableVirtualBackground ret = \(ret)")
+        showLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
     }
     
     /// 设置虚拟背景

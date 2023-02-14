@@ -273,7 +273,7 @@ extension ShowAgoraKitManager {
     /// - Parameter key: 要更新的key
     func updateSettingForkey(_ key: ShowSettingKey, currentChannelId:String? = nil) {
         let isOn = key.boolValue
-        let index = key.intValue
+        let indexValue = key.intValue
         let sliderValue = key.floatValue
         
         switch key {
@@ -294,6 +294,7 @@ extension ShowAgoraKitManager {
             
            break
         case .videoEncodeSize:
+            let index = indexValue % dimensionsItems.count
             videoEncoderConfig.dimensions = dimensionsItems[index]
             if let currentChannelId = currentChannelId{
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
@@ -308,6 +309,7 @@ extension ShowAgoraKitManager {
                 agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             }
         case .FPS:
+            let index = indexValue % fpsItems.count
             videoEncoderConfig.frameRate = fpsItems[index]
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
@@ -329,8 +331,10 @@ extension ShowAgoraKitManager {
         case .audioBitRate:
             break
         case .captureVideoSize:
+            let index = indexValue % captureDimensionsItems.count
             setCaptureVideoDimensions(captureDimensionsItems[index])
         case .captureFrameRate:
+            let index = indexValue % fpsItems.count
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
             agoraKit.setCameraCapturerConfiguration(captureConfig)
         }
