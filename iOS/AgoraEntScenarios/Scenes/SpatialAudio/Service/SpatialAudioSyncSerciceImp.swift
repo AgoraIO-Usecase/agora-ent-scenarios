@@ -229,6 +229,7 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func subscribeEvent(with delegate: SpatialAudioServiceSubscribeDelegate) {
         self.subscribeDelegate = delegate
+        _subscribeRoomStatusChanged()
         _subscribeMicSeatApplyChanged()
         _subscribeUsersChanged()
         _subscribeMicSeatInfoChanged()
@@ -850,7 +851,7 @@ extension SpatialAudioSyncSerciceImp {
         return self.roomList.filter {$0.room_id == room_id}.first
     }
     
-    func subscribeRoomStatusChanged() {
+    func _subscribeRoomStatusChanged() {
         guard let channelName = roomId else {
             agoraAssert("channelName = nil")
             return
