@@ -244,6 +244,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void onMemberJoinedChorus() {
+        mBinding.ilActive.lrcView.setEnableDrag(false);
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
@@ -346,6 +347,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             mBinding.ilActive.switchOriginal.setChecked(false);
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
         } else if (this.mRole == Role.Partner) {
+            mBinding.ilActive.switchOriginal.setChecked(false);
             mBinding.ilActive.lrcView.setEnableDrag(false);
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);

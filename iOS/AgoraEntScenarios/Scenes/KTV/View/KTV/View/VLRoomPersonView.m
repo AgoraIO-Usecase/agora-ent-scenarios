@@ -111,12 +111,12 @@
     
     cell.muteImgView.hidden = !seatModel.isAudioMuted;
     
-    if(seatModel.ifJoinedChorus)
+    if(seatModel.isJoinedChorus)
         cell.joinChorusBtn.hidden = NO;
     else
         cell.joinChorusBtn.hidden = YES;
     
-    if (seatModel.id == nil) {
+    if (seatModel.rtcUid == nil) {
         cell.muteImgView.hidden = YES;
         cell.singingBtn.hidden = YES;
         cell.joinChorusBtn.hidden = YES;

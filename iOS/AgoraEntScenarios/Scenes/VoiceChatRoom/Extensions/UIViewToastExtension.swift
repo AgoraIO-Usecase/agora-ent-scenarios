@@ -304,8 +304,10 @@ public extension UIView {
             toast.isExclusiveTouch = true
         }
 
-        activeToasts.add(toast)
-        addSubview(toast)
+        DispatchQueue.main.async {
+            self.activeToasts.add(toast)
+            self.addSubview(toast)
+        }
 
         UIView.animate(withDuration: ToastManager.shared.style.fadeDuration, delay: 0.0, options: [.curveEaseOut, .allowUserInteraction], animations: {
             toast.alpha = 1.0

@@ -7,6 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
+import SDWebImage
 
 public class VoiceRoomGiftCell: UITableViewCell {
     var gift: VoiceRoomGiftEntity?
@@ -52,9 +53,9 @@ public class VoiceRoomGiftCell: UITableViewCell {
         if gift == nil {
             gift = item
         }
-        avatar.image = gift?.avatar
+        avatar.sd_setImage(with: URL(string: item.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
         userName.text = gift?.userName ?? ""
-        giftName.text = "Sent " + (gift?.gift_name ?? "")
+        giftName.text = "Sent ".localized() + (gift?.gift_name ?? "")
         giftIcon.image = UIImage("\(gift?.gift_id ?? "")")
         giftNumbers.text = "X \(gift?.gift_count ?? "1")"
     }
