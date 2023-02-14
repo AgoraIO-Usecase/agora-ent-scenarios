@@ -37,12 +37,34 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String,Boolean>>> =
         SingleSourceLiveData()
+
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _closeBotObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _robotVolumeObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> =
         SingleSourceLiveData()
+    private val _openBlueBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _closeBlueBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _openRedBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _closeRedBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _openBlueBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _closeBlueBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _openRedBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _closeRedBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
+        SingleSourceLiveData()
+    private val _blueRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> =
+        SingleSourceLiveData()
+    private val _redRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> =
+        SingleSourceLiveData()
+
     private val _muteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
         SingleSourceLiveData()
     private val _unMuteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
@@ -91,6 +113,36 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     /**改变机器人音量*/
     fun robotVolumeObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _robotVolumeObservable
+
+    /**打开蓝色机器人空气衰减*/
+    fun openBlueBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _openBlueBotAirAbsorbObservable
+
+    /**关闭蓝色机器人空气衰减*/
+    fun closeBlueBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _closeBlueBotAirAbsorbObservable
+
+    /**打开红色机器人空气衰减*/
+    fun openRedBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _openRedBotAirAbsorbObservable
+
+    /**关闭红色机器人空气衰减*/
+    fun closeRedBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _closeRedBotAirAbsorbObservable
+
+    /**打开蓝色机器人模糊*/
+    fun openBlueBotBlurObservable(): LiveData<Resource<Boolean>> = _openBlueBotBlurObservable
+
+    /**关闭蓝色机器人模糊*/
+    fun closeBlueBotBlurObservable(): LiveData<Resource<Boolean>> = _closeBlueBotBlurObservable
+
+    /**打开红色机器人模糊*/
+    fun openRedBotBlurObservable(): LiveData<Resource<Boolean>> = _openRedBotBlurObservable
+
+    /**关闭红色机器人模糊*/
+    fun closeRedBotBlurObservable(): LiveData<Resource<Boolean>> = _closeRedBotBlurObservable
+
+    /**蓝色机器人衰减系数*/
+    fun blueRobotAttenuationObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _blueRobotAttenuationObservable
+
+    /**红色机器人衰减系数*/
+    fun redRobotAttenuationObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _redRobotAttenuationObservable
 
     /**本地禁麦*/
     fun muteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _muteMicObservable
@@ -187,6 +239,48 @@ class VoiceRoomLivingViewModel : ViewModel() {
     // 更新机器人音量
     fun updateBotVolume(robotVolume: Int) {
         _robotVolumeObservable.setSource(mRepository.updateRobotVolume(robotVolume))
+    }
+
+    fun enableBlueRobotAirAbsorb(active: Boolean) {
+        if (active) {
+            _openBlueBotAirAbsorbObservable.setSource(mRepository.enableBlueRobotAirAbsorb(true))
+        } else {
+            _openBlueBotAirAbsorbObservable.setSource(mRepository.enableBlueRobotAirAbsorb(false))
+        }
+    }
+
+    fun enableRedRobotAirAbsorb(active: Boolean) {
+        if (active) {
+            _openRedBotAirAbsorbObservable.setSource(mRepository.enableRedRobotAirAbsorb(true))
+        } else {
+            _openRedBotAirAbsorbObservable.setSource(mRepository.enableRedRobotAirAbsorb(false))
+        }
+    }
+
+    fun enableBlueRobotBlur(active: Boolean) {
+        if (active) {
+            _openBlueBotBlurObservable.setSource(mRepository.enableBlueRobotBlur(true))
+        } else {
+            _openBlueBotBlurObservable.setSource(mRepository.enableBlueRobotBlur(false))
+        }
+    }
+
+    fun enableRedRobotBlur(active: Boolean) {
+        if (active) {
+            _openRedBotBlurObservable.setSource(mRepository.enableRedRobotBlur(true))
+        } else {
+            _openRedBotBlurObservable.setSource(mRepository.enableRedRobotBlur(false))
+        }
+    }
+
+    // 更新机器人音量
+    fun updateBlueRoBotAttenuation(attenuation: Int) {
+        _blueRobotAttenuationObservable.setSource(mRepository.updateBlueRoBotAttenuation(attenuation))
+    }
+
+    // 更新机器人音量
+    fun updateRedRoBotAttenuation(attenuation: Int) {
+        _redRobotAttenuationObservable.setSource(mRepository.updateRedRoBotAttenuation(attenuation))
     }
 
     // 更新公告
