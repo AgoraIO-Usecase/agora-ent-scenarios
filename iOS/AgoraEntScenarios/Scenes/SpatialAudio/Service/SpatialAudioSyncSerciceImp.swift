@@ -173,7 +173,6 @@ extension SpatialAudioSyncSerciceImp {
     }
     
     fileprivate func createMics(roomId: String, completion: @escaping (Error?, [SARoomMic]?)->Void) {
-        
         _getMicSeatList(roomId: roomId) {[weak self] error, micList in
             guard let self = self else {return}
             if let err = error {
@@ -222,6 +221,14 @@ extension SpatialAudioSyncSerciceImp {
             }
         }
     }
+    
+    fileprivate func _subscribeAll() {
+        _subscribeRoomStatusChanged()
+        _subscribeMicSeatApplyChanged()
+        _subscribeUsersChanged()
+        _subscribeMicSeatInfoChanged()
+        _subscribeRobotChanged()
+    }
 }
 
 
@@ -229,15 +236,10 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func subscribeEvent(with delegate: SpatialAudioServiceSubscribeDelegate) {
         self.subscribeDelegate = delegate
-        _subscribeRoomStatusChanged()
-        _subscribeMicSeatApplyChanged()
-        _subscribeUsersChanged()
-        _subscribeMicSeatInfoChanged()
-        _subscribeRobotChanged()
     }
     
     func unsubscribeEvent() {
-        agoraPrint("imp all unsubscribe...")
+        agoraPrint("imp all unsubscribe ...")
 //        self.subscribeDelegate = nil
         SyncUtil
             .scene(id: self.roomId ?? "")?
@@ -261,12 +263,12 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
-        let owner: SAUser = SAUser()
-        owner.rtc_uid = VLUserCenter.user.id
-        owner.name = VLUserCenter.user.name
-        owner.uid = VLUserCenter.user.id
-        owner.mic_index = 0
-        owner.portrait = VLUserCenter.user.headUrl
+//        let owner: SAUser = SAUser()
+//        owner.rtc_uid = VLUserCenter.user.id
+//        owner.name = VLUserCenter.user.name
+//        owner.uid = VLUserCenter.user.id
+//        owner.mic_index = 0
+//        owner.portrait = VLUserCenter.user.headUrl
         
         self.roomList.append(room)
         let params = room.kj.JSONObject()
@@ -279,8 +281,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 guard let self = self else {return}
                 let model = model(from: result.toJson()?.z.jsonToDictionary() ?? [:], SARoomEntity.self)
                 self.roomId = model.room_id!
-                
+                self.roomList.append(model)
                 self._startCheckExpire()
+                self._subscribeAll()
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, micList in
                         completion(error, model)
@@ -317,6 +320,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             self.roomId = room_id
             
             self._startCheckExpire()
+            self._subscribeAll()
             //获取IM信息
             let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
             self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
@@ -864,6 +868,7 @@ extension SpatialAudioSyncSerciceImp {
                        }, onUpdated: { [weak self] object in
                            guard let self = self, let jsonStr = object.toJson() else { return }
                            let room = model(from: jsonStr.z.jsonToDictionary(), SARoomEntity.self)
+                           guard room.room_id == channelName else {return}
                            let origRoom = self.roomList.filter({ $0.room_id == room.room_id }).first
                            agoraPrint("imp room subscribe onUpdated...")
                            if origRoom?.announcement != room.announcement {
@@ -878,8 +883,8 @@ extension SpatialAudioSyncSerciceImp {
                            }*/
                        }, onDeleted: { [weak self] object in
                            guard let model = self?.roomList.filter({ $0.objectId == object.getId()}).first,
-                                 model.room_id == channelName
-                           else {
+                                 model.room_id == channelName,
+                                 model.owner?.uid != VLUserCenter.user.id else {
                                return
                            }
                            agoraPrint("imp room subscribe onDeleted...")
