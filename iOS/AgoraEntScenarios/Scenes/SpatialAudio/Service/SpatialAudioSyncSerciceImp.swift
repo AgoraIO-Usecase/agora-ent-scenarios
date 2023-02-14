@@ -697,14 +697,18 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func startMicSeatApply(index: Int?, completion: @escaping (Error?, Bool) -> Void) {
+        if let apply = self.micApplys.filter({$0.member?.uid == VLUserCenter.user.id}).first {
+            apply.created_at = UInt64(Date().timeIntervalSince1970)
+            apply.index = index ?? self.findMicIndex()
+            _updateMicSeatApply(roomId: self.roomId!, apply: apply) { error in
+                completion(error, error == nil)
+            }
+            return
+        }
+        
         let apply = SAApply()
         apply.created_at = UInt64(Date().timeIntervalSince1970)
-        apply.member = SAUserInfo.shared.user
-        if let idx = index {
-            apply.index = idx
-        } else {
-            apply.index = self.findMicIndex()
-        }
+        apply.index = index ?? self.findMicIndex()
         guard let user = self.userList.filter({$0.uid == VLUserCenter.user.id}).first else {
             completion(SAErrorType.userNotFound("startMicSeatApply").error(), false)
             return
