@@ -263,13 +263,6 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
-//        let owner: SAUser = SAUser()
-//        owner.rtc_uid = VLUserCenter.user.id
-//        owner.name = VLUserCenter.user.name
-//        owner.uid = VLUserCenter.user.id
-//        owner.mic_index = 0
-//        owner.portrait = VLUserCenter.user.headUrl
-        
         self.roomList.append(room)
         let params = room.kj.JSONObject()
         let room_id = room.room_id ?? ""
@@ -351,6 +344,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         if isOwner {
 //            SAIMManager.shared?.userDestroyedChatroom()
+            agoraPrint("imp leaveRoom deleteScenes: \(roomId)")
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
 //            let updateRoom: SARoomEntity = room
@@ -369,6 +363,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //                })
 //            SAIMManager.shared?.userQuitRoom(completion: nil)
             
+            agoraPrint("imp leaveRoom leaveScene \(roomId)")
             _removeUser(roomId: self.roomId!) { error in
             }
             
@@ -1027,7 +1022,9 @@ extension SpatialAudioSyncSerciceImp {
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            defer {
-                               self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
+                               if VLUserCenter.user.id != apply.member?.uid {
+                                   self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
+                               }
                            }
                            self.micApplys.removeAll { $0.objectId == apply.objectId}
                            self.micApplys.append(apply)
@@ -1040,7 +1037,9 @@ extension SpatialAudioSyncSerciceImp {
                                self.micApplys.remove(at: index)
                            }
                            guard let apply = apply else {return}
-                           self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+                           if VLUserCenter.user.id != apply.member?.uid {
+                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+                           }
                        }, onSubscribed: {
                        }, fail: { error in
                            agoraPrint("imp seat apply subscribe fail \(error.message)...")
