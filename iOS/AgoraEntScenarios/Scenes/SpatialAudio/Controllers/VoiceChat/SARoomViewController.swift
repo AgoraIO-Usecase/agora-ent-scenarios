@@ -250,8 +250,8 @@ extension SARoomViewController {
     }
 
     func requestRankList() {
-        AppContext.saServiceImp().fetchGiftContribute { error, users in
-            if error == nil, users != nil {
+        AppContext.saServiceImp().fetchGiftContribute {[weak self] error, users in
+            if error == nil, users != nil, let self = self {
                 let info = self.roomInfo
                 info?.room?.ranking_list = users
                 self.headerView.updateHeader(with: info?.room)
@@ -461,7 +461,8 @@ extension SARoomViewController {
         guard let mic_red: SARoomMic = roomInfo?.mic_info?[6] else { return }
         let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
         robotInfo.use_robot = flag
-        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) {[weak self] error in
+            guard let self = self else {return}
             if error == nil {
                 if self.alienCanPlay {
                     self.sRtcView.playMusic(isPlay: flag)
@@ -484,7 +485,8 @@ extension SARoomViewController {
 
     // announcement
     func updateNotice(with str: String) {
-        AppContext.saServiceImp().updateAnnouncement(content: str) { result in
+        AppContext.saServiceImp().updateAnnouncement(content: str) {[weak self] result in
+            guard let self = self else {return}
             if result {
                 // 如果返回的结果为true 表示上麦成功
                 self.view.makeToast("Notice Posted".localized())
@@ -499,7 +501,8 @@ extension SARoomViewController {
         if isOwner == false { return }
         let robotInfo = roomInfo?.robotInfo ?? SARobotAudioInfo()
         robotInfo.robot_volume = UInt(Vol)
-        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
+        AppContext.saServiceImp().updateRobotInfo(info: robotInfo) {[weak self] error in
+            guard let self = self else {return}
             if error == nil {
                 // 如果返回的结果为true 表示上麦成功
                 guard let robotInfo = self.roomInfo?.robotInfo else { return }
