@@ -1047,6 +1047,7 @@ extension SpatialAudioSyncSerciceImp {
             .collection(className: kCollectionIdSeatApply)
             .delete(id: apply.objectId!, success: { object in
                 agoraPrint("imp seat apply remove success...")
+                completion(nil)
             }, fail: { error in
                 agoraPrint("imp seat apply remove fail :\(error.message)...")
                 completion(SAErrorType.unknown("remove seat apply", error.message).error())
