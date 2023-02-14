@@ -39,11 +39,15 @@ public enum Throttler {
         let isFirstRun = subjects[identifier] == nil ? true : false
 
         if shouldRunImmediately && isFirstRun {
-            work()
+            DispatchQueue.main.async {
+                work()
+            }
         }
 
         if let _ = subjects[identifier] {
-            subjects[identifier]?!.send(work)
+            DispatchQueue.main.async {
+                subjects[identifier]?!.send(work)
+            }
         } else {
             subjects[identifier] = PassthroughSubject<Work, Never>()
             bags[identifier] = Bag()
@@ -52,7 +56,9 @@ public enum Throttler {
 
             subjects[identifier]?!
                 .throttle(for: delay, scheduler: q, latest: shouldRunLatest)
-                .sink(receiveValue: { $0() })
+                .sink(receiveValue: {
+                    $0()
+                })
                 .store(in: &bags[identifier]!)
         }
     }

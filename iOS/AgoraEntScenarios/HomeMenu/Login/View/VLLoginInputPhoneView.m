@@ -5,6 +5,7 @@
 
 #import "VLLoginInputPhoneView.h"
 #import "VLFontUtils.h"
+#import "MenuUtils.h"
 @import Masonry;
 @import QMUIKit;
 
@@ -93,7 +94,7 @@
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.text = @"手机号";
+        _titleLabel.text = AGLocalizedString(@"手机号");
         _titleLabel.textColor = UIColorMakeWithHex(@"#979CBB");
         _titleLabel.font = VLUIFontMake(15);
     }

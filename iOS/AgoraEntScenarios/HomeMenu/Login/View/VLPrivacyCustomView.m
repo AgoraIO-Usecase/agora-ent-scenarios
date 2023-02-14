@@ -6,6 +6,7 @@
 #import "VLPrivacyCustomView.h"
 #import "VLFontUtils.h"
 #import "VLMacroDefine.h"
+#import "MenuUtils.h"
 @import YYText;
 @import Masonry;
 @import QMUIKit;
@@ -98,14 +99,14 @@
         _label.preferredMaxLayoutWidth = 250;
         NSString *_str4Total = nil;
         if(_pass == 0) {
-            _str4Total = NSLocalizedString(@"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。", nil);
+            _str4Total = AGLocalizedString(@"声动互娱软件是一款用于向声网客户展示产品使用效果的测试产品，仅用于测试产品的功能、性能和可用性，而非提供给大众使用的正式产品。\n1.我们将依据《用户协议》及《隐私政策》来帮助您了解我们在收集、使用、存储您个人信息的情况以及您享有的相关权利。\n2.在您使用本测试软件时，我们将收集您的设备信息、日志信息等，同时根据不同使用场景，你可以授予我们获取您设备的麦克风权限、摄像头权限等信息。\n\n您可通过阅读完整的《用户协议》及《隐私政策》来了解详细信息。");
         }
         else {
-            _str4Total = NSLocalizedString(@"同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。", nil);
+            _str4Total = AGLocalizedString(@"同意 用户协议 及 隐私政策 后，声动互娱才能为您提供协作服务。");
         }
         
-        NSString *_str4Highlight1 = NSLocalizedString(@"用户协议", nil);
-        NSString *_str4Highlight2 = NSLocalizedString(@"隐私政策", nil);
+        NSString *_str4Highlight1 = AGLocalizedString(@"用户协议");
+        NSString *_str4Highlight2 = AGLocalizedString(@"隐私政策");
         NSMutableAttributedString *_mattrStr = [NSMutableAttributedString new];
         
         [_mattrStr appendAttributedString:[[NSAttributedString alloc] initWithString:_str4Total attributes:@{NSFontAttributeName : VLUIFontMake(12), NSForegroundColorAttributeName : UIColorMakeWithHex(@"#6C7192")}]];
@@ -156,10 +157,10 @@
         _disButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_disButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         if(_pass == 0) {
-            [_disButton setTitle:NSLocalizedString(@"不同意", nil) forState:UIControlStateNormal];
+            [_disButton setTitle:AGLocalizedString(@"不同意") forState:UIControlStateNormal];
         }
         else {
-            [_disButton setTitle:NSLocalizedString(@"不同意并退出", nil) forState:UIControlStateNormal];
+            [_disButton setTitle:AGLocalizedString(@"不同意并退出") forState:UIControlStateNormal];
         }
         
         [_disButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -180,10 +181,10 @@
         _agreeButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_agreeButton addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         if(_pass == 0) {
-            [_agreeButton setTitle:NSLocalizedString(@"同意", nil) forState:UIControlStateNormal];
+            [_agreeButton setTitle:AGLocalizedString(@"同意") forState:UIControlStateNormal];
         }
         else {
-            [_agreeButton setTitle:NSLocalizedString(@"同意并继续", nil) forState:UIControlStateNormal];
+            [_agreeButton setTitle:AGLocalizedString(@"同意并继续") forState:UIControlStateNormal];
         }
         
         [_agreeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

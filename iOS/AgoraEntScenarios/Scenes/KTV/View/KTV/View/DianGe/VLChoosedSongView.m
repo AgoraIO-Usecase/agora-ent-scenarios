@@ -16,7 +16,6 @@
 @interface VLChoosedSongView ()<UITableViewDataSource,UITableViewDelegate>
 
 @property(nonatomic, weak) id <VLChoosedSongViewDelegate>delegate;
-@property (nonatomic, strong) NSArray *selSongsArray;
 
 @property (nonatomic, strong) UITableView  *tableView;
 
@@ -101,10 +100,6 @@
     }];
 }
 
-- (NSArray *)getSelSongArray {
-    return self.selSongsArray;
-}
-
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
     KTVRemoveSongInputModel* inputModel = [KTVRemoveSongInputModel new];
     inputModel.songNo = model.songNo;
@@ -114,8 +109,6 @@
         if (error != nil) {
             return;
         }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:kDeleteSuccessNotification object:nil];
     }];
 }
 

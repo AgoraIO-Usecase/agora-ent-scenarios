@@ -6,7 +6,7 @@
 #import <UIKit/UIKit.h>
 @class VLBelcantoModel,VLKTVBelcantoCell,VLChooseBelcantoView;
 @protocol VLChooseBelcantoViewDelegate <NSObject>
-
+@optional
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView*)view backBtnTapped:(id)sender;
 - (void)onVLChooseBelcantoView:(VLChooseBelcantoView*)view itemTapped:(VLBelcantoModel *)model withIndex:(NSInteger)index;
 
@@ -18,8 +18,6 @@
 @property (nonatomic, strong) VLBelcantoModel *selBelcantoModel;
 
 @end
-
-
 
 
 @interface VLKTVBelcantoCell : UICollectionViewCell

@@ -190,7 +190,7 @@
 
 - (void)configLrcViewUIWithCurrentSong:(VLRoomSelSongModel *)song {
     // 是自己点的歌曲
-    if (song.isOwnSong) {
+    if (song.isSongOwner) {
         [self setPlayerViewsHidden:NO nextButtonHidden:NO];
     }
     else if(VLUserCenter.user.ifMaster) {
@@ -298,7 +298,7 @@
         // 歌曲是合唱
         if (song.isChorus) {
             // 歌曲是本人点的 (不等了、独唱)
-            if (song.isOwnSong) {
+            if (song.isSongOwner) {
                 if (self.soloTimer) return;
                 self.soloSongView.hidden = NO;
                 self.robMicrophoneView.hidden = YES;

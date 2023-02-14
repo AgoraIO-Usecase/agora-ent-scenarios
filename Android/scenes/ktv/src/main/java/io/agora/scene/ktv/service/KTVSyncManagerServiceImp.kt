@@ -181,7 +181,7 @@ class KTVSyncManagerServiceImp(
         }
         initSync {
             val isRoomOwner = cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()
-            Instance().joinScene(isRoomOwner, inputModel.roomNo, object : JoinSceneCallback {
+            Instance().joinScene(isRoomOwner, true, inputModel.roomNo, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     mSceneReference = sceneReference
                     currRoomNo = inputModel.roomNo
@@ -987,7 +987,17 @@ class KTVSyncManagerServiceImp(
                 }
             }
             if (!hasMaster && cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
-                val targetSeatInfo = innerGenUserSeatInfo(0)
+                val targetSeatInfo = RoomSeatModel(
+                    roomMap[currRoomNo]?.creatorNo == UserManager.getInstance().user.id.toString(),
+                    UserManager.getInstance().user.headUrl,
+                    UserManager.getInstance().user.id.toString(),
+                    UserManager.getInstance().user.id.toString(),
+                    UserManager.getInstance().user.name,
+                    0,
+                    false,
+                    RoomSeatModel.MUTED_VALUE_FALSE,
+                    RoomSeatModel.MUTED_VALUE_TRUE
+                )
                 innerAddSeatInfo(targetSeatInfo) { error ->
                     if (error != null) {
                         completion.invoke(error, null)

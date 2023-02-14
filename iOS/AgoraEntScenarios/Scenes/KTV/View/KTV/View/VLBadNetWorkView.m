@@ -5,6 +5,7 @@
 
 #import "VLBadNetWorkView.h"
 #import "KTVMacro.h"
+#import "LSTPopView+KTVModal.h"
 @import QMUIKit;
 @import YYCategories;
 
@@ -40,7 +41,7 @@
     UIButton *knowBtn = [[UIButton alloc]initWithFrame:CGRectMake((self.width-115)*0.5, lab.bottom+37, 115, 40)];
     knowBtn.layer.cornerRadius = 20;
     knowBtn.layer.masksToBounds = YES;
-    [knowBtn addTarget:self action:@selector(knowBtnClickEvent) forControlEvents:UIControlEventTouchUpInside];
+    [knowBtn addTarget:self action:@selector(knowBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [knowBtn setBackgroundColor:UIColorMakeWithHex(@"#345DFF")];
     [knowBtn setTitle:KTVLocalizedString(@"我知道了") forState:UIControlStateNormal];
     [knowBtn setTitleColor:UIColorWhite forState:UIControlStateNormal];
@@ -50,9 +51,12 @@
 }
 
 - (void)knowBtnClickEvent:(id)sender {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(onVLBadNetworkView:dismiss:)]) {
+    if ([self.delegate respondsToSelector:@selector(onVLBadNetworkView:dismiss:)]) {
         [self.delegate onVLBadNetworkView:self dismiss:sender];
+        return;
     }
+    
+    [[LSTPopView getPopViewWithCustomView:self] dismiss];
 }
 
 @end

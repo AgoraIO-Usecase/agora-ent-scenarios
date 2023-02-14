@@ -61,11 +61,11 @@ public class VoiceRoomInviteUsersController: UITableViewController {
         return cell ?? VoiceRoomInviteCell()
     }
 
-    override public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if apply?.cursor != nil, (apply?.members?.count ?? 0) - 2 == indexPath.row, (apply?.total ?? 0) >= (apply?.members?.count ?? 0) {
-            fetchUsers()
-        }
-    }
+//    override public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if apply?.cursor != nil, (apply?.members?.count ?? 0) - 2 == indexPath.row, (apply?.total ?? 0) >= (apply?.members?.count ?? 0) {
+//            fetchUsers()
+//        }
+//    }
 }
 
 extension VoiceRoomInviteUsersController {
@@ -76,40 +76,34 @@ extension VoiceRoomInviteUsersController {
     }
 
     @objc private func fetchUsers() {
-        VoiceRoomBusinessRequest.shared.sendGETRequest(api: .fetchRoomMembers(roomId: roomId ?? "", cursor: apply?.cursor ?? "", pageSize: 15), params: [:], classType: VoiceRoomAudiencesEntity.self) { model, error in
+        ChatRoomServiceImp.getSharedInstance().fetchRoomMembers { error, users in
             self.tableView.refreshControl?.endRefreshing()
-            if model != nil, error == nil {
+            if users != nil, error == nil {
                 if self.apply == nil {
+                    let model: VoiceRoomAudiencesEntity = VoiceRoomAudiencesEntity()
+                    model.members = users?.filter({
+                        $0.mic_index == -1
+                    })
                     self.apply = model
                 } else {
-                    self.apply?.cursor = model?.cursor
-                    self.apply?.members?.append(contentsOf: model?.members ?? [])
+                    self.apply?.members?.append(contentsOf: users ?? [])
                 }
+                self.empty.isHidden = (self.apply?.members?.count ?? 0) > 0
                 self.tableView.reloadData()
             } else {
                 self.view.makeToast("\(error?.localizedDescription ?? "")")
             }
-            self.empty.isHidden = (self.apply?.members?.count ?? 0 != 0)
         }
+        
     }
 
     private func inviteUser(user: VRUser?) {
         SVProgressHUD.show()
-        var params: [String: Any] = ["uid": user?.uid ?? ""]
-        if idx > 0 {
-            params = ["uid": user?.uid ?? "", "mic_index": idx]
-        }
-        VoiceRoomBusinessRequest.shared.sendPOSTRequest(api: .inviteUserToMic(roomId: roomId ?? ""), params: params) { dic, error in
+        let chat_uid: String = user?.chat_uid ?? ""
+        ChatRoomServiceImp.getSharedInstance().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) { error, flag in
             SVProgressHUD.dismiss()
-            if dic != nil, error == nil, let result = dic?["result"] as? Bool {
-                if result {
-                    self.view.makeToast("Invitation sent!".localized())
-                } else {
-                    self.view.makeToast("Invited failed!".localized())
-                }
-            } else {
-                self.view.makeToast("\(error?.localizedDescription ?? "")")
-            }
+            self.view.makeToast(flag == true ? "Invitation sent!".localized() : "Invited failed!".localized())
         }
+
     }
 }
