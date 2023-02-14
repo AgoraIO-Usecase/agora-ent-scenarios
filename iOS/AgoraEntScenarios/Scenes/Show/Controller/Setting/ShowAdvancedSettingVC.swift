@@ -14,6 +14,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
     var mode: ShowMode?
     var isBroadcaster = true
     var isOutside = false
+    var currentChannelId: String?
 
     // 自定义导航栏
     private let naviBar = ShowNavigationBar()
@@ -151,7 +152,7 @@ class ShowAdvancedSettingVC: UIViewController, UIGestureRecognizerDelegate {
         let vc = ShowVideoSettingVC()
         vc.settingManager = settingManager
         vc.isOutside = isOutside
-       
+        vc.currentChannelId = currentChannelId
         vc.dataArray = settings[index]
         vc.willChangeSettingParams = {[weak self] key, value in
             guard let wSelf = self else { return false }

@@ -18,6 +18,11 @@ class ShowMusicManager: NSObject {
     }()
     
     private var agoraKit: AgoraRtcEngineKit!
+    lazy var player: AgoraRtcMediaPlayerProtocol? = {
+        let player = agoraKit.createMediaPlayer(with: self)
+        player?.setLoopCount(-1)
+        return player
+    }()
     
     // 美声选项
     private lazy var beautyPresets: [AgoraVoiceBeautifierPreset] = {
@@ -127,7 +132,8 @@ extension ShowMusicManager {
         if index != nil  {
             playMusic(index: index!)
         }else{
-            agoraKit.stopAudioMixing()
+//            agoraKit.stopAudioMixing()
+            player?.stop()
         }
     }
     
@@ -163,7 +169,19 @@ extension ShowMusicManager {
             return
         }
        let musicPath = bundle.path(forResource: musicNames[index], ofType: "wav") ?? ""
-        agoraKit.startAudioMixing(musicPath, loopback: false, cycle: -1)
+//        agoraKit.startAudioMixing(musicPath, loopback: false, cycle: -1)
+        player?.stop()
+        let source = AgoraMediaSource()
+        source.url = musicPath
+        player?.open(with: source)
     }
 }
 
+extension ShowMusicManager: AgoraRtcMediaPlayerDelegate {
+    
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if state == .openCompleted {
+            playerKit.play()
+        }
+    }
+}

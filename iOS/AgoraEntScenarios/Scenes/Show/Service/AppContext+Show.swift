@@ -12,6 +12,7 @@ let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName:
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
+private let kDebugModeKey = "kDebugModeKey"
 
 extension AppContext {
     static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
@@ -50,6 +51,16 @@ extension AppContext {
         }
         get {
             return self.extDic[kRtcTokenMapKey] as? [String: String]
+        }
+    }
+    
+    @objc public var isDebugMode: Bool{
+        set{
+            UserDefaults.standard.set(newValue, forKey: kDebugModeKey)
+        }
+        
+        get {
+            return UserDefaults.standard.bool(forKey: kDebugModeKey)
         }
     }
 }

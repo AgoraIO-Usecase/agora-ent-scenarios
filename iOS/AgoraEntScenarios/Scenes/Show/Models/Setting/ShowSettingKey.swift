@@ -10,7 +10,7 @@ import AgoraRtcKit
 
 enum ShowAgoraVideoDimensions: String, CaseIterable {
     
-    case _240x360 = "240x360"
+//    case _240x360 = "240x360"
     case _360x640 = "360x640"
     case _480x854 = "480x854"
     case _540x960 = "540x960"
@@ -95,6 +95,7 @@ enum ShowSettingKey: String, CaseIterable {
     case musincVolume           // 音乐音量
     case audioBitRate           // 音频码率
     case captureVideoSize       // 采集分辨率
+    case captureFrameRate       // 采集码率
     
     var title: String {
         switch self {
@@ -129,6 +130,8 @@ enum ShowSettingKey: String, CaseIterable {
         case .audioBitRate:
             return "show_advance_setting_audio_bitRate_title".show_localized
         case .captureVideoSize:
+            return ""
+        case .captureFrameRate:
             return ""
         }
     }
@@ -167,6 +170,8 @@ enum ShowSettingKey: String, CaseIterable {
         case .audioBitRate:
             return .label
         case .captureVideoSize:
+            return .label
+        case .captureFrameRate:
             return .label
         }
     }
@@ -214,7 +219,7 @@ enum ShowSettingKey: String, CaseIterable {
         switch self {
         case .videoEncodeSize:
             return ShowAgoraVideoDimensions.allCases.map({ $0.rawValue })
-        case .FPS:
+        case .FPS, .captureFrameRate:
             return [AgoraVideoFrameRate.fps1.stringValue(),
                     AgoraVideoFrameRate.fps7.stringValue(),
                     AgoraVideoFrameRate.fps10.stringValue(),

@@ -180,8 +180,8 @@ class ShowAgoraKitManager: NSObject {
                                 role: AgoraClientRole) {
 //        initAudienceConfig()
         if exConnectionMap[targetChannelId] == nil {
-            let mediaOptions = AgoraRtcChannelMediaOptions()
             let subscribeStatus = role == .audience ? false : true
+            let mediaOptions = AgoraRtcChannelMediaOptions()
             mediaOptions.autoSubscribeAudio = subscribeStatus
             mediaOptions.autoSubscribeVideo = subscribeStatus
 //            mediaOptions.publishCameraTrack = false
@@ -190,6 +190,9 @@ class ShowAgoraKitManager: NSObject {
             // 极速直播
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
+            }else{
+                agoraKit.setCameraCapturerConfiguration(captureConfig)
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
         
             let connection = AgoraRtcConnection()
@@ -199,11 +202,6 @@ class ShowAgoraKitManager: NSObject {
             //TODO: retain cycle in joinChannelEx
             let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
             let date = Date()
-            let encoderRet = agoraKit.setVideoEncoderConfigurationEx(videoEncoderConfig, connection: connection)
-            showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(videoEncoderConfig.dimensions), bitrate = \(videoEncoderConfig.bitrate), fps = \(videoEncoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
-            let captrueRet = agoraKit.setCameraCapturerConfiguration(captureConfig)
-            showLogger.info("setCameraCapturerConfiguration  dimensions = \(captureConfig.dimensions), fps = \(captureConfig.frameRate),  captrueRet = \(captrueRet)", context: kShowLogBaseContext)
-
             let ret =
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
@@ -212,6 +210,7 @@ class ShowAgoraKitManager: NSObject {
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
                 showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
+            agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection
             
             if ret == 0 {
@@ -222,6 +221,14 @@ class ShowAgoraKitManager: NSObject {
                                  context: kShowLogBaseContext)
             }
         }
+    }
+    
+    func updateVideoEncoderConfigurationForConnenction(currentChannelId: String) {
+        let connection = AgoraRtcConnection()
+        connection.channelId = currentChannelId
+        connection.localUid = UInt(VLUserCenter.user.id) ?? 0
+        let encoderRet = agoraKit.setVideoEncoderConfigurationEx(videoEncoderConfig, connection: connection)
+        showLogger.info("setVideoEncoderConfigurationEx  dimensions = \(videoEncoderConfig.dimensions), bitrate = \(videoEncoderConfig.bitrate), fps = \(videoEncoderConfig.frameRate),  encoderRet = \(encoderRet)", context: kShowLogBaseContext)
     }
     
     //MARK: public method
@@ -293,7 +300,8 @@ class ShowAgoraKitManager: NSObject {
             seg?.modelType = .agoraGreen
             seg?.greenCapacity = greenCapacity
         }
-        agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
+        let ret = agoraKit.enableVirtualBackground(isOn, backData: source, segData: seg)
+        showLogger.info("isOn = \(isOn), enableVirtualBackground ret = \(ret)")
     }
     
     /// 设置虚拟背景
@@ -357,6 +365,13 @@ class ShowAgoraKitManager: NSObject {
     func setVideoDimensions(_ size: CGSize){
         videoEncoderConfig.dimensions = CGSize(width: size.width, height: size.height)
         agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+    }
+    
+    /// 设置265
+    /// - Parameter isOn: 开关
+    func setH265On(_ isOn: Bool) {
+        agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
+        agoraKit.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")
     }
     
     func cleanCapture() {

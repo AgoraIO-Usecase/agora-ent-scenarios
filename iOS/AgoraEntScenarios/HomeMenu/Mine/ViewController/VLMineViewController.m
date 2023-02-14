@@ -461,6 +461,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     }];
 }
 
+// 连续点击事件
+- (void)didTapedVersionLabel {
+    [AppContext shared].isDebugMode = YES;
+    [self.mineView refreshTableView];
+}
+
 #pragma mark - Public Methods
 
 - (void)configNavigationBar:(UINavigationBar *)navigationBar {
@@ -481,6 +487,10 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
                               [AgoraRtcEngineKit getSdkVersion]];
         _versionLabel.font = VLUIFontMake(12);
         _versionLabel.textColor = UIColorMakeWithHex(@"#6C7192");
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapedVersionLabel)];
+        tap.numberOfTapsRequired = 5;
+        [_versionLabel addGestureRecognizer:tap];
+        _versionLabel.userInteractionEnabled = YES;
     }
     return _versionLabel;
 }
