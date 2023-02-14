@@ -464,11 +464,6 @@ extension SARoomViewController {
         AppContext.saServiceImp().updateRobotInfo(info: robotInfo) {[weak self] error in
             guard let self = self else {return}
             if error == nil {
-                if self.alienCanPlay {
-                    self.sRtcView.playMusic(isPlay: flag)
-                    self.alienCanPlay = false
-                }
-                
                 mic_blue.status = flag == true ? 5 : -2
                 mic_red.status = flag == true ? 5 : -2
                 self.roomInfo?.robotInfo.use_robot = flag

@@ -77,6 +77,7 @@ class SA3DRtcView: UIView {
             redMediaPlayer?.stop()
             blueMediaPlayer?.stop()
         }
+        collectionView.reloadData()
     }
     
     private func setupSpatialAudio() {
@@ -559,7 +560,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
                                        playerId: Int(redMediaPlayer?.getMediaPlayerId() ?? 0))
-                print("pos red == \(pos) rect = \(rect)")
             }
             
         case 4:
@@ -570,7 +570,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
                                        playerId: Int(blueMediaPlayer?.getMediaPlayerId() ?? 0))
-                print("pos blue == \(pos) rect = \(rect)")
             }
         case 5:
             if let mic_info = micInfos?[4] {
