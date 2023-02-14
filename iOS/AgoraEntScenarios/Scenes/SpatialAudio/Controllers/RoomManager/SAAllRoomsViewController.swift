@@ -39,7 +39,8 @@ extension SAAllRoomsViewController {
     }
 
     private func fetchRooms(cursor: String) {
-        AppContext.saServiceImp().fetchRoomList(page: 0) { error, rooms in
+        AppContext.saServiceImp().fetchRoomList(page: 0) {[weak self] error, rooms in
+            guard let self = self else {return}
             self.roomList.refreshControl?.endRefreshing()
             if error == nil {
                 guard let rooms = rooms else {return}

@@ -85,8 +85,9 @@ public class SASoundEffectsViewController: SABaseViewController {
                 SAIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
                     if error == nil {
-                        AppContext.saServiceImp().createRoom(room: entity) { error, room in
+                        AppContext.saServiceImp().createRoom(room: entity) {[weak self] error, room in
                             SVProgressHUD.dismiss()
+                            guard let self = self else {return}
                             self.view.window?.isUserInteractionEnabled = true
                             if let room = room,error == nil {
                                 self.entryRoom(room: room)
