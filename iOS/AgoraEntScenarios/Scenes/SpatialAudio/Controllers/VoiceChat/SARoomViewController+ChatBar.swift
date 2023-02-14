@@ -14,6 +14,7 @@ extension SARoomViewController {
     
     func showEQView() {
         let isOpenSpatial = roomInfo?.robotInfo.use_robot == true
+        let volumn = Double((roomInfo?.robotInfo.robot_volume ?? 180)) / 400.0
 
         let actionView = ActionSheetManager()
         actionView
@@ -22,7 +23,7 @@ extension SARoomViewController {
             .title(title: "Audio Settings")
             .sectionHeader(title: "Bot Settings", desc: "Host Only")
             .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red", isOn: isOpenSpatial, isEnabel: isOwner)
-            .sliderCell(iconName: "icons／set／laba", title: "Robot volume", value: 0.45, isEnable: isOwner)
+            .sliderCell(iconName: "icons／set／laba", title: "Robot volume", value: volumn, isEnable: isOwner)
             .sectionHeader(iconName: "new", title: "Spatial Audio", desc: nil)
             .textCell(iconName: "icons／set／3D", title: "Spatial Audio", desc: nil, isShowArrow: true)
             .config()
@@ -44,6 +45,8 @@ extension SARoomViewController {
     
     func showSpatialAudioView() {
         guard let micInfos = sRtcView.micInfos else { return }
+        let robotInfo = self.roomInfo?.robotInfo ?? SARobotAudioInfo()
+        
         let red = micInfos[6]
         let blue = micInfos[3]
         
@@ -53,13 +56,13 @@ extension SARoomViewController {
             .rows(rows: [3, 3])
             .title(title: "Spatial Audio")
             .sectionHeader(iconName: "new", title: "Agora Blue Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: blue.attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb", isOn: blue.airAbsorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur", isOn: blue.voiceBlur, isEnabel: isOwner)
+            .sliderCell(title: "Attenuation factor volume", value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb", isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur", isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
             .sectionHeader(iconName: "new", title: "Agora Red Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: red.attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb", isOn: red.airAbsorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur", isOn: red.voiceBlur, isEnabel: isOwner)
+            .sliderCell(title: "Attenuation factor volume", value: robotInfo.red_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb", isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur", isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
             guard let self = self else { return }
@@ -88,24 +91,26 @@ extension SARoomViewController {
                 default: break
                 }
             }
-            AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in
-                
-            }
             self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
+            AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in }
         }
         actionView.didSliderValueChangeClosure = { [weak self] indexPath, value in
             guard let self = self, let micInfos = self.sRtcView.micInfos else { return }
+            let robotInfo = self.roomInfo?.robotInfo ?? SARobotAudioInfo()
             let red = micInfos[6]
             let blue = micInfos[3]
             if indexPath.section == 0 {
                 blue.attenuation = value
+                robotInfo.blue_robot_attenuation = value
                 
             } else {
                 red.attenuation = value
+                robotInfo.red_robot_attenuation = value
             }
             self.sRtcView.micInfos?[3] = blue
             self.sRtcView.micInfos?[6] = red
+            AppContext.saServiceImp().updateRobotInfo(info: robotInfo) { error in }
         }
         actionView.show()
     }
