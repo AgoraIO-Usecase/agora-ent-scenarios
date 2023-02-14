@@ -793,7 +793,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         localPlayerPosition = position_ms
         localPlayerSystemTime = System.currentTimeMillis()
 
-        val config = songConfig ?: return
         if (config.role == KTVSingRole.KTVSingRoleMainSinger && position_ms > audioPlayoutDelay) {
             val msg: MutableMap<String?, Any?> = HashMap()
             msg["cmd"] = "setLrcTime"
