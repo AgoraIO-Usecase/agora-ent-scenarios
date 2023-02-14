@@ -921,13 +921,15 @@ extension ShowSyncManagerServiceImp {
                            guard let self = self,
                                  let jsonStr = object.toJson(),
                                  let model = ShowUser.yy_model(withJSON: jsonStr) else { return }
+                           defer{
+                               self._updateUserCount { error in
+                               }
+                           }
                            if self.userList.contains(where: { $0.userId == model.userId }) {
                                self.subscribeDelegate?.onMicSeatInvitationUpdated(invitation: model)
                                return
                            }
                            self.userList.append(model)
-                           self._updateUserCount { error in
-                           }
                            self.subscribeDelegate?.onUserJoinedRoom(user: model)
                            self.subscribeDelegate?.onUserCountChanged(userCount: self.userList.count)
                            
