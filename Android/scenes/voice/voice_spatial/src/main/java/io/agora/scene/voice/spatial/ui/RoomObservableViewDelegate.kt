@@ -401,6 +401,7 @@ class RoomObservableViewDelegate constructor(
                     }
                 }
                 iRoomMicView.onInitMic(micInfoList, robotInfo.useRobot)
+                updateSpatialPosition(micInfoList)
             }
         }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
@@ -929,7 +930,7 @@ class RoomObservableViewDelegate constructor(
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
         iRoomMicView.onSeatUpdated(newMicMap)
-        updateSpatialPosition(newMicMap)
+        updateSpatialPosition(newMicMap.values)
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
@@ -943,8 +944,8 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
-    private fun updateSpatialPosition(map: Map<Int, VoiceMicInfoModel>) {
-        map.forEach{ (_, model) ->
+    private fun updateSpatialPosition(models: Collection<VoiceMicInfoModel>) {
+        models.forEach{ model ->
             model.member?.rtcUid?.let { uid ->
                 if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     AgoraRtcEngineController.get().updateSelfPosition(

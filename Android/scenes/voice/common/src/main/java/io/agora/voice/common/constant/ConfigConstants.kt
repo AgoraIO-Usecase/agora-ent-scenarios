@@ -51,7 +51,7 @@ object ConfigConstants {
     object BotSpeaker {
         const val None = -1
         const val BotBlue = 0 // 机器人小蓝
-        const val BotRed = 1 // 机器人小兰
+        const val BotRed = 1 // 机器人小红
         const val BotBoth = 2 // 两个机器人一起播放
     }
 
