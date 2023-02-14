@@ -70,6 +70,7 @@ class SyncUtil: NSObject {
     }
 
     class func leaveScene(id: String) {
+        manager?.leaveScene(roomId: id)
         sceneRefs.removeValue(forKey: id)
     }
     

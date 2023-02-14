@@ -263,13 +263,6 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func createRoom(room: SARoomEntity, completion: @escaping (Error?, SARoomEntity?) -> Void) {
-//        let owner: SAUser = SAUser()
-//        owner.rtc_uid = VLUserCenter.user.id
-//        owner.name = VLUserCenter.user.name
-//        owner.uid = VLUserCenter.user.id
-//        owner.mic_index = 0
-//        owner.portrait = VLUserCenter.user.headUrl
-        
         self.roomList.append(room)
         let params = room.kj.JSONObject()
         let room_id = room.room_id ?? ""
@@ -351,6 +344,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         if isOwner {
 //            SAIMManager.shared?.userDestroyedChatroom()
+            agoraPrint("imp leaveRoom deleteScenes: \(roomId)")
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
 //            let updateRoom: SARoomEntity = room
@@ -369,6 +363,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //                })
 //            SAIMManager.shared?.userQuitRoom(completion: nil)
             
+            agoraPrint("imp leaveRoom leaveScene \(roomId)")
             _removeUser(roomId: self.roomId!) { error in
             }
             
