@@ -75,7 +75,7 @@ extension ShowAgoraKitManager {
     /// - Parameters:
     ///   - isOn: 开关
     ///   - srType: 默认1.5倍
-    func setSuperResolutionOn(_ isOn: Bool, srType:SRType = .x1_33) {
+    func setSuperResolutionOn(_ isOn: Bool, srType:SRType = .none) {
         // 避免重复设置
         if isOn == self.srIsOn && srType == self.srType {
             return
@@ -85,10 +85,12 @@ extension ShowAgoraKitManager {
         if srType == .none {
             agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(false), \"mode\": 2}}")
         }else{
-            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
             agoraKit.setParameters("{\"rtc.video.sr_type\":\(srType.rawValue)}")
             agoraKit.setParameters("{\"rtc.video.sr_max_wh\":\(921600)}")
+            // enabled要放在srType之后 否则修改超分倍数可能不会立即生效
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
         }
+        showLogger.info("----- setSuperResolutionOn\(ShowSettingKey.SR.boolValue)  srType: \(srType)")
     }
     
     /// 设置超分倍数
@@ -144,29 +146,38 @@ extension ShowAgoraKitManager {
     }
     
     // 预设模式
-    private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captureSize: ShowAgoraCaptureVideoDimensions) {
-        ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: encodeSize.sizeValue))
-        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
-        ShowSettingKey.videoBitRate.writeValue(bitRate)
-        ShowSettingKey.H265.writeValue(h265On)
-        ShowSettingKey.captureVideoSize.writeValue(captureDimensionsItems.firstIndex(of: captureSize.sizeValue))
-        ShowSettingKey.lowlightEnhance.writeValue(false)
-        ShowSettingKey.colorEnhance.writeValue(false)
-        ShowSettingKey.videoDenoiser.writeValue(false)
-        ShowSettingKey.PVC.writeValue(false)
-        
-        updateSettingForkey(.videoEncodeSize)
-        updateSettingForkey(.videoBitRate)
-        updateSettingForkey(.FPS)
-        updateSettingForkey(.H265)
-        updateSettingForkey(.lowlightEnhance)
-        updateSettingForkey(.colorEnhance)
-        updateSettingForkey(.videoDenoiser)
-        updateSettingForkey(.PVC)
-        updateSettingForkey(.captureVideoSize)
-        
-        // 设置采集分辨率
-//        setCaptureVideoDimensions(videoSize.sizeValue)
+    private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool, captureSize: ShowAgoraCaptureVideoDimensions, cache: Bool = true) {
+        if cache {
+            ShowSettingKey.videoEncodeSize.writeValue(dimensionsItems.firstIndex(of: encodeSize.sizeValue))
+            ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
+            ShowSettingKey.videoBitRate.writeValue(bitRate)
+            ShowSettingKey.H265.writeValue(h265On)
+            ShowSettingKey.captureVideoSize.writeValue(captureDimensionsItems.firstIndex(of: captureSize.sizeValue))
+            ShowSettingKey.lowlightEnhance.writeValue(false)
+            ShowSettingKey.colorEnhance.writeValue(false)
+            ShowSettingKey.videoDenoiser.writeValue(false)
+            ShowSettingKey.PVC.writeValue(false)
+            
+            updateSettingForkey(.videoEncodeSize)
+            updateSettingForkey(.videoBitRate)
+            updateSettingForkey(.FPS)
+            updateSettingForkey(.H265)
+            updateSettingForkey(.lowlightEnhance)
+            updateSettingForkey(.colorEnhance)
+            updateSettingForkey(.videoDenoiser)
+            updateSettingForkey(.PVC)
+            updateSettingForkey(.captureVideoSize)
+        }else {
+            videoEncoderConfig.dimensions = encodeSize.sizeValue
+            videoEncoderConfig.frameRate = fps
+            videoEncoderConfig.bitrate = Int(bitRate)
+            captureConfig.dimensions = captureSize.sizeValue
+            captureConfig.frameRate = Int32(fps.rawValue)
+            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            setH265On(h265On)
+        }
+       
     }
     
     /// 设置观众端画质增强
@@ -192,21 +203,24 @@ extension ShowAgoraKitManager {
             case .pk:
                 _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P)
             }
+            broadcastorMachineType = .low
         case .show_medium:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 1800, h265On: true, captureSize: ._720P)
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
+            broadcastorMachineType = .medium
         case .show_high:
             
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 2099, h265On: true, captureSize: ._720P)
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
+            broadcastorMachineType = .high
         case .quality_low:
             _setQualityEnable(false,uid: uid)
         case .quality_medium:
@@ -222,9 +236,42 @@ extension ShowAgoraKitManager {
         }
     }
     
+    /// 更新配置信息
+    /// - Parameters:
+    ///   - mode: 秀场交互类型
+    func updateVideoProfileForMode(_ mode: ShowMode) {
+        switch broadcastorMachineType {
+        case .unknown:
+            break
+        case .low:
+            switch mode {
+            case .single:
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 1461, h265On: false, captureSize: ._1080P, cache: false)
+            case .pk:
+                _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 700, h265On: false, captureSize: ._720P, cache: false)
+            }
+            
+        case .medium:
+            switch mode {
+            case .single:
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 1800, h265On: true, captureSize: ._720P, cache: false)
+            case .pk:
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
+            }
+            
+        case .high:
+            switch mode {
+            case .single:
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 2099, h265On: true, captureSize: ._720P, cache: false)
+            case .pk:
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P, cache: false)
+            }
+        }
+    }
+    
     /// 更新设置
     /// - Parameter key: 要更新的key
-    func updateSettingForkey(_ key: ShowSettingKey) {
+    func updateSettingForkey(_ key: ShowSettingKey, currentChannelId:String? = nil) {
         let isOn = key.boolValue
         let index = key.intValue
         let sliderValue = key.floatValue
@@ -248,21 +295,31 @@ extension ShowAgoraKitManager {
            break
         case .videoEncodeSize:
             videoEncoderConfig.dimensions = dimensionsItems[index]
-            let ret = agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
-            showLogger.info(" videoEncoderConfig.dimensions = \(videoEncoderConfig.dimensions) ret = \(ret)")
+            if let currentChannelId = currentChannelId{
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
+            }else{
+                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            }
         case .videoBitRate:
             videoEncoderConfig.bitrate = Int(sliderValue)
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            if let currentChannelId = currentChannelId {
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
+            }else{
+                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            }
         case .FPS:
             videoEncoderConfig.frameRate = fpsItems[index]
-            agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            if let currentChannelId = currentChannelId {
+                updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
+            }else{
+                agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
             agoraKit.setCameraCapturerConfiguration(captureConfig)
             
         case .H265:
-            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(isOn)}")
-            agoraKit.setParameters("{\"engine.video.codec_type\":\"\(isOn ? 3 : 2)\"}")
+            setH265On(isOn)
         case .earmonitoring:
             agoraKit.enable(inEarMonitoring: isOn)
         case .recordingSignalVolume:
@@ -279,4 +336,28 @@ extension ShowAgoraKitManager {
         }
     }
 
+}
+
+private let kBroadcastorMachineType = "kBroadcastorMachineType"
+
+extension ShowAgoraKitManager {
+    enum MachineType: Int {
+        case unknown = 0
+        case high
+        case medium
+        case low
+    }
+    
+    // 选择的主播端机型
+    var broadcastorMachineType: MachineType {
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: kBroadcastorMachineType)
+        }
+        get {
+            if let value = UserDefaults.standard.value(forKey: kBroadcastorMachineType) as? Int {
+                return MachineType(rawValue: value) ?? .unknown
+            }
+            return .unknown
+        }
+    }
 }

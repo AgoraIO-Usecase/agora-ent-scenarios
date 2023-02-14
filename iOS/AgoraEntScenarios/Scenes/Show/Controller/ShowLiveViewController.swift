@@ -20,8 +20,12 @@ class ShowLiveViewController: UIViewController {
             
             self.joinStartDate = Date()
             updateLoadingType(loadingType: loadingType)
+            remoteVideoWidth = nil
+            currentMode = nil
         }
     }
+    private var currentChannelId: String?
+    
     private var joinStartDate: Date?
     
     private var roomId: String {
@@ -292,6 +296,7 @@ class ShowLiveViewController: UIViewController {
         guard let channelId = room?.roomId, let ownerId = room?.ownerId else {
             return
         }
+        currentChannelId = channelId
         self.joinStartDate = Date()
         let uid: UInt = UInt(ownerId)!
         agoraKitManager.joinChannelEx(currentChannelId: channelId,
@@ -658,6 +663,8 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             }
             if roomId != interaction.roomId {
                 let uid = UInt(interaction.userId!)!
+                agoraKitManager.updateVideoProfileForMode(.pk)
+                currentChannelId = roomId
                 agoraKitManager.joinChannelEx(currentChannelId: roomId,
                                               targetChannelId: interactionRoomId,
                                               ownerId: uid,
@@ -679,6 +686,9 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             liveView.canvasView.canvasType = .joint_broadcasting
             liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             let role: AgoraClientRole = (role == .broadcaster || interaction.userId == VLUserCenter.user.id) ? .broadcaster : .audience
+            if role == .broadcaster {
+                agoraKitManager.updateVideoProfileForMode(.pk)
+            }
             agoraKitManager.switchRole(role: role,
                                        channelId: roomId,
                                        options: self.channelOptions,
@@ -698,6 +708,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
+            agoraKitManager.updateVideoProfileForMode(.single)
             agoraKitManager.leaveChannelEx(roomId: interaction.roomId ?? "")
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
@@ -783,6 +794,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 //        realTimeView.statsInfo?.updateLocalVideoStats(stats)
         realTimeView.localStatsInfo?.updateLocalVideoStats(stats)
         realTimeView.remoteStatsInfo?.updateLocalVideoStats(stats)
+        showLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
 
     }
     
@@ -796,6 +808,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
             let mode: ShowMode = interactionStatus == .idle ? .single : .pk
             // 防止多次调用
             if mode != currentMode || stats.width != remoteVideoWidth {
+                print(" [\(Date())] ----- setSuperResolutionOn remoteVideoStats roomId = \(roomId) = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height)")
                 agoraKitManager.setSuperResolutionForAudienceType(presetType: audiencePresetType, videoWidth: Int(stats.width), mode: mode)
                 currentMode = mode
                 remoteVideoWidth = stats.width
@@ -833,7 +846,7 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, videoSizeChangedOf sourceType: AgoraVideoSourceType, uid: UInt, size: CGSize, rotation: Int) {
-        print("videoSizeChangedOf = \(String(describing: room?.ownerId?.debugDescription)) width = \(size.width), height = \(size.height), sourceType = \(sourceType.rawValue)")
+        print(" [\(Date())] ----- setSuperResolutionOn videoSizeChangedOf roomId = \(roomId) = \(String(describing: room?.ownerId?.debugDescription)) width = \(size.width), height = \(size.height), sourceType = \(sourceType.rawValue)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit,
@@ -928,6 +941,8 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
     func onClickMusicButton() {
         let vc = ShowMusicEffectVC()
         vc.musicManager = musicManager
+        vc.agorakitManager = agoraKitManager
+        vc.currentChannelId = currentChannelId
         present(vc, animated: true)
     }
     
@@ -1053,6 +1068,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
                 vc.isBroadcaster = wSelf.role == .broadcaster
                 vc.settingManager = wSelf.agoraKitManager
                 vc.audiencePresetType = wSelf.audiencePresetType
+                vc.currentChannelId = wSelf.currentChannelId
                 wSelf.navigationController?.pushViewController(vc, animated: true)
             }
         }
