@@ -38,6 +38,7 @@ typedef enum : NSUInteger {
 - (void)refreseUserInfo:(VLLoginModel *)loginModel;
 - (void)refreseAvatar:(UIImage *)avatar;
 - (void)refreseNickName:(NSString *)nickName;
+- (void)refreshTableView;
 
 @end
 

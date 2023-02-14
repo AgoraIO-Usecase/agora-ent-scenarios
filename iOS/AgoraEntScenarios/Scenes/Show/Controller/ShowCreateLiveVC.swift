@@ -131,7 +131,14 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
 //        vc.isOutside = true
 //        vc.settingManager = agoraKitManager
 //        self.navigationController?.pushViewController(vc, animated: true)
-        showPreset()
+        if AppContext.shared.isDebugMode {
+            let vc = ShowDebugSettingVC()
+            vc.isOutside = true
+            vc.settingManager = agoraKitManager
+            self.navigationController?.pushViewController(vc, animated: true)
+        }else{
+            showPreset()
+        }
     }
     
     func onClickCameraBtnAction() {

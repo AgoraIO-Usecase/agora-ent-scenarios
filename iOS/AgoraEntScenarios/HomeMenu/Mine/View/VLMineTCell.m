@@ -54,4 +54,9 @@
     self.itemTitleLabel.text = dict[@"titleStr"];
 }
 
+- (void)setIconImageName:(NSString *)imgStr title:(NSString *)title {
+    self.iconImgView.image = UIImageMake(imgStr);
+    self.itemTitleLabel.text = title;
+}
+
 @end
