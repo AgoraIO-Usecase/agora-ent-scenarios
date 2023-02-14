@@ -448,7 +448,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             spatialTimer = Timer().apply {
                 schedule(object: TimerTask() {
                     override fun run() {
-                        AgoraRtcEngineController.get().sendSelfPosition(spatialSeatInfo!!)
+                        spatialSeatInfo?.let {
+                            AgoraRtcEngineController.get().sendSelfPosition(it)
+                        }
                     }
                 }, 0, 2000)
             }
