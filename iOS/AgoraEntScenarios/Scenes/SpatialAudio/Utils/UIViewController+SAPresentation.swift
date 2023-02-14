@@ -10,7 +10,7 @@ import Foundation
 /// 遵守PresentationViewType协议的UIViewController
 public typealias SAPresentationViewController = UIViewController & SAPresentedViewType
 
-public extension SABaseViewController {
+public extension UIViewController {
     /// 自定义present方法
     func sa_presentViewController(_ viewController: SAPresentationViewController, animated: Bool = true) {
         viewController.modalPresentationStyle = .custom
@@ -22,7 +22,7 @@ public extension SABaseViewController {
 // MARK: -  UIViewControllerTransitioningDelegate
 //#if DEBUG
 //#else
-extension SABaseViewController: UIViewControllerTransitioningDelegate {
+extension UIViewController: UIViewControllerTransitioningDelegate {
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         return SAPresentationController(presentedViewController: presented, presenting: presenting)
     }
