@@ -95,54 +95,7 @@ extension SpatialAudioSyncSerciceImp {
             completion()
         }
     }
-    
-    fileprivate func initIM(with roomName: String,
-                            chatId: String?,
-                            channelId: String,
-                            imUid: String?,
-                            pwd: String,
-                            completion: @escaping (String, String, String) -> Void) {
 
-        var im_token = ""
-        var im_uid = ""
-        var chatroom_id = ""
-
-        let impGroup = DispatchGroup()
-        let imQueue = DispatchQueue(label: "com.agora.imp.www")
-        let tokenQueue = DispatchQueue(label: "token")
-
-        impGroup.enter()
-        imQueue.async {
-            NetworkManager.shared.generateIMConfig(type: 1,
-                                                   channelName: roomName,
-                                                   nickName: VLUserCenter.user.name,
-                                                   chatId: chatId,
-                                                   imUid: imUid,
-                                                   password: pwd,
-                                                   uid:  VLUserCenter.user.id,
-                                                   sceneType: .voice) { uid, room_id, token in
-                im_uid = uid ?? ""
-                chatroom_id = room_id ?? ""
-                im_token = token ?? ""
-                impGroup.leave()
-            }
-
-        }
-        
-        impGroup.enter()
-        tokenQueue.async {
-            NetworkManager.shared.generateToken(channelName: channelId, uid: VLUserCenter.user.id, tokenType: .token007, type: .rtc) { token in
-                VLUserCenter.user.agoraRTCToken = token ?? ""
-                impGroup.leave()
-            }
-        }
-        
-        impGroup.notify(queue: .main) {
-            completion(im_token, im_uid, chatroom_id )
-        }
-    }
-    
-    
     func findMicIndex() -> Int {
         var mic_index = 0
         for i in 0...7 {
@@ -314,11 +267,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             
             self._startCheckExpire()
             self._subscribeAll()
-            //获取IM信息
-            let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
-            self.initIM(with: room.name ?? "",chatId: updateRoom.chatroom_id, channelId: updateRoom.channel_id ?? "",imUid: imId, pwd: "12345678") { im_token, chat_uid, chatroom_id in
-                VLUserCenter.user.im_token = im_token
-                VLUserCenter.user.chat_uid = chat_uid
+            NetworkManager.shared.generateToken(channelName: room_id, uid: userId, tokenType: .token007, type: .rtc) { token in
+                VLUserCenter.user.agoraRTCToken = token ?? ""
+                VLUserCenter.user.chat_uid = userId
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, miclist in
                         completion(error, updateRoom)
