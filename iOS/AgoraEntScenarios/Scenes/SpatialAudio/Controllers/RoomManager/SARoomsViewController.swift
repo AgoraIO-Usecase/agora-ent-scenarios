@@ -127,8 +127,9 @@ extension SARoomsViewController {
 
     private func loginIMThenPush(room: SARoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        AppContext.saServiceImp().joinRoom(room.room_id ?? "") { error, room_entity in
+        AppContext.saServiceImp().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
             SVProgressHUD.dismiss()
+            guard let self = self else {return}
             if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
                 SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
                 return

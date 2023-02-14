@@ -198,7 +198,8 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
 //        AppContext.saTmpServiceImp().userList = self.roomInfo?.room?.member_list ?? []
         self.roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
         if isOwner {
-            AppContext.saServiceImp().updateRoomMembers { error in
+            AppContext.saServiceImp().updateRoomMembers {[weak self] error in
+                guard let self = self else {return}
                 if error != nil {
                     self.view.makeToast("\(error?.localizedDescription ?? "")")
                 }
