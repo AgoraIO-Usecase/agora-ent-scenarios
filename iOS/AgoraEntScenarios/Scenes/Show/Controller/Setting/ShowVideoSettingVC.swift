@@ -21,6 +21,7 @@ class ShowVideoSettingVC: UIViewController {
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowAgoraKitManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
+    var currentChannelId: String?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -125,7 +126,7 @@ extension ShowVideoSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
         if let willChange = willChangeSettingParams, willChange(key,value) == true {
             key.writeValue(value)
-            settingManager.updateSettingForkey(key)
+            settingManager.updateSettingForkey(key, currentChannelId: currentChannelId)
         }
         tableView.reloadData()
     }
