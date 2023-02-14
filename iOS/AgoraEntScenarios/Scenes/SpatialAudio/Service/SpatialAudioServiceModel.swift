@@ -91,8 +91,8 @@ public class SARobotAudioInfo: NSObject, Convertible {
     var red_robot_blur: Bool = false
     var blue_robot_absorb: Bool = false
     var blue_robot_blur: Bool = false
-    var blue_robot_attenuation: Float = 0
-    var red_robot_attenuation: Float = 0
+    var blue_robot_attenuation: Double = 0
+    var red_robot_attenuation: Double = 0
     
     var objectId: String = ""
     
