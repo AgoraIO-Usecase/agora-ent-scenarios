@@ -110,7 +110,7 @@ class SenseBeautyManager: NSObject {
     }
     
     func resetSticker(datas: [BeautyModel]) {
-        processor.cleareStickers()
+        processor.removeStickerId(stickerId)
         stickerId = 0
     }
     

@@ -94,7 +94,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
-            let index = data.intValue
+            let index = data.intValue % data.items.count
             let value = data.items[index]
             cell.setTitle(data.title, value: value) { [weak self] in
                 let vc = ShowSettingActionSheetVC()
