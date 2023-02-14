@@ -95,22 +95,14 @@ class RoomObservableViewDelegate constructor(
                     if (data != true) return
                     iRoomMicView.activeBot(true) { type, points ->
                         AgoraRtcEngineController.get().updatePlayerPosition(
-                            arrayOf(points.first.x, points.first.y, 0f),
-                            arrayOf(points.second.x, points.second.y, 0f),
+                            floatArrayOf(points.first.x, points.first.y, 0f),
+                            floatArrayOf(points.second.x, points.second.y, 0f),
                             type
                         )
                     }
                     robotInfo.useRobot = true
                     roomAudioSettingDialog?.updateBoxCheckBoxView(true)
-                    // 创建房间，第⼀次启动机器⼈后播放音效：
-                    if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
-                        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
-                        AgoraRtcEngineController.get()
-                            .updateEffectVolume(robotInfo.robotVolume)
-                        RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
-                            AgoraRtcEngineController.get().playMusic(it)
-                        }
-                    }
+                    activeRobotSound()
                 }
             })
         }
@@ -278,7 +270,7 @@ class RoomObservableViewDelegate constructor(
                 iRoomMicView.updateSpatialPosition(position)
                 AgoraRtcEngineController.get().updateRemotePosition(
                     position.uid,
-                    arrayOf(position.x, position.y, 0f),
+                    floatArrayOf(position.x, position.y, 0f),
                     position.forward
                 )
             }
@@ -995,9 +987,13 @@ class RoomObservableViewDelegate constructor(
     }
 
     fun onRobotUpdated(robotInfo: RobotSpatialAudioModel) {
+        val oldValue = this.robotInfo.useRobot
         this.robotInfo = robotInfo
         ThreadManager.getInstance().runOnMainThread {
             iRoomMicView.activeBot(robotInfo.useRobot, null)
+            if (robotInfo.useRobot != oldValue) {
+                activeRobotSound()
+            }
         }
     }
 
@@ -1078,6 +1074,18 @@ class RoomObservableViewDelegate constructor(
         }
     }
 
+    private fun activeRobotSound() {
+        // 创建房间，第⼀次启动机器⼈后播放音效：
+        if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
+            VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+            AgoraRtcEngineController.get()
+                .updateEffectVolume(robotInfo.robotVolume)
+            RoomSoundAudioConstructor.createRoomSoundAudioMap[roomKitBean.roomType]?.let {
+                AgoraRtcEngineController.get().playMusic(it)
+            }
+        }
+    }
+
     /**
      * 根据麦位数据更新ui
      */
@@ -1102,9 +1110,9 @@ class RoomObservableViewDelegate constructor(
             model.member?.rtcUid?.let { uid ->
                 if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
                     AgoraRtcEngineController.get().updateSelfPosition(
-                        arrayOf(model.position.x, model.position.y),
-                        arrayOf(model.forward.x, model.forward.y),
-                        arrayOf(-(model.forward.y), model.forward.x),
+                        floatArrayOf(model.position.x, model.position.y, 0.0f),
+                        floatArrayOf(model.forward.x, model.forward.y, 0.0f),
+                        floatArrayOf(-(model.forward.y), model.forward.x, 0.0f),
                     )
                 } else {
                     if (!model.isSpatialSet) {
@@ -1113,8 +1121,8 @@ class RoomObservableViewDelegate constructor(
                     }
                     AgoraRtcEngineController.get().updateRemotePosition(
                         uid,
-                        arrayOf(model.position.x, model.position.y),
-                        arrayOf(model.forward.x, model.forward.y),
+                        floatArrayOf(model.position.x, model.position.y, 0.0f),
+                        floatArrayOf(model.forward.x, model.forward.y, 0.0f),
                     )
                 }
             }

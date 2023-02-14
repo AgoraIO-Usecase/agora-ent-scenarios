@@ -348,9 +348,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 object : OnItemMoveListener<VoiceMicInfoModel> {
                     override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
                         super.onItemMove(data, position, viewType)
-                        val right = arrayOf(-position.forward[1], -position.forward[0], 0f)
+                        val right = floatArrayOf(-position.forward[1], -position.forward[0], 0f)
                         AgoraRtcEngineController.get().updateSelfPosition(
-                            arrayOf(position.x, position.y, 0f),
+                            floatArrayOf(position.x, position.y, 0f),
                             position.forward,
                             right
                         )
@@ -458,7 +458,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             spatialTimer?.cancel()
             val defaultSeat = SeatPositionInfo(
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
-                arrayOf(0f, -1f, 0f),
+                floatArrayOf(0f, -1f, 0f),
                 0f,
                 0f,
                 0f
