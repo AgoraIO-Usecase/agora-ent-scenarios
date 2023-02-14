@@ -389,7 +389,7 @@ class ShowAgoraKitManager: NSObject {
         }
         showLogger.info("leaveChannelEx roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
         agoraKit.leaveChannelEx(connection)
-        exConnectionMap[roomId] = nil
+        exConnectionMap[channelId] = nil
     }
     
     func joinChannelEx(currentChannelId: String,
