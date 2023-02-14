@@ -303,27 +303,12 @@ class AgoraRtcEngineController {
         if (isBroadcaster){
             mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
-            }?.also {
-                val options = ChannelMediaOptions()
-                options.publishMediaPlayerAudioTrack = true
-                options.publishMediaPlayerId = it.mediaPlayerId
-                rtcEngine?.updateChannelMediaOptions(options)
             }
             botBluePlayer =  rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
-            }?.also {
-                val options = ChannelMediaOptions()
-                options.publishMediaPlayerAudioTrack = true
-                options.publishMediaPlayerId = it.mediaPlayerId
-                rtcEngine?.updateChannelMediaOptions(options)
             }
             botRedPlayer =  rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(firstMediaPlayerObserver)
-            }?.also {
-                val options = ChannelMediaOptions()
-                options.publishMediaPlayerAudioTrack = true
-                options.publishMediaPlayerId = it.mediaPlayerId
-                rtcEngine?.updateChannelMediaOptions(options)
             }
         }
         return true
