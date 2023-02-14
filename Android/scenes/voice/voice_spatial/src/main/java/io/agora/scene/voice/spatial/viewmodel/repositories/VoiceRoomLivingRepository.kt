@@ -123,7 +123,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     fun updateBlueRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        voiceRobotInfo.blueRobotAttenuation = attenuation
+        voiceRobotInfo.blueRobotAttenuation = (attenuation / 100).toFloat()
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
@@ -139,7 +139,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     fun updateRedRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
-        voiceRobotInfo.redRobotAttenuation = attenuation
+        voiceRobotInfo.redRobotAttenuation = (attenuation / 100).toFloat()
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
                 voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
