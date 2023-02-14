@@ -123,10 +123,10 @@ extension SARoomViewController {
         rtckit.initSpatialAudio(recvRange: 15)
 
         var rtcJoinSuccess = false
-        var IMJoinSuccess = false
+//        var IMJoinSuccess = false
 
         let VMGroup = DispatchGroup()
-        let imQueue = DispatchQueue(label: "com.im.vm.www")
+//        let imQueue = DispatchQueue(label: "com.im.vm.www")
         let rtcQueue = DispatchQueue(label: "com.rtc.vm.www")
 
         VMGroup.enter()
@@ -135,16 +135,16 @@ extension SARoomViewController {
             VMGroup.leave()
         }
 
-        VMGroup.enter()
-        imQueue.async {
-            SAIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
-                IMJoinSuccess = error == nil
-                VMGroup.leave()
-            })
-        }
+//        VMGroup.enter()
+//        imQueue.async {
+//            SAIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
+//                IMJoinSuccess = error == nil
+//                VMGroup.leave()
+//            })
+//        }
 
         VMGroup.notify(queue: .main) { [weak self] in
-            let joinSuccess = rtcJoinSuccess && IMJoinSuccess
+            let joinSuccess = rtcJoinSuccess //&& IMJoinSuccess
             guard let `self` = self else { return }
             if !joinSuccess {
                 self.view.makeToast("Join failed!")
@@ -156,7 +156,7 @@ extension SARoomViewController {
                 } else {
                     //观众更新拉取详情后更新kv
                     self.requestRoomDetail()
-                    self.sendJoinedMessage()
+//                    self.sendJoinedMessage()
                 }
             }
         }
