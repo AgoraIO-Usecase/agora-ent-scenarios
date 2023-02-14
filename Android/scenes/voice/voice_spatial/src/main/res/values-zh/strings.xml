@@ -163,7 +163,7 @@
     <string name="voice_chatroom_agora_blue_bot">声蓝⽻</string>
     <string name="voice_chatroom_agora_red_bot">声红颜</string>
     <string name="voice_chatroom_attenuation_factor">衰减系数</string>
-    <string name="voice_chatroom_air_absorb">空⽓传播模拟</string>
+    <string name="voice_chatroom_air_absorb">空⽓衰减</string>
     <string name="voice_chatroom_voice_blur">⼈声模糊</string>
     <string name="voice_chatroom_sound_selection">最佳⾳效</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">只有房主可以更改最佳⾳效</string>

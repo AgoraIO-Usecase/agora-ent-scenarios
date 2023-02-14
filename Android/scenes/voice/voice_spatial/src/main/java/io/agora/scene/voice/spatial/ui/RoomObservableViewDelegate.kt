@@ -141,6 +141,112 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         }
+        /**打开蓝色机器人空气衰减*/
+        roomLivingViewModel.openBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueAbsorb(true)
+                }
+            })
+        }
+
+        /**关闭蓝色机器人空气衰减*/
+        roomLivingViewModel.closeBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueAbsorb(false)
+                }
+            })
+        }
+
+        /**打开红色机器人空气衰减*/
+        roomLivingViewModel.openRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedAbsorb(true)
+                }
+            })
+        }
+
+        /**关闭红色机器人空气衰减*/
+        roomLivingViewModel.closeRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedAbsorb(false)
+                }
+            })
+        }
+
+        /**打开蓝色机器人模糊*/
+        roomLivingViewModel.openBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueBlur(true)
+                }
+            })
+        }
+
+        /**关闭蓝色机器人模糊*/
+        roomLivingViewModel.closeBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueBlur(false)
+                }
+            })
+        }
+
+        /**打开红色机器人模糊*/
+        roomLivingViewModel.openRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedBlur(true)
+                }
+            })
+        }
+
+        /**关闭红色机器人模糊*/
+        roomLivingViewModel.closeRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
+            parseResource(response, object : OnResourceParseCallback<Boolean>() {
+                override fun onSuccess(data: Boolean?) {
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedBlur(false)
+                }
+            })
+        }
+
+        /**蓝色机器人衰减系数*/
+        roomLivingViewModel.blueRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+            parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
+                override fun onSuccess(data: Pair<Int, Boolean>?) {
+                    data?.let {
+                        if (it.second) {
+                            AgoraRtcEngineController.get().adjustBlueAttenuation(it.first)
+                        }
+                    }
+                }
+            })
+        }
+
+        /**红色机器人衰减系数*/
+        roomLivingViewModel.redRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
+            parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
+                override fun onSuccess(data: Pair<Int, Boolean>?) {
+                    data?.let {
+                        if (it.second) {
+                            AgoraRtcEngineController.get().adjustRedAttenuation(it.first)
+                        }
+                    }
+                }
+            })
+        }
+
         // 麦位音量监听
         AgoraRtcEngineController.get().setMicVolumeListener(object : RtcMicVolumeListener() {
             // 更新机器人音量
@@ -566,7 +672,54 @@ class RoomObservableViewDelegate constructor(
             arguments = Bundle().apply {
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_SPATIAL_OPEN, false)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_IS_ENABLED, roomKitBean.isOwner)
+
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_AIR_ABSORB_ENABLED, robotInfo.blueRobotAbsorb)
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotAbsorb)
+                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100).toInt())
+                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100).toInt())
             }
+        }
+
+        spatialAudioSheetDialog.audioSettingsListener = object :
+            RoomSpatialAudioSheetDialog.OnClickSpatialAudioRobotsSettingsListener {
+            override fun onBlueBotAttenuationChange(progress: Int) {
+                roomLivingViewModel.updateBlueRoBotAttenuation(progress)
+            }
+
+            override fun onBlueBotAirAbsorbCheckedChanged(
+                buttonView: CompoundButton,
+                isChecked: Boolean
+            ) {
+                roomLivingViewModel.enableBlueRobotAirAbsorb(isChecked)
+            }
+
+            override fun onBlueBotVoiceBlurCheckedChanged(
+                buttonView: CompoundButton,
+                isChecked: Boolean
+            ) {
+                roomLivingViewModel.enableBlueRobotBlur(isChecked)
+            }
+
+            override fun onRedBotAttenuationChange(progress: Int) {
+                roomLivingViewModel.updateRedRoBotAttenuation(progress)
+            }
+
+            override fun onRedBotAirAbsorbCheckedChanged(
+                buttonView: CompoundButton,
+                isChecked: Boolean
+            ) {
+                roomLivingViewModel.enableRedRobotAirAbsorb(isChecked)
+            }
+
+            override fun onRedBotVoiceBlurCheckedChanged(
+                buttonView: CompoundButton,
+                isChecked: Boolean
+            ) {
+                roomLivingViewModel.enableRedRobotBlur(isChecked)
+            }
+
         }
 
         spatialAudioSheetDialog.show(activity.supportFragmentManager, "mtSpatialAudio")

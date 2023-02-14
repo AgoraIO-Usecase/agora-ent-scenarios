@@ -871,11 +871,14 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 是否启用机器人
-     * @param enable true 启动机器人，false 关闭机器人
+     * 更新机器人配置
+     * @param info 机器人配置
      */
-    override fun enableRobot(enable: Boolean, completion: (error: Int, result:Boolean) -> Unit) {
-        val targetSeatInfo = if (enable) {
+    override fun updateRobotInfo(
+        info: RobotSpatialAudioModel,
+        completion: (error: Int, result: Boolean) -> Unit
+    ) {
+        val targetSeatInfo = if (info.useRobot) {
             VoiceMicInfoModel().apply {
                 this.micIndex = 3
                 micStatus = MicStatus.BotActivated
@@ -889,9 +892,9 @@ class VoiceSyncManagerServiceImp(
 
         innerUpdateSeat(targetSeatInfo) {
             if (it == null) {
-                robotInfo.useRobot = enable
-                innerUpdateRobotInfo(robotInfo) { e ->
+                innerUpdateRobotInfo(info) { e ->
                     if (e == null) {
+                        robotInfo = info
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                     } else {
                         completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
@@ -903,20 +906,6 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    /**
-     * 更新机器人音量
-     * @param value 音量
-     */
-    override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
-        robotInfo.robotVolume = value
-        innerUpdateRobotInfo(robotInfo) { e ->
-            if (e == null) {
-                completion.invoke(VoiceServiceProtocol.ERR_OK, true)
-            } else {
-                completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
-            }
-        }
-    }
     override fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit) {
         roomTimeUpSubscriber = onRoomTimeUp
     }
@@ -1486,15 +1475,9 @@ class VoiceSyncManagerServiceImp(
             override fun onUpdated(item: IObject?) {
                 val obj = item?.toObject(RobotSpatialAudioModel::class.java) ?: return
 
-                if (obj.robotVolume != robotInfo.robotVolume) {
-                    roomServiceSubscribeDelegates.forEach {
-                        ThreadManager.getInstance().runOnMainThread {
-//                            val attributeMap = hashMapOf<String, String>()
-//                            val key = "robot_volume"
-//                            attributeMap[key] = obj.robotVolume.toString()
-//                            it.onSeatUpdated(currRoomNo, attributeMap)
-                            it.onRobotUpdate(currRoomNo, obj)
-                        }
+                roomServiceSubscribeDelegates.forEach {
+                    ThreadManager.getInstance().runOnMainThread {
+                        it.onRobotUpdate(currRoomNo, obj)
                     }
                 }
                 robotInfo = obj

@@ -23,6 +23,7 @@ import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
 
+
 /**
  * @author create by zhangwei03
  */
@@ -426,6 +427,51 @@ class AgoraRtcEngineController {
         "playMusic soundId:$soundId".logD(TAG)
         resetMediaPlayer()
         openMediaPlayer(audioUrl, speakerType)
+    }
+
+    // -------------- EQ相关 ----------------
+    // 打开/关闭空气衰减
+    fun enableBlueAbsorb(isChecked: Boolean) {
+        val spatialAudioParams = SpatialAudioParams()
+        spatialAudioParams.enable_air_absorb = isChecked
+        botBluePlayer?.setSpatialAudioParams(spatialAudioParams)
+    }
+
+    // 打开/关闭模糊
+    fun enableBlueBlur(isChecked: Boolean) {
+        val spatialAudioParams = SpatialAudioParams()
+        spatialAudioParams.enable_blur = isChecked
+        botBluePlayer?.setSpatialAudioParams(spatialAudioParams)
+    }
+
+    // 打开/关闭空气衰减
+    fun enableRedAbsorb(isChecked: Boolean) {
+        val spatialAudioParams = SpatialAudioParams()
+        spatialAudioParams.enable_air_absorb = isChecked
+        botRedPlayer?.setSpatialAudioParams(spatialAudioParams)
+    }
+
+    // 打开/关闭模糊
+    fun enableRedBlur(isChecked: Boolean) {
+        val spatialAudioParams = SpatialAudioParams()
+        spatialAudioParams.enable_blur = isChecked
+        botRedPlayer?.setSpatialAudioParams(spatialAudioParams)
+    }
+
+    // 设置衰减系数
+    fun adjustBlueAttenuation(progress: Int) {
+        botBluePlayer?.mediaPlayerId?.let {
+            val value: Double = (progress / 100).toDouble()
+            spatial?.setPlayerAttenuation(it, value, false);
+        }
+    }
+
+    // 设置衰减系数
+    fun adjustRedAttenuation(progress: Int) {
+        botRedPlayer?.mediaPlayerId?.let {
+            val value: Double = (progress / 100).toDouble()
+            spatial?.setPlayerAttenuation(it, value, false);
+        }
     }
 
     /**
