@@ -2,7 +2,7 @@ package io.agora.scene.voice.spatial.model
 
 data class SeatPositionInfo(
     val uid: Int,
-    val forward: Array<Float>,
+    val forward: FloatArray,
     val x: Float,
     val y: Float,
     val angle: Float

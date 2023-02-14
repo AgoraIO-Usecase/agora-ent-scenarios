@@ -178,13 +178,16 @@ class AgoraRtcEngineController {
      * @param forward 朝向[x, y, z]
      * @param right 朝向[x, y, z]
      */
-    public fun updateSelfPosition(pos: Array<Float>, forward: Array<Float>, right: Array<Float>) {
+    public fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
         "spatial update self position: p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]} r: ${right[0]} ${right[1]}".logD("Spatial Voice")
         spatial?.updateSelfPosition(
-            pos.toFloatArray(),
-            forward.toFloatArray(),
-            right.toFloatArray(),
-            arrayListOf<Float>(0f, 0f, 1f).toFloatArray())
+            pos,
+//            floatArrayOf(0.0f, 9.5f, 0.0f) ,
+//            floatArrayOf(0.0f, -1.0f, 0.0f),
+//            floatArrayOf(-1.0f, 0.0f, 0.0f),
+            forward,
+            right,
+            floatArrayOf(1.0f, 0.0f, -0.0f))
     }
     /**
      * 发送本地位置到远端
@@ -216,11 +219,11 @@ class AgoraRtcEngineController {
      * @param pos 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
-    public fun updateRemotePosition(uid: Int, pos: Array<Float>, forward: Array<Float>) {
+    public fun updateRemotePosition(uid: Int, pos: FloatArray, forward: FloatArray) {
         "spatial update remote position: u: $uid p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
         val position = RemoteVoicePositionInfo()
-        position.position = pos.toFloatArray()
-        position.forward = forward.toFloatArray()
+        position.position = pos
+        position.forward = forward
         spatial?.updateRemotePosition(uid, position)
     }
     /**
@@ -228,12 +231,12 @@ class AgoraRtcEngineController {
      * @param pos 位置[x, y, z]
      * @param forward 朝向[x, y, z]
      */
-    public fun updatePlayerPosition(pos: Array<Float>, forward: Array<Float>, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
+    public fun updatePlayerPosition(pos: FloatArray, forward: FloatArray, soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue) {
         when (soundSpeaker) {
             ConfigConstants.BotSpeaker.BotBlue -> {
                 val position = RemoteVoicePositionInfo()
-                position.position = pos.toFloatArray()
-                position.forward = forward.toFloatArray()
+                position.position = pos
+                position.forward = forward
                 botBluePlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
                     "spatial update player blue: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
@@ -241,8 +244,8 @@ class AgoraRtcEngineController {
             }
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
-                position.position = pos.toFloatArray()
-                position.forward = forward.toFloatArray()
+                position.position = pos
+                position.forward = forward
                 botRedPlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
                     "spatial update player red: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
@@ -301,16 +304,14 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        if (isBroadcaster){
-            mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
-            }
-            botBluePlayer =  rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
-            }
-            botRedPlayer =  rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
-            }
+        mediaPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+            registerPlayerObserver(firstMediaPlayerObserver)
+        }
+        botBluePlayer =  rtcEngine?.createMediaPlayer()?.apply {
+            registerPlayerObserver(firstMediaPlayerObserver)
+        }
+        botRedPlayer =  rtcEngine?.createMediaPlayer()?.apply {
+            registerPlayerObserver(firstMediaPlayerObserver)
         }
         return true
     }
