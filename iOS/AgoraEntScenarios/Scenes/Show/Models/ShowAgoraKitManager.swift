@@ -369,10 +369,10 @@ class ShowAgoraKitManager: NSObject {
         let depMap: [String: ShowRTCLoadingType]? = exConnectionDeps[channelId]
 //        depMap?[roomId] = nil
         guard depMap?.count ?? 0 == 0 else {
-            showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId\(channelId)", context: kShowLogBaseContext)
+            showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
             return
         }
-        showLogger.info("leaveChannelEx \(roomId)", context: kShowLogBaseContext)
+        showLogger.info("leaveChannelEx roomId: \(roomId), channelId: \(channelId)", context: kShowLogBaseContext)
         agoraKit.leaveChannelEx(connection)
         exConnectionMap[roomId] = nil
     }
