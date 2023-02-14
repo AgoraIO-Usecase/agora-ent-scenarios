@@ -87,7 +87,7 @@ extension SAApplyUsersViewController {
     private func agreeUserApply(user: SAApply?) {
         SVProgressHUD.show()
         guard let user1 = user?.member else { return }
-        AppContext.saServiceImp().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: {[weak self] error,mic  in
+        AppContext.saServiceImp().acceptMicSeatApply(chatUid: user1.uid ?? "", completion: {[weak self] error,mic  in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
             if self.agreeApply != nil,let mic = mic {
