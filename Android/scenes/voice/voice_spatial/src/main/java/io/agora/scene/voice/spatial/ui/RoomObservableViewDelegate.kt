@@ -145,7 +145,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.openBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueAbsorb(true)
                 }
             })
         }
@@ -154,7 +155,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.closeBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueAbsorb(false)
                 }
             })
         }
@@ -163,7 +165,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.openRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedAbsorb(true)
                 }
             })
         }
@@ -172,7 +175,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.closeRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedAbsorb(false)
                 }
             })
         }
@@ -181,7 +185,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.openBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueBlur(true)
                 }
             })
         }
@@ -190,7 +195,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.closeBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableBlueBlur(false)
                 }
             })
         }
@@ -199,7 +205,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.openRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedBlur(true)
                 }
             })
         }
@@ -208,7 +215,8 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.closeRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    // TODO RTC
+                    if (data != true) return
+                    AgoraRtcEngineController.get().enableRedBlur(false)
                 }
             })
         }
@@ -217,7 +225,11 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.blueRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
-                    // TODO RTC
+                    data?.let {
+                        if (it.second) {
+                            AgoraRtcEngineController.get().adjustBlueAttenuation(it.first)
+                        }
+                    }
                 }
             })
         }
@@ -226,7 +238,11 @@ class RoomObservableViewDelegate constructor(
         roomLivingViewModel.redRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
             parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
                 override fun onSuccess(data: Pair<Int, Boolean>?) {
-                    // TODO RTC
+                    data?.let {
+                        if (it.second) {
+                            AgoraRtcEngineController.get().adjustRedAttenuation(it.first)
+                        }
+                    }
                 }
             })
         }
@@ -661,8 +677,8 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotAbsorb)
-                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, robotInfo.blueRobotAttenuation)
-                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, robotInfo.redRobotAttenuation)
+                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100).toInt())
+                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100).toInt())
             }
         }
 
