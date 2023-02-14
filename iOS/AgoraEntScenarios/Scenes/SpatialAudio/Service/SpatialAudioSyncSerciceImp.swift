@@ -877,7 +877,7 @@ extension SpatialAudioSyncSerciceImp {
                                self.subscribeDelegate?.onRobotVolumeChanged(roomId: channelName, volume: room.robot_volume ?? 0, from: room.owner?.name ?? "")
                            }*/
                        }, onDeleted: { [weak self] object in
-                           guard let model = self?.roomList.filter({ $0.objectId == object.getId()}).first,
+                           guard let model = self?.roomList.filter({ $0.room_id == object.getId() }).first,
                                  model.room_id == channelName,
                                  model.owner?.uid != VLUserCenter.user.id else {
                                return
@@ -1022,7 +1022,9 @@ extension SpatialAudioSyncSerciceImp {
                                  let jsonStr = object.toJson() else { return }
                            let apply = model(from: jsonStr.z.jsonToDictionary(), SAApply.self)
                            defer {
-                               self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
+                               if VLUserCenter.user.id != apply.member?.uid {
+                                   self.subscribeDelegate?.onReceiveSeatRequest(roomId: self.roomId!, applicant: apply)
+                               }
                            }
                            self.micApplys.removeAll { $0.objectId == apply.objectId}
                            self.micApplys.append(apply)
@@ -1035,7 +1037,9 @@ extension SpatialAudioSyncSerciceImp {
                                self.micApplys.remove(at: index)
                            }
                            guard let apply = apply else {return}
-                           self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+                           if VLUserCenter.user.id != apply.member?.uid {
+                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+                           }
                        }, onSubscribed: {
                        }, fail: { error in
                            agoraPrint("imp seat apply subscribe fail \(error.message)...")
