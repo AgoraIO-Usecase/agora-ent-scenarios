@@ -100,7 +100,7 @@ extension SAInviteUsersController {
 
     private func inviteUser(user: SAUser?) {
         SVProgressHUD.show()
-        let chat_uid: String = user?.rtc_uid ?? ""
+        let chat_uid: String = user?.uid ?? ""
         AppContext.saServiceImp().startMicSeatInvitation(chatUid: chat_uid, index: idx < 0 ? nil:idx) {[weak self] error, flag in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
