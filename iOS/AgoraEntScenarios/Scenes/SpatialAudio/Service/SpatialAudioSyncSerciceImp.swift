@@ -389,7 +389,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(nil, roomInfo)
         }
     }
-    
+   
     func fetchGiftContribute(completion: @escaping (Error?, [SAUser]?) -> Void) {
         completion(SAErrorType.notImplemented("fetchGiftContribute").error(), nil)
     }

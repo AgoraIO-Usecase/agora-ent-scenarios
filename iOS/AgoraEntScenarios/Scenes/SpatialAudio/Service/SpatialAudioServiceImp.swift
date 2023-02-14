@@ -299,7 +299,7 @@ extension SpatialAudioServiceImp: SpatialAudioServiceProtocol {
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
-        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList.kj.JSONString() ?? ""], completion: { error in
+        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList.kj.JSONString() ], completion: { error in
             completion(self.convertError(error: error))
         })
     }
