@@ -65,7 +65,7 @@ import AgoraChat
         print("\(self.swiftClassName ?? "") is destroyed!")
         SAIMManager.shared?.logoutIM()
         SAIMManager.shared = nil
-        SpatialAudioServiceImp._sharedInstance = nil
+//        SpatialAudioServiceImp._sharedInstance = nil
         SAUserInfo.shared.user = nil
         SAUserInfo.shared.currentRoomOwner = nil
     }
@@ -130,14 +130,14 @@ extension SARoomsViewController {
         AppContext.saServiceImp().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
-            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
-                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
-                return
-            }
-            if error == nil, room_entity != nil {
-                SAIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
+//            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
+//                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+//                return
+//            }
+//            if error == nil, room_entity != nil {
+//                SAIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
                     if error == nil {
-                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
+//                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
                         self.mapUser(user: VLUserCenter.user)
                         let info: SARoomInfo = SARoomInfo()
                         info.room = room
@@ -145,12 +145,12 @@ extension SARoomsViewController {
                         let vc = SARoomViewController(info: info)
                         self.navigationController?.pushViewController(vc, animated: true)
                     } else {
-                        SVProgressHUD.showError(withStatus: "IM login failed!")
+                        SVProgressHUD.showError(withStatus: "join room failed!")
                     }
-                })
-            } else {
-                SVProgressHUD.showError(withStatus: "Members reach limit!")
-            }
+//                })
+//            } else {
+//                SVProgressHUD.showError(withStatus: "Members reach limit!")
+//            }
         }
     }
 

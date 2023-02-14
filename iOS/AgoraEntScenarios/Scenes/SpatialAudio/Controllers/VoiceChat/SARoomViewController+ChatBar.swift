@@ -163,7 +163,7 @@ extension SARoomViewController {
                         self.roomInfo?.room?.ranking_list = [SAUser]()
                     }
                     if (SAUserInfo.shared.user?.chat_uid ?? "").isEmpty {
-                        SAUserInfo.shared.user?.chat_uid = VLUserCenter.user.chat_uid
+                        SAUserInfo.shared.user?.chat_uid = VLUserCenter.user.id
                     }
                     let ranker = self.roomInfo?.room?.ranking_list?.first(where: { $0.chat_uid ?? "" == SAUserInfo.shared.user?.chat_uid ?? ""
                     })
@@ -322,7 +322,7 @@ extension SARoomViewController {
     }
 
     func cancelRequestSpeak(index: Int?) {
-        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: self.roomInfo?.room?.owner?.chat_uid ?? "") {[weak self] error, flag in
+        AppContext.saServiceImp().cancelMicSeatApply(chat_uid: VLUserCenter.user.id) {[weak self] error, flag in
             guard let self = self else {return}
             if error == nil {
                 self.view.makeToast("Cancel apply success!".localized(), point: self.toastPoint, title: nil, image: nil, completion: nil)
