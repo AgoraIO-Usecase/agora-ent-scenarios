@@ -390,7 +390,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func fetchRoomMembers(completion: @escaping (Error?, [SAUser]?) -> Void) {
-        _getUserList(roomId: self.roomId!, finished: completion)
+        _getUserList(roomId: self.roomId!) { error, users in
+            completion(error, users?.filter({$0.uid != VLUserCenter.user.id}))
+        }
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
