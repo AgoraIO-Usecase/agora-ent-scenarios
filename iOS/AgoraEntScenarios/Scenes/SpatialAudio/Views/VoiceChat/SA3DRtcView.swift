@@ -147,6 +147,10 @@ class SA3DRtcView: UIView {
     }
 
     public func updateUser(_ mic: SARoomMic) {
+        
+        // 更新micinfos数组
+        self.micInfos?[mic.mic_index] = mic
+        
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 3 {
@@ -156,12 +160,9 @@ class SA3DRtcView: UIView {
             }
         } else {
             //更新可移动view的数据
-            guard let micInfos = micInfos, micInfos.isEmpty == false else { return }
-            let micInfo = micInfos[0]
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
-            rtcUserView.tag = 200
-            rtcUserView.user = micInfo.member
-            panGesture?.isEnabled = micInfo.member?.uid == VLUserCenter.user.id
+            rtcUserView.user = mic.member
+            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.userNo
         }
     }
 
