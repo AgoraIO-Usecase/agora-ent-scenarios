@@ -71,7 +71,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
     func onReceiveSeatRequest(roomId: String, applicant: SAApply) {
         self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: true)
     }
-    
+
     func onReceiveSeatRequestRejected(roomId: String, chat_uid: String) {
         self.refreshApplicants(chat_uid: chat_uid)
     }
