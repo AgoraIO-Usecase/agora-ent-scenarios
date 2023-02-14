@@ -1303,16 +1303,16 @@ class LiveDetailFragment : Fragment() {
                 // 画质增强、高端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
                     // 1080P
-                    if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
+                    if (stats.width == VideoSetting.Resolution.V_1080P.height && stats.height == VideoSetting.Resolution.V_1080P.width) {
                         superResolution = VideoSetting.SuperResolution.SR_NONE
                         showTip = true;
                     }
                     // 720P
-                    else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
+                    else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
                         superResolution = VideoSetting.SuperResolution.SR_1_5
                     }
                     // 540P、480P
-                    else if ((stats.width == VideoSetting.Resolution.V_540P.width && stats.height == VideoSetting.Resolution.V_540P.height) || (stats.width == VideoSetting.Resolution.V_480P.width && stats.height == VideoSetting.Resolution.V_480P.height)) {
+                    else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width) || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
                         superResolution = VideoSetting.SuperResolution.SR_1_33
                     }
                     // 360P以及以下
@@ -1323,12 +1323,12 @@ class LiveDetailFragment : Fragment() {
                 // 画质增强、中端机
                 VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
                     // 1080P
-                    if (stats.width == VideoSetting.Resolution.V_1080P.width && stats.height == VideoSetting.Resolution.V_1080P.height) {
+                    if (stats.width == VideoSetting.Resolution.V_1080P.height && stats.height == VideoSetting.Resolution.V_1080P.width) {
                         superResolution = VideoSetting.SuperResolution.SR_NONE
                         showTip = true;
                     }
                     // 720P
-                    else if (stats.width == VideoSetting.Resolution.V_720P.width && stats.height == VideoSetting.Resolution.V_720P.height) {
+                    else if (stats.width == VideoSetting.Resolution.V_720P.height && stats.height == VideoSetting.Resolution.V_720P.width) {
                         superResolution = VideoSetting.SuperResolution.SR_1
                     }
                     // 360P以及以下
