@@ -85,6 +85,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     /**房间基础*/
     private val roomKitBean = RoomKitBean()
     private var isRoomOwnerLeave = false
+    private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -537,7 +538,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         })
 
         supportFragmentManager.registerFragmentLifecycleCallbacks(object: FragmentManager.FragmentLifecycleCallbacks(){
-            private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
             override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
                 if (f is BottomSheetDialogFragment) {
                     if (dialogFragments.contains(f)) {
@@ -597,6 +597,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
         isRoomOwnerLeave = false
         binding.subtitle.clearTask()
+        dialogFragments.clear()
         super.finish()
     }
 
