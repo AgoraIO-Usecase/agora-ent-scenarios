@@ -161,7 +161,7 @@ class SA3DRtcView: UIView {
             //更新可移动view的数据
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
-            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.userNo
+            panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
         }
     }
 
@@ -643,7 +643,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     }
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
-        guard "\(uid)" != VLUserCenter.user.userNo else { return }
+        guard "\(uid)" != VLUserCenter.user.id else { return }
         let result = String(data: data, encoding: .utf8)
         guard let info = JSONObject.toModel(SAPositionInfo.self, value: result) else { return }
         
