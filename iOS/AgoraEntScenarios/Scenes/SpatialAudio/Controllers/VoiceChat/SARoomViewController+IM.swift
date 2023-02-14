@@ -289,8 +289,8 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 }
 
                 if let _ = first.member {
-                    let local_uid: String = SAUserInfo.shared.user?.chat_uid ?? ""
-                    let cp_uid: String = first.member?.chat_uid ?? ""
+                    let local_uid: String = VLUserCenter.user.id
+                    let cp_uid: String = first.member?.uid ?? ""
                     if local_uid == cp_uid {
                         local_index = mic_index
                         if !isOwner {
