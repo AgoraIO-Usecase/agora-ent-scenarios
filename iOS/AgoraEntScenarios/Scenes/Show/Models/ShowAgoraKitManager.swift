@@ -364,8 +364,14 @@ class ShowAgoraKitManager: NSObject {
         agoraKit.stopPreview()
     }
     
-    func leaveChannelEx(roomId: String) {
-        guard let connection = exConnectionMap[roomId] else { return }
+    func leaveChannelEx(roomId: String, channelId: String) {
+        guard let connection = exConnectionMap[channelId] else { return }
+        let depMap: [String: ShowRTCLoadingType]? = exConnectionDeps[channelId]
+//        depMap?[roomId] = nil
+        guard depMap?.count ?? 0 == 0 else {
+            showLogger.info("leaveChannelEx break, depcount: \(depMap?.count ?? 0), roomId: \(roomId), channelId\(channelId)", context: kShowLogBaseContext)
+            return
+        }
         showLogger.info("leaveChannelEx \(roomId)", context: kShowLogBaseContext)
         agoraKit.leaveChannelEx(connection)
         exConnectionMap[roomId] = nil
