@@ -45,7 +45,7 @@ public class SAApplyCell: UITableViewCell {
         userName.text = item?.member?.name
         avatar.sd_setImage(with: URL(string: item?.member?.portrait ?? "")!, placeholderImage: nil)
         operation.setTitle(item?.member?.invited == true ? sceneLocalized("Accepted") : sceneLocalized("Accept"), for: .normal)
-        operation.setBackgroundImage(UIImage.sceneImage(name:item?.member?.invited == true ? "" : "blue_btn_bg"), for: .normal)
+        operation.setBackgroundImage(item?.member?.invited == true ? nil : UIImage.sceneImage(name:"blue_btn_bg"), for: .normal)
         var color = UIColor.white
         if item?.member?.invited == true {
             color = UIColor(0x979CBB)
