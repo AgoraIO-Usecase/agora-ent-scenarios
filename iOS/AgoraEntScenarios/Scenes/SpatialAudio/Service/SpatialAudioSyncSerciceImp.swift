@@ -115,7 +115,7 @@ extension SpatialAudioSyncSerciceImp {
         mic.member = SAUser()
         mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
-        mic.member?.chat_uid = ""
+        mic.member?.chat_uid = VLUserCenter.user.id
         mic.member?.mic_index = 1
         mic.member?.name = VLUserCenter.user.name
         mic.member?.portrait = VLUserCenter.user.headUrl
@@ -592,7 +592,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             mic.status = 0
         }
         mic.member = user
-        mic.objectId = self.mics[user.mic_index ?? 0].objectId
+        let idx = max(user.mic_index ?? 0, 0)
+        mic.objectId = self.mics[idx].objectId
         
         let impGroup = DispatchGroup()
         impGroup.enter()
@@ -604,6 +605,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             impGroup.leave()
         }
         
+        impGroup.enter()
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error != nil {
                 retErr = error
@@ -1113,6 +1115,7 @@ extension SpatialAudioSyncSerciceImp {
     fileprivate func _addUserInfo(roomId: String, finished: @escaping (SAUser?) -> Void) {
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
+        owner.chat_uid = owner.rtc_uid
         owner.name = VLUserCenter.user.name
         owner.uid = VLUserCenter.user.id
         owner.mic_index = -1
