@@ -24,7 +24,7 @@ object VideoSetting {
     enum class Resolution(val width: Int, val height: Int) {
         V_1080P(1920, 1080),
         V_720P(1280, 720),
-        V_540P(480, 540),
+        V_540P(960, 540),
         V_480P(854, 480),
         V_360P(640, 360),
         V_240P(360, 240)
