@@ -230,6 +230,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 self.roomList.append(model)
                 self._startCheckExpire()
                 self._subscribeAll()
+                self.updateRobotInfo(info: SARobotAudioInfo()) { error in
+                }
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, micList in
                         completion(error, model)
@@ -265,6 +267,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             guard let self = self else {return}
             self.roomId = room_id
             
+            self._getRobotInfo { error, info in
+            }
             self._startCheckExpire()
             self._subscribeAll()
             NetworkManager.shared.generateToken(channelName: room_id, uid: userId, tokenType: .token007, type: .rtc) { token in
@@ -557,7 +561,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func startMicSeatInvitation(chatUid: String, index: Int?, completion: @escaping (Error?, Bool) -> Void) {
-        guard let user = self.userList.first(where: { $0.chat_uid == chatUid }) else {
+        guard let user = self.userList.first(where: { $0.uid == chatUid }) else {
             agoraAssert("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
@@ -620,10 +624,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             }
             
             self.userList.first(where: {
-                $0.chat_uid ?? "" == SAUserInfo.shared.user?.uid ?? ""
+                $0.uid ?? "" == SAUserInfo.shared.user?.uid ?? ""
             })?.mic_index = mic.mic_index
             self.micApplys.removeAll {
-                $0.member?.chat_uid ?? "" == user.chat_uid ?? ""
+                $0.member?.uid ?? "" == user.chat_uid ?? ""
             }
             let currentMic = self.mics[safe: mic.mic_index]
             if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
@@ -637,7 +641,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     }
     
     func refuseInvite(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
-        guard let user = self.userList.first(where: { $0.chat_uid == chat_uid }) else {
+        guard let user = self.userList.first(where: { $0.uid == chat_uid }) else {
             agoraAssert("startMicSeatInvitation not found")
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
@@ -686,7 +690,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     
     func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?, SARoomMic?) -> Void) {
         var mic_index = 1
-        guard let apply = self.micApplys.first(where: { $0.member?.chat_uid ?? "" == chatUid }) else {
+        guard let apply = self.micApplys.first(where: { $0.member?.uid ?? "" == chatUid }) else {
             completion(SAErrorType.unknown("acceptMicSeatApply", "apply not found").error(), nil)
             return
         }
@@ -717,7 +721,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //            self.micApplys.removeAll {
 //                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
 //            }
-            self.userList.first(where: { $0.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+            self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? ""
                             })?.mic_index = mic_index
             let currentMic = self.mics[safe: mic_index]
             if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
@@ -872,7 +876,7 @@ extension SpatialAudioSyncSerciceImp {
 extension SpatialAudioSyncSerciceImp {
     fileprivate func _cleanUserMicIndex(mic: SARoomMic) {
         let user = self.userList.first(where: {
-            $0.chat_uid ?? "" == mic.member?.chat_uid ?? ""
+            $0.uid ?? "" == mic.member?.uid ?? ""
         })
         user?.mic_index = -1
     }
@@ -995,7 +999,7 @@ extension SpatialAudioSyncSerciceImp {
                            }
                            guard let apply = apply else {return}
                            if VLUserCenter.user.id != apply.member?.uid {
-                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+                               self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.uid ?? "")
                            }
                        }, onSubscribed: {
                        }, fail: { error in
@@ -1169,7 +1173,7 @@ extension SpatialAudioSyncSerciceImp {
                                if user.status == .waitting {
                                    self.subscribeDelegate?.onReceiveSeatInvitation(roomId: self.roomId!, user: user)
                                } else if user.status == .rejected {
-                                   self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: self.roomId!, chat_uid: user.chat_uid!)
+                                   self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: self.roomId!, chat_uid: user.uid!)
                                }
                                return
                            }
@@ -1186,7 +1190,7 @@ extension SpatialAudioSyncSerciceImp {
                                self.userList.remove(at: index)
                                self._updateUserCount { error in
                                }
-                               self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: roomId, chat_uid: user?.chat_uid ?? "")
+                               self.subscribeDelegate?.onReceiveCancelSeatInvitation(roomId: roomId, chat_uid: user?.uid ?? "")
                            }
                            guard let user = user else { return }
                            if user.uid == VLUserCenter.user.id {
