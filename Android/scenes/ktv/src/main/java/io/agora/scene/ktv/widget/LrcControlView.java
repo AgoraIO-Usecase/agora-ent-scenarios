@@ -188,6 +188,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void onMemberJoinedChorus() {
+        mBinding.ilActive.lrcView.setEnableDrag(false);
         mBinding.ilIDLE.getRoot().setVisibility(View.GONE);
         mBinding.clActive.setVisibility(View.VISIBLE);
         mBinding.ilChorus.getRoot().setVisibility(View.GONE);
