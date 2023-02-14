@@ -277,7 +277,7 @@ class ShowLiveViewController: UIViewController {
     func leaveRoom(){
         agoraKitManager.setRtcDelegate(delegate: nil, roomId: roomId)
         agoraKitManager.cleanCapture()
-        agoraKitManager.leaveChannelEx(roomId: roomId)
+        agoraKitManager.leaveChannelEx(roomId: roomId, channelId: roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         
         AppContext.showServiceImp(roomId).leaveRoom {[weak self] error in
@@ -698,7 +698,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     private func _onStopInteraction(interaction: ShowInteractionInfo) {
         switch interaction.interactStatus {
         case .pking:
-            agoraKitManager.leaveChannelEx(roomId: interaction.roomId ?? "")
+            agoraKitManager.leaveChannelEx(roomId: self.roomId, channelId: interaction.roomId ?? "")
             liveView.canvasView.canvasType = .none
             liveView.canvasView.setRemoteUserInfo(name: "")
 //            if interaction.userId == VLUserCenter.user.id {
