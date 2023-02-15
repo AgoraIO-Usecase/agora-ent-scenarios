@@ -1572,7 +1572,7 @@ class VoiceSyncManagerServiceImp(
                 item ?: return
                 val originRoomInfo = roomMap[currRoomNo] ?: return
                 val roomInfo = item.toObject(VoiceRoomModel::class.java)
-                if (item.id != currRoomNo) return
+                //if (item.id != currRoomNo) return
                 if (originRoomInfo.announcement != roomInfo.announcement) {
                     roomServiceSubscribeDelegates.forEach {
                         ThreadManager.getInstance().runOnMainThread {

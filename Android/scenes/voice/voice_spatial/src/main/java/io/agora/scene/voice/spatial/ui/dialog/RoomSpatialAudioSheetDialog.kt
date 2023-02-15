@@ -74,6 +74,8 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
             mcbRedBotVoiceBlur.isChecked = isRedBlurEnabled
             pbBlueBotAttenuationFactor.progress = blueAttenuation
             pbRedBotAttenuationFactor.progress = redAttenuation
+            mtBlueBotAttenuationFactorValue.text = blueAttenuation.toString()
+            mtRedBotAttenuationFactorValue.text = redAttenuation.toString()
 
             if (isEnabled) {
                 pbBlueBotAttenuationFactor.alpha = ENABLE_ALPHA
