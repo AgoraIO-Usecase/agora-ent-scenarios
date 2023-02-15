@@ -165,6 +165,12 @@ class SA3DRtcView: UIView {
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
+            if mic.member == nil {
+                UIView.animate(withDuration: 0.25, animations: {
+                    self.rtcUserView.center = self.collectionView.center
+                    self.rtcUserView.angle = 90
+                })
+            }
         }
     }
 
