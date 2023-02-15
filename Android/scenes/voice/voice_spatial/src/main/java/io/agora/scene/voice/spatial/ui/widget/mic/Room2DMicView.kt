@@ -103,7 +103,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                     }
                 }
             }
-            if (micInfo.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
+            if (micInfo.member != null && micInfo.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
                 // 用户音量
                 when (micInfo.audioVolumeType) {
                     ConfigConstants.VolumeType.Volume_None -> {

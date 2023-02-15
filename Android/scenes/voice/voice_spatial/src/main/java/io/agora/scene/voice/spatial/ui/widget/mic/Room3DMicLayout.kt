@@ -1,6 +1,5 @@
 package io.agora.scene.voice.spatial.ui.widget.mic
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Point
 import android.graphics.PointF
@@ -362,13 +361,14 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean) {
         micInfoList.forEach { micInfo ->
-            if (micInfo.micIndex == 3) return@forEach
-            val index = micInfo.micIndex
-            micInfoMap[index] = micInfo
-            micViewMap[index]?.apply {
-                binding(micInfo)
-                micInfo.position = getPosition(this as View)
-                micInfo.forward = getForward(index)
+            if (micInfo.micIndex != 3 && micInfo.micIndex != 6) {
+                val index = micInfo.micIndex
+                micInfoMap[index] = micInfo
+                micViewMap[index]?.apply {
+                    binding(micInfo)
+                    micInfo.position = getPosition(this as View)
+                    micInfo.forward = getForward(index)
+                }
             }
         }
         activeBot(isBotActive, null)
