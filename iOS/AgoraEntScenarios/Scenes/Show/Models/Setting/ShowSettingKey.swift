@@ -8,6 +8,68 @@
 import Foundation
 import AgoraRtcKit
 
+enum ShowAgoraSRType: String, CaseIterable {
+    case x1 = "x1"
+    case x1_33 = "x1.33"
+    case x1_5 = "x1.5"
+    case x2 = "x2"
+    
+    var typeValue: ShowAgoraKitManager.SRType {
+        switch self {
+        case .x1:
+            return .x1
+        case .x1_33:
+            return .x1_33
+        case .x1_5:
+            return .x1_5
+        case .x2:
+            return .x2
+        }
+    }
+}
+
+enum ShowAgoraRenderMode: String, CaseIterable {
+    case hidden = "hidden"
+    case fit = "fit"
+    
+    var modeValue: AgoraVideoRenderMode {
+        switch self {
+        case .hidden:
+            return .hidden
+        case .fit:
+            return .fit
+        }
+    }
+}
+
+enum ShowAgoraEncode: String, CaseIterable {
+    case hard = "硬编"
+    case soft = "软编"
+    
+    var encodeValue: Bool {
+        switch self {
+        case .hard:
+            return true
+        case .soft:
+            return false
+        }
+    }
+}
+
+enum ShowAgoraCodeCType: String, CaseIterable {
+    case h265 = "h265"
+    case h264 = "h264"
+    
+    var typeValue: Int {
+        switch self {
+        case .h265:
+            return 3
+        case .h264:
+            return 2
+        }
+    }
+}
+
 enum ShowAgoraVideoDimensions: String, CaseIterable {
     
 //    case _240x360 = "240x360"
@@ -96,6 +158,14 @@ enum ShowSettingKey: String, CaseIterable {
     case audioBitRate           // 音频码率
     case captureVideoSize       // 采集分辨率
     case captureFrameRate       // 采集码率
+    case focusFace              // 人脸对焦
+    case encode                 // 硬编/软编
+    case codeCType                // 编码器
+    case mirror                 // 镜像
+    case renderMode             // 模式
+    case debugSrType            // 超分倍数
+    case debugSR                // debug超分开关
+    case debugPVC               // pvc
     
     var title: String {
         switch self {
@@ -133,6 +203,22 @@ enum ShowSettingKey: String, CaseIterable {
             return ""
         case .captureFrameRate:
             return ""
+        case .focusFace:
+            return "人脸对焦"
+        case .encode:
+            return "硬编/软编"
+        case .codeCType:
+            return "编码器"
+        case .mirror:
+            return "镜像"
+        case .renderMode:
+            return "fit/hidden"
+        case .debugSrType:
+            return "超分倍数"
+        case .debugSR:
+            return "超分开关"
+        case .debugPVC:
+            return "PVC"
         }
     }
     
@@ -173,6 +259,22 @@ enum ShowSettingKey: String, CaseIterable {
             return .label
         case .captureFrameRate:
             return .label
+        case .focusFace:
+            return .aSwitch
+        case .encode:
+            return .label
+        case .codeCType:
+            return .label
+        case .mirror:
+            return .aSwitch
+        case .renderMode:
+            return .label
+        case .debugSrType:
+            return .label
+        case .debugSR:
+            return .aSwitch
+        case .debugPVC:
+            return .aSwitch
         }
     }
     
@@ -230,6 +332,14 @@ enum ShowSettingKey: String, CaseIterable {
             return ["2","3","5"]
         case .captureVideoSize:
             return ShowAgoraCaptureVideoDimensions.allCases.map({ "\($0.rawValue)P" })
+        case .encode:
+            return ShowAgoraEncode.allCases.map({$0.rawValue})
+        case .codeCType:
+            return ShowAgoraCodeCType.allCases.map({$0.rawValue})
+        case .renderMode:
+            return ShowAgoraRenderMode.allCases.map({$0.rawValue})
+        case .debugSrType:
+            return ShowAgoraSRType.allCases.map({$0.rawValue})
         default:
             return []
         }

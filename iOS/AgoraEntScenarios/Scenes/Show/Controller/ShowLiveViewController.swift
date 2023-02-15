@@ -233,7 +233,7 @@ class ShowLiveViewController: UIViewController {
         super.viewDidLoad()
         view.layer.contents = UIImage.show_sceneImage(name: "show_live_pkbg")?.cgImage
         setupUI()
-        
+        defaultConfig()
         guard let room = room else {return}
         if room.ownerId == VLUserCenter.user.id {
             self.joinChannel()
@@ -264,6 +264,15 @@ class ShowLiveViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+    
+    private func defaultConfig(){
+        if AppContext.shared.isDebugMode {
+            guard let room = room else {return}
+            if room.ownerId != VLUserCenter.user.id {
+                agoraKitManager.debugDefaultAudienceSetting()
+            }
+        }
     }
     
     private func setupUI(){
@@ -1058,7 +1067,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
             guard let wSelf = self else { return }
             if AppContext.shared.isDebugMode {
                 let vc = ShowDebugSettingVC()
-                vc.isOutside = true
+                vc.isBroadcastor = wSelf.role == .broadcaster
                 vc.settingManager = wSelf.agoraKitManager
                 wSelf.navigationController?.pushViewController(vc, animated: true)
             }else {

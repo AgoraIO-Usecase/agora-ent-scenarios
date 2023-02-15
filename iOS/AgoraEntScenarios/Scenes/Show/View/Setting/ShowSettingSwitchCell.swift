@@ -37,7 +37,7 @@ class ShowSettingSwitchCell: ShowSettingBaseCell {
             make.right.equalTo(-20)
             make.centerY.equalTo(titleLabel)
         }
-        detailButton.isHidden = false
+        detailButton.isHidden = AppContext.shared.isDebugMode
     }
     
     func setTitle(_ title: String, enable: Bool = true, isOn: Bool, valueChangedAction: ((_ isOn: Bool)->())?, detailButtonAction: (()->())?) {

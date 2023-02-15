@@ -15,12 +15,12 @@ private let Debug2TFCellID = "Debug2TFCellID"
 
 class ShowDebugSettingVC: UIViewController {
     
-    var isOutside = true // 频道外
-    var settingManager: ShowAgoraKitManager!
+    var isBroadcastor = true // 频道外
+    var settingManager: ShowAgoraKitManager?
     
     private let transDelegate = ShowPresentTransitioningDelegate()
     private lazy var dataArray: [Any] = {
-        createDataArray()
+        isBroadcastor ? createBroadcastorDataArray() : createAudienceDataArray()
     }()
     
     // 自定义导航栏
@@ -78,23 +78,34 @@ class ShowDebugSettingVC: UIViewController {
         }
     }
     
-    private func createDataArray() -> [Any] {
-        [
+    private func createBroadcastorDataArray() -> [Any] {
+        guard let settingManager = settingManager else {
+            return createAudienceDataArray()
+        }
+        return [
             settingManager.debug1TFModelForKey(.captureFrameRate),
             settingManager.debug2TFModelForKey(.captureVideoSize),
             settingManager.debug1TFModelForKey(.encodeFrameRate),
             settingManager.debug2TFModelForKey(.encodeVideoSize),
             settingManager.debug1TFModelForKey(.bitRate),
-            settingManager.debug2TFModelForKey(.exposureRange),
-            settingManager.debug2TFModelForKey(.colorSpace),
-            ShowSettingKey.H265,
+            ShowSettingKey.debugPVC,
+            ShowSettingKey.focusFace,  // 人脸对焦
+            settingManager.debug2TFModelForKey(.exposureRange),// 曝光区域
+            settingManager.debug2TFModelForKey(.colorSpace), // 颜色空间
+            ShowSettingKey.encode,
+            ShowSettingKey.codeCType,
+            ShowSettingKey.mirror,
+            ShowSettingKey.renderMode,
             ShowSettingKey.colorEnhance,
             ShowSettingKey.lowlightEnhance,
             ShowSettingKey.videoDenoiser,
-            ShowSettingKey.PVC,
-            ShowSettingKey.videoEncodeSize,
-            ShowSettingKey.FPS,
-            ShowSettingKey.videoBitRate
+        ]
+    }
+    
+    private func createAudienceDataArray() -> [Any] {
+        [
+            ShowSettingKey.debugSR,
+            ShowSettingKey.debugSrType
         ]
     }
 }
@@ -111,7 +122,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug1TFCellID, for: indexPath) as! ShowDebugSetting1TFCell
             cell.setTitle(tf1Model.title, value: tf1Model.tfText, unit: tf1Model.unitText) {[weak self] textField in
                 tf1Model.tfText = textField.text
-                self?.settingManager.updateDebugProfileFor1TFMode(tf1Model)
+                self?.settingManager?.updateDebugProfileFor1TFMode(tf1Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -122,10 +133,10 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: Debug2TFCellID, for: indexPath) as! ShowDebugSetting2TFCell
             cell.setTitle(tf2Model.title, value1: tf2Model.tf1Text, value2: tf2Model.tf2Text, separator: tf2Model.separatorText) {[weak self] textField in
                 tf2Model.tf1Text = textField.text
-                self?.settingManager.updateDebugProfileFor2TFModel(tf2Model)
+                self?.settingManager?.updateDebugProfileFor2TFModel(tf2Model)
             } tf2DidEndEditing: { [weak self] textField in
                 tf2Model.tf2Text = textField.text
-                self?.settingManager.updateDebugProfileFor2TFModel(tf2Model)
+                self?.settingManager?.updateDebugProfileFor2TFModel(tf2Model)
             } beginEditing: {
                 tableView.scrollToRow(at: indexPath, at: .top, animated: true)
             }
@@ -136,11 +147,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
         var cell: UITableViewCell!
         if data.type == .aSwitch {
             let cell = tableView.dequeueReusableCell(withIdentifier: SwitchCellID, for: indexPath) as! ShowSettingSwitchCell
-            var enable = true
-            if data == .H265 || data == .PVC {
-                enable = isOutside
-            }
-            cell.setTitle(data.title,enable:enable, isOn: data.boolValue) {[weak self] isOn in
+            cell.setTitle(data.title,enable:true, isOn: data.boolValue) {[weak self] isOn in
                 self?.changeValue(isOn, forSettingKey: data)
             } detailButtonAction: {[weak self] in
                 self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
@@ -167,7 +174,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
                 vc.dataArray = data.items
                 vc.didSelectedIndex = {[weak self] index in
                     data.writeValue(index)
-                    self?.settingManager.updateSettingForkey(data)
+                    self?.settingManager?.updateSettingForkey(data)
                     tableView.reloadData()
                 }
                 self?.present(vc, animated: true, completion: {
@@ -188,7 +195,7 @@ extension ShowDebugSettingVC: UITableViewDelegate, UITableViewDataSource {
 extension ShowDebugSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
         key.writeValue(value)
-        settingManager.updateSettingForkey(key)
+        settingManager?.updateSettingForkey(key)
         tableView.reloadData()
     }
 }

@@ -21,7 +21,9 @@ class ShowLivePagesViewController: ViewController {
     
     lazy var agoraKitManager: ShowAgoraKitManager = {
         let manager = ShowAgoraKitManager()
-        manager.defaultSetting()
+        if AppContext.shared.isDebugMode == false {
+            manager.defaultSetting()            
+        }
         return manager
     }()
     

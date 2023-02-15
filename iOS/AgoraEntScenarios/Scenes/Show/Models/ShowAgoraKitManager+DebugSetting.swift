@@ -48,6 +48,29 @@ enum ShowDebug2TFSettingKey: String {
 
 extension ShowAgoraKitManager {
     
+    func debugDefaultBroadcastorSetting() {
+        captureConfig.dimensions = CGSize(width: 720, height: 1280)
+        captureConfig.frameRate = 15
+        videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
+        videoEncoderConfig.frameRate = .fps15
+        videoEncoderConfig.bitrate = 1800
+        
+        updateSettingForkey(.debugPVC)
+        updateSettingForkey(.focusFace)
+        updateSettingForkey(.encode)
+        updateSettingForkey(.codeCType)
+        updateSettingForkey(.mirror)
+        updateSettingForkey(.renderMode)
+        updateSettingForkey(.colorEnhance)
+        updateSettingForkey(.lowlightEnhance)
+        updateSettingForkey(.videoDenoiser)
+    }
+    
+    func debugDefaultAudienceSetting() {
+        updateSettingForkey(.debugSR)
+        updateSettingForkey(.debugSrType)
+    }
+    
     func debug1TFModelForKey(_ key: ShowDebug1TFSettingKey) -> ShowDebug1TFModel {
         var originalValue = ""
         switch key {
@@ -85,17 +108,29 @@ extension ShowAgoraKitManager {
         guard let title = model.title, let key =  ShowDebug1TFSettingKey(rawValue: title) else { return }
         switch key {
         case .captureFrameRate:
-            guard let value = Int32(text) else { return }
+            guard let value = Int32(text) else {
+                showLogger.info("***Debug*** 采集帧率参数为空 ")
+                return
+            }
             captureConfig.frameRate = value
             agoraKit.setCameraCapturerConfiguration(captureConfig)
+            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureFrameRate = \(captureConfig.frameRate) ")
         case .encodeFrameRate:
-            guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else { return }
+            guard let value = Int(text), let fps = AgoraVideoFrameRate(rawValue: value) else {
+                showLogger.info("***Debug*** 编码帧率参数为空 ")
+                return
+            }
             videoEncoderConfig.frameRate = fps
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(videoEncoderConfig.frameRate) ")
         case .bitRate:
-            guard let value = Int(text) else { return }
+            guard let value = Int(text) else {
+                showLogger.info("***Debug*** 码率参数为空")
+                return
+            }
             videoEncoderConfig.bitrate = value
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.bitrate = \(videoEncoderConfig.bitrate) ")
         }
     }
     
@@ -106,15 +141,22 @@ extension ShowAgoraKitManager {
         guard value1 > 0, value2 > 0 else { return }
         switch key {
         case .captureVideoSize:
+            agoraKit.disableVideo()
             captureConfig.dimensions = CGSize(width: value1, height: value2)
             agoraKit.setCameraCapturerConfiguration(captureConfig)
+            agoraKit.enableVideo()
+            showLogger.info("***Debug*** setCameraCapturerConfiguration.captureVideoSize = \(captureConfig.dimensions) ")
         case .encodeVideoSize:
             videoEncoderConfig.dimensions = CGSize(width: value1, height: value2)
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+            showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(videoEncoderConfig.dimensions) ")
         case .exposureRange:
-            break
+            agoraKit.setCameraExposurePosition(CGPoint(x: value1, y: value2))
+            showLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: value1, y: value2)) ")
         case .colorSpace:
-            break
+            agoraKit.setParameters("{\"che.video.videoFullrangeExt\":\(value1)}")
+            agoraKit.setParameters("{\"che.video.matrixCoefficientsExt\":\(value2)}")
+            showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(value1)} {\"che.video.matrixCoefficientsExt\":\(value2)} ")
         }
     }
 }
