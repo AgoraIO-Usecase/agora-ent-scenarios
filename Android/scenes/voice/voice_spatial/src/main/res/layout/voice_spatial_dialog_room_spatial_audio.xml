@@ -101,11 +101,12 @@
                 style="@style/voice_bottom_sheet_progress"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/voice_chatroom_attenuation_factor"
+                android:max="100"
                 app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotAttenuationFactor"
                 app:layout_constraintEnd_toStartOf="@+id/mtBlueBotAttenuationFactorValue"
                 app:layout_constraintStart_toEndOf="@+id/mtBlueBotAttenuationFactor"
                 app:layout_constraintTop_toTopOf="@+id/mtBlueBotAttenuationFactor"
-                tools:progress="10" />
+                tools:progress="50" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotAttenuationFactorValue"
@@ -209,7 +210,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/mtRedBotAttenuationFactorValue"
                 app:layout_constraintStart_toEndOf="@+id/mtRedBotAttenuationFactor"
                 app:layout_constraintTop_toTopOf="@+id/mtRedBotAttenuationFactor"
-                tools:progress="10" />
+                tools:progress="50" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotAttenuationFactorValue"

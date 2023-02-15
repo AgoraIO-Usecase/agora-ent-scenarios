@@ -411,6 +411,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         if (index >= 0 && index < micInfoMap.size) {
             micInfoMap[index]?.apply {
                 this.audioVolumeType = volume
+                micViewMap[index]?.binding(this)
             }
         }
     }
