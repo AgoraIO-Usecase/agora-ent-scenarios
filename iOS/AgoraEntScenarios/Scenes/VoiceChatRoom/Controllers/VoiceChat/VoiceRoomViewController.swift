@@ -145,7 +145,8 @@ extension VoiceRoomViewController {
             guard let `self` = self else { return }
             if !joinSuccess {
                 self.view.makeToast("Join failed!")
-                self.didHeaderAction(with: .back, destroyed: true)
+                self.rtckit.leaveChannel()
+                self.backAction()
             } else {
                 if self.isOwner == true {
                     //房主更新环信KV
