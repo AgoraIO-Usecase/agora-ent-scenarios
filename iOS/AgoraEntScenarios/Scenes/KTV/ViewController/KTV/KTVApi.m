@@ -24,58 +24,6 @@ time_t uptime(void) {
   }
 }
 
-@interface KTVChorusSeekHelper : NSObject
-
-@property (nonatomic, assign) int seekTimes;
-
-@property (nonatomic, strong) NSDate* seekDate;
-@property (nonatomic, assign) NSInteger seekToPosition;
-
-@property (nonatomic, strong) NSDate* delayDate;
-@end
-
-@implementation KTVChorusSeekHelper
-
-- (instancetype)init {
-    if (self = [super init]) {
-        [self reset];
-    }
-    
-    return self;
-}
-
-- (void)reset {
-    self.seekTimes = 5;
-    self.seekDate = nil;
-    self.seekToPosition = 0;
-    self.delayDate = [NSDate date];
-}
-
-- (int)getDelayTs {
-    if (self.seekTimes <= 0 || -[self.delayDate timeIntervalSinceNow] * 1000 < 1000) {
-        return 0;
-    }
-    self.delayDate = [NSDate date];
-    self.seekTimes --;
-    return 20;
-}
-
-- (NSInteger)calcExpectPosition:(NSInteger)expectPosition {
-    self.seekDate = [NSDate date];
-    self.seekToPosition = expectPosition;
-    return self.seekToPosition;
-}
-
-- (void)showSeekCostIfNeedWithPosition:(NSInteger)position {
-    if (self.seekDate) {
-        KTVLogInfo(@"seek cost: %.f ms, expectPosition: %ld, position: %ld", -[self.seekDate timeIntervalSinceNow] * 1000, self.seekToPosition, position);
-        self.seekDate = nil;
-        self.seekToPosition = 0;
-    }
-}
-
-@end
-
 
 @implementation KTVSongConfiguration
 
@@ -121,8 +69,6 @@ time_t uptime(void) {
 @property (nonatomic, assign) int chorusRemoteUserVolume;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
-
-@property (nonatomic, strong) KTVChorusSeekHelper* chorusSeekHelper;
 @end
 
 @implementation KTVApi
@@ -136,7 +82,6 @@ time_t uptime(void) {
         self.musicCallbacks = [NSMutableDictionary dictionary];
         self.loadDict = [NSMutableDictionary dictionary];
         self.lyricUrlDict = [NSMutableDictionary dictionary];
-        self.chorusSeekHelper = [KTVChorusSeekHelper new];
         
         // 调节本地播放音量。0-100
         [self adjustPlayoutVolume:100];
@@ -481,7 +426,6 @@ time_t uptime(void) {
                 [self.rtcMediaPlayer play];
                 self.localPlayerPosition = uptime();
                 self.playerDuration = 0;
-                [self.chorusSeekHelper reset];
                 return;
             }
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
@@ -490,12 +434,11 @@ time_t uptime(void) {
 //                NSInteger localPosition2 = [self.rtcMediaPlayer getPosition];
                 NSInteger expectPosition = position + localNtpTime - remoteNtp + self.audioPlayoutDelay;
                 NSInteger threshold = expectPosition - localPosition;
-                if(labs(threshold) > 40 - [self.chorusSeekHelper getDelayTs]) {
+                if(labs(threshold) > 40) {
                     KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition);
 //                    KTVLogInfo(@"localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", localPosition, localPosition2, localPosition2 - localPosition);
 //                    NSDate*date = [NSDate date];
 //                    NSInteger pos1 = [self.rtcMediaPlayer getPosition];
-                    expectPosition = [self.chorusSeekHelper calcExpectPosition:expectPosition];
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
 //                    NSInteger pos2 = [self.rtcMediaPlayer getPosition];
 //                    NSLog(@"seekToPosition: %.fms, %ld/%ld/%ld", -[date timeIntervalSinceNow] * 1000, pos1, pos2, expectPosition);
@@ -606,7 +549,6 @@ time_t uptime(void) {
 
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToPosition:(NSInteger)position
 {
-    [self.chorusSeekHelper showSeekCostIfNeedWithPosition:position];
     self.localPlayerPosition = uptime() - position;
     
     if (self.config.role == KTVSingRoleMainSinger && position > self.audioPlayoutDelay) {
