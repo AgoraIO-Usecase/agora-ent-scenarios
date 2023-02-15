@@ -286,7 +286,11 @@ time_t uptime(void) {
 -(void)resumePlay
 {
     self.localPlayerPosition = [self.rtcMediaPlayer getPosition];
-    [self.rtcMediaPlayer resume];
+    if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePaused) {
+        [self.rtcMediaPlayer resume];
+    } else {
+        [self.rtcMediaPlayer play];
+    }
 }
 
 -(void)pausePlay
@@ -422,12 +426,6 @@ time_t uptime(void) {
         self.remotePlayerDuration = duration;
         KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
-            if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStateOpenCompleted) {
-                [self.rtcMediaPlayer play];
-                self.localPlayerPosition = uptime();
-                self.playerDuration = 0;
-                return;
-            }
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
                 NSInteger localNtpTime = [self getNtpTimeInMs];
                 NSInteger localPosition = uptime() - self.localPlayerPosition;
