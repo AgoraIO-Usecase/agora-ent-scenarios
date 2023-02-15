@@ -317,7 +317,6 @@ extension SA3DRtcView {
                 let pos = viewCenterPostion(view: rtcUserView)
                 var info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
-                info.position = pos.map({ $0.doubleValue })
                 info.forward = forward
                 info.x = pos.first?.doubleValue ?? 0
                 info.y = pos[1].doubleValue
@@ -327,8 +326,7 @@ extension SA3DRtcView {
                 streamInfo.message = JSONObject.toJsonString(info)
                 
                 guard let streamData = JSONObject.toData(streamInfo) else { return }
-                let ret = rtcKit?.sendStreamMessage(with: streamData)
-                print("ret == \(ret)")
+                rtcKit?.sendStreamMessage(with: streamData)
             }
         }
     }
@@ -653,13 +651,15 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
         guard let streamInfo = JSONObject.toModel(SADataStreamInfo.self, value: result),
               let info = JSONObject.toModel(SAPositionInfo.self, value: streamInfo.message) else { return }
         
-        let pos = info.position.map({ NSNumber(value: $0) })
+//        let pos = info.position.map({ NSNumber(value: $0) })
+        var point = pointConvertToView(point: CGPoint(x: info.x, y: info.y))
+        point = checkEdgeRange(point: point)
+        let pos = [NSNumber(value: point.x), NSNumber(value: point.y), 0]
         let forward = info.forward.map({ NSNumber(value: $0) })
         rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
                                            position: pos,
                                            forward: forward)
-        var point = pointConvertToView(point: CGPoint(x: info.x, y: info.y))
-        point = checkEdgeRange(point: point)
+        
         UIView.animate(withDuration: 0.25) {
             self.rtcUserView.center = point
         }

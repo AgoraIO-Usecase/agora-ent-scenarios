@@ -14,7 +14,6 @@ struct SADataStreamInfo: Codable {
 
 struct SAPositionInfo: Codable {
     var uid: Int = 0
-    var position: [Double] = []
     var forward: [Double] = []
     var x: CGFloat = 0
     var y: CGFloat = 0
