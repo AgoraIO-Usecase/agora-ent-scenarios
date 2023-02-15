@@ -125,7 +125,6 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
 
                 }
             }
-
         }
     }
 
