@@ -93,18 +93,16 @@
     self.gradeView = [[GradeView alloc]init];
     self.gradeView.frame = CGRectMake(15, 15, self.width - 30, 30);
     [self addSubview:self.gradeView];
-    [self layoutIfNeeded];
-    [self.gradeView setup];
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
-    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 10)];
+    _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
     _karaokeView.delegate = self;
-    _karaokeView.lyricsView.textNormalColor = [UIColor yellowColor];
-    _karaokeView.lyricsView.textSelectedColor = [UIColor blueColor];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor cyanColor];
-    _karaokeView.lyricsView.textNormalFontSize = [UIFont systemFontOfSize:13];
-    _karaokeView.lyricsView.textHighlightFontSize = [UIFont systemFontOfSize:16];
+    _karaokeView.lyricsView.textNormalColor = [UIColor whiteColor];
+    _karaokeView.lyricsView.textSelectedColor = [UIColor grayColor];
+    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.textNormalFontSize = [UIFont fontWithName:@"PingFang SC" size:13];
+    _karaokeView.lyricsView.textHighlightFontSize = [UIFont fontWithName:@"PingFang SC" size:16];
     _karaokeView.lyricsView.draggable = true;
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
