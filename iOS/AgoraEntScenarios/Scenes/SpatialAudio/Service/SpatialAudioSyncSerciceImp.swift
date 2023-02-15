@@ -898,18 +898,11 @@ extension SpatialAudioSyncSerciceImp {
                            if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
                                self.mics[index] = seat
                            }
-//                           self.mics.removeAll { $0.objectId == seat.objectId}
-//                           self.mics.append(seat)
-                       }, onDeleted: {[weak self] object in
+                           self.mics.removeAll { $0.objectId == seat.objectId}
+                           self.mics.append(seat)
+                       }, onDeleted: { _ in
                            agoraPrint("imp seat info subscribe onDeleted...")
-//                           guard let self = self else {return}
-//                           var apply: SAApply? = nil
-//                           if let index = self.micApplys.firstIndex(where: { object.getId() == $0.objectId }) {
-//                               apply = self.micApplys[index]
-//                               self.micApplys.remove(at: index)
-//                           }
-//                           guard let apply = apply else {return}
-//                           self.subscribeDelegate?.onReceiveSeatRequestRejected(roomId: self.roomId!, chat_uid: apply.member?.chat_uid ?? "")
+
                        }, onSubscribed: {
                        }, fail: { error in
                            agoraPrint("imp seat info subscribe fail \(error.message)...")
