@@ -75,34 +75,34 @@ class SAEQSettingView: UIView, UITextViewDelegate {
 
     private let settingName: [String] = ["Spatial Audio", "Attenuation factor", "Air absorb", "Voice blur"]
     
-    private let AIAECSettingName: [String] = ["Turn on AIAEC".localized()]
+    private let AIAECSettingName: [String] = ["Turn on AIAEC".localized_spatial()]
     
-    private let AGSettingName: [String] = ["Turn on AGC".localized()]
+    private let AGSettingName: [String] = ["Turn on AGC".localized_spatial()]
 
     
-    private let soundType: [String] = ["TV Sound".localized(), "Kitchen Sound".localized(), "Street Sound".localized(), "Mashine Sound".localized(), "Office Sound".localized(), "Home Sound".localized(), "Construction Sound".localized(), "Alert Sound/Music".localized(), "Applause".localized(), "Wind Sound".localized(), "Mic Pop Filter".localized(), "Audio Feedback".localized(), "Microphone Finger Rub Sound".localized(), "Screen Tap Sound".localized()]
+    private let soundType: [String] = ["TV Sound".localized_spatial(), "Kitchen Sound".localized_spatial(), "Street Sound".localized_spatial(), "Mashine Sound".localized_spatial(), "Office Sound".localized_spatial(), "Home Sound".localized_spatial(), "Construction Sound".localized_spatial(), "Alert Sound/Music".localized_spatial(), "Applause".localized_spatial(), "Wind Sound".localized_spatial(), "Mic Pop Filter".localized_spatial(), "Audio Feedback".localized_spatial(), "Microphone Finger Rub Sound".localized_spatial(), "Screen Tap Sound".localized_spatial()]
     
-    private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".localized(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".localized(), "Ex. Keyboard tapping, mouse clicking sounds".localized(), "Ex. Door closing, chair squeaking, baby crying sounds".localized(), "Ex. Knocking sound".localized()]
+    private let soundDetail: [String] = ["Ex. Bird, car, subway sounds".localized_spatial(), "Ex. Fan, air conditioner, vacuum cleaner, printer sounds".localized_spatial(), "Ex. Keyboard tapping, mouse clicking sounds".localized_spatial(), "Ex. Door closing, chair squeaking, baby crying sounds".localized_spatial(), "Ex. Knocking sound".localized_spatial()]
 
     var settingType: SA_AUDIO_SETTING_TYPE = .Spatial {
         didSet {
             if settingType == .Spatial {
-                titleLabel.text = "Spatial Setting".localized()
+                titleLabel.text = "Spatial Setting".localized_spatial()
             } else if settingType == .Noise {
-                titleLabel.text = "Noise Setting".localized()
+                titleLabel.text = "Noise Setting".localized_spatial()
             } else if settingType == .effect {
-                titleLabel.text = "Effect Setting".localized()
+                titleLabel.text = "Effect Setting".localized_spatial()
             } else if settingType == .AIAEC {
-                titleLabel.text = "AIAEC".localized()
+                titleLabel.text = "AIAEC".localized_spatial()
             } else if settingType == .AGC {
-                titleLabel.text = "AGC".localized()
+                titleLabel.text = "AGC".localized_spatial()
 
             }
             tableView.reloadData()
         }
     }
 
-    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "otherSound".localized(), fontSize: 12, width: ScreenWidth - 100)
+    lazy var otherSoundHeaderHeight: CGFloat = textHeight(text: "otherSound".localized_spatial(), fontSize: 12, width: ScreenWidth - 100)
 
     var resBlock: ((SA_AUDIO_SETTING_TYPE) -> Void)?
 
@@ -203,7 +203,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if settingType == .Noise && section == 2 {
-            return textHeight(text: "AINS Sup".localized(), fontSize: 13, width: ScreenWidth - 40) + 15
+            return textHeight(text: "AINS Sup".localized_spatial(), fontSize: 13, width: ScreenWidth - 40) + 15
         } else if settingType == .effect && section == 1 {
             return 40~ + 12~ + otherSoundHeaderHeight + 10~
         } else if settingType == .AIAEC || settingType == .AGC {
@@ -253,7 +253,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 66))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "AIAEC_desc".localized()
+            titleLabel.text = "AIAEC_desc".localized_spatial()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -264,7 +264,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 10, y: 5~, width: screenWidth-20, height: 60))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.numberOfLines = 0
-            titleLabel.text = "AGC_desc".localized()
+            titleLabel.text = "AGC_desc".localized_spatial()
             titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             footer.addSubview(titleLabel)
             return footer
@@ -274,7 +274,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             footer.backgroundColor = .white
             let textView = UITextView(frame: CGRect(x: 30, y: 0, width: screenWidth - 60, height: 40))
 
-            let text = NSMutableAttributedString(string: "Visit More".localized())
+            let text = NSMutableAttributedString(string: "Visit More".localized_spatial())
             text.addAttribute(NSAttributedString.Key.font,
                               value: UIFont.systemFont(ofSize: 13),
                               range: NSRange(location: 0, length: text.length))
@@ -316,10 +316,10 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: 300~, height: 30~))
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
-                titleLabel.text = "Current Sound".localized()
+                titleLabel.text = "Current Sound".localized_spatial()
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
             } else if settingType == .Spatial {
-                titleLabel.text = "Agora Blue Bot".localized()
+                titleLabel.text = "Agora Blue Bot".localized_spatial()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             } else if settingType == .AIAEC {
                 
@@ -327,7 +327,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
         
 
             } else {
-                titleLabel.text = "AINS Settings".localized()
+                titleLabel.text = "AINS Settings".localized_spatial()
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
             }
             headerView.addSubview(titleLabel)
@@ -340,7 +340,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             if settingType == .effect {
                 titleLabel.textColor = UIColor(red: 60 / 255.0, green: 66 / 255.0, blue: 103 / 255.0, alpha: 1)
-                titleLabel.text = "Other Sound".localized()
+                titleLabel.text = "Other Sound".localized_spatial()
                 headerView.addSubview(titleLabel)
 
                 if section == 1 {
@@ -355,7 +355,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
                     warningView.addSubview(iconView)
 
                     let warningLabel = UILabel(frame: CGRect(x: 30, y: 6, width: screenWidth - 100, height: otherSoundHeaderHeight))
-                    warningLabel.text = "otherSound".localized()
+                    warningLabel.text = "otherSound".localized_spatial()
                     warningLabel.numberOfLines = 0
                     warningLabel.lineBreakMode = .byCharWrapping
                     warningLabel.font = UIFont.systemFont(ofSize: 12)
@@ -364,13 +364,13 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "Agora Red Bot" : "AINS Definition".localized()
+                titleLabel.text = settingType == .Spatial ? "Agora Red Bot".localized_spatial() : "AINS Definition".localized_spatial()
                 headerView.addSubview(titleLabel)
             }
 
             return headerView
         } else {
-            let height = textHeight(text: "AINS Sup".localized(), fontSize: 13, width: ScreenWidth - 40)
+            let height = textHeight(text: "AINS Sup".localized_spatial(), fontSize: 13, width: ScreenWidth - 40)
             let headerView: UIView = .init(frame: CGRect(x: 0, y: 0, width: screenWidth, height: height + 15))
             headerView.backgroundColor = UIColor(red: 247 / 255.0, green: 248 / 255.0, blue: 251 / 255.0, alpha: 1)
             let titleLabel: UILabel = .init(frame: CGRect(x: 20~, y: 5~, width: screenWidth - 40, height: height))
@@ -378,7 +378,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
             titleLabel.lineBreakMode = .byCharWrapping
             titleLabel.font = UIFont.systemFont(ofSize: 13)
             titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-            titleLabel.text = "AINS Sup".localized()
+            titleLabel.text = "AINS Sup".localized_spatial()
             headerView.addSubview(titleLabel)
             return headerView
         }
@@ -461,7 +461,7 @@ extension SAEQSettingView: UITableViewDelegate, UITableViewDataSource {
                  return cell
              } else if indexPath.section == 1 {
                  let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: tIdentifier)!
-                 cell.textLabel?.text = "AINS: AI Noise Suppression".localized()
+                 cell.textLabel?.text = "AINS: AI Noise Suppression".localized_spatial()
                  cell.textLabel?.font = UIFont.systemFont(ofSize: 13)
                  cell.textLabel?.textColor = UIColor(hex: "0x3C4267")
                  cell.isUserInteractionEnabled = false

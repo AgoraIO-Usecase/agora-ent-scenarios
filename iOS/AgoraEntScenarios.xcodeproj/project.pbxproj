@@ -529,6 +529,7 @@
 		E70B4B0D299235FA00A7FB7F /* SAPositionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B0C299235FA00A7FB7F /* SAPositionInfo.swift */; };
 		E70B4B142992527D00A7FB7F /* ActionSheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */; };
 		E70B4B162993AC5D00A7FB7F /* SASpatialTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */; };
+		E7922338299CFBDD00596F1E /* SALanagerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7922337299CFBDD00596F1E /* SALanagerManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1211,6 +1212,7 @@
 		E70B4B0C299235FA00A7FB7F /* SAPositionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SAPositionInfo.swift; sourceTree = "<group>"; };
 		E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetManager.swift; sourceTree = "<group>"; };
 		E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SASpatialTipsView.swift; sourceTree = "<group>"; };
+		E7922337299CFBDD00596F1E /* SALanagerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SALanagerManager.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2459,6 +2461,7 @@
 				DDC51C5D298C141B00D837AC /* SAPresentationController.swift */,
 				DDC51C5E298C141B00D837AC /* Notification+SAPresentation.swift */,
 				DDC51C5F298C141B00D837AC /* SAPasswordAlert.swift */,
+				E7922337299CFBDD00596F1E /* SALanagerManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3522,6 +3525,7 @@
 				DD4DFA2E298BCBE5000AF053 /* VLOnLineListVC.m in Sources */,
 				DDC51D53298C141C00D837AC /* SACreateRoomView.swift in Sources */,
 				DDC51D33298C141C00D837AC /* SANoticeView.swift in Sources */,
+				E7922338299CFBDD00596F1E /* SALanagerManager.swift in Sources */,
 				DDC51E20298C1D8900D837AC /* VoiceRoomGiftersViewController.swift in Sources */,
 				DDC51DFF298C1D8900D837AC /* Xcode14.m in Sources */,
 				DDA19A4928FFE57A009D3E61 /* EKAttributes+UserInteraction.swift in Sources */,

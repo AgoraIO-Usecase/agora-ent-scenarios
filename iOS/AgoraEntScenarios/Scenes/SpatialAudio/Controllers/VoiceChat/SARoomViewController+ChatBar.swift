@@ -20,12 +20,12 @@ extension SARoomViewController {
         actionView
             .section(section: 2)
             .rows(rows: [2, 1])
-            .title(title: "Audio Settings")
-            .sectionHeader(title: "Bot Settings", desc: "Host Only")
-            .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red", isOn: isOpenSpatial, isEnabel: isOwner)
-            .sliderCell(iconName: "icons／set／laba", title: "Robot volume", value: volumn, isEnable: isOwner)
-            .sectionHeader(iconName: "new", title: "Spatial Audio", desc: nil)
-            .textCell(iconName: "icons／set／3D", title: "Spatial Audio", desc: nil, isShowArrow: true)
+            .title(title: "Audio Settings".localized_spatial())
+            .sectionHeader(title: "Bot Settings".localized_spatial(), desc: "Host Only".localized_spatial())
+            .switchCell(iconName: "icons／set／jiqi", title: "Agora Blue&Agora Red".localized_spatial(), isOn: isOpenSpatial, isEnabel: isOwner)
+            .sliderCell(iconName: "icons／set／laba", title: "Robot volume".localized_spatial(), value: volumn, isEnable: isOwner)
+            .sectionHeader(iconName: "new", title: "Spatial Audio".localized_spatial(), desc: nil)
+            .textCell(iconName: "icons／set／3D", title: "Spatial Audio".localized_spatial(), desc: nil, isShowArrow: true)
             .config()
         actionView.didCellItemClosure = { [weak self] indexPath in
             guard indexPath.section == 1 && indexPath.row == 0 else { return }
@@ -54,15 +54,15 @@ extension SARoomViewController {
         actionView
             .section(section: 2)
             .rows(rows: [3, 3])
-            .title(title: "Spatial Audio")
-            .sectionHeader(iconName: "new", title: "Agora Blue Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb", isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur", isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
-            .sectionHeader(iconName: "new", title: "Agora Red Bot", desc: "Host Only")
-            .sliderCell(title: "Attenuation factor volume", value: robotInfo.red_robot_attenuation, isEnable: isOwner)
-            .switchCell(title: "Air Absorb", isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
-            .switchCell(title: "Voice Blur", isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
+            .title(title: "Spatial Audio".localized_spatial())
+            .sectionHeader(iconName: "new", title: "Agora Blue Bot".localized_spatial(), desc: "Host Only".localized_spatial())
+            .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.blue_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.blue_robot_absorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.blue_robot_blur, isEnabel: isOwner)
+            .sectionHeader(iconName: "new", title: "Agora Red Bot".localized_spatial(), desc: "Host Only".localized_spatial())
+            .sliderCell(title: "Attenuation factor volume".localized_spatial(), value: robotInfo.red_robot_attenuation, isEnable: isOwner)
+            .switchCell(title: "Air Absorb".localized_spatial(), isOn: robotInfo.red_robot_absorb, isEnabel: isOwner)
+            .switchCell(title: "Voice Blur".localized_spatial(), isOn: robotInfo.red_robot_blur, isEnabel: isOwner)
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] indexPath, isOn in
             guard let self = self else { return }
