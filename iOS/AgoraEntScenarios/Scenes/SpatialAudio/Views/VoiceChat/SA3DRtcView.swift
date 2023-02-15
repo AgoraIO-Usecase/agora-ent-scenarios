@@ -315,14 +315,18 @@ extension SA3DRtcView {
             
             if let user = micInfos?.first?.member {
                 let pos = viewCenterPostion(view: rtcUserView)
-                let info = SAPositionInfo()
+                var info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
                 info.position = pos.map({ $0.doubleValue })
                 info.forward = forward
                 info.x = pos.first?.doubleValue ?? 0
                 info.y = pos[1].doubleValue
                 info.angle = angle
-                guard let streamData = JSONObject.toData(info) else { return }
+                
+                var streamInfo = SADataStreamInfo()
+                streamInfo.message = JSONObject.toJsonString(info)
+                
+                guard let streamData = JSONObject.toData(streamInfo) else { return }
                 let ret = rtcKit?.sendStreamMessage(with: streamData)
                 print("ret == \(ret)")
             }
@@ -646,7 +650,8 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
         guard "\(uid)" != VLUserCenter.user.id else { return }
         let result = String(data: data, encoding: .utf8)
-        guard let info = JSONObject.toModel(SAPositionInfo.self, value: result) else { return }
+        guard let streamInfo = JSONObject.toModel(SADataStreamInfo.self, value: result),
+              let info = JSONObject.toModel(SAPositionInfo.self, value: streamInfo.message) else { return }
         
         let pos = info.position.map({ NSNumber(value: $0) })
         let forward = info.forward.map({ NSNumber(value: $0) })

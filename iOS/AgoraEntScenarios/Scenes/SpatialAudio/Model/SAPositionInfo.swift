@@ -7,7 +7,12 @@
 
 import UIKit
 
-class SAPositionInfo: Codable {
+struct SADataStreamInfo: Codable {
+    var code: Int = 101
+    var message: String?
+}
+
+struct SAPositionInfo: Codable {
     var uid: Int = 0
     var position: [Double] = []
     var forward: [Double] = []
