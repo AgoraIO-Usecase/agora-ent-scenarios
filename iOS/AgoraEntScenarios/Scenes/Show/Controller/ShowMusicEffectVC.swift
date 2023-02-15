@@ -6,10 +6,14 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 class ShowMusicEffectVC: UIViewController {
     
     var musicManager: ShowMusicManager?
+    var agorakitManager: ShowAgoraKitManager?
+    var currentChannelId: String?
+    
     
     private let headerView = ShowMusicTableHeaderView()
     
@@ -91,6 +95,12 @@ extension ShowMusicEffectVC: UITableViewDelegate, UITableViewDataSource {
                 self?.musicManager?.setBeautyIndex(data.selectedIndex)
             case .mixture:
                 self?.musicManager?.setMixIndex(data.selectedIndex)
+            }
+            if let channelId = self?.currentChannelId, let playerId = self?.musicManager?.player?.getMediaPlayerId() {
+                let options = AgoraRtcChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = Int(playerId)
+                self?.agorakitManager?.updateChannelEx(channelId: channelId, options: options)
             }
             tableView.reloadData()
         })

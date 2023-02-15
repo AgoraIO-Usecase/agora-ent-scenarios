@@ -44,7 +44,7 @@ class ShowRoomListView: UIView {
         collectionView.dataSource = self
         addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
-            make.edges.equalTo(UIEdgeInsets(top:  98, left: 0, bottom: 0, right: 0))
+            make.edges.equalTo(UIEdgeInsets(top:  Screen.safeAreaTopHeight() + 54, left: 0, bottom: 0, right: 0))
         }
         
         // 空列表
@@ -72,7 +72,7 @@ class ShowRoomListView: UIView {
         addSubview(createButton)
         createButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-34)
+            make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
             make.height.equalTo(btnHeight)
             make.width.equalTo(195)
         }

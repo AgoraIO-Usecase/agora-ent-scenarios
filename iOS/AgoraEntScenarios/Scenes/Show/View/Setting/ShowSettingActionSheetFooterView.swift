@@ -39,8 +39,6 @@ class ShowSettingActionSheetFooterView: UIView {
         bgView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
             make.top.equalTo(8)
-            make.width.equalToSuperview()
-            make.height.equalTo(93)
         }
         
         addSubview(button)

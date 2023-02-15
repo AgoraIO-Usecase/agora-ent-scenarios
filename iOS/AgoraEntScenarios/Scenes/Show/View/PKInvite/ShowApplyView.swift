@@ -9,6 +9,7 @@ import UIKit
 import Agora_Scene_Utils
 
 class ShowApplyView: UIView {
+    private var roomId: String!
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "连麦申请".show_localized
@@ -77,8 +78,9 @@ class ShowApplyView: UIView {
         }
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(roomId: String) {
+        self.roomId = roomId
+        super.init(frame: .zero)
         setupUI()
     }
     
@@ -87,15 +89,11 @@ class ShowApplyView: UIView {
     }
     
     func getAllMicSeatList(autoApply: Bool) {
-        AppContext.showServiceImp.getAllMicSeatApplyList {[weak self] _, list in
+        let imp = AppContext.showServiceImp(roomId)
+        imp.getAllMicSeatApplyList {[weak self] _, list in
             guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
             if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                AppContext.showServiceImp.createMicSeatApply { _ in
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                        self?.getAllMicSeatList(autoApply: autoApply)
-                    } 
-                }
                 self?.revokeutton.setTitle("撤回申请".show_localized, for: .normal)
                 self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
                                           for: .normal,
@@ -103,6 +101,17 @@ class ShowApplyView: UIView {
                                           spacing: 5)
                 self?.revokeutton.tag = 0
                 self?.revokeutton.isHidden = false
+                imp.createMicSeatApply { error in
+                    if let error = error {
+                        self?.revokeutton.isHidden = true
+                        ToastView.show(text: error.localizedDescription)
+                        return
+                    }
+                    
+                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+                        self?.getAllMicSeatList(autoApply: autoApply)
+                    }
+                }
             }
             self?.setupTipsInfo(count: list.count)
             self?.tableView.dataArray = list
@@ -173,12 +182,12 @@ class ShowApplyView: UIView {
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
 //            revokeutton.isHidden = true
-            AppContext.showServiceImp.cancelMicSeatApply { _ in }
+            AppContext.showServiceImp(roomId).cancelMicSeatApply { _ in }
             let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
             tableView.dataArray?.remove(at: index)
             setupTipsInfo(count: dataArray.count)
         } else if let interactionModel = interactionModel {
-            AppContext.showServiceImp.stopInteraction(interaction: interactionModel) { _ in }
+            AppContext.showServiceImp(roomId).stopInteraction(interaction: interactionModel) { _ in }
             AlertManager.hiddenView()
         }
     }

@@ -19,7 +19,7 @@ class ShowPresettingVC: UIViewController {
     var isBroadcaster = true
 //    var selectedIndexPath: IndexPath?
     
-    private var selectedType: ShowPresetType?
+    var selectedType: ShowPresetType?
     private var modeName: String?
     
     private var dataArray: [ShowPresettingModel] {
@@ -96,6 +96,16 @@ class ShowPresettingVC: UIViewController {
         tableView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
             make.top.equalTo(headerView.snp.bottom)
+        }
+        
+        if let selectedType = selectedType, isBroadcaster == false {
+            for (i, mode) in dataArray.enumerated() {
+                if let row = mode.optionsArray.firstIndex(of: selectedType) {
+                    self.modeName = mode.title
+                    let indexPath = IndexPath(row: row, section: i)
+                    self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+                }
+            }
         }
     }
     

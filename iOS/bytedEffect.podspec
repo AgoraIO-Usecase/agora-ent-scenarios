@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = "bytedEffect"
+  s.name         = "BytedEffect"
   s.version      = "4.3.0"
   s.license       = { "type" => "Copyright", "text" => "Copyright 2018 agora.io. All rights reserved.\n"}
   s.homepage     = 'https://github.com'

@@ -39,12 +39,14 @@ class ShowSettingLabelCell: ShowSettingBaseCell {
             make.right.equalTo(-44)
             make.centerY.equalToSuperview()
         }
+        detailButton.isHidden = AppContext.shared.isDebugMode
     }
     
-    func setTitle(_ title: String, value: String, cellDidSelectedAction: (()->())?) {
+    func setTitle(_ title: String, value: String, cellDidSelectedAction: (()->())?, detailButtonAction: (()->())?) {
         titleLabel.text = title
         valueLabel.text = value
         self.cellDidSelectedAction = cellDidSelectedAction
+        self.clickDetailButonAction = detailButtonAction
     }
 
     @objc private func didSelectedCell() {

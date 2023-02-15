@@ -106,11 +106,7 @@ class NetworkManager:NSObject {
                        type: AgoraTokenType,
                        success: @escaping (String?) -> Void)
     {
-        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil)
-            return
-        }
-        let params = ["appCertificate": KeyCenter.Certificate ?? "",
+        let params = ["appCertificate": KeyCenter.Certificate,
                       "appId": KeyCenter.AppId,
                       "channelName": channelName,
                       "expire": 1500,
@@ -152,10 +148,6 @@ class NetworkManager:NSObject {
                           uid: String,
                           sceneType: SceneType,
                           success: @escaping (String?, String?, String?) -> Void) {
-        if KeyCenter.Certificate == nil || KeyCenter.Certificate?.isEmpty == true {
-            success(nil, nil, nil)
-            return
-        }
         var chatParams = [
             "name": channelName,
             "description": "test",
@@ -229,7 +221,6 @@ class NetworkManager:NSObject {
     }
     
     func getPlayloadWithSceneType(_ type: SceneType) -> String? {
-    
         let userInfo: [String: Any] = [
             "id": VLUserCenter.user.id,     //用户id
             "sceneName": type.desc()
@@ -241,6 +232,53 @@ class NetworkManager:NSObject {
         }
         let payload: String? = String(data: jsonData, encoding: .utf8) ?? nil
         return payload
+    }
+    
+    func startCloudPlayer(channelName: String,
+                          uid: String,
+                          robotUid: UInt,
+                          streamUrl: String,
+                          success: @escaping (String?) -> Void) {
+        let params: [String: Any] = ["appId": KeyCenter.AppId,
+                                        "channelName": channelName,
+                                        "uid": uid,
+                                        "robotUid": robotUid,
+                                        "region": "cn",
+                                        "streamUrl": streamUrl,
+                                        "src": "iOS",
+                                        "traceId": NSString.withUUID().md5() ?? ""]
+                      
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)cloud-player/start",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
+        })
+    }
+    
+    func cloudPlayerHeartbeat(channelName: String,
+                              uid: String,
+                              success: @escaping (String?) -> Void) {
+        let params: [String: String] = ["appId": KeyCenter.AppId,
+                                        "channelName": channelName,
+                                        "uid": uid,
+                                        "src": "iOS",
+                                        "traceId": NSString.withUUID().md5() ?? ""]
+                      
+        NetworkManager.shared.postRequest(urlString: "\(baseServerUrl)heartbeat",
+                                          params: params,
+                                          success: { response in
+            let code = response["code"] as? Int
+            let msg = response["msg"] as? String
+            success(code == 0 ? nil : msg)
+        }, failure: { error in
+            print(error)
+            success(error.description)
+        })
     }
 
     func getRequest(urlString: String, success: SuccessClosure?, failure: FailClosure?) {

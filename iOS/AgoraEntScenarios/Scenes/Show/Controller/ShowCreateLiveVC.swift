@@ -15,28 +15,29 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
-    private var selectedResolution = 1
+//    private var selectedResolution = 1
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
     
-    private let liveVC = ShowLiveViewController()
-    
     lazy var agoraKitManager: ShowAgoraKitManager = {
-//        let manager = ShowAgoraKitManager()
-//        manager.defaultSetting()
-//        return manager
-        return liveVC.agoraKitManager
+        let manager = ShowAgoraKitManager()
+        if AppContext.shared.isDebugMode {
+            manager.debugDefaultBroadcastorSetting()
+        }else{
+            manager.defaultSetting()
+        }
+        return manager
     }()
         
     private lazy var beautyVC = ShowBeautySettingVC()
     
     deinit {
-        print("deinit-- ShowCreateLiveVC")
+        showLogger.info("deinit-- ShowCreateLiveVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        print("init-- ShowCreateLiveVC")
+        showLogger.info("init-- ShowCreateLiveVC")
     }
     
     required init?(coder: NSCoder) {
@@ -102,7 +103,7 @@ class ShowCreateLiveVC: UIViewController {
         
         // 创建默认美颜效果
         ShowBeautyFaceVC.beautyData.forEach({
-            ByteBeautyManager.shareManager.setBeauty(path: $0.path,
+            BeautyManager.shareManager.setBeauty(path: $0.path,
                                                      key: $0.key,
                                                      value: $0.value)
         })
@@ -111,7 +112,7 @@ class ShowCreateLiveVC: UIViewController {
     private func showPreset() {
         let vc = ShowPresettingVC()
         vc.didSelectedPresetType = {[weak self] type, modeName in
-            self?.agoraKitManager.updatePresetForType(type, mode: .signle)
+            self?.agoraKitManager.updatePresetForType(type, mode: .single)
             let text1 = "show_presetting_update_toast1".show_localized
             let text2 = "show_presetting_update_toast2".show_localized
             ToastView.show(text: "\(text1)\"\(modeName)\"\(text2)")
@@ -120,7 +121,7 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     @objc private func didClickCancelButton(){
-        ByteBeautyManager.shareManager.destroy()
+        BeautyManager.shareManager.destroy()
         dismiss(animated: true)
     }
 }
@@ -134,7 +135,14 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
 //        vc.isOutside = true
 //        vc.settingManager = agoraKitManager
 //        self.navigationController?.pushViewController(vc, animated: true)
-        showPreset()
+        if AppContext.shared.isDebugMode {
+            let vc = ShowDebugSettingVC()
+            vc.isBroadcastor = true
+            vc.settingManager = agoraKitManager
+            self.navigationController?.pushViewController(vc, animated: true)
+        }else{
+            showPreset()
+        }
     }
     
     func onClickCameraBtnAction() {
@@ -150,15 +158,16 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
     func onClickQualityBtnAction() {
         createView.hideBottomViews = true
         let vc = ShowSelectQualityVC()
-        vc.defalutSelectIndex = selectedResolution
+//        vc.defalutSelectIndex = selectedResolution
         present(vc, animated: true)
         vc.dismissed = { [weak self] in
             self?.createView.hideBottomViews = false
         }
         vc.selectedItem = {[weak self] resolution,index in
             guard let wSelf = self else { return }
-            wSelf.selectedResolution = index
-            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+//            wSelf.selectedResolution = index
+//            wSelf.agoraKitManager.setCaptureVideoDimensions(CGSize(width: resolution.width, height: resolution.height))
+            wSelf.agoraKitManager.selectCaptureVideoDimensions(index: index)
         }
     }
     
@@ -173,17 +182,19 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             return
         }
         
-        AppContext.showServiceImp.createRoom(roomName: roomName,
-                                             roomId: createView.roomNo,
-                                             thumbnailId: createView.roomBg) { [weak self] err, detailModel in
+        let roomId = createView.roomNo
+        AppContext.showServiceImp(createView.roomNo).createRoom(roomName: roomName,
+                                                                roomId: roomId,
+                                                                thumbnailId: createView.roomBg) { [weak self] err, detailModel in
 //            liveVC.agoraKit = self?.agoraKitManager.agoraKit
-            guard let wSelf = self else { return }
-//            let liveVC = ShowLiveViewController()
-            wSelf.liveVC.room = detailModel
-            wSelf.liveVC.selectedResolution = wSelf.selectedResolution
-//            liveVC.agoraKitManager = wSelf.agoraKitManager
+            guard let wSelf = self, let detailModel = detailModel else { return }
+            let liveVC = ShowLivePagesViewController()
+            liveVC.agoraKitManager = wSelf.agoraKitManager
+            liveVC.roomList = [detailModel]
+//            liveVC.selectedResolution = wSelf.selectedResolution
+            liveVC.focusIndex = liveVC.roomList?.firstIndex(where: { $0.roomId == roomId }) ?? 0
             
-            wSelf.navigationController?.pushViewController(wSelf.liveVC, animated: false)
+            wSelf.navigationController?.pushViewController(liveVC, animated: false)
         }
     }
 }

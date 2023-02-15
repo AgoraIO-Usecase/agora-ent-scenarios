@@ -9,6 +9,7 @@ import UIKit
 import Agora_Scene_Utils
 
 class ShowPKInviteView: UIView {
+    var roomId: String!
     var pkUserInvitationList: [ShowPKUserInfo]? {
         didSet {
             tableView.dataArray = pkUserInvitationList ?? []
@@ -80,8 +81,9 @@ class ShowPKInviteView: UIView {
     private var pkTipsViewHeightCons: NSLayoutConstraint?
     
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(roomId: String) {
+        self.roomId = roomId
+        super.init(frame: .zero)
         setupUI()
     }
     
@@ -148,7 +150,7 @@ class ShowPKInviteView: UIView {
             return
         }
         
-        AppContext.showServiceImp.stopInteraction(interaction: pkInfo) { error in
+        AppContext.showServiceImp(roomId).stopInteraction(interaction: pkInfo) { error in
         }
     }
     
@@ -164,6 +166,7 @@ extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
                                                  for: indexPath) as! ShowPKInviteViewCell
+        cell.roomId = roomId
         cell.pkUser = self.pkUserInvitationList?[indexPath.row]
         cell.pkInvitation = self.createPKInvitationMap?[cell.pkUser?.roomId ?? ""]
         return cell
