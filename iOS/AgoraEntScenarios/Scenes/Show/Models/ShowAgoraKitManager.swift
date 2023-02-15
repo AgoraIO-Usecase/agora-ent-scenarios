@@ -82,6 +82,11 @@ class ShowAgoraKitManager: NSObject {
     
     let videoEncoderConfig = AgoraVideoEncoderConfiguration()
     
+    var exposureRangeX: Int?
+    var exposureRangeY: Int?
+    var matrixCoefficientsExt: Int?
+    var videoFullrangeExt: Int?
+    
     //[ex channelId: connection]
     private var exConnectionMap: [String: AgoraRtcConnection] = [:]
     //[ex channelId: [room id: status]]
