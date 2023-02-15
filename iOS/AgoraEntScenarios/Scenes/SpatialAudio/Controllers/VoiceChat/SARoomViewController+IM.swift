@@ -256,8 +256,10 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 }
                 if !isOwner {
                     var state: SAChatBarState = .selected
-                    if status == 0 || status != -1 {
+                    if status == 0  {
                         state = .unSelected
+                    } else {
+                        state = .selected
                     }
                     self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
@@ -288,9 +290,7 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                     let cp_uid: String = first.member?.uid ?? ""
                     if local_uid == cp_uid {
                         local_index = mic_index
-                        if !isOwner {
-                            self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
-                        }
+                        self.rtckit.setClientRole(role: (isOwner || status == 0) ? .owner : .audience)
                         //如果当前是0的状态  就设置成主播
                         self.rtckit.muteLocalAudioStream(mute: status != 0)
                     }

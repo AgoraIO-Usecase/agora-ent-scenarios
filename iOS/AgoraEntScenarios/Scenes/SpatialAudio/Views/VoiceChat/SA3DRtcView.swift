@@ -140,8 +140,8 @@ class SA3DRtcView: UIView {
                 //更新可移动view的数据
                 guard let micInfos = self?.micInfos else { return }
                 let micInfo = micInfos[0]
+                micInfo.member?.volume = vol
                 self?.rtcUserView.cellType = self?.getCellTypeWithStatus(micInfo.status) ?? .AgoraChatRoomBaseUserCellTypeAdd
-                self?.rtcUserView.tag = 200
                 self?.rtcUserView.user = micInfo.member
             }
         }

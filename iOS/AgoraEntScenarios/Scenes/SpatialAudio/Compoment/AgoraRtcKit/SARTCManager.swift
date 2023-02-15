@@ -816,7 +816,7 @@ extension SARTCManager: AgoraRtcEngineDelegate {
         guard let _ = delegate else {
             return
         }
-
+        print("total:=-===\(totalVolume)")
         // 如果Uid = 0，表示是本地用户的声音
         var real_speakers: [AgoraRtcAudioVolumeInfo] = speakers
         for (index, value) in speakers.enumerated() {

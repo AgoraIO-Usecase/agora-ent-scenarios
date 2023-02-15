@@ -235,7 +235,7 @@ extension SARoomViewController {
             return
         }
         chatBar.micState = !chatBar.micState
-        chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
+       // chatBar.refresh(event: .mic, state: chatBar.micState ? .selected : .unSelected, asCreator: false)
         // 需要根据麦位特殊处理
         chatBar.micState == true ? muteLocal(with: idx) : unmuteLocal(with: idx)
         rtckit.muteLocalAudioStream(mute: chatBar.micState)
