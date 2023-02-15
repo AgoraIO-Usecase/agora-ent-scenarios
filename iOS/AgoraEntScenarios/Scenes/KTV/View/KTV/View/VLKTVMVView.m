@@ -98,8 +98,8 @@
     CGFloat lH = self.height - lY;
     _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
     _karaokeView.delegate = self;
-    _karaokeView.lyricsView.textNormalColor = [UIColor whiteColor];
-    _karaokeView.lyricsView.textSelectedColor = [UIColor grayColor];
+    _karaokeView.lyricsView.textNormalColor = [UIColor grayColor];
+    _karaokeView.lyricsView.textSelectedColor = [UIColor whiteColor];
     _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
     _karaokeView.lyricsView.textNormalFontSize = [UIFont fontWithName:@"PingFang SC" size:13];
     _karaokeView.lyricsView.textHighlightFontSize = [UIFont fontWithName:@"PingFang SC" size:16];
