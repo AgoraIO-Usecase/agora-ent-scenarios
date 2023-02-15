@@ -63,8 +63,8 @@
 "Contribution Total"="贡献总计";
 "Send"="发送";
 "Joined"="进入直播间";
-"Agora Blue"="Agora小蓝";
-"Agora Red"="Agora小红";
+"Agora Blue"="声蓝羽";
+"Agora Red"="声红颜";
 "Sweet Heart"="甜心";
 "Flower"="鲜花";
 "Crystal Box"="水晶盒子";
@@ -111,7 +111,7 @@
 "red" = "声红颜";
 "host" = "房主";
 "Best Sound" = "最佳音效";
-"Robot Volume" = "机器人音量";
+"Robot volume" = "机器人音量";
 "Audio Settings" = "音效设置";
 "ACEQ" = "声网语聊房 2.0 EQ";
 "High" = "高";
@@ -209,8 +209,13 @@
 "Incorrect room name" = "房间名不合规";
 "AIAEC" = "AI回声消除";
 "AGC" = "人声自动增益";
-"Agora Blue & Red Bot" = "声蓝羽&声红颜";
+"Agora Blue&Agora Red" = "声蓝羽&声红颜";
 "Room Audio Settings" = "房间音效设置";
+"Agora Blue Bot" = "声蓝羽";
+"Attenuation factor volume" = "衰减系数";
+"Air Absorb" = "空气传播模拟";
+"Voice Blur" = "人声模糊";
+"Agora Red Bot" = "声红颜";
 "AIAEC" = "AI回声消除";
 "AGC" = "人声自动增益";
 "Turn on AIAEC" = "开启AI回声消除";
@@ -221,3 +226,8 @@
 "Best Agora Sound" = "最佳音效";
 "SA MODE" = "空间音频房";
 "SA MODE DETAIL" = "身临其境般的语聊体验，就像你在真实空间里和朋友聊天";
+"How to use 3D Spatial Audio Seat" = "如何使用3D空间音频";
+"Put on headsets" = "戴上耳机";
+"Move avatar around to hear different spatial audio effects" = "移动头像可以听到不同的空间音频效果";
+"I got it" = "我知道了";
+"Host Only" = "仅房主可操作";

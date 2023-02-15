@@ -360,7 +360,7 @@ extension SAAudioSettingDetailViewController: UITableViewDelegate, UITableViewDa
                 }
             } else {
                 titleLabel.textColor = UIColor(red: 108 / 255.0, green: 113 / 255.0, blue: 146 / 255.0, alpha: 1)
-                titleLabel.text = settingType == .Spatial ? "Agora Red Bot" : "AINS Definition".localized()
+                titleLabel.text = settingType == .Spatial ? "Agora Red Bot".localized() : "AINS Definition".localized()
                 headerView.addSubview(titleLabel)
             }
 
