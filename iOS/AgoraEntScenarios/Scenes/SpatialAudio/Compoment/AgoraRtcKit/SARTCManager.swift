@@ -155,6 +155,8 @@ public struct SARtcType {
      * report alien type
      */
     @objc optional func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) -> Void
+    
+    @objc optional func didOccurError(with code: AgoraErrorCode) -> Void
 }
 
 public let kMPK_RTC_UID_SA: UInt = 1
@@ -854,7 +856,10 @@ extension SARTCManager: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        
+        guard let _ = delegate else {
+            return
+        }
+        delegate?.didOccurError?(with: errorCode)
     }
 
     // dataStream received

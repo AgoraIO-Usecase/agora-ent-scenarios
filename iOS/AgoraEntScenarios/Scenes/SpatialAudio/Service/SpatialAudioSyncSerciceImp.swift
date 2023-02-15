@@ -258,8 +258,8 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         updateRoom.member_count = (updateRoom.member_count ?? 0) + 1
         updateRoom.click_count = (updateRoom.click_count ?? 0) + 1
         let params = updateRoom.kj.JSONObject()
-        let userId = room.owner?.uid ?? ""
-        let room_id = room.room_id!
+        let userId = VLUserCenter.user.id
+        let room_id = room.room_id ?? ""
         SyncUtil.joinScene(id: room_id,
                            userId: userId,
                            isOwner: userId == VLUserCenter.user.id,
