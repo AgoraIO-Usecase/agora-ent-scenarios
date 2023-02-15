@@ -2,6 +2,7 @@ package io.agora.scene.voice.spatial.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
@@ -482,9 +483,9 @@ class RoomObservableViewDelegate constructor(
         if (!voiceRoomInfo.micInfo.isNullOrEmpty()) {
             // 麦位数据不为空
             voiceRoomInfo.micInfo?.let { micList ->
-                val micInfoList: List<VoiceMicInfoModel> =
-                    RoomInfoConstructor.extendMicInfoList(micList, roomKitBean.roomType, roomKitBean.ownerId)
-                micInfoList.forEach { micInfo ->
+//                val micInfoList: List<VoiceMicInfoModel> =
+//                    RoomInfoConstructor.extendMicInfoList(micList, roomKitBean.roomType, roomKitBean.ownerId)
+                micList.forEach { micInfo ->
                     micInfo.member?.let { userInfo ->
                         val rtcUid = userInfo.rtcUid
                         val micIndex = micInfo.micIndex
@@ -498,8 +499,8 @@ class RoomObservableViewDelegate constructor(
                         }
                     }
                 }
-                iRoomMicView.onInitMic(micInfoList, robotInfo.useRobot)
-                updateSpatialPosition(micInfoList)
+                iRoomMicView.onInitMic(micList, robotInfo.useRobot)
+                updateSpatialPosition(micList)
             }
         }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)

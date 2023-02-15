@@ -14,6 +14,7 @@ import io.agora.voice.common.utils.GsonTools
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
+import java.util.concurrent.CountDownLatch
 
 /**
  * @author create by zhangwei03
@@ -108,10 +109,12 @@ class VoiceSyncManagerServiceImp(
                     val ret = mutableListOf<VoiceRoomModel>()
                     result?.forEach { iObj ->
                         try {
-                            val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
-                            ret.add(voiceRoom)
-                            roomMap[voiceRoom.roomId] = voiceRoom
-                            objIdOfRoomNo[voiceRoom.roomId] = iObj.id
+                            if (iObj.id != "") {
+                                val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
+                                ret.add(voiceRoom)
+                                roomMap[voiceRoom.roomId] = voiceRoom
+                                objIdOfRoomNo[voiceRoom.roomId] = iObj.id
+                            }
                         } catch (e: Exception) {
                             "voice room list get scene error: ${e.message}".logE()
                         }
@@ -1266,14 +1269,56 @@ class VoiceSyncManagerServiceImp(
 
     // ----------------------------- 麦位状态 -----------------------------
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
-        val mem = userMap[uid]
-        mem?.micIndex = index
+        var mem: VoiceMemberModel? = null
+        var micState = MicStatus.Idle
+        if (userMap.containsKey(uid)) {
+            mem = userMap[uid]
+            mem?.micIndex = index
+            micState = MicStatus.Normal
+        }
         return VoiceMicInfoModel().apply {
             micIndex = index
             member = mem
             ownerTag = false
-            micStatus = MicStatus.Normal
+            micStatus = micState
         }
+    }
+
+    private fun innerGenerateAllDefaultSeatInfo(completion: (error: Exception?) -> Unit) {
+        val countDownLatch = CountDownLatch(6)
+        innerAddSeatInfo(innerGenerateDefaultSeatInfo(0, "")) {
+            if (it == null) countDownLatch.countDown()
+        }
+        innerAddSeatInfo(innerGenerateDefaultSeatInfo(2, "")) {
+            if (it == null) countDownLatch.countDown()
+        }
+        innerAddSeatInfo(VoiceMicInfoModel().apply {
+                    micIndex = 3
+                    member = null
+                    ownerTag = false
+                    micStatus = MicStatus.BotInactive
+                }) {
+            if (it == null) countDownLatch.countDown()
+        }
+        innerAddSeatInfo(innerGenerateDefaultSeatInfo(4, "")) {
+            if (it == null) countDownLatch.countDown()
+        }
+        innerAddSeatInfo(innerGenerateDefaultSeatInfo(5, "")) {
+            if (it == null) countDownLatch.countDown()
+        }
+        innerAddSeatInfo(VoiceMicInfoModel().apply {
+                                micIndex = 6
+                                member = null
+                                ownerTag = false
+                                micStatus = MicStatus.BotInactive
+        }) {
+            if (it == null) countDownLatch.countDown()
+        }
+
+        Thread {
+            countDownLatch.await()
+            completion.invoke(null)
+        }.start()
     }
 
     private fun innerGetAllSeatInfo(success: (List<VoiceMicInfoModel>) -> Unit) {
@@ -1315,20 +1360,22 @@ class VoiceSyncManagerServiceImp(
             }
             if (!hasMaster && cacheRoom.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
                 //房主上麦
-                val targetSeatInfo = VoiceMicInfoModel().apply {
-                    micIndex = 1
-                    member = cacheRoom.owner
-                    ownerTag = true
-                    micStatus = MicStatus.Normal
-                }
-                innerAddSeatInfo(targetSeatInfo) { error ->
-                    if (error != null) {
-                        completion.invoke(error, emptyList())
-                        return@innerAddSeatInfo
+                innerGenerateAllDefaultSeatInfo {
+                    val targetSeatInfo = VoiceMicInfoModel().apply {
+                        micIndex = 1
+                        member = cacheRoom.owner
+                        ownerTag = true
+                        micStatus = MicStatus.Normal
                     }
-                    outList.add(targetSeatInfo)
-                    ThreadManager.getInstance().runOnMainThread {
-                        completion.invoke(null, outList)
+                    innerAddSeatInfo(targetSeatInfo) { error ->
+                        if (error != null) {
+                            completion.invoke(error, emptyList())
+                            return@innerAddSeatInfo
+                        }
+                        outList.add(targetSeatInfo)
+                        ThreadManager.getInstance().runOnMainThread {
+                            completion.invoke(null, outList)
+                        }
                     }
                 }
             } else {
