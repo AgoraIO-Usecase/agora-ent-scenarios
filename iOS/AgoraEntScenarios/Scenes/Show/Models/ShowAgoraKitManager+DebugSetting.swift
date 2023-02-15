@@ -51,9 +51,15 @@ extension ShowAgoraKitManager {
     func debugDefaultBroadcastorSetting() {
         captureConfig.dimensions = CGSize(width: 720, height: 1280)
         captureConfig.frameRate = 15
+        agoraKit.setCameraCapturerConfiguration(captureConfig)
+        
         videoEncoderConfig.dimensions = CGSize(width: 720, height: 1280)
         videoEncoderConfig.frameRate = .fps15
         videoEncoderConfig.bitrate = 1800
+        agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
+        
+        setExposureRange()
+        setColorSpace()
         
         updateSettingForkey(.debugPVC)
         updateSettingForkey(.focusFace)
@@ -94,11 +100,19 @@ extension ShowAgoraKitManager {
             text1 = "\(Int(videoEncoderConfig.dimensions.width))"
             text2 = "\(Int(videoEncoderConfig.dimensions.height))"
         case .exposureRange:
-            text1 = ""
-            text2 = ""
+            if let exposureRangeX = exposureRangeX {
+                text1 = "\(exposureRangeX)"
+            }
+            if let exposureRangeY = exposureRangeY {
+                text2 = "\(exposureRangeY)"
+            }
         case .colorSpace:
-            text1 = ""
-            text2 = ""
+            if let videoFullrangeExt = videoFullrangeExt {
+                text1 = "\(videoFullrangeExt)"
+            }
+            if let matrixCoefficientsExt = matrixCoefficientsExt {
+                text2 = "\(matrixCoefficientsExt)"                
+            }
         }
         return ShowDebug2TFModel(title: key.rawValue, tf1Text: text1, tf2Text: text2, separatorText: key.separator)
     }
@@ -151,12 +165,31 @@ extension ShowAgoraKitManager {
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             showLogger.info("***Debug*** setVideoEncoderConfiguration.encodeVideoSize = \(videoEncoderConfig.dimensions) ")
         case .exposureRange:
-            agoraKit.setCameraExposurePosition(CGPoint(x: value1, y: value2))
-            showLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: value1, y: value2)) ")
+            exposureRangeX = value1
+            exposureRangeY = value2
+            setExposureRange()
         case .colorSpace:
-            agoraKit.setParameters("{\"che.video.videoFullrangeExt\":\(value1)}")
-            agoraKit.setParameters("{\"che.video.matrixCoefficientsExt\":\(value2)}")
-            showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(value1)} {\"che.video.matrixCoefficientsExt\":\(value2)} ")
+            videoFullrangeExt = value1
+            matrixCoefficientsExt = value2
+            setColorSpace()
+        }
+    }
+}
+
+extension ShowAgoraKitManager {
+    
+    private func setExposureRange() {
+        if let x = exposureRangeX, let y = exposureRangeY {
+            agoraKit.setCameraExposurePosition(CGPoint(x: x, y: y))
+            showLogger.info("***Debug*** setCameraExposurePosition = \(CGPoint(x: x, y: y)) ")
+        }
+    }
+    
+    private func setColorSpace(){
+        if let v1 = videoFullrangeExt, let v2 = matrixCoefficientsExt {
+            agoraKit.setParameters("{\"che.video.videoFullrangeExt\":\(v1)}")
+            agoraKit.setParameters("{\"che.video.matrixCoefficientsExt\":\(v2)}")
+            showLogger.info("***Debug*** {\"che.video.videoFullrangeExt\":\(v1)} {\"che.video.matrixCoefficientsExt\":\(v2)} ")
         }
     }
 }
