@@ -266,62 +266,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
         self.role = role
     }
 
-    /**
-     * 加入实时KTV频道
-     * @param channelName 频道名称
-     * @param rtcUid RTCUid 如果传0，大网会自动分配
-     * @param rtmUid 可选，如果不使用RTM，使用自己的IM，这个值不用传
-     */
-    @objc public func joinKTVChannelWith(with channelName: String, rtcUid: Int) {
-        self.channelName = channelName
-        type = .SpatialAudio
-
-        loadKit(with: channelName, rtcUid: rtcUid)
-
-        // Support dynamic setting in the channel and real-time chorus scene
-        rtcKit.setParameters("{\"rtc.audio_resend\":false}")
-        rtcKit.setParameters("{\"rtc.audio_fec\":[3,2]}")
-        rtcKit.setParameters("{\"rtc.audio.aec_length\":50}")
-
-        setParametersWithMD()
-        if role != .audience {
-            mediaPlayer = rtcKit.createMediaPlayer(with: self)
-
-            if streamId == -1 {
-                let config = AgoraDataStreamConfig()
-                config.ordered = false
-                config.syncWithAudio = false
-                rtcKit.createDataStream(&streamId, config: config)
-                if streamId == -1 {
-                    return
-                }
-            }
-        }
-
-        if role == .owner {
-            let option = AgoraRtcChannelMediaOptions()
-            option.publishCameraTrack = false
-            option.publishMicrophoneTrack = true
-            option.publishCustomAudioTrack = false
-            option.autoSubscribeAudio = true
-            option.autoSubscribeVideo = false
-            option.clientRoleType = .broadcaster
-            setParametersWithMD()
-
-            rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(rtcUid), mediaOptions: option)
-
-        }  else {
-            let option = AgoraRtcChannelMediaOptions()
-            option.publishCameraTrack = false // 关闭视频采集
-            option.publishMicrophoneTrack = false // 关闭音频采集
-            option.autoSubscribeAudio = true
-            option.clientRoleType = .audience
-            setParametersWithMD()
-
-            option.clientRoleType = .audience // 设置观众角色
-            rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: 0, mediaOptions: option)
-        }
-    }
 
     /**
      * 加入语聊房
