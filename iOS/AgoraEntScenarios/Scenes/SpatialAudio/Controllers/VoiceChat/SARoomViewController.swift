@@ -116,7 +116,6 @@ extension SARoomViewController {
     // 加载RTC
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
-      //  guard (roomInfo?.room?.chatroom_id) != nil else { return }
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
@@ -560,7 +559,7 @@ extension SARoomViewController: SAManagerDelegate {
     
     func didOccurError(with code: AgoraErrorCode) {
         self.view.makeToast("Join failed!")
-        self.didHeaderAction(with: .back, destroyed: true)
+//        self.didHeaderAction(with: .back, destroyed: true)
     }
 
     func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {

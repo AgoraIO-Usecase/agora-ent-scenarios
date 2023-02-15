@@ -73,6 +73,8 @@ class SA3DRtcView: UIView {
         if isPlay {
             redMediaPlayer?.open(redMusicPath, startPos: 0)
             blueMediaPlayer?.open(blueMusicPath, startPos: 0)
+            redMediaPlayer?.mute(true)
+            blueMediaPlayer?.mute(true)
         } else {
             redMediaPlayer?.stop()
             blueMediaPlayer?.stop()
