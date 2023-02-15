@@ -79,6 +79,7 @@ typedef enum : NSUInteger {
 -(void)setProgressWith:(NSInteger)progress;
 -(void)startTimer;
 - (void)pauseTimer;
+-(void)freeTimer;
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine didJoinedOfUid:(NSUInteger)uid elapsed:(NSInteger)elapsed;
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine

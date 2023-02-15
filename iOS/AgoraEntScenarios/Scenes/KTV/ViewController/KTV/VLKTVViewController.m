@@ -185,6 +185,7 @@ KTVApiDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [UIViewController popGestureOpen:self];
+    [self.ktvApi freeTimer];
     [self leaveRTCChannel];
     [[UIApplication sharedApplication] setIdleTimerDisabled: NO];
 }
@@ -916,11 +917,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //track has to be selected after loaded
                 [self.ktvApi selectTrackMode:self.trackMode];
             }
-            [self.MVView start];
+            //[self.MVView start];
             [self.ktvApi startTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
         } else if(state == AgoraMediaPlayerStatePaused) {
-            [self.MVView stop];
+           // [self.MVView stop];
             [self.ktvApi pauseTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
@@ -1174,6 +1175,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 if (weakSelf.selSongsArray.count >= 1) {
                     [weakSelf.ktvApi stopSong];
                     [weakSelf removeCurrentSongWithSync:YES];
+                    [weakSelf.MVView showSkipView:false];
                 }
             }
             [[VLAlert shared] dismiss];

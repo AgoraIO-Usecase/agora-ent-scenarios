@@ -53,6 +53,7 @@ protocol AgoraLrcDownloadDelegate {
                          completion: @escaping Completion,
                          failure: @escaping UnZipErrorClosure)
     {
+
         delegate?.beginDownloadLrc?(url: urlString)
         self.urlString = urlString
         let fileName = urlString.fileName.components(separatedBy: ".").first ?? ""
