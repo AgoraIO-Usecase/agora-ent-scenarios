@@ -53,7 +53,8 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             AttributedText(" \(VoiceRoomUserInfo.shared.user?.name ?? "") ").font(.systemFont(ofSize: 12, weight: .semibold)).foregroundColor(Color(white: 1, alpha: 0.74))
             AttributedText("a rocket".localized()).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(.white)
         }
-        let text = HorizontalTextCarousel(frame: CGRect(x: 15, y: self.headerView.frame.maxY-10, width: string.string.z.sizeWithText(font: .systemFont(ofSize: 12, weight: .semibold), size: CGSize(width: ScreenWidth-60, height: 15)).width, height: 20)).cornerRadius(10)
+        
+        let text = HorizontalTextCarousel(frame: CGRect(x: 15, y: self.headerView.frame.maxY-10, width: 0, height: 20)).cornerRadius(10)
         self.view.addSubview(text)
         text.textAnimation(text: string)
     }
