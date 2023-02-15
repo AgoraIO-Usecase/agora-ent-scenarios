@@ -204,7 +204,7 @@ class VoiceSyncManagerServiceImp(
     override fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit) {
         initScene {
             val isRoomOwner = roomMap[roomId]?.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
-            Sync.Instance().joinScene(isRoomOwner, roomId, object : JoinSceneCallback {
+            Sync.Instance().joinScene(isRoomOwner, true, roomId, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     "syncManager joinScene onSuccess ${sceneReference?.id}".logD()
                     mSceneReference = sceneReference
@@ -263,6 +263,7 @@ class VoiceSyncManagerServiceImp(
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
+        roomTimeUpSubscriber = null
         roomSubscribeListener.clear()
         if (TextUtils.equals(cacheRoom.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
             // 移除房间
