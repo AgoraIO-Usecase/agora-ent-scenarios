@@ -116,73 +116,12 @@ extension SARoomViewController {
     // 加载RTC
     func loadKit() {
         guard let channel_id = roomInfo?.room?.channel_id else { return }
-        guard let roomId = roomInfo?.room?.chatroom_id else { return }
+      //  guard (roomInfo?.room?.chatroom_id) != nil else { return }
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
         rtckit.initSpatialAudio(recvRange: 15)
-
-        var rtcJoinSuccess = false
-//        var IMJoinSuccess = false
-
-        let VMGroup = DispatchGroup()
-//        let imQueue = DispatchQueue(label: "com.im.vm.www")
-        let rtcQueue = DispatchQueue(label: "com.rtc.vm.www")
-
-        VMGroup.enter()
-        rtcQueue.async { [weak self] in
-            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
-            VMGroup.leave()
-        }
-
-//        VMGroup.enter()
-//        imQueue.async {
-//            SAIMManager.shared?.joinedChatRoom(roomId: roomId, completion: { room, error in
-//                IMJoinSuccess = error == nil
-//                VMGroup.leave()
-//            })
-//        }
-
-        VMGroup.notify(queue: .main) { [weak self] in
-            let joinSuccess = rtcJoinSuccess //&& IMJoinSuccess
-            guard let `self` = self else { return }
-            if !joinSuccess {
-                self.view.makeToast("Join failed!")
-                self.didHeaderAction(with: .back, destroyed: true)
-            } else {
-                if self.isOwner == true {
-                    //房主更新环信KV
-                    self.setChatroomAttributes()
-                } else {
-                    //观众更新拉取详情后更新kv
-                    self.requestRoomDetail()
-//                    self.sendJoinedMessage()
-                }
-            }
-        }
-    }
-    
-    private func setChatroomAttributes() {
-//        SAIMManager.shared?.setChatroomAttributes(attributes: AppContext.saTmpServiceImp().createMics() , completion: { error in
-//            if error == nil {
-                self.refreshRoomInfo()
-//            } else {
-//                self.view.makeToast("Set chatroom attributes failed!")
-//            }
-//        })
-    }
-    
-    private func sendJoinedMessage() {
-        guard let user = SAUserInfo.shared.user else {return}
-        user.mic_index = -1
-        SAIMManager.shared?.sendCustomMessage(roomId: roomInfo?.room?.chatroom_id ?? "",
-                                              event: SAJoinedMember,
-                                              customExt: ["user" : user.kj.JSONString()],
-                                              completion: { message, error in
-            if error != nil {
-                self.view.makeToast("Send joined chatroom message failed!")
-            }
-        })
+        let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
     }
     
     func refreshRoomInfo() {
@@ -605,7 +544,12 @@ extension SARoomViewController: SVGAPlayerDelegate {
 
 extension SARoomViewController: SAManagerDelegate {
     func didRtcLocalUserJoinedOfUid(uid: UInt) {
-        
+        if self.isOwner == true {
+            self.refreshRoomInfo()
+        } else {
+            //观众更新拉取详情
+            self.requestRoomDetail()
+        }
     }
 
     func didRtcRemoteUserJoinedOfUid(uid: UInt) {
@@ -613,6 +557,11 @@ extension SARoomViewController: SAManagerDelegate {
     }
 
     func didRtcUserOfflineOfUid(uid: UInt) {}
+    
+    func didOccurError(with code: AgoraErrorCode) {
+        self.view.makeToast("Join failed!")
+        self.didHeaderAction(with: .back, destroyed: true)
+    }
 
     func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
         sRtcView.updateAlienMic(with: type)
