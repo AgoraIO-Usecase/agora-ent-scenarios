@@ -124,6 +124,7 @@ extension VoiceRoomViewController {
             if $0.gift_id == "VoiceRoomGift9" {
                 vc.dismiss(animated: true)
                 self?.rocketAnimation()
+                self?.notifyHorizontalTextCarousel(gift: $0)
             }
         }
         presentViewController(vc, animated: true)
@@ -222,6 +223,10 @@ extension VoiceRoomViewController {
         }
         if !isOwner, idx == 0 {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
+            return
+        }
+        guard let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: idx] else { return }
+        if mic.status == 2 {
             return
         }
         chatBar.micState = !chatBar.micState
