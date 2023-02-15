@@ -39,7 +39,7 @@ class ShowSettingLabelCell: ShowSettingBaseCell {
             make.right.equalTo(-44)
             make.centerY.equalToSuperview()
         }
-        detailButton.isHidden = false
+        detailButton.isHidden = AppContext.shared.isDebugMode
     }
     
     func setTitle(_ title: String, value: String, cellDidSelectedAction: (()->())?, detailButtonAction: (()->())?) {

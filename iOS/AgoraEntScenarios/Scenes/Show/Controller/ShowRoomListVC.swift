@@ -43,13 +43,17 @@ class ShowRoomListVC: UIViewController {
     }
     
     @objc private func didClickSettingButton(){
-        showPresettingVC {[weak self] type in
-            let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
-            let audencePresetType = ShowPresetType(rawValue: value)
-            if audencePresetType != .unknown {
-                UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+        if AppContext.shared.isDebugMode {
+            showDebugSetVC()
+        }else {
+            showPresettingVC {[weak self] type in
+                let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
+                let audencePresetType = ShowPresetType(rawValue: value)
+                if audencePresetType != .unknown {
+                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+                }
+                self?.needUpdateAudiencePresetType = true
             }
-            self?.needUpdateAudiencePresetType = true
         }
     }
     
@@ -77,20 +81,30 @@ class ShowRoomListVC: UIViewController {
             let value = UserDefaults.standard.integer(forKey: kAudienceShowPresetType)
             let audencePresetType = ShowPresetType(rawValue: value)
             // 如果是owner是自己 或者已经设置过观众模式
-            if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
-                wSelf.joinRoom(room)
-            }else{
-                wSelf.showPresettingVC { [weak self] type in
-                    self?.needUpdateAudiencePresetType = true
-                    UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
-                    self?.joinRoom(room)
+            if AppContext.shared.isDebugMode == false {
+                if room.ownerId == VLUserCenter.user.id || audencePresetType != .unknown {
+                    wSelf.joinRoom(room)
+                }else{
+                    wSelf.showPresettingVC { [weak self] type in
+                        self?.needUpdateAudiencePresetType = true
+                        UserDefaults.standard.set(type.rawValue, forKey: kAudienceShowPresetType)
+                        self?.joinRoom(room)
+                    }
                 }
+            }else {
+                wSelf.joinRoom(room)
             }
         }
         view.addSubview(roomListView)
         roomListView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func showDebugSetVC(){
+        let vc = ShowDebugSettingVC()
+        vc.isBroadcastor = false
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func showPresettingVC(selected:((_ type: ShowPresetType)->())? = nil) {
