@@ -230,11 +230,15 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 self.roomList.append(model)
                 self._startCheckExpire()
                 self._subscribeAll()
-                self.updateRobotInfo(info: SARobotAudioInfo()) { error in
-                }
-                self._addUserIfNeed(roomId: room_id) { err in
-                    self.createMics(roomId: room_id) { error, micList in
-                        completion(error, model)
+                self.updateRobotInfo(info: SARobotAudioInfo()) { error in }
+                let userId = VLUserCenter.user.id
+                NetworkManager.shared.generateToken(channelName: room_id, uid: userId, tokenType: .token007, type: .rtc) { token in
+                    VLUserCenter.user.agoraRTCToken = token ?? ""
+                    VLUserCenter.user.chat_uid = userId
+                    self._addUserIfNeed(roomId: room_id) { err in
+                        self.createMics(roomId: room_id) { error, micList in
+                            completion(error, model)
+                        }
                     }
                 }
                 //添加鉴黄接口
