@@ -7,6 +7,10 @@
 
 import UIKit
 
+private let kTableViewBottomOffset: CGFloat = Screen.safeAreaBottomHeight() + 109
+private let kChatInputViewHeight: CGFloat = 56
+
+
 protocol ShowRoomLiveViewDelegate: ShowRoomBottomBarDelegate, ShowCanvasViewDelegate {
     func onClickSendMsgButton(text: String)
     func onClickCloseButton()
@@ -60,6 +64,13 @@ class ShowRoomLiveView: UIView {
         return button
     }()
     
+    private lazy var coverView: UIView = {
+        let view = UIView()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapedCoverView))
+        view.addGestureRecognizer(tap)
+        return view
+    }()
+    
     lazy var bottomBar: ShowRoomBottomBar = {
         let view = ShowRoomBottomBar(isBroadcastor: isBroadcastor)
         return view
@@ -101,6 +112,7 @@ class ShowRoomLiveView: UIView {
         super.init(frame: .zero)
         self.isBroadcastor = isBroadcastor
         createSubviews()
+        addObserver()
     }
     
     required init?(coder: NSCoder) {
@@ -135,16 +147,18 @@ class ShowRoomLiveView: UIView {
         
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 109
             make.left.equalTo(15)
-            make.bottom.equalTo(-143)
+            make.bottom.equalTo(-kTableViewBottomOffset)
             make.right.equalTo(-70)
             make.height.equalTo(168)
         }
     
         addSubview(chatButton)
         chatButton.snp.makeConstraints { make in
+            let bottomOffset = Screen.safeAreaBottomHeight() + 4
             make.left.equalTo(15)
-            make.bottom.equalTo(-38)
+            make.bottom.equalTo(-max(10, bottomOffset))
         }
         
         addSubview(bottomBar)
@@ -156,9 +170,48 @@ class ShowRoomLiveView: UIView {
         addSubview(chatInputView)
         chatInputView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
-            make.height.equalTo(56)
+            make.height.equalTo(kChatInputViewHeight)
             make.bottom.equalToSuperview()
         }
+    }
+    
+    private func addObserver(){
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil) { [weak self] notify in
+            guard let self = self else {return}
+            guard let keyboardRect = (notify.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+            guard let duration = notify.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            let keyboradHeight = keyboardRect.size.height
+            self.chatInputView.snp.updateConstraints { make in
+                make.bottom.equalToSuperview().offset(-keyboradHeight)
+            }
+            self.tableView.snp.updateConstraints { make in
+                make.bottom.equalTo(-kTableViewBottomOffset - keyboradHeight)
+            }
+            UIView.animate(withDuration: duration) {
+                self.layoutIfNeeded()
+            }
+            
+            self.addSubview(self.coverView)
+            self.coverView.snp.makeConstraints { make in
+                make.left.right.top.equalToSuperview()
+                make.bottom.equalTo(-keyboradHeight-kChatInputViewHeight)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil) {[weak self] notify in
+            guard let self = self else {return}
+            self.chatInputView.snp.updateConstraints { make in
+                make.bottom.equalToSuperview()
+            }
+            self.tableView.snp.updateConstraints { make in
+                make.bottom.equalTo(-kTableViewBottomOffset)
+            }
+            self.coverView.removeFromSuperview()
+        }
+    }
+    
+    @objc private func didTapedCoverView(){
+        chatInputView.textField.resignFirstResponder()
     }
     
     @objc private func didClickChatButton() {

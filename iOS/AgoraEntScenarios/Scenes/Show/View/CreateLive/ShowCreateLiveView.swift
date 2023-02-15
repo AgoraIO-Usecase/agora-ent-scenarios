@@ -170,6 +170,10 @@ class ShowCreateLiveView: UIView {
         layoutButtonArray()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        nameTextField.resignFirstResponder()
+    }
+    
     private func createButton(imgName: String, title: String) ->UIButton {
         let button = UIButton(type: .custom)
         let imageView = UIImageView(image: UIImage.show_sceneImage(name: imgName))

@@ -52,6 +52,7 @@ class ShowRoomChatCell: UITableViewCell {
             make.right.equalTo(-10)
             make.bottom.equalTo(-10)
         }
+        self.selectedBackgroundView = UIView()
     }
     
     func setUserName(_ userName: String, msg: String) {

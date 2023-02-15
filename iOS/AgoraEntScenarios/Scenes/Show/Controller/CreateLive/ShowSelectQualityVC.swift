@@ -21,7 +21,8 @@ class ShowSelectQualityVC: UIViewController {
     
     var selectedItem: ((_ item: Resolution, _ index: Int)->())?
     var dismissed: (()->())?
-    var defalutSelectIndex = 0
+    var defalutSelectIndex =  ShowSettingKey.captureVideoSize.intValue
+    /*
     private let dataArray  = [
         Resolution(width: 1080, height: 1920, valueStr: "1080P", name: "极清"),
         Resolution(width: 720, height: 1280, valueStr: "720P", name: "超清"),
@@ -31,6 +32,13 @@ class ShowSelectQualityVC: UIViewController {
         Resolution(width: 270, height: 480, valueStr: "270P", name: "低清"),
 //        Resolution(width: 180, height: 320, valueStr: "180P", name: "低清"),
     ]
+    */
+    
+    private let dataArray = {
+        ShowAgoraCaptureVideoDimensions.allCases.map({
+            Resolution(width: $0.sizeValue.width, height: $0.sizeValue.height, valueStr: $0.valueTitle, name: $0.levelTitle)
+        })
+    }()
     
     // 背景
     private lazy var bgView: UIView = {
@@ -53,7 +61,7 @@ class ShowSelectQualityVC: UIViewController {
         let marginLeft: CGFloat = 20
         let interSpacing: CGFloat = 15
         let countFowRow: CGFloat = 3
-        let cellWidth: CGFloat = (Screen.width - marginLeft * 2  - (countFowRow - 1) * interSpacing) / countFowRow
+        let cellWidth: CGFloat = (Screen.width - marginLeft * 2  - (countFowRow - 1) * interSpacing) / countFowRow - 2
         layout.minimumInteritemSpacing = interSpacing
         layout.minimumLineSpacing = lineSpacing
         layout.sectionInset = UIEdgeInsets(top: 0, left: marginLeft, bottom: 0, right: marginLeft)

@@ -21,6 +21,7 @@ class ShowVideoSettingVC: UIViewController {
     var dataArray = [ShowSettingKey]()
     var settingManager: ShowAgoraKitManager!
     var willChangeSettingParams: ((_ key: ShowSettingKey, _ value: Any)->Bool)?
+    var currentChannelId: String?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -28,6 +29,7 @@ class ShowVideoSettingVC: UIViewController {
         tableView.dataSource = self
         tableView.allowsSelection = false
         tableView.rowHeight = 47
+        tableView.separatorStyle = .none
         tableView.registerCell(ShowSettingSwitchCell.self, forCellReuseIdentifier: SwitchCellID)
         tableView.registerCell(ShowSettingSegmentCell.self, forCellReuseIdentifier: SegmentCellID)
         tableView.registerCell(ShowSettingSliderCell.self, forCellReuseIdentifier: SliderCellID)
@@ -92,7 +94,7 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }else if data.type == .label {
             let cell = tableView.dequeueReusableCell(withIdentifier: LabelCellID, for: indexPath) as! ShowSettingLabelCell
-            let index = data.intValue
+            let index = data.intValue % data.items.count
             let value = data.items[index]
             cell.setTitle(data.title, value: value) { [weak self] in
                 let vc = ShowSettingActionSheetVC()
@@ -108,7 +110,10 @@ extension ShowVideoSettingVC: UITableViewDelegate, UITableViewDataSource {
                 self?.present(vc, animated: true, completion: {
                     vc.showBgView()
                 })
+            } detailButtonAction: {[weak self] in
+                self?.showAlert(title: data.title, message: data.tips, confirmTitle: "OK", cancelTitle: nil)
             }
+
             return cell
         }else {
             cell = UITableViewCell()
@@ -121,7 +126,7 @@ extension ShowVideoSettingVC {
     func changeValue(_ value: Any, forSettingKey key: ShowSettingKey) {
         if let willChange = willChangeSettingParams, willChange(key,value) == true {
             key.writeValue(value)
-            settingManager.updateSettingForkey(key)
+            settingManager.updateSettingForkey(key, currentChannelId: currentChannelId)
         }
         tableView.reloadData()
     }

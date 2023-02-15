@@ -22,7 +22,7 @@ enum ShowPresetStandardType {
 }
 
 enum ShowMode {
-    case signle // 单主播模式
+    case single // 单主播模式
     case pk // pk模式
 }
 

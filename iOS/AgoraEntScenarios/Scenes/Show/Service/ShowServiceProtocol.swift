@@ -49,6 +49,15 @@ protocol ShowServiceProtocol: NSObjectProtocol {
     func leaveRoom(completion: @escaping (NSError?) -> Void)
     
     
+    /// 初始化房间信息
+    /// - Parameter completion: <#completion description#>
+    func initRoom(completion: @escaping (NSError?) -> Void)
+    
+    
+    /// 释放初始化房间信息
+    /// - Parameter completion: <#completion description#>
+    func deinitRoom(completion: @escaping (NSError?) -> Void)
+    
     
     /// 获取当前房间所有用户
     /// - Parameter completion: 完成回调   (错误信息， 用户列表)
