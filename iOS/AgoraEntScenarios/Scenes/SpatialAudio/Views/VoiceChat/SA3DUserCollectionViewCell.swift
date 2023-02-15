@@ -29,7 +29,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
             contentView.layoutIfNeeded()
         }
     }
-    
+
     public func refreshUser(with mic: SARoomMic) {
         let status = mic.status
         var bgIcon = ""
