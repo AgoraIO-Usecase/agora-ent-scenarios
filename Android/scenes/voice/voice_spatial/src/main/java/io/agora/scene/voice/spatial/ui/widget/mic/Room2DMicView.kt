@@ -133,4 +133,11 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
             }
         }
     }
+
+    fun changeAngle(angle: Float) {
+        val layoutParams: LayoutParams = mBinding.ivMicArrowAnim.layoutParams as LayoutParams
+        layoutParams.circleAngle = angle
+        mBinding.ivMicArrowAnim.rotation = angle
+        mBinding.ivMicArrowAnim.layoutParams = layoutParams
+    }
 }

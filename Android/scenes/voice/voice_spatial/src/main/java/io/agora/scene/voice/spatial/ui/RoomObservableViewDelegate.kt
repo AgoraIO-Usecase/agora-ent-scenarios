@@ -991,9 +991,20 @@ class RoomObservableViewDelegate constructor(
         val oldValue = this.robotInfo.useRobot
         this.robotInfo = robotInfo
         ThreadManager.getInstance().runOnMainThread {
-            iRoomMicView.activeBot(robotInfo.useRobot, null)
             if (robotInfo.useRobot != oldValue) {
-                activeRobotSound()
+                if (robotInfo.useRobot) {
+                    iRoomMicView.activeBot(true) { type, points ->
+                        AgoraRtcEngineController.get().updatePlayerPosition(
+                            floatArrayOf(points.first.x, points.first.y, 0f),
+                            floatArrayOf(points.second.x, points.second.y, 0f),
+                            type
+                        )
+                    }
+                    activeRobotSound()
+                } else {
+                    iRoomMicView.activeBot(false, null)
+                    AgoraRtcEngineController.get().resetMediaPlayer()
+                }
             }
         }
     }

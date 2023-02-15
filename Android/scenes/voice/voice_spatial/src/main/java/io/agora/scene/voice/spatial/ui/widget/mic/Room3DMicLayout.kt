@@ -117,6 +117,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             preMovePoint.x = binding.micV0Center.left + micViewSize.width / 2
             preMovePoint.y = binding.micV0Center.top + micViewSize.height / 2
         }
+        binding.micV1.changeAngle(180.0f)
+        binding.micV2.changeAngle(135.0f)
+        binding.micV3Blue.changeAngle(45.0f)
+        binding.micV4.changeAngle(0.0f)
+        binding.micV5.changeAngle(315.0f)
+        binding.micV6Red.changeAngle(225.0f)
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex0] = binding.micV0Center
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex1] = binding.micV1
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex2] = binding.micV2
@@ -381,12 +387,12 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 binding.micV3Blue.binding(this)
                 micViewMap[ConfigConstants.MicConstant.KeyIndex3]?.binding(this)
                 // BotSpeaker Type Position
-                each?.invoke(1, Pair(getPosition(binding.micV3Blue), PointF(1f, 1f)))
+                each?.invoke(0, Pair(getPosition(binding.micV3Blue), PointF(1f, 1f)))
             }
             micInfoMap[ConfigConstants.MicConstant.KeyIndex6]?.apply {
                 this.micStatus = MicStatus.BotActivated
                 micViewMap[ConfigConstants.MicConstant.KeyIndex6]?.binding(this)
-                each?.invoke(0, Pair(getPosition(binding.micV6Red), PointF(-1f, -1f)))
+                each?.invoke(1, Pair(getPosition(binding.micV6Red), PointF(-1f, -1f)))
             }
         } else {
             micInfoMap[ConfigConstants.MicConstant.KeyIndex3]?.apply {

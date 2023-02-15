@@ -179,12 +179,9 @@ class AgoraRtcEngineController {
      * @param right 朝向[x, y, z]
      */
     public fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
-        "spatial update self position: p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]} r: ${right[0]} ${right[1]}".logD("Spatial Voice")
+        "update self position: p: ${pos.contentToString()} f: ${forward.contentToString()} r: ${right.contentToString()}".logD("spatial_voice")
         spatial?.updateSelfPosition(
             pos,
-//            floatArrayOf(0.0f, 9.5f, 0.0f) ,
-//            floatArrayOf(0.0f, -1.0f, 0.0f),
-//            floatArrayOf(-1.0f, 0.0f, 0.0f),
             forward,
             right,
             floatArrayOf(1.0f, 0.0f, -0.0f))
@@ -239,7 +236,7 @@ class AgoraRtcEngineController {
                 position.forward = forward
                 botBluePlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
-                    "spatial update player blue: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
+                    "bot blue ${pos.contentToString()}".logD("spatial_voice")
                 }
             }
             ConfigConstants.BotSpeaker.BotRed -> {
@@ -248,7 +245,7 @@ class AgoraRtcEngineController {
                 position.forward = forward
                 botRedPlayer?.mediaPlayerId?.let {
                     spatial?.updatePlayerPositionInfo(it, position)
-                    "spatial update player red: ${pos[0]} ${pos[1]} u: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
+                    "bot red ${pos.contentToString()}".logD("spatial_voice")
                 }
             }
         }
