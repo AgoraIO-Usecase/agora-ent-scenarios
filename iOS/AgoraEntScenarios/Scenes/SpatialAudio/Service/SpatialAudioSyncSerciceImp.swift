@@ -590,6 +590,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         } else {
             mic.mic_index = self.findMicIndex()
         }
+        user.mic_index = mic.mic_index
         switch self.mics[mic.mic_index].status {
         case 2:
             mic.status = self.mics[mic.mic_index].status
@@ -650,7 +651,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(SAErrorType.unknown("startMicSeatInvitation", "user not found").error(), false)
             return
         }
-        user.mic_index = nil
+        user.mic_index = -1
         user.status = .rejected
         _updateUserInfo(roomId: self.roomId!, user: user) { error in
             completion(error, error == nil)
@@ -703,6 +704,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         } else {
             mic_index = apply.index ?? 1
         }
+        
         let mic = SARoomMic()
         mic.mic_index = mic_index
         switch self.mics[mic_index].status {
@@ -714,9 +716,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         default:
             mic.status = 0
         }
+        apply.member?.mic_index = mic_index
         mic.member = apply.member
         mic.objectId = mics[mic_index].objectId
-        _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
+        _updateMicSeat(roomId: self.roomId!, mic: mic) { [self] error in
             if let error = error {
                 completion(error, nil)
                 return
@@ -725,8 +728,11 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //            self.micApplys.removeAll {
 //                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
 //            }
-            self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? ""
-                            })?.mic_index = mic_index
+            let user = self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? "" })
+            user?.mic_index = mic_index
+            _updateUserInfo(roomId: self.roomId!, user: mic.member!) { _ in
+                
+            }
             let currentMic = self.mics[safe: mic_index]
             if currentMic?.status ?? 0 == -1 || currentMic?.status ?? 0 == 2 {
                 self.mics[mic_index]  = mic

@@ -14,7 +14,7 @@ extension SARoomViewController {
     
     func showEQView() {
         let isOpenSpatial = roomInfo?.robotInfo.use_robot == true
-        let volumn = Double((roomInfo?.robotInfo.robot_volume ?? 180)) / 400.0
+        let volumn = Double((roomInfo?.robotInfo.robot_volume ?? 180)) / 100.0
 
         let actionView = ActionSheetManager()
         actionView
@@ -37,8 +37,8 @@ extension SARoomViewController {
             self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
-            self?.sRtcView.updatePlayerVolume(value: Double(value * 400))
-            self?.updateVolume(Int(value * 400.0))
+            self?.sRtcView.updatePlayerVolume(value: Double(value * 100))
+            self?.updateVolume(Int(value * 100.0))
         }
         actionView.show()
     }
