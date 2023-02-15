@@ -733,9 +733,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             }
         }
         
-//        _removeMicSeatApply(roomId: self.roomId!, apply: apply) { error in
-//
-//        }
+        _removeMicSeatApply(roomId: self.roomId!, apply: apply) { error in
+
+        }
     }
     
     func updateAnnouncement(content: String, completion: @escaping (Bool) -> Void) {
@@ -1117,12 +1117,13 @@ extension SpatialAudioSyncSerciceImp {
     }
 
     fileprivate func _addUserInfo(roomId: String, finished: @escaping (SAUser?) -> Void) {
+        let room = self.roomList.filter {$0.room_id == self.roomId}.first
         let owner: SAUser = SAUser()
         owner.rtc_uid = VLUserCenter.user.id
         owner.chat_uid = owner.rtc_uid
         owner.name = VLUserCenter.user.name
         owner.uid = VLUserCenter.user.id
-        owner.mic_index = -1
+        owner.mic_index = room?.owner?.uid == owner.uid ? 1 :  -1
         owner.portrait = VLUserCenter.user.headUrl
 
         let params = owner.kj.JSONObject()
