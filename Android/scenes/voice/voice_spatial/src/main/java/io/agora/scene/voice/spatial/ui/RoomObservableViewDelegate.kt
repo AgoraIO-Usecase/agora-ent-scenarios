@@ -989,6 +989,29 @@ class RoomObservableViewDelegate constructor(
 
     fun onRobotUpdated(robotInfo: RobotSpatialAudioModel) {
         val oldValue = this.robotInfo.useRobot
+        if (robotInfo.useRobot) {
+            if (this.robotInfo.robotVolume != robotInfo.robotVolume) {
+                AgoraRtcEngineController.get().updateEffectVolume(robotInfo.robotVolume)
+            }
+            if (this.robotInfo.redRobotAttenuation != robotInfo.redRobotAttenuation) {
+                AgoraRtcEngineController.get().adjustRedAttenuation((robotInfo.redRobotAttenuation * 100).toInt())
+            }
+            if (this.robotInfo.blueRobotAttenuation != robotInfo.blueRobotAttenuation) {
+                AgoraRtcEngineController.get().adjustBlueAttenuation((robotInfo.blueRobotAttenuation * 100).toInt())
+            }
+            if (this.robotInfo.blueRobotBlur != robotInfo.blueRobotBlur) {
+                AgoraRtcEngineController.get().enableBlueBlur(robotInfo.blueRobotBlur)
+            }
+            if (this.robotInfo.redRobotBlur != robotInfo.redRobotBlur) {
+                AgoraRtcEngineController.get().enableRedBlur(robotInfo.redRobotBlur)
+            }
+            if (this.robotInfo.redRobotAbsorb != robotInfo.redRobotAbsorb) {
+                AgoraRtcEngineController.get().enableRedAbsorb(robotInfo.redRobotAbsorb)
+            }
+            if (this.robotInfo.blueRobotAbsorb != robotInfo.blueRobotAbsorb) {
+                AgoraRtcEngineController.get().enableBlueAbsorb(robotInfo.blueRobotAbsorb)
+            }
+        }
         this.robotInfo = robotInfo
         ThreadManager.getInstance().runOnMainThread {
             if (robotInfo.useRobot != oldValue) {
