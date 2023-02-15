@@ -55,6 +55,7 @@ public class SAApplyUsersViewController: UITableViewController {
         cell?.agreeClosure = { [weak self] in
             self?.agreeUserApply(user: $0)
             AppContext.saTmpServiceImp().micApplys[safe: indexPath.row]?.member?.invited = true
+            
             self?.tableView.reloadData()
         }
         return cell ?? SAApplyCell()
