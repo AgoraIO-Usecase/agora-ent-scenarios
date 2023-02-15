@@ -898,8 +898,6 @@ extension SpatialAudioSyncSerciceImp {
                            if let index = self.mics.firstIndex(where: { $0.objectId == seat.objectId }) {
                                self.mics[index] = seat
                            }
-                           self.mics.removeAll { $0.objectId == seat.objectId}
-                           self.mics.append(seat)
                        }, onDeleted: { _ in
                            agoraPrint("imp seat info subscribe onDeleted...")
 
