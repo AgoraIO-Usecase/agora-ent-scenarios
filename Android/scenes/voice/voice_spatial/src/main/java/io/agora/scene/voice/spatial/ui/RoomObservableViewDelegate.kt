@@ -1167,7 +1167,7 @@ class RoomObservableViewDelegate constructor(
     fun checkUserLeaveMic() {
         val localUserIndex = localUserIndex()
         // 普通用户离开
-        if (localUserIndex > 0) {
+        if (localUserIndex >= 0) {
             roomLivingViewModel.leaveMic(localUserIndex)
         }
     }
