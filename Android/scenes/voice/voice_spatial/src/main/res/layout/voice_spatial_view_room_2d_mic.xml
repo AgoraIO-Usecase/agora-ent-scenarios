@@ -55,6 +55,15 @@
         app:layout_constraintTop_toTopOf="@+id/ivMicInfo"
         app:shapeAppearance="@style/voice_seat_roundStyle" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMicArrowAnim"
+        android:layout_width="20dp"
+        android:layout_height="14dp"
+        android:background="@drawable/voice_go_00028"
+        app:layout_constraintCircle="@+id/ivSeatOuterRing"
+        app:layout_constraintCircleAngle="0"
+        app:layout_constraintCircleRadius="37dp" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtMicRotActive"
         android:layout_width="44dp"
@@ -95,14 +104,5 @@
         app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
         app:layout_constraintTop_toBottomOf="@+id/ivMicInfo"
         tools:text="Susan Stark" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ivMicArrowAnim"
-        android:layout_width="20dp"
-        android:layout_height="14dp"
-        android:background="@drawable/voice_go_00028"
-        app:layout_constraintCircle="@+id/ivSeatOuterRing"
-        app:layout_constraintCircleAngle="0"
-        app:layout_constraintCircleRadius="37dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
