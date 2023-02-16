@@ -86,7 +86,7 @@ class SAGift: SABaseInfo {
 @objcMembers
 public class SARobotAudioInfo: NSObject, Convertible {
     var use_robot: Bool = false
-    var robot_volume: UInt = 180
+    var robot_volume: UInt = 45
     var red_robot_absorb: Bool = false
     var red_robot_blur: Bool = false
     var blue_robot_absorb: Bool = false

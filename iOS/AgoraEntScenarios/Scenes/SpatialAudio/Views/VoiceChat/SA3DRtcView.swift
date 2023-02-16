@@ -502,7 +502,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 5:
                 if let mic_info = micInfos?[4] {
                     cell.tag = 204
-                    cell.setArrowInfo(imageName: "sa_up_arrow", margin: -6)
+                    cell.setArrowInfo(imageName: "sa_up_arrow", margin: -5)
                     
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
@@ -511,7 +511,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             case 6:
                 if let mic_info = micInfos?[5] {
                     cell.tag = 205
-                    cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -6)
+                    cell.setArrowInfo(imageName: "sa_upleft_arrow", margin: -4)
                     
                     cell.cellType = getCellTypeWithStatus(mic_info.status)
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
