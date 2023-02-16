@@ -9,7 +9,7 @@
     tools:theme="@style/Theme.MaterialComponents.Light">
 
     <io.agora.karaoke_view.v11.ScoringView
-        android:id="@+id/pitchView"
+        android:id="@+id/scoringView"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:layout_marginTop="26dp"
@@ -24,7 +24,7 @@
         app:pitchStickHeight="6dp" />
 
     <io.agora.karaoke_view.v11.LyricsView
-        android:id="@+id/lrcView"
+        android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#00000000"
@@ -32,18 +32,18 @@
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        app:firstToneStartIndicatorPaddingTop="8dp"
-        app:firstToneStartIndicatorRadius="4dp"
+        app:currentTextColor="#FFE960"
+        app:currentTextSize="18sp"
+        app:defaultTextColor="@color/white"
+        app:defaultTextSize="16sp"
+        app:labelWhenNoLyrics=" "
         app:layout_constraintBottom_toTopOf="@+id/bgd_control_layout_lrc"
-        app:layout_constraintTop_toBottomOf="@+id/pitchView"
-        app:lrcCurrentTextColor="#FFE960"
-        app:lrcDividerHeight="8sp"
-        app:lrcLabel=" "
-        app:lrcMarginTop="6dp"
-        app:lrcNormalTextColor="@color/white"
-        app:lrcNormalTextSize="16sp"
-        app:lrcTextGravity="center"
-        app:lrcTextSize="18sp" />
+        app:layout_constraintTop_toBottomOf="@+id/scoringView"
+        app:lineSpacing="8sp"
+        app:paddingTop="6dp"
+        app:startOfVerseIndicatorPaddingTop="8dp"
+        app:startOfVerseIndicatorRadius="4dp"
+        app:textGravity="center" />
 
     <View
         android:id="@+id/bgd_control_layout_lrc"
@@ -89,8 +89,8 @@
         android:layout_width="80dp"
         android:layout_height="28dp"
         android:layout_marginBottom="30dp"
-        android:orientation="horizontal"
         android:background="@drawable/ktv_skip_btn_bg"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/switchOriginal"
         app:layout_constraintStart_toEndOf="@id/ivMusicStart">
@@ -99,19 +99,17 @@
             android:id="@+id/ivSkipPreludeSkip"
             android:layout_width="60dp"
             android:layout_height="match_parent"
-            android:text="@string/ktv_skip_prelude"
             android:gravity="center"
-            android:textSize="12dp"
-            android:textColor="@color/white">
-        </TextView>
+            android:text="@string/ktv_skip_prelude"
+            android:textColor="@color/white"
+            android:textSize="12dp"></TextView>
 
         <ImageView
             android:id="@+id/ivSkipPreludeCancel"
             android:layout_width="13dp"
             android:layout_height="13dp"
             android:layout_gravity="center"
-            android:background="@mipmap/ktv_skip_cancel">
-        </ImageView>
+            android:background="@mipmap/ktv_skip_cancel"></ImageView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -120,8 +118,8 @@
         android:layout_width="80dp"
         android:layout_height="28dp"
         android:layout_marginBottom="30dp"
-        android:orientation="horizontal"
         android:background="@drawable/ktv_skip_btn_bg"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/switchOriginal"
         app:layout_constraintStart_toEndOf="@id/ivMusicStart">
@@ -130,19 +128,17 @@
             android:id="@+id/ivSkipPostludeSkip"
             android:layout_width="60dp"
             android:layout_height="match_parent"
-            android:text="@string/ktv_skip_postlude"
             android:gravity="center"
-            android:textSize="12dp"
-            android:textColor="@color/white">
-        </TextView>
+            android:text="@string/ktv_skip_postlude"
+            android:textColor="@color/white"
+            android:textSize="12dp"></TextView>
 
         <ImageView
             android:id="@+id/ivSkipPostludeCancel"
             android:layout_width="13dp"
             android:layout_height="13dp"
             android:layout_gravity="center"
-            android:background="@mipmap/ktv_skip_cancel">
-        </ImageView>
+            android:background="@mipmap/ktv_skip_cancel"></ImageView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
