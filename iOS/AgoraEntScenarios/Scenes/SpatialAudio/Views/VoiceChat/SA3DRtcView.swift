@@ -26,8 +26,8 @@ class SA3DRtcView: UIView {
     private var lastMovedPoint: CGPoint = .init(x: UIScreen.main.bounds.size.width / 2.0, y: 275~)
     private var touchState: SATouchState = .began
     
-    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
-    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
+//    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
+//    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
     private var panGesture: UIPanGestureRecognizer?
     
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
@@ -54,7 +54,7 @@ class SA3DRtcView: UIView {
         self.rtcKit = rtcKit
         SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
-        setupSpatialAudio()
+        rtcKit?.setupSpatialAudio()
     }
 
     @available(*, unavailable)
@@ -62,35 +62,11 @@ class SA3DRtcView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updatePlayerVolume(value: Double) {
-        redMediaPlayer?.adjustPlayoutVolume(Int32(value))
-        blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
-    }
-    
     func playMusic(isPlay: Bool) {
-        let redMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[1])"
-        let blueMusicPath = "\(SAConfig.CreateCommonRoom)\(SAConfig.baseAlienMic[0])"
-        if isPlay {
-            redMediaPlayer?.open(redMusicPath, startPos: 0)
-            blueMediaPlayer?.open(blueMusicPath, startPos: 0)
-            redMediaPlayer?.mute(true)
-            blueMediaPlayer?.mute(true)
-        } else {
-            redMediaPlayer?.stop()
-            blueMediaPlayer?.stop()
-        }
-        collectionView.reloadData()
+        rtcKit?.playMusic(with: .Spatical)
     }
     
-    private func setupSpatialAudio() {
-        rtcKit?.playerDelegate = self
-        redMediaPlayer = rtcKit?.initMediaPlayer()
-        redMediaPlayer?.adjustPlayoutVolume(Int32(0.45 * 400))
-        rtcKit?.setPlayerAttenuation(attenuation: 0.2, playerId: redMediaPlayer?.getMediaPlayerId() ?? 0)
-        blueMediaPlayer = rtcKit?.initMediaPlayer()
-        blueMediaPlayer?.adjustPlayoutVolume(Int32(0.45 * 400))
-        rtcKit?.setPlayerAttenuation(attenuation: 0.2, playerId: blueMediaPlayer?.getMediaPlayerId() ?? 0)
-    }
+    
     
     //因为麦位顺序的特殊性 需要对数据进行调整
     private func getRealIndex(with index: Int) -> Int {//4表示中间的用户
@@ -192,7 +168,7 @@ class SA3DRtcView: UIView {
         } else if type == .blueAndRed {
             updateAlienMic(2, flag: true)
             updateAlienMic(4, flag: true)
-        } else if type == .none {
+        } else if (type == .none || type == .ended) {
             updateAlienMic(2, flag: false)
             updateAlienMic(4, flag: false)
         }
@@ -478,9 +454,9 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
                     
-                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: redMediaPlayer)
-                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: redMediaPlayer)
-                    setPlayerAttenuation(mediaPlayer: redMediaPlayer, attenuation: mic_info.attenuation)
+                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: rtcKit?.redMediaPlayer)
+                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: rtcKit?.redMediaPlayer)
+                    setPlayerAttenuation(mediaPlayer: rtcKit?.redMediaPlayer, attenuation: mic_info.attenuation)
                 }
                 
             case 4:
@@ -495,9 +471,9 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
                     
-                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: blueMediaPlayer)
-                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: blueMediaPlayer)
-                    setPlayerAttenuation(mediaPlayer: blueMediaPlayer, attenuation: mic_info.attenuation)
+                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: rtcKit?.blueMediaPlayer)
+                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: rtcKit?.blueMediaPlayer)
+                    setPlayerAttenuation(mediaPlayer: rtcKit?.blueMediaPlayer, attenuation: mic_info.attenuation)
                 }
             case 5:
                 if let mic_info = micInfos?[4] {
@@ -569,7 +545,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
-                                       playerId: Int(redMediaPlayer?.getMediaPlayerId() ?? 0))
+                                       playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
             }
             
         case 4:
@@ -579,7 +555,7 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 
                 setMediaPlayerPosition(pos: pos,
                                        forward: mic_info.forward,
-                                       playerId: Int(blueMediaPlayer?.getMediaPlayerId() ?? 0))
+                                       playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
             }
         case 5:
             if let mic_info = micInfos?[4] {
@@ -645,11 +621,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     }
 }
 extension SA3DRtcView: SAMusicPlayerDelegate {
-    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        if state == .openCompleted || state == .playBackAllLoopsCompleted || state == .playBackCompleted {
-            playerKit.play()
-        }
-    }
     
     func didReceiveStreamMsgOfUid(uid: UInt, data: Data) {
         guard "\(uid)" != VLUserCenter.user.id else { return }
