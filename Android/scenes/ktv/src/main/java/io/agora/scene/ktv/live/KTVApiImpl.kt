@@ -59,6 +59,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var audioPlayoutDelay = 0
     private var remoteVolume: Int = 15 // 远端音频
 
+    private var isRelease = false
+
     override fun initWithRtcEngine(
         engine: RtcEngine,
         channelName: String,
@@ -80,6 +82,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun release() {
+        isRelease = true
         loadSongMap.clear()
         lyricUrlMap.clear()
         lyricCallbackMap.clear()
@@ -453,12 +456,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                             super.onJoinChannelSuccess(channel, uid, elapsed)
                             if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = true
+                            if (isRelease) return
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
                         }
 
                         override fun onLeaveChannel(stats: RtcStats?) {
                             super.onLeaveChannel(stats)
                             if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = false
+                            if (isRelease) return
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
                         }
                     }
