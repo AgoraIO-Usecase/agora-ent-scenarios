@@ -344,7 +344,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
     [super motionEnded:motion withEvent:event];
     
-    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:[AgoraEntLog logsDir]]]
+    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:[AgoraEntLog cacheDir]]]
                                                                              applicationActivities:nil];
 
     [self presentViewController:controller animated:YES completion:nil];

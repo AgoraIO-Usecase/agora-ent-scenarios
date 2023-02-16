@@ -36,6 +36,17 @@ UITextFieldDelegate
 
 @implementation VLSelectedSongList
 
+- (void)setSelSongsArray:(NSArray *)selSongsArray {
+    _selSongsArray = selSongsArray;
+    [self.listContainerView.validListDict enumerateKeysAndObjectsUsingBlock:^(NSNumber *  key, id<JXCategoryListContentViewDelegate>   obj, BOOL *  stop) {
+        if (![obj isKindOfClass:[VLSelectSongTableItemView class]]) {
+            return;
+        }
+        VLSelectSongTableItemView* itemView = (VLSelectSongTableItemView* )obj;
+        itemView.selSongsArray = selSongsArray;
+    }];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSelectedSongListDelegate>)delegate
                    withRoomNo:(NSString *)roomNo
@@ -164,6 +175,7 @@ UITextFieldDelegate
     VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
                                                                                     withRooNo:self.roomNo
                                                                                      ifChorus:self.ifChorus];
+    selSongView.selSongsArray = self.selSongsArray;
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
     return selSongView;
 }

@@ -23,12 +23,10 @@ typedef enum : NSUInteger {
 
 @interface VLSongList : UIView
 
-@property (nonatomic, readonly) NSArray *selSongsArray;
+@property (nonatomic, strong) NSArray *selSongsArray;
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSongListDelegate>)delegate;
-
-- (void)setSelSongsUIWithArray:(NSArray *)selSongsArray;
 
 @end
 
