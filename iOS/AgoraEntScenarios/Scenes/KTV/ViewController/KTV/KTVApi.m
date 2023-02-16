@@ -94,6 +94,14 @@ time_t uptime(void) {
         self.musicCenter = musicCenter;
         self.rtcMediaPlayer = rtcMediaPlayer;
         
+        //为了 尽量不超时 设置了1000ms
+        [self.engine setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
+        [self.engine setParameters:@"{\"che.audio.agc.enable\": true}"];
+        [self.engine setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
+        [self.engine setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
+//        [self.engine setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
+//        [self.engine setParameters:@"{\"che.audio.custom_payload_type\":78}"];
+        
 //        [self.rtcMediaPlayer setPlayerOption:@"play_pos_change_callback" value:100];
         
         [[AppContext shared] registerEventDelegate:self];
@@ -255,6 +263,8 @@ time_t uptime(void) {
             options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            [self.rtcMediaPlayer adjustPlayoutVolume:50];
+            [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else if(role == KTVSingRoleCoSinger) {
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
@@ -268,23 +278,21 @@ time_t uptime(void) {
             
             //mute main Singer player audio
             [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
+            [self.rtcMediaPlayer adjustPlayoutVolume:50];
+            [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
             options.publishMediaPlayerAudioTrack = NO;
             [self.engine updateChannelWithMediaOptions:options];
-            
-            return;
         }
-        
-        [self.rtcMediaPlayer adjustPlayoutVolume:50];
-        [self.rtcMediaPlayer adjustPublishSignalVolume:50];
     }
 }
 
 -(void)resumePlay
 {
+    //只在特殊情况(播放等)调用getPosition(会耗时)
     self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
     if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePaused) {
         [self.rtcMediaPlayer resume];
@@ -318,7 +326,6 @@ time_t uptime(void) {
     [self.rtcMediaPlayer selectAudioTrack:mode == KTVPlayerTrackOrigin ? 0 : 1];
 //    [self syncTrackMode:mode];
 }
-
 
 - (void)adjustPlayoutVolume:(int)volume {
     self.playoutVolume = volume;
@@ -434,12 +441,7 @@ time_t uptime(void) {
                 NSInteger threshold = expectPosition - localPosition;
                 if(labs(threshold) > 40) {
                     KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition);
-//                    KTVLogInfo(@"localPosition: %ld, localPosition2: %ld, localPosition2-localPosition: %ld", localPosition, localPosition2, localPosition2 - localPosition);
-//                    NSDate*date = [NSDate date];
-//                    NSInteger pos1 = [self.rtcMediaPlayer getPosition];
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
-//                    NSInteger pos2 = [self.rtcMediaPlayer getPosition];
-//                    NSLog(@"seekToPosition: %.fms, %ld/%ld/%ld", -[date timeIntervalSinceNow] * 1000, pos1, pos2, expectPosition);
                 }
             }
         }
@@ -528,6 +530,7 @@ time_t uptime(void) {
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
         if (self.config.role == KTVSingRoleMainSinger) {
+            //TODO: 目前不delay直接play会有大概率对不齐的情况，具体delay的时间或者把delay放在回调里的策略需要修改
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [playerKit play];
             });
@@ -556,7 +559,7 @@ time_t uptime(void) {
         NSDictionary *dict = @{
             @"cmd":@"setLrcTime",
             @"duration":@(self.playerDuration),
-            @"time":@(position - self.audioPlayoutDelay),
+            @"time":@(position - self.audioPlayoutDelay),   //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
             @"ntp":@([self getNtpTimeInMs]),
             @"playerState":@(self.playerState)
         };
@@ -586,6 +589,7 @@ time_t uptime(void) {
 
 - (NSInteger)playerDuration {
     if (_playerDuration == 0) {
+        //只在特殊情况(播放、暂停等)调用getDuration(会耗时)
         _playerDuration = [_rtcMediaPlayer getDuration];
     }
     
