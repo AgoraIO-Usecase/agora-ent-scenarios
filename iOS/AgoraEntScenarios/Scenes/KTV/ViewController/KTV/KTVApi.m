@@ -285,7 +285,7 @@ time_t uptime(void) {
 
 -(void)resumePlay
 {
-    self.localPlayerPosition = [self.rtcMediaPlayer getPosition];
+    self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
     if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePaused) {
         [self.rtcMediaPlayer resume];
     } else {
@@ -424,7 +424,7 @@ time_t uptime(void) {
         
         self.remotePlayerPosition = position;
         self.remotePlayerDuration = duration;
-        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
+//        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
             if([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePlaying) {
                 NSInteger localNtpTime = [self getNtpTimeInMs];
@@ -755,7 +755,7 @@ time_t uptime(void) {
 - (void)leaveChorus2ndChannel
 {
     if(self.subChorusConnection == nil) {
-        KTVLogWarn(@"aaaaaa leaveChorus2ndChannel fail connection = nil");
+        KTVLogWarn(@"leaveChorus2ndChannel fail connection = nil");
         return;
     }
     
