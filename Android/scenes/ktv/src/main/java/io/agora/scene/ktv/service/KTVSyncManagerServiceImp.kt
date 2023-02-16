@@ -253,6 +253,7 @@ class KTVSyncManagerServiceImp(
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
+        roomTimeUpSubscriber = null
 
         if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
             // 移除房间
