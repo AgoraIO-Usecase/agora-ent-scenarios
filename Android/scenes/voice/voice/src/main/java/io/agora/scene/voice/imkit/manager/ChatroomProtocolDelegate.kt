@@ -623,7 +623,6 @@ class ChatroomProtocolDelegate constructor(
             }
             // 关麦（麦位用户操作包括房主操作自己）
             MicClickAction.Mute -> {
-                micInfo.micStatus = MicStatus.Mute
                 micInfo.member?.micStatus = 0
             }
             // 开麦（麦位用户操作包括房主操作自己）

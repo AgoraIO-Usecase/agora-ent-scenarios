@@ -493,8 +493,10 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                         giftViewDelegate.showGiftDialog(object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 roomObservableDelegate.onSendGiftSuccess(roomKitBean.roomId,message)
-                                binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
-                                    ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
+                                if (CustomMsgHelper.getInstance().getMsgGiftId(message).equals("VoiceRoomGift9")){
+                                    binding.subtitle.showSubtitleView(resources.getString(R.string.voice_chatroom_gift_notice,
+                                        ChatroomIMManager.getInstance().getUserName(message),voiceRoomModel.owner?.nickName))
+                                }
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
