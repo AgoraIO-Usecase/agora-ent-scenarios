@@ -601,6 +601,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void setProgress(Long progress) {
+        if (mKaraokeView.getLyricsData() == null) return;
         if (mRole == Role.Singer) {
             if (progress >= mKaraokeView.getLyricsData().startOfVerse) {
                 mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);

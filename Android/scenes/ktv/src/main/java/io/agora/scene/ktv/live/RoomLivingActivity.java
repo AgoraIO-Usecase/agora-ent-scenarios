@@ -266,7 +266,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
                 getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
         roomLivingViewModel.roomTimeUpLiveData.observe(this, isTimeUp -> {
-            if (roomLivingViewModel.release()) {
+            if (roomLivingViewModel.release() && isTimeUp) {
                 showTimeUpExitDialog();
             }
         });

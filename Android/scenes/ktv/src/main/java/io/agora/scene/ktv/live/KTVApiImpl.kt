@@ -395,7 +395,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val msg: MutableMap<String?, Any?> = java.util.HashMap()
                 msg["cmd"] = "setVoicePitch"
                 msg["pitch"] = pitch
-                msg["time"] = mPlayer.playPosition
+                msg["time"] = localPlayerPosition
                 val jsonMsg = JSONObject(msg)
                 val ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().toByteArray())
                 if (ret < 0) {
@@ -504,15 +504,12 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         KTVLogger.d(TAG, "startDisplayLrc called")
         mStopDisplayLrc = false
         mDisplayThread = Thread {
-            var curTs: Long
-            var curTime: Long
-            var offset: Long
             while (!mStopDisplayLrc) {
                 val lastReceivedTime = mLastReceivedPlayPosTime ?: continue
-                curTime = System.currentTimeMillis()
-                offset = curTime - lastReceivedTime
+                val curTime = System.currentTimeMillis()
+                val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    curTs = mReceivedPlayPosition + offset
+                    val curTs = mReceivedPlayPosition + offset
                     runOnMainThread {
                         lrcView?.setProgress(curTs)
                     }
@@ -682,7 +679,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     pitch = if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                         runOnMainThread {
                             lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat())
-                            lrcView?.setProgress(mPlayer.playPosition)
+                            //lrcView?.setProgress(localPlayerPosition)
                         }
                         info.voicePitch
                     } else {
@@ -757,13 +754,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 mPlayer.play()
-            }
-            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+                mPlayer.selectAudioTrack(1)
 
                 this.localPlayerPosition = 0
                 startSyncPitch()
-                mPlayer.selectAudioTrack(1)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
+                mRtcEngine.adjustPlaybackSignalVolume(100)
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
@@ -782,9 +782,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val score = view.cumulativeScore.toFloat()
                 ktvApiEventHandler?.onSingingScoreResult(score)
                 syncSingingScore(score)
-            }
-            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
-                mRtcEngine.adjustPlaybackSignalVolume(100)
             }
             else -> {}
         }
