@@ -14,7 +14,7 @@ extension SARoomViewController {
     
     func showEQView() {
         let isOpenSpatial = roomInfo?.robotInfo.use_robot == true
-        let volumn = Double((roomInfo?.robotInfo.robot_volume ?? 180)) / 100.0
+        let volumn = Double((roomInfo?.robotInfo.robot_volume ?? 45)) / 100.0
 
         let actionView = ActionSheetManager()
         actionView
