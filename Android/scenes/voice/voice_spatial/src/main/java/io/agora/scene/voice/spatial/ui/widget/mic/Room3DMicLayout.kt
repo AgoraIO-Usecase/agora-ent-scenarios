@@ -50,9 +50,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
     // 上一次移动坐标(中心圆点)
     private val preMovePoint = Point(0, 0)
 
-    // 是否触摸移动
-    private var isMove = false
-
     // spatialView 尺寸
     private val micViewSize by lazy {
         Size(binding.micV0Center.width, binding.micV0Center.height)
@@ -112,17 +109,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         binding = VoiceSpatialViewRoom3dMicLayoutBinding.bind(root)
         constraintSet.clone(binding.root)
         initListeners()
-        post {
-            // 当前移动的坐标圆点
-            preMovePoint.x = binding.micV0Center.left + micViewSize.width / 2
-            preMovePoint.y = binding.micV0Center.top + micViewSize.height / 2
-        }
-        binding.micV1.changeAngle(180.0f)
-        binding.micV2.changeAngle(135.0f)
-        binding.micV3Blue.changeAngle(45.0f)
-        binding.micV4.changeAngle(0.0f)
-        binding.micV5.changeAngle(315.0f)
-        binding.micV6Red.changeAngle(225.0f)
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex0] = binding.micV0Center
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex1] = binding.micV1
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex2] = binding.micV2
@@ -130,6 +116,18 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex4] = binding.micV4
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex5] = binding.micV5
         this.micViewMap[ConfigConstants.MicConstant.KeyIndex6] = binding.micV6Red
+        post {
+            // 当前移动的坐标圆点
+            preMovePoint.x = binding.micV0Center.left + micViewSize.width / 2
+            preMovePoint.y = binding.micV0Center.top + micViewSize.height / 2
+            binding.micV0Center.changeAngle(180.0f)
+            binding.micV1.changeAngle(180.0f)
+            binding.micV2.changeAngle(135.0f)
+            binding.micV3Blue.changeAngle(45.0f)
+            binding.micV4.changeAngle(0.0f)
+            binding.micV5.changeAngle(315.0f)
+            binding.micV6Red.changeAngle(225.0f)
+        }
     }
 
     fun setUpInitMicInfoMap() {
@@ -266,7 +264,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             MotionEvent.ACTION_DOWN -> {
                 lastX = x
                 lastY = y
-                isMove = false
                 "onTouchEvent ACTION_DOWN x:${x} y:${y}".logD(TAG)
                 return true
             }
@@ -283,7 +280,6 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 }
                 binding.micV0Center.translationX = nextTransitionX
                 binding.micV0Center.translationY = nextTransitionY
-                isMove = true
                 // 计算箭头角度
                 val curTime = SystemClock.elapsedRealtime()
                 if (curTime - preTime >= TIME_INTERVAL) {
