@@ -7,14 +7,29 @@
     android:paddingHorizontal="5dp">
 
     <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivSeatOuterRing"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/voice_bg_oval_white30"
+        tools:background="@color/voice_black"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:shapeAppearance="@style/voice_seat_roundStyle" />
+
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivMicInfo"
         android:layout_width="58dp"
         android:layout_height="58dp"
         android:background="@drawable/voice_bg_oval_white30"
-        android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/ivSeatOuterRing"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@+id/ivSeatOuterRing"
+        app:layout_constraintStart_toStartOf="@+id/ivSeatOuterRing"
+        app:layout_constraintTop_toTopOf="@+id/ivSeatOuterRing"
         app:shapeAppearance="@style/voice_seat_roundStyle" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -80,4 +95,14 @@
         app:layout_constraintStart_toStartOf="@+id/ivMicInfo"
         app:layout_constraintTop_toBottomOf="@+id/ivMicInfo"
         tools:text="Susan Stark" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMicArrowAnim"
+        android:layout_width="20dp"
+        android:layout_height="14dp"
+        android:background="@drawable/voice_go_00028"
+        app:layout_constraintCircle="@+id/ivSeatOuterRing"
+        app:layout_constraintCircleAngle="0"
+        app:layout_constraintCircleRadius="37dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

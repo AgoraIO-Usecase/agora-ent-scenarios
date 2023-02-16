@@ -34,7 +34,7 @@ class VoiceBuddyImp : io.agora.scene.voice.spatial.global.IVoiceBuddy {
     }
 
     override fun userId(): String {
-        return (UserManager.getInstance().user?.userNo ?: "").toString()
+        return (UserManager.getInstance().user?.id ?: "").toString()
     }
 
     override fun userToken(): String {

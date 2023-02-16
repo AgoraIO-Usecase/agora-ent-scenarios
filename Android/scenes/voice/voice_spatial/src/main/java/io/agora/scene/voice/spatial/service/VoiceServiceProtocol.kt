@@ -189,18 +189,10 @@ interface VoiceServiceProtocol {
     fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 是否启用机器人
-     * @param enable true 启动机器人，false 关闭机器人
+     * 更新机器人配置
+     * @param info 机器人配置
      */
-    fun enableRobot(enable: Boolean, completion: (error: Int, enable: Boolean) -> Unit)
-
-    /**
-     * 更新机器人音量
-     * @param value 音量
-     */
-    fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-
+    fun updateRobotInfo(info: RobotSpatialAudioModel, completion: (error: Int, result: Boolean) -> Unit)
 
     fun subscribeRoomTimeUp(
         onRoomTimeUp: () -> Unit

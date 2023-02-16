@@ -36,7 +36,7 @@ data class VoiceMemberModel constructor(
     // 这里用的是user.id
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = -1,
-    @SerializedName("mic_request_status") var status: Int = MicRequestStatus.idle.value
+    @SerializedName("status") var status: Int = MicRequestStatus.idle.value
 ) : BaseRoomBean
 
 /**
@@ -73,8 +73,10 @@ data class VoiceRoomModel constructor(
 data class RobotSpatialAudioModel constructor(
     @SerializedName("use_robot") var useRobot: Boolean = false,
     @SerializedName("robot_volume") var robotVolume: Int = 50,
+    @SerializedName("red_robot_attenuation") var redRobotAttenuation: Float = 0.5f,
     @SerializedName("red_robot_absorb") var redRobotAbsorb: Boolean = false,
     @SerializedName("red_robot_blur") var redRobotBlur: Boolean = false,
+    @SerializedName("blue_robot_attenuation") var blueRobotAttenuation: Float = 0.5f,
     @SerializedName("blue_robot_absorb") var blueRobotAbsorb: Boolean = false,
     @SerializedName("blue_robot_blur") var blueRobotBlur: Boolean = false,
 ) : BaseRoomBean
