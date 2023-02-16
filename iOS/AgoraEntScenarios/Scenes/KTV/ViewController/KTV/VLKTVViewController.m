@@ -1302,8 +1302,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit updateChannelWithMediaOptions:option];
     }
     
-    [self.RTCkit enableLocalAudio:isOnMicSeat];
-    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
+//    [self.RTCkit enableLocalAudio:isOnMicSeat];
+//    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
