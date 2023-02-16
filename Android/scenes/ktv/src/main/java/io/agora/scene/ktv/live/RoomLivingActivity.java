@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -180,7 +179,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
                             binding.tvZC.setText("主唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else if ((item.getUserNo().equals(songModel.getUserNo()) || item.getUserNo().equals(songModel.getChorusNo()))
-                            && (roomLivingViewModel.chorusPlayingLiveData.getValue() == null)) {
+                                && (roomLivingViewModel.chorusPlayingLiveData.getValue() == null)) {
                             binding.tvZC.setText("合唱");
                             binding.tvZC.setVisibility(View.VISIBLE);
                         } else {
@@ -347,7 +346,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
                 getBinding().lrcControlView.onPauseStatus();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_LRC_RESET) {
-                getBinding().lrcControlView.getLrcView().reset();
+                getBinding().lrcControlView.getLyricsView().reset();
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_START) {
                 getBinding().lrcControlView.setEnabled(false);
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_CHANGING_END) {
@@ -355,7 +354,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             }
         });
         roomLivingViewModel.playerMusicOpenDurationLiveData.observe(this, duration -> {
-            getBinding().lrcControlView.getLrcView().setTotalDuration(duration);
+            getBinding().lrcControlView.getLyricsView().setDuration(duration);
         });
         roomLivingViewModel.playerMusicPlayCompleteLiveData.observe(this, score -> {
             getBinding().tvResultScore.setText(String.valueOf(score));
@@ -457,7 +456,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             timeUpExitDialog.setDialogBtnText("", getString(R.string.ktv_confirm));
             timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
-                public void onLeftButtonClick() {}
+                public void onLeftButtonClick() {
+                }
 
                 @Override
                 public void onRightButtonClick() {
@@ -539,6 +539,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showChorusSongDialogTag = false;
+
     private void showChorusSongDialog() {
         if (showChorusSongDialogTag) {
             return;
@@ -580,6 +581,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     }
 
     private boolean showChooseSongDialogTag = false;
+
     private void showChooseSongDialog() {
         if (showChooseSongDialogTag) {
             return;
@@ -726,7 +728,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             creatorExitDialog.setDialogBtnText("", getString(R.string.ktv_iknow));
             creatorExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
-                public void onLeftButtonClick() {}
+                public void onLeftButtonClick() {
+                }
 
                 @Override
                 public void onRightButtonClick() {
