@@ -4,7 +4,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AgoraEntScenarios-swift.h"
 #import "VLRoomSelSongModel.h"
+#import "KTVSkipView.h"
 @import AgoraLyricsScore;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,11 +42,16 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
+
+-(void)didSkipViewClick;
+
 @end
 
 @interface VLKTVMVView : UIView
 
-@property (nonatomic, strong) AgoraLrcScoreView *lrcView;
+@property (nonatomic, strong) KaraokeView *karaokeView;
+@property (nonatomic, strong) GradeView *gradeView;
+@property (nonatomic, strong) IncentiveView *incentiveView;
 
 - (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLKTVMVViewDelegate>)delegate;
 
@@ -95,6 +102,11 @@ typedef enum : NSUInteger {
 - (void)reset;
 ///滚动到指定位置
 - (void)scrollToTime:(NSTimeInterval)time;
+
+#pragma mark - 前奏尾奏相关
+-(void)setSkipType:(SkipType)type;
+
+-(void)showSkipView:(bool)flag;
 
 @end
 
