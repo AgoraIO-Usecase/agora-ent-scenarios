@@ -94,10 +94,10 @@
                 @"subTitleStr":@""
             },
             @{
-                @"bgImgStr":@"home_talk_bg",
+                @"bgImgStr":@"spatial_bg",
                 @"iconImgStr":@"home_talk_icon",
-                @"titleStr":AGLocalizedString(@"空间音频"),
-                @"subTitleStr":AGLocalizedString(@"")
+                @"titleStr":AGLocalizedString(@"语聊房"),
+                @"subTitleStr":AGLocalizedString(@"-空间音频模式")
             },
         ];
     }
