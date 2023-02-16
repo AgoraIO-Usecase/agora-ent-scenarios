@@ -160,18 +160,9 @@ extension SARoomViewController {
         roomInfo = info
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
-//        if roomInfo?.room?.member_list == nil {
-            roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-//        }
-//        roomInfo?.room?.member_list?.append(SAUserInfo.shared.user!)
-//        SAIMManager.shared?.setChatroomAttributes(attributes: ["member_list": roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
-//            if error != nil {
-//                self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
-//            }
-//        })
-        
+        roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
+
         AppContext.saTmpServiceImp().mics = mics
-//        AppContext.saTmpServiceImp().userList = roomInfo?.room?.member_list ?? []
         roomInfo?.room?.ranking_list = info.room?.ranking_list
         if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid }) {
             SAUserInfo.shared.user?.amount = first.amount
