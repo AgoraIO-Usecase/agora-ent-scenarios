@@ -358,6 +358,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     func updatePlayerVolume(value: Double) {
         redMediaPlayer?.adjustPlayoutVolume(Int32(value))
         blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
+        redMediaPlayer?.mute(true)
+        blueMediaPlayer?.mute(true)
     }
     
     func setMediaPlayerPositionInfo(playerId: Int,

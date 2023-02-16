@@ -72,7 +72,7 @@ import KakaJSON
     var airAbsorb: Bool = false
     var voiceBlur: Bool = false
     
-    
+    var pos: [NSNumber]?
     var forward: [NSNumber]?
     var right: [NSNumber]?
     var up: [NSNumber] = [0, 0, 1]

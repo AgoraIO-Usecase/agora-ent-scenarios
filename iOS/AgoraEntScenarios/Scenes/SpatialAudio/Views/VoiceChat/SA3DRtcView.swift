@@ -129,6 +129,9 @@ class SA3DRtcView: UIView {
         // 更新micinfos数组
         self.micInfos?[mic.mic_index] = mic
         
+        // 更新空间音频位置
+        updateSpatialPos()
+        
         let realIndex: Int = getRealIndex(with: mic.mic_index)
         micInfos?[mic.mic_index] = mic
         let indexPath = IndexPath(item: realIndex, section: 0)
@@ -165,7 +168,7 @@ class SA3DRtcView: UIView {
             updateAlienMic(4, flag: false)
         } else if type == .blue  {
             updateAlienMic(4, flag: true)
-            updateAlienMic(4, flag: false)
+            updateAlienMic(2, flag: false)
         } else if type == .blueAndRed {
             updateAlienMic(2, flag: true)
             updateAlienMic(4, flag: true)
@@ -286,31 +289,28 @@ extension SA3DRtcView {
         
         moveCenter = checkEdgeRange(point: moveCenter)
         let angle = getAngle(rtcUserView.center, preP: lastCenterPoint)
-        if pan.state == .changed {
-            rtcUserView.angle = angle
-            lastCenterPoint = rtcUserView.center
-            
-            rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
-            pan.setTranslation(.zero, in: self)
-        } else if pan.state == .ended {
-            rtcUserView.angle = angle
-            let forward = updateCenterUserPosition()
-            
-            if let user = micInfos?.first?.member {
-                let pos = viewCenterPostion(view: rtcUserView)
-                var info = SAPositionInfo()
-                info.uid = Int(user.uid ?? "0") ?? 0
-                info.forward = forward
-                info.x = pos.first?.doubleValue ?? 0
-                info.y = pos[1].doubleValue
-                info.angle = angle
-                
+        
+        rtcUserView.angle = angle
+        lastCenterPoint = rtcUserView.center
+        
+        rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
+        pan.setTranslation(.zero, in: self)
+        
+        let forward = updateCenterUserPosition()
+        
+        if let user = micInfos?.first?.member {
+            let pos = viewCenterPostion(view: rtcUserView)
+            var info = SAPositionInfo()
+            info.uid = Int(user.uid ?? "0") ?? 0
+            info.forward = forward
+            info.x = pos.first?.doubleValue ?? 0
+            info.y = pos[1].doubleValue
+            info.angle = angle
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.02) {
                 var streamInfo = SADataStreamInfo()
                 streamInfo.message = JSONObject.toJsonString(info)
-                
                 guard let streamData = JSONObject.toData(streamInfo) else { return }
-                let ret = rtcKit?.sendStreamMessage(with: streamData)
-                print("ret == \(ret)")
+                self.rtcKit?.sendStreamMessage(with: streamData)
             }
         }
     }
@@ -380,6 +380,35 @@ extension SA3DRtcView {
                    NSNumber(value: Double(viewConvertToPoint(rect: rect).y)),
                    NSNumber(0.0)]
         return pos
+    }
+    
+    private func updateSpatialPos() {
+        micInfos?.enumerated().forEach({ index, info in
+            if info.member == nil { return }
+            switch index {
+            case 6: //red robot
+                setMediaPlayerPosition(pos: info.pos ?? [],
+                                       forward: info.forward,
+                                       playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
+                
+            case 3: // blue robot
+                setMediaPlayerPosition(pos: info.pos ?? [],
+                                       forward: info.forward,
+                                       playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
+                
+            default:
+                if info.member?.uid == VLUserCenter.user.id {
+                    rtcKit?.updateSpetialPostion(position: info.pos ?? [],
+                                                 axisForward: info.forward ?? [],
+                                                 axisRight: info.right ?? [],
+                                                 axisUp: info.up)
+                } else {
+                    rtcKit?.updateRemoteSpetialPostion(uid: info.member?.uid,
+                                                       position: info.pos ?? [],
+                                                       forward: info.forward)
+                }
+            }
+        })
     }
     
     private func setMediaPlayerPosition(pos: [NSNumber], forward: [NSNumber]?, playerId: Int) {
@@ -514,80 +543,38 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
             if let mic_info = micInfos?[2] {
                 mic_info.forward = [1, -1, 0]
                 mic_info.right = [-1, -1, 0]
-                if mic_info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: pos,
-                                                 axisForward: mic_info.forward ?? [],
-                                                 axisRight: mic_info.right ?? [],
-                                                 axisUp: mic_info.up)
-                } else {
-                    rtcKit?.updateRemoteSpetialPostion(uid: mic_info.member?.uid,
-                                                       position: pos,
-                                                       forward: mic_info.forward)
-                }
+                mic_info.pos = pos
             }
         case 1:
             if let mic_info = micInfos?[1] {
                 mic_info.forward = [0, -1, 0]
                 mic_info.right = [-1, 0, 0]
-                if mic_info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: pos,
-                                                 axisForward: mic_info.forward ?? [],
-                                                 axisRight: mic_info.right ?? [],
-                                                 axisUp: mic_info.up)
-                } else {
-                    rtcKit?.updateRemoteSpetialPostion(uid: mic_info.member?.uid,
-                                                       position: pos,
-                                                       forward: mic_info.forward)
-                }
+                mic_info.pos = pos
             }
         case 2:
-            if let mic_info = micInfos?[6] {
+            if let mic_info = micInfos?[6] { // red robot
                 mic_info.forward = [-1, -1, 0]
                 mic_info.right = [-1, 1, 0]
-                
-                setMediaPlayerPosition(pos: pos,
-                                       forward: mic_info.forward,
-                                       playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
+                mic_info.pos = pos
             }
             
         case 4:
-            if let mic_info = micInfos?[3] {
+            if let mic_info = micInfos?[3] { // blue robot
                 mic_info.forward = [1, 1, 0]
                 mic_info.right = [1, -1, 0]
-                
-                setMediaPlayerPosition(pos: pos,
-                                       forward: mic_info.forward,
-                                       playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
+                mic_info.pos = pos
             }
         case 5:
             if let mic_info = micInfos?[4] {
                 mic_info.forward = [0, 1, 0]
                 mic_info.right = [1, 0, 0]
-                if mic_info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: pos,
-                                                 axisForward: mic_info.forward ?? [],
-                                                 axisRight: mic_info.right ?? [],
-                                                 axisUp: mic_info.up)
-                } else {
-                    rtcKit?.updateRemoteSpetialPostion(uid: mic_info.member?.uid,
-                                                       position: pos,
-                                                       forward: mic_info.forward)
-                }
+                mic_info.pos = pos
             }
         case 6:
             if let mic_info = micInfos?[5] {
                 mic_info.forward = [-1, 1, 0]
                 mic_info.right = [1, 1, 0]
-                if mic_info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: pos,
-                                                 axisForward: mic_info.forward ?? [],
-                                                 axisRight: mic_info.right ?? [],
-                                                 axisUp: mic_info.up)
-                } else {
-                    rtcKit?.updateRemoteSpetialPostion(uid: mic_info.member?.uid,
-                                                       position: pos,
-                                                       forward: mic_info.forward)
-                }
+                mic_info.pos = pos
             }
         default:
             break
