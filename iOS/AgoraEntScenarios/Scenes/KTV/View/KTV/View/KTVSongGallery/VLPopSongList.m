@@ -84,7 +84,8 @@
     }else{
         self.choosedCountLabel.hidden = YES;
     }
-    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
+    self.selsectSongView.selSongsArray = selSongsArray;
+    self.choosedSongView.selSongsArray = selSongsArray;
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
@@ -142,7 +143,6 @@
 - (VLSelectedSongList *)selsectSongView {
     if (!_selsectSongView) {
         _selsectSongView = [[VLSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
-        
     }
     return _selsectSongView;
 }

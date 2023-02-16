@@ -173,7 +173,7 @@
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
     VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
-    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 400);
+    _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 440);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];
     _settingView.delegate = delegate;

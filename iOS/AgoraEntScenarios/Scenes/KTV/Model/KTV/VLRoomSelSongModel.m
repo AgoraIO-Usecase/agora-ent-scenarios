@@ -15,6 +15,13 @@
     return NO;
 }
 
+- (BOOL)isSongCoSinger {
+    if (self.isChorus && [self.chorusNo isEqualToString:VLUserCenter.user.id]) {
+        return YES;
+    }
+    return NO;
+}
+
 
 - (BOOL)readyToPlay {
     return !self.isChorus || (self.isChorus && [self.chorusNo length] > 0);

@@ -277,7 +277,7 @@ KTVApiDelegate
         }
     }];
     
-    //callback if choose song list didchanged
+    //callback if choose song list did changed
     [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
@@ -301,7 +301,7 @@ KTVApiDelegate
     
     [[AppContext ktvServiceImp] subscribeNetworkStatusChangedWithBlock:^(KTVServiceNetworkStatus status) {
         if (status != KTVServiceNetworkStatusOpen) {
-            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
+//            [VLToast toast:[NSString stringWithFormat:@"network changed: %ld", status]];
             return;
         }
         [weakSelf _fetchServiceAllData];
@@ -443,7 +443,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
              data:(NSData * _Nonnull)data {    //接收到对方的RTC消息
     
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
-    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
+//    KTVLogInfo(@"receiveStreamMessageFromUid:%@,streamID:%d,uid:%d",dict,(int)streamId,(int)uid);
     if([dict[@"cmd"] isEqualToString:@"countdown"]) {  //倒计时
         int leftSecond = [dict[@"time"] intValue];
         [self.MVView setCoundDown:leftSecond];
@@ -508,6 +508,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine contentInspectResult:(AgoraContentInspectResult)result {
     KTVLogInfo(@"contentInspectResult: %ld", result);
+}
+
+- (void)rtcEngine:(AgoraRtcEngineKit *)engine localAudioStats:(AgoraRtcLocalAudioStats *)stats {
+    [self.ktvApi mainRtcEngine:engine localAudioStats:stats];
 }
 
 #pragma mark - action utils / business
@@ -770,13 +774,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 
 - (void)joinRTCChannel {
     self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    //setup private param
+//    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
+//    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
+    
     //use game streaming in solo mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
-    
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
-    [self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
-    [self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
@@ -828,10 +832,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.AgoraMcc enableMainQueueDispatch:YES];
     
     self.rtcMediaPlayer = [self.AgoraMcc createMusicPlayerWithDelegate:[AppContext shared]];
-    // 调节本地播放音量。0-100
-    [self.rtcMediaPlayer adjustPlayoutVolume:200];
-    // 调节远端用户听到的音量。0-400
-    [self.rtcMediaPlayer adjustPublishSignalVolume:200];
     
     self.ktvApi = [[KTVApi alloc] initWithRtcEngine:self.RTCkit channel:self.roomModel.roomNo musicCenter:self.AgoraMcc player:self.rtcMediaPlayer dataStreamId:ktvApiStreamId delegate:self];
     self.ktvApi.lrcView = self.MVView.lrcView;
@@ -1174,14 +1174,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         // 官方文档是100 ？ SDK 是 400？？？？
         // 调节本地播放音量 取值范围为 [0,100]
         // 0、无声。 100、（默认）媒体文件的原始播放音量
-        [self.rtcMediaPlayer adjustPlayoutVolume:value];
+        [self.ktvApi adjustPlayoutVolume:value];
         
         // 调节远端用户听到的音量 取值范围[0、400]
         // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-        [self.rtcMediaPlayer adjustPublishSignalVolume:value];
+        [self.ktvApi adjustPublishSignalVolume:value];
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
+    } else if (type == VLKTVValueDidChangedTypeRemoteValue) {
+        [self.ktvApi adjustChorusRemoteUserPlaybackVoulme:setting.remoteVolume];
     }
 }
 
@@ -1321,8 +1323,8 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit updateChannelWithMediaOptions:option];
     }
     
-    [self.RTCkit enableLocalAudio:isOnMicSeat];
-    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
+//    [self.RTCkit enableLocalAudio:isOnMicSeat];
+//    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
     VLRoomSeatModel* info = [self getCurrentUserSeatInfo];
     self.isNowMicMuted = info.isAudioMuted;
