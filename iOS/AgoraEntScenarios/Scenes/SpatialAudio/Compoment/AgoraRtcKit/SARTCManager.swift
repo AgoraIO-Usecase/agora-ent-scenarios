@@ -58,6 +58,7 @@ public struct SARtcType {
         case social = 7
         case ktv = 8
         case anchor = 9
+        case Spatical = 10
     }
 
     /**
@@ -183,6 +184,9 @@ public let kMPK_RTC_UID_SA: UInt = 1
     @objc public weak var playerDelegate: SAMusicPlayerDelegate?
     
     public var localSpatial: AgoraLocalSpatialAudioKit?
+    
+    public var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
+    public var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
 
     // 单例
     @objc public class func getSharedInstance() -> SARTCManager {
@@ -234,22 +238,34 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 count = SAConfig.SoundSelectAnchor.count
                 musicIndex = baseMusicCount < count ? baseMusicCount : count - 1
                 musicPath = SAConfig.SoundSelectAnchor[musicIndex]
+            case .Spatical:
+                count = SAConfig.spatialAlienMic.count
+                musicIndex = baseMusicCount < count ? baseMusicCount : count - 1
+                musicPath = "\(SAConfig.CreateSpatialRoom)\(SAConfig.spatialAlienMic[musicIndex])"
             case .sound:
                 return
             }
             if baseMusicCount >= count {
-                rtcKit.stopAudioMixing()
+               // rtcKit.stopAudioMixing()
+                redMediaPlayer?.stop()
+                blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended, musicType: musicType)
             } else {
+                musicPath = musicPath.replacingOccurrences(of: "EN", with: "Lau".localized())
+                print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
                     delegate?.reportAlien?(with: .blue, musicType: musicType)
+                    blueMediaPlayer?.open(musicPath, startPos: 0)
                 } else if musicPath.contains("-R-") {
                     delegate?.reportAlien?(with: .red, musicType: musicType)
+                    redMediaPlayer?.open(musicPath, startPos: 0)
                 } else if musicPath.contains("-B&R-") {
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
+                    blueMediaPlayer?.open(musicPath, startPos: 0)
+                    redMediaPlayer?.open(musicPath, startPos: 0)
                 }
-                musicPath = musicPath.replacingOccurrences(of: "EN", with: "Lau".localized())
-                rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
+                
+               // rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
     }
@@ -319,6 +335,15 @@ public let kMPK_RTC_UID_SA: UInt = 1
         rtcKit.createDataStream(&streamId, config: config)
     }
     
+    public func setupSpatialAudio() {
+        redMediaPlayer = initMediaPlayer()
+        redMediaPlayer?.adjustPlayoutVolume(Int32(0.45 * 400))
+        setPlayerAttenuation(attenuation: 0.2, playerId: redMediaPlayer?.getMediaPlayerId() ?? 0)
+        blueMediaPlayer = initMediaPlayer()
+        blueMediaPlayer?.adjustPlayoutVolume(Int32(0.45 * 400))
+        setPlayerAttenuation(attenuation: 0.2, playerId: blueMediaPlayer?.getMediaPlayerId() ?? 0)
+    }
+    
     func initMediaPlayer() -> AgoraRtcMediaPlayerProtocol? {
         let mediaPlayer = rtcKit.createMediaPlayer(with: self)
         mediaPlayer?.setLoopCount(10000)
@@ -330,6 +355,11 @@ public let kMPK_RTC_UID_SA: UInt = 1
         localSpatial?.setPlayerAttenuation(attenuation,
                                            playerId: UInt(playerId),
                                            forceSet: false)
+    }
+    
+    func updatePlayerVolume(value: Double) {
+        redMediaPlayer?.adjustPlayoutVolume(Int32(value))
+        blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
     }
     
     func setMediaPlayerPositionInfo(playerId: Int,
@@ -428,6 +458,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
             baseMusicCount = SAConfig.SoundSelectGame.count
         } else if musicType == .anchor {
             baseMusicCount = SAConfig.SoundSelectAnchor.count
+        } else if musicType == .Spatical {
+            baseMusicCount = SAConfig.spatialAlienMic.count
         }
     }
 
@@ -858,6 +890,8 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
                 count = SAConfig.SoundSelectGame.count
             case .anchor:
                 count = SAConfig.SoundSelectAnchor.count
+            case .Spatical:
+                count = SAConfig.spatialAlienMic.count
             }
             if baseMusicCount < count {
                 baseMusicCount += 1
@@ -876,9 +910,15 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
 
     // mpk didChangedTo
     public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        guard let _ = delegate else {
-            return
+        if state == .openCompleted {
+            playerKit.play()
+        } else if (state == .playBackAllLoopsCompleted || state == .playBackCompleted)  {
+            playerKit.stop()
+            let count = SAConfig.spatialAlienMic.count
+            if baseMusicCount < count {
+                baseMusicCount += 1
+            }
         }
-        playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+
     }
 }
