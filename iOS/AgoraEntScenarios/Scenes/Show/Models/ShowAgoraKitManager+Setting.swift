@@ -189,7 +189,8 @@ extension ShowAgoraKitManager {
             videoEncoderConfig.bitrate = Int(bitRate)
             captureConfig.dimensions = captureSize.sizeValue
             captureConfig.frameRate = Int32(fps.rawValue)
-            agoraKit.setCameraCapturerConfiguration(captureConfig)
+//            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            updateCameraCaptureConfiguration()
             agoraKit.setVideoEncoderConfiguration(videoEncoderConfig)
             setH265On(h265On)
         }
@@ -223,7 +224,7 @@ extension ShowAgoraKitManager {
         case .show_medium:
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 1800, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 1800, h265On: true, captureSize: ._720P)
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
@@ -232,7 +233,7 @@ extension ShowAgoraKitManager {
             
             switch mode {
             case .single:
-                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 2099, h265On: true, captureSize: ._720P)
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 2099, h265On: true, captureSize: ._720P)
             case .pk:
                 _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 800, h265On: true, captureSize: ._720P)
             }
@@ -334,7 +335,8 @@ extension ShowAgoraKitManager {
             }
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            agoraKit.setCameraCapturerConfiguration(captureConfig)
+//            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            updateCameraCaptureConfiguration()
             
         case .H265:
             setH265On(isOn)
@@ -352,7 +354,7 @@ extension ShowAgoraKitManager {
         case .captureFrameRate:
             let index = indexValue % fpsItems.count
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
-            agoraKit.setCameraCapturerConfiguration(captureConfig)
+            updateCameraCaptureConfiguration()
         case .focusFace:
             agoraKit.setCameraAutoFocusFaceModeEnabled(isOn)
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")

@@ -115,6 +115,22 @@ struct ShowStatisticsInfo {
         }
     }
     
+    mutating func cleanRemoteDescription() -> (String, String){
+        let sendTitle = "接受\n".show_localized
+        let videoSize = "接收分辨率"+": 0 x 0"
+        let videoSend = "码率".show_localized+": \(0) kbps"
+        let downlink = "下行网络".show_localized+": \(downlink) KB/s"
+
+        let fps = "接收帧率".show_localized+": \(0) fps"
+        let vSendLoss = "下行丢包率".show_localized+": \(0) %"
+        let lastmile = "延迟".show_localized+": \(0) ms"
+        
+        let leftInfo = [sendTitle, videoSize,   videoSend,  downlink].joined(separator: "\n\n")
+        let rightInfo = [" \n",     fps,        vSendLoss,  lastmile].joined(separator: "\n\n")
+
+        return (leftInfo, rightInfo)
+    }
+    
     func description(audioOnly: Bool) -> (String, String) {
         switch type {
         case .local(let info):  return localDescription(info: info, audioOnly: audioOnly)
