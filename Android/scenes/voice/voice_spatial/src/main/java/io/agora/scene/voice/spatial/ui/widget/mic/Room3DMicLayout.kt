@@ -44,8 +44,8 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
 
     private val constraintSet = ConstraintSet()
 
-    private var lastX = 0
-    private var lastY = 0
+    private var lastX = -1
+    private var lastY = -1
 
     // 上一次移动坐标(中心圆点)
     private val preMovePoint = Point(0, 0)
@@ -261,13 +261,15 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         val x = event.x.toInt()
         val y = event.y.toInt()
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                lastX = x
-                lastY = y
-                "onTouchEvent ACTION_DOWN x:${x} y:${y}".logD(TAG)
-                return true
-            }
             MotionEvent.ACTION_MOVE -> {
+                if (!getRect(binding.micV0Center).contains(event.x, event.y)) {
+                    return false
+                }
+                if (lastX < 0 || lastY < 0) {
+                    lastX = x
+                    lastY = y
+                    return false
+                }
                 val dx = (x - lastX)
                 val dy = (y - lastY)
                 lastX = x
@@ -314,8 +316,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                 return true
             }
             MotionEvent.ACTION_UP -> {
+                lastX = -1
+                lastY = -1
             }
-            MotionEvent.ACTION_CANCEL -> {}
+            MotionEvent.ACTION_CANCEL -> {
+                lastX = -1
+                lastY = -1
+            }
         }
         return super.onTouchEvent(event)
     }
