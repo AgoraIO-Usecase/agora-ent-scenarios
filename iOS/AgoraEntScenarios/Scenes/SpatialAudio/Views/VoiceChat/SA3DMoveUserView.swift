@@ -113,6 +113,11 @@ class SA3DMoveUserView: UIView {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_middle_arrow"))
         return imageView
     }()
+    private lazy var icon3dImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "SA_3D_icon"))
+        return imageView
+    }()
+    
     private var lastAngle: Double = 0
 
     private var lineView: UIView = .init()
@@ -179,6 +184,8 @@ class SA3DMoveUserView: UIView {
         iconView.layer.cornerRadius = 37~
         iconView.layer.masksToBounds = true
         addSubview(iconView)
+        
+        addSubview(icon3dImageView)
 
         addSubview(micView)
 
@@ -218,6 +225,11 @@ class SA3DMoveUserView: UIView {
             make.centerX.equalTo(self)
             make.top.equalTo(self).offset(44~)
             make.width.height.equalTo(74~)
+        }
+        
+        icon3dImageView.snp.makeConstraints { make in
+            make.top.equalTo(iconView.snp.top)
+            make.centerX.equalTo(iconView.snp.centerX)
         }
 
         micView.snp.makeConstraints { make in
