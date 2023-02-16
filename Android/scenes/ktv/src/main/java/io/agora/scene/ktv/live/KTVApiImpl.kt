@@ -718,13 +718,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 mPlayer.play()
-            }
-            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
 
                 this.localPlayerPosition = 0
                 startSyncPitch()
                 mPlayer.selectAudioTrack(1)
+            }
+            Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
