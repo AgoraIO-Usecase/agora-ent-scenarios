@@ -98,7 +98,8 @@ extension SpatialAudioSyncSerciceImp {
 
     func findMicIndex() -> Int {
         var mic_index = 0
-        for i in 0...7 {
+        for i in 1...8 {
+            if i == 8 { return 0 }
             let mic = self.mics[safe: i]
             if mic?.member == nil {
                 mic_index = mic?.mic_index ?? 1
