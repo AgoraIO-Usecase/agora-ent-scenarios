@@ -1,6 +1,7 @@
 package io.agora.scene.voice.spatial.rtckit
 
 import android.content.Context
+import android.util.Log
 import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -52,9 +53,7 @@ class AgoraRtcEngineController {
     private val playerVoicePositionInfo = hashMapOf<Int, RemoteVoicePositionInfo>()
     private var localVoicePositionInfoRun : Runnable? = null
 
-    private val dataStreamId: Int by lazy {
-        rtcEngine?.createDataStream(DataStreamConfig())?: 0
-    }
+    private var dataStreamId: Int = 0
 
     fun setMicVolumeListener(micVolumeListener: RtcMicVolumeListener) {
         this.micVolumeListener = micVolumeListener
@@ -104,6 +103,7 @@ class AgoraRtcEngineController {
                     "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid".logD(TAG)
                     // 默认开启降噪
                     deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
+                    dataStreamId = rtcEngine?.createDataStream(DataStreamConfig())?: 0
                     joinCallback?.onSuccess(true)
                 }
 
@@ -198,10 +198,11 @@ class AgoraRtcEngineController {
     public fun sendSelfPosition(position: SeatPositionInfo) {
         GsonTools.beanToString(position)?.also {
             val steamInfo = DataStreamInfo(101, it)
-            rtcEngine?.sendStreamMessage(
+            val ret = rtcEngine?.sendStreamMessage(
                 dataStreamId,
                 GsonTools.beanToString(steamInfo)?.toByteArray()
             )
+            Log.d("pigpig", "$ret")
         }
     }
     /**
