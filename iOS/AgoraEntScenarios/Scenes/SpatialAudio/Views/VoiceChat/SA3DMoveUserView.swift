@@ -19,44 +19,42 @@ class SA3DMoveUserView: UIView {
 
             switch cellType {
             case .AgoraChatRoomBaseUserCellTypeAdd:
-                iconView.isHidden = true
+                avatarImageView.isHidden = true
                 micView.isHidden = true
                 bgIconView.image = UIImage("icons／solid／add")
             case .AgoraChatRoomBaseUserCellTypeMute:
-                iconView.isHidden = false
+                avatarImageView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.forbidden)
             case .AgoraChatRoomBaseUserCellTypeForbidden:
-                iconView.isHidden = false
+                avatarImageView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.forbidden)
             case .AgoraChatRoomBaseUserCellTypeLock:
-                iconView.isHidden = true
+                avatarImageView.isHidden = true
                 micView.isHidden = true
                 bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeNormalUser:
-                iconView.isHidden = false
+                avatarImageView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 nameBtn.setImage(UIImage(named: ""), for: .normal)
             case .AgoraChatRoomBaseUserCellTypeMuteAndLock:
-                iconView.isHidden = true
+                avatarImageView.isHidden = true
                 micView.isHidden = false
                 micView.setState(.forbidden)
                 bgIconView.image = UIImage("icons／solid／lock")
             case .AgoraChatRoomBaseUserCellTypeAlienNonActive:
-                iconView.isHidden = false
+                avatarImageView.isHidden = false
                 micView.isHidden = false
                 micView.setState(.on)
                 micView.isHidden = true
                 nameBtn.setImage(UIImage("guanfang"), for: .normal)
-                coverView.isHidden = false
                 activeButton.isHidden = false
             case .AgoraChatRoomBaseUserCellTypeAlienActive:
-                iconView.isHidden = false
+                avatarImageView.isHidden = false
                 micView.isHidden = false
                 nameBtn.setImage(UIImage("guanfang"), for: .normal)
-                coverView.isHidden = true
                 activeButton.isHidden = true
             }
         }
@@ -73,9 +71,9 @@ class SA3DMoveUserView: UIView {
     public var iconImgUrl: String = "" {
         didSet {
             if iconImgUrl.hasPrefix("http") {
-                iconView.sd_setImage(with: URL(string: iconImgUrl))
+                avatarImageView.sd_setImage(with: URL(string: iconImgUrl))
             } else {
-                iconView.image = UIImage.sceneImage(name: iconImgUrl)
+                avatarImageView.image = UIImage.sceneImage(name: iconImgUrl)
             }
         }
     }
@@ -99,18 +97,22 @@ class SA3DMoveUserView: UIView {
     }
 
     private var bgView: UIView = .init()
-    private var iconView: UIImageView = .init()
+    private var avatarImageView: UIImageView = .init()
     private var bgIconView: UIImageView = .init()
     private var micView: SAMicVolView = .init()
-    private var volImgView: UIImageView = .init()
-    private var volBgView: UIView = .init()
     private var nameBtn: UIButton = .init()
-    private var coverView: UIView = .init()
     private var activeButton: UIButton = .init()
-    private var svgaPlayer: SVGAPlayer = .init()
-    private var parser: SVGAParser = .init()
-    private lazy var arrowImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage.sceneImage(name: "sa_middle_arrow"))
+    private lazy var animateContainerView: UIView = {
+        let view = UIView()
+        return view
+    }()
+    private var animateImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage.sceneImage(name: "3d_arrow_animation/voice_go_00000"))
+        imageView.animationImages = (0...45).map({ UIImage.sceneImage(name: String(format: "3d_arrow_animation/voice_go_%05d", $0)) ?? UIImage() })
+        imageView.animationDuration = 2.0
+        imageView.animationRepeatCount = .max
+        imageView.startAnimating()
+        imageView.transform = CGAffineTransform(rotationAngle: .pi)
         return imageView
     }()
     private lazy var icon3dImageView: UIImageView = {
@@ -120,15 +122,13 @@ class SA3DMoveUserView: UIView {
     
     private var lastAngle: Double = 0
 
-    private var lineView: UIView = .init()
-
     public var tapClickBlock:(() -> Void)?
     
     var angle: Double = 270 {
         didSet {
             let value = (angle - 90) / 180.0 * Double.pi
             UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear) {
-                self.arrowImageView.transform = self.arrowImageView.transform.rotated(by: value - self.lastAngle)
+                self.animateContainerView.transform = self.animateContainerView.transform.rotated(by: value - self.lastAngle)
             }
             lastAngle = value
         }
@@ -146,44 +146,27 @@ class SA3DMoveUserView: UIView {
     }
     
     fileprivate func layoutUI() {
-        lineView.backgroundColor = .clear
-        lineView.layer.bounds = CGRect(x: 0, y: 0, width: 30~, height: 82~)
-        lineView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
-        addSubview(lineView)
-
-        addSubview(arrowImageView)
-        arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(animateContainerView)
+        animateContainerView.addSubview(animateImageView)
         
         bgView.layer.cornerRadius = 40~
         bgView.layer.masksToBounds = true
         bgView.backgroundColor = UIColor(red: 104 / 255.0, green: 128 / 255.0, blue: 1, alpha: 1)
         addSubview(bgView)
-        
-        arrowImageView.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
-        arrowImageView.centerYAnchor.constraint(equalTo: bgView.centerYAnchor, constant: 0).isActive = true
     
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapClick))
         bgView.addGestureRecognizer(tap)
         bgView.isUserInteractionEnabled = true
-
-        lineView.addSubview(svgaPlayer)
-        svgaPlayer.loops = 0
-        svgaPlayer.clearsAfterStop = true
-
-        parser.parse(withNamed: "一个箭头", in: nil) { [weak self] videoItem in
-            self?.svgaPlayer.videoItem = videoItem
-            self?.svgaPlayer.startAnimation()
-        }
 
         bgIconView.image = UIImage.sceneImage(name: "icons／solid／add")
         bgIconView.layer.cornerRadius = 15~
         bgIconView.layer.masksToBounds = true
         addSubview(bgIconView)
 
-        iconView.image = UIImage(named: "")
-        iconView.layer.cornerRadius = 37~
-        iconView.layer.masksToBounds = true
-        addSubview(iconView)
+        avatarImageView.image = UIImage(named: "")
+        avatarImageView.layer.cornerRadius = 37~
+        avatarImageView.layer.masksToBounds = true
+        addSubview(avatarImageView)
         
         addSubview(icon3dImageView)
 
@@ -194,53 +177,49 @@ class SA3DMoveUserView: UIView {
         nameBtn.setTitle("", for: .normal)
         nameBtn.isUserInteractionEnabled = false
         addSubview(nameBtn)
-
-        lineView.snp.makeConstraints { make in
-            make.centerX.equalTo(self)
-            make.height.equalTo(82~)
-            make.width.equalTo(30~)
-            make.top.equalTo(self).offset(40~)
-        }
-
-        svgaPlayer.snp.makeConstraints { make in
-            make.left.right.equalTo(lineView)
-            make.height.equalTo(30~)
-            make.width.equalTo(30~)
-            make.top.equalTo(8)
-        }
-
+        
         bgView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.top.equalTo(self).offset(40~)
             make.width.height.equalTo(82~)
         }
-
+        
+        animateContainerView.snp.makeConstraints { make in
+            make.edges.equalTo(bgView)
+        }
+        
+        animateImageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(animateContainerView.snp.bottom)
+            make.width.height.equalTo(26)
+        }
+        
         bgIconView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.centerY.equalTo(self.bgView)
             make.width.height.equalTo(30~)
         }
 
-        iconView.snp.makeConstraints { make in
+        avatarImageView.snp.makeConstraints { make in
             make.centerX.equalTo(self)
             make.top.equalTo(self).offset(44~)
             make.width.height.equalTo(74~)
         }
         
         icon3dImageView.snp.makeConstraints { make in
-            make.top.equalTo(iconView.snp.top)
-            make.centerX.equalTo(iconView.snp.centerX)
+            make.top.equalTo(avatarImageView.snp.top)
+            make.centerX.equalTo(avatarImageView.snp.centerX)
         }
 
         micView.snp.makeConstraints { make in
-            make.right.equalTo(self.iconView).offset(5~)
+            make.right.equalTo(self.avatarImageView).offset(5~)
             make.width.height.equalTo(18~)
-            make.bottom.equalTo(self.iconView.snp.bottom).offset(-5~)
+            make.bottom.equalTo(self.avatarImageView.snp.bottom).offset(-5~)
         }
 
         nameBtn.snp.makeConstraints { make in
             make.centerX.equalTo(self)
-            make.top.equalTo(self.iconView.snp.bottom).offset(10~)
+            make.top.equalTo(self.avatarImageView.snp.bottom).offset(10~)
             make.height.equalTo(20~)
         }
     }
