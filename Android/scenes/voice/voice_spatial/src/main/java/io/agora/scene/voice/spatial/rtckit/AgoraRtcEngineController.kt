@@ -49,6 +49,9 @@ class AgoraRtcEngineController {
 
     private var spatial: ILocalSpatialAudioEngine? = null
 
+    private val playerVoicePositionInfo = hashMapOf<Int, RemoteVoicePositionInfo>()
+    private var localVoicePositionInfoRun : Runnable? = null
+
     private val dataStreamId: Int by lazy {
         rtcEngine?.createDataStream(DataStreamConfig())?: 0
     }
@@ -180,11 +183,14 @@ class AgoraRtcEngineController {
      */
     public fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
         "update self position: p: ${pos.contentToString()} f: ${forward.contentToString()} r: ${right.contentToString()}".logD("spatial_voice")
-        spatial?.updateSelfPosition(
-            pos,
-            forward,
-            right,
-            floatArrayOf(1.0f, 0.0f, -0.0f))
+        localVoicePositionInfoRun = Runnable {
+            spatial?.updateSelfPosition(
+                pos,
+                forward,
+                right,
+                floatArrayOf(0.0f, 0.0f, 1.0f))
+        }
+        localVoicePositionInfoRun?.run()
     }
     /**
      * 发送本地位置到远端
@@ -234,19 +240,13 @@ class AgoraRtcEngineController {
                 val position = RemoteVoicePositionInfo()
                 position.position = pos
                 position.forward = forward
-                botBluePlayer?.mediaPlayerId?.let {
-                    spatial?.updatePlayerPositionInfo(it, position)
-                    "bot blue ${pos.contentToString()}".logD("spatial_voice")
-                }
+                playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId] = position
             }
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
                 position.position = pos
                 position.forward = forward
-                botRedPlayer?.mediaPlayerId?.let {
-                    spatial?.updatePlayerPositionInfo(it, position)
-                    "bot red ${pos.contentToString()}".logD("spatial_voice")
-                }
+                playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId] = position
             }
         }
     }
@@ -459,7 +459,7 @@ class AgoraRtcEngineController {
     // 设置衰减系数
     fun adjustBlueAttenuation(progress: Int) {
         botBluePlayer?.mediaPlayerId?.let {
-            val value: Double = (progress / 100).toDouble()
+            val value: Double = (progress * 1.0f / 100).toDouble()
             spatial?.setPlayerAttenuation(it, value, false);
         }
     }
@@ -467,7 +467,7 @@ class AgoraRtcEngineController {
     // 设置衰减系数
     fun adjustRedAttenuation(progress: Int) {
         botRedPlayer?.mediaPlayerId?.let {
-            val value: Double = (progress / 100).toDouble()
+            val value: Double = (progress * 1.0f / 100).toDouble()
             spatial?.setPlayerAttenuation(it, value, false);
         }
     }
@@ -522,6 +522,8 @@ class AgoraRtcEngineController {
             RtcEngineEx.destroy()
             rtcEngine = null
         }
+        localVoicePositionInfoRun = null
+        playerVoicePositionInfo.clear()
     }
 
     private var soundSpeakerType = ConfigConstants.BotSpeaker.BotBlue
@@ -538,14 +540,44 @@ class AgoraRtcEngineController {
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     when (soundSpeakerType) {
-                        ConfigConstants.BotSpeaker.BotBlue -> botBluePlayer?.play()
-                        ConfigConstants.BotSpeaker.BotRed -> botRedPlayer?.play()
+                        ConfigConstants.BotSpeaker.BotBlue -> {
+
+                            botBluePlayer?.play()
+                            botBluePlayer?.mute(true)
+                            playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
+                        }
+                        ConfigConstants.BotSpeaker.BotRed -> {
+                            botRedPlayer?.play()
+                            botRedPlayer?.mute(true)
+                            playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(botRedPlayer!!.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
+                        }
                         ConfigConstants.BotSpeaker.BotBoth -> {
                             botBluePlayer?.play()
                             botRedPlayer?.play()
+                            botBluePlayer?.mute(true)
+                            botRedPlayer?.mute(true)
+                            playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
+                            playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(botRedPlayer!!.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
                         }
                         else -> {
                             mediaPlayer?.play()
+                            mediaPlayer?.mute(true)
+                            playerVoicePositionInfo[mediaPlayer!!.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(mediaPlayer!!.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
                         }
                     }
                 }
