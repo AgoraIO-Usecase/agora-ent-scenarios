@@ -223,3 +223,4 @@
 "AGC_desc" = "开启后会自动调整您唱歌的音量，以完美匹配伴奏音量，推荐您唱歌的时候开启";
 "Personal audio Settings" = "个人音效设置";
 "Best Agora Sound" = "最佳音效";
+"The current microphone has been muted" = "当前麦位已被静音";

@@ -227,6 +227,7 @@ extension VoiceRoomViewController {
         }
         guard let mic = ChatRoomServiceImp.getSharedInstance().mics[safe: idx] else { return }
         if mic.status == 2 {
+            view.makeToast("The current microphone has been muted".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
         chatBar.micState = !chatBar.micState
