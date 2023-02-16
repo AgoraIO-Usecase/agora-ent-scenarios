@@ -757,15 +757,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
     //use game streaming in solo mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
-    
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    //为了 尽量不超时 设置了1000ms
-    [self.RTCkit setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
-    [self.RTCkit setParameters:@"{\"che.audio.agc.enable\": true}"];
-    [self.RTCkit setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
-    [self.RTCkit setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
-    //[self.RTCkit setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
-    //[self.RTCkit setParameters:@"{\"che.audio.custom_payload_type\":78}"];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
