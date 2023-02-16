@@ -700,7 +700,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             completion(SAErrorType.unknown("acceptMicSeatApply", "apply not found").error(), nil)
             return
         }
-        if apply.index ?? 0 < 1 {
+        if apply.index ?? 0 < 0 {
             mic_index = self.findMicIndex()
         } else {
             mic_index = apply.index ?? 1
@@ -729,9 +729,9 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //            self.micApplys.removeAll {
 //                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
 //            }
-            let user = self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? "" })
-            user?.mic_index = mic_index
-            _updateUserInfo(roomId: self.roomId!, user: mic.member!) { _ in
+            guard let user = self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? "" }) else { return }
+            user.mic_index = mic_index
+            _updateUserInfo(roomId: self.roomId!, user: user) { _ in
                 
             }
             let currentMic = self.mics[safe: mic_index]
