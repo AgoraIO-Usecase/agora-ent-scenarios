@@ -107,9 +107,12 @@ AgoraMusicContentCenterEventDelegate
         }
     }
     
-    [self calcSelectedStatus];
-    
-    [self.tableView reloadData];
+
+//    [self calcSelectedStatus];
+//
+//    [self.tableView reloadData];
+
+    [self updateData];
 }
 
 
@@ -219,6 +222,24 @@ AgoraMusicContentCenterEventDelegate
             model.ifChoosed = YES;
         }
     }
+    [self.tableView reloadData];
+}
+
+//更新别人点的歌曲状态
+- (void)setSelSongArrayWith:(NSArray *)array {
+    self.selSongsArray = array;
+    [self updateData];
+}
+
+-(void)updateData  {
+    for (VLSongItmModel *itemModel in self.songsMuArray) {
+        for (VLRoomSelSongModel *selModel in self.selSongsArray) {
+            if ([itemModel.songNo isEqualToString:selModel.songNo]) {
+                itemModel.ifChoosed = YES;
+            }
+        }
+    }
+    
     [self.tableView reloadData];
 }
 
