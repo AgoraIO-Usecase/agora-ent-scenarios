@@ -441,7 +441,7 @@ extension SARoomViewController {
                 guard let robotInfo = self.roomInfo?.robotInfo else { return }
                 robotInfo.robot_volume = UInt(Vol)
                 self.roomInfo?.robotInfo = robotInfo
-                self.sRtcView.updatePlayerVolume(value: Double(Vol))
+                self.rtckit.updatePlayerVolume(value: Double(Vol))
             }
         }
     }
@@ -563,6 +563,7 @@ extension SARoomViewController: SAManagerDelegate {
     }
 
     func reportAlien(with type: SARtcType.ALIEN_TYPE, musicType: SARtcType.VMMUSIC_TYPE) {
+        print("musicPath:\(type.rawValue)")
         sRtcView.updateAlienMic(with: type)
     }
 

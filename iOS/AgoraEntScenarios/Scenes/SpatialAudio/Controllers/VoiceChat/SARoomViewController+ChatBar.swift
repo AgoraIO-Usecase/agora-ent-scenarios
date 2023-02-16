@@ -37,7 +37,7 @@ extension SARoomViewController {
             self.activeAlien(isOn)
         }
         actionView.didSliderValueChangeClosure = { [weak self] _, value in
-            self?.sRtcView.updatePlayerVolume(value: Double(value * 100))
+            self?.rtckit.updatePlayerVolume(value: Double(value * 100))
             self?.updateVolume(Int(value * 100.0))
         }
         actionView.show()
