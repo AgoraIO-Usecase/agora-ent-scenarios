@@ -788,29 +788,32 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
 //        realTimeView.statsInfo?.updateChannelStats(stats)
-        realTimeView.localStatsInfo?.updateChannelStats(stats)
-        realTimeView.remoteStatsInfo?.updateChannelStats(stats)
+        realTimeView.sendStatsInfo?.updateChannelStats(stats)
+        realTimeView.receiveStatsInfo?.updateChannelStats(stats)
+        resetRealTimeIfNeeded()
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        realTimeView.statsInfo?.updateLocalAudioStats(stats)
-        realTimeView.localStatsInfo?.updateLocalAudioStats(stats)
-        realTimeView.remoteStatsInfo?.updateLocalAudioStats(stats)
-
+        realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
+        realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
 //        realTimeView.statsInfo?.updateLocalVideoStats(stats)
-        realTimeView.localStatsInfo?.updateLocalVideoStats(stats)
-        realTimeView.remoteStatsInfo?.updateLocalVideoStats(stats)
+        realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
+        realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
+        resetRealTimeIfNeeded()
         showLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
 
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        realTimeView.statsInfo?.updateVideoStats(stats)
-        realTimeView.localStatsInfo?.updateVideoStats(stats)
-        realTimeView.remoteStatsInfo?.updateVideoStats(stats)
+        realTimeView.sendStatsInfo?.updateVideoStats(stats)
+        realTimeView.receiveStatsInfo?.updateVideoStats(stats)
+        resetRealTimeIfNeeded()
 
         showLogger.info("room.ownderid = \(String(describing: room?.ownerId?.debugDescription)) width = \(stats.width), height = \(stats.height)")
         if let audiencePresetType = audiencePresetType {
@@ -830,22 +833,23 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        realTimeView.statsInfo?.updateAudioStats(stats)
-        realTimeView.localStatsInfo?.updateAudioStats(stats)
-        realTimeView.remoteStatsInfo?.updateAudioStats(stats)
-
+        realTimeView.sendStatsInfo?.updateAudioStats(stats)
+        realTimeView.receiveStatsInfo?.updateAudioStats(stats)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateUplinkNetworkInfo(networkInfo)
-        realTimeView.localStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-        realTimeView.remoteStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+        realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+        realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
-        realTimeView.localStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-        realTimeView.remoteStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-
+        realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
+        realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
@@ -971,6 +975,15 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         present(settingMenuVC, animated: true)
     }
     
+}
+
+extension ShowLiveViewController {
+    
+    private func resetRealTimeIfNeeded() {
+        if role == .broadcaster && interactionStatus != .pking {
+            realTimeView.cleanRemoteDescription()
+        }
+    }
 }
 
 

@@ -196,7 +196,7 @@ class ShowAgoraKitManager: NSObject {
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
             }else{
-                agoraKit.setCameraCapturerConfiguration(captureConfig)
+//                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
             }
         
@@ -358,11 +358,17 @@ class ShowAgoraKitManager: NSObject {
     /// 设置采集分辨率
     /// - Parameter size: 分辨率
     func setCaptureVideoDimensions(_ size: CGSize){
-        agoraKit.disableVideo()
         captureConfig.dimensions = CGSize(width: size.width, height: size.height)
+        updateCameraCaptureConfiguration()
+    }
+    
+    /// 更新采集参数
+    /// - Returns:
+    func updateCameraCaptureConfiguration() {
+        agoraKit.disableVideo()
         let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
         agoraKit.enableVideo()
-        showLogger.info("setCaptureVideoDimensions width = \(size.width), height = \(size.height), ret = \(ret)")
+        showLogger.info("setCaptureVideoDimensions = \(captureConfig.dimensions), framerate = \(captureConfig.frameRate)  ret = \(ret)")
     }
     
     /// 设置编码分辨率
@@ -512,7 +518,9 @@ class ShowAgoraKitManager: NSObject {
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
     func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
+        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     

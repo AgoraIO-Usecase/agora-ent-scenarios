@@ -38,23 +38,32 @@ class ShowRealTimeDataView: UIView {
 //        }
 //    }
     
-    var remoteStatsInfo: ShowStatisticsInfo? {
+    var receiveStatsInfo: ShowStatisticsInfo? {
         didSet{
             updateStatistisInfo()
         }
     }
     
-    var localStatsInfo: ShowStatisticsInfo? {
+    var sendStatsInfo: ShowStatisticsInfo? {
         didSet{
             updateStatistisInfo()
         }
+    }
+    
+    func cleanRemoteDescription(){
+        let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        let remoteLeftStr = receiveStatsInfo?.cleanRemoteDescription().0 ?? ""
+        let remoteRightStr = receiveStatsInfo?.cleanRemoteDescription().1 ?? ""
+        leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
+        rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
     }
     
     private func updateStatistisInfo(){
-        let localLeftStr = localStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let localRightStr = localStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
-        let remoteLeftStr = remoteStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
-        let remoteRightStr = remoteStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        let localLeftStr = sendStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let localRightStr = sendStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
+        let remoteLeftStr = receiveStatsInfo?.description(audioOnly: audioOnly).0 ?? ""
+        let remoteRightStr = receiveStatsInfo?.description(audioOnly: audioOnly).1 ?? ""
         leftInfoLabel.text = [localLeftStr, remoteLeftStr].joined(separator: "\n\n")
         rightInfoLabel.text = [localRightStr, remoteRightStr].joined(separator: "\n\n")
     }
@@ -67,8 +76,8 @@ class ShowRealTimeDataView: UIView {
 //        } else {
 //            statsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
 //        }
-        localStatsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
-        remoteStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
+        sendStatsInfo = ShowStatisticsInfo(type: .local(ShowStatisticsInfo.LocalInfo()))
+        receiveStatsInfo = ShowStatisticsInfo(type: .remote(ShowStatisticsInfo.RemoteInfo()))
         setupUI()
     }
     
