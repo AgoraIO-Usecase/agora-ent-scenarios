@@ -1190,8 +1190,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
         if (streamId == 0) {
             DataStreamConfig cfg = new DataStreamConfig();
-            cfg.syncWithAudio = true;
-            cfg.ordered = true;
+            cfg.syncWithAudio = false;
+            cfg.ordered = false;
             streamId = mRtcEngine.createDataStream(cfg);
         }
 
