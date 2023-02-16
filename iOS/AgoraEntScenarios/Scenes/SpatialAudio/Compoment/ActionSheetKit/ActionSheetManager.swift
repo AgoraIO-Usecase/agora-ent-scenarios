@@ -52,10 +52,18 @@ class ActionSheetManager: UIView {
         tableView.estimatedSectionHeaderHeight = 0
         tableView.estimatedRowHeight = 0
         tableView.backgroundColor = .clear
+        tableView.showsVerticalScrollIndicator = false
         tableView.registerCell(ActionSheetTextCell.self, forCellReuseIdentifier: ActionSheetTextCell.description())
         tableView.registerCell(ActionSheetSwitchCell.self, forCellReuseIdentifier: ActionSheetSwitchCell.description())
         tableView.registerCell(ActionSheetSliderCell.self, forCellReuseIdentifier: ActionSheetSliderCell.description())
         return tableView
+    }()
+    private lazy var backButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage.sceneImage(name: "back"), for: .normal)
+        button.isHidden = true
+        button.addTargetFor(self, action: #selector(clickBackButton(sender:)), for: .touchUpInside)
+        return button
     }()
     private lazy var lineView: UIImageView = {
         let imageView = UIImageView(image: UIImage.sceneImage(name: "tchead"))
@@ -79,12 +87,17 @@ class ActionSheetManager: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
         widthAnchor.constraint(equalToConstant: Screen.width).isActive = true
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
+        
+        addSubview(backButton)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
+        backButton.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         
         addSubview(lineView)
         lineView.addSubview(titleLabel)
@@ -217,15 +230,42 @@ class ActionSheetManager: UIView {
     }
     func show() {
         guard let vc = UIViewController.cl_topViewController() else { return }
+        let vcs = vc.navigationController?.viewControllers ?? []
+        let isContainer = vcs.contains(where: { $0 is SAAlertViewController })
         let maxH = Screen.height * 0.75
         let tableViewH = tableView.contentSize.height >= maxH ? maxH : tableView.contentSize.height
         tableViewHCons?.constant = tableViewH
         tableViewHCons?.isActive = true
-        let height = tableViewH + 59 + Screen.safeAreaBottomHeight()
-        let controller = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
-                                                                                                     height: height)),
-                                               custom: self)
-        vc.sa_presentViewController(controller)
+        var height = tableViewH + 59 + Screen.safeAreaBottomHeight()
+        var component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                     height: height))
+        backButton.isHidden = !isContainer
+        if isContainer || vcs.isEmpty {
+            height = vc.view.height - 59 - Screen.safeAreaBottomHeight()
+            component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                         height: height))
+            tableViewHCons?.constant = height
+            tableViewHCons?.isActive = true
+            let controller = SAAlertViewController(compent: component,
+                                                         custom: self,
+                                                         isLayout: true)
+            vc.navigationController?.pushViewController(controller, animated: true)
+            
+        } else {
+            let controller = SAAlertViewController(compent: component,
+                                                         custom: self,
+                                                         isLayout: true)
+            let nav = SAAlertNavigationController(rootViewController: controller)
+            (vc as? SABaseViewController)?.sa_navigationViewController(nav)
+        }
+    }
+    
+    @objc
+    private func clickBackButton(sender: UIButton) {
+        let vc = UIViewController.cl_topViewController()
+        vc?.navigationController?.popViewController(animated: true)
+        let vcs = vc?.navigationController?.viewControllers ?? []
+        sender.isHidden = vcs.isEmpty
     }
 }
 

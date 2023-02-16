@@ -78,10 +78,24 @@ public protocol SAPresentedViewType {
 
 extension SAPresentedViewType {
     var presentTransitionType: SATransitionType {
+        if self is UINavigationController {
+            let vc = (self as? UINavigationController)?.viewControllers.last as? SAAlertViewController
+            if vc?.presentedViewComponent?.presentTransitionType != nil {
+                return vc!.presentedViewComponent!.presentTransitionType ?? .translation(origin: (vc?.presentedViewComponent?.destination.defaultOrigin ?? .none) ?? .bottomOutOfLine)
+            }
+            return .translation(origin: (vc?.presentedViewComponent?.destination.defaultOrigin ?? .bottomOutOfLine))
+        }
         return presentedViewComponent!.presentTransitionType ?? .translation(origin: presentedViewComponent!.destination.defaultOrigin)
     }
 
     var dismissTransitionType: SATransitionType {
+        if self is UINavigationController {
+            let vc = (self as? UINavigationController)?.viewControllers.last as? SAAlertViewController
+            if vc?.presentedViewComponent!.dismissTransitionType != nil {
+                return vc!.presentedViewComponent!.dismissTransitionType ?? presentTransitionType
+            }
+            return presentTransitionType
+        }
         return presentedViewComponent!.dismissTransitionType ?? presentTransitionType
     }
 }

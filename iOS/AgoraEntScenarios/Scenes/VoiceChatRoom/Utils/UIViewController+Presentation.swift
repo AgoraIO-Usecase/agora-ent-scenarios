@@ -20,19 +20,19 @@ public extension VRBaseViewController {
 }
 
 // MARK: -  UIViewControllerTransitioningDelegate
+//
+extension VRBaseViewController: UIViewControllerTransitioningDelegate {
+    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        return PresentationController(presentedViewController: presented, presenting: presenting)
+    }
 
-//extension VRBaseViewController: UIViewControllerTransitioningDelegate {
-//    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-//        return PresentationController(presentedViewController: presented, presenting: presenting)
-//    }
-//
-//    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let presentedVC = presented as? PresentedViewType else { return nil }
-//        return presentedVC.presentTransitionType.animation
-//    }
-//
-//    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let dismissedVC = dismissed as? PresentedViewType else { return nil }
-//        return dismissedVC.dismissTransitionType.animation
-//    }
-//}
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let presentedVC = presented as? PresentedViewType else { return nil }
+        return presentedVC.presentTransitionType.animation
+    }
+
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let dismissedVC = dismissed as? PresentedViewType else { return nil }
+        return dismissedVC.dismissTransitionType.animation
+    }
+}

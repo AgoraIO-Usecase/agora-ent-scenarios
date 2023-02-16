@@ -84,11 +84,13 @@ class SASpatialTipsView: UIView {
         guard let vc = UIViewController.cl_topViewController() as? SABaseViewController else { return }
         let controller = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
                                                                                                      height: 480)),
-                                               custom: self)
+                                               custom: self,
+                                               isLayout: true)
         vc.sa_presentViewController(controller)
     }
     
     private func setupUI() {
+        backgroundColor = .white
         addSubview(lineView)
         lineView.addSubview(titleLabel)
         lineView.translatesAutoresizingMaskIntoConstraints = false

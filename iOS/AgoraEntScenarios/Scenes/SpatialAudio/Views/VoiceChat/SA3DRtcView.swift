@@ -55,6 +55,7 @@ class SA3DRtcView: UIView {
         SwiftyFitsize.reference(width: 375, iPadFitMultiple: 0.6)
         layoutUI()
         rtcKit?.setupSpatialAudio()
+        rtcKit?.playerDelegate = self
     }
 
     @available(*, unavailable)
@@ -63,7 +64,7 @@ class SA3DRtcView: UIView {
     }
     
     func playMusic(isPlay: Bool) {
-        rtcKit?.playMusic(with: .Spatical)
+        rtcKit?.playMusic(with: .Spatical, isPlay: isPlay)
     }
     
     
@@ -141,12 +142,12 @@ class SA3DRtcView: UIView {
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
             rtcUserView.user = mic.member
             panGesture?.isEnabled = mic.member?.uid == VLUserCenter.user.id
-            if mic.member == nil {
-                UIView.animate(withDuration: 0.25, animations: {
-                    self.rtcUserView.center = self.collectionView.center
-                    self.rtcUserView.angle = 90
-                })
-            }
+//            if mic.member == nil {
+//                UIView.animate(withDuration: 0.25, animations: {
+//                    self.rtcUserView.center = self.collectionView.center
+//                    self.rtcUserView.angle = 90
+//                })
+//            }
         }
     }
 
@@ -308,7 +309,8 @@ extension SA3DRtcView {
                 streamInfo.message = JSONObject.toJsonString(info)
                 
                 guard let streamData = JSONObject.toData(streamInfo) else { return }
-                rtcKit?.sendStreamMessage(with: streamData)
+                let ret = rtcKit?.sendStreamMessage(with: streamData)
+                print("ret == \(ret)")
             }
         }
     }

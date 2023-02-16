@@ -18,10 +18,7 @@ import AgoraChat
             }
         }
     }
-
-//    private let all = VRAllRoomsViewController()
     private let normal = SANormalRoomsViewController()
-//    private let spatialSound = VRSpatialSoundViewController()
 
     private var currentUser: VLLoginModel?
 
@@ -65,7 +62,6 @@ import AgoraChat
         print("\(self.swiftClassName ?? "") is destroyed!")
         SAIMManager.shared?.logoutIM()
         SAIMManager.shared = nil
-//        SpatialAudioServiceImp._sharedInstance = nil
         SAUserInfo.shared.user = nil
         SAUserInfo.shared.currentRoomOwner = nil
     }
@@ -88,20 +84,22 @@ extension SARoomsViewController {
         create.action = { [weak self] in
             self?.navigationController?.pushViewController(SACreateRoomViewController(), animated: true)
         }
-//        self.container.scrollClosure = { [weak self] in
-//            let idx = IndexPath(row: $0, section: 0)
-//            guard let self = self else { return }
-//            self.menuBar.refreshSelected(indexPath: idx)
-//        }
-//        self.menuBar.selectClosure = { [weak self] in
-//            self?.index = $0.row
-//        }
     }
 
     private func entryRoom(room: SARoomEntity) {
         if room.is_private ?? false {
-            let alert = SAPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
-            let vc = SAAlertViewController(compent: component(), custom: alert)
+            let width = ScreenWidth - 75
+            let height = (ScreenWidth - 63 - 3 * 16) / 4.0 + 177
+            var component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
+                                                                         height: ScreenHeight))
+            component.destination = .center
+            component.canPanDismiss = false
+            
+            let alert = SAPasswordAlert(frame: CGRect(x: 37.5,
+                                                      y: 168,
+                                                      width: width,
+                                                      height: height)).backgroundColor(.white).cornerRadius(16)
+            let vc = SAAlertViewController(compent: component, custom: alert)
             sa_presentViewController(vc)
             alert.actionEvents = {
                 if $0 == 31 {
@@ -118,52 +116,25 @@ extension SARoomsViewController {
         }
     }
 
-    private func component() -> SAPresentedViewComponent {
-        var component = SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: ScreenHeight))
-        component.destination = .center
-        component.canPanDismiss = false
-        return component
-    }
-
     private func loginIMThenPush(room: SARoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
         AppContext.saServiceImp().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
-//            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
-//                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
-//                return
-//            }
-//            if error == nil, room_entity != nil {
-//                SAIMManager.shared?.loginIM(userName: VLUserCenter.user.chat_uid , token: VLUserCenter.user.im_token , completion: { userName, error in
-                    if error == nil {
-//                        SVProgressHUD.showSuccess(withStatus: "IM login successful!")
-                        self.mapUser(user: VLUserCenter.user)
-                        let info: SARoomInfo = SARoomInfo()
-                        info.room = room
-                        info.mic_info = nil
-                        let vc = SARoomViewController(info: info)
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    } else {
-                        SVProgressHUD.showError(withStatus: "join room failed!")
-                    }
-//                })
-//            } else {
-//                SVProgressHUD.showError(withStatus: "Members reach limit!")
-//            }
+            if error == nil {
+                self.mapUser(user: VLUserCenter.user)
+                let info: SARoomInfo = SARoomInfo()
+                info.room = room
+                info.mic_info = nil
+                let vc = SARoomViewController(info: info)
+                self.navigationController?.pushViewController(vc, animated: true)
+            } else {
+                SVProgressHUD.showError(withStatus: "join room failed!")
+            }
         }
     }
 
     private func childViewControllersEvent() {
-//        self.all.didSelected = { [weak self] in
-//            self?.entryRoom(room: $0)
-//        }
-//        self.all.totalCountClosure = { [weak self] in
-//            guard let self = self else { return }
-//            self.menuBar.dataSource[0].detail = "(\($0))"
-//            self.menuBar.menuList.reloadData()
-//        }
-
         normal.didSelected = { [weak self] room in
             SAThrottler.throttle(delay: .seconds(1)) {
                 DispatchQueue.main.async {
@@ -171,19 +142,5 @@ extension SARoomsViewController {
                 }
             }
         }
-//        self.normal.totalCountClosure = { [weak self] in
-//            guard let self = self else { return }
-//            self.menuBar.dataSource[1].detail = "(\($0))"
-//            self.menuBar.menuList.reloadData()
-//        }
-//
-//        self.spatialSound.didSelected = { [weak self] in
-//            self?.entryRoom(room: $0)
-//        }
-//        self.spatialSound.totalCountClosure = { [weak self] in
-//            guard let self = self else { return }
-//            self.menuBar.dataSource[2].detail = "(\($0))"
-//            self.menuBar.menuList.reloadData()
-//        }
     }
 }

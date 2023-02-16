@@ -264,8 +264,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
                     blueMediaPlayer?.open(musicPath, startPos: 0)
                     redMediaPlayer?.open(musicPath, startPos: 0)
                 }
-                
-               // rtcKit.startAudioMixing(musicPath, loopback: false, cycle: 1)
             }
         }
     }
@@ -427,13 +425,15 @@ public let kMPK_RTC_UID_SA: UInt = 1
      *
      *
      */
-    public func playMusic(with type: SARtcType.VMMUSIC_TYPE) {
-        let code = rtcKit.stopAudioMixing()
-        if code == 0 {
+    public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
+        if isPlay {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
                 self.musicType = type
                 self.baseMusicCount = 0
             }
+        } else {
+            redMediaPlayer?.stop()
+            blueMediaPlayer?.stop()
         }
     }
 
