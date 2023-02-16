@@ -94,7 +94,7 @@ time_t uptime(void) {
         self.musicCenter = musicCenter;
         self.rtcMediaPlayer = rtcMediaPlayer;
         
-        [self.rtcMediaPlayer setPlayerOption:@"play_pos_change_callback" value:100];
+//        [self.rtcMediaPlayer setPlayerOption:@"play_pos_change_callback" value:100];
         
         [[AppContext shared] registerEventDelegate:self];
         [[AppContext shared] registerPlayerEventDelegate:self];
