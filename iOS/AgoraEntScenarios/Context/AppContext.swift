@@ -13,6 +13,7 @@ import Bugly
     @objc var sceneLocalizeBundleName: String?
     @objc var sceneImageBundleName: String?
     @objc var extDic: NSMutableDictionary = NSMutableDictionary()
+    @objc var isDebugMode = false
     
     override init() {
         super.init()

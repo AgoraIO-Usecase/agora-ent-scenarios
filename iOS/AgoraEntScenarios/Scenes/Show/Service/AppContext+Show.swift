@@ -54,14 +54,14 @@ extension AppContext {
         }
     }
     
-    @objc public var isDebugMode: Bool{
-        set{
-            UserDefaults.standard.set(newValue, forKey: kDebugModeKey)
-        }
-        
-        get {
-            return UserDefaults.standard.bool(forKey: kDebugModeKey)
-        }
-    }
+//    @objc public var isDebugMode: Bool{
+//        set{
+//            UserDefaults.standard.set(newValue, forKey: kDebugModeKey)
+//        }
+//        
+//        get {
+//            return UserDefaults.standard.bool(forKey: kDebugModeKey)
+//        }
+//    }
 }
 
