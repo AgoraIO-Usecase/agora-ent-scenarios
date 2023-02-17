@@ -511,6 +511,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (offset <= 1000) {
                     val curTs = mReceivedPlayPosition + offset
                     runOnMainThread {
+                        lrcView?.karaokeView?.setPitch(pitch.toFloat())
                         lrcView?.setProgress(curTs)
                     }
                 }
@@ -597,6 +598,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val position = jsonMsg.getLong("time")
                 val duration = jsonMsg.getLong("duration")
                 val remoteNtp = jsonMsg.getLong("ntp")
+                val pitch = jsonMsg.getDouble("pitch")
                 this.remotePlayerDuration = duration
                 this.remotePlayerPosition = position
 
@@ -617,6 +619,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     // 独唱观众
                     mLastReceivedPlayPosTime = System.currentTimeMillis()
                     mReceivedPlayPosition = position
+                    this.pitch = pitch
                 }
             } else if (jsonMsg.getString("cmd") == "Seek") {
                 // 伴唱收到原唱seek指令
@@ -631,10 +634,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 if (!isChorusCoSinger) {
                     val pitch = jsonMsg.getDouble("pitch")
                     val time = jsonMsg.getLong("time")
-                    runOnMainThread {
-                        lrcView?.karaokeView?.setPitch(pitch.toFloat())
-                        lrcView?.setProgress(time)
-                    }
+                    this.pitch = pitch
+//                    runOnMainThread {
+//                        lrcView?.karaokeView?.setPitch(pitch.toFloat())
+//                        lrcView?.setProgress(time)
+//                    }
                 }
             } else if (jsonMsg.getString("cmd") == "PlayerState") {
                 // 其他端收到原唱seek指令
@@ -677,13 +681,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             for (info in allSpeakers) {
                 if (info.uid == 0) {
                     pitch = if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-                        runOnMainThread {
-                            lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat())
-                            //lrcView?.setProgress(localPlayerPosition)
-                        }
+//                        runOnMainThread {
+//                            //lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat())
+//                            //lrcView?.setProgress(localPlayerPosition)
+//                        }
                         info.voicePitch
                     } else {
-                        runOnMainThread { lrcView?.karaokeView?.setPitch(0.0F) }
+                        //runOnMainThread { lrcView?.karaokeView?.setPitch(0.0F) }
                         0.0
                     }
                 }
@@ -802,6 +806,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["duration"] = duration
             msg["time"] = position_ms - audioPlayoutDelay // "position-audioDeviceDelay" 是计算出当前播放的真实进度
             msg["playerState"] = Constants.MediaPlayerState.getValue(mPlayer.state)
+            msg["pitch"] = pitch
             val jsonMsg = JSONObject(msg)
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }
