@@ -930,7 +930,7 @@ class LiveDetailFragment : Fragment() {
             resetSettingsItem(interactionInfo!!.ownerMuteAudio)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.enableLocalVideo(activated)
+                    LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         mService.muteAudio(!activated, mRoomInfo.ownerId)
