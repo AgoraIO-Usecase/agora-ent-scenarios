@@ -359,7 +359,7 @@ extension SA3DRtcView {
                                     y: vPoint.y - oPoint.y)
         // 屏幕相对坐标转化为坐标系坐标
         return CGPoint(x: relativePoint.x / fullWidth * axisLength,
-                       y: relativePoint.y / fullWidth * axisLength)
+                       y: relativePoint.y / fullHeight * axisLength)
     }
     
     // 将笛卡尔坐标转换成视图中的坐标
