@@ -319,6 +319,7 @@ time_t uptime(void) {
     self.config = nil;
     
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
+    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -675,6 +676,7 @@ time_t uptime(void) {
 -(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
 {
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
+    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
 }
 
 #pragma private apis
@@ -745,6 +747,7 @@ time_t uptime(void) {
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
         
+        [weakSelf.engine setParameters: @"{\"che.audio.enable.md \": false}"];
         if(weakSelf.config.type == KTVSongTypeChorus &&
            weakSelf.config.role == KTVSingRoleMainSinger) {
             //fix pushDirectAudioFrameRawData frozen
