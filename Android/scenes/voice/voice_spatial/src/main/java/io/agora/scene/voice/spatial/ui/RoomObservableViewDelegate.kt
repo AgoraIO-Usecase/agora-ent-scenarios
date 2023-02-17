@@ -499,8 +499,9 @@ class RoomObservableViewDelegate constructor(
                         }
                     }
                 }
-                iRoomMicView.onInitMic(micList, robotInfo.useRobot)
-                updateSpatialPosition(micList)
+                iRoomMicView.onInitMic(micList, robotInfo.useRobot) {
+                    updateSpatialPosition(micList)
+                }
             }
         }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
@@ -1125,8 +1126,9 @@ class RoomObservableViewDelegate constructor(
      * 根据麦位数据更新ui
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
-        iRoomMicView.onSeatUpdated(newMicMap)
-        updateSpatialPosition(newMicMap.values)
+        iRoomMicView.onSeatUpdated(newMicMap) {
+            updateSpatialPosition(newMicMap.values)
+        }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
