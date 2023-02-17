@@ -7,18 +7,18 @@
 
 import Foundation
 
-#if DEBUG
-
-#else
-public extension Notification {
-    /// 键盘frame
-    var keyboardEndFrame: CGRect? {
-        return (userInfo?[UIApplication.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
-    }
-
-    /// 键盘动画时间
-    var keyboardAnimationDuration: TimeInterval? {
-        return (userInfo?[UIApplication.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue
-    }
-}
-#endif
+//#if DEBUG
+//
+//#else
+//public extension Notification {
+//    /// 键盘frame
+//    var keyboardEndFrame: CGRect? {
+//        return (userInfo?[UIApplication.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+//    }
+//
+//    /// 键盘动画时间
+//    var keyboardAnimationDuration: TimeInterval? {
+//        return (userInfo?[UIApplication.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue
+//    }
+//}
+//#endif
