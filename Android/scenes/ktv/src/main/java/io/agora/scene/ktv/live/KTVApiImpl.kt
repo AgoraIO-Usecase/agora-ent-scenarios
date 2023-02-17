@@ -59,6 +59,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var audioPlayoutDelay = 0
     private var remoteVolume: Int = 15 // 远端音频
 
+    // 音高
+    private var pitch = 0.0
+
     private var isRelease = false
 
     override fun initWithRtcEngine(
@@ -282,7 +285,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         KTVLogger.d(TAG, "stopSong called")
         val config = songConfig ?: return
         hasJoinChannelEx = false
-        stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
@@ -366,58 +368,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         msg["score"] = score.toDouble()
         val jsonMsg = JSONObject(msg)
         sendStreamMessageWithJsonObject(jsonMsg) {}
-    }
-
-    // ------------------ 音高pitch同步 ------------------
-    private var mSyncPitchThread: Thread? = null
-    private var mStopSyncPitch = true
-    private var pitch = 0.0
-
-    // 开始同步音高
-    private fun startSyncPitch() {
-        mSyncPitchThread = Thread(object : Runnable {
-            override fun run() {
-                mStopSyncPitch = false
-                while (!mStopSyncPitch) {
-                    if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING ||
-                        mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PAUSED) {
-                        sendSyncPitch(pitch)
-                    }
-                    try {
-                        Thread.sleep(999L)
-                    } catch (exp: InterruptedException) {
-                        break
-                    }
-                }
-            }
-
-            private fun sendSyncPitch(pitch: Double) {
-                val msg: MutableMap<String?, Any?> = java.util.HashMap()
-                msg["cmd"] = "setVoicePitch"
-                msg["pitch"] = pitch
-                msg["time"] = localPlayerPosition
-                val jsonMsg = JSONObject(msg)
-                val ret = mRtcEngine.sendStreamMessage(streamId, jsonMsg.toString().toByteArray())
-                if (ret < 0) {
-                    KTVLogger.e(TAG, "sendPitch() sendStreamMessage called returned: $ret")
-                }
-            }
-        })
-        mSyncPitchThread?.name = "Thread-SyncPitch"
-        mSyncPitchThread?.start()
-    }
-
-    // 停止同步音高
-    private fun stopSyncPitch() {
-        mStopSyncPitch = true
-        pitch = 0.0
-        if (mSyncPitchThread != null) {
-            try {
-                mSyncPitchThread?.join()
-            } catch (exp: InterruptedException) {
-                KTVLogger.e(TAG, "stopSyncPitch: $exp")
-            }
-        }
     }
 
     // 合唱
@@ -628,18 +578,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     val position = jsonMsg.getLong("position")
                     mPlayer.seek(position)
                 }
-            } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
-                // 观众同步pitch
-                val isChorusCoSinger = isChorusCoSinger() ?: return
-                if (!isChorusCoSinger) {
-                    val pitch = jsonMsg.getDouble("pitch")
-                    val time = jsonMsg.getLong("time")
-                    this.pitch = pitch
-//                    runOnMainThread {
-//                        lrcView?.karaokeView?.setPitch(pitch.toFloat())
-//                        lrcView?.setProgress(time)
-//                    }
-                }
             } else if (jsonMsg.getString("cmd") == "PlayerState") {
                 // 其他端收到原唱seek指令
                 val state = jsonMsg.getInt("state")
@@ -681,13 +619,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             for (info in allSpeakers) {
                 if (info.uid == 0) {
                     pitch = if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
-//                        runOnMainThread {
-//                            //lrcView?.karaokeView?.setPitch(info.voicePitch.toFloat())
-//                            //lrcView?.setProgress(localPlayerPosition)
-//                        }
                         info.voicePitch
                     } else {
-                        //runOnMainThread { lrcView?.karaokeView?.setPitch(0.0F) }
                         0.0
                     }
                 }
@@ -759,9 +692,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 duration = mPlayer.duration
                 mPlayer.play()
                 mPlayer.selectAudioTrack(1)
-
                 this.localPlayerPosition = 0
-                startSyncPitch()
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
@@ -773,7 +704,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.adjustPlaybackSignalVolume(100)
                 duration = 0
                 this.localPlayerPosition = 0
-                stopSyncPitch()
                 stopDisplayLrc()
                 this.mLastReceivedPlayPosTime = null
                 this.mReceivedPlayPosition = 0
