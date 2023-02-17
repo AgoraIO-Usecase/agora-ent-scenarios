@@ -18,5 +18,5 @@ include ':common:base'
 include ':common:ui-widget'
 include ':scenes:ktv'
 
-include ':scenes:voice:voice'
-include ':scenes:voice:common'
+//include ':scenes:voice:voice'
+//include ':scenes:voice:common'
