@@ -254,17 +254,13 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
                     blueMediaPlayer?.open(musicPath, startPos: 0)
-                    blueMediaPlayer?.mute(true)
                     delegate?.reportAlien?(with: .blue, musicType: musicType)
                 } else if musicPath.contains("-R-") {
                     redMediaPlayer?.open(musicPath, startPos: 0)
-                    redMediaPlayer?.mute(true)
                     delegate?.reportAlien?(with: .red, musicType: musicType)
                 } else if musicPath.contains("-B&R-") {
                     blueMediaPlayer?.open(musicPath, startPos: 0)
                     redMediaPlayer?.open(musicPath, startPos: 0)
-                    blueMediaPlayer?.mute(true)
-                    redMediaPlayer?.mute(true)
                     delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
             }
@@ -913,7 +909,10 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
 
     // mpk didChangedTo
     public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
-        if state == .openCompleted {
+        if state == .playing {
+            playerKit.mute(true)
+            
+        } else if state == .openCompleted {
             playerKit.play()
         } else if (state == .playBackAllLoopsCompleted || state == .playBackCompleted)  {
             playerKit.stop()
@@ -922,6 +921,6 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
                 baseMusicCount += 1
             }
         }
-
+        playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
     }
 }
