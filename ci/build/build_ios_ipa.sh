@@ -7,7 +7,7 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
 
-cd ${PROJECT_PATH} && pod install
+cd ${PROJECT_PATH} && pod install --repo-update
 
 if [ $? -eq 0 ]; then
     echo "success"
