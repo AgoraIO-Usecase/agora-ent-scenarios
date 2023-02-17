@@ -1010,6 +1010,11 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         config.mAppId = BuildConfig.AGORA_APP_ID;
         config.mEventHandler = new IRtcEngineEventHandler() {
             @Override
+            public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
+                if (mRtcEngine == null) return;
+                mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+            }
+            @Override
             public void onStreamMessage(int uid, int streamId, byte[] data) {
                 JSONObject jsonMsg;
                 try {
@@ -1068,6 +1073,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}");
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}");
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}");
+        mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         int ret = mRtcEngine.joinChannel(
                 roomInfoLiveData.getValue().getAgoraRTCToken(),
@@ -1181,6 +1187,16 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             @Override
             public void onRemoteVolumeChanged(int volume) {
                 ktvApiProtocol.adjustRemoteVolume(volume);
+            }
+
+            @Override
+            public void onAudioDumpEnable(boolean enable) {
+                if (enable) {
+                    mRtcEngine.setParameters("{\"rtc.debug.enable\": true}");
+                    mRtcEngine.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+                } else {
+                    mRtcEngine.setParameters("{\"rtc.debug.enable\": false}");
+                }
             }
         });
 
