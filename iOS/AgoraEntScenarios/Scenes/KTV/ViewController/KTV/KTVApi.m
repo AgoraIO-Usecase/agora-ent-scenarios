@@ -253,7 +253,6 @@ time_t uptime(void) {
         }
     } else {
         if(role == KTVSingRoleMainSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
@@ -263,10 +262,11 @@ time_t uptime(void) {
             options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
+            //openMediaWithSongCode必须在切换setAudioScenario之后，否则会造成mpk播放对齐不准的问题
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else if(role == KTVSingRoleCoSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
@@ -278,6 +278,8 @@ time_t uptime(void) {
             
             //mute main Singer player audio
             [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
+            //openMediaWithSongCode必须在切换setAudioScenario之后，否则会造成mpk播放对齐不准的问题
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else {
@@ -531,10 +533,8 @@ time_t uptime(void) {
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
         if (self.config.role == KTVSingRoleMainSinger) {
-            //TODO: 目前不delay直接play会有大概率对不齐的情况，具体delay的时间或者把delay放在回调里的策略需要修改
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [playerKit play];
-            });
+            //主唱播放，通过同步消息“setLrcTime”通知伴唱play
+            [playerKit play];
         }
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = uptime();
