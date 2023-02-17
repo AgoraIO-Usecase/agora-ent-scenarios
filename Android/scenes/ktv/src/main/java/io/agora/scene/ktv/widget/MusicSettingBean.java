@@ -11,6 +11,7 @@ public class MusicSettingBean {
     private int audioEffectParams1 = 0;
     private int audioEffectParams2 = 0;
     private int remoteVolume = 15;
+    private boolean isAudioDumpEnabled = false;
 
 
     public MusicSettingBean(boolean isEar, int volMic, int volMusic, int toneValue, MusicSettingDialog.Callback mCallback) {
@@ -98,5 +99,14 @@ public class MusicSettingBean {
     public void setRemoteVolume(int newValue) {
         this.remoteVolume = newValue;
         this.mCallback.onRemoteVolumeChanged(newValue);
+    }
+
+    public boolean isAudioDumpEnabled() {
+        return isAudioDumpEnabled;
+    }
+
+    public void enableAudioDump(boolean enable) {
+        this.isAudioDumpEnabled = enable;
+        this.mCallback.onAudioDumpEnable(enable);
     }
 }
