@@ -220,4 +220,26 @@
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
     <string name="show_live_detail_living_end">直播已结束</string>
     <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
+
+    <string-array name="show_encoder">
+        <item>硬编码</item>
+        <item>软编码</item>
+    </string-array>
+
+    <string-array name="show_codec">
+        <item>h265</item>
+        <item>h264</item>
+    </string-array>
+
+    <string-array name="show_render_mode">
+        <item>hidden</item>
+        <item>fix</item>
+    </string-array>
+
+    <string-array name="show_sr_type">
+        <item>1倍超分</item>
+        <item>1.33倍超分</item>
+        <item>1.5倍超分</item>
+        <item>2 倍超分</item>
+    </string-array>
 </resources>

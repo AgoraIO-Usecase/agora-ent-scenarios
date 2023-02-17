@@ -4,19 +4,27 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.IBeautyProcessor
 import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
+import io.agora.scene.show.debugSettings.DebugSettingModel
 
 object RtcEngineInstance {
 
-    val videoEncoderConfiguration = VideoEncoderConfiguration()
+    val videoEncoderConfiguration = VideoEncoderConfiguration().apply {
+        orientationMode = VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+    }
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
+    val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
+        followEncodeDimensionRatio = false
+    }
+    val debugSettingModel = DebugSettingModel().apply {  }
 
     private var innerBeautyProcessor: IBeautyProcessor? = null
     val beautyProcessor: IBeautyProcessor
@@ -71,6 +79,24 @@ object RtcEngineInstance {
         innerBeautyProcessor?.let { processor ->
             processor.release()
             innerBeautyProcessor = null
+        }
+        debugSettingModel.apply {
+            pvcEnabled = true
+            autoFocusFaceModeEnabled = true
+            exposurePositionX = null
+            exposurePositionY = null
+            cameraSelect = null
+            videoFullrangeExt = null
+            matrixCoefficientsExt = null
+            enableHWEncoder = true
+            codecType = 3     // 2 -> h264, 3 -> h265
+            mirrorMode = false
+            renderMode = 0       // 0 -> hidden, 1 -> fix
+            colorEnhance = false
+            dark = false
+            noise = false
+            srEnabled = false
+            srType = 1.0
         }
     }
 }
