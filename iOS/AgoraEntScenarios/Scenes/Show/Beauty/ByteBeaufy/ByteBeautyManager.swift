@@ -73,7 +73,7 @@ class ByteBeautyManager {
     
     func reset(datas: [BeautyModel]) {
         datas.forEach({
-            $0.isSelected = $0.key == "103"
+            $0.isSelected = $0.key == "smooth"
             guard $0.path != nil else { return }
             processor.updateComposerNodeIntensity($0.path,
                                                   key: $0.key,
