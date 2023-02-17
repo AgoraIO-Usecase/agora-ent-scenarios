@@ -10,7 +10,7 @@ import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 interface IRoomMicView {
 
     /**初始化麦位数据*/
-    fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean)
+    fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean, complete: (() -> Unit)?)
 
     /**开关机器人*/
     fun activeBot(active: Boolean, each: ((Int, Pair<PointF, PointF>) -> Unit)?)
@@ -24,7 +24,7 @@ interface IRoomMicView {
     fun updateBotVolume(speakerType: Int, volume: Int)
 
     /**多麦位更新*/
-    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
+    fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, complete: (() -> Unit)?)
 
     /**是否在麦位上,-1 不在*/
     fun findMicByUid(uid: String): Int

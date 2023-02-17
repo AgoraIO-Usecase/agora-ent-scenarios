@@ -366,7 +366,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         childView.isClickable = isClickable
     }
 
-    override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean) {
+    override fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean, complete: (() -> Unit)?) {
         micInfoList.forEach { micInfo ->
             if (micInfo.micIndex != 3 && micInfo.micIndex != 6) {
                 val index = micInfo.micIndex
@@ -455,7 +455,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         return -1
     }
 
-    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
+    override fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, complete: (() -> Unit)?) {
         ThreadManager.getInstance().runOnMainThread {
             newMicMap.entries.forEach { entry ->
                 val index = entry.key
@@ -469,6 +469,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
                         micInfo.forward = getForward(index)
                     }
                 }
+                complete?.invoke()
             }
             // 机器人
             if (newMicMap.containsKey(ConfigConstants.MicConstant.KeyIndex3)) {
