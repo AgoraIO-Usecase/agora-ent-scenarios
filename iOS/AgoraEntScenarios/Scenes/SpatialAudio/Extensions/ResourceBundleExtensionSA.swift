@@ -6,12 +6,12 @@
 //
 
 import Foundation
-#if DEBUG
-
-#else
-public let resourceBundle = Bundle(path: Bundle.main.path(forResource: "SpatialAudioResource", ofType: "bundle") ?? "") ?? Bundle.main
-
-public extension Bundle {
-    static var voiceRoomBundle: Bundle { resourceBundle }
-}
-#endif
+//#if DEBUG
+//
+//#else
+//public let resourceBundle = Bundle(path: Bundle.main.path(forResource: "SpatialAudioResource", ofType: "bundle") ?? "") ?? Bundle.main
+//
+//public extension Bundle {
+//    static var voiceRoomBundle: Bundle { resourceBundle }
+//}
+//#endif

@@ -8,12 +8,12 @@
 import Foundation
 import UIKit
 
-#if DEBUG
-
-#else
-public extension UIImage {
-    convenience init?(_ bundleResourceName: String) {
-        self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
-    }
-}
-#endif
+//#if DEBUG
+//
+//#else
+//public extension UIImage {
+//    convenience init?(_ bundleResourceName: String) {
+//        self.init(named: bundleResourceName, in: Bundle.voiceRoomBundle, with: nil)
+//    }
+//}
+//#endif

@@ -7,12 +7,12 @@
 
 import Foundation
 
-#if DEBUG
-
-#else
-public extension String {
-    func localized() -> String {
-        return sceneLocalized(self)
-    }
-}
-#endif
+//#if DEBUG
+//
+//#else
+//public extension String {
+//    func localized() -> String {
+//        return sceneLocalized(self)
+//    }
+//}
+//#endif
