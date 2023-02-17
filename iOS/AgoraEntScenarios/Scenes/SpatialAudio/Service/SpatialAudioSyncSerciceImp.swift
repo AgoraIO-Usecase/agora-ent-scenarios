@@ -111,13 +111,13 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _getOwnerSeat() -> SARoomMic {
         let mic = SARoomMic()
-        mic.mic_index = 1
+        mic.mic_index = 0
         mic.status = 0
         mic.member = SAUser()
         mic.member?.uid = VLUserCenter.user.id
         mic.member?.name = VLUserCenter.user.name
         mic.member?.chat_uid = VLUserCenter.user.id
-        mic.member?.mic_index = 1
+        mic.member?.mic_index = 0
         mic.member?.name = VLUserCenter.user.name
         mic.member?.portrait = VLUserCenter.user.headUrl
         mic.member?.rtc_uid = VLUserCenter.user.id
@@ -146,8 +146,8 @@ extension SpatialAudioSyncSerciceImp {
                 if existMicIdxs.contains(i) {
                     continue
                 }
-                let item = i == 1 ? self._getOwnerSeat() : SARoomMic()
-                if i != 1 {
+                let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
+                if i != 0 {
                     item.mic_index = i
                     if i == 3 || i == 6 {
                         item.status = -2   //robot

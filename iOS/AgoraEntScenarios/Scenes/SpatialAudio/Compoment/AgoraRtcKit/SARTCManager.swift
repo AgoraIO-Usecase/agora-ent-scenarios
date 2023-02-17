@@ -246,7 +246,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 return
             }
             if baseMusicCount >= count {
-               // rtcKit.stopAudioMixing()
                 redMediaPlayer?.stop()
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended, musicType: musicType)
@@ -254,15 +253,19 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 musicPath = musicPath.replacingOccurrences(of: "EN", with: "Lau".localized())
                 print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
+                    blueMediaPlayer?.open(musicPath, startPos: 0)
+                    blueMediaPlayer?.mute(true)
                     delegate?.reportAlien?(with: .blue, musicType: musicType)
-                    blueMediaPlayer?.open(musicPath, startPos: 0)
                 } else if musicPath.contains("-R-") {
-                    delegate?.reportAlien?(with: .red, musicType: musicType)
                     redMediaPlayer?.open(musicPath, startPos: 0)
+                    redMediaPlayer?.mute(true)
+                    delegate?.reportAlien?(with: .red, musicType: musicType)
                 } else if musicPath.contains("-B&R-") {
-                    delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                     blueMediaPlayer?.open(musicPath, startPos: 0)
                     redMediaPlayer?.open(musicPath, startPos: 0)
+                    blueMediaPlayer?.mute(true)
+                    redMediaPlayer?.mute(true)
+                    delegate?.reportAlien?(with: .blueAndRed, musicType: musicType)
                 }
             }
         }
@@ -358,8 +361,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
     func updatePlayerVolume(value: Double) {
         redMediaPlayer?.adjustPlayoutVolume(Int32(value))
         blueMediaPlayer?.adjustPlayoutVolume(Int32(value))
-        redMediaPlayer?.mute(true)
-        blueMediaPlayer?.mute(true)
     }
     
     func setMediaPlayerPositionInfo(playerId: Int,

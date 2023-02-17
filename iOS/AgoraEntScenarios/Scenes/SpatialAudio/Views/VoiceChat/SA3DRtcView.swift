@@ -29,6 +29,7 @@ class SA3DRtcView: UIView {
 //    private var redMediaPlayer: AgoraRtcMediaPlayerProtocol?
 //    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
     private var panGesture: UIPanGestureRecognizer?
+    private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
     
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
@@ -41,6 +42,7 @@ class SA3DRtcView: UIView {
                 return
             }
             collectionView.reloadData()
+            updateSpatialPos()
             
             guard let mic = micInfos?.first else { return }
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
@@ -183,7 +185,10 @@ class SA3DRtcView: UIView {
         guard let micInfo = micInfos?.first else { return [] }
         let pos = viewCenterPostion(view: rtcUserView)
         let realPosition = calcuRealPositon(angle: rtcUserView.angle)
+        micInfo.pos = pos
+        micInfo.forward = realPosition.0
         if micInfo.member?.uid == VLUserCenter.user.id {
+            micInfo.right = realPosition.1
             rtcKit?.updateSpetialPostion(position: pos,
                                          axisForward: realPosition.0,
                                          axisRight: realPosition.1,
@@ -296,21 +301,23 @@ extension SA3DRtcView {
         rtcUserView.center = CGPoint(x: moveCenter.x, y: moveCenter.y)
         pan.setTranslation(.zero, in: self)
         
-        let forward = updateCenterUserPosition()
-        
-        if let user = micInfos?.first?.member {
-            let pos = viewCenterPostion(view: rtcUserView)
-            var info = SAPositionInfo()
-            info.uid = Int(user.uid ?? "0") ?? 0
-            info.forward = forward
-            info.x = pos.first?.doubleValue ?? 0
-            info.y = pos[1].doubleValue
-            info.angle = angle
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.02) {
+        let forward = self.updateCenterUserPosition()
+        let pos = viewCenterPostion(view: rtcUserView)
+        DispatchQueue.global().async {
+            let currentTime = CFAbsoluteTimeGetCurrent()
+            if currentTime - 0.2 < self.lastTime { return }
+            if let user = self.micInfos?.first?.member {
+                var info = SAPositionInfo()
+                info.uid = Int(user.uid ?? "0") ?? 0
+                info.forward = forward
+                info.x = pos.first?.doubleValue ?? 0
+                info.y = pos[1].doubleValue
+                info.angle = angle
                 var streamInfo = SADataStreamInfo()
                 streamInfo.message = JSONObject.toJsonString(info)
                 guard let streamData = JSONObject.toData(streamInfo) else { return }
                 self.rtcKit?.sendStreamMessage(with: streamData)
+                self.lastTime = currentTime
             }
         }
     }
@@ -384,7 +391,8 @@ extension SA3DRtcView {
     
     private func updateSpatialPos() {
         micInfos?.enumerated().forEach({ index, info in
-            if info.member == nil { return }
+            guard info.member != nil else { return }
+            print("pos === \(info.pos)  name === \(info.member?.name ?? "")")
             switch index {
             case 6: //red robot
                 setMediaPlayerPosition(pos: info.pos ?? [],
@@ -398,14 +406,14 @@ extension SA3DRtcView {
                 
             default:
                 if info.member?.uid == VLUserCenter.user.id {
-                    rtcKit?.updateSpetialPostion(position: info.pos ?? [],
-                                                 axisForward: info.forward ?? [],
-                                                 axisRight: info.right ?? [],
+                    rtcKit?.updateSpetialPostion(position: info.pos ?? [0, 0, 0],
+                                                 axisForward: info.forward ?? [0, 1, 0],
+                                                 axisRight: info.right ?? [1, 0, 0],
                                                  axisUp: info.up)
                 } else {
                     rtcKit?.updateRemoteSpetialPostion(uid: info.member?.uid,
-                                                       position: info.pos ?? [],
-                                                       forward: info.forward)
+                                                       position: info.pos ??  [0, 0, 0],
+                                                       forward: info.forward ?? [0, 1, 0])
                 }
             }
         })

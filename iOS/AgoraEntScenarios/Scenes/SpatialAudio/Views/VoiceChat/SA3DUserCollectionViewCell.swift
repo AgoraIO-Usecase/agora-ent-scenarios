@@ -97,7 +97,7 @@ class SA3DUserCollectionViewCell: UICollectionViewCell {
         } else {
             rtcUserView.iconView.image = UIImage(mic.member?.portrait ?? "")
         }
-        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 1 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
+        rtcUserView.nameBtn.setImage(UIImage((mic.mic_index == 0 || mic.mic_index == 3 || mic.mic_index == 6) ? "Landlord" : ""), for: .normal)
         rtcUserView.nameBtn.setTitle(mic.member?.name ?? "\(mic.mic_index)", for: .normal)
     }
 
