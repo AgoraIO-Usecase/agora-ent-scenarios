@@ -392,7 +392,6 @@ extension SA3DRtcView {
     private func updateSpatialPos() {
         micInfos?.enumerated().forEach({ index, info in
             guard info.member != nil else { return }
-            print("pos === \(info.pos)  name === \(info.member?.name ?? "")")
             switch index {
             case 6: //red robot
                 setMediaPlayerPosition(pos: info.pos ?? [],
@@ -638,5 +637,11 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
             self.rtcUserView.center = point
         }
         rtcUserView.angle = info.angle
+    }
+    
+    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+        if state == .playing {
+            updateSpatialPos()
+        }
     }
 }
