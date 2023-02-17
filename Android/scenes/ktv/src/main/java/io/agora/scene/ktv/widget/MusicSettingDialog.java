@@ -246,5 +246,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         void onToneChanged(int newToneValue);
 
         void onRemoteVolumeChanged(int volume);
+
+        void onAudioDumpEnable(boolean enable);
     }
 }
