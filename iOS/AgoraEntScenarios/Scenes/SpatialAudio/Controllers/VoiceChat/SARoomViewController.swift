@@ -269,7 +269,7 @@ extension SARoomViewController {
             }
         } else {
             if isOwner {
-                if index == 1 {
+                if index == 0 {
                     showMuteView(with: index)
                 } else {
                     showApplyAlert(index)
