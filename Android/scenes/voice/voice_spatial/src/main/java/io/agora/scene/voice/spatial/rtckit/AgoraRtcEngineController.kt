@@ -224,7 +224,6 @@ class AgoraRtcEngineController {
      * @param forward 朝向[x, y, z]
      */
     public fun updateRemotePosition(uid: Int, pos: FloatArray, forward: FloatArray) {
-        "spatial update remote position: u: $uid p: ${pos[0]} ${pos[1]} f: ${forward[0]} ${forward[1]}".logD("Spatial Voice")
         val position = RemoteVoicePositionInfo()
         position.position = pos
         position.forward = forward
