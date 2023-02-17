@@ -670,8 +670,8 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotBlur)
-                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100).toInt())
-                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100).toInt())
+                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, robotInfo.blueRobotAttenuation)
+                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, robotInfo.redRobotAttenuation)
             }
         }
 
@@ -994,10 +994,10 @@ class RoomObservableViewDelegate constructor(
                 AgoraRtcEngineController.get().updateEffectVolume(robotInfo.robotVolume)
             }
             if (this.robotInfo.redRobotAttenuation != robotInfo.redRobotAttenuation) {
-                AgoraRtcEngineController.get().adjustRedAttenuation((robotInfo.redRobotAttenuation * 100).toInt())
+                AgoraRtcEngineController.get().adjustRedAttenuation(robotInfo.redRobotAttenuation)
             }
             if (this.robotInfo.blueRobotAttenuation != robotInfo.blueRobotAttenuation) {
-                AgoraRtcEngineController.get().adjustBlueAttenuation((robotInfo.blueRobotAttenuation * 100).toInt())
+                AgoraRtcEngineController.get().adjustBlueAttenuation(robotInfo.blueRobotAttenuation)
             }
             if (this.robotInfo.blueRobotBlur != robotInfo.blueRobotBlur) {
                 AgoraRtcEngineController.get().enableBlueBlur(robotInfo.blueRobotBlur)
