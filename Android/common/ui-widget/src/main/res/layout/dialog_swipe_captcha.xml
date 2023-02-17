@@ -20,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/swipeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -52,13 +53,13 @@
         android:layout_below="@id/swipeCaptchaView"
         android:layout_centerHorizontal="true"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginBottom="10dp"
         android:progressDrawable="@drawable/bg_full_grey_ec_r10"
         android:splitTrack="false"
         android:thumb="@mipmap/ic_btn_seekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/swipeCaptchaView" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/iBtnRefresh"
