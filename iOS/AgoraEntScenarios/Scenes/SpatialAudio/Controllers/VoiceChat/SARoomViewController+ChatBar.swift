@@ -230,7 +230,7 @@ extension SARoomViewController {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
-        if !isOwner, idx == 1 {
+        if !isOwner, idx == 0 {
             view.makeToast("you have no wheat slots!".localized(), point: view.center, title: nil, image: nil, completion: nil)
             return
         }
