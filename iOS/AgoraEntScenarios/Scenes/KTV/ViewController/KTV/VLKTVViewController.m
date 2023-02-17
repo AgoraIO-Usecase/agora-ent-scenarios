@@ -34,6 +34,7 @@
 #import "LSTPopView+KTVModal.h"
 #import "KTVApi.h"
 #import "HWWeakTimer.h"
+#import "KTVDebugManager.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -163,6 +164,10 @@ KTVApiDelegate
     //处理背景
     [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    
+    
+    //add debug
+    [self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
