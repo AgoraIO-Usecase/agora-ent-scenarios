@@ -129,13 +129,16 @@ class SA3DRtcView: UIView {
     public func updateUser(_ mic: SARoomMic) {
         
         // 更新micinfos数组
-        self.micInfos?[mic.mic_index] = mic
+        let info = micInfos?[mic.mic_index]
+        mic.pos = info?.pos
+        mic.forward = info?.forward
+        mic.right = info?.right
+        micInfos?[mic.mic_index] = mic
         
         // 更新空间音频位置
         updateSpatialPos()
         
         let realIndex: Int = getRealIndex(with: mic.mic_index)
-        micInfos?[mic.mic_index] = mic
         let indexPath = IndexPath(item: realIndex, section: 0)
         if realIndex != 3 {
             DispatchQueue.main.async {[weak self] in
@@ -624,10 +627,9 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
         guard let streamInfo = JSONObject.toModel(SADataStreamInfo.self, value: result),
               let info = JSONObject.toModel(SAPositionInfo.self, value: streamInfo.message) else { return }
         
-//        let pos = info.position.map({ NSNumber(value: $0) })
         var point = pointConvertToView(point: CGPoint(x: info.x, y: info.y))
         point = checkEdgeRange(point: point)
-        let pos = [NSNumber(value: point.x), NSNumber(value: point.y), 0]
+        let pos = viewCenterPostion(rect: CGRect(origin: point, size: rtcUserView.size))
         let forward = info.forward.map({ NSNumber(value: $0) })
         rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
                                            position: pos,

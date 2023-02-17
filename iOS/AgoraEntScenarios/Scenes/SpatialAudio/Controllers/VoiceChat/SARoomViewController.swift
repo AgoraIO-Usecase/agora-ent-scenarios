@@ -119,8 +119,8 @@ extension SARoomViewController {
         let rtcUid = VLUserCenter.user.id
         rtckit.setClientRole(role: isOwner ? .owner : .audience)
         rtckit.delegate = self
-        rtckit.initSpatialAudio(recvRange: 15)
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
+        rtckit.initSpatialAudio(recvRange: 15)
     }
     
     func refreshRoomInfo() {
