@@ -166,15 +166,13 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
         val fullWidth = binding.cl3DMicLayoutRoot.width * 1.0f
         val fullHeight = binding.cl3DMicLayoutRoot.height * 1.0f
         val oPoint = PointF(fullWidth * 0.5f, fullHeight * 0.5f)
-        // 翻转Y轴
-        val turnY = fullHeight - view.y
-        val vPoint = PointF(view.width * 0.5f + view.x, turnY - (view.height * 0.5f))
-        // 相对坐标
-        val relativePoint = PointF(vPoint.x - oPoint.x, vPoint.y - oPoint.y)
+        val vPoint = PointF(view.x + view.width * 0.5f, view.y + view.height * 0.5f)
+        // 相对坐标并翻转Y轴
+        val relativePoint = PointF(vPoint.x - oPoint.x, oPoint.y - vPoint.y)
         // 屏幕相对坐标转化为坐标系坐标
         return PointF(
             relativePoint.x / fullWidth * axisLength,
-            relativePoint.y / fullWidth * axisLength
+            relativePoint.y / fullHeight * axisLength
         )
     }
     /**

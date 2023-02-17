@@ -263,6 +263,7 @@ class VoiceSyncManagerServiceImp(
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
+        ThreadManager.getInstance().removeCallbacks(timerRoomEndRun)
         roomTimeUpSubscriber = null
         roomSubscribeListener.clear()
         if (TextUtils.equals(cacheRoom.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
