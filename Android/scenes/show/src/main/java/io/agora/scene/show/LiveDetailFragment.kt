@@ -23,19 +23,21 @@ import com.bumptech.glide.Glide
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_ULTRA_LOW_LATENCY
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
 import io.agora.scene.show.databinding.ShowLivingEndDialogBinding
+import io.agora.scene.show.debugSettings.DebugAudienceSettingDialog
+import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.*
 import io.agora.scene.show.widget.*
 import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
@@ -91,6 +93,8 @@ class LiveDetailFragment : Fragment() {
     private val mPermissionHelp by lazy { (requireActivity() as? LiveDetailActivity)?.mPermissionHelp!! }
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
     private val mRtcVideoSwitcher by lazy { RtcEngineInstance.videoSwitcher }
+    private fun showDebugModeDialog() = DebugSettingDialog(requireContext()).show()
+    private fun showAudienceDebugModeDialog() = DebugAudienceSettingDialog(requireContext()).show()
 
     // 当前互动状态
     private var interactionInfo: ShowInteractionInfo? = null
@@ -174,6 +178,12 @@ class LiveDetailFragment : Fragment() {
         releaseCountdown()
         destroyService()
         return destroyRtcEngine()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        destroy()
+        mBeautyProcessor.reset()
     }
 
     private fun onBackPressed() {
@@ -614,7 +624,13 @@ class LiveDetailFragment : Fragment() {
                         }
                     }
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
-                    SettingDialog.ITEM_ID_SETTING -> if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
+                    SettingDialog.ITEM_ID_SETTING -> {
+                        if (AgoraApplication.the().isDebugModeOpen) {
+                            if (isHostView()) showDebugModeDialog() else showAudienceDebugModeDialog()
+                        } else {
+                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(context).show()
+                        }
+                    }
                 }
             }
             show()
@@ -674,16 +690,16 @@ class LiveDetailFragment : Fragment() {
         mMusicEffectDialog.setOnItemSelectedListener { musicEffectDialog, itemId ->
             when (itemId) {
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_NONE -> {
-                    mRtcEngine.stopAudioMixing()
+                    mRtcVideoSwitcher.stopAudioMixing(mMainRtcConnection)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY -> {
-                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcEngine.startAudioMixing("/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcEngine.startAudioMixing("/assets/romantic.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {

@@ -22,6 +22,7 @@ public class AgoraApplication extends MultiDexApplication {
     public static AgoraApplication the() {
         return sInstance;
     }
+    private boolean isDebugModeOpen = false;
 
     public void onCreate() {
         super.onCreate();
@@ -75,5 +76,13 @@ public class AgoraApplication extends MultiDexApplication {
 
             }
         });
+    }
+
+    public void enableDebugMode(boolean enable) {
+        this.isDebugModeOpen = enable;
+    }
+
+    public boolean isDebugModeOpen() {
+        return isDebugModeOpen;
     }
 }
