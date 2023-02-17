@@ -21,7 +21,7 @@ class KTVSyncManagerServiceImp(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol {
-    private val kSceneId = "scene_ktv"
+    private val kSceneId = "scene_ktv_2.2.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -253,6 +253,9 @@ class KTVSyncManagerServiceImp(
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
+
+        // 重置体验时间事件
+        mainHandler.removeCallbacks(timerRoomEndRun)
         roomTimeUpSubscriber = null
 
         if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
