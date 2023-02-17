@@ -1,11 +1,13 @@
 package io.agora.scene.ktv.live.fragment.dialog;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.ktv.databinding.FragmentEffectVoiceBinding;
 import io.agora.scene.ktv.live.RoomLivingActivity;
@@ -29,6 +31,11 @@ public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectV
 
     @Override
     public void initListener() {
+        if (!AgoraApplication.the().isDebugModeOpen()) {
+            getBinding().cbAudioDumpText.setVisibility(View.GONE);
+            getBinding().cbStartAudioDump.setVisibility(View.GONE);
+        }
+
         getBinding().ivBackIcon.setOnClickListener(view -> {
             ((RoomLivingActivity) requireActivity()).closeMenuDialog();
         });
@@ -41,6 +48,9 @@ public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectV
             } else {
                 mSetting.setAudioEffectParameters(0, 4);
             }
+        });
+        getBinding().cbStartAudioDump.setOnCheckedChangeListener((compoundButton, b) -> {
+            mSetting.enableAudioDump(b);
         });
         getBinding().cbGentleWind.setOnCheckedChangeListener((compoundButton, b) -> {
             if (b) {
@@ -77,6 +87,12 @@ public class EffectVoiceFragment extends BaseViewBindingFragment<FragmentEffectV
             getBinding().cbMinor.setChecked(true);
         } else if (mSetting.getAudioEffectParams1() == 1) {
             getBinding().cbMajor.setChecked(true);
+        }
+
+        if (mSetting.isAudioDumpEnabled()) {
+            getBinding().cbStartAudioDump.setChecked(true);
+        } else {
+            getBinding().cbStartAudioDump.setChecked(false);
         }
     }
 }

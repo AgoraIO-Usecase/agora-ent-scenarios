@@ -53,11 +53,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     // event
     private var ktvApiEventHandler: KTVApi.KTVApiEventHandler? = null
-    private var hasJoinChannelEx: Boolean = false
+    private var mainSingerHasJoinChannelEx: Boolean = false
+    private var coSingerHasJoinChannelEx: Boolean = false
 
     // 合唱校准
     private var audioPlayoutDelay = 0
     private var remoteVolume: Int = 15 // 远端音频
+    private var countDownLatch: CountDownLatch? = null  // 主唱play 在 setAudioScenario 之后
 
     // 音高
     private var pitch = 0.0
@@ -95,8 +97,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mPlayer.unRegisterPlayerObserver(this)
         mMusicCenter.unregisterEventHandler()
 
-        hasJoinChannelEx = false
+        mainSingerHasJoinChannelEx = false
+        coSingerHasJoinChannelEx = false
         streamId = 0
+        countDownLatch = null
     }
 
     override fun loadSong(
@@ -197,6 +201,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun playSong(songCode: Long) {
         KTVLogger.d(TAG, "playSong called")
         val config = songConfig ?: return
+
+        countDownLatch = CountDownLatch(1)
+
         // reset status
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
@@ -210,6 +217,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             if (role == KTVSingRole.KTVSingRoleMainSinger) {
                 KTVLogger.d(TAG, "KTVSongTypeSolo,KTVSingRoleMainSinger playSong")
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+                mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
                 mPlayer.open(songCode, 0)
 
                 // 音量最佳实践调整
@@ -284,7 +292,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     override fun stopSong() {
         KTVLogger.d(TAG, "stopSong called")
         val config = songConfig ?: return
-        hasJoinChannelEx = false
+        mainSingerHasJoinChannelEx = false
+        stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
@@ -293,6 +302,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             leaveChorus2ndChannel()
         }
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+        mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
     }
 
     override fun resumePlay() {
@@ -404,17 +414,28 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     channelMediaOption,
                     object: IRtcEngineEventHandler() {
                         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                            super.onJoinChannelSuccess(channel, uid, elapsed)
-                            if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = true
                             if (isRelease) return
+                            super.onJoinChannelSuccess(channel, uid, elapsed)
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
+                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+                            if (role == KTVSingRole.KTVSingRoleMainSinger) {
+                                mainSingerHasJoinChannelEx = true
+                                countDownLatch?.countDown()
+                            } else if (role == KTVSingRole.KTVSingRoleCoSinger) {
+                                coSingerHasJoinChannelEx = true
+                            }
                         }
 
                         override fun onLeaveChannel(stats: RtcStats?) {
-                            super.onLeaveChannel(stats)
-                            if (role == KTVSingRole.KTVSingRoleMainSinger) hasJoinChannelEx = false
                             if (isRelease) return
+                            super.onLeaveChannel(stats)
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+                            if (role == KTVSingRole.KTVSingRoleMainSinger) {
+                                mainSingerHasJoinChannelEx = false
+                            } else if (role == KTVSingRole.KTVSingRoleCoSinger) {
+                                coSingerHasJoinChannelEx = false
+                            }
                         }
                     }
                 )
@@ -555,13 +576,24 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val isChorusCoSinger = isChorusCoSinger() ?: return
                 if (isChorusCoSinger) {
                     // 本地BGM校准逻辑
-                    if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                    if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED && coSingerHasJoinChannelEx) {
+                        val delta = getNtpTimeInMs() - remoteNtp;
+                        Log.i("dqm", "ChorusCoSinger start to play bgm with position: $delta");
+                        mPlayer.play()
+                        val expectPosition = position + delta + audioPlayoutDelay;
+                        if (expectPosition > 0) {
+                            mPlayer.seek(expectPosition);
+                        }
+                    } else if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
                         val localNtpTime = getNtpTimeInMs()
                         val currentSystemTime = System.currentTimeMillis()
                         val localPosition = currentSystemTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
                         val expectPosition = localNtpTime - remoteNtp + position + audioPlayoutDelay // 期望主唱的播放时间
                         val diff = expectPosition - localPosition
+                        Log.e("dqm", "play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
+                                "  localPosition: " + localPosition + "  localPlayerPosition: " + localPlayerPosition + "  ntp diff: " + (localNtpTime-remoteNtp))
                         if (diff > 40 || diff < -40) { //设置阈值为40ms，避免频繁seek
+                            Log.e("dqm", "!!!!!!!!!!!!!!!!!!!!!");
                             mPlayer.seek(expectPosition)
                         }
                     }
@@ -690,15 +722,25 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         when (mediaPlayerState) {
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
-                mPlayer.play()
-                mPlayer.selectAudioTrack(1)
                 this.localPlayerPosition = 0
+                startSyncPitch()
+                mPlayer.selectAudioTrack(1)
+                val config = songConfig ?: return
+                if (config.role == KTVSingRole.KTVSingRoleMainSinger &&
+                    config.type == KTVSongType.KTVSongTypeChorus) {
+                    Thread {
+                        countDownLatch?.await()
+                        if (mainSingerHasJoinChannelEx) {
+                            mPlayer.play()
+                        }
+                    }.start()
+                } else if (config.role == KTVSingRole.KTVSingRoleMainSinger &&
+                    config.type == KTVSongType.KTVSongTypeSolo) {
+                    mPlayer.play()
+                }
             }
             Constants.MediaPlayerState.PLAYER_STATE_PLAYING -> {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-            }
-            Constants.MediaPlayerState.PLAYER_STATE_PAUSED -> {
-                mRtcEngine.adjustPlaybackSignalVolume(100)
             }
             Constants.MediaPlayerState.PLAYER_STATE_STOPPED -> {
                 mRtcEngine.adjustPlaybackSignalVolume(100)
@@ -777,7 +819,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         renderTimeMs: Long,
         avsync_type: Int
     ): Boolean {
-        if (hasJoinChannelEx) {
+        if (mainSingerHasJoinChannelEx) {
             mRtcEngine.pushDirectAudioFrame(buffer, renderTimeMs, 48000, 2)
         }
         return true
