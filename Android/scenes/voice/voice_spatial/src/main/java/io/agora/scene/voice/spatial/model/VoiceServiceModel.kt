@@ -74,10 +74,10 @@ data class RobotSpatialAudioModel constructor(
     @SerializedName("use_robot") var useRobot: Boolean = false,
     @SerializedName("robot_volume") var robotVolume: Int = 50,
     @SerializedName("red_robot_attenuation") var redRobotAttenuation: Float = 0.5f,
-    @SerializedName("red_robot_absorb") var redRobotAbsorb: Boolean = false,
+    @SerializedName("red_robot_absorb") var redRobotAbsorb: Boolean = true,
     @SerializedName("red_robot_blur") var redRobotBlur: Boolean = false,
     @SerializedName("blue_robot_attenuation") var blueRobotAttenuation: Float = 0.5f,
-    @SerializedName("blue_robot_absorb") var blueRobotAbsorb: Boolean = false,
+    @SerializedName("blue_robot_absorb") var blueRobotAbsorb: Boolean = true,
     @SerializedName("blue_robot_blur") var blueRobotBlur: Boolean = false,
 ) : BaseRoomBean
 

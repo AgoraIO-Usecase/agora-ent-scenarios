@@ -1287,7 +1287,7 @@ class VoiceSyncManagerServiceImp(
 
     private fun innerGenerateAllDefaultSeatInfo(completion: (error: Exception?) -> Unit) {
         val countDownLatch = CountDownLatch(6)
-        innerAddSeatInfo(innerGenerateDefaultSeatInfo(0, "")) {
+        innerAddSeatInfo(innerGenerateDefaultSeatInfo(1, "")) {
             if (it == null) countDownLatch.countDown()
         }
         innerAddSeatInfo(innerGenerateDefaultSeatInfo(2, "")) {
@@ -1363,7 +1363,7 @@ class VoiceSyncManagerServiceImp(
                 //房主上麦
                 innerGenerateAllDefaultSeatInfo {
                     val targetSeatInfo = VoiceMicInfoModel().apply {
-                        micIndex = 1
+                        micIndex = 0
                         member = cacheRoom.owner
                         ownerTag = true
                         micStatus = MicStatus.Normal

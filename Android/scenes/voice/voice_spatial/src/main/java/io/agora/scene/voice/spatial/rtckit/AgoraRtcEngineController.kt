@@ -171,7 +171,7 @@ class AgoraRtcEngineController {
         localSpatialAudioConfig.mRtcEngine = rtcEngine
         localSpatial.initialize(localSpatialAudioConfig)
         localSpatial.setMaxAudioRecvCount(6)
-        localSpatial.setAudioRecvRange(10f)
+        localSpatial.setAudioRecvRange(15f)
         localSpatial.setDistanceUnit(1f)
         spatial = localSpatial
     }
@@ -563,6 +563,8 @@ class AgoraRtcEngineController {
                             botRedPlayer?.play()
                             botBluePlayer?.mute(true)
                             botRedPlayer?.mute(true)
+                            enableRedAbsorb(true)
+                            enableBlueAbsorb(true)
                             playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
                                 spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
                                 localVoicePositionInfoRun?.run()

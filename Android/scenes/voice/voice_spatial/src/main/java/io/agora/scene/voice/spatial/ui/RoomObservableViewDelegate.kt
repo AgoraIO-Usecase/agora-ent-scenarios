@@ -669,7 +669,7 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_AIR_ABSORB_ENABLED, robotInfo.blueRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotAbsorb)
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotBlur)
                 putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100).toInt())
                 putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100).toInt())
             }
