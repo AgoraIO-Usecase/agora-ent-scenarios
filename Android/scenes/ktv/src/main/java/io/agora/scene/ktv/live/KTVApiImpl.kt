@@ -293,7 +293,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         KTVLogger.d(TAG, "stopSong called")
         val config = songConfig ?: return
         mainSingerHasJoinChannelEx = false
-        stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
         this.mReceivedPlayPosition = 0
@@ -578,7 +577,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     // 本地BGM校准逻辑
                     if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED && coSingerHasJoinChannelEx) {
                         val delta = getNtpTimeInMs() - remoteNtp;
-                        Log.i("dqm", "ChorusCoSinger start to play bgm with position: $delta");
                         mPlayer.play()
                         val expectPosition = position + delta + audioPlayoutDelay;
                         if (expectPosition > 0) {
@@ -590,10 +588,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                         val localPosition = currentSystemTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
                         val expectPosition = localNtpTime - remoteNtp + position + audioPlayoutDelay // 期望主唱的播放时间
                         val diff = expectPosition - localPosition
-                        Log.e("dqm", "play_status_seek: " + diff + "  localNtpTime: " + localNtpTime + "  expectPosition: " + expectPosition +
-                                "  localPosition: " + localPosition + "  localPlayerPosition: " + localPlayerPosition + "  ntp diff: " + (localNtpTime-remoteNtp))
                         if (diff > 40 || diff < -40) { //设置阈值为40ms，避免频繁seek
-                            Log.e("dqm", "!!!!!!!!!!!!!!!!!!!!!");
                             mPlayer.seek(expectPosition)
                         }
                     }
@@ -723,7 +718,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             Constants.MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                 duration = mPlayer.duration
                 this.localPlayerPosition = 0
-                startSyncPitch()
                 mPlayer.selectAudioTrack(1)
                 val config = songConfig ?: return
                 if (config.role == KTVSingRole.KTVSingRoleMainSinger &&
