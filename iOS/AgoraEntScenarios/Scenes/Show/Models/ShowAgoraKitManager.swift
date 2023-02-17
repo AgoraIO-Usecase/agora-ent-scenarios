@@ -365,9 +365,11 @@ class ShowAgoraKitManager: NSObject {
     /// 更新采集参数
     /// - Returns:
     func updateCameraCaptureConfiguration() {
-        agoraKit.disableVideo()
+//        agoraKit.disableVideo()
+        agoraKit.stopPreview()
         let ret = agoraKit.setCameraCapturerConfiguration(captureConfig)
-        agoraKit.enableVideo()
+//        agoraKit.enableVideo()
+        agoraKit.startPreview()
         showLogger.info("setCaptureVideoDimensions = \(captureConfig.dimensions), framerate = \(captureConfig.frameRate)  ret = \(ret)")
     }
     
