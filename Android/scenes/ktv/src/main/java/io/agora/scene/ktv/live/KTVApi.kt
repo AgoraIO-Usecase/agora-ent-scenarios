@@ -115,5 +115,13 @@ interface KTVApi {
      */
     fun setLycView(view: LrcControlView)
 
+    /**
+     * 设置听到播放的所有音频的音量
+     */
     fun adjustRemoteVolume(volume: Int)
+
+    /**
+     * 设置听到播放的所有音频的音量
+     */
+    fun setIsMicOpen(isOnMicOpen: Boolean)
 }

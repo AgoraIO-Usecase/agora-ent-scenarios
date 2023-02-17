@@ -2,6 +2,7 @@ package io.agora.scene.ktv.live
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
@@ -64,6 +65,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     // 音高
     private var pitch = 0.0
 
+    // 是否在麦上
+    private var isOnMicOpen = false
     private var isRelease = false
 
     override fun initWithRtcEngine(
@@ -217,7 +220,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             if (role == KTVSingRole.KTVSingRoleMainSinger) {
                 KTVLogger.d(TAG, "KTVSongTypeSolo,KTVSingRoleMainSinger playSong")
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
-                mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+                mRtcEngine.setParameters("{\"che.audio.enable.md\": false}")
                 mPlayer.open(songCode, 0)
 
                 // 音量最佳实践调整
@@ -301,7 +304,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             leaveChorus2ndChannel()
         }
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
-        mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+        mRtcEngine.setParameters("{\"che.audio.enable.md\": false}")
     }
 
     override fun resumePlay() {
@@ -336,6 +339,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
             mRtcEngine.adjustPlaybackSignalVolume(volume)
         }
+    }
+
+    override fun setIsMicOpen(isOnMicOpen: Boolean) {
+        Log.d("pigpig", "setIsMicOpen: " + isOnMicOpen)
+        this.isOnMicOpen = isOnMicOpen
     }
 
     // ------------------ inner --------------------
@@ -416,7 +424,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             if (isRelease) return
                             super.onJoinChannelSuccess(channel, uid, elapsed)
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
-                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}")
                             if (role == KTVSingRole.KTVSingRoleMainSinger) {
                                 mainSingerHasJoinChannelEx = true
                                 countDownLatch?.countDown()
@@ -429,7 +437,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                             if (isRelease) return
                             super.onLeaveChannel(stats)
                             mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
-                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
+                            mRtcEngine.setParameters("{\"che.audio.enable.md\": false}")
                             if (role == KTVSingRole.KTVSingRoleMainSinger) {
                                 mainSingerHasJoinChannelEx = false
                             } else if (role == KTVSingRole.KTVSingRoleCoSinger) {
@@ -645,7 +653,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         ) {
             for (info in allSpeakers) {
                 if (info.uid == 0) {
-                    pitch = if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING) {
+                    pitch = if (mPlayer.state == Constants.MediaPlayerState.PLAYER_STATE_PLAYING && isOnMicOpen) {
                         info.voicePitch
                     } else {
                         0.0

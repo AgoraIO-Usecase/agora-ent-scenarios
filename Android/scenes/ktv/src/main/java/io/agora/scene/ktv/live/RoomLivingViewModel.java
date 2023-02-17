@@ -155,6 +155,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     public void init() {
         if (isRoomOwner()) {
+            ktvApiProtocol.setIsMicOpen(true);
             isOnSeat = true;
         }
         initRTCPlayer();
@@ -554,6 +555,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
     }
 
     private void updateVolumeStatus(boolean isUnMute) {
+        ktvApiProtocol.setIsMicOpen(isUnMute);
         if (!isUnMute) {
             if (mSetting.isEar()) {
                 isOpnEar = true;
