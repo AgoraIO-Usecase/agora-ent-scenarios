@@ -91,7 +91,7 @@ class SenseBeautyManager: NSObject {
     
     func reset(datas: [BeautyModel]) {
         datas.forEach({
-            $0.isSelected = $0.key == "103"
+//            $0.isSelected = $0.key == "103"
             guard $0.path != nil, let key = UInt32($0.key ?? "0") else { return }
             processor.setEffectType(key, value: 0)
         })
