@@ -1198,7 +1198,7 @@ class LiveDetailFragment : Fragment() {
                     activity?.runOnUiThread {
                         refreshStatisticInfo(
                             upBitrate = stats.sentBitrate,
-                            encodeFps = stats.sentFrameRate,
+                            encodeFps = stats.captureFrameRate,
                             upLossPackage = stats.txPacketLossRate,
                             encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
                         )

@@ -521,8 +521,9 @@ object VideoSetting {
             // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         captureResolution?.let {
+            var fps: Int = frameRate?.fps ?: let { 15 }
             rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
-                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, 15)
+                CameraCapturerConfiguration.CaptureFormat(it.width, it.height, fps)
             ).apply {
                 followEncodeDimensionRatio = false
             })
