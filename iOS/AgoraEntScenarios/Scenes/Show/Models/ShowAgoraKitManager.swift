@@ -261,7 +261,7 @@ class ShowAgoraKitManager: NSObject {
         NetworkManager.shared.generateToken(channelName: channelId,
                                             uid: UserInfo.userId,
                                             tokenType: .token007,
-                                            type: .rtc) { token in
+                                            type: .rtc) {[weak self] token in
             guard let token = token else {
                 showLogger.error("renewToken fail: token is empty")
                 return
@@ -269,7 +269,7 @@ class ShowAgoraKitManager: NSObject {
             let option = AgoraRtcChannelMediaOptions()
             option.token = token
             AppContext.shared.rtcTokenMap?[channelId] = token
-            self.updateChannelEx(channelId: channelId, options: option)
+            self?.updateChannelEx(channelId: channelId, options: option)
         }
     }
     

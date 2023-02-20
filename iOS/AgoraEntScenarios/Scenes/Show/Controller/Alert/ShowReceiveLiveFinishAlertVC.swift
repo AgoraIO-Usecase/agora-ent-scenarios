@@ -58,6 +58,12 @@ extension ShowReceiveLiveFinishAlertVC {
                     ownerUrl: String,
                     ownerName: String,
                     dismiss: @escaping (()->())){
+        for childVC in topVC.children {
+            if childVC is ShowReceiveLiveFinishAlertVC {
+                return
+            }
+        }
+        
         let vc = ShowReceiveLiveFinishAlertVC()
         vc.finishAlertView.headImg = ownerUrl
         vc.finishAlertView.headName = ownerName
