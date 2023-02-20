@@ -245,8 +245,9 @@ class ShowLiveViewController: UIViewController {
         } else {
             AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
-                if let _ = error {
+                if let err = error {
     //                ToastView.show(text: error.localizedDescription)
+                    showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId!), error = \(err) ")
                     self.onRoomExpired()
                     return
                 }
@@ -312,7 +313,8 @@ class ShowLiveViewController: UIViewController {
                                       targetChannelId: channelId,
                                       ownerId: uid,
                                       options: self.channelOptions,
-                                      role: role) {
+                                      role: role) { [weak self] in
+            guard let self = self else { return }
             if needUpdateCavans {
                 if self.role == .audience {
                     self.agoraKitManager.setupRemoteVideo(channelId: channelId,
@@ -463,6 +465,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
     func onUserLeftRoom(user: ShowUser) {
         if user.userId == room?.ownerId {
+            showLogger.info(" finishAlertVC onUserLeftRoom : roomid = \(roomId)")
             onRoomExpired()
         }
     }
