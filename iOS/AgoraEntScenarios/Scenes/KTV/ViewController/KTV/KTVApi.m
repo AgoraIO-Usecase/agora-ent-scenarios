@@ -96,7 +96,7 @@ time_t uptime(void) {
         
         //为了 尽量不超时 设置了1000ms
         [self.engine setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
-        [self.engine setParameters:@"{\"che.audio.agc.enable\": true}"];
+//        [self.engine setParameters:@"{\"che.audio.agc.enable\": true}"];
         [self.engine setParameters:@"{\"rtc.video.enable_sync_render_ntp\": true}"];
         [self.engine setParameters:@"{\"rtc.net.maxS2LDelay\": 800}"];
 //        [self.engine setParameters:@"{\"che.audio.custom_bitrate\":128000}"];
@@ -319,7 +319,7 @@ time_t uptime(void) {
     self.config = nil;
     
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
+//    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -676,7 +676,7 @@ time_t uptime(void) {
 -(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
 {
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
+//    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
 }
 
 #pragma private apis
@@ -747,7 +747,7 @@ time_t uptime(void) {
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
         
-        [weakSelf.engine setParameters: @"{\"che.audio.enable.md \": false}"];
+//        [weakSelf.engine setParameters: @"{\"che.audio.enable.md \": false}"];
         if(weakSelf.config.type == KTVSongTypeChorus &&
            weakSelf.config.role == KTVSingRoleMainSinger) {
             //fix pushDirectAudioFrameRawData frozen

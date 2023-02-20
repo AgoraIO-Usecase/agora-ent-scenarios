@@ -768,7 +768,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
     [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
-    [self.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
+//    [self.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:250 smooth:3 reportVad:YES];
     if (code == 0) {
@@ -831,7 +831,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                        mediaOptions:[self channelMediaOptions]
                         joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"Agora - 加入RTC成功");
-        [weakSelf.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
+//        [weakSelf.RTCkit setParameters: @"{\"che.audio.enable.md \": false}"];
     }];
     if (ret != 0) {
         KTVLogError(@"joinChannelByToken fail: %d, uid: %ld, token: %@", ret, [VLUserCenter.user.id integerValue], VLUserCenter.user.agoraRTCToken);
