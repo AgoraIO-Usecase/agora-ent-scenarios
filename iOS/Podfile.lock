@@ -33,7 +33,7 @@ PODS:
     - LSTTimer
   - LSTTimer (0.2.10)
   - Masonry (1.1.0)
-  - Protobuf (3.21.12)
+  - Protobuf (3.22.0)
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
@@ -124,7 +124,7 @@ SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 260f18dfa184b64b064ddeb222aae08f6f6c4937
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
-  AgoraLyricsScore: 3349439e88dd3562518f807d0dd933fbe242f08c
+  AgoraLyricsScore: 503fb9a0ddd073a5faaab37db537614c9650ec82
   AgoraRtcEngine_iOS: 7af3b344c55059556eeb05dc748ff124c593d4fb
   AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
   AgoraSyncManager: ee9b8af10559986f82a3c98308fa60603aedfa25
@@ -136,7 +136,7 @@ SPEC CHECKSUMS:
   LSTPopView: 9379f00f6ce7d1fc620b50ab00ed3ef97b2d4d52
   LSTTimer: caf8f02ff366ca175cf4c1778d26c166183c1b6f
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
+  Protobuf: 5e6cbc143d02fe08585d86b0098f8b755d2caaab
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608

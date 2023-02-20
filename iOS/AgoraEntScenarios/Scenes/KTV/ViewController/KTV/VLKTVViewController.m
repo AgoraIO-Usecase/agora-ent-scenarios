@@ -917,20 +917,15 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 //track has to be selected after loaded
                 [self.ktvApi selectTrackMode:self.trackMode];
             }
-            //[self.MVView start];
-            [self.ktvApi startTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPlay];
         } else if(state == AgoraMediaPlayerStatePaused) {
-           // [self.MVView stop];
-            [self.ktvApi pauseTimer];
             [self.MVView updateMVPlayerState:VLKTVMVViewActionTypeMVPause];
         } else if(state == AgoraMediaPlayerStateStopped) {
             [self.MVView reset];
-            [self.ktvApi pauseTimer];
-            self.ktvApi.last = 0;
+            if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
+                [self.MVView showSkipView:false];
+            }
         } else if(state == AgoraMediaPlayerStatePlayBackAllLoopsCompleted) {
-            [self.ktvApi pauseTimer];
-            self.ktvApi.last = 0;
             if([self isCurrentSongMainSinger:VLUserCenter.user.id]){
                 [self.MVView showSkipView:false];
             }
