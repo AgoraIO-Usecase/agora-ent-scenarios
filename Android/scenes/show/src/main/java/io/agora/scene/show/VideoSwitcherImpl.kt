@@ -88,7 +88,9 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         joinRtcChannel(connectionWrap, eventListener)
         connectionsJoined.add(connectionWrap)
 
-        preloadChannels()
+        if(connectionsJoined.size == 1){
+            preloadChannels()
+        }
     }
 
     private fun preloadChannels() {
@@ -182,12 +184,15 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                 }
                 return
             }
-
             it.release()
         }
 
         var videoView = container.container.getChildAt(container.viewIndex)
         if (videoView !is TextureView) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        } else {
+            container.container.removeViewInLayout(videoView)
             videoView = TextureView(container.container.context)
             container.container.addView(videoView, container.viewIndex)
         }

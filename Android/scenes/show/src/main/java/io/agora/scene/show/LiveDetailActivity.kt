@@ -129,7 +129,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
+                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
                     when(state){
                         ViewPager2.SCROLL_STATE_SETTLING -> mBinding.viewPager2.isUserInputEnabled = false
                         ViewPager2.SCROLL_STATE_IDLE -> {
