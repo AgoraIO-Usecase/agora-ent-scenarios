@@ -248,7 +248,8 @@ class ShowLiveViewController: UIViewController {
                 if let err = error {
     //                ToastView.show(text: error.localizedDescription)
                     showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId!), error = \(err) ")
-                    self.onRoomExpired()
+//                    self.onRoomExpired()
+                    self._ensureRoomIsExst(roomId: room.roomId!)
                     return
                 }
                 showLogger.info("self.loadingType ==== \(self.loadingType)")
@@ -396,6 +397,24 @@ extension ShowLiveViewController {
 
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
+    
+    private func _ensureRoomIsExst(roomId: String) {
+        AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
+            guard let self = self else { return }
+            guard let list = roomList else {
+                self.onRoomExpired()
+                return
+            }
+            for item in list {
+                let aRoomId = item.roomId
+                if aRoomId == roomId {
+                    return
+                }
+            }
+            self.onRoomExpired()
+        }
+    }
+    
     private func _subscribeServiceEvent() {
         let service = AppContext.showServiceImp(roomId)
         
