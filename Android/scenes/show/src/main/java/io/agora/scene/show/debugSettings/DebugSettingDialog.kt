@@ -127,7 +127,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 if (isFocus) return
                 val etFps = mBinding.etFps.text.toString().toIntOrNull()?: 30
                 RtcEngineInstance.videoEncoderConfiguration.frameRate = etFps
-                RtcEngineInstance.rtcEngine.setCameraCapturerConfiguration(RtcEngineInstance.videoCaptureConfiguration)
+                RtcEngineInstance.rtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 ShowLogger.d(TAG, "videoCaptureConfiguration.frameRate: $etFps")
             }
         }
@@ -140,7 +140,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 val etResolutionHeight = mBinding.etResolutionHeight.text.toString().toIntOrNull()?: 1080
                 RtcEngineInstance.videoEncoderConfiguration.dimensions.width = etResolutionWidth
                 RtcEngineInstance.videoEncoderConfiguration.dimensions.height = etResolutionHeight
-                RtcEngineInstance.rtcEngine.setCameraCapturerConfiguration(RtcEngineInstance.videoCaptureConfiguration)
+                RtcEngineInstance.rtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 ShowLogger.d(TAG, "videoCaptureConfiguration.dimensions: $etResolutionWidth, $etResolutionHeight")
             }
         }
@@ -152,7 +152,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 val etResolutionHeight = mBinding.etResolutionHeight.text.toString().toIntOrNull()?: 1080
                 RtcEngineInstance.videoEncoderConfiguration.dimensions.width = etResolutionWidth
                 RtcEngineInstance.videoEncoderConfiguration.dimensions.height = etResolutionHeight
-                RtcEngineInstance.rtcEngine.setCameraCapturerConfiguration(RtcEngineInstance.videoCaptureConfiguration)
+                RtcEngineInstance.rtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 ShowLogger.d(TAG, "videoCaptureConfiguration.dimensions: $etResolutionWidth, $etResolutionHeight")
             }
         }
@@ -163,6 +163,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 if (isFocus) return
                 val bitrate = mBinding.etBitrate.text.toString().toIntOrNull()?: 720
                 RtcEngineInstance.videoEncoderConfiguration.bitrate = bitrate
+                RtcEngineInstance.rtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 ShowLogger.d(TAG, "videoCaptureConfiguration.bitrate: $bitrate")
             }
         }
@@ -214,7 +215,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 if (isFocus) return
                 val cameraNum = mBinding.etSwitchCamera.text.toString().toIntOrNull()
                 RtcEngineInstance.debugSettingModel.cameraSelect = cameraNum
-                if (cameraNum != null && (cameraNum == 1 || cameraNum == 2)) {
+                if (cameraNum != null && (cameraNum == 0 || cameraNum == 1)) {
                     RtcEngineInstance.rtcEngine.setParameters("{\"che.video.android_camera_select\":$cameraNum}")
                     ShowLogger.d(TAG, "che.video.android_camera_select: $cameraNum")
                 }
