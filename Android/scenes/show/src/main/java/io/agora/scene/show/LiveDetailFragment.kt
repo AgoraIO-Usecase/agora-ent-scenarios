@@ -716,10 +716,10 @@ class LiveDetailFragment : Fragment() {
                     mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/relax.wav", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
@@ -1158,9 +1158,14 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo != null &&
             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)
         ) {
-            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
+            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
+                mService.leaveRoom(mRoomInfo.roomId)
+            }, {
+                mService.leaveRoom(mRoomInfo.roomId)
+            })
+        }else{
+            mService.leaveRoom(mRoomInfo.roomId)
         }
-        mService.leaveRoom(mRoomInfo.roomId)
     }
 
     private fun showLivingEndLayout() {
