@@ -100,10 +100,9 @@
     _karaokeView.delegate = self;
     _karaokeView.lyricsView.textNormalColor = [UIColor grayColor];
     _karaokeView.lyricsView.textSelectedColor = [UIColor whiteColor];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor colorWithHexString:@"#FF8AB4"];
+    _karaokeView.lyricsView.textHighlightedColor = [UIColor yellowColor];
     _karaokeView.lyricsView.textNormalFontSize = [UIFont fontWithName:@"PingFang SC" size:13];
     _karaokeView.lyricsView.textHighlightFontSize = [UIFont fontWithName:@"PingFang SC" size:16];
-    _karaokeView.lyricsView.draggable = true;
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
     _karaokeView.scoringView.localPitchCursorOffsetX = 5;
@@ -286,7 +285,7 @@
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
     self.idleView.hidden = song;
     self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
-    
+    self.karaokeView.lyricsView.draggable = !song.isChorus;
     //config score label visibility
 //    self.config.isHiddenScoreView = NO;
 //    [self.lrcView setConfig:self.config];
