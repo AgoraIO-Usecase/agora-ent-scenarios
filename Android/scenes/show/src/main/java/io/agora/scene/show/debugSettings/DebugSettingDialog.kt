@@ -72,7 +72,7 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
         }
         // 镜像
         setEnable(mBinding.mirrorSwitchCompat, RtcEngineInstance.debugSettingModel.mirrorMode)
-        // hit / hidden
+        // hidden / fix
         if (RtcEngineInstance.debugSettingModel.renderMode == 1) {
             setSelect(mBinding.fixModeRadioBox, 0)
         } else {
@@ -291,8 +291,8 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
             // setUpLocalVideo videoCanvas mirrorMode
             RtcEngineInstance.debugSettingModel.mirrorMode = isOpen
             val mirrorMode = if (isOpen)  VIDEO_MIRROR_MODE_ENABLED else VIDEO_MIRROR_MODE_DISABLED
-            val renderMode = if (RtcEngineInstance.debugSettingModel.renderMode == 0)  RENDER_MODE_HIDDEN else RENDER_MODE_FIT
-            RtcEngineInstance.rtcEngine.setLocalRenderMode(mirrorMode, renderMode)
+            val renderMode = if (RtcEngineInstance.debugSettingModel.renderMode == 1)  RENDER_MODE_HIDDEN else RENDER_MODE_FIT
+            RtcEngineInstance.rtcEngine.setLocalRenderMode(renderMode, mirrorMode)
             ShowLogger.d(TAG, "setLocalRenderMode mirrorMode: $mirrorMode, renderMode: $renderMode")
         }
 
@@ -304,13 +304,13 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                     // hidden
                     RtcEngineInstance.debugSettingModel.renderMode = 1
                     val mirrorMode = if (RtcEngineInstance.debugSettingModel.mirrorMode)  VIDEO_MIRROR_MODE_ENABLED else VIDEO_MIRROR_MODE_DISABLED
-                    RtcEngineInstance.rtcEngine.setLocalRenderMode(mirrorMode, RENDER_MODE_HIDDEN)
+                    RtcEngineInstance.rtcEngine.setLocalRenderMode(RENDER_MODE_HIDDEN, mirrorMode)
                     ShowLogger.d(TAG, "setLocalRenderMode mirrorMode: $mirrorMode, renderMode: 1(hidden)")
                 } else if (p2 == 1) {
                     // fit
                     RtcEngineInstance.debugSettingModel.renderMode = 2
                     val mirrorMode = if (RtcEngineInstance.debugSettingModel.mirrorMode)  VIDEO_MIRROR_MODE_ENABLED else VIDEO_MIRROR_MODE_DISABLED
-                    RtcEngineInstance.rtcEngine.setLocalRenderMode(mirrorMode, RENDER_MODE_FIT)
+                    RtcEngineInstance.rtcEngine.setLocalRenderMode(RENDER_MODE_FIT, mirrorMode)
                     ShowLogger.d(TAG, "setLocalRenderMode mirrorMode: $mirrorMode, renderMode: 2(fit)")
                 }
             }
