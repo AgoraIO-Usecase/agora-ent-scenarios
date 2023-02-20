@@ -304,6 +304,7 @@ class ShowSyncManagerServiceImpl(
         initSync {
             Sync.Instance().joinScene(
                 roomInfo.ownerId == UserManager.getInstance().user.id.toString() || roomInfo.isRobotRoom(),
+                true,
                 roomId, object : Sync.JoinSceneCallback {
                     override fun onSuccess(sceneReference: SceneReference?) {
                         roomInfoController.sceneReference = sceneReference
