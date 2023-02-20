@@ -1208,35 +1208,29 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRtcStats = { stats ->
-                if (isRoomOwner) {
-                    runOnUiThread {
-                        refreshStatisticInfo(
-                            cpuAppUsage = stats.cpuAppUsage,
-                            cpuTotalUsage = stats.cpuTotalUsage,
-                        )
-                    }
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        cpuAppUsage = stats.cpuAppUsage,
+                        cpuTotalUsage = stats.cpuTotalUsage,
+                    )
                 }
             },
             onLocalVideoStats = { stats ->
-                if (isRoomOwner) {
-                    runOnUiThread {
-                        refreshStatisticInfo(
-                            upBitrate = stats.sentBitrate,
-                            encodeFps = stats.captureFrameRate,
-                            upLossPackage = stats.txPacketLossRate,
-                            encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
-                        )
-                    }
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        upBitrate = stats.sentBitrate,
+                        encodeFps = stats.captureFrameRate,
+                        upLossPackage = stats.txPacketLossRate,
+                        encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
+                    )
                 }
             },
             onLocalAudioStats = { stats ->
-                if (isRoomOwner) {
-                    runOnUiThread {
-                        refreshStatisticInfo(
-                            audioBitrate = stats.sentBitrate,
-                            audioLossPackage = stats.txPacketLossRate
-                        )
-                    }
+                runOnUiThread {
+                    refreshStatisticInfo(
+                        audioBitrate = stats.sentBitrate,
+                        audioLossPackage = stats.txPacketLossRate
+                    )
                 }
             },
             onRemoteVideoStats = { stats ->
