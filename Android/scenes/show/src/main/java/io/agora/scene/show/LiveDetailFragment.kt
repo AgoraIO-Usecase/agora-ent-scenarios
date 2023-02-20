@@ -491,6 +491,7 @@ class LiveDetailFragment : Fragment() {
         // 上行码率、下行码率
         upBitrate: Int? = null, downBitrate: Int? = null
     ) {
+        activity ?: return
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
         val visible = statisticBinding.isVisible
@@ -1597,12 +1598,12 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.enableLocalVideo(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
-            channelMediaOptions.publishMicrophoneTrack = true
+            channelMediaOptions.publishMicrophoneTrack = false
             channelMediaOptions.publishCustomAudioTrack = false
-            channelMediaOptions.enableAudioRecordingOrPlayout = true
+            channelMediaOptions.enableAudioRecordingOrPlayout = false
             channelMediaOptions.autoSubscribeVideo = true
-            channelMediaOptions.autoSubscribeAudio = false
-            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+            channelMediaOptions.autoSubscribeAudio = true
+            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
@@ -1619,6 +1620,7 @@ class LiveDetailFragment : Fragment() {
                     viewIndex = 0
                 )
             )
+
         } else {
             // 观众
             val channelMediaOptions = ChannelMediaOptions()
