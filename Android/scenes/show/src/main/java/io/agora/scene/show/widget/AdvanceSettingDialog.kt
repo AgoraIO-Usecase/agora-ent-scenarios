@@ -399,7 +399,7 @@ class AdvanceSettingDialog(context: Context) : BottomFullDialog(context) {
     private fun onSelectorChanged(itemId: Int, index: Int) {
         when (itemId) {
             ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(encoderResolution = VideoSetting.ResolutionList[index], captureResolution = VideoSetting.ResolutionList[index])
-            ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(frameRate = VideoSetting.FrameRateList[index])
+            ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(captureResolution = VideoSetting.ResolutionList[index], frameRate = VideoSetting.FrameRateList[index])
         }
     }
 }
