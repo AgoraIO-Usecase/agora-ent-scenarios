@@ -949,10 +949,11 @@ class LiveDetailFragment : Fragment() {
             resetSettingsItem(interactionInfo!!.ownerMuteAudio)
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.enableLocalVideo(activated)
+                    LivePKSettingsDialog.ITEM_ID_CAMERA -> mRtcEngine.muteLocalVideoStreamEx(!activated, mMainRtcConnection)
                     LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         mService.muteAudio(mRoomInfo.roomId, !activated, mRoomInfo.ownerId)
+                        mRtcEngine.muteLocalAudioStreamEx(!activated, RtcConnection(interactionInfo!!.roomId, UserManager.getInstance().user.id.toInt()))
                     }
                     LivePKSettingsDialog.ITEM_ID_STOP_PK -> {
                         if (interactionInfo != null) {
@@ -1215,7 +1216,7 @@ class LiveDetailFragment : Fragment() {
                     runOnUiThread {
                         refreshStatisticInfo(
                             upBitrate = stats.sentBitrate,
-                            encodeFps = stats.sentFrameRate,
+                            encodeFps = stats.captureFrameRate,
                             upLossPackage = stats.txPacketLossRate,
                             encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
                         )
