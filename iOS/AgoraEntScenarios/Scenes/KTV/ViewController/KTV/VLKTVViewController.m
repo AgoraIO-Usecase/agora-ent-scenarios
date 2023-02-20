@@ -98,6 +98,7 @@ KTVApiDelegate
 @property (nonatomic, assign) BOOL isNowCameraMuted;
 @property (nonatomic, assign) BOOL isOnMicSeat;
 @property (nonatomic, assign) BOOL isEarOn;
+@property (nonatomic, assign) int playoutVolume;
 @property (nonatomic, assign) KTVPlayerTrackMode trackMode;
 
 @property (nonatomic, strong) NSArray <VLRoomSelSongModel*>* selSongsArray;
@@ -515,6 +516,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //TODO: fix score view visible problem while owner reopen the room
     [self.MVView updateUIWithSong:model onSeat:self.isOnMicSeat];
     [self markSongPlaying:model];
+    
+    //TODO: will remove ktv api adjust playout volume method
+    [self setPlayoutVolume:[model isChorus] ? 50 : 100];
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
         [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
@@ -1149,14 +1153,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     } else if (type == VLKTVValueDidChangedTypeAcc) { // 伴奏
         int value = setting.accValue * 400;
-        // 官方文档是100 ？ SDK 是 400？？？？
-        // 调节本地播放音量 取值范围为 [0,100]
-        // 0、无声。 100、（默认）媒体文件的原始播放音量
-        [self.ktvApi adjustPlayoutVolume:value];
-        
-        // 调节远端用户听到的音量 取值范围[0、400]
-        // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
-        [self.ktvApi adjustPublishSignalVolume:value];
+        self.playoutVolume = value;
     } else if (type == VLKTVValueDidChangedTypeListItem) {
         AgoraAudioEffectPreset preset = [self audioEffectPreset:setting.kindIndex];
         [self.RTCkit setAudioEffectPreset:preset];
@@ -1340,6 +1337,22 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self _checkInEarMonitoring];
     NSAssert(self.settingView != nil, @"self.settingView == nil");
     [self.settingView setIsEarOn:isEarOn];
+}
+
+- (void)setPlayoutVolume:(int)playoutVolume {
+    _playoutVolume = playoutVolume;
+    
+    // 官方文档是100 ？ SDK 是 400？？？？
+    // 调节本地播放音量 取值范围为 [0,100]
+    // 0、无声。 100、（默认）媒体文件的原始播放音量
+    [self.ktvApi adjustPlayoutVolume:playoutVolume];
+    
+    // 调节远端用户听到的音量 取值范围[0、400]
+    // 100: （默认）媒体文件的原始音量。400: 原始音量的四倍（自带溢出保护）
+    [self.ktvApi adjustPublishSignalVolume:playoutVolume];
+    
+    //update ui
+    [self.settingView setAccValue: (float)playoutVolume / 400.0];
 }
 
 - (void)_checkInEarMonitoring {
