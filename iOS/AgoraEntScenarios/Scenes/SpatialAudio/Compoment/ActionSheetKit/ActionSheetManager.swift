@@ -233,7 +233,7 @@ class ActionSheetManager: UIView {
         let vcs = vc.navigationController?.viewControllers ?? []
         let isContainer = vcs.contains(where: { $0 is SAAlertViewController })
         let maxH = Screen.height * 0.75
-        let tableViewH = tableView.contentSize.height >= maxH ? maxH : tableView.contentSize.height
+        let tableViewH = tableView.contentSize.height >= maxH ? maxH : tableView.contentSize.height < 300 ? 300 : tableView.contentSize.height
         tableViewHCons?.constant = tableViewH
         tableViewHCons?.isActive = true
         var height = tableViewH + 59 + Screen.safeAreaBottomHeight()

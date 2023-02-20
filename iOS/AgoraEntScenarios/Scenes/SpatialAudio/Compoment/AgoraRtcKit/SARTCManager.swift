@@ -504,6 +504,12 @@ public let kMPK_RTC_UID_SA: UInt = 1
         }
     }
 
+    //Dump 全链路音频数据收集
+    public func setAPMOn(isOn: Bool){
+        rtcKit.setParameters("{\"rtc.debug.enable\": \(isOn)}")
+        rtcKit.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
+    }
+    
     //AGC-新增人声自动增益开关
     public func setAGCOn(isOn:Bool){
         if (isOn) {

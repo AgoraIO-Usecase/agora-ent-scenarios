@@ -40,6 +40,18 @@ class SARoomViewController: SABaseViewController {
                                                       width: ScreenWidth,
                                                       height: 50),
                                         style: .spatialAudio)
+    private lazy var debugButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Debug", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.cornerRadius(25)
+        button.backgroundColor = .white
+        button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
+        return button
+    }()
+    private lazy var actionView = ActionSheetManager()
+    
     private lazy var tipsView = SASpatialTipsView()
 
     var preView: SAVMPresentView!
@@ -121,6 +133,8 @@ extension SARoomViewController {
         rtckit.delegate = self
         let _ = self.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self.vmType ) == 0
         rtckit.initSpatialAudio(recvRange: 15)
+        // 收集APM全链路音频
+        rtckit.setAPMOn(isOn: true)
     }
     
     func refreshRoomInfo() {
@@ -229,10 +243,30 @@ extension SARoomViewController {
         }
         view.addSubViews([chatBar])
         
+        view.addSubview(debugButton)
+        debugButton.translatesAutoresizingMaskIntoConstraints = false
+        debugButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -35).isActive = true
+        debugButton.bottomAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        debugButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        debugButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
         view.layoutIfNeeded()
     }
 
 
+    @objc
+    private func onTapDebugButton() {
+        actionView.section(section: 1)
+            .row(row: 1)
+            .title(title: "Dump数据类型")
+            .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: true)
+            .config()
+        actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
+            self?.rtckit.setAPMOn(isOn: isOn)
+        }
+        actionView.show()
+    }
+    
     func didHeaderAction(with action: SAHEADER_ACTION, destroyed: Bool) {
         if action == .back || action == .popBack {
             if isOwner && action != .popBack {
