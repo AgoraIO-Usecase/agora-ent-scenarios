@@ -1010,11 +1010,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         config.mAppId = BuildConfig.AGORA_APP_ID;
         config.mEventHandler = new IRtcEngineEventHandler() {
             @Override
-            public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
-                if (mRtcEngine == null) return;
-                mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
-            }
-            @Override
             public void onStreamMessage(int uid, int streamId, byte[] data) {
                 JSONObject jsonMsg;
                 try {
@@ -1070,10 +1065,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         mRtcEngine.enableAudioVolumeIndication(30, 10, true);
 
         mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}");
-        mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}");
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}");
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}");
-        mRtcEngine.setParameters("{\"che.audio.enable.md\": false}");
         mRtcEngine.setClientRole(isOnSeat ? Constants.CLIENT_ROLE_BROADCASTER : Constants.CLIENT_ROLE_AUDIENCE);
         int ret = mRtcEngine.joinChannel(
                 roomInfoLiveData.getValue().getAgoraRTCToken(),
