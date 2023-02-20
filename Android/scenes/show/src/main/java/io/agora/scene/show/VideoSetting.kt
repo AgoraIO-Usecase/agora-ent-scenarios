@@ -57,9 +57,7 @@ object VideoSetting {
         FrameRate.FPS_7,
         FrameRate.FPS_10,
         FrameRate.FPS_15,
-        FrameRate.FPS_24,
-        FrameRate.FPS_30,
-        FrameRate.FPS_60,
+        FrameRate.FPS_24
     )
 
     enum class DeviceLevel(val value: Int) {
