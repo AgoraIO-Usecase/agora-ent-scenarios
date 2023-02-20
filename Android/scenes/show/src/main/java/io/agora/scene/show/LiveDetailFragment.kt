@@ -1561,6 +1561,24 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun updatePKingMode() {
+        val eventListener = VideoSwitcher.IChannelEventListener(
+            onRemoteVideoStats = { stats ->
+                setEnhance(stats)
+                activity?.runOnUiThread {
+                    refreshStatisticInfo(downBitrate = stats.receivedBitrate, receiveFPS = stats.decoderOutputFrameRate, downLossPackage = stats.packetLossRate, downDelay = stats.delay, receiveVideoSize = Size(stats.width, stats.height))
+                }
+            },
+            onRemoteAudioStats = { stats ->
+                activity?.runOnUiThread {
+                    refreshStatisticInfo(audioBitrate = stats.receivedBitrate, audioLossPackage = stats.audioLossRate)
+                }
+            },
+            onDownlinkNetworkInfoUpdated = { info ->
+                activity?.runOnUiThread {
+                    refreshStatisticInfo(downLinkBps = info.bandwidth_estimation_bps)
+                }
+            }
+        )
         // 开始pk
         if (interactionInfo == null) return
         if (interactionInfo?.interactStatus != ShowInteractionStatus.pking.value) return
@@ -1590,7 +1608,7 @@ class LiveDetailFragment : Fragment() {
                 UserManager.getInstance().user.id.toInt()
             )
             mRtcVideoSwitcher.joinChannel(
-                pkRtcConnection, channelMediaOptions, VideoSwitcher.IChannelEventListener()
+                pkRtcConnection, channelMediaOptions, eventListener
             )
             mRtcVideoSwitcher.setupRemoteVideo(
                 pkRtcConnection,
@@ -1616,7 +1634,7 @@ class LiveDetailFragment : Fragment() {
                 UserManager.getInstance().user.id.toInt()
             )
             mRtcVideoSwitcher.joinChannel(
-                pkRtcConnection, channelMediaOptions, VideoSwitcher.IChannelEventListener()
+                pkRtcConnection, channelMediaOptions, eventListener
             )
 
             mRtcVideoSwitcher.setupRemoteVideo(
