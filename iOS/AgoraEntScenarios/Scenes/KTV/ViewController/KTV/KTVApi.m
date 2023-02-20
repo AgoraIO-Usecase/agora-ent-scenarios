@@ -294,8 +294,6 @@ time_t uptime(void) {
 
 -(void)resumePlay
 {
-    //只在特殊情况(播放等)调用getPosition(会耗时)
-    self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
     if ([self.rtcMediaPlayer getPlayerState] == AgoraMediaPlayerStatePaused) {
         [self.rtcMediaPlayer resume];
     } else {
@@ -432,7 +430,7 @@ time_t uptime(void) {
             [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
         }
         
-        self.remotePlayerPosition = position;
+        self.remotePlayerPosition = uptime() - position;
         self.remotePlayerDuration = duration;
 //        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
@@ -539,9 +537,11 @@ time_t uptime(void) {
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
+        self.remotePlayerPosition = uptime();
     } else if (state == AgoraMediaPlayerStatePlaying) {
-        self.localPlayerPosition = uptime();
+        self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
         self.playerDuration = 0;
+        self.remotePlayerPosition = uptime();
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -585,7 +585,7 @@ time_t uptime(void) {
         return time;
     }
     
-    return self.remotePlayerPosition;
+    return uptime() - self.remotePlayerPosition;
 }
 
 - (NSInteger)playerDuration {
