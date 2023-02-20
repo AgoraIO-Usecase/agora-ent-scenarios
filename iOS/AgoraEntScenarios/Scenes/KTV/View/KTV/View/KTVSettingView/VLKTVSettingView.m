@@ -241,6 +241,11 @@ VLKTVRemoteVolumeViewDelegate
     self.soundSwitcher.on = isEarOn;
 }
 
+- (void)setAccValue:(float)accValue {
+    self.setting.accValue = accValue;
+    self.accSlider.value = accValue;
+}
+
 @end
 
 @implementation VLKTVSettingModel
