@@ -14,6 +14,7 @@ typedef enum : NSUInteger {
     VLMineViewClickTypeAboutUS,            // 关于我们
     VLMineViewClickTypeLogout,             // 退出登录
     VLMineViewClickTypeDestroyAccount,     // 注销账号
+    VLMineViewClickTypeDebug,              // 开发者模式
 } VLMineViewClickType;
 
 typedef enum : NSUInteger {
@@ -38,6 +39,7 @@ typedef enum : NSUInteger {
 - (void)refreseUserInfo:(VLLoginModel *)loginModel;
 - (void)refreseAvatar:(UIImage *)avatar;
 - (void)refreseNickName:(NSString *)nickName;
+- (void)refreshTableView;
 
 @end
 

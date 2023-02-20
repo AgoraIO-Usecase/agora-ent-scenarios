@@ -530,6 +530,8 @@
 		E70B4B142992527D00A7FB7F /* ActionSheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */; };
 		E70B4B162993AC5D00A7FB7F /* SASpatialTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */; };
 		E7922338299CFBDD00596F1E /* SALanagerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7922337299CFBDD00596F1E /* SALanagerManager.swift */; };
+		E792233F29A370CE00596F1E /* VLMineCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E792233E29A370CE00596F1E /* VLMineCellModel.m */; };
+		E792234129A372B600596F1E /* VLMineSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E792234029A372B600596F1E /* VLMineSwitchCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1213,6 +1215,9 @@
 		E70B4B132992527D00A7FB7F /* ActionSheetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSheetManager.swift; sourceTree = "<group>"; };
 		E70B4B152993AC5D00A7FB7F /* SASpatialTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SASpatialTipsView.swift; sourceTree = "<group>"; };
 		E7922337299CFBDD00596F1E /* SALanagerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SALanagerManager.swift; sourceTree = "<group>"; };
+		E792233D29A370C700596F1E /* VLMineCellModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMineCellModel.h; sourceTree = "<group>"; };
+		E792233E29A370CE00596F1E /* VLMineCellModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLMineCellModel.m; sourceTree = "<group>"; };
+		E792234029A372B600596F1E /* VLMineSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VLMineSwitchCell.swift; sourceTree = "<group>"; };
 		FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1734,6 +1739,8 @@
 		DD8416BF29090C520026B624 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				E792233D29A370C700596F1E /* VLMineCellModel.h */,
+				E792233E29A370CE00596F1E /* VLMineCellModel.m */,
 				DD8416C029090C520026B624 /* VLUploadImageResModel.h */,
 				DD8416C129090C520026B624 /* VLUploadImageResModel.m */,
 			);
@@ -1746,6 +1753,7 @@
 				05A491E12994A10E007B1ABB /* AboutAgoraHeader.swift */,
 				05A491DF2994A10E007B1ABB /* ContactInfoCell.swift */,
 				05A491E02994A10E007B1ABB /* SceneVersionCell.swift */,
+				E792234029A372B600596F1E /* VLMineSwitchCell.swift */,
 				DD8416C329090C520026B624 /* VLMineView.m */,
 				DD8416C429090C520026B624 /* VLMineTCell.m */,
 				DD8416C529090C520026B624 /* VLMineView.h */,
@@ -3386,6 +3394,7 @@
 				DDA19A6B28FFE57A009D3E61 /* EKButtonView.swift in Sources */,
 				DDC51CFF298C141C00D837AC /* SpatialAudioServiceModel.swift in Sources */,
 				DDC51E46298C1D8900D837AC /* VoiceRoomInputBar.swift in Sources */,
+				E792233F29A370CE00596F1E /* VLMineCellModel.m in Sources */,
 				DDC51D42298C141C00D837AC /* SAEmojiListView.swift in Sources */,
 				DDC51D1B298C141C00D837AC /* SAEndLiveAlert.swift in Sources */,
 				DD84177B29090C520026B624 /* VLHomeViewController.m in Sources */,
@@ -3415,6 +3424,7 @@
 				DDA199EC28FFE579009D3E61 /* VLAPIRequest.m in Sources */,
 				DDC51E2A298C1D8900D837AC /* VRSoundEffectsViewController.swift in Sources */,
 				DDA19A0828FFE579009D3E61 /* GCDTimer.swift in Sources */,
+				E792234129A372B600596F1E /* VLMineSwitchCell.swift in Sources */,
 				DDC51CEA298C141C00D837AC /* Notification+SAPresentation.swift in Sources */,
 				DDA19A2728FFE57A009D3E61 /* QDThemeManager.m in Sources */,
 				DDC51D13298C141C00D837AC /* SARoomListCell.swift in Sources */,
