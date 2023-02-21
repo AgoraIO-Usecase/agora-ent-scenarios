@@ -395,10 +395,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
                 return;
             }
             int defaultColor = ContextCompat.getColor(getContext(), R.color.yellow_60);
-            mBinding.ilActive.lyricsView.setCurrentTextColor(defaultColor);
+            mBinding.ilActive.lyricsView.setCurrentHighlightedTextColor(defaultColor);
 
             defaultColor = ContextCompat.getColor(getContext(), R.color.white);
-            mBinding.ilActive.lyricsView.setDefaultTextColor(defaultColor);
+            mBinding.ilActive.lyricsView.setCurrentTextColor(defaultColor);
         });
         mBinding.clActive.setBackgroundResource(resId);
     }
