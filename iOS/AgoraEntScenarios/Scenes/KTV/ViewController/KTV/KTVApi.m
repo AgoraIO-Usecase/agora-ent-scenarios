@@ -69,6 +69,8 @@ time_t uptime(void) {
 @property (nonatomic, assign) int chorusRemoteUserVolume;
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
+
+@property (nonatomic, assign) AgoraAudioScenario scenario;
 @end
 
 @implementation KTVApi
@@ -127,6 +129,7 @@ time_t uptime(void) {
     self.config = config;
     KTVSingRole role = config.role;
     NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:songCode]];
+    self.scenario = AgoraAudioScenarioChorus;
     if(loadHistory) {
         KTVLoadSongState state = [loadHistory intValue];
         KTVLogInfo(@"song %ld load state exits %ld", songCode, state);
@@ -142,7 +145,7 @@ time_t uptime(void) {
             return;
         }
     }
-
+    
     [self.loadDict setObject:[NSNumber numberWithInt:KTVLoadSongStateInProgress] forKey:[self songCodeString:songCode]];
 
     dispatch_group_t group = dispatch_group_create();
@@ -227,6 +230,8 @@ time_t uptime(void) {
             state = KTVLoadSongStateOK;
             return block(songCode, [self cachedLyricUrl:songCode], role, state);
         }
+        
+        self.scenario = AgoraAudioScenarioGameStreaming;
         return block(songCode, [self cachedLyricUrl:songCode], role, state);
     });
 }
@@ -318,8 +323,7 @@ time_t uptime(void) {
     [self.lrcView reset];
     self.config = nil;
     
-    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-//    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
+    self.scenario = AgoraAudioScenarioGameStreaming;
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -501,6 +505,12 @@ time_t uptime(void) {
     [self updateRemotePlayBackVolumeIfNeed];
 }
 
+- (void)setScenario:(AgoraAudioScenario)scenario {
+    _scenario = scenario;
+    [self.engine setAudioScenario:scenario];
+    KTVLogInfo(@"setScenario: %ld", scenario);
+}
+
 #pragma mark - AgoraAudioFrameDelegate
 - (BOOL)onRecordAudioFrame:(AgoraAudioFrame *)frame channelId:(NSString *)channelId
 {
@@ -673,11 +683,10 @@ time_t uptime(void) {
 //    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
 //}
 
--(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
-{
-    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-//    [self.engine setParameters: @"{\"che.audio.enable.md \": false}"];
-}
+//-(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
+//{
+//    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
+//}
 
 #pragma private apis
 //发送流消息
@@ -742,12 +751,10 @@ time_t uptime(void) {
     VL(weakSelf);
     [self.engine setDirectExternalAudioSource:YES];
     [self.engine setAudioFrameDelegate:self];
-    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
     int ret =
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
         
-//        [weakSelf.engine setParameters: @"{\"che.audio.enable.md \": false}"];
         if(weakSelf.config.type == KTVSongTypeChorus &&
            weakSelf.config.role == KTVSingRoleMainSinger) {
             //fix pushDirectAudioFrameRawData frozen
