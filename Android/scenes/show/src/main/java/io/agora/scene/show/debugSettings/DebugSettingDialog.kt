@@ -252,12 +252,12 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 == 0) {
                     // 硬编
-                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":true}")
+                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":\"true\"}")
                     RtcEngineInstance.debugSettingModel.enableHWEncoder = true
                     ShowLogger.d(TAG, "engine.video.enable_hw_encoder: true")
                 } else if (p2 == 1) {
                     // 软编
-                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":false}")
+                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":\"false\"}")
                     RtcEngineInstance.debugSettingModel.enableHWEncoder = false
                     ShowLogger.d(TAG, "engine.video.enable_hw_encoder: false")
                 }
@@ -273,12 +273,12 @@ class DebugSettingDialog(context: Context) : BottomFullDialog(context) {
                 if (p2 == 0) {
                     // h265
                     RtcEngineInstance.debugSettingModel.codecType = 3
-                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.codec_type\":3}")
+                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.codec_type\":\"3\"}")
                     ShowLogger.d(TAG, "engine.video.codec_type: 3(h265)")
                 } else if (p2 == 1) {
                     // h264
                     RtcEngineInstance.debugSettingModel.codecType = 2
-                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.codec_type\":2}")
+                    RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.codec_type\":\"2\"}")
                     ShowLogger.d(TAG, "engine.video.codec_type: 2(h264)")
                 }
             }
