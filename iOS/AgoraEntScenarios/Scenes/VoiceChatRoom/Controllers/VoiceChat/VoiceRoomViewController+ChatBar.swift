@@ -66,10 +66,10 @@ extension VoiceRoomViewController {
                 self?.view.makeToast("Host Sound".localized())
                 return
             }
-            if self?.roomInfo?.room?.use_robot == false {
-                self?.view.makeToast("Active First".localized())
-                return
-            }
+//            if self?.roomInfo?.room?.use_robot == false {
+//                self?.view.makeToast("Active First".localized())
+//                return
+//            }
 
             if type == .none {
                 // 如果选择的是其他音效。弹窗确认是否需要退出
