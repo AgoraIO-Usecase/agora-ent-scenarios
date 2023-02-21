@@ -296,6 +296,11 @@ object VideoSetting {
         SPUtil.putBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, currAudienceEnhanceSwitch)
     }
 
+    fun resetAudienceSetting() {
+        val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
+        setCurrAudienceSetting(result)
+    }
+
     fun resetBroadcastSetting() {
         setCurrBroadcastSetting(when (currAudienceDeviceLevel) {
             DeviceLevel.Low -> RecommendBroadcastSetting.LowDevice1v1
