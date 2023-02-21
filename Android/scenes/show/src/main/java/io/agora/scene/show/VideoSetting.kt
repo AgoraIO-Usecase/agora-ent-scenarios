@@ -464,7 +464,10 @@ object VideoSetting {
         isJoinedRoom: Boolean, SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            if (currAudienceEnhanceSwitch) {
+            val enableSR = currAudienceEnhanceSwitch || SR == SuperResolution.SR_NONE
+            ShowLogger.d("VideoSetting", "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch")
+
+            if (enableSR) {
                 // 设置最大分辨率
                 rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921600}")
                 /**
@@ -477,9 +480,8 @@ object VideoSetting {
                  */
                 rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
             }
-            ShowLogger.d("VideoSetting", "SR Config -- enable=$currAudienceEnhanceSwitch sr_type=$SR")
             // 超分开关
-            rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":${currAudienceEnhanceSwitch}, \"mode\": 2}}")
+            rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
         }
     }
 
