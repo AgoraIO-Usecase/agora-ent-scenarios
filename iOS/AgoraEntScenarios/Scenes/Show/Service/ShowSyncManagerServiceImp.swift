@@ -207,8 +207,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         room.createdAt = Date().millionsecondSince1970()
         let params = room.yy_modelToJSONObject() as? [String: Any]
         initScene { [weak self] in
-            SyncUtil.joinScene(id: room.roomId!,
-                          userId: room.ownerId!,
+            SyncUtil.joinScene(id: room.roomId,
+                          userId: room.ownerId,
                           isOwner: true,
                           property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
@@ -251,8 +251,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         let params = room.yy_modelToJSONObject() as? [String: Any]
         initScene { [weak self] in
-            SyncUtil.joinScene(id: room.roomId!,
-                                         userId: room.ownerId!,
+            SyncUtil.joinScene(id: room.roomId,
+                                         userId: room.ownerId,
                                          isOwner: self?.isOwner(room) ?? false,
                                          property: params) { result in
                 //            LogUtils.log(message: "result == \(result.toJson() ?? "")", level: .info)
@@ -294,7 +294,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
         defer {
             self.pkCreatedInvitationMap.values.forEach { invitation in
-                guard let pkRoomId = invitation.roomId else { return }
+                let pkRoomId = invitation.roomId
+                if pkRoomId.isEmpty {return}
                 _leaveScene(roomId: pkRoomId)
             }
             
@@ -517,7 +518,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func createPKInvitation(room: ShowRoomListModel,
                             completion: @escaping (NSError?) -> Void) {
         //if robot room, reject
-        if room.roomId?.count ?? 0 > 6 {
+        if room.roomId.count > 6 {
             completion(ShowError.userCannotAccept.toNSError())
             return
         }
@@ -534,7 +535,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             guard let self = self, error == nil, let invitationList = invitationList else { return }
             
             self._unsubscribePKInvitationChanged(roomId: room.roomId)
-            self._subscribePKInvitationChanged(channelName: room.roomId!) {[weak self] (status, invitation) in
+            self._subscribePKInvitationChanged(channelName: room.roomId) {[weak self] (status, invitation) in
                 self?._handleCreatePkInvitationRespone(invitation: invitation, status: status)
             }
             
@@ -552,16 +553,16 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 _invitation.roomId = room.roomId
                 _invitation.fromUserId = VLUserCenter.user.id
                 _invitation.fromName = VLUserCenter.user.name
-                _invitation.fromRoomId = self.roomId
+                _invitation.fromRoomId = self.roomId ?? ""
                 _invitation.status = .waitting
 //                _invitation.fromUserMuteAudio = self.userMuteLocalAudio
                 _invitation.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-                self.pkCreatedInvitationMap[_invitation.roomId!] = _invitation
+                self.pkCreatedInvitationMap[_invitation.roomId] = _invitation
                 self._addPKInvitation(invitation: _invitation, completion: completion)
                 return
             }
             
-            self.pkCreatedInvitationMap[invitation.roomId!] = invitation
+            self.pkCreatedInvitationMap[invitation.roomId] = invitation
 //            if invitation.status == .waitting {
 //                agoraPrint("pk invitaion already send ")
 //                return
@@ -630,7 +631,7 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
             cancelMicSeatApply { error in
             }
             
-            cancelMicSeatInvitation(userId: interaction.userId ?? "") { err in
+            cancelMicSeatInvitation(userId: interaction.userId) { err in
             }
             return
         }
@@ -1386,11 +1387,8 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _addPKInvitation(invitation: ShowPKInvitation, completion: @escaping (NSError?) -> Void) {
-        guard let channelName = invitation.roomId else {
-//            assert(false, "channelName = nil")
-            agoraPrint("_addPKInvitation channelName = nil")
-            return
-        }
+        let channelName = invitation.roomId
+        if channelName.isEmpty {return}
         agoraPrint("imp pk invitation add... \(channelName)")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
@@ -1407,10 +1405,8 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _removePKInvitation(invitation: ShowPKInvitation, completion: @escaping (NSError?) -> Void) {
-        guard let channelName = invitation.roomId else {
-            agoraPrint("_removePKInvitation channelName = nil")
-            return
-        }
+        let channelName = invitation.roomId
+        if channelName.isEmpty {return}
         agoraPrint("imp pk invitation remove... \(channelName)")
 
         SyncUtil
@@ -1427,10 +1423,8 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _updatePKInvitation(invitation: ShowPKInvitation, completion: @escaping (NSError?) -> Void) {
-        guard let channelName = invitation.roomId else {
-            agoraPrint("_updatePKInvitation channelName = nil")
-            return
-        }
+        let channelName = invitation.roomId
+        if channelName.isEmpty {return}
         agoraPrint("imp pk invitation update... \(channelName)")
 
         let params = invitation.yy_modelToJSONObject() as! [String: Any]
@@ -1449,7 +1443,11 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _recvPKRejected(invitation: ShowPKInvitation) {
-        guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId, pkRoomId != roomId else { return }
+        guard roomId == invitation.fromRoomId else { return }
+        let pkRoomId = invitation.roomId
+        if pkRoomId != roomId {
+            return
+        }
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
 //        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
         _leaveScene(roomId: pkRoomId)
@@ -1500,7 +1498,8 @@ extension ShowSyncManagerServiceImp {
     }
     
     private func _recvPKFinish(invitation: ShowPKInvitation) {
-        guard roomId == invitation.fromRoomId, let pkRoomId = invitation.roomId else { return }
+        guard roomId == invitation.fromRoomId else { return }
+        let pkRoomId = invitation.roomId
         _unsubscribePKInvitationChanged(roomId: pkRoomId)
 //        SyncUtil.scene(id: pkRoomId)?.deleteScenes()
         _leaveScene(roomId: pkRoomId)
@@ -1510,7 +1509,7 @@ extension ShowSyncManagerServiceImp {
         
         _removeInteraction(interaction: interaction) { error in
         }
-        self.pkCreatedInvitationMap[invitation.roomId!] = nil
+        self.pkCreatedInvitationMap[invitation.roomId] = nil
     }
     
     func _getCurrentApplyUser(roomId: String?, completion: @escaping (ShowRoomListModel?) -> Void) {
@@ -1528,7 +1527,7 @@ extension ShowSyncManagerServiceImp {
     //recv pk invitation feedback(accpet/reject/...)
     func _handleCreatePkInvitationRespone(invitation: ShowPKInvitation, status: ShowSubscribeStatus) {
         if status == .created {
-            self.pkCreatedInvitationMap[invitation.roomId!] = invitation
+            self.pkCreatedInvitationMap[invitation.roomId] = invitation
         }
         guard let model = self.pkCreatedInvitationMap.values.filter({ $0.objectId == invitation.objectId }).first else {
             return
@@ -1621,7 +1620,7 @@ extension ShowSyncManagerServiceImp {
                       let model = ShowInteractionInfo.yy_model(withJSON: jsonStr) else {
                     return
                 }
-                let userId = model.userId ?? ""
+                let userId = model.userId
                 let index = self.interactionList.firstIndex(where: { $0.userId == model.userId })
                 if let index = index, !self.interactionPaddingIdsSet.contains(userId) {
                     self.interactionList.remove(at: index)
@@ -1787,7 +1786,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     }
     
     override func isOwner(_ room: ShowRoomListModel) -> Bool {
-        if room.roomId?.count ?? 0 == 6 {
+        if room.roomId.count == 6 {
             return super.isOwner(room)
         }
         
@@ -1795,12 +1794,13 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     }
     
     override func _checkRoomExpire() {
-        guard let room = self.room, let roomId = room.roomId else { return }
-        if room.roomId?.count ?? 0 == 6 {
+        guard let room = self.room else { return }
+        let roomId = room.roomId
+        if room.roomId.count == 6 {
             return super._checkRoomExpire()
         }
         
-        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: room.ownerId ?? "") { msg in
+        NetworkManager.shared.cloudPlayerHeartbeat(channelName: roomId, uid: room.ownerId) { msg in
             guard let msg = msg else {return}
             agoraAssert("cloudPlayerHeartbeat fail: \(roomId) \(msg)")
         }
@@ -1817,7 +1817,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                 
                 var robotIds = robotRoomIds
                 dataArray.forEach { room in
-                    let roomId = (Int(room.roomId ?? "") ?? 0) - kRobotRoomStartId
+                    let roomId = (Int(room.roomId) ?? 0) - kRobotRoomStartId
                     guard roomId > 0, let idx = robotIds.firstIndex(of: "\(roomId)") else{
                         return
                     }
@@ -1861,7 +1861,7 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         super.joinRoom(room: room, completion: completion)
         
-        startCloudPlayer(roomId: room.roomId, robotUid: UInt(room.ownerId ?? "") ?? 0)
+        startCloudPlayer(roomId: room.roomId, robotUid: UInt(room.ownerId) ?? 0)
     }
     
     override func createMicSeatApply(completion: @escaping (NSError?) -> Void) {

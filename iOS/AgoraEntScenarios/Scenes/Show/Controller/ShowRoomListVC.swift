@@ -145,7 +145,7 @@ class ShowRoomListVC: UIViewController {
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .fullScreen
         if room.ownerId == VLUserCenter.user.id {
-            AppContext.showServiceImp(room.roomId!).joinRoom(room: room) {[weak self] error, model in
+            AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, model in
                 if let error = error {
                     ToastView.show(text: error.localizedDescription)
                     return

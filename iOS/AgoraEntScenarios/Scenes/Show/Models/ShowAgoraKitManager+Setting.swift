@@ -360,11 +360,11 @@ extension ShowAgoraKitManager {
             showLogger.info("***Debug*** setCameraAutoFocusFaceModeEnabled  \(isOn)")
         case .encode:
             let index = indexValue % encodeItems.count
-            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\(encodeItems[index])}")
+            agoraKit.setParameters("{\"engine.video.enable_hw_encoder\":\"\(encodeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.enable_hw_encoder  \(encodeItems[index])")
         case .codeCType:
             let index = indexValue % codeCTypeItems.count
-            agoraKit.setParameters("{\"engine.video.codec_type\":\(codeCTypeItems[index])}")
+            agoraKit.setParameters("{\"engine.video.codec_type\":\"\(codeCTypeItems[index])\"}")
             showLogger.info("***Debug*** engine.video.codec_type  \(codeCTypeItems[index])")
 
         case .mirror, .renderMode:
