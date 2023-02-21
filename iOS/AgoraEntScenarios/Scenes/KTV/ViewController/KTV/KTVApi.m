@@ -42,7 +42,8 @@ AgoraRtcMediaPlayerDelegate,
 AgoraMusicContentCenterEventDelegate,
 AgoraRtcEngineDelegate,
 KaraokeDelegate,
-AgoraAudioFrameDelegate
+AgoraAudioFrameDelegate,
+AgoraLrcDownloadDelegate
 >
 
 @property(nonatomic, weak)AgoraRtcEngineKit* engine;
@@ -78,6 +79,7 @@ AgoraAudioFrameDelegate
 @property (nonatomic, assign) NSInteger totalLines;
 @property (nonatomic, assign) double totalScore;
 @property (nonatomic, assign) BOOL isPause;
+@property (assign, nonatomic) double voicePitch;
 
 @property (nonatomic, strong) NSString *currentLoadUrl;//当前正在请求的歌词url
 @end
@@ -104,6 +106,7 @@ AgoraAudioFrameDelegate
         self.dataStreamId = streamId;
         self.musicCenter = musicCenter;
         self.rtcMediaPlayer = rtcMediaPlayer;
+        self.localPlayerPosition = uptime();
         
         //为了 尽量不超时 设置了1000ms
         [self.engine setParameters:@"{\"rtc.ntp_delay_drop_threshold\":1000}"];
@@ -134,14 +137,11 @@ AgoraAudioFrameDelegate
         return;
     }
     kWeakSelf(self)
-    self.last = 0;
-    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.1 block:^(NSTimer * _Nonnull timer) {
-        NSInteger current = self.last;
-        current += 100;
-        self.last = current;
+    self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.05 block:^(NSTimer * _Nonnull timer) {
+        NSInteger current = [weakself getPlayerCurrentTime];
+        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
+        [self setProgressWith:current];
         if(self.config.role == KTVSingRoleMainSinger){
-            NSInteger current = [weakself.rtcMediaPlayer getPosition];
-            [self setProgressWith:current];
             //如果超过前奏时间 自动隐藏前奏View
             if(!weakself.lyricModel){return;}
             if(current + 500 >= weakself.lyricModel.preludeEndPosition && weakself.hasSendPreludeEndPosition == false){
@@ -155,8 +155,6 @@ AgoraAudioFrameDelegate
                     weakself.hasSendEndPosition = true;
                 }
             }
-        } else {
-            [self setProgressWith:self.last];
         }
     } repeats:true];
     
@@ -165,6 +163,7 @@ AgoraAudioFrameDelegate
 -(void)startTimer {
     if(self.isPause == false){
         [self.timer fire];
+        NSLog(@"timer: startTimer---%ld", self.playerState);
     } else {
         [self resumeTimer];
     }
@@ -172,14 +171,18 @@ AgoraAudioFrameDelegate
 
 //恢复定时器
 - (void)resumeTimer {
+    if(self.isPause == false){return;};
     self.isPause = false;
     [self.timer setFireDate:[NSDate date]];
+    NSLog(@"timer: resumeTimer---%ld", self.playerState);
 }
 
 //暂停定时器
 -(void)pauseTimer {
+    if(self.isPause){return;};
     self.isPause = true;
     [self.timer setFireDate:[NSDate distantFuture]];
+    NSLog(@"timer: pauserTimer---%ld", self.playerState);
 }
 
 //释放定时器
@@ -377,13 +380,11 @@ AgoraAudioFrameDelegate
         [self.rtcMediaPlayer play];
     }
     
-    [self resumeTimer];
 }
 
 -(void)pausePlay
 {
     [self.rtcMediaPlayer pause];
-    [self pauseTimer];
 }
 
 -(void)stopSong
@@ -396,7 +397,6 @@ AgoraAudioFrameDelegate
     }
     [self.karaokeView reset];
     self.config = nil;
-    
     [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
 }
 
@@ -411,20 +411,17 @@ AgoraAudioFrameDelegate
 //跳过前奏
 -(void)SkipPrelude{
     [self.rtcMediaPlayer seekToPosition:self.lyricModel.preludeEndPosition];
-    [self setProgressWith: self.lyricModel.preludeEndPosition - 500];
 }
 
 //跳过前奏
 -(void)SkipTheEpilogue{
     [self.rtcMediaPlayer seekToPosition:self.rtcMediaPlayer.getDuration - 500];
-    [self setProgressWith: self.rtcMediaPlayer.getDuration];
 }
 
 -(void)setProgressWith:(NSInteger)progress {
-    self.last = progress;
     kWeakSelf(self)
     dispatch_async(dispatch_get_main_queue(), ^{
-        [weakself.karaokeView setProgressWithProgress:progress];
+        [weakself.karaokeView setPitchWithPitch:self.voicePitch progress:progress];
     });
 }
 
@@ -527,14 +524,15 @@ AgoraAudioFrameDelegate
         NSInteger position = [dict[@"time"] integerValue];
         NSInteger duration = [dict[@"duration"] integerValue];
         NSInteger remoteNtp = [dict[@"ntp"] integerValue];
+        double voicePitch = [dict[@"pitch"] doubleValue];
         AgoraMediaPlayerState state = [dict[@"playerState"] integerValue];
         if (self.playerState != state) {
             KTVLogInfo(@"recv state with setLrcTime : %ld", (long)state);
             self.playerState = state;
+            [self updateCosingerPlayerStatusIfNeed];
             [self.delegate controller:self song:self.config.songCode didChangedToState:state local:NO];
         }
-        [self setProgressWith: position];
-        self.remotePlayerPosition = position;
+        self.remotePlayerPosition = uptime() - position;
         self.remotePlayerDuration = duration;
         //        KTVLogInfo(@"setLrcTime: %ld / %ld", self.remotePlayerPosition, self.remotePlayerDuration);
         if(self.config.type == KTVSongTypeChorus && self.config.role == KTVSingRoleCoSinger) {
@@ -545,10 +543,12 @@ AgoraAudioFrameDelegate
                 NSInteger expectPosition = position + localNtpTime - remoteNtp + self.audioPlayoutDelay;
                 NSInteger threshold = expectPosition - localPosition;
                 if(labs(threshold) > 40) {
-                    KTVLogInfo(@"threshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition);
+                    KTVLogInfo(@"progress: setthreshold: %ld  expectPosition: %ld  position: %ld, localNtpTime: %ld, remoteNtp: %ld, audioPlayoutDelay: %ld, localPosition: %ld", threshold, expectPosition, position, localNtpTime, remoteNtp, self.audioPlayoutDelay, localPosition);
                     [self.rtcMediaPlayer seekToPosition:expectPosition];
                 }
             }
+        } else if (self.config.role == KTVSingRoleAudience) {
+            self.voicePitch = voicePitch;
         }
         [self.delegate controller:self song:self.config.songCode config:self.config didChangedToPosition:position local:NO];
     } else if([dict[@"cmd"] isEqualToString:@"PlayerState"]) {
@@ -561,13 +561,13 @@ AgoraAudioFrameDelegate
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
-        int pitch = [dict[@"pitch"] intValue];
-        NSInteger time = [dict[@"time"] integerValue];
-        kWeakSelf(self)
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakself.karaokeView setPitchWithPitch:pitch progress:time];
-        });
-        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
+//        int pitch = [dict[@"pitch"] intValue];
+//        NSInteger time = [dict[@"time"] integerValue];
+//        kWeakSelf(self)
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [weakself.karaokeView setPitchWithPitch:pitch progress:time];
+//        });
+//        KTVLogInfo(@"receiveStreamMessageFromUid1 setVoicePitch: %ld", time);
     }
 }
 
@@ -579,17 +579,18 @@ AgoraAudioFrameDelegate
     }
     
     double pitch = speakers.firstObject.voicePitch;
-    NSDictionary *dict = @{
-        @"cmd":@"setVoicePitch",
-        @"pitch":@(pitch),
-        @"time": @([self getPlayerCurrentTime])
-    };
-    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
-    }];
-    kWeakSelf(self)
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakself.karaokeView setPitchWithPitch:pitch progress:[self.rtcMediaPlayer getPosition]];
-    });
+    self.voicePitch = pitch;
+//    NSDictionary *dict = @{
+//        @"cmd":@"setVoicePitch",
+//        @"pitch":@(pitch),
+//        @"time": @([self getPlayerCurrentTime])
+//    };
+//    [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
+//    }];
+//    kWeakSelf(self)
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [weakself.karaokeView setPitchWithPitch:pitch progress:[self getPlayerCurrentTime]];
+//    });
     
 }
 
@@ -616,7 +617,7 @@ AgoraAudioFrameDelegate
 
 - (void)onKaraokeViewWithView:(KaraokeView *)view didFinishLineWith:(LyricLineModel *)model score:(NSInteger)score cumulativeScore:(NSInteger)cumulativeScore lineIndex:(NSInteger)lineIndex lineCount:(NSInteger)lineCount{
     self.totalLines = lineCount;
-    self.totalScore = cumulativeScore                ;
+    self.totalScore = cumulativeScore;
     if([self.delegate respondsToSelector:@selector(didlrcViewDidScrollFinishedWithCumulativeScore:totalScore:)]){
         [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.totalScore totalScore:lineCount * 100];
     }
@@ -625,6 +626,29 @@ AgoraAudioFrameDelegate
 - (void)setPlayerState:(AgoraMediaPlayerState)playerState {
     _playerState = playerState;
     [self updateRemotePlayBackVolumeIfNeed];
+
+    [self updateTimeWithState:playerState];
+}
+
+-(void)updateTimeWithState:(AgoraMediaPlayerState)playerState {
+    NSLog(@"playerState: %ld", playerState);
+    VL(weakSelf);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        switch (playerState) {
+            case AgoraMediaPlayerStatePaused:
+                [weakSelf pauseTimer];
+                break;
+            case AgoraMediaPlayerStateStopped:
+                //                case AgoraMediaPlayerStatePlayBackAllLoopsCompleted:
+                [weakSelf pauseTimer];
+                break;
+            case AgoraMediaPlayerStatePlaying:
+                [weakSelf startTimer];
+                break;
+            default:
+                break;
+        }
+    });
 }
 
 #pragma mark - AgoraAudioFrameDelegate
@@ -665,9 +689,11 @@ AgoraAudioFrameDelegate
     } else if (state == AgoraMediaPlayerStateStopped) {
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
+        self.remotePlayerPosition = uptime() - 0;
     } else if (state == AgoraMediaPlayerStatePlaying) {
-        self.localPlayerPosition = uptime();
+        self.localPlayerPosition = uptime() - [self.rtcMediaPlayer getPosition];
         self.playerDuration = 0;
+    } else if (state == AgoraMediaPlayerStatePaused) {
     }
     if (self.config.role == KTVSingRoleMainSinger) {
         [self syncPlayState:state];
@@ -688,6 +714,7 @@ AgoraAudioFrameDelegate
                 @"duration":@(self.playerDuration),
                 @"time":@(position - self.audioPlayoutDelay),   //不同机型delay不同，需要发送同步的时候减去发送机型的delay，在接收同步加上接收机型的delay
                 @"ntp":@([self getNtpTimeInMs]),
+                @"pitch": @(self.voicePitch),
                 @"playerState":@(self.playerState)
             };
             [self sendStreamMessageWithDict:dict success:nil];
@@ -711,7 +738,7 @@ AgoraAudioFrameDelegate
         return time;
     }
     
-    return self.remotePlayerPosition;
+    return uptime() - self.remotePlayerPosition;
 }
 
 - (NSInteger)playerDuration {
