@@ -210,6 +210,7 @@ class LiveDetailActivity : AppCompatActivity() {
         super.onDestroy()
         vpFragments[currLoadPosition]?.stopLoadPage()
         VideoSetting.resetBroadcastSetting()
+        VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
         RtcEngineInstance.beautyProcessor.reset()
         RtcEngineInstance.destroy()
