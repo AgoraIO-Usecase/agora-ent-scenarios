@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 
-private let kSceneId = "scene_ktv"
+private let kSceneId = "scene_ktv_2.2.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"

@@ -88,8 +88,8 @@
     self.selsectSongView.selSongsArray = selSongsArray;
     self.choosedSongView.selSongsArray = selSongsArray;
 
-   // [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
-   // [self.selsectSongView setSelSongArrayWith: selSongsArray];
+//    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
+//    [self.selsectSongView setSelSongArrayWith: selSongsArray];
 
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
