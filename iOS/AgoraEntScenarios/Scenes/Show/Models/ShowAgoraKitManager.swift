@@ -205,7 +205,8 @@ class ShowAgoraKitManager: NSObject {
             connection.localUid = UInt(VLUserCenter.user.id) ?? 0
             
             //TODO: retain cycle in joinChannelEx
-            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
+//            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
+            let proxy = delegateMap[currentChannelId]
             let date = Date()
             let ret =
             agoraKit.joinChannelEx(byToken: token,
@@ -239,10 +240,14 @@ class ShowAgoraKitManager: NSObject {
     //MARK: public method
     func setRtcDelegate(delegate: AgoraRtcEngineDelegate?, roomId: String) {
         guard let delegate = delegate else {
-            delegateMap[roomId] = nil
+            delegateMap[roomId]?.delegate = nil
             return
         }
-        let proxy = ShowAgoraExProxy(delegate:delegate)
+        var proxy = delegateMap[roomId]
+        if proxy == nil {
+            proxy = ShowAgoraExProxy(delegate: delegate)
+        }
+        proxy?.delegate = delegate
         
         delegateMap[roomId] = proxy
     }

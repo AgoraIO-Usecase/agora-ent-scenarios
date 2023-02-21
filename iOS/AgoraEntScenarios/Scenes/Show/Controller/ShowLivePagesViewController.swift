@@ -78,13 +78,14 @@ extension ShowLivePagesViewController {
         showLogger.info("preloadEnterRoom: \(prevIdx) and \(nextIdx)", context: kShowLogBaseContext)
         preloadIdxs.forEach { idx in
             let room = roomList[idx]
-            guard let roomId = room.roomId else {return}
+            let roomId = room.roomId
+            if roomId.isEmpty {return}
             let vc = ShowLiveViewController(agoraKitManager: self.agoraKitManager)
             vc.audiencePresetType = self.audiencePresetType
 //            vc?.selectedResolution = self.selectedResolution
             vc.room = room
             vc.loadingType = .preload
-            vc.pagesVC = self
+            vc.delegate = self
             self.roomVCMap[roomId] = vc
             //TODO: invoke viewdidload to join channel
             vc.view.frame = self.view.bounds
@@ -164,9 +165,11 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             showLogger.info("collectionView cellForItemAt: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
         }
         
-        guard let room = self.roomList?[idx], let roomId = room.roomId else {
+        guard let room = self.roomList?[idx]  else {
             return cell
         }
+        
+        let roomId = room.roomId
         
         let origVC = cell.contentView.viewWithTag(kShowLiveRoomViewTag)?.next as? ShowLiveViewController
         
@@ -183,7 +186,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
 //            vc?.selectedResolution = self.selectedResolution
             vc?.room = room
             vc?.loadingType = .preload
-            vc?.pagesVC = self
+            vc?.delegate = self
         }
         
         guard let vc = vc else {
@@ -214,7 +217,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
         showLogger.info("collectionView willDisplay: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
-        guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
+        guard let room = self.roomList?[idx], let vc = self.roomVCMap[room.roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
         }
@@ -225,7 +228,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let idx = realCellIndex(with: indexPath.row)
         showLogger.info("collectionView didEndDisplaying: \(idx)/\(indexPath.row)  cache vc count: \(self.roomVCMap.count)")
-        guard let room = self.roomList?[idx], let roomId = room.roomId, let vc = self.roomVCMap[roomId] else {
+        guard let room = self.roomList?[idx], let vc = self.roomVCMap[room.roomId] else {
 //            assert(false, "room at index \(idx) not found")
             return
         }
@@ -252,5 +255,15 @@ extension ShowLivePagesViewController {
         get{
             return collectionView.isScrollEnabled
         }
+    }
+}
+
+extension ShowLivePagesViewController: ShowLiveViewControllerDelegate {
+    func currentUserIsOnSeat() {
+        isScrollEnable = false
+    }
+    
+    func currentUserIsOffSeat() {
+        isScrollEnable = true
     }
 }

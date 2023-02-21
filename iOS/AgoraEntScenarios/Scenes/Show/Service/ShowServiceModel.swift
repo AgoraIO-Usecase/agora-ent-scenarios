@@ -61,11 +61,11 @@ class ShowBaseInfo: NSObject {
 /// 房间列表信息
 @objcMembers
 class ShowRoomListModel: ShowBaseInfo {
-    var roomId: String?                                //房间号
+    var roomId: String = ""                                //房间号
     var roomName: String?                              //房间名
     var roomUserCount: Int = 1                         //房间人数
     var thumbnailId: String?                           //缩略图id
-    var ownerId: String?                               //房主user id (rtc uid)
+    var ownerId: String = ""                               //房主user id (rtc uid)
     var ownerAvatar: String?                           //房主头像
     var ownerName: String?                             //房主名
     var roomStatus: ShowRoomStatus = .activity         //直播状态
@@ -86,7 +86,7 @@ class ShowRoomDetailModel: ShowRoomListModel {
 ///用户信息
 @objcMembers
 class ShowUser: ShowBaseInfo {
-    var userId: String?              //用户id (rtc uid)
+    var userId: String = ""              //用户id (rtc uid)
     var avatar: String?              //用户头像
     var userName: String?                     //用户名
     var status: ShowRoomRequestStatus = .idle //申请状态
@@ -95,7 +95,7 @@ class ShowUser: ShowBaseInfo {
 /// 聊天消息
 @objcMembers
 class ShowMessage: ShowBaseInfo {
-    var userId: String?        //用户id (rtc uid)
+    var userId: String = ""        //用户id (rtc uid)
     var userName: String?      //用户名
     var message: String?       //消息文本内容
     var createAt: Int64 = 0    //创建时间，与19700101时间比较的毫秒数
@@ -111,7 +111,7 @@ class ShowMicSeatApply: ShowUser {
     
     #if DEBUG
     override var description: String {
-        return "userId: \(userId ?? "") status: \(status) objectId: \(objectId ?? "")"
+        return "userId: \(userId) status: \(status) objectId: \(objectId ?? "")"
     }
     #endif
 }
@@ -135,12 +135,12 @@ typealias ShowMicSeatInvitation = ShowUser
 
 /// PK邀请
 class ShowPKInvitation: ShowBaseInfo {
-    var userId: String?                              //被pk用户id (rtc uid)
+    var userId: String = ""                              //被pk用户id (rtc uid)
     var userName: String?                            //用户名
-    var roomId: String?                              //被pk房间id
-    var fromUserId: String?                          //发起Pk用户id (rtc uid)
+    var roomId: String = ""                              //被pk房间id
+    var fromUserId: String = ""                          //发起Pk用户id (rtc uid)
     var fromName: String?                            //发起Pk用户名
-    var fromRoomId: String?                          //发起Pk房间id
+    var fromRoomId: String = ""                          //发起Pk房间id
     var status: ShowRoomRequestStatus = .waitting    //邀请状态
     var userMuteAudio: Bool = false                  //userId静音状态
     var fromUserMuteAudio: Bool = false              //fromUserId静音状态
@@ -166,16 +166,16 @@ class ShowPKInvitation: ShowBaseInfo {
     
     #if DEBUG
     override var description: String {
-        return "userId: \(userId ?? "") roomId: \(roomId ?? "") fromUserId: \(fromUserId ?? "") fromRoomId: \(fromRoomId ?? "") status: \(status) objectId: \(objectId ?? "")"
+        return "userId: \(userId) roomId: \(roomId) fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) status: \(status) objectId: \(objectId ?? "")"
     }
     #endif
 }
 
 //连麦/Pk模型
 class ShowInteractionInfo: ShowBaseInfo {
-    var userId: String?                                 //用户id (rtc uid) pk是另一个房间的房主uid，连麦是连麦观众uid
+    var userId: String = ""                                 //用户id (rtc uid) pk是另一个房间的房主uid，连麦是连麦观众uid
     var userName: String?                               //用户名
-    var roomId: String?                                 //用户所在房间id
+    var roomId: String = ""                                 //用户所在房间id
     var interactStatus: ShowInteractionStatus = .idle   //交互类型
     var muteAudio: Bool = false                         //userId静音状态
     var ownerMuteAudio: Bool = false                    //房主静音状态（后续拆成两条interation info的muteAudio）
@@ -183,7 +183,7 @@ class ShowInteractionInfo: ShowBaseInfo {
     
     #if DEBUG
     override var description: String {
-        return "userId: \(userId ?? "") roomId: \(roomId ?? "") status: \(interactStatus) objectId: \(objectId ?? "")"
+        return "userId: \(userId) roomId: \(roomId) status: \(interactStatus) objectId: \(objectId ?? "")"
     }
     #endif
     
