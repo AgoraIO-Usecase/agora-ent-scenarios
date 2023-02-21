@@ -1331,7 +1331,8 @@ class LiveDetailFragment : Fragment() {
                         superResolution = VideoSetting.SuperResolution.SR_1_5
                     }
                     // 540P、480P
-                    else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width) || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
+                    else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
+                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
                         superResolution = VideoSetting.SuperResolution.SR_1_33
                     }
                     // 360P以及以下

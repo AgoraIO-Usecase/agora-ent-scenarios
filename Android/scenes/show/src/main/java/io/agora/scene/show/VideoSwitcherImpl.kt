@@ -29,6 +29,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private var localVideoCanvas: LocalVideoCanvasWrap? = null
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val preLoadRun = Runnable { preloadChannels() }
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -42,6 +43,8 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     }
 
     override fun unloadConnections() {
+        mainHandler.removeCallbacksAndMessages(null)
+
         connectionsJoined.forEach {
             leaveRtcChannel(it)
         }
@@ -88,8 +91,9 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         joinRtcChannel(connectionWrap, eventListener)
         connectionsJoined.add(connectionWrap)
 
-        if(connectionsJoined.size == 1){
-            preloadChannels()
+        mainHandler.removeCallbacks(preLoadRun)
+        if (connectionsJoined.size == 1 || connectionsPreloaded.size <= 0) {
+            mainHandler.postDelayed(preLoadRun, 500)
         }
     }
 
