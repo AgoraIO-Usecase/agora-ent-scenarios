@@ -63,7 +63,7 @@ class SARoomViewController: SABaseViewController {
     }
     var ains_state: SARtcType.AINS_STATE = .mid
     var local_index: Int?
-    var alienCanPlay: Bool = true
+    var alienCanPlay: Bool = false
     var vmType: SARtcType.VMMUSIC_TYPE = .social
 
     public var roomInfo: SARoomInfo? {
@@ -180,19 +180,7 @@ extension SARoomViewController {
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
         roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-        let red_robot = mics[6]
-        let blue_robot = mics[3]
-        red_robot.status = info.robotInfo.use_robot == true ? 5 : -2
-        red_robot.attenuation = roomInfo?.robotInfo.red_robot_attenuation ?? 0.2
-        red_robot.airAbsorb = roomInfo?.robotInfo.red_robot_absorb ?? true
-        red_robot.voiceBlur = roomInfo?.robotInfo.red_robot_blur ?? false
-        blue_robot.status = info.robotInfo.use_robot == true ? 5 : -2
-        blue_robot.attenuation = roomInfo?.robotInfo.blue_robot_attenuation ?? 0.2
-        blue_robot.airAbsorb = roomInfo?.robotInfo.blue_robot_absorb ?? true
-        blue_robot.voiceBlur = roomInfo?.robotInfo.blue_robot_blur ?? false
-        sRtcView.updateUser(blue_robot)
-        sRtcView.updateUser(red_robot)
-        sRtcView.playMusic(isPlay: info.robotInfo.use_robot)
+        onRobotUpdate(robotInfo: info.robotInfo)
         
         AppContext.saTmpServiceImp().mics = mics
         roomInfo?.room?.ranking_list = info.room?.ranking_list
