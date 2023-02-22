@@ -118,13 +118,14 @@ extension SARoomsViewController {
 
     private func loginIMThenPush(room: SARoomEntity) {
         SVProgressHUD.show(withStatus: "Loading".localized())
-        AppContext.saServiceImp().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
+        AppContext.saServiceImp().joinRoom(room.room_id ?? "") { [weak self] error, room_entity, robot in
             SVProgressHUD.dismiss()
             guard let self = self else {return}
             if error == nil {
                 self.mapUser(user: VLUserCenter.user)
                 let info: SARoomInfo = SARoomInfo()
                 info.room = room
+                info.robotInfo = robot ?? SARobotAudioInfo()
                 info.mic_info = nil
                 let vc = SARoomViewController(info: info)
                 self.navigationController?.pushViewController(vc, animated: true)

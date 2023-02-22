@@ -180,7 +180,20 @@ extension SARoomViewController {
         headerView.updateHeader(with: info.room)
         guard let mics = roomInfo?.mic_info else { return }
         roomInfo?.room?.member_list = AppContext.saTmpServiceImp().userList
-
+        let red_robot = mics[6]
+        let blue_robot = mics[3]
+        red_robot.status = info.robotInfo.use_robot == true ? 5 : -2
+        red_robot.attenuation = roomInfo?.robotInfo.red_robot_attenuation ?? 0.2
+        red_robot.airAbsorb = roomInfo?.robotInfo.red_robot_absorb ?? true
+        red_robot.voiceBlur = roomInfo?.robotInfo.red_robot_blur ?? false
+        blue_robot.status = info.robotInfo.use_robot == true ? 5 : -2
+        blue_robot.attenuation = roomInfo?.robotInfo.blue_robot_attenuation ?? 0.2
+        blue_robot.airAbsorb = roomInfo?.robotInfo.blue_robot_absorb ?? true
+        blue_robot.voiceBlur = roomInfo?.robotInfo.blue_robot_blur ?? false
+        sRtcView.updateUser(blue_robot)
+        sRtcView.updateUser(red_robot)
+        sRtcView.playMusic(isPlay: info.robotInfo.use_robot)
+        
         AppContext.saTmpServiceImp().mics = mics
         roomInfo?.room?.ranking_list = info.room?.ranking_list
         if let first = info.room?.ranking_list?.first(where: { $0.chat_uid == VLUserCenter.user.chat_uid }) {

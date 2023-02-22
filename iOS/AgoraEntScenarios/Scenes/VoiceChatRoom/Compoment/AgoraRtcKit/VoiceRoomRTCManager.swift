@@ -387,6 +387,8 @@ public let kMPK_RTC_UID: UInt = 1
         }
         setAINS(with: .mid)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
+        rtcKit.setEnableSpeakerphone(true)
+        rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
     }

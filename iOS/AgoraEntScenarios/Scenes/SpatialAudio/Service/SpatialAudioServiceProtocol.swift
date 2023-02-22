@@ -161,7 +161,7 @@ protocol SpatialAudioServiceProtocol: NSObjectProtocol {
     /// 加入房间
     /// - Parameters:
     ///
-    func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?) -> Void)
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?, SARobotAudioInfo?) -> Void)
     
     /// 离开房间
     /// - Parameters:
