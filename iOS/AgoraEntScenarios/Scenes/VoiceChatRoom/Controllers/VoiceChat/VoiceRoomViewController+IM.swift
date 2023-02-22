@@ -96,7 +96,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onAnnouncementChanged(roomId: String, content: String) {
-        self.view.makeToast("Voice room announcement changed!", point: toastPoint, title: nil, image: nil, completion: nil)
+        self.view.makeToast("Voice room announcement changed!".localized(), point: toastPoint, title: nil, image: nil, completion: nil)
         self.roomInfo?.room?.announcement = content
     }
     
@@ -106,7 +106,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        var message = reason.errorDesc()
+        let message = reason.errorDesc()
         self.view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
         var destroyed = false
         if reason == .destroyed {
@@ -193,7 +193,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
             if let first = mics.first {
                 let status = first.status
                 let mic_index = first.mic_index
-                guard let micStatus = first.member?.micStatus else { return }
                 //刷新底部✋🏻状态
                 if !isOwner {
                     refreshHandsUp(status: status)

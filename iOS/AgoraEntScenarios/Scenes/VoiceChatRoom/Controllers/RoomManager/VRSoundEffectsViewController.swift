@@ -61,18 +61,23 @@ public class VRSoundEffectsViewController: VRBaseViewController {
         self.view.window?.isUserInteractionEnabled = false
         let imId: String? = VLUserCenter.user.chat_uid.count > 0 ? VLUserCenter.user.chat_uid : nil
         let entity = self.createEntity()
-        print("fetch IMConfig begin:\(Date().timeIntervalSince1970)")
         ChatRoomServiceImp.getSharedInstance().initIM(with: entity.name ?? "", type:2, chatId: nil, channelId: entity.channel_id ?? "",  imUid: imId, pwd: "12345678") { im_token, uid, room_id in
-            print("fetch IMConfig end:\(Date().timeIntervalSince1970)")
             entity.chatroom_id = room_id
             entity.owner = VoiceRoomUserInfo.shared.user
             entity.owner?.chat_uid = uid
+            if room_id.isEmpty {
+                SVProgressHUD.dismiss()
+                self.view.window?.isUserInteractionEnabled = true
+                self.view.window?.makeToast("Create chatroom failed!Please input compliant name.")
+                ChatRoomServiceImp.getSharedInstance().leaveRoom(entity.room_id ?? "") { error, value in
+                }
+                self.backAction()
+                return
+            }
             if !AgoraChatClient.shared().isLoggedIn {
                 VoiceRoomIMManager.shared?.loginIM(userName: uid , token: im_token , completion: { userName, error in
                     SVProgressHUD.dismiss()
-                    print("login IM end:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                     if error == nil {
-                        print("create room begin:\(Date().z.dateString("yyyy-MM-dd HH:mm:ss"))")
                         self.createVoiceChatRoom(entity: entity)
                     }else {
                         self.view.window?.isUserInteractionEnabled = true
@@ -88,7 +93,6 @@ public class VRSoundEffectsViewController: VRBaseViewController {
     private func createVoiceChatRoom(entity: VRRoomEntity) {
         ChatRoomServiceImp.getSharedInstance().createRoom(room: entity) { error, room in
             SVProgressHUD.dismiss()
-            print("create room end:\(Date().timeIntervalSince1970)")
             self.view.window?.isUserInteractionEnabled = true
             if let room = room,error == nil {
                 self.entryRoom(room: room)
