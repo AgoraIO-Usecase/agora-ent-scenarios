@@ -21,7 +21,7 @@ class VMNoticeView: UIView {
     private var limLabel: UILabel = .init()
     private var editBtn: UIButton = .init()
 
-    private let placeHolder: String = "Announce to chatroom, 140 character limit."
+    private let placeHolder: String = "Announce to chatroom, 140 character limit.".localized()
 
     var resBlock: ((Bool, String?) -> Void)?
 

@@ -103,7 +103,14 @@ class VoiceRoomAudioSettingDetailViewController: UIViewController {
             } else if settingType == .AGC {
                 titleLabel.text = "AGC".localized()
             }
-            tableView.tableFooterView = AuditionEffectView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 162), type: self.settingType)
+            if tableView.tableFooterView == nil {
+                switch settingType {
+                case .AGC,.AIAEC:
+                    tableView.tableFooterView = AuditionEffectView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 162), type: self.settingType)
+                default:
+                    tableView.tableFooterView = UIView()
+                }
+            }
             tableView.reloadData()
         }
     }
