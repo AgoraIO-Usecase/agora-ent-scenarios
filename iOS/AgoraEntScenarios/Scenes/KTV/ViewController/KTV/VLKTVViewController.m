@@ -518,7 +518,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self markSongPlaying:model];
     
     //TODO: will remove ktv api adjust playout volume method
-    [self setPlayoutVolume:[model isChorus] ? 50 : 100];
+    [self setPlayoutVolume:50];
     
     KTVSingRole role = [model isSongOwner] ? KTVSingRoleMainSinger :
         [[model chorusNo] isEqualToString:VLUserCenter.user.id] ? KTVSingRoleCoSinger : KTVSingRoleAudience;
