@@ -3,6 +3,9 @@ package io.agora.scene.ktv.live;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,9 +14,11 @@ import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -207,6 +212,37 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
             setPlayerBgFromMsg(0);
         }
         getBinding().tvRoomName.setText(roomLivingViewModel.roomInfoLiveData.getValue().getRoomName());
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) getBinding().rvUserMember.getLayoutParams();
+
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        int heightPixels; // current window
+        int widthPixels; // current window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Rect rect = windowManager.getCurrentWindowMetrics().getBounds();
+            heightPixels = rect.height();
+            widthPixels = rect.width();
+        } else {
+            Point point = new Point();
+            windowManager.getDefaultDisplay().getSize(point);
+            heightPixels = point.y;
+            widthPixels = point.x;
+        }
+
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        if (heightPixels * 1.0 / widthPixels > 16.0 / 9) { // 2K/Slim/> 16:9 screens
+            // TODO(HAI_GUO) Flip/Fold/Split screens and One-handed mode may not supported well
+            params.bottomMargin = (int) (160 * density);
+            getBinding().rvUserMember.setLayoutParams(params);
+        }
+
+        // density 4.0 densityDpi 640 system resources 2560 1440 display real 2560 1440 current window 2560 1440 HUAWEI V9
+        // density 3.0 densityDpi 480 system resources 2297 1080 display real 2400 1080 current window 2400 1080 1+ 9R
     }
 
     @Override

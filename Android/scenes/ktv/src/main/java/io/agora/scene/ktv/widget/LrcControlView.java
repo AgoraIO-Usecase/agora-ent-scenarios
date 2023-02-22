@@ -2,25 +2,17 @@ package io.agora.scene.ktv.widget;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,7 +20,6 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
@@ -127,37 +118,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
 
         initListener();
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) getLayoutParams();
-
-        WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        int heightPixels; // current window
-        int widthPixels; // current window
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Rect rect = windowManager.getCurrentWindowMetrics().getBounds();
-            heightPixels = rect.height();
-            widthPixels = rect.width();
-        } else {
-            Point point = new Point();
-            windowManager.getDefaultDisplay().getSize(point);
-            heightPixels = point.y;
-            widthPixels = point.x;
-        }
-
-        float density = Resources.getSystem().getDisplayMetrics().density;
-        if (heightPixels * 1.0 / widthPixels > 16.0 / 9) { // 2K/Slim/> 16:9 screens
-            // TODO(HAI_GUO) Flip/Fold/Split screens and One-handed mode may not supported well
-            params.bottomMargin = (int) (120 * density);
-            setLayoutParams(params);
-        }
-
-        // density 4.0 densityDpi 640 system resources 2560 1440 display real 2560 1440 current window 2560 1440 HUAWEI V9
-        // density 3.0 densityDpi 480 system resources 2297 1080 display real 2400 1080 current window 2400 1080 1+ 9R
     }
 
     @Override
