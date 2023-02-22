@@ -331,7 +331,7 @@ class ShowLiveViewController: UIViewController {
                 }
             }
         }
-        liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name)
+        liveView.canvasView.setLocalUserInfo(name: VLUserCenter.user.name, img: VLUserCenter.user.headUrl)
         
         self.muteLocalVideo = false
         self.muteLocalAudio = false
@@ -510,7 +510,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         //TODO: migration to interaction did start
         if apply.status == .accepted {
             liveView.canvasView.canvasType = .joint_broadcasting
-            liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "")
+            liveView.canvasView.setRemoteUserInfo(name: apply.userName ?? "", img: apply.avatar)
 //            if apply.userId == VLUserCenter.user.id {
 //                agoraKitManager.switchRole(role: .broadcaster,
 //                                           uid: apply.userId,
@@ -584,7 +584,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 
     func onMicSeatInvitationAccepted(invitation: ShowMicSeatInvitation) {
 //        liveView.canvasView.canvasType = .joint_broadcasting
-        liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "")
+        liveView.canvasView.setRemoteUserInfo(name: invitation.userName ?? "", img: invitation.avatar)
 //        ToastView.show(text: "seat invitation \(invitation.userId ?? "") did accept")
 //        guard invitation.userId == VLUserCenter.user.id else { return }
 //        agoraKitManager.switchRole(role: .broadcaster,
@@ -607,7 +607,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         }
         if invitation.fromRoomId == room?.roomId {
             //send invitation
-            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            createPKInvitationMap[invitation.roomId] = invitation
             pkInviteView.createPKInvitationMap = createPKInvitationMap
             
             return
@@ -639,7 +639,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         if invitation.fromRoomId == room?.roomId {
             //send invitation
-            createPKInvitationMap[invitation.roomId ?? ""] = invitation
+            createPKInvitationMap[invitation.roomId] = invitation
             pkInviteView.createPKInvitationMap = createPKInvitationMap
             
             return
@@ -655,7 +655,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
         
         if invitation.fromRoomId == room?.roomId {
             //send invitation
-            createPKInvitationMap[invitation.roomId ?? ""] = nil
+            createPKInvitationMap[invitation.roomId] = nil
             pkInviteView.createPKInvitationMap = createPKInvitationMap
             return
         }
@@ -745,7 +745,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             agoraKitManager.updateVideoProfileForMode(.single)
             agoraKitManager.leaveChannelEx(roomId: self.roomId, channelId: interaction.roomId)
             liveView.canvasView.canvasType = .none
-            liveView.canvasView.setRemoteUserInfo(name: "")
+            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
 //            if interaction.userId == VLUserCenter.user.id {
 //                let options = self.channelOptions
 //                options.publishCameraTrack = false
@@ -755,7 +755,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //                self.muteLocalVideo = true
 //            }
         case .onSeat:
-            liveView.canvasView.setRemoteUserInfo(name: "")
+            liveView.canvasView.setRemoteUserInfo(name: interaction.userName ?? "")
             liveView.canvasView.canvasType = .none
             liveView.bottomBar.linkButton.isShowRedDot = false
             liveView.bottomBar.linkButton.isSelected = false
