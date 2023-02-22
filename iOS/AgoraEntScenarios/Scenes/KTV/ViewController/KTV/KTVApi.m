@@ -139,7 +139,7 @@ AgoraLrcDownloadDelegate
     kWeakSelf(self)
     self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.05 block:^(NSTimer * _Nonnull timer) {
         NSInteger current = [weakself getPlayerCurrentTime];
-        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
+//        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
         [self setProgressWith:current];
         if(self.config.role == KTVSingRoleMainSinger){
             //如果超过前奏时间 自动隐藏前奏View
