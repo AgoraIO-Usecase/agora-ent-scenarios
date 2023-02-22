@@ -11,7 +11,7 @@ import UIKit
 public enum SAHEADER_ACTION {
     case back
     case notice
-    case soundClick
+    case beginnersGuide
     case rank
     case popBack
 }
@@ -53,7 +53,7 @@ class SARoomHeaderView: UIView {
         self.giftBtn.snp.updateConstraints { make in
             make.width.greaterThanOrEqualTo(gift_count >= 100 ? 50 : 40)
         }
-        self.soundSetLabel.text = getSoundType(with: room.sound_effect)
+        soundSetLabel.text = "Beginner's Guide".localized_spatial()
         updateGiftList(with: room)
     }
     
@@ -305,7 +305,7 @@ class SARoomHeaderView: UIView {
 
     @objc private func soundClick() {
         guard let block = completeBlock else { return }
-        block(.soundClick)
+        block(.beginnersGuide)
     }
 
     @objc private func rankClick() {
@@ -385,23 +385,6 @@ class SARoomHeaderView: UIView {
             rankSBtn.isHidden = true
             rankTBtn.isHidden = true
         }
-    }
-    
-    private func getSoundType(with index: Int) -> String {
-        var soundType: String = sceneLocalized("Social Chat")
-        switch index {
-        case 1:
-            soundType = sceneLocalized("Social Chat")
-        case 2:
-            soundType = sceneLocalized("Karaoke")
-        case 3:
-            soundType = sceneLocalized("Gaming Buddy")
-        case 4:
-            soundType = sceneLocalized("Professional Podcaster")
-        default:
-            soundType = sceneLocalized("Social Chat")
-        }
-        return soundType
     }
     
     func getImage(with url: String,  completion:(@escaping (UIImage?) -> Void)){
