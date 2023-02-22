@@ -117,6 +117,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             if (connectionsPreloaded.none { it.isSameChannel(conn) }) {
                 val options = ChannelMediaOptions()
                 options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
                 conn.mediaOptions = options
@@ -146,6 +147,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             ?.let { conn ->
                 val options = conn.mediaOptions
                 options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
                 rtcEngine.updateChannelMediaOptionsEx(options, conn)
