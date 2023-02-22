@@ -394,7 +394,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
 
         mBinding.ivCumulativeScoreGrade.setImageResource(R.drawable.ktv_ic_grade_c);
-        mBinding.tvCumulativeScore.setText("0.0");
+        mBinding.tvCumulativeScore.setText("0");
         mBinding.gradeView.setScore(0, 0, 0);
     }
 
@@ -431,7 +431,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
         mBinding.gradeView.setScore((long) score, (long) cumulativeScore, (long) perfectScore);
 
-        mBinding.tvCumulativeScore.setText("" + mCumulativeScore);
+        mBinding.tvCumulativeScore.setText("" + (int) mCumulativeScore);
         mBinding.ivCumulativeScoreGrade.setImageResource(mBinding.gradeView.getCumulativeDrawable());
 
         if (!mNeedToShowComboView) {
