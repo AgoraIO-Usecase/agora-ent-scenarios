@@ -230,3 +230,6 @@
 "AIAEC Audition" = "AI回声消除试听";
 "AGC Audition" = "人声自动增益试听";
 "Voice room announcement changed!" = "语聊房公告变更!";
+"Time limit desc" = "The experience limit has been reached. This room has been closed";
+"Close Bot" = "关闭机器人";
+"Other Settings" = "其他设置";
