@@ -479,7 +479,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func changeMicUserStatus(status: Int,completion: @escaping (Error?, VRRoomMic?) -> Void) {
-        guard let mic = self.mics.first(where: { $0.member?.chat_uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
+        guard let mic = self.mics.first(where: { $0.member?.uid ?? "" == VoiceRoomUserInfo.shared.user?.chat_uid ?? ""
         }) else { return }
         mic.member?.micStatus = status
         VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(mic.mic_index)":mic.kj.JSONString()], completion: { error in
