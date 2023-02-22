@@ -4,8 +4,6 @@ plugins {
     id 'kotlin-kapt'
 }
 
-def localsdkPath = "sdk-4_0_0_229-soul"
-
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
@@ -42,17 +40,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs += "${localsdkPath}"
-        }
-    }
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
     implementation rootProject.ext.deps.appcompat
     api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation
@@ -77,7 +68,7 @@ dependencies {
 
     implementation rootProject.ext.deps.coroutines_android
 
-    //api rootProject.ext.deps.rtc
+    api rootProject.ext.deps.rtc
     api rootProject.ext.deps.rtm
 
 }
