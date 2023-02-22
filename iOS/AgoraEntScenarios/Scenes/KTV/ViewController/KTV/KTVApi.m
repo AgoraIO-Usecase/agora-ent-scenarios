@@ -241,13 +241,16 @@ time_t uptime(void) {
     KTVSongType type = self.config.type;
     if(type == KTVSongTypeSolo) {
         if(role == KTVSingRoleMainSinger) {
-            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
             options.autoSubscribeVideo = YES;
             options.publishMediaPlayerId = [self.rtcMediaPlayer getMediaPlayerId];
             options.publishMediaPlayerAudioTrack = YES;
             [self.engine updateChannelWithMediaOptions:options];
+            
+            [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
+            [self.rtcMediaPlayer adjustPlayoutVolume:50];
+            [self.rtcMediaPlayer adjustPublishSignalVolume:50];
         } else {
             AgoraRtcChannelMediaOptions* options = [AgoraRtcChannelMediaOptions new];
             options.autoSubscribeAudio = YES;
