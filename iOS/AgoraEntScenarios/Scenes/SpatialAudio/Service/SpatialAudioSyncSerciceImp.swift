@@ -252,10 +252,10 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
     }
     
-    func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?) -> Void) {
+    func joinRoom(_ roomId: String, completion: @escaping (Error?, SARoomEntity?, SARobotAudioInfo?) -> Void) {
         guard let room = _roomInfo(roomId: roomId) else {
             agoraAssert("join room fail, \(roomId) not found")
-            completion(SAErrorType.roomInfoNotFound("join room", roomId).error(), nil)
+            completion(SAErrorType.roomInfoNotFound("join room", roomId).error(), nil, robotInfo)
             return
         }
         
@@ -273,6 +273,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
             self.roomId = room_id
             
             self._getRobotInfo { error, info in
+                self.robotInfo = info
             }
             self._startCheckExpire()
             self._subscribeAll()
@@ -281,12 +282,12 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
                 VLUserCenter.user.chat_uid = userId
                 self._addUserIfNeed(roomId: room_id) { err in
                     self.createMics(roomId: room_id) { error, miclist in
-                        completion(error, updateRoom)
+                        completion(error, updateRoom, self.robotInfo)
                     }
                 }
             }
         } fail: { error in
-            completion(error, nil)
+            completion(error, nil, self.robotInfo)
         }
         
     }
@@ -334,6 +335,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func fetchRoomDetail(entity: SARoomEntity, completion: @escaping (Error?, SARoomInfo?) -> Void) {
         let roomInfo = SARoomInfo()
         roomInfo.room = entity
+        roomInfo.robotInfo = robotInfo ?? SARobotAudioInfo()
         _getMicSeatList(roomId: entity.room_id ?? "") { error, mics in
             if let error = error {
                 agoraAssert(error.localizedDescription)
