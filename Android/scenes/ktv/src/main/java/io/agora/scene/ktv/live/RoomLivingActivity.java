@@ -3,7 +3,6 @@ package io.agora.scene.ktv.live;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -401,9 +400,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
     @Override
     protected void onResume() {
         super.onResume();
-        KTVLogger.d("ktv", "onResume() " + isBlackDarkStatus() + " " +
-                Resources.getSystem().getDisplayMetrics().density + " " +
-                Resources.getSystem().getDisplayMetrics().densityDpi + " " + Resources.getSystem().getDisplayMetrics().heightPixels);
+        KTVLogger.d("ktv", "onResume() " + isBlackDarkStatus());
         setDarkStatusIcon(isBlackDarkStatus());
     }
 
