@@ -70,7 +70,7 @@ time_t uptime(void) {
 
 @property (nonatomic, assign) AgoraMediaPlayerState playerState;
 
-@property (nonatomic, assign) AgoraAudioScenario scenario;
+@property (nonatomic, assign) AgoraAudioScenario audioScenario;
 @end
 
 @implementation KTVApi
@@ -129,7 +129,6 @@ time_t uptime(void) {
     self.config = config;
     KTVSingRole role = config.role;
     NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:songCode]];
-    self.scenario = AgoraAudioScenarioChorus;
     if(loadHistory) {
         KTVLoadSongState state = [loadHistory intValue];
         KTVLogInfo(@"song %ld load state exits %ld", songCode, state);
@@ -231,7 +230,6 @@ time_t uptime(void) {
             return block(songCode, [self cachedLyricUrl:songCode], role, state);
         }
         
-        self.scenario = AgoraAudioScenarioGameStreaming;
         return block(songCode, [self cachedLyricUrl:songCode], role, state);
     });
 }
@@ -267,7 +265,7 @@ time_t uptime(void) {
             options.enableAudioRecordingOrPlayout = YES;
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
-            //openMediaWithSongCode必须在切换setAudioScenario之后，否则会造成mpk播放对齐不准的问题
+            
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
@@ -283,7 +281,7 @@ time_t uptime(void) {
             
             //mute main Singer player audio
             [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
-            //openMediaWithSongCode必须在切换setAudioScenario之后，否则会造成mpk播放对齐不准的问题
+            
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
@@ -322,8 +320,6 @@ time_t uptime(void) {
     [self.lrcView stop];
     [self.lrcView reset];
     self.config = nil;
-    
-    self.scenario = AgoraAudioScenarioGameStreaming;
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -505,10 +501,10 @@ time_t uptime(void) {
     [self updateRemotePlayBackVolumeIfNeed];
 }
 
-- (void)setScenario:(AgoraAudioScenario)scenario {
-    _scenario = scenario;
-    [self.engine setAudioScenario:scenario];
-    KTVLogInfo(@"setScenario: %ld", scenario);
+- (void)setAudioScenario:(AgoraAudioScenario)audioScenario {
+    _audioScenario = audioScenario;
+    [self.engine setAudioScenario:audioScenario];
+    KTVLogInfo(@"setAudioScenario: %ld", audioScenario);
 }
 
 #pragma mark - AgoraAudioFrameDelegate
@@ -683,10 +679,10 @@ time_t uptime(void) {
 //    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
 //}
 
-//-(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
-//{
-//    [self.engine setAudioScenario:AgoraAudioScenarioGameStreaming];
-//}
+-(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
+{
+    self.audioScenario = AgoraAudioScenarioGameStreaming;
+}
 
 #pragma private apis
 //发送流消息
@@ -751,6 +747,7 @@ time_t uptime(void) {
     VL(weakSelf);
     [self.engine setDirectExternalAudioSource:YES];
     [self.engine setAudioFrameDelegate:self];
+    self.audioScenario = AgoraAudioScenarioChorus;
     int ret =
     [self.engine joinChannelExByToken:VLUserCenter.user.agoraPlayerRTCToken connection:connection delegate:self mediaOptions:options joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
         KTVLogInfo(@"joinChannelExByToken success: channel: %@, uid: %ld", channel, uid);
