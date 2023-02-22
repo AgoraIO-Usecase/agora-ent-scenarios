@@ -28,7 +28,7 @@ public enum updateRoomState {
         case .destroyed:
             return "VoiceRoom was destroyed!"
         case .offLined:
-            return"you are offline!"
+            return "you are offline!"
         default:
             return ""
         }
