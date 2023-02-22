@@ -306,7 +306,6 @@
 		DDA19A0B28FFE579009D3E61 /* JSONObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994B28FFE579009D3E61 /* JSONObject.swift */; };
 		DDA19A0C28FFE579009D3E61 /* SyncUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994C28FFE579009D3E61 /* SyncUtil.swift */; };
 		DDA19A0D28FFE579009D3E61 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1994F28FFE579009D3E61 /* NetworkManager.swift */; };
-		DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995128FFE579009D3E61 /* VLCache.m */; };
 		DDA19A0F28FFE579009D3E61 /* VLUserCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995928FFE579009D3E61 /* VLUserCenter.m */; };
 		DDA19A1028FFE579009D3E61 /* VLGlobalHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DDA1995B28FFE579009D3E61 /* VLGlobalHelper.m */; };
 		DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDDDA2D28FFD78B005F4E8B /* KeyCenter.swift */; };
@@ -759,8 +758,6 @@
 		DDA1994B28FFE579009D3E61 /* JSONObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObject.swift; sourceTree = "<group>"; };
 		DDA1994C28FFE579009D3E61 /* SyncUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncUtil.swift; sourceTree = "<group>"; };
 		DDA1994F28FFE579009D3E61 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		DDA1995128FFE579009D3E61 /* VLCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCache.m; sourceTree = "<group>"; };
-		DDA1995228FFE579009D3E61 /* VLCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCache.h; sourceTree = "<group>"; };
 		DDA1995428FFE579009D3E61 /* VLURLPathConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLURLPathConfig.h; sourceTree = "<group>"; };
 		DDA1995528FFE579009D3E61 /* VLMacroDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLMacroDefine.h; sourceTree = "<group>"; };
 		DDA1995628FFE579009D3E61 /* VLColorDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLColorDefine.h; sourceTree = "<group>"; };
@@ -2002,7 +1999,6 @@
 			isa = PBXGroup;
 			children = (
 				DDA1994E28FFE579009D3E61 /* NetworkManager */,
-				DDA1995028FFE579009D3E61 /* Cache */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
 				DDA1995A28FFE579009D3E61 /* Helper */,
 			);
@@ -2015,15 +2011,6 @@
 				DDA1994F28FFE579009D3E61 /* NetworkManager.swift */,
 			);
 			path = NetworkManager;
-			sourceTree = "<group>";
-		};
-		DDA1995028FFE579009D3E61 /* Cache */ = {
-			isa = PBXGroup;
-			children = (
-				DDA1995128FFE579009D3E61 /* VLCache.m */,
-				DDA1995228FFE579009D3E61 /* VLCache.h */,
-			);
-			path = Cache;
 			sourceTree = "<group>";
 		};
 		DDA1995328FFE579009D3E61 /* VLDefine */ = {
@@ -2419,7 +2406,6 @@
 				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
 				DD220B7F295B332C00F57F30 /* HorizontalCardView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
-				DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */,
 				DD0292D0295BF0DC00485225 /* VLSongList.m in Sources */,
 				DD0292ED295BF0DC00485225 /* VLKTVTopView.m in Sources */,
 				DD0292EA295BF0DC00485225 /* VLKTVBottomToolbar.m in Sources */,
