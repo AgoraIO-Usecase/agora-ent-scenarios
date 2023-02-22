@@ -90,8 +90,16 @@ class VoiceRoomViewController: VRBaseViewController {
         loadKit()
         // 处理底部事件
         charBarEvents()
+        self.subscribeSceneRoom()
         NotificationCenter.default.addObserver(self, selector: #selector(leaveRoom), name: Notification.Name("terminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateMicInfo), name: Notification.Name("updateMicInfo"), object: nil)
+    }
+    
+    private func subscribeSceneRoom() {
+        SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
+            self.view.window?.makeToast("Time limit desc".localized())
+            self.backAction()
+        })
     }
 
     override func viewWillDisappear(_ animated: Bool) {
