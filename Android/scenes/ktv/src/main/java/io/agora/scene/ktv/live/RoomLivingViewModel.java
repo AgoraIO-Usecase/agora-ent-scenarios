@@ -1340,6 +1340,14 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         }
+
+                        // settings
+                        mSetting.setVolMic(100);
+                        if (type == KTVSongType.KTVSongTypeSolo) {
+                            mSetting.setVolMusic(100);
+                        } else {
+                            mSetting.setVolMusic(50);
+                        }
                         ktvApiProtocol.playSong(song);
                     }
                     return null;

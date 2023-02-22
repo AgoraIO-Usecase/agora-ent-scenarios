@@ -208,8 +208,8 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mPlayer.open(songCode, 0)
 
                 // 音量最佳实践调整
-                mPlayer.adjustPlayoutVolume(50)
-                mPlayer.adjustPublishSignalVolume(50)
+                mPlayer.adjustPlayoutVolume(100)
+                mPlayer.adjustPublishSignalVolume(100)
 
                 val channelMediaOption = ChannelMediaOptions()
                 channelMediaOption.autoSubscribeAudio = true
