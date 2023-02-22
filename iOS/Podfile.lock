@@ -52,7 +52,6 @@ PODS:
     - Protobuf (~> 3.4)
   - SVProgressHUD (2.2.5)
   - SwiftyBeaver (1.9.5)
-  - YYCache (1.0.4)
   - YYCategories (1.0.4):
     - YYCategories/no-arc (= 1.0.4)
   - YYCategories/no-arc (1.0.4)
@@ -82,7 +81,6 @@ DEPENDENCIES:
   - SVGAPlayer (= 2.5.7)
   - SVProgressHUD (= 2.2.5)
   - SwiftyBeaver (= 1.9.5)
-  - YYCache (= 1.0.4)
   - YYCategories (= 1.0.4)
   - YYModel (= 1.0.4)
   - ZSwiftBaseLib (= 0.1.6.1)
@@ -112,7 +110,6 @@ SPEC REPOS:
     - SVGAPlayer
     - SVProgressHUD
     - SwiftyBeaver
-    - YYCache
     - YYCategories
     - YYModel
     - Zip
@@ -147,12 +144,11 @@ SPEC CHECKSUMS:
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  YYCache: 8105b6638f5e849296c71f331ff83891a4942952
   YYCategories: 6bcd4314c6661a561410dce4a793379ebd306abd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f5d039af0c4be833bb86c6d382930775c4087ab9
 
-PODFILE CHECKSUM: e8e2868a2c720c367ce9c7da76263b94aeca56c7
+PODFILE CHECKSUM: f62187e66b3870ef72b22d441cce6b15db882dea
 
 COCOAPODS: 1.11.3
