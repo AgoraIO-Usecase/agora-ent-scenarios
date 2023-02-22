@@ -20,7 +20,7 @@ extension VoiceRoomViewController {
         audioSetVC.ains_state = ains_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
         audioSetVC.useRobotBlock = { [weak self] flag in
-            if self?.alienCanPlay == true && flag == true {
+            if flag == true {
                 self?.roomInfo?.room?.use_robot = true
                 self?.rtckit.playMusic(with: .alien)
             }

@@ -47,7 +47,6 @@ class VoiceRoomViewController: VRBaseViewController {
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
     var local_index: Int?
-    var alienCanPlay: Bool = true
     var vmType: VMMUSIC_TYPE = .social
 
     public var roomInfo: VRRoomInfo? {
@@ -470,10 +469,11 @@ extension VoiceRoomViewController {
         guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
         ChatRoomServiceImp.getSharedInstance().enableRobot(enable: flag) { error in
             if error == nil {
-                if self.alienCanPlay {
+                if flag {
                     self.rtckit.adjustAudioMixingVolume(with: 50)
                     self.rtckit.playMusic(with: .alien)
-                    self.alienCanPlay = false
+                } else {
+                    self.rtckit.stopPlayMusic()
                 }
 
                 let mic_info = mic
