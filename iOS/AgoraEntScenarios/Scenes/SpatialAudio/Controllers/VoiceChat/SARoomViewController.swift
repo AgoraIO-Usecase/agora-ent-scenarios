@@ -106,7 +106,12 @@ class SARoomViewController: SABaseViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        tipsView.show()
+        let isHidden = UserDefaults.standard.bool(forKey: "beginnersGuide")
+        if !isHidden {
+            tipsView.show()
+            UserDefaults.standard.set(true, forKey: "beginnersGuide")
+            UserDefaults.standard.synchronize()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -288,7 +293,7 @@ extension SARoomViewController {
         } else if action == .rank {
             // 展示土豪榜
             showUsers()
-        } else if action == .soundClick {
+        } else if action == .beginnersGuide {
             showSoundView()
         }
     }
@@ -381,16 +386,7 @@ extension SARoomViewController {
     }
 
     func showSoundView() {
-        let soundView = SASoundView(frame: CGRect(x: 0,
-                                                  y: 0,
-                                                  width: ScreenWidth,
-                                                  height: 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1)),
-                                    soundEffect: roomInfo?.room?.sound_effect ?? 1)
-        let height = 180 + getDetailTextHeight(roomInfo?.room?.sound_effect ?? 1)
-        let vc = SAAlertViewController(compent: SAPresentedViewComponent(contentSize: CGSize(width: ScreenWidth,
-                                                                                             height: height)),
-                                       custom: soundView)
-        sa_presentViewController(vc)
+        tipsView.show()
     }
 
     func showActiveAlienView(_ active: Bool) {
