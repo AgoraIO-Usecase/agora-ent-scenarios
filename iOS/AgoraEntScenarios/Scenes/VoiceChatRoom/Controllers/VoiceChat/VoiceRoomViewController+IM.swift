@@ -240,16 +240,13 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                     let cp_uid: String = first.member?.chat_uid ?? ""
                     if local_uid == cp_uid {
                         local_index = mic_index
-                        if !isOwner {
-                            self.rtckit.setClientRole(role: status == 0 ? .owner : .audience)
-                        }
-                        //如果当前是0的状态  就设置成主播
-                        self.rtckit.muteLocalAudioStream(mute: (status != 0 && micStatus != 0))
+                        self.micMuteManager(mic: first)
                     }
                 } else {
                     if local_index == nil || mic_index == local_index {
                         rtckit.setClientRole(role: .audience)
                         rtckit.muteLocalAudioStream(mute: true)
+                        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
                     }
                 }
                 

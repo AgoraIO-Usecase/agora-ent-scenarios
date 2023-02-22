@@ -121,6 +121,7 @@ extension VoiceRoomViewController {
                 return
             }
         }
+        
         ChatRoomServiceImp.getSharedInstance().changeMic(old_index: from, new_index: to) { error, micMap in
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
@@ -131,11 +132,9 @@ extension VoiceRoomViewController {
                 guard let mic = ChatRoomServiceImp.getSharedInstance().mics.first(where: {
                                     VoiceRoomUserInfo.shared.user?.chat_uid ?? "" == $0.member?.chat_uid ?? ""
                                 }) else { return }
-                self.rtckit.setClientRole(role: mic.status == 0 ? .owner : .audience)
-                self.rtckit.muteLocalAudioStream(mute: mic.status != 0)
+                self.micMuteManager(mic: mic)
             }
         }
-
     }
 
 
