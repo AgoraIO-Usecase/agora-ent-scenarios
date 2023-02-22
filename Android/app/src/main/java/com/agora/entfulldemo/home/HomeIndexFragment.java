@@ -20,10 +20,13 @@ import com.agora.entfulldemo.databinding.AppFragmentHomeIndexBinding;
 
 import java.util.List;
 
+import io.agora.scene.base.ReportApi;
 import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.base.utils.ToastUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIndexBinding> {
 
@@ -43,12 +46,22 @@ public class HomeIndexFragment extends BaseViewBindingFragment<AppFragmentHomeIn
                 @Override
                 public void onItemClick(@NonNull ScenesModel scenesModel, View view, int position, long viewType) {
                     if (scenesModel.getActive()) {
+                        reportEnter(scenesModel);
                         goScene(scenesModel);
                     }
                 }
             }, HomeIndexHolder.class);
             getBinding().rvScenes.setAdapter(homeIndexAdapter);
         }
+    }
+
+    private void reportEnter(@NonNull ScenesModel scenesModel){
+        ReportApi.reportEnter(scenesModel.getScene(), new Function1<Boolean, Unit>() {
+            @Override
+            public Unit invoke(Boolean aBoolean) {
+                return null;
+            }
+        },null);
     }
 
     private void goScene(@NonNull ScenesModel scenesModel) {
