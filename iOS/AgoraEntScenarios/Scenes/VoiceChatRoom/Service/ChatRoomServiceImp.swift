@@ -492,35 +492,31 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             completion(self.normalError(),nil)
             return
         }
-        let old_mic = VRRoomMic()
-        switch self.mics[safe: old_index]?.status ?? -1 {
-        case 2:
-            old_mic.status = self.mics[old_index].status
-        case 3,4:
+        let old_mic = mics[safe: old_index]
+        let old_medber = old_mic?.member
+        let new_mic = mics[safe: new_index]
+        
+        old_mic?.member = new_mic?.member
+        new_mic?.member = old_medber
+        old_mic?.mic_index = old_index
+        new_mic?.mic_index = new_index
+        
+        if old_mic?.status == 3 || old_mic?.status == 4 {
             completion(self.normalError(),nil)
             return
-        default:
-            old_mic.status = -1
         }
-        old_mic.mic_index = old_index
-        let new_mic = VRRoomMic()
-        switch self.mics[safe: old_index]?.status ?? -1 {
-        case 2:
-            new_mic.status = self.mics[new_index].status
-        case 3,4:
+        if new_mic?.status == 3 || new_mic?.status == 4 {
             completion(self.normalError(),nil)
             return
-        default:
-            new_mic.status = 0
         }
-        new_mic.mic_index = new_index
-        new_mic.member = VoiceRoomUserInfo.shared.user
-        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)":old_mic.kj.JSONString(),"mic_\(new_index)":new_mic.kj.JSONString()], completion: { error in
-            if error == nil {
-                self.mics[old_index] = old_mic
-                self.mics[new_index] = new_mic
+        guard old_index != new_index else { return }
+        VoiceRoomIMManager.shared?.setChatroomAttributes( attributes: ["mic_\(old_index)": old_mic?.kj.JSONString() ?? "",
+                                                                       "mic_\(new_index)": new_mic?.kj.JSONString() ?? ""],
+                                                          completion: { error in
+            if let old_mic = old_mic, let new_mic = new_mic {
+                completion(self.convertError(error: error),[old_index: old_mic,
+                                                            new_index: new_mic])
             }
-            completion(self.convertError(error: error),[old_index:old_mic,new_index:new_mic])
         })
     }
     
