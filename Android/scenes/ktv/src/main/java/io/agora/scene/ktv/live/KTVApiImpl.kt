@@ -79,6 +79,9 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         engine.addHandler(this)
         player.registerPlayerObserver(this)
         musicCenter.registerEventHandler(this)
+        // 音量最佳实践调整
+        mPlayer.adjustPlayoutVolume(50)
+        mPlayer.adjustPublishSignalVolume(50)
     }
 
     override fun release() {
@@ -207,10 +210,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
                 mPlayer.open(songCode, 0)
 
-                // 音量最佳实践调整
-                mPlayer.adjustPlayoutVolume(100)
-                mPlayer.adjustPublishSignalVolume(100)
-
                 val channelMediaOption = ChannelMediaOptions()
                 channelMediaOption.autoSubscribeAudio = true
                 channelMediaOption.autoSubscribeVideo = true
@@ -241,11 +240,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
                     joinChorus2ndChannel()
 
-                    // 音量最佳实践调整
-                    mPlayer.adjustPlayoutVolume(50)
-                    mPlayer.adjustPublishSignalVolume(50)
                     mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-
                     mPlayer.open(songCode, 0)
                 }
                 KTVSingRole.KTVSingRoleCoSinger -> {
@@ -254,13 +249,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                     channelMediaOption.autoSubscribeVideo = true
                     channelMediaOption.publishMediaPlayerAudioTrack = false
                     mRtcEngine.updateChannelMediaOptions(channelMediaOption)
+
                     joinChorus2ndChannel()
 
-                    // 音量最佳实践调整
-                    mPlayer.adjustPlayoutVolume(50)
-                    mPlayer.adjustPublishSignalVolume(50)
                     mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-
                     mPlayer.open(songCode, 0)
                 }
                 KTVSingRole.KTVSingRoleAudience -> {
