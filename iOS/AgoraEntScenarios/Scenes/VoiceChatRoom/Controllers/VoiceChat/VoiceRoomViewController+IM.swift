@@ -92,7 +92,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        self.headerView.updateHeader(with: self.roomInfo?.room)
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
+        VoiceRoomIMManager.shared
     }
     
     func onAnnouncementChanged(roomId: String, content: String) {
