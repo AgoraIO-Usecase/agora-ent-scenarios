@@ -50,6 +50,8 @@
 
 
 - (void)itemClickAction:(int)tagValue {
+    NSArray* sceneNames = @[@"VoiceChat", @"KTV", @"LiveShow"];
+    [[NetworkManager shared] reportSceneClickWithSceneName:sceneNames[tagValue]];
     switch (tagValue) {
         case 0:
         {
