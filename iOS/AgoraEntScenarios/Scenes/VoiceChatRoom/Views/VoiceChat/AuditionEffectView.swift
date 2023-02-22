@@ -27,7 +27,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var before: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("Before")
+        UILabel(frame: CGRect(x: 20, y: 28, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("Before".localized())
     }()
     
     private lazy var beforeAnimation: UIImageView = {
@@ -43,7 +43,7 @@ final class AuditionEffectView: UIView {
     }()
     
     private lazy var after: UILabel = {
-        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("After")
+        UILabel(frame: CGRect(x: 20, y: self.before.frame.maxY+45, width: self.whiteContainer.frame.width-40, height: 20)).font(.systemFont(ofSize: 13, weight: .semibold)).textColor(UIColor(0x3C4267)).text("After".localized())
     }()
     
     private lazy var afterAnimation: UIImageView = {
@@ -98,11 +98,11 @@ final class AuditionEffectView: UIView {
         var text = ""
         switch type {
         case .AIAEC:
-            text = "AIAEC Audition"
+            text = "AIAEC Audition".localized()
             self.beforePlaceHolderImage = UIImage("AIAECbefore")!
             self.afterPlaceHolderImage = UIImage("AIAECafter")!
         case .AGC:
-            text = "AGC Audition"
+            text = "AGC Audition".localized()
             self.beforePlaceHolderImage = UIImage("AGCbefore")!
             self.afterPlaceHolderImage = UIImage("AGCafter")!
         default:
@@ -123,7 +123,7 @@ final class AuditionEffectView: UIView {
         var type = "m4a"
         if self.type == .AGC {
             resourceName = "2xAGC_"
-            type = "wav"
+            type = "WAV"
         }
         if sender.tag == 11 {
             self.beforePlay.isSelected = !self.beforePlay.isSelected
