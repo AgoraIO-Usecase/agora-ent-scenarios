@@ -180,3 +180,9 @@
 
 "DemoTestDesc" = "This product is for testing only, not for commerce.\nEvery room will be maintained for 20 minutes.";
 "The current microphone has been muted" = "The current microphone has been muted";
+"Announce to chatroom, 140 character limit." = "Announce to chatroom, 140 character limit.";
+"Before" = "Before";
+"After" = "After";
+"AIAEC Audition" = "AIAEC Audition";
+"AGC Audition" = "AGC Audition";
+"Voice room announcement changed!" = "Voice room announcement changed!";

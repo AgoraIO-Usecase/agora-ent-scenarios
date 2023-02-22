@@ -59,8 +59,8 @@
 "Off-Stage"="下麦";
 "Anchor Invited You On-Stage"="房主邀请您上麦";
 "Decline"="拒绝";
-"Gifts"="打赏";
-"gifts"="打赏";
+"Gifts"="送给";
+"gifts"="送给";
 "a rocket" = "一个火箭";
 "Contribution Total"="贡献总计";
 "Contribution List" = "贡献榜单";
@@ -224,3 +224,9 @@
 "Personal audio Settings" = "个人音效设置";
 "Best Agora Sound" = "最佳音效";
 "The current microphone has been muted" = "当前麦位已被静音";
+"Announce to chatroom, 140 character limit." = "聊天室公告，限制140个字。";
+"Before" = "开启前";
+"After" = "开启后";
+"AIAEC Audition" = "AI回声消除试听";
+"AGC Audition" = "人声自动增益试听";
+"Voice room announcement changed!" = "语聊房公告变更!";
