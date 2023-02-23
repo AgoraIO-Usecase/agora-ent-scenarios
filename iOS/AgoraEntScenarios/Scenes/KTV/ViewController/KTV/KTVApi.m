@@ -463,6 +463,11 @@ time_t uptime(void) {
     } else if([dict[@"cmd"] isEqualToString:@"TrackMode"]) {
         
     } else if([dict[@"cmd"] isEqualToString:@"setVoicePitch"]) {
+        //伴唱显示自己分数
+        if (self.config.type == KTVSongTypeChorus
+            && self.config.role == KTVSingRoleCoSinger) {
+            return;
+        }
         int pitch = [dict[@"pitch"] intValue];
 //        NSInteger time = [dict[@"time"] integerValue];
         [self.lrcView setVoicePitch:@[@(pitch)]];
@@ -472,12 +477,21 @@ time_t uptime(void) {
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine reportAudioVolumeIndicationOfSpeakers:(NSArray<AgoraRtcAudioVolumeInfo *> *)speakers totalVolume:(NSInteger)totalVolume
 {
-    if (self.config.role != KTVSingRoleMainSinger
-        || self.playerState != AgoraMediaPlayerStatePlaying) {
+    if (self.playerState != AgoraMediaPlayerStatePlaying) {
+        return;
+    }
+    
+    if (self.config.role == KTVSingRoleAudience) {
         return;
     }
     
     double pitch = speakers.firstObject.voicePitch;
+    [self.lrcView setVoicePitch:@[@(pitch)]];
+    
+    if (self.config.role != KTVSingRoleMainSinger) {
+        return;
+    }
+    
     NSDictionary *dict = @{
         @"cmd":@"setVoicePitch",
         @"pitch":@(pitch),
@@ -485,8 +499,6 @@ time_t uptime(void) {
     };
     [self sendStreamMessageWithDict:dict success:^(BOOL ifSuccess) {
     }];
-    
-    [self.lrcView setVoicePitch:@[@(pitch)]];
 }
 
 
