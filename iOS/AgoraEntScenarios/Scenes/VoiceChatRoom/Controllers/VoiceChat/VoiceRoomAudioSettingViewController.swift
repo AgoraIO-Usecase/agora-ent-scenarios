@@ -66,6 +66,11 @@ class VoiceRoomAudioSettingViewController: UIViewController {
         self.navigationController?.navigationBar.isHidden = true
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
+    }
+    
     private func layoutUI() {
 
         let path = UIBezierPath(roundedRect: self.view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 20.0, height: 20.0))

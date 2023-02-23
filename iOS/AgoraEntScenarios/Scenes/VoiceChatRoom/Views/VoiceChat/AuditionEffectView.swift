@@ -82,14 +82,8 @@ final class AuditionEffectView: UIView {
     
     private func actionEvents() {
         VoiceRoomRTCManager.getSharedInstance().stopMixingClosure = {
-            if self.afterPlay.isSelected == false {
-                self.beforePlay.isSelected = false
-                self.beforeAnimation.image = self.beforePlaceHolderImage
-            }
-            if self.beforePlay.isSelected == false {
-                self.afterPlay.isSelected = false
-                self.afterAnimation.image = self.afterPlaceHolderImage
-            }
+            self.beforeAnimation.image = self.beforePlaceHolderImage
+            self.afterAnimation.image = self.afterPlaceHolderImage
             
         }
     }
@@ -108,13 +102,11 @@ final class AuditionEffectView: UIView {
         default:
             text = ""
         }
+        self.afterPlay.setImage(UIImage("play2"), for: .normal)
+        self.beforePlay.setImage(UIImage("play2"), for: .normal)
         self.beforeAnimation.image = self.beforePlaceHolderImage
         self.afterAnimation.image = self.afterPlaceHolderImage
         self.title.text = text
-        self.beforePlay.setImage(UIImage("play2"), for: .normal)
-        self.beforePlay.setImage(UIImage("zanting"), for: .selected)
-        self.afterPlay.setImage(UIImage("play2"), for: .normal)
-        self.afterPlay.setImage(UIImage("zanting"), for: .selected)
     }
     
     @objc private func playAnimation(sender: UIButton) {
@@ -127,34 +119,41 @@ final class AuditionEffectView: UIView {
         }
         if sender.tag == 11 {
             self.beforePlay.isSelected = !self.beforePlay.isSelected
+            if self.beforePlay.isSelected {
+                self.afterPlay.isSelected = !self.beforePlay.isSelected
+            }
             resourceName += "Before"
             wavName += "-Before"
         } else {
             self.afterPlay.isSelected = !self.afterPlay.isSelected
+            if self.afterPlay.isSelected  {
+                self.beforePlay.isSelected = !self.afterPlay.isSelected
+            }
             resourceName += "After"
             wavName += "-After"
         }
         guard let path = Bundle.voiceRoomBundle.path(forResource: resourceName, ofType: "png") else { return }
         guard let wavPath = Bundle.voiceRoomBundle.path(forResource: wavName, ofType: type) else { return }
         VoiceRoomRTCManager.getSharedInstance().rtcKit.stopAudioMixing()
-        if sender.tag == 11 {
-            if self.beforePlay.isSelected == false {
-                self.beforeAnimation.image = self.beforePlaceHolderImage
-            } else {
-                self.afterAnimation.image = self.afterPlaceHolderImage
-                self.afterPlay.isSelected = false
-                self.beforeAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.beforePlaceHolderImage)
-                VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
-            }
+        self.afterPlay.setImage(UIImage("play2"), for: .normal)
+        self.beforePlay.setImage(UIImage("play2"), for: .normal)
+        if self.beforePlay.isSelected {
+            self.afterPlay.setImage(UIImage("play2"), for: .normal)
+            self.beforePlay.setImage(UIImage("zanting"), for: .normal)
+            self.afterAnimation.image = self.afterPlaceHolderImage
+            self.beforeAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.beforePlaceHolderImage)
+            VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
         } else {
-            if self.afterPlay.isSelected == false {
-                self.afterAnimation.image = self.afterPlaceHolderImage
-            } else {
-                self.beforeAnimation.image = self.afterPlaceHolderImage
-                self.beforePlay.isSelected = false
-                self.afterAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.afterPlaceHolderImage)
-                VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
-            }
+            self.beforeAnimation.image = self.beforePlaceHolderImage
+        }
+        if self.afterPlay.isSelected {
+            self.beforePlay.setImage(UIImage("play2"), for: .normal)
+            self.afterPlay.setImage(UIImage("zanting"), for: .normal)
+            self.beforeAnimation.image = self.afterPlaceHolderImage
+            self.afterAnimation.sd_setImage(with: URL(fileURLWithPath: path), placeholderImage: self.afterPlaceHolderImage)
+            VoiceRoomRTCManager.getSharedInstance().rtcKit.startAudioMixing(wavPath, loopback: false, cycle: 1)
+        } else {
+            self.afterAnimation.image = self.afterPlaceHolderImage
         }
     }
     
