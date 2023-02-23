@@ -30,7 +30,7 @@ object ScenesConstructor {
 //                true
 //            ),
             ScenesModel(
-                AgoraScene.LivShow,
+                AgoraScene.LiveShow,
                 "io.agora.scene.show.RoomListActivity",
                 context.getString(R.string.app_show_live),
                 R.mipmap.bg_btn_home1,
