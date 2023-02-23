@@ -619,7 +619,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             } else if (jsonMsg.getString("cmd") == "setVoicePitch") {
                 // 观众同步pitch
                 val isChorusCoSinger = isChorusCoSinger() ?: return
-                if (isChorusCoSinger) {
+                if (!isChorusCoSinger) {
                     val pitch = jsonMsg.getDouble("pitch")
                     runOnMainThread { lrcView?.pitchView?.updateLocalPitch(pitch.toFloat()) }
                 }
