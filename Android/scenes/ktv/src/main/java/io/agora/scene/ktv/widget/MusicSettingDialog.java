@@ -86,6 +86,8 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvDialogM
         mBinding.btnToneDownDialogSetting.setOnClickListener(v -> tuningTone(false));
         mBinding.btnToneUpDialogSetting.setOnClickListener(v -> tuningTone(true));
 
+        mBinding.textRemoteVolume.setText("" + this.mSetting.getRemoteVolume());
+
         mBinding.switchEar.setOnCheckedChangeListener((buttonView, isChecked) -> this.mSetting.setEar(isChecked));
         mBinding.sbVol1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
