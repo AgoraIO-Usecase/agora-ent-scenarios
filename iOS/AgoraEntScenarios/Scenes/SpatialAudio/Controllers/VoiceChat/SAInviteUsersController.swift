@@ -83,7 +83,7 @@ extension SAInviteUsersController {
                 if self.apply == nil {
                     let model: SAAudiencesEntity = SAAudiencesEntity()
                     model.members = users?.filter({
-                        $0.mic_index == -1
+                        $0.status != .accepted
                     })
                     self.apply = model
                 } else {

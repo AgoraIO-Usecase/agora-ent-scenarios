@@ -70,7 +70,7 @@ extension SARoomViewController {
 
     // 下麦
     func leaveMic(with index: Int) {
-        chatBar.refresh(event: .mic, state: .selected, asCreator: false)
+        chatBar.refresh(event: .mic, state: .unSelected, asCreator: false)
         AppContext.saServiceImp().leaveMic(mic_index: index) {[weak self] error, mic in
             guard let self = self else {return}
             if error == nil,let mic = mic {
@@ -78,7 +78,7 @@ extension SARoomViewController {
                 self.rtckit.setClientRole(role: .audience)
                 self.local_index = nil
                 self.chatBar.refresh(event: .handsUp, state: .unSelected, asCreator: self.isOwner)
-                self.chatBar.refresh(event: .mic, state: .selected, asCreator: self.isOwner)
+                self.chatBar.refresh(event: .mic, state: .unSelected, asCreator: self.isOwner)
             }
         }
         

@@ -30,6 +30,8 @@ class SA3DRtcView: UIView {
 //    private var blueMediaPlayer: AgoraRtcMediaPlayerProtocol?
     private var panGesture: UIPanGestureRecognizer?
     private var lastTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
+    private lazy var redSpatialParams = AgoraSpatialAudioParams()
+    private lazy var blueSpatialParams = AgoraSpatialAudioParams()
     
     public var clickBlock: ((SABaseUserCellType, Int) -> Void)?
     public var activeBlock: ((SABaseUserCellType) -> Void)?
@@ -244,6 +246,37 @@ class SA3DRtcView: UIView {
         rtcUserView.addGestureRecognizer(panGesture!)
     }
     
+    func setAirAbsorb(isRed: Bool, isBlue: Bool, isOpen: Bool) {
+        if isRed {
+            redSpatialParams.enable_air_absorb = isOpen
+            rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
+        }
+        if isBlue {
+            blueSpatialParams.enable_air_absorb = isOpen
+            rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
+        }
+    }
+    func setVoiceBlur(isRed: Bool, isBlue: Bool, isOpen: Bool) {
+        if isRed {
+            redSpatialParams.enable_blur = isOpen
+            rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
+        }
+        if isBlue {
+            blueSpatialParams.enable_blur = isOpen
+            rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
+        }
+    }
+    func setPlayerAttenuation(isRed: Bool, isBlue: Bool, attenuation: Double) {
+        if isRed {
+            rtcKit?.setPlayerAttenuation(attenuation: attenuation,
+                                         playerId: rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0)
+        }
+        if isBlue {
+            rtcKit?.setPlayerAttenuation(attenuation: attenuation,
+                                         playerId: rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0)
+        }
+    }
+    
     func getCellType(With status: Int) -> SABaseUserCellType {
         if let _ = self.micInfos?[0] {
             switch status {
@@ -426,22 +459,6 @@ extension SA3DRtcView {
                                            position: pos,
                                            forward: forward)
     }
-    
-    private func setAirAbsorb(isOpen: Bool, mediaPlayer: AgoraRtcMediaPlayerProtocol?) {
-        let spatialParams = AgoraSpatialAudioParams()
-        spatialParams.enable_air_absorb = isOpen
-        mediaPlayer?.setSpatialAudioParams(spatialParams)
-    }
-    
-    private func setVoiceBlur(isOpen: Bool, mediaPlayer: AgoraRtcMediaPlayerProtocol?) {
-        let spatialParams = AgoraSpatialAudioParams()
-        spatialParams.enable_blur = isOpen
-        mediaPlayer?.setSpatialAudioParams(spatialParams)
-    }
-    
-    private func setPlayerAttenuation(mediaPlayer: AgoraRtcMediaPlayerProtocol?, attenuation: Double) {
-        rtcKit?.setPlayerAttenuation(attenuation: attenuation, playerId: mediaPlayer?.getMediaPlayerId() ?? 0)
-    }
 }
 
 extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -494,10 +511,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeDown
                     cell.refreshUser(with: mic_info)
-                    
-                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: rtcKit?.redMediaPlayer)
-                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: rtcKit?.redMediaPlayer)
-                    setPlayerAttenuation(mediaPlayer: rtcKit?.redMediaPlayer, attenuation: mic_info.attenuation)
                 }
                 
             case 4:
@@ -511,10 +524,6 @@ extension SA3DRtcView: UICollectionViewDelegate, UICollectionViewDataSource, UIC
                     cell.cellType = mic_info.status == 5 ? .AgoraChatRoomBaseUserCellTypeAlienActive : .AgoraChatRoomBaseUserCellTypeAlienNonActive
                     cell.directionType = .AgoraChatRoom3DUserDirectionTypeUp
                     cell.refreshUser(with: mic_info)
-                    
-                    setAirAbsorb(isOpen: mic_info.airAbsorb, mediaPlayer: rtcKit?.blueMediaPlayer)
-                    setVoiceBlur(isOpen: mic_info.voiceBlur, mediaPlayer: rtcKit?.blueMediaPlayer)
-                    setPlayerAttenuation(mediaPlayer: rtcKit?.blueMediaPlayer, attenuation: mic_info.attenuation)
                 }
             case 5:
                 if let mic_info = micInfos?[4] {

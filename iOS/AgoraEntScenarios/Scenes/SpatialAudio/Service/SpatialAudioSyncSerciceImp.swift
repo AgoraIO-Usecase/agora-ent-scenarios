@@ -445,9 +445,15 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         let mic = SARoomMic()
         let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
-        mic.status = (oldMic.status == 2 ? 2:-1)
+        mic.status = (oldMic.status == 2 ? 2 : -1)
         mic.objectId = oldMic.objectId
         self._cleanUserMicIndex(mic: oldMic)
+        
+        if let member = oldMic.member {
+            member.status = .idle
+            member.invited = false
+            _updateUserInfo(roomId: roomId!, user: member) { _ in }
+        }
         
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
@@ -462,9 +468,16 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         let mic = SARoomMic()
         let oldMic = self.mics[mic_index]
         mic.mic_index = mic_index
-        mic.status = oldMic.status == 2 ? 2:-1
+        mic.status = oldMic.status == 2 ? 2 : -1
         mic.objectId = oldMic.objectId
         self._cleanUserMicIndex(mic: self.mics[mic_index])
+        
+        if let member = oldMic.member {
+            member.status = .idle
+            member.invited = false
+            _updateUserInfo(roomId: roomId!, user: member) { _ in }
+        }
+        
         _updateMicSeat(roomId: self.roomId!, mic: mic) { error in
             if error == nil {
                 self.mics[mic_index] = mic
@@ -656,6 +669,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
         }
         user.mic_index = -1
         user.status = .rejected
+        user.invited = false
         _updateUserInfo(roomId: self.roomId!, user: user) { error in
             completion(error, error == nil)
         }
@@ -733,6 +747,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
 //            }
             guard let user = self.userList.first(where: { $0.uid ?? "" == apply.member?.uid ?? "" }) else { return }
             user.mic_index = mic_index
+            user.status = .accepted
             _updateUserInfo(roomId: self.roomId!, user: user) { _ in
                 
             }
@@ -1147,7 +1162,7 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func _updateUserInfo(roomId: String, user: SAUser, completion: @escaping (Error?) -> Void) {
         agoraPrint("imp user update...")
-
+        guard user.objectId != nil else { return }
         let params = user.kj.JSONObject()
         SyncUtil
             .scene(id: roomId)?
