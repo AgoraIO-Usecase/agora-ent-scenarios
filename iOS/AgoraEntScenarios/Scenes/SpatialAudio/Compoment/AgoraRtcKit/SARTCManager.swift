@@ -250,7 +250,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
                 blueMediaPlayer?.stop()
                 delegate?.reportAlien?(with: .ended, musicType: musicType)
             } else {
-                musicPath = musicPath.replacingOccurrences(of: "EN", with: "Lau".localized())
+                let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
+                musicPath = musicPath.replacingOccurrences(of: "CN", with: lanuagePath)
                 print("musicPath:\(musicPath)")
                 if musicPath.contains("-B-") {
                     blueMediaPlayer?.open(musicPath, startPos: 0)
@@ -472,7 +473,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
         } else if type == .ainsOff {
             path = SAConfig.NoneSound[index]
         }
-        path = path.replacingOccurrences(of: "CN", with: sceneLocalized("Lau"))
+        let lanuagePath = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized_spatial() : "EN"
+        path = path.replacingOccurrences(of: "CN", with: lanuagePath)
         rtcKit.startAudioMixing(path, loopback: false, cycle: 1)
     }
 
