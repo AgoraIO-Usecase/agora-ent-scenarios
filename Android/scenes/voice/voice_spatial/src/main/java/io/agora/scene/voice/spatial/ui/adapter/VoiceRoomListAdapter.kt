@@ -30,7 +30,8 @@ class VoiceRoomListAdapter constructor(
             showPrivate(item.isPrivate)
             binding.roomName.text = item.roomName
             binding.ownerName.text = item.owner?.nickName ?: ""
-            binding.roomCount.text = context.getString(R.string.voice_room_list_count, item.memberCount.toString())
+            val countStr = if (item.memberCount > 0) item.memberCount.toString() else "0"
+            binding.roomCount.text = context.getString(R.string.voice_room_list_count, countStr)
 
             ImageTools.loadImage(mBinding.ownerAvatar,item.owner?.portrait)
         }

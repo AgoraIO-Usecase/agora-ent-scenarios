@@ -19,12 +19,6 @@ import io.agora.voice.common.ui.dialog.BaseSheetDialog
  * ---------------------------------------------------------------------------------------------
  **/
 class Room3DWelcomeSheetDialog : BaseSheetDialog<VoiceSpatialDialogRoomWelcomeBinding>() {
-
-    companion object {
-        // 是否需要展示
-        var needShow = true
-    }
-
     // 绑定ViewBinding
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomWelcomeBinding? {
         return VoiceSpatialDialogRoomWelcomeBinding.inflate(inflater, container, false)
@@ -36,7 +30,6 @@ class Room3DWelcomeSheetDialog : BaseSheetDialog<VoiceSpatialDialogRoomWelcomeBi
         binding?.apply {
             // 事件监听
             mbNext.setOnClickListener {
-                needShow = false
                 dismiss()
             }
         }

@@ -102,7 +102,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             else if (roomDetailInfo.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
                 llChatroomAgoraSound.isVisible = true
                 ivIcon.isVisible = true
-                mtChatroomAgoraSound.text = "Beginner's Guide"
+                mtChatroomAgoraSound.text = root.context.getString(R.string.voice_chatroom_beginner_guide)
             } else {
                 llChatroomAgoraSound.isVisible = false
             }

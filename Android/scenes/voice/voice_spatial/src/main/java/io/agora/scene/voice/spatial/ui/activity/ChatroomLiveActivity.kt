@@ -131,6 +131,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                         roomObservableDelegate.onRoomDetails(it)
                     }
                 }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    "roomDetailsObservable onError -- code=$code, message=$message".logD()
+                }
             })
         }
         roomLivingViewModel.joinObservable().observe(this) { response: Resource<Boolean> ->
@@ -379,11 +384,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
 
             override fun onClickSoundSocial(view: View) {
-                if (roomKitBean.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
-                    Room3DWelcomeSheetDialog.needShow = true
-                    roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-                    return
-                }
+                roomObservableDelegate.showRoom3DWelcomeSheetDialog()
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
                     finish()
                 })
