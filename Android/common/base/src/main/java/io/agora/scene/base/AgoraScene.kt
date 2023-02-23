@@ -6,6 +6,6 @@ package io.agora.scene.base
 enum class AgoraScene {
     KTV,
     ChatRoom,
-    LivShow,
+    LiveShow,
     SpatialAudioChatRoom,
 }
