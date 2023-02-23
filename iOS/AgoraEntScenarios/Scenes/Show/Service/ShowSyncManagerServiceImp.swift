@@ -69,7 +69,7 @@ private func agoraPrint(_ message: String) {
 }
 
 class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
-    private let uniqueId: String = NSString.withUUID().md5() as! String
+    private let uniqueId: String = NSString.withUUID().md5()!
     fileprivate var roomList: [ShowRoomListModel]? {
         set {
             AppContext.shared.showRoomList = newValue
@@ -263,7 +263,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                     return
                 }
                 self?.roomId = channelName
-                SyncUtilsWrapper.syncUtilsInited = false
                 NetworkManager.shared.generateTokens(channelName: channelName,
                                                      uid: "\(UserInfo.userId)",
                                                      tokenGeneratorType: .token007,

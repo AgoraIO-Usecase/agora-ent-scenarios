@@ -83,9 +83,10 @@ class SyncUtil: NSObject {
 class SyncUtilsWrapper {
     static var syncUtilsInited: Bool = false
     static private var subscribeConnectStateMap: [String: (SocketConnectState?, Bool)->Void] = [:]
+    static private var currentState: SocketConnectState = .connecting
     
     class func initScene(uniqueId: String, sceneId: String, completion: @escaping (SocketConnectState?, Bool)->Void) {
-        let state: SocketConnectState? = subscribeConnectStateMap[uniqueId] == nil ? .open : nil
+        let state: SocketConnectState? = subscribeConnectStateMap[uniqueId] == nil ? currentState : nil
         let inited: Bool = state == nil ? true : false
         subscribeConnectStateMap[uniqueId] = completion
         if syncUtilsInited {
@@ -97,7 +98,11 @@ class SyncUtilsWrapper {
         }
         
         SyncUtil.subscribeConnectState { state in
-            
+            if currentState == state {
+                return
+            }
+            currentState = state
+            print("subscribeConnectState: \(state)")
             let inited = syncUtilsInited
             defer {
                 subscribeConnectStateMap.forEach { (key: String, value: (SocketConnectState, Bool) -> Void) in
@@ -120,6 +125,7 @@ class SyncUtilsWrapper {
     
     class func cleanScene() {
         syncUtilsInited = false
+        currentState = .connecting
         subscribeConnectStateMap.removeAll()
     }
 }
