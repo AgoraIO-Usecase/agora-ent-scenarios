@@ -197,7 +197,6 @@ public extension VoiceRoomIMManager {
             break
         }
         removeListener()
-        AgoraChatClient.shared().logout(false)
     }
 
     func chatroomAttributesDidUpdated(_ roomId: String, attributeMap: [String: String]?, from fromId: String) {
