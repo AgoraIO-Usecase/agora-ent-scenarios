@@ -36,6 +36,13 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
         blue_mic.airAbsorb = robotInfo.red_robot_absorb
         blue_mic.voiceBlur = robotInfo.red_robot_blur
         
+        sRtcView.setAirAbsorb(isRed: true, isBlue: false, isOpen: robotInfo.red_robot_absorb)
+        sRtcView.setAirAbsorb(isRed: false, isBlue: true, isOpen: robotInfo.blue_robot_absorb)
+        sRtcView.setVoiceBlur(isRed: true, isBlue: false, isOpen: robotInfo.red_robot_blur)
+        sRtcView.setVoiceBlur(isRed: false, isBlue: true, isOpen: robotInfo.blue_robot_blur)
+        sRtcView.setPlayerAttenuation(isRed: true, isBlue: false, attenuation: robotInfo.red_robot_attenuation)
+        sRtcView.setPlayerAttenuation(isRed: false, isBlue: true, attenuation: robotInfo.blue_robot_attenuation)
+        
         self.sRtcView.updateUser(blue_mic)
         self.sRtcView.updateUser(red_mic)
         
@@ -263,12 +270,14 @@ extension SARoomViewController: SpatialAudioServiceSubscribeDelegate {
                 }
                 if !isOwner {
                     var state: SAChatBarState = .selected
-                    if status == 0  {
+                    if status == 0 || status == -1  {
                         state = .unSelected
                     } else {
                         state = .selected
                     }
-                    self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
+                    if first.member != nil {
+                        self.chatBar.refresh(event: .mic, state: state, asCreator: isOwner)
+                    }
                     if mic_index == local_index && (status == -1 || status == 3 || status == 4 || status == 2) {
                         local_index = nil
                     }

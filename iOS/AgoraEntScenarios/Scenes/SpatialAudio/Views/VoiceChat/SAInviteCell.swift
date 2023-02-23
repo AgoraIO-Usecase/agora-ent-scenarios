@@ -43,7 +43,7 @@ public class SAInviteCell: UITableViewCell {
     func refresh(item: SAUser?) {
         user = item
         userName.text = item?.name
-        item?.invited = (item?.mic_index ?? 0 != -1)
+//        item?.invited = (item?.mic_index ?? 0 != -1)
         avatar.sd_setImage(with: URL(string: item?.portrait ?? "")!, placeholderImage: nil)
         operation.setTitle(item?.invited == true ? sceneLocalized("Invited") : sceneLocalized("Invite"), for: .normal)
         operation.setBackgroundImage(item?.invited == true ? nil : UIImage.sceneImage(name: "blue_btn_bg"), for: .normal)
@@ -55,7 +55,7 @@ public class SAInviteCell: UITableViewCell {
     }
 
     @objc func invite() {
-        if inviteClosure != nil, user?.mic_index ?? 0 < 1, user?.invited ?? false == false {
+        if inviteClosure != nil, user?.status == .idle, user?.invited ?? false == false {
             inviteClosure!(user)
         }
     }
