@@ -242,6 +242,14 @@ object VideoSetting {
     // 超分开关
     private var currAudienceEnhanceSwitch = SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
+    // 是否在pk 模式中，pk 中观众不开启超分
+    @Volatile
+    private var isPkMode: Boolean = false
+
+    fun setIsPkMode(isPkMode:Boolean){
+        this.isPkMode = isPkMode
+    }
+
     fun getCurrAudienceSetting(): AudienceSetting {
         //
         val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
@@ -297,6 +305,7 @@ object VideoSetting {
     }
 
     fun resetAudienceSetting() {
+        isPkMode = false
         val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
         setCurrAudienceSetting(result)
     }
@@ -464,7 +473,8 @@ object VideoSetting {
         isJoinedRoom: Boolean, SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         SR?.let {
-            val enableSR = currAudienceEnhanceSwitch || SR == SuperResolution.SR_NONE
+            // pk 中关闭超分
+            val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE && !isPkMode
             ShowLogger.d("VideoSetting", "SR_Config -- enable=$enableSR sr_type=$SR currAudienceEnhanceSwitch=$currAudienceEnhanceSwitch")
 
             if (enableSR) {
