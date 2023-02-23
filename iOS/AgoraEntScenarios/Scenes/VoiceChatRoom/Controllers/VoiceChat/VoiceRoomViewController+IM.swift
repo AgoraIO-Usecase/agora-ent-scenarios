@@ -92,6 +92,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
+        self.headerView.updateHeader(with: self.roomInfo?.room)
         self.convertShowText(userName: user.name ?? "", content: "Joined".localized(), joined: true)
     }
     
@@ -107,14 +108,12 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
-        self.view.makeToast(message, point: toastPoint, title: nil, image: nil, completion: nil)
-        var destroyed = false
+        self.view.window?.makeToast(message)
         if reason == .destroyed {
-            destroyed = true
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
         }
         ChatRoomServiceImp.getSharedInstance().leaveRoom(roomId) { _, _ in }
-        self.didHeaderAction(with: .back, destroyed: destroyed)
+        self.backAction()
     }
     
     func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
@@ -242,6 +241,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
                         self.micMuteManager(mic: first)
                     }
                 } else {
+                    self.view.makeToast("You were removed from stage".localized())
                     if local_index == nil || mic_index == local_index {
                         rtckit.setClientRole(role: .audience)
                         rtckit.muteLocalAudioStream(mute: true)
