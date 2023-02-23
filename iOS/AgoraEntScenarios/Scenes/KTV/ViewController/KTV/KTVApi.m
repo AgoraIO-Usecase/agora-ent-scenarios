@@ -371,7 +371,7 @@ time_t uptime(void) {
 }
 
 - (void)updateRemotePlayBackVolumeIfNeed {
-    if (self.config.type != KTVSongTypeChorus || self.config.role == KTVSingRoleAudience) {
+    if (self.config.role == KTVSongTypeUnknown || self.config.role == KTVSingRoleAudience) {
         KTVLogInfo(@"updateRemotePlayBackVolumeIfNeed: %d, role: %ld", 100, self.config.role);
         [self.engine adjustPlaybackSignalVolume:100];
         return;
