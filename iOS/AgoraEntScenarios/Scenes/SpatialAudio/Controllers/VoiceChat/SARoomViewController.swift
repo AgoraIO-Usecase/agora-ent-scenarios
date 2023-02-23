@@ -106,12 +106,7 @@ class SARoomViewController: SABaseViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let isHidden = UserDefaults.standard.bool(forKey: "beginnersGuide")
-        if !isHidden {
-            tipsView.show()
-            UserDefaults.standard.set(true, forKey: "beginnersGuide")
-            UserDefaults.standard.synchronize()
-        }
+        tipsView.show()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
