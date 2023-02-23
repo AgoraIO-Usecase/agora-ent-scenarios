@@ -5,7 +5,7 @@
 //  Created by zhaoyongqiang on 2021/11/19.
 //
 import UIKit
-import YYCategories
+//import YYCategories
 
 @objc
 class NetworkManager:NSObject {
@@ -412,14 +412,14 @@ extension NetworkManager {
                              ]],
                       "src": src,
                       "ts": ts,
-                      "sign": "src=\(src)&ts=\(ts)".md5] as [String: Any]
+                      "sign": "src=\(src)&ts=\(ts)".md5Encrypt] as [String: Any]
 //        ToastView.showWait(text: "loading...", view: nil)
         let url = "https://report-ad.agoralab.co/v1/report"
         NetworkManager.shared.postRequest(urlString: url,
                                           params: params,
                                           success: { response in
-//            let data = response["data"] as? [String: String]
-//            print(response)
+            let data = response["data"] as? [String: String]
+            print(response)
 //            success(token)
 //            ToastView.hidden()
         }, failure: { error in
