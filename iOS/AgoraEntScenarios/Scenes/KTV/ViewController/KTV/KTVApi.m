@@ -247,6 +247,7 @@ time_t uptime(void) {
             options.publishMediaPlayerId = [self.rtcMediaPlayer getMediaPlayerId];
             options.publishMediaPlayerAudioTrack = YES;
             [self.engine updateChannelWithMediaOptions:options];
+            self.audioScenario = AgoraAudioScenarioChorus;
             
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
@@ -324,6 +325,7 @@ time_t uptime(void) {
     [self.lrcView stop];
     [self.lrcView reset];
     self.config = nil;
+    self.audioScenario = AgoraAudioScenarioGameStreaming;
 }
 
 -(void)selectTrackMode:(KTVPlayerTrackMode)mode
@@ -683,10 +685,10 @@ time_t uptime(void) {
 //    [self.engine setAudioScenario:AgoraAudioScenarioChorus];
 //}
 
--(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
-{
-    self.audioScenario = AgoraAudioScenarioGameStreaming;
-}
+//-(void)rtcEngine:(AgoraRtcEngineKit *)engine didLeaveChannelWithStats:(AgoraChannelStats *)stats
+//{
+//    self.audioScenario = AgoraAudioScenarioGameStreaming;
+//}
 
 #pragma private apis
 //发送流消息
