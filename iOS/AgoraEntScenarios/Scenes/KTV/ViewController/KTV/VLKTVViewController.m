@@ -893,7 +893,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             if(local) {
                 KTVLogInfo(@"Playback all loop completed");
                 VLRoomSelSongModel *songModel = self.selSongsArray.firstObject;
-                if([self isCurrentSongMainSinger:VLUserCenter.user.id]) {
+                if([songModel isSongOwner] || [songModel isSongCoSinger]) {
                     [self showScoreViewWithScore:[self.MVView getAvgSongScore] song:songModel];
                 }
                 [self removeCurrentSongWithSync:YES];
