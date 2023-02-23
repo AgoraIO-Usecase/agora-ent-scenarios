@@ -48,6 +48,7 @@ class VoiceRoomViewController: VRBaseViewController {
     var ains_state: AINS_STATE = .mid
     var local_index: Int?
     var vmType: VMMUSIC_TYPE = .social
+    var isHeaderBack = false
 
     public var roomInfo: VRRoomInfo? {
         didSet {
@@ -97,8 +98,10 @@ class VoiceRoomViewController: VRBaseViewController {
     
     private func subscribeSceneRoom() {
         SyncUtil.scene(id: self.roomInfo?.room?.room_id ?? "")?.subscribe(key: "",onDeleted: { _ in
-            self.view.window?.makeToast("Time limit desc".localized())
-            self.backAction()
+            if self.isHeaderBack == false {
+                self.view.window?.makeToast("Time limit desc".localized())
+                self.backAction()
+            }
         })
     }
 
@@ -151,7 +154,7 @@ extension VoiceRoomViewController {
             let joinSuccess = rtcJoinSuccess && IMJoinSuccess
             guard let `self` = self else { return }
             if !joinSuccess {
-                self.view.makeToast("Join failed!")
+                self.view.window?.makeToast("Join failed!")
                 self.rtckit.leaveChannel()
                 self.backAction()
             } else {
@@ -317,6 +320,7 @@ extension VoiceRoomViewController {
 
     func didHeaderAction(with action: HEADER_ACTION, destroyed: Bool) {
         if action == .back || action == .popBack {
+            self.isHeaderBack = true
             if isOwner && action != .popBack {
                 if destroyed != true {
                     showEndLive()

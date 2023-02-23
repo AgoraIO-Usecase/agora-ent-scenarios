@@ -46,6 +46,7 @@ public class VoiceRoomAudienceCell: UITableViewCell {
     func refresh(user: VRUser?) {
         self.item = user
         self.userName.text = user?.name
+        self.operation.isHidden = (VoiceRoomUserInfo.shared.currentRoomOwner?.chat_uid ?? "") != (VoiceRoomUserInfo.shared.user?.chat_uid ?? "")
         self.avatar.sd_setImage(with: URL(string: user?.portrait ?? "")!, placeholderImage: UIImage(named: "mine_avatar_placeHolder"))
     }
     @MainActor
