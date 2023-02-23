@@ -27,8 +27,8 @@
     <string name="voice_room_create_chat_room">Chat Room</string>
     <string name="voice_room_create_chat_3d_room">Spatial Audio</string>
     <string name="voice_room_create_chat_room_desc">Multi-audio chat scenario where anyone can unmute their mic and speak \nCo-Watch / Team Chat / Gaming Buddy Chat</string>
-    <string name="voice_room_create_3d_room">Spatial Audio</string>
-    <string name="voice_room_create_3d_room_desc">Power natural conversations that make people feel like "they're in the room" together</string>
+    <string name="voice_room_create_3d_room">Spatial Audio Mode Room</string>
+    <string name="voice_room_create_3d_room_desc">Power natural conversations that make people feel like they\'re \"in the room\" together</string>
     <string name="voice_room_create_ktv_room">KTV</string>
     <string name="voice_room_create_tips">Enter 4 Digit PassWord</string>
     <string name="voice_room_check_password">Incorrect Password</string>
@@ -46,10 +46,10 @@
     <string name="voice_empty_raised_hands">No one raised hands yet</string>
     <string name="voice_room_profile">Profile</string>
     <string name="voice_room_close">Room Closed</string>
-    <string name="voice_room_kick_member">Kicked Out</string>
+    <string name="voice_room_kick_member">You were kicked off from the room</string>
 
     <string name="voice_room_welcome">Welcome to the voice chat room! Pornography, gambling or violence is strictly prohibited in the room.</string>
-    <string name="voice_chatroom_time_up_tips">The room experience time has been exhausted.</string>
+    <string name="voice_chatroom_time_up_tips">The experience limit has been reached. This room has been closed</string>
 
     <!-- gift -->
     <string name="voice_gift_default_name_1">Sweet Heart</string>
@@ -102,8 +102,8 @@
     <string name="voice_chatroom_exchange_mic">Exchange seat?</string>
     <string name="voice_chatroom_exchange_mic_success">Exchange seat success</string>
     <string name="voice_chatroom_exchange_mic_fail">Exchange seat error:%1$s</string>
-    <string name="voice_chatroom_mic_close_by_host">Mic closed by host</string>
-    <string name="voice_chatroom_mic_muted_by_host">The current seat has been banned by the host</string>
+    <string name="voice_chatroom_mic_close_by_host">The seat has been closed</string>
+    <string name="voice_chatroom_mic_muted_by_host">The seat has been muted</string>
     <string name="voice_chatroom_mic_kicked_off">Kicked Off</string>
     <string name="voice_chatroom_mic_unblocked">Mic Unblocked</string>
     <string name="voice_chatroom_mic_blocked">Mic Blocked</string>
@@ -116,7 +116,7 @@
     <string name="voice_chatroom_mic_on_stage">On-Stage</string>
     <string name="voice_chatroom_mic_off_stage">Off-Stage</string>
     <string name="voice_chatroom_mic_removed_from_stage">You were removed from stage</string>
-    <string name="voice_chatroom_mic_kicked_out_of_the_room">You have been kicked out of the room</string>
+    <string name="voice_chatroom_mic_kicked_out_of_the_room">You were kicked off from the room</string>
     <string name="voice_chatroom_mic_anchor_invited_you_on_stage">Anchor Invited You On-Stage</string>
     <string name="voice_chatroom_mic_exchange_mic_success">Exchange mic success</string>
     <string name="voice_chatroom_mic_exchange_mic_failed">Exchange mic failed</string>
@@ -136,6 +136,7 @@
     <string name="voice_room_disclaimer_content_3">It’s your freedom to choose to test this Product or not. But if you decide to do so, and if you download, install, or use this Product, it means that you confirm and agree that under no circumstances shall Agora be liable for any form of loss or injury caused to yourself or others when you use this Product for any reason, in any manner.</string>
     <string name="voice_room_disclaimer_email">If you have any query, please feel free to contact support@agora.io</string>
 
+    <string name="voice_chatroom_beginner_guide">Beginner\'s Guide</string>
     <string name="voice_chatroom_welcome">How to use 3D Spatial Audio Seat</string>
     <string name="voice_chatroom_welcome_tip1">Put on headsets</string>
     <string name="voice_chatroom_welcome_tip2">Move avatar around to hear different spatial audio effects</string>

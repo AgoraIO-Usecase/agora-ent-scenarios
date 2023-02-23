@@ -526,9 +526,6 @@ class RoomObservableViewDelegate constructor(
      * 展示3D空间音频欢迎页
      */
     fun showRoom3DWelcomeSheetDialog() {
-        if (!Room3DWelcomeSheetDialog.needShow) {
-            return
-        }
         val room3DWelcomeSheetDialog = Room3DWelcomeSheetDialog()
         room3DWelcomeSheetDialog.show(activity.supportFragmentManager, "room3DWelcomeSheetDialog")
     }
@@ -812,7 +809,7 @@ class RoomObservableViewDelegate constructor(
             roomMicMangerDialog.show(activity.supportFragmentManager, "RoomMicManagerSheetDialog")
         } else if (micInfo.micStatus == MicStatus.Lock || micInfo.micStatus == MicStatus.LockForceMute) {
             // 座位被锁麦
-            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
+            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
             val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
             if (mineMicIndex >= 0) {
