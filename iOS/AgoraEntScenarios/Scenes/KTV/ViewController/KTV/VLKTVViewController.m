@@ -278,7 +278,7 @@ KTVApiDelegate
     }];
     
     //callback if choose song list did changed
-    [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo) {
+    [[AppContext ktvServiceImp] subscribeChooseSongChangedWithBlock:^(KTVSubscribe status, VLRoomSelSongModel * songInfo, NSArray<VLRoomSelSongModel*>* songArray) {
         // update in-ear monitoring
         [weakSelf _checkInEarMonitoring];
         
@@ -288,14 +288,15 @@ KTVApiDelegate
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
             KTVLogInfo(@"song did updated: %@ ischorus: %d, status: %ld", song.name, songInfo.isChorus, songInfo.status);
-            if (song == nil) {
-                NSMutableArray* selSongsArray = [NSMutableArray arrayWithArray:weakSelf.selSongsArray];
-                [selSongsArray appendObject:songInfo];
-                weakSelf.selSongsArray = selSongsArray;
-                return;
-            }
-            
-            [weakSelf replaceSelSongWithInfo:songInfo];
+//            if (song == nil) {
+//                NSMutableArray* selSongsArray = [NSMutableArray arrayWithArray:weakSelf.selSongsArray];
+//                [selSongsArray appendObject:songInfo];
+//                weakSelf.selSongsArray = selSongsArray;
+//                return;
+//            }
+//
+//            [weakSelf replaceSelSongWithInfo:songInfo];
+            weakSelf.selSongsArray = [NSMutableArray arrayWithArray:songArray];
         }
     }];
     
@@ -706,16 +707,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
-    NSMutableArray* selSongsArray = [NSMutableArray array];
-    [self.selSongsArray enumerateObjectsUsingBlock:^(VLRoomSelSongModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.songNo isEqualToString:songInfo.songNo]) {
-            [selSongsArray addObject:songInfo];
-            return;
-        }
-        [selSongsArray addObject:obj];
-    }];
-    
-    self.selSongsArray = selSongsArray;
+    self.selSongsArray = [KTVSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
 }
 
 - (void)leaveRoom {
