@@ -552,6 +552,7 @@ time_t uptime(void) {
 -(void)AgoraRtcMediaPlayer:(id<AgoraRtcMediaPlayerProtocol>)playerKit didChangedToState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error
 {
     if (state == AgoraMediaPlayerStateOpenCompleted) {
+        KTVLogInfo(@"loadSong play completed %ld", self.config.songCode);
         self.localPlayerPosition = uptime();
         self.playerDuration = 0;
         if (self.config.role == KTVSingRoleMainSinger) {
@@ -822,6 +823,7 @@ time_t uptime(void) {
         //overwrite existing callback and use new
         [self.lyricCallbacks setObject:block forKey:url];
     }
+    KTVLogInfo(@"setLrcLyric: %@", url);
     [self.lrcView setLrcUrlWithUrl:url];
 }
 
