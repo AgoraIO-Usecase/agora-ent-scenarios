@@ -44,7 +44,6 @@ class SA3DRtcView: UIView {
                 return
             }
             collectionView.reloadData()
-            updateSpatialPos()
             
             guard let mic = micInfos?.first else { return }
             rtcUserView.cellType = getCellTypeWithStatus(mic.status)
@@ -173,12 +172,15 @@ class SA3DRtcView: UIView {
         if type == .red {
             updateAlienMic(2,flag: true)
             updateAlienMic(4, flag: false)
+            
         } else if type == .blue  {
             updateAlienMic(4, flag: true)
             updateAlienMic(2, flag: false)
+            
         } else if type == .blueAndRed {
             updateAlienMic(2, flag: true)
             updateAlienMic(4, flag: true)
+            
         } else if (type == .none || type == .ended) {
             updateAlienMic(2, flag: false)
             updateAlienMic(4, flag: false)
@@ -433,11 +435,13 @@ extension SA3DRtcView {
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.redMediaPlayer?.getMediaPlayerId() ?? 0))
+                rtcKit?.redMediaPlayer?.setSpatialAudioParams(redSpatialParams)
                 
             case 3: // blue robot
                 setMediaPlayerPosition(pos: info.pos ?? [],
                                        forward: info.forward,
                                        playerId: Int(rtcKit?.blueMediaPlayer?.getMediaPlayerId() ?? 0))
+                rtcKit?.blueMediaPlayer?.setSpatialAudioParams(blueSpatialParams)
                 
             default:
                 if info.member?.uid == VLUserCenter.user.id {
