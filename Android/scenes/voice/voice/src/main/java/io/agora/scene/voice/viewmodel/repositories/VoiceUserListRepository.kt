@@ -88,7 +88,7 @@ class VoiceUserListRepository : BaseRepository() {
     fun fetchInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
-                voiceServiceProtocol.fetchRoomMembers(completion = { error, result ->
+                voiceServiceProtocol.fetchRoomInvitedMembers(completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
                     } else {
@@ -123,6 +123,23 @@ class VoiceUserListRepository : BaseRepository() {
                 voiceServiceProtocol.fetchRoomMembers( completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(result))
+                    } else {
+                        callBack.onError(error)
+                    }
+                })
+            }
+        }
+        return resource.asLiveData()
+    }
+
+
+    // 踢出用户
+    fun kickRoomMember(chatUidList: MutableList<String>,index:Int): LiveData<Resource<Int>> {
+        val resource = object : NetworkOnlyResource<Int>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Int>>) {
+                voiceServiceProtocol.kickMemberOutOfRoom(chatUidList,completion = { error, result ->
+                    if (error == VoiceServiceProtocol.ERR_OK) {
+                        callBack.onSuccess(createLiveData(index))
                     } else {
                         callBack.onError(error)
                     }

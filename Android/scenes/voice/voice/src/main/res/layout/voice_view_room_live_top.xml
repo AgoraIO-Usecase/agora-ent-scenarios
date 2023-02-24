@@ -81,6 +81,7 @@
             android:id="@+id/llChatroomMemberRank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
             android:layout_gravity="end"
             android:orientation="horizontal">
 

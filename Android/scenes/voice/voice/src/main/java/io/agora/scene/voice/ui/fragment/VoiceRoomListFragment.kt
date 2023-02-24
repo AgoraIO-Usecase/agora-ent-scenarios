@@ -30,6 +30,7 @@ import io.agora.voice.common.net.callback.VRValueCallBack
 import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.utils.FastClickTools
+import io.agora.voice.common.utils.LogTools.i
 import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.LogTools.logE
 import io.agora.voice.common.utils.ThreadManager
@@ -114,6 +115,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
                 override fun onSuccess(reslut: VoiceRoomModel?) {
                     curVoiceRoomModel = reslut ?: return
+                    "apex-wt :${reslut.memberCount}".logD()
                     val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     "Voice room list chat_username:$chatUsername".logD()
@@ -217,6 +219,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
     private fun goChatroomPage() {
         val parentActivity = activity
         curVoiceRoomModel?.let {
+            "apex-wt VoiceRoomListFragment ${it.memberCount}".logD()
             if (parentActivity != null) ChatroomLiveActivity.startActivity(parentActivity, it)
         }
 
