@@ -499,8 +499,9 @@ class RoomObservableViewDelegate constructor(
                         }
                     }
                 }
-                iRoomMicView.onInitMic(micList, robotInfo.useRobot)
-                updateSpatialPosition(micList)
+                iRoomMicView.onInitMic(micList, robotInfo.useRobot) {
+                    updateSpatialPosition(micList)
+                }
             }
         }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
@@ -525,9 +526,6 @@ class RoomObservableViewDelegate constructor(
      * 展示3D空间音频欢迎页
      */
     fun showRoom3DWelcomeSheetDialog() {
-        if (!Room3DWelcomeSheetDialog.needShow) {
-            return
-        }
         val room3DWelcomeSheetDialog = Room3DWelcomeSheetDialog()
         room3DWelcomeSheetDialog.show(activity.supportFragmentManager, "room3DWelcomeSheetDialog")
     }
@@ -669,9 +667,9 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_AIR_ABSORB_ENABLED, robotInfo.blueRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
-                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotAbsorb)
-                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100).toInt())
-                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100).toInt())
+                putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotBlur)
+                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, robotInfo.blueRobotAttenuation)
+                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, robotInfo.redRobotAttenuation)
             }
         }
 
@@ -811,7 +809,7 @@ class RoomObservableViewDelegate constructor(
             roomMicMangerDialog.show(activity.supportFragmentManager, "RoomMicManagerSheetDialog")
         } else if (micInfo.micStatus == MicStatus.Lock || micInfo.micStatus == MicStatus.LockForceMute) {
             // 座位被锁麦
-            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_close_by_host))
+            ToastTools.show(activity, activity.getString(R.string.voice_chatroom_mic_muted_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
             val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
             if (mineMicIndex >= 0) {
@@ -994,10 +992,10 @@ class RoomObservableViewDelegate constructor(
                 AgoraRtcEngineController.get().updateEffectVolume(robotInfo.robotVolume)
             }
             if (this.robotInfo.redRobotAttenuation != robotInfo.redRobotAttenuation) {
-                AgoraRtcEngineController.get().adjustRedAttenuation((robotInfo.redRobotAttenuation * 100).toInt())
+                AgoraRtcEngineController.get().adjustRedAttenuation(robotInfo.redRobotAttenuation)
             }
             if (this.robotInfo.blueRobotAttenuation != robotInfo.blueRobotAttenuation) {
-                AgoraRtcEngineController.get().adjustBlueAttenuation((robotInfo.blueRobotAttenuation * 100).toInt())
+                AgoraRtcEngineController.get().adjustBlueAttenuation(robotInfo.blueRobotAttenuation)
             }
             if (this.robotInfo.blueRobotBlur != robotInfo.blueRobotBlur) {
                 AgoraRtcEngineController.get().enableBlueBlur(robotInfo.blueRobotBlur)
@@ -1125,8 +1123,9 @@ class RoomObservableViewDelegate constructor(
      * 根据麦位数据更新ui
      */
     private fun updateViewByMicMap(newMicMap: Map<Int, VoiceMicInfoModel>) {
-        iRoomMicView.onSeatUpdated(newMicMap)
-        updateSpatialPosition(newMicMap.values)
+        iRoomMicView.onSeatUpdated(newMicMap) {
+            updateSpatialPosition(newMicMap.values)
+        }
         chatPrimaryMenuView.showMicVisible(isLocalAudioMute, localUserIndex() >= 0)
         if (roomKitBean.isOwner) {
             val handsCheckMap = mutableMapOf<Int, String>()
@@ -1167,7 +1166,7 @@ class RoomObservableViewDelegate constructor(
     fun checkUserLeaveMic() {
         val localUserIndex = localUserIndex()
         // 普通用户离开
-        if (localUserIndex > 0) {
+        if (localUserIndex >= 0) {
             roomLivingViewModel.leaveMic(localUserIndex)
         }
     }

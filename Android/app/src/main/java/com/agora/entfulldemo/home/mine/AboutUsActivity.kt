@@ -19,7 +19,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val servicePhone = "400-632-6626"
     private val webSite = "https://www.agora.io/cn/about-us/"
 
-
     override fun getViewBinding(inflater: LayoutInflater): AppActivityAboutUsBinding {
         return AppActivityAboutUsBinding.inflate(inflater)
     }
@@ -30,14 +29,12 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         setupClickPhoneAction()
         setupClickWebAction()
         // set versions
-        binding.tvVersion.text = "2.1.0"
+        binding.tvVersion.text = "20230110-2.1.0-4.1.1"
         binding.tvServiceNumber.text = servicePhone
         binding.tvHomeWebSite.text = webSite
-        binding.tvChatRoomVersion.text = "2.1.0"
-        binding.tvSpaceVoiceVersion.text = "2.1.0"
-        binding.tvOnlineKTVVersion.text = "2.1.0"
-//        binding.tvLiveShowVersion.text = "2.1.0"
-//        binding.tvGameRoomVersion.text = "2.1.0"
+        binding.tvChatRoomVersion.text = "2.1.0-YL-1.2"
+        binding.tvSpaceVoiceVersion.text = "2.1.0-YLKJ-1.2"
+        binding.tvOnlineKTVVersion.text = "2.1.0-KTV-2.1.1"
     }
 
     fun setupClickWebAction() {

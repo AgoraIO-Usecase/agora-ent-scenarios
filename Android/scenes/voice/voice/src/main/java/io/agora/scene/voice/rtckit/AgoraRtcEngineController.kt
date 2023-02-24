@@ -264,6 +264,25 @@ class AgoraRtcEngineController {
     }
 
     /**
+     * APM全链路音频开关
+     */
+    fun setApmOn(isOn: Boolean) {
+        if (isOn) {
+            rtcEngine?.setParameters("{\"rtc.debug.enable\": true}");
+            rtcEngine?.setParameters(
+                "{\"che.audio.frame_dump\":{" +
+                        "\"location\":\"all\"," +
+                        "\"action\":\"start\"," +
+                        "\"max_size_bytes\":\"120000000\"," +
+                        "\"uuid\":\"123456789\"," +
+                        "\"duration\":\"1200000\"}" +
+                        "}")
+        } else {
+            rtcEngine?.setParameters("{\"rtc.debug.enable\": false}")
+        }
+    }
+
+    /**
      * 音效队列
      */
     private val soundAudioQueue: ArrayDeque<SoundAudioBean> = ArrayDeque()

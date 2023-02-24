@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
@@ -29,6 +30,7 @@ import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.Room3DWelcomeSheetDialog
+import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.voice.common.constant.ConfigConstants
@@ -128,6 +130,11 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                     data?.let {
                         roomObservableDelegate.onRoomDetails(it)
                     }
+                }
+
+                override fun onError(code: Int, message: String?) {
+                    super.onError(code, message)
+                    "roomDetailsObservable onError -- code=$code, message=$message".logD()
                 }
             })
         }
@@ -377,11 +384,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
             }
 
             override fun onClickSoundSocial(view: View) {
-                if (roomKitBean.roomType == ConfigConstants.RoomType.Spatial_Chatroom) {
-                    Room3DWelcomeSheetDialog.needShow = true
-                    roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-                    return
-                }
+                roomObservableDelegate.showRoom3DWelcomeSheetDialog()
                 roomObservableDelegate.onClickSoundSocial(roomKitBean.soundEffect, finishBack = {
                     finish()
                 })
@@ -439,6 +442,16 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                 }
             }
         }, true)
+        // debug 模式
+        if (AgoraApplication.the().isDebugModeOpen) {
+            binding.btnDebug.isVisible = true
+            VoiceRoomDebugOptionsDialog.debugMode()
+        } else {
+            binding.btnDebug.isVisible = false
+        }
+        binding.btnDebug.setOnClickListener {
+            VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
+        }
     }
 
     fun setSpatialSeatInfo(info: SeatPositionInfo?) {
@@ -452,7 +465,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceSpatialActivityChatroomBinding>
                             AgoraRtcEngineController.get().sendSelfPosition(it)
                         }
                     }
-                }, 0, 2000)
+                }, 0, 100)
             }
         } else if (oldValue != null && info == null) {
             spatialTimer?.cancel()

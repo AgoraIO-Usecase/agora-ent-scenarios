@@ -27,8 +27,8 @@
     <string name="voice_room_create_chat_room">语聊房</string>
     <string name="voice_room_create_chat_3d_room">空间音频房</string>
     <string name="voice_room_create_chat_room_desc">多人语音互动场景，观众可以自由上麦进行语音交流 \n一起看 / 开黑 / 游戏陪玩</string>
-    <string name="voice_room_create_3d_room">空间音频</string>
-    <string name="voice_room_create_3d_room_desc">拟真且自然的对话，让人们感觉是在一个现实房间里交谈</string>
+    <string name="voice_room_create_3d_room">空间音频房</string>
+    <string name="voice_room_create_3d_room_desc">身临其境般的语聊体验，就像你在真实空间里和朋友聊天</string>
     <string name="voice_room_create_ktv_room">KTV</string>
     <string name="voice_room_create_tips">请输入4位数密码</string>
     <string name="voice_room_check_password">密码错误，请重试</string>
@@ -46,10 +46,10 @@
     <string name="voice_empty_raised_hands">暂无上麦请求</string>
     <string name="voice_room_profile">个人信息</string>
     <string name="voice_room_close">房间销毁</string>
-    <string name="voice_room_kick_member">已踢出房间</string>
+    <string name="voice_room_kick_member">您已被移出房间</string>
 
     <string name="voice_room_welcome">欢迎来到声网语聊房！房间内严禁色情、赌博或暴力内容。</string>
-    <string name="voice_chatroom_time_up_tips">房间体验时间已耗尽。</string>
+    <string name="voice_chatroom_time_up_tips">已到达体验限制时间，本房间已被关闭</string>
 
     <!-- gift -->
     <string name="voice_gift_default_name_1">甜心</string>
@@ -102,8 +102,8 @@
     <string name="voice_chatroom_exchange_mic">更换麦位？</string>
     <string name="voice_chatroom_exchange_mic_success">更换麦位成功</string>
     <string name="voice_chatroom_exchange_mic_fail">更换麦位失败:%1$s</string>
-    <string name="voice_chatroom_mic_close_by_host">当前座位已被房主关闭</string>
-    <string name="voice_chatroom_mic_muted_by_host">当前座位已被房主禁麦</string>
+    <string name="voice_chatroom_mic_close_by_host">当前麦位已被关闭</string>
+    <string name="voice_chatroom_mic_muted_by_host">当前麦位已被静音</string>
     <string name="voice_chatroom_mic_kicked_off">已强制下麦</string>
     <string name="voice_chatroom_mic_unblocked">已解锁</string>
     <string name="voice_chatroom_mic_blocked">已锁麦</string>
@@ -116,7 +116,7 @@
     <string name="voice_chatroom_mic_on_stage">已上麦</string>
     <string name="voice_chatroom_mic_off_stage">已下麦</string>
     <string name="voice_chatroom_mic_removed_from_stage">您已被请下麦</string>
-    <string name="voice_chatroom_mic_kicked_out_of_the_room">你已被房主从语聊房移出</string>
+    <string name="voice_chatroom_mic_kicked_out_of_the_room">您已被移出房间</string>
     <string name="voice_chatroom_mic_anchor_invited_you_on_stage">房主邀请你上麦</string>
     <string name="voice_chatroom_mic_exchange_mic_success">交换麦位成功</string>
     <string name="voice_chatroom_mic_exchange_mic_failed">交换麦位失败</string>
@@ -136,6 +136,7 @@
     <string name="voice_room_disclaimer_content_3">如果您下载、安装、使⽤本产品，即表明您确认并同意声⽹对因任何原因在试⽤本产品时可能对您⾃身或他⼈造成的任何形式的损失和伤害不承担任何责任。</string>
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
 
+    <string name="voice_chatroom_beginner_guide">如何使用</string>
     <string name="voice_chatroom_welcome">如何使用3D空间音频</string>
     <string name="voice_chatroom_welcome_tip1">戴上耳机</string>
     <string name="voice_chatroom_welcome_tip2">移动头像可以听到不同的空间音频效果</string>

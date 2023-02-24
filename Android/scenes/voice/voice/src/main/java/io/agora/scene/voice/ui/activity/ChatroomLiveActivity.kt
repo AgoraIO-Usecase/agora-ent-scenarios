@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
 import io.agora.scene.voice.global.VoiceBuddyFactory
@@ -33,6 +34,7 @@ import io.agora.scene.voice.service.VoiceRoomSubscribeDelegate
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.RoomGiftViewDelegate
 import io.agora.scene.voice.ui.RoomObservableViewDelegate
+import io.agora.scene.voice.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.ui.widget.barrage.ChatroomMessagesView
 import io.agora.scene.voice.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
@@ -564,6 +566,16 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 }
             }
         }, true)
+        // debug 模式
+        if (AgoraApplication.the().isDebugModeOpen) {
+            binding.btnDebug.isVisible = true
+            VoiceRoomDebugOptionsDialog.debugMode()
+        } else {
+            binding.btnDebug.isVisible = false
+        }
+        binding.btnDebug.setOnClickListener {
+            VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
+        }
     }
 
     override fun onBackPressed() {
