@@ -232,7 +232,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 case .high:
                     cell.contentLabel.text = "High".localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Medium".localized()
                 case .off:
                     cell.contentLabel.text = "Off".localized()
                 }
@@ -370,7 +370,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 case .high:
                     cell.contentLabel.text = "High".localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Medium".localized()
                 case .off:
                     cell.contentLabel.text = "Off".localized()
                 }
