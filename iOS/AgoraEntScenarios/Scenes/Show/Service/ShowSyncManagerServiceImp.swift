@@ -1073,10 +1073,10 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .add(data: params, success: { object in
-                agoraPrint("imp message add success...")
+                agoraPrint("imp message add success...\(channelName)")
                 finished?(nil)
             }, fail: { error in
-                agoraPrint("imp message add fail :\(error.message)...")
+                agoraPrint("imp message add fail :\(error.message)...\(channelName)")
                 agoraPrint(error.message)
                 finished?(error.toNSError())
             })
