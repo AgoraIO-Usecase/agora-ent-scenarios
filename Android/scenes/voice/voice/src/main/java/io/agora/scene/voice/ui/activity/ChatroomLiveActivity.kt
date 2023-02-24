@@ -109,7 +109,7 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
     private fun initData() {
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
         giftViewDelegate.onRoomDetails(roomKitBean.roomId, roomKitBean.ownerId)
-        ChatroomIMManager.getInstance().init(roomKitBean.chatroomId)
+        ChatroomIMManager.getInstance().init(roomKitBean.chatroomId,roomKitBean.isOwner)
         ChatroomIMManager.getInstance().saveWelcomeMsg(
             getString(R.string.voice_room_welcome),
             VoiceBuddyFactory.get().getVoiceBuddy().nickName()
@@ -275,17 +275,19 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 if (!TextUtils.equals(roomKitBean.chatroomId, roomId)) return
                 "onUserJoinedRoom $roomId, ${voiceMember.chatUid}".logD(TAG)
                 ThreadManager.getInstance().runOnMainThread {
+                    "onUserJoinedRoom 1 ${voiceRoomModel.memberCount}".logD(TAG)
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
+                    "onUserJoinedRoom 2 ${voiceRoomModel.memberCount}".logD(TAG)
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                     binding.cTopView.onUpdateWatchCount(voiceRoomModel.clickCount)
                     voiceMember.let {
-                        if (!voiceRoomModel.owner?.chatUid.equals(it.chatUid)){
+                        if (roomKitBean.isOwner){
                             ChatroomIMManager.getInstance().setMemberList(it)
+                            roomLivingViewModel.updateRoomMember()
                         }
                     }
                     binding.messageView.refreshSelectLast()
-                    roomObservableDelegate.onMemberJoinRefresh()
                 }
             }
 
@@ -307,7 +309,9 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                             roomObservableDelegate.checkUserLeaveMic(ChatroomIMManager.getInstance().getMicIndexByChatUid(it))
                         }
                     }
+                    "onUserLeftRoom 1 ${voiceRoomModel.memberCount}".logD(TAG)
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount - 1
+                    "onUserLeftRoom 2 ${voiceRoomModel.memberCount}".logD(TAG)
                     binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
                 }
             }
@@ -459,8 +463,8 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 onBackPressed()
             }
 
-            override fun onClickRank(view: View) {
-                roomObservableDelegate.onClickRank()
+            override fun onClickRank(view: View,pageIndex:Int) {
+                roomObservableDelegate.onClickRank(pageIndex)
             }
 
             override fun onClickNotice(view: View) {
@@ -473,9 +477,6 @@ class ChatroomLiveActivity : BaseUiActivity<VoiceActivityChatroomBinding>(), Eas
                 })
             }
 
-            override fun onClickMemberCount(view: View) {
-                roomObservableDelegate.onClickMemberCount()
-            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object : MenuItemClickListener {
             override fun onChatExtendMenuItemClick(itemId: Int, view: View?) {

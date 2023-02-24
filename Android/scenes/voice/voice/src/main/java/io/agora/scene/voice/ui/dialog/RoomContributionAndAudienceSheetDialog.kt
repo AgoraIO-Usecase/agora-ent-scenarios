@@ -18,6 +18,7 @@ import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogContributionAndAudienceBinding
+import io.agora.scene.voice.ui.fragment.RoomAudienceListFragment
 
 class RoomContributionAndAudienceSheetDialog constructor() :
     BaseFixedHeightSheetDialog<VoiceDialogContributionAndAudienceBinding>() {
@@ -121,10 +122,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
         init {
             with(fragments) {
                 put(PAGE_INDEX0, RoomContributionRankingFragment.getInstance(roomKitBean))
-                // todo 一期不显示用户列表
-//                if (roomKitBean.isOwner) {
-//                    put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(roomKitBean))
-//                }
+                put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(roomKitBean))
             }
         }
 

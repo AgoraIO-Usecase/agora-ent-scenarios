@@ -6,7 +6,7 @@ import android.os.Looper
 import android.text.TextUtils
 import io.agora.CallBack
 import io.agora.ValueCallBack
-import io.agora.chat.adapter.EMAError
+import io.agora.chat.ChatRoom
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
@@ -343,15 +343,41 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取邀请列表
+     * 获取邀请列表（过滤已在麦位成员）
      */
-    override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
+    override fun fetchRoomInvitedMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         val  memberList = ChatroomIMManager.getInstance().fetchRoomInviteMembers()
         if (memberList != null ){
             completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
         }else{
             completion.invoke(VoiceServiceProtocol.ERR_FAILED,mutableListOf())
         }
+    }
+
+    /**
+     * 获取房间成员列表
+     */
+    override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
+        val  memberList = ChatroomIMManager.getInstance().fetchRoomMembers()
+        if (memberList != null ){
+            completion.invoke(VoiceServiceProtocol.ERR_OK,memberList)
+        }else{
+            completion.invoke(VoiceServiceProtocol.ERR_FAILED,mutableListOf())
+        }
+    }
+
+    override fun kickMemberOutOfRoom(chatUidList: MutableList<String>, completion: (error: Int, result: Boolean) -> Unit) {
+        //房主踢用户(踢出房间)
+        ChatroomIMManager.getInstance().removeMemberToRoom(chatUidList,object :
+            ValueCallBack<ChatRoom>{
+            override fun onSuccess(value: ChatRoom?) {
+                completion.invoke(VoiceServiceProtocol.ERR_OK,true)
+            }
+
+            override fun onError(code: Int, error: String?) {
+                completion.invoke(VoiceServiceProtocol.ERR_FAILED,false)
+            }
+        })
     }
 
     /**
