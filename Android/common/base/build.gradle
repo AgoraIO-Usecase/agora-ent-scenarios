@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-kapt'
 }
 
-def localsdkPath = "sdk-4_0_0_229-soul"
+def localsdkPath = "sdk-4_0_0_222-soul"
 
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
