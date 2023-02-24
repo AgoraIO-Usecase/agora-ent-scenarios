@@ -292,24 +292,10 @@ public let kMPK_RTC_UID_SA: UInt = 1
         self.type = .VoiceChat
         rtcKit.delegate = self
         rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
-        setParametersWithMD()
-        if type == .ktv || type == .social {
-            rtcKit.setChannelProfile(.liveBroadcasting)
+        rtcKit.setChannelProfile(.liveBroadcasting)
 
-            rtcKit.setAudioProfile(.musicHighQuality)
-            rtcKit.setAudioScenario(.gameStreaming)
-        } else if type == .game {
-            rtcKit.setChannelProfile(.communication)
-        } else if type == .anchor {
-            rtcKit.setChannelProfile(.liveBroadcasting)
-            rtcKit.setAudioProfile(.musicHighQualityStereo)
-            rtcKit.setAudioScenario(.gameStreaming)
-            rtcKit.setParameters("{\"che.audio.custom_payload_type\":73}")
-            rtcKit.setParameters("{\"che.audio.custom_bitrate\":128000}")
-            //  rtcKit.setRecordingDeviceVolume(128)
-            rtcKit.setParameters("{\"che.audio.input_channels\":2}")
-        }
-        setAINS(with: .mid)
+        rtcKit.setAudioProfile(.musicHighQuality)
+        rtcKit.setAudioScenario(.gameStreaming)
         rtcKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
         let code: Int32 = rtcKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: UInt(rtcUid ?? 0))
         return code
@@ -400,10 +386,6 @@ public let kMPK_RTC_UID_SA: UInt = 1
         rtcKit.delegate = self
     }
 
-    private func setParametersWithMD (){
-        rtcKit.setParameters("{\"che.audio.md.enable\":false}")
-
-    }
     /**
      * 加载RTC
      */
@@ -492,66 +474,11 @@ public let kMPK_RTC_UID_SA: UInt = 1
         return rtcKit.setParameters("{\"rtc.audio.music_mode\": \(grade.rawValue)}")
     }
     
-    //AIAEC-AI回声消除
-    public func setAIAECOn(isOn:Bool){
-        //agora_ai_echo_cancellation
-//        rtcKit.enableExtension(withVendor: "agora_ai_echo_cancellation", extension: "", enabled: true)
-        
-        if (isOn){
-            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":1}");
-
-        } else {
-            rtcKit.setParameters("{\"che.audio.aiaec.working_mode\":0}");
-
-        }
-    }
 
     //Dump 全链路音频数据收集
     public func setAPMOn(isOn: Bool){
         rtcKit.setParameters("{\"rtc.debug.enable\": \(isOn)}")
         rtcKit.setParameters("{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}");
-    }
-    
-    //AGC-新增人声自动增益开关
-    public func setAGCOn(isOn:Bool){
-        if (isOn) {
-            rtcKit.setParameters("{\"che.audio.agc.enable\":true}")
-        } else {
-            rtcKit.setParameters("{\"che.audio.agc.enable\":false}")
-        }
-        rtcKit.setParameters("{\"che.audio.agc.targetlevelBov\":3}")
-        rtcKit.setParameters("{\"che.audio.agc.compressionGain\":18}")
-    }
-    
-    /**
-     * 开启/关闭 AI降噪
-     * @param
-     * @return 开启/关闭回声消除的结果
-     */
-    public func setAINS(with level: SARtcType.AINS_STATE) {
-        switch level {
-        case .high:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":2}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":10}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":10}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":0}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":8}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
-        case .mid:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":2}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
-        case .off:
-            rtcKit.setParameters("{\"che.audio.ains_mode\":0}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerBound\":80}")
-            rtcKit.setParameters("{\"che.audio.nsng.lowerMask\":50}")
-            rtcKit.setParameters("{\"che.audio.nsng.statisticalbound\":5}")
-            rtcKit.setParameters("{\"che.audio.nsng.finallowermask\":30}")
-            rtcKit.setParameters("{\"che.audio.nsng.enhfactorstastical\":200}")
-        }
     }
 
     /**
