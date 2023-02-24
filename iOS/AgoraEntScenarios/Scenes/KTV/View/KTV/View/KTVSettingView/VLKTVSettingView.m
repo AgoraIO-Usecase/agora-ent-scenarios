@@ -61,11 +61,11 @@ VLKTVRemoteVolumeViewDelegate
 - (void)initSubViews {
     [self addSubview:self.titleLabel];
     [self addSubview:self.soundSwitcher];
-    [self addSubview:self.tonesView];
+//    [self addSubview:self.tonesView];
     [self addSubview:self.soundSlider];
     [self addSubview:self.accSlider];
     [self addSubview:self.remoteVolumeView];
-    [self addSubview:self.kindsView];
+//    [self addSubview:self.kindsView];
 }
 
 - (void)addSubViewConstraints {
@@ -79,15 +79,15 @@ VLKTVRemoteVolumeViewDelegate
         make.top.mas_equalTo(self.titleLabel.mas_bottom).offset(16);
     }];
     
-    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
-        make.height.mas_equalTo(26);
-    }];
+//    [self.tonesView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.right.mas_equalTo(self);
+//        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
+//        make.height.mas_equalTo(26);
+//    }];
     
     [self.soundSlider mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(self);
-        make.top.mas_equalTo(self.tonesView.mas_bottom).offset(25);
+        make.top.mas_equalTo(self.soundSwitcher.mas_bottom).offset(25);
         make.height.mas_equalTo(22);
     }];
     
@@ -103,11 +103,11 @@ VLKTVRemoteVolumeViewDelegate
         make.height.mas_equalTo(22);
     }];
     
-    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
-        make.left.right.mas_equalTo(self);
-        make.bottom.mas_equalTo(self).offset(-64);
-    }];
+//    [self.kindsView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.mas_equalTo(self.remoteVolumeView.mas_bottom).offset(35);
+//        make.left.right.mas_equalTo(self);
+//        make.bottom.mas_equalTo(self).offset(-64);
+//    }];
 }
 
 #pragma mark - VLKTVSwitcherViewDelegate
