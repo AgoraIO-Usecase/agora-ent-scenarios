@@ -403,6 +403,7 @@
     [_lrcView start];
     self.totalLines = 0;
     self.totalScore = 0.0f;
+    KTVLogInfo(@"lrc... _startLrc %@", self.musicTitleLabel.text);
 }
 
 
@@ -414,13 +415,16 @@
 
 - (void)start {
     [_lrcView start];
+    KTVLogInfo(@"lrc... start %@", self.musicTitleLabel.text);
 }
 
 - (void)stop {
     [_lrcView stop];
+    KTVLogInfo(@"lrc... stop %@", self.musicTitleLabel.text);
 }
 
 - (void)reset {
+    KTVLogInfo(@"lrc... reset %@", self.musicTitleLabel.text);
     [_lrcView stop];
     [_lrcView reset];
     [self setSongScore:0];
