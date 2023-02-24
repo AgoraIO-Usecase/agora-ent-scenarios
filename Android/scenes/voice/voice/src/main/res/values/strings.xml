@@ -146,8 +146,8 @@
     <string name="voice_chatroom_agora_bot">Agora Blue &#038; Red Bot</string>
     <string name="voice_chatroom_bot_volume">Bot Volume</string>
     <string name="voice_chatroom_room_audio_settings">Room Audio Settings</string>
-    <string name="voice_chatroom_best_sound_effect">Best Agora Sound</string>
-    <string name="voice_chatroom_noise_suppression">Noise Suppression</string>
+    <string name="voice_chatroom_best_sound_effect">Agora Sound Selection</string>
+    <string name="voice_chatroom_noise_suppression">AINS</string>
     <string name="voice_chatroom_aiaec">AIAEC</string>
     <string name="voice_chatroom_aiagc">AGC</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC Audition</string>
