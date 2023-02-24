@@ -54,7 +54,7 @@ public class GradeView extends View {
     private float mHeight = 0;
 
     private final RectF mCumulativeScoreBarRectF = new RectF();
-    private final Paint mCumulativeScoreBar = new Paint();
+    private final Paint mCumulativeScoreBarPaint = new Paint();
 
     private LinearGradient mCumulativeLinearGradient;
 
@@ -70,13 +70,13 @@ public class GradeView extends View {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         if (changed) {
-            mDefaultBackgroundRectF.top = 0;
-            mDefaultBackgroundRectF.left = 0;
-            mDefaultBackgroundRectF.right = right;
-            mDefaultBackgroundRectF.bottom = bottom;
-
             mWidth = right - left;
             mHeight = bottom - top;
+
+            mDefaultBackgroundRectF.top = 0;
+            mDefaultBackgroundRectF.left = 0;
+            mDefaultBackgroundRectF.right = mWidth;
+            mDefaultBackgroundRectF.bottom = mHeight;
         }
     }
 
@@ -93,6 +93,7 @@ public class GradeView extends View {
         mGradeSeparatorLabelIndicatorPaint.setStyle(Paint.Style.FILL);
         mGradeSeparatorLabelIndicatorPaint.setTextAlign(Paint.Align.CENTER);
 
+        mDefaultBackgroundPaint.setShader(null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mDefaultBackgroundPaint.setColor(Color.argb(1f, 0f, 0f, 0.3f));
 
@@ -109,6 +110,7 @@ public class GradeView extends View {
         float offsetForLabelX = mGradeSeparatorLabelIndicatorPaint.measureText("S");
         float baseLineForLabel = mHeight / 2 - fontMetrics.top / 2 - fontMetrics.bottom / 2;
 
+        mDefaultBackgroundPaint.setAntiAlias(true);
         canvas.drawRoundRect(mDefaultBackgroundRectF, mHeight / 2, mHeight / 2, mDefaultBackgroundPaint);
 
         canvas.drawLine((float) (mWidth * xRadioOfGradeC), 0, (float) (mWidth * xRadioOfGradeC), mHeight, mGradeSeparatorIndicatorPaint);
@@ -123,9 +125,9 @@ public class GradeView extends View {
         if (mCumulativeLinearGradient == null) {
             buildDefaultCumulativeScoreBarStyle(Color.parseColor("#FF99f5FF"), Color.parseColor("#FF1B6FFF"));
         }
-        mCumulativeScoreBar.setShader(mCumulativeLinearGradient);
-        mCumulativeScoreBar.setAntiAlias(true);
-        canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBar);
+        mCumulativeScoreBarPaint.setShader(mCumulativeLinearGradient);
+        mCumulativeScoreBarPaint.setAntiAlias(true);
+        canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBarPaint);
     }
 
     public void setScore(long score, long cumulativeScore, long perfectScore) {

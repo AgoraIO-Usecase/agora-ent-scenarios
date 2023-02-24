@@ -2,7 +2,6 @@ package io.agora.scene.ktv.widget;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,10 +11,8 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,7 +20,6 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
@@ -50,6 +46,7 @@ import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.ZipUtils;
+import io.agora.scene.ktv.KTVLogger;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcPrepareBinding;
@@ -121,20 +118,6 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mKaraokeView = new KaraokeView(mBinding.ilActive.lyricsView, mBinding.ilActive.scoringView);
 
         initListener();
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) getLayoutParams();
-
-        float heightPixels = Resources.getSystem().getDisplayMetrics().heightPixels;
-        float density = Resources.getSystem().getDisplayMetrics().density;
-        if (heightPixels > 1280 * 2) { // 2K/Slim screen
-            params.bottomMargin = (int) (120 * density);
-            setLayoutParams(params);
-        }
     }
 
     @Override
@@ -371,7 +354,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
 
         mBinding.ivCumulativeScoreGrade.setImageResource(R.drawable.ktv_ic_grade_c);
-        mBinding.tvCumulativeScore.setText("0.0");
+        mBinding.tvCumulativeScore.setText("0");
         mBinding.gradeView.setScore(0, 0, 0);
     }
 
@@ -408,7 +391,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
         mBinding.gradeView.setScore((long) score, (long) cumulativeScore, (long) perfectScore);
 
-        mBinding.tvCumulativeScore.setText("" + mCumulativeScore);
+        mBinding.tvCumulativeScore.setText("" + (int) mCumulativeScore);
         mBinding.ivCumulativeScoreGrade.setImageResource(mBinding.gradeView.getCumulativeDrawable());
 
         if (!mNeedToShowComboView) {
