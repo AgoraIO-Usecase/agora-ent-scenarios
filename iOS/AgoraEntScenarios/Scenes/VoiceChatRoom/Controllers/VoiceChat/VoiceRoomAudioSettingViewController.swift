@@ -31,7 +31,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     
     
     
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+    private var settingImage: [String] = ["AINS", "AIAEC", "AGC", "jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
 
 
     private var soundTitle: [String] = []
