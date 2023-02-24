@@ -537,6 +537,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     KTVLogInfo(@"loadSong name: %@, songNo: %@, type: %ld, role: %ld", model.songName, model.songNo, type, role);
     VL(weakSelf);
     [self.ktvApi loadSong:[[model songNo] integerValue] withConfig:config withCallback:^(NSInteger songCode, NSString * _Nonnull lyricUrl, KTVSingRole role, KTVLoadSongState state) {
+        KTVLogInfo(@"loadSong result: %ld", state);
         if(state == KTVLoadSongStateOK) {
             [weakSelf.MVView updateUIWithSong:model onSeat:weakSelf.isOnMicSeat];
             [weakSelf.ktvApi playSong:[[model songNo] integerValue]];
