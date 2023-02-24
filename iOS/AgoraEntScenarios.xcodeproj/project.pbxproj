@@ -16,6 +16,7 @@
 		A8889DC72997092A004BAA1C /* ShowDebug1TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC629970929004BAA1C /* ShowDebug1TFModel.swift */; };
 		A8889DC92997093D004BAA1C /* ShowDebug2TFModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DC82997093D004BAA1C /* ShowDebug2TFModel.swift */; };
 		A8889DCD29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8889DCC29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift */; };
+		A8E0F47E29A897BD001E807A /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0F47D29A897BD001E807A /* Throttle.swift */; };
 		A8E630BD298520CF002EADA4 /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E630BC298520CF002EADA4 /* KeyCenter.swift */; };
 		BF370B5409C9BBA693EEFB80 /* Pods_AgoraEntScenarios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1922429382BABB488B6495 /* Pods_AgoraEntScenarios.framework */; };
 		DD2A43CB28FFCEE7004CEDCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43CA28FFCEE7004CEDCF /* AppDelegate.swift */; };
@@ -350,6 +351,7 @@
 		A8889DC629970929004BAA1C /* ShowDebug1TFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebug1TFModel.swift; sourceTree = "<group>"; };
 		A8889DC82997093D004BAA1C /* ShowDebug2TFModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebug2TFModel.swift; sourceTree = "<group>"; };
 		A8889DCC29979C26004BAA1C /* ShowAgoraKitManager+DebugSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowAgoraKitManager+DebugSetting.swift"; sourceTree = "<group>"; };
+		A8E0F47D29A897BD001E807A /* Throttle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
 		A8E630BC298520CF002EADA4 /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
 		DD220BC1295B340A00F57F30 /* MenuUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuUtils.h; sourceTree = "<group>"; };
 		DD2A43C728FFCEE7004CEDCF /* AgoraEntScenarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgoraEntScenarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1744,6 +1746,7 @@
 		DDE85597296BB34E00982E52 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				A8E0F47D29A897BD001E807A /* Throttle.swift */,
 				DDE85598296BB34E00982E52 /* NSString+Show.swift */,
 				DDE85599296BB34E00982E52 /* UIFont+Show.swift */,
 				DDE8559A296BB34E00982E52 /* Date+Show.swift */,
@@ -2356,6 +2359,7 @@
 				DDE85633296BB34E00982E52 /* ShowReceiveLiveFinishAlertVC.swift in Sources */,
 				DDE8566A296BB34E00982E52 /* ShowPresettingFooterView.swift in Sources */,
 				DDA199E928FFE579009D3E61 /* VLResponseDataModel.m in Sources */,
+				A8E0F47E29A897BD001E807A /* Throttle.swift in Sources */,
 				DDA19A4428FFE57A009D3E61 /* EKProperty.swift in Sources */,
 				DDE85666296BB34E00982E52 /* ShowCanvasView.swift in Sources */,
 				DDA199EF28FFE579009D3E61 /* VLBaseTableView.m in Sources */,
@@ -2800,7 +2804,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2841,7 +2845,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
