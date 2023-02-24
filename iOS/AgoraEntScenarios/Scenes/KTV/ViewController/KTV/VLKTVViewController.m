@@ -706,9 +706,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     
 }
 
-- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
-    self.selSongsArray = [KTVSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
-}
+//- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
+//    self.selSongsArray = [KTVSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
+//}
 
 - (void)leaveRoom {
     VL(weakSelf);
