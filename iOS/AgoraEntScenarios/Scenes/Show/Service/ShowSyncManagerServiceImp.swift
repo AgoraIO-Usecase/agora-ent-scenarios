@@ -1073,7 +1073,7 @@ extension ShowSyncManagerServiceImp {
             .scene(id: channelName)?
             .collection(className: SYNC_MANAGER_MESSAGE_COLLECTION)
             .add(data: params, success: { object in
-                agoraPrint("imp message add success...\(channelName)")
+                agoraPrint("imp message add success...\(channelName) params = \(params)")
                 finished?(nil)
             }, fail: { error in
                 agoraPrint("imp message add fail :\(error.message)...\(channelName)")
@@ -1767,7 +1767,7 @@ extension ShowSyncManagerServiceImp {
 }
 
 
-private let robotRoomIds = ["1", "2", "3"/*, "4", "5", "6", "7", "8", "9"*/]
+private let robotRoomIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 private let robotRoomOwnerHeaders = [
     "https://download.agora.io/demo/release/bot1.png"
 ]

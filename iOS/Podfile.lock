@@ -71,7 +71,7 @@ PODS:
   - MBProgressHUD (1.1.0)
   - MJExtension (3.4.1)
   - MJRefresh (3.2.3)
-  - Protobuf (3.21.12)
+  - Protobuf (3.22.0)
   - QMUIKit (4.5.1):
     - QMUIKit/QMUIComponents (= 4.5.1)
     - QMUIKit/QMUICore (= 4.5.1)
@@ -500,7 +500,7 @@ SPEC CHECKSUMS:
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   MJExtension: 21c5f6f8c4d5d8844b7ae8fbae08fed0b501f961
   MJRefresh: 2b1214a2dc8f4df4c5dcb028ea2ad4e245425fb7
-  Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
+  Protobuf: 5e6cbc143d02fe08585d86b0098f8b755d2caaab
   QMUIKit: 3e717c45730ecdf5011ca76751990ad1a23ba7e1
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SenseLib: 6b0a54e6057dc62f2c1aa8227bd095bcaba2e268

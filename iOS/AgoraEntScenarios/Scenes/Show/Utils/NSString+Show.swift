@@ -9,6 +9,9 @@ import Foundation
 
 extension String {
     var show_localized: String {
+        if let ret = AppContext.shared.localizedCache[self] {
+            return ret
+        }
         guard let bundlePath = Bundle.main.path(forResource: "showResource", ofType: "bundle"),
               let bundle = Bundle(path: bundlePath)
         else {
@@ -27,6 +30,8 @@ extension String {
         guard let langPath = bundle.path(forResource: lang, ofType: "lproj") , let detailBundle = Bundle(path: langPath) else {
             return self
         }
-        return NSLocalizedString(self,tableName: "Localizable", bundle:detailBundle ,comment: "")
+        let retStr = NSLocalizedString(self,tableName: "Localizable", bundle:detailBundle ,comment: "")
+        AppContext.shared.localizedCache[self] = retStr
+        return retStr
     }
 }

@@ -209,13 +209,14 @@ class ShowAgoraKitManager: NSObject {
 //            let proxy = ShowAgoraExProxy(delegate: delegateMap[currentChannelId])
             let proxy = delegateMap[currentChannelId]
             let date = Date()
+            showLogger.info("try to join room[\(connection.channelId)] ex uid: \(connection.localUid)", context: kShowLogBaseContext)
             let ret =
             agoraKit.joinChannelEx(byToken: token,
                                    connection: connection,
                                    delegate: proxy,
                                    mediaOptions: mediaOptions) { channelName, uid, elapsed in
                 let cost = Int(-date.timeIntervalSinceNow * 1000)
-                showLogger.info("join room[\(channelName)] ex success \(uid) cost \(cost) ms", context: kShowLogBaseContext)
+                showLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             }
             agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
             exConnectionMap[targetChannelId] = connection
@@ -394,7 +395,7 @@ class ShowAgoraKitManager: NSObject {
     }
     
     func cleanCapture() {
-        ByteBeautyManager.shareManager.destroy()
+//        ByteBeautyManager.shareManager.destroy()
         agoraKit.stopPreview()
         agoraKit.setVideoFrameDelegate(nil)
     }
