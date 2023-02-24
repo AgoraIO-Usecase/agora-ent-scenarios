@@ -283,7 +283,11 @@ KTVApiDelegate
         [weakSelf _checkInEarMonitoring];
         
         if (KTVSubscribeDeleted == status) {
-            [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
+            BOOL success = [weakSelf removeSelSongWithSongNo:[songInfo.songNo integerValue] sync:NO];
+            if (!success) {
+                self.selSongsArray = songArray;
+                KTVLogInfo(@"removeSelSongWithSongNo fail, reload it");
+            }
         } else {
             VLRoomSelSongModel* song = [weakSelf selSongWithSongNo:songInfo.songNo];
             //add new song
@@ -671,7 +675,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 }
 
-- (void)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
     __block VLRoomSelSongModel* removed;
     BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
@@ -682,9 +686,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     NSMutableArray<VLRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         if([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
-            return false;
+            return NO;
         }
-        return true;
+        return YES;
     }]]];
     
     if(removed != nil) {
@@ -702,8 +706,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                 }
             }];
         }
+        
+        return YES;
+    } else {
+        return NO;
     }
-    
 }
 
 //- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
