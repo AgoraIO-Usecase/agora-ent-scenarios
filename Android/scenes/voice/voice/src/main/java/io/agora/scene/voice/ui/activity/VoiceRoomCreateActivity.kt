@@ -242,6 +242,7 @@ class VoiceRoomCreateActivity : BaseUiActivity<VoiceActivityCreateRoomLayoutBind
             binding.bottomNext.isEnabled = true
             dismissLoading()
             "voice room create joinChatRoom onSuccess".logD()
+            "apex-wt VoiceRoomCreateActivity ${it.memberCount}".logD()
             ChatroomLiveActivity.startActivity(this, it)
             finish()
         }

@@ -15,7 +15,7 @@ import java.util.Map;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.LogTools;
+import io.agora.voice.common.utils.ImageTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;
@@ -37,15 +37,7 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
 
         @Override
         public void setData(VoiceMemberModel item, int position) {
-            int resId = 0;
-            try {
-                resId = mContext.getResources().getIdentifier(item.getPortrait(), "drawable", mContext.getPackageName());
-            }catch (Exception e){
-                LogTools.e("getResources()", e.getMessage());
-            }
-            if (resId != 0){
-                avatar.setImageResource(resId);
-            }
+            ImageTools.loadImage(avatar, item.getPortrait());
             name.setText(item.getNickName());
             action.setOnClickListener(new View.OnClickListener() {
                 @Override

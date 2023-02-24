@@ -25,12 +25,19 @@ class VoiceUserListViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _acceptMicSeatApplyObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
         SingleSourceLiveData()
+    private val _roomMemberObservable: SingleSourceLiveData<Resource<List<VoiceMemberModel>>> =
+        SingleSourceLiveData()
+    private val _kickMemberObservable: SingleSourceLiveData<Resource<Int>> =
+        SingleSourceLiveData()
 
     /**申请列表*/
     fun applicantsListObservable(): LiveData<Resource<List<VoiceMemberModel>>> = _applicantsListObservable
 
     /**邀请列表*/
     fun inviteListObservable(): LiveData<Resource<List<VoiceMemberModel>>> = _inviteListObservable
+
+    /**成员列表*/
+    fun memberListObservable(): LiveData<Resource<List<VoiceMemberModel>>> = _roomMemberObservable
 
     /** 榜单列表 */
     fun contributeListObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _contributeListObservable
@@ -40,6 +47,9 @@ class VoiceUserListViewModel : ViewModel() {
 
     /**同意上麦申请*/
     fun acceptMicSeatApplyObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatApplyObservable
+
+    /**踢出用户*/
+    fun kickOffObservable():LiveData<Resource<Int>> = _kickMemberObservable
 
     /** 申请列表*/
     fun fetchApplicantsList() {
@@ -56,6 +66,11 @@ class VoiceUserListViewModel : ViewModel() {
         _contributeListObservable.setSource(mRepository.fetchGiftContribute())
     }
 
+    /**成员列表*/
+    fun fetchMemberList(){
+        _roomMemberObservable.setSource(mRepository.fetchRoomMembers())
+    }
+
     // 邀请用户上麦
     fun startMicSeatInvitation(chatUid: String, micIndex: Int?) {
         _startMicSeatInvitationObservable.setSource(mRepository.startMicSeatInvitation(chatUid, micIndex))
@@ -64,5 +79,12 @@ class VoiceUserListViewModel : ViewModel() {
     // 同意上麦申请
     fun acceptMicSeatApply(chatUid: String) {
         _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(chatUid))
+    }
+
+    // 将成员踢出房间
+    fun kickMembersOutOfTheRoom(chatUid:String,index:Int){
+        val userList = mutableListOf<String>()
+        userList.add(chatUid)
+        _kickMemberObservable.setSource(mRepository.kickRoomMember(userList,index))
     }
 }

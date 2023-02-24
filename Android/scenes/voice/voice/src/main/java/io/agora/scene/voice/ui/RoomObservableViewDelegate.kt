@@ -80,7 +80,6 @@ class RoomObservableViewDelegate constructor(
         return localUserMicInfo?.micIndex ?: -1
     }
 
-    private var memberCountDialog: RoomMemberCountDialog? = null
     private var robotDialog: RoomRobotEnableDialog? = null
 
     init {
@@ -411,46 +410,6 @@ class RoomObservableViewDelegate constructor(
         dialog.show(
             activity.supportFragmentManager, "ContributionAndAudienceSheetDialog"
         )
-    }
-
-    /**
-     * 成员数
-     */
-    fun onClickMemberCount(){
-        RoomMemberCountDialog(object : RoomMemberCountDialog.OnClickKickMemberListener{
-            override fun onKickMember(member: VoiceMemberModel,index:Int) {
-                val userList = mutableListOf<String>()
-                member.chatUid?.let { userList.add(it) }
-                //房主踢用户(踢出房间)
-                ChatroomIMManager.getInstance().removeMemberToRoom(userList,object :
-                    ValueCallBack<ChatRoom>{
-                    override fun onSuccess(value: ChatRoom?) {
-                        userList.clear()
-                        if (userList.size > 0){
-                            for (s in userList) {
-                                ChatroomCacheManager.cacheManager.removeMember(s)
-                            }
-                        }
-                        memberCountDialog?.notifyItemRemovedRefresh(index)
-                    }
-
-                    override fun onError(code: Int, error: String?) {
-                        e(
-                            TAG, "onClickMemberCount onKickMember onError code = $code desc: $error"
-                        )
-                    }
-                })
-            }
-        }).apply {
-            memberCountDialog = this
-        }.show(activity.supportFragmentManager, "mtClickMemberCount")
-    }
-
-    /**
-     * 成员加入刷新成员列表
-     */
-    fun onMemberJoinRefresh(){
-        memberCountDialog?.notifyItemAddRefresh()
     }
 
     /**

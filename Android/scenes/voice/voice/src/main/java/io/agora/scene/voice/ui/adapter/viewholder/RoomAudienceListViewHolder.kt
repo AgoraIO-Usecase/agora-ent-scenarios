@@ -1,9 +1,11 @@
 package io.agora.scene.voice.ui.adapter.viewholder
 
+import android.view.View
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
+import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.voice.common.utils.ImageTools
@@ -15,28 +17,22 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomA
         data?.let { audienceInfo ->
             binding.mtAudienceUsername.text = audienceInfo.nickName
             ImageTools.loadImage(binding.ivAudienceAvatar, audienceInfo.portrait)
-            if (audienceInfo.micIndex == -1) {
-                // 不在麦位上
+            if ( ChatroomIMManager.getInstance().isOwner ){
                 binding.mtAudienceAction.apply {
                     isClickable = true
-                    text = binding.root.context.getString(R.string.voice_room_invite)
-                    setTextColor(ResourcesTools.getColor(context.resources, io.agora.voice.common.R.color.voice_white))
-                    setBackgroundResource(R.drawable.voice_bg_rect_radius20_gradient_blue)
-                    setOnClickListener {
-                        onItemChildClick(MicClickAction.Invite, it)
-                    }
-                }
-            } else {
-                // 在麦位上
-                binding.mtAudienceAction.apply {
-                    isClickable = true
-                    text = binding.root.context.getString(R.string.voice_room_kickoff)
-                    setTextColor(ResourcesTools.getColor(context.resources, R.color.voice_main_color_156ef3))
-                    setBackgroundResource(0)
+                    text = binding.root.context.getString(R.string.voice_member_count_action_kick)
+                    setTextColor(ResourcesTools.getColor(context.resources, R.color.voice_white))
                     setOnClickListener {
                         onItemChildClick(MicClickAction.KickOff, it)
                     }
                 }
+            }else{
+//                binding.mtAudienceAction.apply {
+//                    isClickable = true
+//                    text = binding.root.context.getString(R.string.voice_member_count_action_kick)
+//                    setTextColor(ResourcesTools.getColor(context.resources, R.color.voice_white))
+//                }
+                binding.mtAudienceAction.visibility = View.GONE
             }
         }
     }
