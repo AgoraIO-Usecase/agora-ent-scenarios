@@ -60,9 +60,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _closeRedBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _blueRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> =
+    private val _blueRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Double, Boolean>>> =
         SingleSourceLiveData()
-    private val _redRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Int, Boolean>>> =
+    private val _redRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Double, Boolean>>> =
         SingleSourceLiveData()
 
     private val _muteMicObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
@@ -139,10 +139,10 @@ class VoiceRoomLivingViewModel : ViewModel() {
     fun closeRedBotBlurObservable(): LiveData<Resource<Boolean>> = _closeRedBotBlurObservable
 
     /**蓝色机器人衰减系数*/
-    fun blueRobotAttenuationObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _blueRobotAttenuationObservable
+    fun blueRobotAttenuationObservable(): LiveData<Resource<Pair<Double, Boolean>>> = _blueRobotAttenuationObservable
 
     /**红色机器人衰减系数*/
-    fun redRobotAttenuationObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _redRobotAttenuationObservable
+    fun redRobotAttenuationObservable(): LiveData<Resource<Pair<Double, Boolean>>> = _redRobotAttenuationObservable
 
     /**本地禁麦*/
     fun muteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _muteMicObservable
@@ -274,12 +274,12 @@ class VoiceRoomLivingViewModel : ViewModel() {
     }
 
     // 更新机器人音量
-    fun updateBlueRoBotAttenuation(attenuation: Int) {
+    fun updateBlueRoBotAttenuation(attenuation: Double) {
         _blueRobotAttenuationObservable.setSource(mRepository.updateBlueRoBotAttenuation(attenuation))
     }
 
     // 更新机器人音量
-    fun updateRedRoBotAttenuation(attenuation: Int) {
+    fun updateRedRoBotAttenuation(attenuation: Double) {
         _redRobotAttenuationObservable.setSource(mRepository.updateRedRoBotAttenuation(attenuation))
     }
 

@@ -123,10 +123,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    fun updateBlueRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+    fun updateBlueRoBotAttenuation(attenuation: Double): LiveData<Resource<Pair<Double, Boolean>>> {
         voiceRobotInfo.blueRobotAttenuation = attenuation
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+        val resource = object : NetworkOnlyResource<Pair<Double, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Double, Boolean>>>) {
                 voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(Pair(attenuation, result)))
@@ -139,10 +139,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    fun updateRedRoBotAttenuation(attenuation: Int): LiveData<Resource<Pair<Int, Boolean>>> {
+    fun updateRedRoBotAttenuation(attenuation: Double): LiveData<Resource<Pair<Double, Boolean>>> {
         voiceRobotInfo.redRobotAttenuation = attenuation
-        val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
-            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Int, Boolean>>>) {
+        val resource = object : NetworkOnlyResource<Pair<Double, Boolean>>() {
+            override fun createCall(callBack: ResultCallBack<LiveData<Pair<Double, Boolean>>>) {
                 voiceServiceProtocol.updateRobotInfo(voiceRobotInfo, completion = { error, result ->
                     if (error == VoiceServiceProtocol.ERR_OK) {
                         callBack.onSuccess(createLiveData(Pair(attenuation, result)))

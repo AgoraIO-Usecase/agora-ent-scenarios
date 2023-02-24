@@ -457,18 +457,16 @@ class AgoraRtcEngineController {
     }
 
     // 设置衰减系数
-    fun adjustBlueAttenuation(progress: Int) {
-        val value = progress / 100.0f
+    fun adjustBlueAttenuation(progress: Double) {
         botBluePlayer?.mediaPlayerId?.let {
-            spatial?.setPlayerAttenuation(it, value.toDouble(), false);
+            spatial?.setPlayerAttenuation(it, progress, false);
         }
     }
 
     // 设置衰减系数
-    fun adjustRedAttenuation(progress: Int) {
-        val value = progress / 100.0f
+    fun adjustRedAttenuation(progress: Double) {
         botRedPlayer?.mediaPlayerId?.let {
-            spatial?.setPlayerAttenuation(it, value.toDouble(), false);
+            spatial?.setPlayerAttenuation(it, progress.toDouble(), false);
         }
     }
     /**
