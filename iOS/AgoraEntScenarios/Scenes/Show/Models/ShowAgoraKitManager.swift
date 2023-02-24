@@ -195,6 +195,7 @@ class ShowAgoraKitManager: NSObject {
             // 极速直播
             if role == .audience {
                 mediaOptions.audienceLatencyLevel = .lowLatency
+                agoraKit.setVideoFrameDelegate(self)
             }else{
 //                updateCameraCaptureConfiguration()
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
@@ -395,6 +396,7 @@ class ShowAgoraKitManager: NSObject {
     func cleanCapture() {
         ByteBeautyManager.shareManager.destroy()
         agoraKit.stopPreview()
+        agoraKit.setVideoFrameDelegate(nil)
     }
     
     func leaveChannelEx(roomId: String, channelId: String) {
@@ -525,9 +527,9 @@ class ShowAgoraKitManager: NSObject {
 extension ShowAgoraKitManager: AgoraVideoFrameDelegate {
     
     func onCapture(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
+//        print("aaa onCapture1 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         videoFrame.pixelBuffer = BeautyManager.shareManager.processFrame(pixelBuffer: videoFrame.pixelBuffer)
-        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
+//        print("aaa onCapture2 w:\(CVPixelBufferGetWidth(videoFrame.pixelBuffer!)) h:\(CVPixelBufferGetHeight(videoFrame.pixelBuffer!))")
         return true
     }
     
@@ -620,4 +622,36 @@ extension ShowAgoraKitManager {
 //            agoraKit.setParameters("{\"che.video.vpr.enable\":false}") // off
 //        }
 //    }
+}
+
+extension ShowAgoraKitManager {
+    func setOffMediaOptionsVideo(roomid: String) {
+        guard let connection = exConnectionMap[roomid] else {
+            showLogger.info("setOffMediaOptionsVideo  connection 不存在 \(roomid)")
+            return
+        }
+        showLogger.info("setOffMediaOptionsVideo  count = \(exConnectionMap.count), roomid = \(roomid)")
+        let mediaOptions = AgoraRtcChannelMediaOptions()
+        mediaOptions.autoSubscribeVideo = false
+        agoraKit.updateChannelEx(with: mediaOptions, connection: connection)
+//        exConnectionMap.forEach { key, connention in
+//            if key != roomid {
+//                let mediaOptions = AgoraRtcChannelMediaOptions()
+//                mediaOptions.autoSubscribeVideo = false
+//                agoraKit.updateChannelEx(with: mediaOptions, connection: connention)
+//            }
+//        }
+    }
+    
+    func setOffMediaOptionsAudio() {
+        exConnectionMap.forEach { _, connention in
+            let mediaOptions = AgoraRtcChannelMediaOptions()
+            mediaOptions.autoSubscribeAudio = false
+            agoraKit.updateChannelEx(with: mediaOptions, connection: connention)
+        }
+    }
+    
+    func setOffSuperResolution() {
+        setSuperResolutionOn(false)
+    }
 }

@@ -116,7 +116,7 @@ struct ShowStatisticsInfo {
     }
     
     mutating func cleanRemoteDescription() -> (String, String){
-        let sendTitle = "接受\n".show_localized
+        let sendTitle = "接收\n".show_localized
         let videoSize = "接收分辨率"+": 0 x 0"
         let videoSend = "码率".show_localized+": \(0) kbps"
         let downlink = "下行网络".show_localized+": \(downlink) KB/s"
@@ -161,7 +161,7 @@ struct ShowStatisticsInfo {
     }
     
     private func remoteDescription(info: RemoteInfo, audioOnly: Bool) -> (String, String) {
-        let sendTitle = "接受\n".show_localized
+        let sendTitle = "接收\n".show_localized
         let videoSize = "接收分辨率"+": \(info.videoStats.width) x \(info.videoStats.height)"
         let videoSend = "码率".show_localized+": \(info.videoStats.receivedBitrate) kbps"
         let downlink = "下行网络".show_localized+": \(downlink) KB/s"

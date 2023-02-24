@@ -11,6 +11,16 @@ import AgoraRtcKit
 // 标记是否已经打开过
 private let hasOpenedKey = "hasOpenKey"
 
+private let fpsItems: [AgoraVideoFrameRate] = [
+    .fps1,
+    .fps7,
+    .fps10,
+    .fps15,
+    .fps24,
+    .fps30,
+    .fps60
+]
+
 extension ShowAgoraKitManager {
     
     // 超分倍数
@@ -45,18 +55,6 @@ extension ShowAgoraKitManager {
     
     private var debugSrTypeItems: [SRType] {
         ShowAgoraSRType.allCases.map({$0.typeValue})
-    }
-    
-    private var fpsItems: [AgoraVideoFrameRate] {
-        [
-           .fps1,
-           .fps7,
-           .fps10,
-           .fps15,
-           .fps24,
-           .fps30,
-           .fps60
-       ]
     }
     
     // 默认设置
@@ -305,8 +303,8 @@ extension ShowAgoraKitManager {
         case .PVC:
             agoraKit.setParameters("{\"rtc.video.enable_pvc\":\(isOn)}")
         case .SR:
-//            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
-            setSuperResolutionOn(isOn)
+            agoraKit.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":\(isOn), \"mode\": 2}}")
+//            setSuperResolutionOn(isOn)
         case .BFrame:
             
            break
@@ -406,5 +404,35 @@ extension ShowAgoraKitManager {
             }
             return .unknown
         }
+    }
+}
+
+
+typealias ShowAgoraPreviewConfig = (AgoraVideoEncoderConfiguration, AgoraCameraCapturerConfiguration)
+
+
+extension ShowAgoraKitManager {
+    
+    static func previewPreset() -> ShowAgoraPreviewConfig {
+        let encoderConfig = AgoraVideoEncoderConfiguration()
+        let captrueConfig = AgoraCameraCapturerConfiguration()
+        
+        let dimensionsItems = ShowAgoraVideoDimensions.allCases.map({$0.sizeValue})
+        // 编码分辨率
+        let encodeDimensionIndex = ShowSettingKey.videoEncodeSize.intValue % dimensionsItems.count
+        encoderConfig.dimensions = dimensionsItems[encodeDimensionIndex]
+        // 码率
+        let videoBitRate = Int(ShowSettingKey.videoBitRate.floatValue)
+        encoderConfig.bitrate = videoBitRate
+        // 帧率
+        let fpsIndex = ShowSettingKey.FPS.intValue % fpsItems.count
+        encoderConfig.frameRate = fpsItems[fpsIndex]
+        captrueConfig.frameRate = Int32(fpsItems[fpsIndex].rawValue)
+        
+        // 采集分辨率
+        let captureDimensionsItems = ShowAgoraCaptureVideoDimensions.allCases.map({$0.sizeValue})
+        let captruesizeindex = ShowSettingKey.captureVideoSize.intValue % captureDimensionsItems.count
+        captrueConfig.dimensions = captureDimensionsItems[captruesizeindex]
+        return (encoderConfig, captrueConfig)
     }
 }

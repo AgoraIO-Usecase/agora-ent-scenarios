@@ -63,6 +63,50 @@ class ShowLivePagesViewController: ViewController {
         scroll(to: fakeCellIndex(with: focusIndex))
         preloadEnterRoom()
         updateAudiencePresetType()
+//        addDebugButton()
+    }
+    
+    private func addDebugButton(){
+        let button = UIButton(type: .custom)
+        button.setTitle("Video", for: .normal)
+        button.addTarget(self, action: #selector(didClickDebugVideoButton), for: .touchUpInside)
+        view.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.left.top.equalTo(100)
+            make.width.height.equalTo(60)
+        }
+        
+        let Audiobutton = UIButton(type: .custom)
+        Audiobutton.setTitle("Audio", for: .normal)
+        Audiobutton.addTarget(self, action: #selector(didClickDebugAudioButton), for: .touchUpInside)
+        view.addSubview(Audiobutton)
+        Audiobutton.snp.makeConstraints { make in
+            make.centerY.equalTo(button)
+            make.left.equalTo(button.snp.right).offset(20)
+            make.width.height.equalTo(60)
+        }
+        
+        let superbutton = UIButton(type: .custom)
+        superbutton.setTitle("超分", for: .normal)
+        superbutton.addTarget(self, action: #selector(didClickDebugSuperButton), for: .touchUpInside)
+        view.addSubview(superbutton)
+        superbutton.snp.makeConstraints { make in
+            make.centerY.equalTo(button)
+            make.left.equalTo(Audiobutton.snp.right).offset(20)
+            make.width.height.equalTo(60)
+        }
+    }
+    
+    @objc private func didClickDebugVideoButton(){
+        agoraKitManager.setOffMediaOptionsVideo(roomid: currentVC?.room?.roomId ?? "")
+    }
+    
+    @objc private func didClickDebugAudioButton(){
+        agoraKitManager.setOffMediaOptionsAudio()
+    }
+    
+    @objc private func didClickDebugSuperButton(){
+        agoraKitManager.setOffSuperResolution()
     }
 }
 
@@ -222,6 +266,7 @@ extension ShowLivePagesViewController: UICollectionViewDelegate, UICollectionVie
             return
         }
         vc.loadingType = .loading
+        currentVC = vc
         self.view.endEditing(true)
     }
     

@@ -15,6 +15,8 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
     
+    var previewSet: ShowAgoraPreviewConfig?
+    
 //    private var selectedResolution = 1
     
 //    let transDelegate = ShowPresentTransitioningDelegate()
@@ -24,7 +26,15 @@ class ShowCreateLiveVC: UIViewController {
         if AppContext.shared.isDebugMode {
             manager.debugDefaultBroadcastorSetting()
         }else{
-            manager.defaultSetting()
+//            manager.defaultSetting()
+            guard let previewSet = previewSet else {
+                return manager
+            }
+            manager.videoEncoderConfig.frameRate = previewSet.0.frameRate
+            manager.videoEncoderConfig.dimensions = previewSet.0.dimensions
+            manager.videoEncoderConfig.bitrate = previewSet.0.bitrate
+            manager.captureConfig.dimensions = previewSet.1.dimensions
+            manager.captureConfig.frameRate = previewSet.1.frameRate
         }
         return manager
     }()

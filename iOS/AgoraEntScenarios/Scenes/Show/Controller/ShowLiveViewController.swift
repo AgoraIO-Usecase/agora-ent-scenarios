@@ -33,6 +33,8 @@ class ShowLiveViewController: UIViewController {
     
     private var joinStartDate: Date?
     
+    private var checking = false
+    
     private var roomId: String {
         get {
             guard let roomId = room?.roomId else {
@@ -250,6 +252,7 @@ class ShowLiveViewController: UIViewController {
         } else {
             AppContext.showServiceImp(room.roomId).joinRoom(room: room) {[weak self] error, detailModel in
                 guard let self = self else { return }
+                showLogger.info("joinRoom: roomid = \(room.roomId)")
                 if let err = error {
     //                ToastView.show(text: error.localizedDescription)
                     showLogger.info(" finishAlertVC joinRoom : roomid = \(room.roomId), error = \(err) ")
@@ -257,7 +260,6 @@ class ShowLiveViewController: UIViewController {
                     self._ensureRoomIsExst(roomId: room.roomId)
                     return
                 }
-                showLogger.info("self.loadingType ==== \(self.loadingType)")
                 self.joinChannel(needUpdateCavans: self.loadingType == .loading)
                 if self.loadingType == .loading {
                     self.updateLoadingType(loadingType: self.loadingType)
@@ -403,19 +405,36 @@ extension ShowLiveViewController {
 //MARK: service subscribe
 extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     
+    private func _joinRoom() {
+        self.joinChannel(needUpdateCavans: self.loadingType == .loading)
+        if self.loadingType == .loading {
+            self.updateLoadingType(loadingType: self.loadingType)
+        }
+        self._subscribeServiceEvent()
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    
     private func _ensureRoomIsExst(roomId: String) {
+        print("finishAlertVC joinRoom : roomid = \(roomId) ,_ensureRoomIsExst , checking = \(checking) ")
+        if checking { return }
+        checking = true
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
             guard let self = self else { return }
+            self.checking = false
             guard let list = roomList else {
                 self.onRoomExpired()
+                print("finishAlertVC joinRoom : roomid = \(roomId) ,_ensureRoomIsExst , roomlist is empty ")
                 return
             }
             for item in list {
                 let aRoomId = item.roomId
                 if aRoomId == roomId {
+                    self._joinRoom()
+                    print("finishAlertVC joinRoom : roomid = \(roomId) _joinRoom 房间实时上存在")
                     return
                 }
             }
+            print("finishAlertVC joinRoom : roomid = \(roomId) _ensureRoomIsExst 房间确实不存在")
             self.onRoomExpired()
         }
     }
@@ -813,32 +832,32 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
 //        realTimeView.statsInfo?.updateChannelStats(stats)
-//        realTimeView.sendStatsInfo?.updateChannelStats(stats)
-//        realTimeView.receiveStatsInfo?.updateChannelStats(stats)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateChannelStats(stats)
+        realTimeView.receiveStatsInfo?.updateChannelStats(stats)
+        resetRealTimeIfNeeded()
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        realTimeView.statsInfo?.updateLocalAudioStats(stats)
-//        realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
-//        realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
+        realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
 //        realTimeView.statsInfo?.updateLocalVideoStats(stats)
-//        realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
-//        realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
+        realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
+        resetRealTimeIfNeeded()
         showLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
 
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        realTimeView.statsInfo?.updateVideoStats(stats)
-//        realTimeView.sendStatsInfo?.updateVideoStats(stats)
-//        realTimeView.receiveStatsInfo?.updateVideoStats(stats)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateVideoStats(stats)
+        realTimeView.receiveStatsInfo?.updateVideoStats(stats)
+        resetRealTimeIfNeeded()
 
         showLogger.info("room.ownderid = \(String(describing: room?.ownerId.debugDescription)) width = \(stats.width), height = \(stats.height)")
         if let audiencePresetType = audiencePresetType {
@@ -858,23 +877,23 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        realTimeView.statsInfo?.updateAudioStats(stats)
-//        realTimeView.sendStatsInfo?.updateAudioStats(stats)
-//        realTimeView.receiveStatsInfo?.updateAudioStats(stats)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateAudioStats(stats)
+        realTimeView.receiveStatsInfo?.updateAudioStats(stats)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateUplinkNetworkInfo(networkInfo)
-//        realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-//        realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+        realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
-//        realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-//        realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-//        resetRealTimeIfNeeded()
+        realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
+        realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
+        resetRealTimeIfNeeded()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
