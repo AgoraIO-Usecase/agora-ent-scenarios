@@ -31,7 +31,7 @@ class VoiceRoomAudioSettingViewController: UIViewController {
     
     
     
-    private var settingImage: [String] = ["icons／set／jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
+    private var settingImage: [String] = ["AINS", "AIAEC", "AGC", "jiqi", "icons／set／laba", "icons／set／zuijia", "icons／set／AINS", "icons／set／3D"]
 
 
     private var soundTitle: [String] = []
@@ -232,7 +232,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 case .high:
                     cell.contentLabel.text = "High".localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Medium".localized()
                 case .off:
                     cell.contentLabel.text = "Off".localized()
                 }
@@ -370,7 +370,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 case .high:
                     cell.contentLabel.text = "High".localized()
                 case .mid:
-                    cell.contentLabel.text = "Middle".localized()
+                    cell.contentLabel.text = "Medium".localized()
                 case .off:
                     cell.contentLabel.text = "Off".localized()
                 }
