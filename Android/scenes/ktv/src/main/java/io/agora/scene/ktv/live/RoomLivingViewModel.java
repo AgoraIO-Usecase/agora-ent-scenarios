@@ -1355,7 +1355,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
-
+        if (mRtcEngine == null) {
+            return;
+        }
         if (isOnSeat) {
             mainChannelMediaOption.publishMicrophoneTrack = true;
             mainChannelMediaOption.publishCameraTrack = isCameraOpened;
@@ -1375,7 +1377,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-            mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
+            if (mPlayer != null) {
+                mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
+            }
             mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         }
