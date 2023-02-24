@@ -215,9 +215,9 @@ class RoomObservableViewDelegate constructor(
         }
 
         /**蓝色机器人衰减系数*/
-        roomLivingViewModel.blueRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
-            parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
-                override fun onSuccess(data: Pair<Int, Boolean>?) {
+        roomLivingViewModel.blueRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Double, Boolean>> ->
+            parseResource(response, object : OnResourceParseCallback<Pair<Double, Boolean>>() {
+                override fun onSuccess(data: Pair<Double, Boolean>?) {
                     data?.let {
                         if (it.second) {
                             AgoraRtcEngineController.get().adjustBlueAttenuation(it.first)
@@ -228,9 +228,9 @@ class RoomObservableViewDelegate constructor(
         }
 
         /**红色机器人衰减系数*/
-        roomLivingViewModel.redRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Int, Boolean>> ->
-            parseResource(response, object : OnResourceParseCallback<Pair<Int, Boolean>>() {
-                override fun onSuccess(data: Pair<Int, Boolean>?) {
+        roomLivingViewModel.redRobotAttenuationObservable().observe(activity) { response: Resource<Pair<Double, Boolean>> ->
+            parseResource(response, object : OnResourceParseCallback<Pair<Double, Boolean>>() {
+                override fun onSuccess(data: Pair<Double, Boolean>?) {
                     data?.let {
                         if (it.second) {
                             AgoraRtcEngineController.get().adjustRedAttenuation(it.first)
@@ -668,15 +668,16 @@ class RoomObservableViewDelegate constructor(
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_AIR_ABSORB_ENABLED, robotInfo.redRobotAbsorb)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_BLUE_BLUR_ENABLED, robotInfo.blueRobotBlur)
                 putBoolean(RoomSpatialAudioSheetDialog.KEY_RED_BLUR_ENABLED, robotInfo.redRobotBlur)
-                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, robotInfo.blueRobotAttenuation)
-                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, robotInfo.redRobotAttenuation)
+                putInt(RoomSpatialAudioSheetDialog.KEY_BLUE_ATTENUATION, (robotInfo.blueRobotAttenuation * 100.0).toInt())
+                putInt(RoomSpatialAudioSheetDialog.KEY_RED_ATTENUATION, (robotInfo.redRobotAttenuation * 100.0).toInt())
             }
         }
 
         spatialAudioSheetDialog.audioSettingsListener = object :
             RoomSpatialAudioSheetDialog.OnClickSpatialAudioRobotsSettingsListener {
             override fun onBlueBotAttenuationChange(progress: Int) {
-                roomLivingViewModel.updateBlueRoBotAttenuation(progress)
+                val value = progress / 100.0
+                roomLivingViewModel.updateBlueRoBotAttenuation(value)
             }
 
             override fun onBlueBotAirAbsorbCheckedChanged(
@@ -694,7 +695,8 @@ class RoomObservableViewDelegate constructor(
             }
 
             override fun onRedBotAttenuationChange(progress: Int) {
-                roomLivingViewModel.updateRedRoBotAttenuation(progress)
+                val value = progress / 100.0
+                roomLivingViewModel.updateRedRoBotAttenuation(value)
             }
 
             override fun onRedBotAirAbsorbCheckedChanged(
