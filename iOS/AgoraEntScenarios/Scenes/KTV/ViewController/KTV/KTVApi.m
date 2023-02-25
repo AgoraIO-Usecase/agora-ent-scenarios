@@ -249,6 +249,7 @@ time_t uptime(void) {
             [self.engine updateChannelWithMediaOptions:options];
             self.audioScenario = AgoraAudioScenarioChorus;
             
+            KTVLogInfo(@"loadSong open music1 %ld", songCode);
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
@@ -271,6 +272,7 @@ time_t uptime(void) {
             [self.engine updateChannelWithMediaOptions:options];
             [self joinChorus2ndChannel];
             
+            KTVLogInfo(@"loadSong open music2 %ld", songCode);
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
@@ -287,6 +289,7 @@ time_t uptime(void) {
             //mute main Singer player audio
             [self.engine muteRemoteAudioStream:self.config.mainSingerUid mute:YES];
             
+            KTVLogInfo(@"loadSong open music3 %ld", songCode);
             [self.rtcMediaPlayer openMediaWithSongCode:songCode startPos:0];
             [self.rtcMediaPlayer adjustPlayoutVolume:50];
             [self.rtcMediaPlayer adjustPublishSignalVolume:50];
@@ -418,6 +421,13 @@ time_t uptime(void) {
 
 - (void)mainRtcEngine:(AgoraRtcEngineKit *)engine receiveStreamMessageFromUid:(NSUInteger)uid streamId:(NSInteger)streamId data:(NSData *)data
 {
+    NSNumber* loadHistory = [self.loadDict objectForKey:[self songCodeString:self.config.songCode]];
+    KTVLoadSongState state = [loadHistory intValue];
+    if (KTVLoadSongStateOK != state) {
+        KTVLogWarn(@"recv data break, load song state: %ld", state);
+        return;
+    }
+    
     NSDictionary *dict = [VLGlobalHelper dictionaryForJsonData:data];
     if (self.config.role == KTVSingRoleMainSinger) {
         KTVLogWarn(@"recv %@ cmd invalid", dict[@"cmd"]);
