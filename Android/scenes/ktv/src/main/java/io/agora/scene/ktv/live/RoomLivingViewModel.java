@@ -80,6 +80,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
      */
     final MutableLiveData<JoinRoomOutputModel> roomInfoLiveData;
     final MutableLiveData<Boolean> roomDeleteLiveData = new MutableLiveData<>();
+    final MutableLiveData<Boolean> roomTimeUpLiveData = new MutableLiveData<>();
     final MutableLiveData<Integer> roomUserCountLiveData = new MutableLiveData<>(0);
 
     /**
@@ -158,8 +159,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     public void init() {
         if (isRoomOwner()) {
-            // 房主开启倒计时，默认为在麦上状态
-            startExitRoomTimer();
             isOnSeat = true;
         }
         initRTCPlayer();
@@ -168,9 +167,12 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         initSongs();
     }
 
-    public void release() {
-        ktvApiProtocol.release();
+    public boolean release() {
         streamId = 0;
+        if (mPlayer != null && iAgoraMusicContentCenter != null && mRtcEngine != null) {
+            ktvApiProtocol.release();
+        }
+
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer.destroy();
@@ -187,8 +189,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mRtcEngine.leaveChannel();
             RtcEngineEx.destroy();
             mRtcEngine = null;
+            return true;
         }
-        mCountDownLatch = null;
+        return false;
     }
 
     // ======================= 房间相关 =======================
@@ -231,6 +234,10 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             return null;
         });
 
+        ktvServiceProtocol.subscribeRoomTimeUp(() -> {
+            roomTimeUpLiveData.postValue(true);
+            return null;
+        });
     }
 
     /**
@@ -243,6 +250,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 // success
                 Log.d(TAG, "RoomLivingViewModel.exitRoom() success");
                 roomDeleteLiveData.postValue(false);
+                roomTimeUpLiveData.postValue(false);
             } else {
                 // failure
                 Log.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
@@ -250,25 +258,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             }
             return null;
         });
-    }
-
-    /**
-     * 房主退出房间倒计时（20分钟）
-     */
-    private CountDownTimer mCountDownLatch;
-    public void startExitRoomTimer() {
-        if (mCountDownLatch != null) mCountDownLatch.cancel();
-        mCountDownLatch = new CountDownTimer(20 * 60 * 1000, 20 * 60 * 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                ToastUtils.showToast("体验时间已耗尽，自动离开房间");
-                exitRoom();
-            }
-        }.start();
     }
 
     /**
@@ -1349,6 +1338,8 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                             mSetting.setVolMusic(50);
                         }
                         ktvApiProtocol.playSong(song);
+                    } else if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
+                        Log.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
                     }
                     return null;
                 }
