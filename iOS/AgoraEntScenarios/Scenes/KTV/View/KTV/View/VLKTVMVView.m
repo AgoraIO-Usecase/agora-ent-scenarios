@@ -251,6 +251,7 @@
 //}
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
+    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@", song.songName, song.name);
     self.idleView.hidden = song;
     self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
     
@@ -403,7 +404,7 @@
     [_lrcView start];
     self.totalLines = 0;
     self.totalScore = 0.0f;
-    KTVLogInfo(@"lrc... _startLrc %@", self.musicTitleLabel.text);
+    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
 }
 
 
@@ -415,16 +416,17 @@
 
 - (void)start {
     [_lrcView start];
-    KTVLogInfo(@"lrc... start %@", self.musicTitleLabel.text);
+    KTVLogInfo(@"VLKTVMVView start [%@]", self.musicTitleLabel.text);
+    NSAssert(self.musicTitleLabel.text.length > 0, @"dfd");
 }
 
 - (void)stop {
     [_lrcView stop];
-    KTVLogInfo(@"lrc... stop %@", self.musicTitleLabel.text);
+    KTVLogInfo(@"VLKTVMVView stop [%@]", self.musicTitleLabel.text);
 }
 
 - (void)reset {
-    KTVLogInfo(@"lrc... reset %@", self.musicTitleLabel.text);
+    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
     [_lrcView stop];
     [_lrcView reset];
     [self setSongScore:0];
