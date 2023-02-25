@@ -75,6 +75,10 @@ interface KTVServiceProtocol {
         changedBlock: (count: Int) -> Unit
     )
 
+    fun subscribeRoomTimeUp(
+        onRoomTimeUp: () -> Unit
+    )
+
 
     // ===================== 麦位相关 =================================
 

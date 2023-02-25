@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.util.Log
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -47,6 +46,7 @@ class KTVSyncManagerServiceImp(
         null
     private var chooseSongSubscriber: ((KTVServiceProtocol.KTVSubscribe, RoomSelSongModel?) -> Unit)? =
         null
+    private var roomTimeUpSubscriber: (() -> Unit)? = null
 
     // cache objectId
     private val objIdOfRoomNo = HashMap<String, String>() // objectId of room no
@@ -63,6 +63,14 @@ class KTVSyncManagerServiceImp(
 
     @Volatile
     private var currRoomNo: String = ""
+
+    // time limit
+    private val ROOM_AVAILABLE_DURATION : Long = 20 * 60 * 1000 // 20min
+    private val timerRoomEndRun = Runnable {
+        runOnMainThread {
+            roomTimeUpSubscriber?.invoke()
+        }
+    }
 
     override fun reset() {
         if (syncUtilsInited) {
@@ -215,6 +223,9 @@ class KTVSyncManagerServiceImp(
                                     runOnMainThread {
                                         completion.invoke(null, kTVJoinRoomOutputModel)
                                     }
+
+                                    // 定时删除房间
+                                    mainHandler.postDelayed(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
                                 }
 
                             }
@@ -241,6 +252,10 @@ class KTVSyncManagerServiceImp(
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
+
+        // 重置体验时间事件
+        mainHandler.removeCallbacks(timerRoomEndRun)
+        roomTimeUpSubscriber = null
 
         if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
             // 移除房间
@@ -350,6 +365,10 @@ class KTVSyncManagerServiceImp(
 
     override fun subscribeUserListCount(changedBlock: (count: Int) -> Unit) {
         roomUserCountSubscriber = changedBlock
+    }
+
+    override fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit) {
+        roomTimeUpSubscriber = onRoomTimeUp
     }
 
     // =================== 麦位相关 ===============================

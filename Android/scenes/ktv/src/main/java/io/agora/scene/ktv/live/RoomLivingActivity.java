@@ -271,6 +271,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         roomLivingViewModel.roomUserCountLiveData.observe(this, count ->
                 getBinding().tvRoomMCount.setText(getString(R.string.ktv_room_count, String.valueOf(count))));
 
+        roomLivingViewModel.roomTimeUpLiveData.observe(this, isTimeUp -> {
+            if (roomLivingViewModel.release() && isTimeUp) {
+                showTimeUpExitDialog();
+            }
+        });
+
         // 麦位相关
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
             boolean isOnSeat = seatModel != null && seatModel.getSeatIndex() >= 0;
@@ -702,6 +708,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         if (temp != null) {
             mRoomSpeakerAdapter.replace(member.getSeatIndex(), null);
         }
+    }
+
+    // 房间存活时间，单位ms
+    private CloseRoomDialog timeUpExitDialog;
+    private void showTimeUpExitDialog() {
+        if (timeUpExitDialog == null) {
+            timeUpExitDialog = new CloseRoomDialog(this);
+            timeUpExitDialog.setCanceledOnTouchOutside(false);
+            timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
+                @Override
+                public void onLeftButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
+
+                @Override
+                public void onRightButtonClick() {
+                    roomLivingViewModel.exitRoom();
+                }
+            });
+        }
+        timeUpExitDialog.show();
     }
 
     private void showCreatorExitDialog() {
