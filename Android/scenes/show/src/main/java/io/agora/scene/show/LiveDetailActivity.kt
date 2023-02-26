@@ -22,7 +22,7 @@ import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.widget.utils.StatusBarUtil
 
 
-class LiveDetailActivity : AppCompatActivity() {
+class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingListener {
     private val TAG = "LiveDetailActivity"
 
     companion object {
@@ -71,6 +71,11 @@ class LiveDetailActivity : AppCompatActivity() {
     private val POSITION_NONE = -1
     private val vpFragments = SparseArray<LiveDetailFragment>()
     private var currLoadPosition = POSITION_NONE
+
+    override fun onMeLinking(isLinking: Boolean) {
+        // 连麦观众禁止切换房间
+        mBinding.viewPager2.isUserInputEnabled = !isLinking
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
