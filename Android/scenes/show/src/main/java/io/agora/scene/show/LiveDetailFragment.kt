@@ -115,6 +115,7 @@ class LiveDetailFragment : Fragment() {
     private val timerRoomEndRun = Runnable {
         destroy() // 房间到了限制时间
         showLivingEndLayout() // 房间到了限制时间
+        ShowLogger.d("showLivingEndLayout","timer end!")
     }
 
     private val mMainRtcConnection by lazy { RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt()) }
@@ -983,6 +984,7 @@ class LiveDetailFragment : Fragment() {
                     destroy()
                      // 进房Error
                     showLivingEndLayout() // 进房Error
+                    ShowLogger.d("showLivingEndLayout","join room error!:${it.message}")
                 }
             }
         })
@@ -998,6 +1000,7 @@ class LiveDetailFragment : Fragment() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
                 destroy() // 房间被房主关闭
                 showLivingEndLayout()// 房间被房主关闭
+                ShowLogger.d("showLivingEndLayout","room delete by owner!")
             }
         }
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
@@ -1053,7 +1056,7 @@ class LiveDetailFragment : Fragment() {
                     }
                     interactionInfo = info
                     // UI
-                    updateVideoSetting()
+                    updateVideoSetting(true)
                     refreshBottomLayout()
                     refreshViewDetailLayout(info.interactStatus)
                     mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
@@ -1079,7 +1082,7 @@ class LiveDetailFragment : Fragment() {
                 interactionInfo = null
                 refreshBottomLayout()
                 refreshPKTimeCount()
-                updateVideoSetting()
+                updateVideoSetting(false)
                 onMeLinkingListener?.onMeLinking(false)
             }
         }
@@ -1116,7 +1119,8 @@ class LiveDetailFragment : Fragment() {
                 mService.stopInteraction(mRoomInfo.roomId, interactionInfo)
             }
             refreshBottomLayout()
-            updateVideoSetting()
+            val isPkMode = interactionInfo?.interactStatus == ShowInteractionStatus.pking.value
+            updateVideoSetting(isPkMode)
             if (interactionInfo != null) {
                 refreshViewDetailLayout(interactionInfo.interactStatus)
                 if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value) {
@@ -1436,7 +1440,8 @@ class LiveDetailFragment : Fragment() {
         )
     }
 
-    private fun updateVideoSetting() {
+    private fun updateVideoSetting(isPkMode:Boolean) {
+        VideoSetting.setIsPkMode(isPkMode)
         if (isRoomOwner || isMeLinking()) {
             VideoSetting.updateBroadcastSetting(
                 when (interactionInfo?.interactStatus) {
