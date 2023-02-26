@@ -60,7 +60,7 @@ extension ShowAgoraKitManager {
         
         setExposureRange()
         setColorSpace()
-        
+        ShowSettingKey.mirror.writeValue(true)
         updateSettingForkey(.debugPVC)
         updateSettingForkey(.focusFace)
         updateSettingForkey(.encode)
