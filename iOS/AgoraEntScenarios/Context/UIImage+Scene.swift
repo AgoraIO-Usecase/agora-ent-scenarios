@@ -19,7 +19,8 @@ extension UIImage {
             return nil
         }
         
-        if let image = AppContext.shared.imageCahe[name] as? UIImage {
+        let cacheName = "\(name)__\(bundleName)"
+        if let image = AppContext.shared.imageCahe[cacheName] as? UIImage {
             return image
         }
 
@@ -43,7 +44,7 @@ extension UIImage {
             if let path = bundle.path(forResource: imageName, ofType: suffix) {
                 let image = UIImage(contentsOfFile: path)
                 assert(image != nil, "image == nil \(path)")
-                AppContext.shared.imageCahe[name] = image
+                AppContext.shared.imageCahe[cacheName] = image
                 return image
             }
         }
