@@ -1364,18 +1364,21 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)setSelSongsArray:(NSArray<VLRoomSelSongModel *> *)selSongsArray {
-    NSArray<VLRoomSelSongModel*> *oldSongsArray = self.selSongsArray;
-    _selSongsArray = selSongsArray;
+    NSArray<VLRoomSelSongModel*> *oldSongsArray = _selSongsArray;
+    _selSongsArray = [NSMutableArray arrayWithArray:selSongsArray];
     
     if (self.chooseSongView) {
-        self.chooseSongView.selSongsArray = selSongsArray; //刷新已点歌曲UI
+        self.chooseSongView.selSongsArray = _selSongsArray; //刷新已点歌曲UI
     }
     
-    [self.roomPersonView updateSingBtnWithChoosedSongArray:self.selSongsArray];
+    [self.roomPersonView updateSingBtnWithChoosedSongArray:_selSongsArray];
     
     VLRoomSelSongModel* originalTopSong = [oldSongsArray firstObject];
     VLRoomSelSongModel* updatedTopSong = [selSongsArray firstObject];
-    KTVLogInfo(@"setSelSongsArray: name: %@ isChorus: %d, status: %ld", updatedTopSong.name, updatedTopSong.isChorus, updatedTopSong.status);
+    KTVLogInfo(@"setSelSongsArray current top: songName: %@ isChorus: %d, chorusNo: %@, status: %ld",
+               updatedTopSong.songName, updatedTopSong.isChorus, updatedTopSong.chorusNo, updatedTopSong.status);
+    KTVLogInfo(@"setSelSongsArray orig top: songName: %@ isChorus: %d, chorusNo: %@, status: %ld",
+               originalTopSong.songName, originalTopSong.isChorus, originalTopSong.chorusNo, originalTopSong.status);
     if(!updatedTopSong.isChorus) {
         //solo
         if(![updatedTopSong isEqual:originalTopSong]){
@@ -1385,11 +1388,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
     } else {
         //chorus
-        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
+//        if(![updatedTopSong.songNo isEqualToString:originalTopSong.songNo]){
             if([updatedTopSong waittingForChorusMatch]) {
                 [self startChorusMatching];
             }
-        }
+//        }
         if([updatedTopSong doneChorusMatch]) {
             [self stopCoSingerWaitWithReason:KTVCoSingerWaitStopCancel];
             [self loadAndPlaySong];
