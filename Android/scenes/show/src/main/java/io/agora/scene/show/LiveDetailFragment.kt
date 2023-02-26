@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
@@ -143,6 +144,7 @@ class LiveDetailFragment : Fragment() {
         super.onAttach(context)
         ShowLogger.d(TAG, "Fragment Lifecycle: onAttach")
         mPermissionHelp = (requireActivity() as? LiveDetailActivity)?.mPermissionHelp
+        onMeLinkingListener = (requireActivity() as? LiveDetailActivity)
         if (isPageLoaded) {
             startLoadPage()
         }
@@ -521,10 +523,10 @@ class LiveDetailFragment : Fragment() {
         downLossPackage?.let { topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, it.toString()) }
         if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, "--")
         // 上行码率
-        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, it.toString()) }
         if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, "--")
         // 下行码率
-        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, it.toString()) }
         if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
@@ -1081,6 +1083,7 @@ class LiveDetailFragment : Fragment() {
                 refreshBottomLayout()
                 refreshPKTimeCount()
                 updateVideoSetting(false)
+                onMeLinkingListener?.onMeLinking(false)
             }
         }
 
@@ -1223,7 +1226,7 @@ class LiveDetailFragment : Fragment() {
                 runOnUiThread {
                     refreshStatisticInfo(
                         upBitrate = stats.sentBitrate,
-                        encodeFps = stats.captureFrameRate,
+                        encodeFps = stats.encoderOutputFrameRate,
                         upLossPackage = stats.txPacketLossRate,
                         encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
                     )
@@ -1239,7 +1242,9 @@ class LiveDetailFragment : Fragment() {
             },
             onRemoteVideoStats = { stats ->
                 setEnhance(stats)
-                if (stats.uid == mRoomInfo.ownerId.toInt()) {
+                // 连麦观众
+                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
                             downBitrate = stats.receivedBitrate,
@@ -1252,7 +1257,9 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteAudioStats = { stats ->
-                if (stats.uid == mRoomInfo.ownerId.toInt()) {
+                // 连麦观众
+                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
@@ -1264,7 +1271,7 @@ class LiveDetailFragment : Fragment() {
             onUplinkNetworkInfoUpdated = { info ->
                 runOnUiThread {
                     refreshStatisticInfo(
-                        upLinkBps = (info.video_encoder_target_bitrate_bps ?: 0) / 1000
+                        upLinkBps = (info.video_encoder_target_bitrate_bps)
                     )
                 }
             },
@@ -1527,6 +1534,8 @@ class LiveDetailFragment : Fragment() {
         } else {
             // 连麦观众视角
             if (interactionInfo?.userId.equals(UserManager.getInstance().user.id.toString())) {
+                // 连麦中观众不允许切换房间
+                onMeLinkingListener?.onMeLinking(true)
                 mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                     showLinkSettingsDialog()
                 }
@@ -1719,5 +1728,11 @@ class LiveDetailFragment : Fragment() {
             mBinding.topLayout.tvTimer.removeCallbacks(it)
             mBinding.topLayout.tvTimer.tag = null
         }
+    }
+
+    private var onMeLinkingListener: OnMeLinkingListener? = null
+
+    interface OnMeLinkingListener {
+        fun onMeLinking(isLinking: Boolean)
     }
 }
