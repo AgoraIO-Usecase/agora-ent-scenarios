@@ -73,11 +73,13 @@ public class LoginViewModel extends BaseRequestViewModel {
                     @Override
                     public void onSuccess(BaseResponse<String> stringBaseResponse) {
                         ToastUtils.showToast("验证码发送成功");
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS, null);
                     }
 
                     @Override
                     public void onFailure(@Nullable ApiException t) {
                         ToastUtils.showToast(t.getMessage());
+                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_FAIL, null);
                     }
                 }
         );
