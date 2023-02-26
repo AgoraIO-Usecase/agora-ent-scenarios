@@ -82,15 +82,15 @@ class SyncUtil: NSObject {
 
 class SyncUtilsWrapper {
     static var syncUtilsInited: Bool = false
-    static private var subscribeConnectStateMap: [String: (SocketConnectState?, Bool)->Void] = [:]
+    static private var subscribeConnectStateMap: [String: (SocketConnectState, Bool)->Void] = [:]
     static private var currentState: SocketConnectState = .connecting
     
-    class func initScene(uniqueId: String, sceneId: String, completion: @escaping (SocketConnectState?, Bool)->Void) {
-        let state: SocketConnectState? = subscribeConnectStateMap[uniqueId] == nil ? currentState : nil
-        let inited: Bool = state == nil ? true : false
-        subscribeConnectStateMap[uniqueId] = completion
+    class func initScene(uniqueId: String,
+                         sceneId: String,
+                         statusSubscribeCallback: @escaping (SocketConnectState, Bool)->Void) {
+        subscribeConnectStateMap[uniqueId] = statusSubscribeCallback
         if syncUtilsInited {
-            completion(state, inited)
+            statusSubscribeCallback(currentState, syncUtilsInited)
             return
         }
         

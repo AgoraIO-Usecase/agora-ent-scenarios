@@ -20,12 +20,15 @@ private let SYNC_MANAGER_INTERACTION_COLLECTION = "show_interaction_collection"
 
 enum ShowError: Int, Error {
     case unknown = 0                   //unknown error
+    case networkError                  //network fail
     case pkInteractionMaximumReach     //pk interaction reach the maximum
     case seatInteractionMaximumReach   //seat interaction reach the maximum
     case userCannotAccept             //reject message if in robot room
     
     func desc() -> String {
         switch self {
+        case .networkError:
+            return "network fail"
         case .pkInteractionMaximumReach:
             return "show_error_pk_interaction_exist".show_localized
         case .seatInteractionMaximumReach:
@@ -101,6 +104,8 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     
     fileprivate var roomId: String?
     
+    fileprivate var connectState: SocketConnectState?
+    
     deinit {
         agoraPrint("deinit-- ShowSyncManagerServiceImp")
         SyncUtilsWrapper.cleanScene(uniqueId: uniqueId)
@@ -120,17 +125,22 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         return room.ownerId == VLUserCenter.user.id
     }
     
-    fileprivate func initScene(completion: @escaping () -> Void) {
+    fileprivate func initScene(completion: @escaping (NSError?) -> Void) {
+        
         SyncUtilsWrapper.initScene(uniqueId: uniqueId, sceneId: kSceneId) {[weak self] state, inited in
-            guard let state = state else {
-                completion()
-                return
-            }
-            
             guard let self = self else {
                 return
             }
             
+            defer {
+                completion(state == .open ? nil : ShowError.networkError.toNSError())
+            }
+            
+            if let _ = self.connectState {
+                self.connectState = state
+                return
+            }
+            self.connectState = state
             let showState = ShowServiceConnectState(rawValue: state.rawValue) ?? .open
             self.subscribeDelegate?.onConnectStateChanged(state: showState)            
             guard state == .open else { return }
@@ -142,8 +152,6 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
                 }
                 return
             }
-
-            completion()
         }
     }
     
@@ -188,6 +196,10 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     func getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
         _getRoomList(page: page) { [weak self] error, list in
             guard let self = self else { return }
+            if let error = error {
+                completion(error, nil)
+                return
+            }
             self.roomList = list
             completion(nil, list)
         }
@@ -206,7 +218,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
         room.ownerAvatar = VLUserCenter.user.headUrl
         room.createdAt = Date().millionsecondSince1970()
         let params = room.yy_modelToJSONObject() as? [String: Any]
-        initScene { [weak self] in
+        initScene { [weak self] error in
+            if let error = error  {
+                completion(error, nil)
+                return
+            }
             SyncUtil.joinScene(id: room.roomId,
                           userId: room.ownerId,
                           isOwner: true,
@@ -250,7 +266,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
     @objc func joinRoom(room: ShowRoomListModel,
                         completion: @escaping (NSError?, ShowRoomDetailModel?) -> Void) {
         let params = room.yy_modelToJSONObject() as? [String: Any]
-        initScene { [weak self] in
+        initScene { [weak self] error in
+            if let error = error  {
+                completion(error, nil)
+                return
+            }
             SyncUtil.joinScene(id: room.roomId,
                                          userId: room.ownerId,
                                          isOwner: self?.isOwner(room) ?? false,
@@ -713,7 +733,11 @@ class ShowSyncManagerServiceImp: NSObject, ShowServiceProtocol {
 //MARK: room operation
 extension ShowSyncManagerServiceImp {
     @objc func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
-        initScene {
+        initScene { error in
+            if let error = error {
+                completion(error, nil)
+                return
+            }
             SyncUtil.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 let dataArray = results.map({ info in
@@ -1517,7 +1541,7 @@ extension ShowSyncManagerServiceImp {
             return
         }
         agoraPrint("imp pk invitation update...")
-        getRoomList(page: 0) { _, roomList in
+        _getRoomList(page: 0) { _, roomList in
             let model = roomList?.filter({ $0.roomId == channelName && $0.interactStatus != .idle }).first
             completion(model)
         }
@@ -1740,7 +1764,7 @@ extension ShowSyncManagerServiceImp {
 //lost connected
 extension ShowSyncManagerServiceImp {
     private func _fetchCreatePkInvitation() {
-        self.getRoomList(page: 0) { [weak self] (err, list) in
+        _getRoomList(page: 0) { [weak self] (err, list) in
             guard let self = self else { return }
             self.pkCreatedInvitationMap.forEach { (key: String, value: ShowPKInvitation) in
                 guard let room = list?.filter({ $0.roomId == key }).first else {
@@ -1807,7 +1831,11 @@ class ShowRobotSyncManagerServiceImp: ShowSyncManagerServiceImp {
     }
     
     @objc override func _getRoomList(page: Int, completion: @escaping (NSError?, [ShowRoomListModel]?) -> Void) {
-        initScene {
+        initScene { error in
+            if let error = error {
+                completion(error, nil)
+                return
+            }
             SyncUtil.fetchAll { results in
                 agoraPrint("result == \(results.compactMap { $0.toJson() })")
                 var dataArray = results.map({ info in

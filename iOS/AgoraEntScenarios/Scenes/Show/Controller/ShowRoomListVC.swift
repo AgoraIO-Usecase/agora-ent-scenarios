@@ -171,11 +171,15 @@ class ShowRoomListVC: UIViewController {
     
     private func getRoomList() {
         AppContext.showServiceImp("").getRoomList(page: 1) { [weak self] error, roomList in
-            if let list = roomList {
-                self?.roomListView.roomList = list
-                self?.roomList = list
+            guard let self = self else {return}
+            self.roomListView.collectionView.mj_header?.endRefreshing()
+            if let error = error {
+                ToastView.show(text: error.localizedDescription)
+                return
             }
-            self?.roomListView.collectionView.mj_header?.endRefreshing()
+            let list = roomList ?? []
+            self.roomListView.roomList = list
+            self.roomList = list
         }
     }
     
