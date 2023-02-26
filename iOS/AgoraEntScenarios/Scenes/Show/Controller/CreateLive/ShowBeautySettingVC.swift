@@ -211,15 +211,26 @@ class ShowBeautySettingVC: UIViewController {
     
     @objc
     private func onTapSegSwitch(sender: UISwitch) {
-        ShowAgoraKitManager.isOpenGreen = sender.isOn
-        slider.isHidden = !sender.isOn
-        if ShowAgoraKitManager.isBlur {
-            agoraKitManager.enableVirtualBackground(isOn: true,
-                                                    greenCapacity: slider.value)
-        } else {
-            agoraKitManager.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
-                                                     isOn: true,
-                                                     greenCapacity: slider.value)
+        func realChange(isOn: Bool){
+            ShowAgoraKitManager.isOpenGreen = isOn
+            slider.isHidden = !isOn
+            if ShowAgoraKitManager.isBlur {
+                agoraKitManager.enableVirtualBackground(isOn: true,
+                                                        greenCapacity: slider.value)
+            } else {
+                agoraKitManager.seVirtualtBackgoundImage(imagePath: "show_live_mritual_bg",
+                                                         isOn: true,
+                                                         greenCapacity: slider.value)
+            }
+        }
+        if sender.isOn == true {
+            sender.isOn = false
+            showAlert(title: "提示", message: "为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦", confirmTitle: "确认开启", cancelTitle: "暂不开启") {
+                realChange(isOn: true)
+                sender.isOn = true
+            }
+        }else{
+            realChange(isOn: sender.isOn)
         }
     }
 }
