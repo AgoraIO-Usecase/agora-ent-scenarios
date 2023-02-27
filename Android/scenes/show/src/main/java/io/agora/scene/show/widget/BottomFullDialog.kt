@@ -81,6 +81,9 @@ open class BottomFullDialog : BottomSheetDialog {
         ) { v, insets ->
             view.layoutParams = (view.layoutParams)?.apply {
                 height = window?.decorView?.height ?: 0
+                if(height == 0){
+                    height = view.resources.displayMetrics.heightPixels
+                }
             }
             insets
         }

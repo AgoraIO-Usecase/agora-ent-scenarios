@@ -22,7 +22,7 @@ import io.agora.scene.show.utils.PermissionHelp
 import io.agora.scene.widget.utils.StatusBarUtil
 
 
-class LiveDetailActivity : AppCompatActivity() {
+class LiveDetailActivity : AppCompatActivity() , LiveDetailFragment.OnMeLinkingListener {
     private val TAG = "LiveDetailActivity"
 
     companion object {
@@ -71,6 +71,11 @@ class LiveDetailActivity : AppCompatActivity() {
     private val POSITION_NONE = -1
     private val vpFragments = SparseArray<LiveDetailFragment>()
     private var currLoadPosition = POSITION_NONE
+
+    override fun onMeLinking(isLinking: Boolean) {
+        // 连麦观众禁止切换房间
+        mBinding.viewPager2.isUserInputEnabled = !isLinking
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,7 +134,7 @@ class LiveDetailActivity : AppCompatActivity() {
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state")
+                    Log.d(TAG, "PageChange onPageScrollStateChanged state=$state hasPageSelected=$hasPageSelected")
                     when(state){
                         ViewPager2.SCROLL_STATE_SETTLING -> mBinding.viewPager2.isUserInputEnabled = false
                         ViewPager2.SCROLL_STATE_IDLE -> {
@@ -210,6 +215,7 @@ class LiveDetailActivity : AppCompatActivity() {
         super.onDestroy()
         vpFragments[currLoadPosition]?.stopLoadPage()
         VideoSetting.resetBroadcastSetting()
+        VideoSetting.resetAudienceSetting()
         TokenGenerator.expireSecond = -1
         RtcEngineInstance.beautyProcessor.reset()
         RtcEngineInstance.destroy()

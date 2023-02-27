@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
@@ -114,6 +115,7 @@ class LiveDetailFragment : Fragment() {
     private val timerRoomEndRun = Runnable {
         destroy() // 房间到了限制时间
         showLivingEndLayout() // 房间到了限制时间
+        ShowLogger.d("showLivingEndLayout","timer end!")
     }
 
     private val mMainRtcConnection by lazy { RtcConnection(mRoomInfo.roomId, UserManager.getInstance().user.id.toInt()) }
@@ -142,6 +144,7 @@ class LiveDetailFragment : Fragment() {
         super.onAttach(context)
         ShowLogger.d(TAG, "Fragment Lifecycle: onAttach")
         mPermissionHelp = (requireActivity() as? LiveDetailActivity)?.mPermissionHelp
+        onMeLinkingListener = (requireActivity() as? LiveDetailActivity)
         if (isPageLoaded) {
             startLoadPage()
         }
@@ -491,6 +494,7 @@ class LiveDetailFragment : Fragment() {
         // 上行码率、下行码率
         upBitrate: Int? = null, downBitrate: Int? = null
     ) {
+        activity ?: return
         val topBinding = mBinding.topLayout
         val statisticBinding = topBinding.tlStatistic
         val visible = statisticBinding.isVisible
@@ -519,10 +523,10 @@ class LiveDetailFragment : Fragment() {
         downLossPackage?.let { topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, it.toString()) }
         if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text = getString(R.string.show_statistic_down_loss_package, "--")
         // 上行码率
-        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        upBitrate?.let { topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, it.toString()) }
         if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text = getString(R.string.show_statistic_up_bitrate, "--")
         // 下行码率
-        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_bitrate, it.toString()) }
+        downBitrate?.let { topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, it.toString()) }
         if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text = getString(R.string.show_statistic_down_bitrate, "--")
         // 上行网络
         topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
@@ -715,10 +719,10 @@ class LiveDetailFragment : Fragment() {
                     mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_ROMANTIC -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/happy.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
                 }
                 MusicEffectDialog.ITEM_ID_BACK_MUSIC_JOY2 -> {
-                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/romantic.wav", false, -1)
+                    mRtcVideoSwitcher.startAudioMixing(mMainRtcConnection, "/assets/relax.wav", false, -1)
                 }
 
                 MusicEffectDialog.ITEM_ID_BEAUTY_VOICE_ORIGINAL -> {
@@ -980,6 +984,7 @@ class LiveDetailFragment : Fragment() {
                     destroy()
                      // 进房Error
                     showLivingEndLayout() // 进房Error
+                    ShowLogger.d("showLivingEndLayout","join room error!:${it.message}")
                 }
             }
         })
@@ -995,6 +1000,7 @@ class LiveDetailFragment : Fragment() {
             if (status == ShowServiceProtocol.ShowSubscribeStatus.deleted) {
                 destroy() // 房间被房主关闭
                 showLivingEndLayout()// 房间被房主关闭
+                ShowLogger.d("showLivingEndLayout","room delete by owner!")
             }
         }
         mService.subscribeUser(mRoomInfo.roomId) { status, user ->
@@ -1050,7 +1056,7 @@ class LiveDetailFragment : Fragment() {
                     }
                     interactionInfo = info
                     // UI
-                    updateVideoSetting()
+                    updateVideoSetting(true)
                     refreshBottomLayout()
                     refreshViewDetailLayout(info.interactStatus)
                     mLinkDialog.setOnSeatStatus(info.userName, info.interactStatus)
@@ -1076,7 +1082,8 @@ class LiveDetailFragment : Fragment() {
                 interactionInfo = null
                 refreshBottomLayout()
                 refreshPKTimeCount()
-                updateVideoSetting()
+                updateVideoSetting(false)
+                onMeLinkingListener?.onMeLinking(false)
             }
         }
 
@@ -1112,7 +1119,8 @@ class LiveDetailFragment : Fragment() {
                 mService.stopInteraction(mRoomInfo.roomId, interactionInfo)
             }
             refreshBottomLayout()
-            updateVideoSetting()
+            val isPkMode = interactionInfo?.interactStatus == ShowInteractionStatus.pking.value
+            updateVideoSetting(isPkMode)
             if (interactionInfo != null) {
                 refreshViewDetailLayout(interactionInfo.interactStatus)
                 if (interactionInfo.interactStatus == ShowInteractionStatus.onSeat.value) {
@@ -1157,9 +1165,14 @@ class LiveDetailFragment : Fragment() {
         if (interactionInfo != null &&
             ((interactionInfo!!.interactStatus == ShowInteractionStatus.pking.value) && isRoomOwner)
         ) {
-            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!)
+            mService.stopInteraction(mRoomInfo.roomId, interactionInfo!!, {
+                mService.leaveRoom(mRoomInfo.roomId)
+            }, {
+                mService.leaveRoom(mRoomInfo.roomId)
+            })
+        }else{
+            mService.leaveRoom(mRoomInfo.roomId)
         }
-        mService.leaveRoom(mRoomInfo.roomId)
     }
 
     private fun showLivingEndLayout() {
@@ -1213,7 +1226,7 @@ class LiveDetailFragment : Fragment() {
                 runOnUiThread {
                     refreshStatisticInfo(
                         upBitrate = stats.sentBitrate,
-                        encodeFps = stats.captureFrameRate,
+                        encodeFps = stats.encoderOutputFrameRate,
                         upLossPackage = stats.txPacketLossRate,
                         encodeVideoSize = Size(stats.encodedFrameWidth, stats.encodedFrameHeight)
                     )
@@ -1229,7 +1242,9 @@ class LiveDetailFragment : Fragment() {
             },
             onRemoteVideoStats = { stats ->
                 setEnhance(stats)
-                if (stats.uid == mRoomInfo.ownerId.toInt()) {
+                // 连麦观众
+                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
                             downBitrate = stats.receivedBitrate,
@@ -1242,7 +1257,9 @@ class LiveDetailFragment : Fragment() {
                 }
             },
             onRemoteAudioStats = { stats ->
-                if (stats.uid == mRoomInfo.ownerId.toInt()) {
+                // 连麦观众
+                val isLinkingAudience = isRoomOwner && isLinking() && stats.uid.toString() == interactionInfo?.userId
+                if (stats.uid == mRoomInfo.ownerId.toInt() || isLinkingAudience) {
                     runOnUiThread {
                         refreshStatisticInfo(
                             audioBitrate = stats.receivedBitrate,
@@ -1254,7 +1271,7 @@ class LiveDetailFragment : Fragment() {
             onUplinkNetworkInfoUpdated = { info ->
                 runOnUiThread {
                     refreshStatisticInfo(
-                        upLinkBps = (info.video_encoder_target_bitrate_bps ?: 0) / 1000
+                        upLinkBps = (info.video_encoder_target_bitrate_bps)
                     )
                 }
             },
@@ -1325,7 +1342,8 @@ class LiveDetailFragment : Fragment() {
                         superResolution = VideoSetting.SuperResolution.SR_1_5
                     }
                     // 540P、480P
-                    else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width) || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
+                    else if ((stats.width == VideoSetting.Resolution.V_540P.height && stats.height == VideoSetting.Resolution.V_540P.width)
+                        || (stats.width == VideoSetting.Resolution.V_480P.height && stats.height == VideoSetting.Resolution.V_480P.width)) {
                         superResolution = VideoSetting.SuperResolution.SR_1_33
                     }
                     // 360P以及以下
@@ -1422,7 +1440,8 @@ class LiveDetailFragment : Fragment() {
         )
     }
 
-    private fun updateVideoSetting() {
+    private fun updateVideoSetting(isPkMode:Boolean) {
+        VideoSetting.setIsPkMode(isPkMode)
         if (isRoomOwner || isMeLinking()) {
             VideoSetting.updateBroadcastSetting(
                 when (interactionInfo?.interactStatus) {
@@ -1472,6 +1491,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, rtcConnection)
             mRtcVideoSwitcher.setupRemoteVideo(
                 rtcConnection,
@@ -1514,6 +1534,8 @@ class LiveDetailFragment : Fragment() {
         } else {
             // 连麦观众视角
             if (interactionInfo?.userId.equals(UserManager.getInstance().user.id.toString())) {
+                // 连麦中观众不允许切换房间
+                onMeLinkingListener?.onMeLinking(true)
                 mBinding.videoLinkingAudienceLayout.videoContainer.setOnClickListener {
                     showLinkSettingsDialog()
                 }
@@ -1609,12 +1631,13 @@ class LiveDetailFragment : Fragment() {
             mRtcEngine.enableLocalVideo(true)
             val channelMediaOptions = ChannelMediaOptions()
             channelMediaOptions.publishCameraTrack = false
-            channelMediaOptions.publishMicrophoneTrack = true
+            channelMediaOptions.publishMicrophoneTrack = false
             channelMediaOptions.publishCustomAudioTrack = false
-            channelMediaOptions.enableAudioRecordingOrPlayout = true
+            channelMediaOptions.enableAudioRecordingOrPlayout = false
             channelMediaOptions.autoSubscribeVideo = true
-            channelMediaOptions.autoSubscribeAudio = false
-            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+            channelMediaOptions.autoSubscribeAudio = true
+            channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
@@ -1631,6 +1654,7 @@ class LiveDetailFragment : Fragment() {
                     viewIndex = 0
                 )
             )
+
         } else {
             // 观众
             val channelMediaOptions = ChannelMediaOptions()
@@ -1641,6 +1665,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = false
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+            channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             val pkRtcConnection = RtcConnection(
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
@@ -1703,5 +1728,11 @@ class LiveDetailFragment : Fragment() {
             mBinding.topLayout.tvTimer.removeCallbacks(it)
             mBinding.topLayout.tvTimer.tag = null
         }
+    }
+
+    private var onMeLinkingListener: OnMeLinkingListener? = null
+
+    interface OnMeLinkingListener {
+        fun onMeLinking(isLinking: Boolean)
     }
 }

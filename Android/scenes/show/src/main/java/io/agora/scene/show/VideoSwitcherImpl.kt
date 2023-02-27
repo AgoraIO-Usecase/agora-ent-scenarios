@@ -29,6 +29,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     private var localVideoCanvas: LocalVideoCanvasWrap? = null
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val preLoadRun = Runnable { preloadChannels() }
 
     override fun setPreloadCount(count: Int) {
         preloadCount = count
@@ -42,6 +43,8 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
     }
 
     override fun unloadConnections() {
+        mainHandler.removeCallbacksAndMessages(null)
+
         connectionsJoined.forEach {
             leaveRtcChannel(it)
         }
@@ -88,7 +91,10 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
         joinRtcChannel(connectionWrap, eventListener)
         connectionsJoined.add(connectionWrap)
 
-        preloadChannels()
+        mainHandler.removeCallbacks(preLoadRun)
+        if (connectionsJoined.size == 1 || connectionsPreloaded.size <= 0) {
+            mainHandler.postDelayed(preLoadRun, 500)
+        }
     }
 
     private fun preloadChannels() {
@@ -111,6 +117,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             if (connectionsPreloaded.none { it.isSameChannel(conn) }) {
                 val options = ChannelMediaOptions()
                 options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
                 conn.mediaOptions = options
@@ -140,6 +147,7 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
             ?.let { conn ->
                 val options = conn.mediaOptions
                 options.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+                options.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
                 options.autoSubscribeVideo = false
                 options.autoSubscribeAudio = false
                 rtcEngine.updateChannelMediaOptionsEx(options, conn)
@@ -182,12 +190,15 @@ class VideoSwitcherImpl(private val rtcEngine: RtcEngineEx) : VideoSwitcher {
                 }
                 return
             }
-
             it.release()
         }
 
         var videoView = container.container.getChildAt(container.viewIndex)
         if (videoView !is TextureView) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
+        } else {
+            container.container.removeViewInLayout(videoView)
             videoView = TextureView(container.container.context)
             container.container.addView(videoView, container.viewIndex)
         }
