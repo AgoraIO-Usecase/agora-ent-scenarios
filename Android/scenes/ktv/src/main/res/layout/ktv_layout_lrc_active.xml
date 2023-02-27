@@ -17,7 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:minimumScore="40"
         app:pitchIndicatorRadius="6dp"
         app:pitchInitialScore="0"
         app:pitchStickHeight="6dp" />
