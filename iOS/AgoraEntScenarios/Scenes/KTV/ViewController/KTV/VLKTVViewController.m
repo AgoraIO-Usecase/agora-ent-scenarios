@@ -35,7 +35,7 @@
 #import "HWWeakTimer.h"
 #import "VLAlert.h"
 #import "VLKTVAlert.h"
-
+#import "KTVDebugManager.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
@@ -169,8 +169,11 @@ KTVApiDelegate
     //处理背景
     [self prepareBgImage];
     [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
-    
+
     self.retryCount = 0;
+    
+    //add debug
+    [self.topView addGestureRecognizer:[KTVDebugManager createStartGesture]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
