@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import com.alibaba.android.arouter.utils.MapUtils.isNotEmpty
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -166,7 +167,7 @@ class KTVSyncManagerServiceImp(
         inputModel: JoinRoomInputModel,
         completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
     ) {
-        if (!TextUtils.isEmpty(currRoomNo)) {
+        if (!TextUtils.isEmpty(currRoomNo) && currRoomNo != inputModel.roomNo) {
             completion.invoke(RuntimeException("The room $currRoomNo has been joined!"), null)
             return
         }
