@@ -726,9 +726,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 // 打分 + 同步分数
                 val isChorusCoSinger = isChorusCoSinger() ?: return
                 val view = lrcView ?: return
-                if (isChorusCoSinger) return
                 val score = view.cumulativeScore.toFloat()
                 ktvApiEventHandler?.onSingingScoreResult(score)
+
+                // 只有主唱同步分数给观众端
+                if (isChorusCoSinger) return
                 syncSingingScore(score)
             }
             else -> {}
