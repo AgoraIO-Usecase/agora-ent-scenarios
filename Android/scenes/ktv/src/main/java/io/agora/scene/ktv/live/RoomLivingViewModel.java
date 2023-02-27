@@ -1079,7 +1079,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
         contentCenterConfiguration.mccUid = UserManager.getInstance().getUser().id;
-        contentCenterConfiguration.rtmToken = roomInfoLiveData.getValue().getAgoraRTMToken();
+        contentCenterConfiguration.token = roomInfoLiveData.getValue().getAgoraRTMToken();
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
 
