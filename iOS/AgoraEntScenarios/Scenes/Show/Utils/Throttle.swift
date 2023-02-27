@@ -9,6 +9,7 @@ import Combine
 import Foundation
 
 /// struct throttling successive works with provided options.
+@available(iOS 13.0, *)
 public enum ShowThrottler {
     typealias WorkIdentifier = String
 

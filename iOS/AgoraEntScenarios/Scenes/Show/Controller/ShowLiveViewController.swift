@@ -302,9 +302,9 @@ class ShowLiveViewController: UIViewController {
         agoraKitManager.leaveChannelEx(roomId: roomId, channelId: roomId)
         AppContext.showServiceImp(roomId).unsubscribeEvent(delegate: self)
         
-        AppContext.showServiceImp(roomId).leaveRoom {[weak self] error in
-            self?.dismiss(animated: true) {
-            }
+        AppContext.showServiceImp(roomId).leaveRoom {_ in
+//            self?.dismiss(animated: true) {
+//            }
         }
         if role == .broadcaster {
             BeautyManager.shareManager.destroy()
@@ -491,13 +491,13 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired() {
+        leaveRoom()
         ShowReceiveLiveFinishAlertVC.show(topVC: self,
                                           ownerUrl: room?.ownerAvatar ?? "",
                                           ownerName: room?.ownerName ?? "") { [weak self] in
             if self?.presentedViewController != nil {
                 self?.presentedViewController?.dismiss(animated: false)
             }
-            self?.leaveRoom()
         }
     }
     
@@ -835,35 +835,26 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
 //        realTimeView.statsInfo?.updateChannelStats(stats)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateChannelStats(stats)
-                self?.realTimeView.receiveStatsInfo?.updateChannelStats(stats)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateChannelStats(stats)
+            self?.realTimeView.receiveStatsInfo?.updateChannelStats(stats)
         }
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioStats stats: AgoraRtcLocalAudioStats) {
 //        realTimeView.statsInfo?.updateLocalAudioStats(stats)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
-                self?.realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateLocalAudioStats(stats)
+            self?.realTimeView.receiveStatsInfo?.updateLocalAudioStats(stats)
         }
         
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, localVideoStats stats: AgoraRtcLocalVideoStats, sourceType: AgoraVideoSourceType) {
 //        realTimeView.statsInfo?.updateLocalVideoStats(stats)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
-                self?.realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateLocalVideoStats(stats)
+            self?.realTimeView.receiveStatsInfo?.updateLocalVideoStats(stats)
         }
         
         showLogger.info("localVideoStats  width = \(stats.encodedFrameWidth), height = \(stats.encodedFrameHeight)")
@@ -872,12 +863,9 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteVideoStats stats: AgoraRtcRemoteVideoStats) {
 //        realTimeView.statsInfo?.updateVideoStats(stats)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateVideoStats(stats)
-                self?.realTimeView.receiveStatsInfo?.updateVideoStats(stats)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateVideoStats(stats)
+            self?.realTimeView.receiveStatsInfo?.updateVideoStats(stats)
         }
         
 
@@ -899,36 +887,27 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, remoteAudioStats stats: AgoraRtcRemoteAudioStats) {
 //        realTimeView.statsInfo?.updateAudioStats(stats)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateAudioStats(stats)
-                self?.realTimeView.receiveStatsInfo?.updateAudioStats(stats)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateAudioStats(stats)
+            self?.realTimeView.receiveStatsInfo?.updateAudioStats(stats)
         }
         
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, uplinkNetworkInfoUpdate networkInfo: AgoraUplinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateUplinkNetworkInfo(networkInfo)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-                self?.realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateUplinkNetworkInfo(networkInfo)
+            self?.realTimeView.receiveStatsInfo?.updateUplinkNetworkInfo(networkInfo)
         }
         
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, downlinkNetworkInfoUpdate networkInfo: AgoraDownlinkNetworkInfo) {
 //        realTimeView.statsInfo?.updateDownlinkNetworkInfo(networkInfo)
-        ShowThrottler.throttle(delay: .seconds(1)) {[weak self] in
-            DispatchQueue.main.async {
-                self?.realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-                self?.realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
-                self?.resetRealTimeIfNeeded()
-            }
+        delayRefreshRealTimeInfo { [weak self] in
+            self?.realTimeView.sendStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
+            self?.realTimeView.receiveStatsInfo?.updateDownlinkNetworkInfo(networkInfo)
         }
         
     }
@@ -1006,9 +985,11 @@ extension ShowLiveViewController: ShowRoomLiveViewDelegate {
         if role == .broadcaster {
             showAlert(message: "show_alert_live_end_title".show_localized) {[weak self] in
                 self?.leaveRoom()
+                self?.dismiss(animated: true)
             }
         }else {
             leaveRoom()
+            dismiss(animated: true)
         }
     }
     
@@ -1065,6 +1046,15 @@ extension ShowLiveViewController {
             realTimeView.cleanRemoteDescription()
         }
     }
+    
+    private func delayRefreshRealTimeInfo(_ task: (()->())?) {
+        ShowThrottler.throttle(delay: .seconds(1)) { [weak self] in
+            DispatchQueue.main.async {
+                task?()
+                self?.resetRealTimeIfNeeded()
+            }
+        }
+    }
 }
 
 
@@ -1072,6 +1062,7 @@ extension ShowLiveViewController {
     private func showError(title: String, errMsg: String) {
         showAlert(title: title, message: errMsg) { [weak self] in
             self?.leaveRoom()
+            self?.dismiss(animated: true)
         }
     }
 }
