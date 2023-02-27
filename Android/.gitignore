@@ -3,3 +3,4 @@
 *.iml
 /build
 common/base/sdk-*/
+/scenes/show/

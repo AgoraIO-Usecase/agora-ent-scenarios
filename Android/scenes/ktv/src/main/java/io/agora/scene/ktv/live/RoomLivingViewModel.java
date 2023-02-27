@@ -1079,7 +1079,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                 = new MusicContentCenterConfiguration();
         contentCenterConfiguration.appId = BuildConfig.AGORA_APP_ID;
         contentCenterConfiguration.mccUid = UserManager.getInstance().getUser().id;
-        contentCenterConfiguration.token = roomInfoLiveData.getValue().getAgoraRTMToken();
+        contentCenterConfiguration.rtmToken = roomInfoLiveData.getValue().getAgoraRTMToken();
         iAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine);
         iAgoraMusicContentCenter.initialize(contentCenterConfiguration);
 
@@ -1357,7 +1357,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
-
+        if (mRtcEngine == null) {
+            return;
+        }
         if (isOnSeat) {
             mainChannelMediaOption.publishMicrophoneTrack = true;
             mainChannelMediaOption.publishCameraTrack = isCameraOpened;
@@ -1376,6 +1378,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
+            if (mPlayer != null) {
+                mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
+            }
             mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         }
