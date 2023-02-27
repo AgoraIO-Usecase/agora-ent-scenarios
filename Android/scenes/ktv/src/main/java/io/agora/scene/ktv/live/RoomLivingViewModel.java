@@ -1326,7 +1326,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
                         }
                         ktvApiProtocol.playSong(song);
                     } else if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
-                        Log.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
+                        KTVLogger.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
                     }
                     return null;
                 }
