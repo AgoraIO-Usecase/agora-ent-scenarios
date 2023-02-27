@@ -332,26 +332,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
             }
         }
 
-        mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { btn, isChecked ->
-            Log.e("liu0208", "OnCheckedChange    $isChecked")
-            if (isChecked) {
-                AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
-                    setCancelable(false)
-                    setTitle(R.string.show_tip)
-                    setMessage(R.string.show_beauty_green_screen_tip)
-                    setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
-                        changeGreenScreenSwitch(true)
-                        dialog.dismiss()
-                    }
-                    setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
-                        mTopBinding.mSwitchMaterial.isChecked = false
-                        dialog.dismiss()
-                    }
-                }.create().show()
-                return@setOnCheckedChangeListener
-            }
-            changeGreenScreenSwitch(isChecked);
-        }
+
     }
 
     // 修改绿幕开关
@@ -374,6 +355,7 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
     private fun refreshTopLayout(groupId: Int, itemId: Int) {
         mTopBinding.slider.clearOnChangeListeners()
         mTopBinding.slider.clearOnSliderTouchListeners()
+        mTopBinding.mSwitchMaterial.setOnCheckedChangeListener(null)
         Log.e("liu0208", "refreshTopLayout    groupId = $groupId    itemId = $itemId")
 
         mTopBinding.ivCompare.visibility = if (groupId != GROUP_ID_VIRTUAL_BG) View.VISIBLE else View.GONE
@@ -386,6 +368,26 @@ class BeautyDialog(context: Context) : BottomDarkDialog(context) {
                 mTopBinding.root.isVisible = true
                 mTopBinding.slider.value = beautyProcessor?.let { it.getGreenScreenStrength() } ?: 0.5f
                 mTopBinding.mSwitchMaterial.isChecked = beautyProcessor?.let { it.greenScreen() } ?: false
+                mTopBinding.mSwitchMaterial.setOnCheckedChangeListener { _, isChecked ->
+                    Log.e("liu0208", "OnCheckedChange    $isChecked")
+                    if (isChecked) {
+                        AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
+                            setCancelable(false)
+                            setTitle(R.string.show_tip)
+                            setMessage(R.string.show_beauty_green_screen_tip)
+                            setPositiveButton(R.string.show_setting_confirm) { dialog, _ ->
+                                changeGreenScreenSwitch(true)
+                                dialog.dismiss()
+                            }
+                            setNegativeButton(R.string.show_setting_cancel) { dialog, _ ->
+                                mTopBinding.mSwitchMaterial.isChecked = false
+                                dialog.dismiss()
+                            }
+                        }.create().show()
+                        return@setOnCheckedChangeListener
+                    }
+                    changeGreenScreenSwitch(isChecked);
+                }
                 mTopBinding.slider.addOnChangeListener { slider, sValure, fromUser ->
                     beautyProcessor?.setBg(sValure)
                     mGroupList[mBottomBinding.tabLayout.selectedTabPosition].apply {
