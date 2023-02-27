@@ -58,8 +58,8 @@ public class GradeView extends View {
 
     private LinearGradient mCumulativeLinearGradient;
 
-    private long mCumulativeScore;
-    private long mPerfectScore;
+    private int mCumulativeScore;
+    private int mPerfectScore;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -94,17 +94,18 @@ public class GradeView extends View {
         mGradeSeparatorLabelIndicatorPaint.setTextAlign(Paint.Align.CENTER);
 
         mDefaultBackgroundPaint.setShader(null);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mDefaultBackgroundPaint.setColor(Color.argb(1f, 0f, 0f, 0.3f));
-
-            mGradeSeparatorIndicatorPaint.setColor(Color.argb(0.3f, 1f, 1f, 1f));
-            mGradeSeparatorLabelIndicatorPaint.setColor(Color.argb(0.3f, 1f, 1f, 1f));
+        int colorOfBgBlue = 0;
+        int colorOfContentGray = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            colorOfBgBlue = getResources().getColor(R.color.ktv_grade_view_bg_blue, null);
+            colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray, null);
         } else {
-            mDefaultBackgroundPaint.setColor(Color.LTGRAY);
-
-            mGradeSeparatorIndicatorPaint.setColor(Color.LTGRAY);
-            mGradeSeparatorLabelIndicatorPaint.setColor(Color.LTGRAY);
+            colorOfBgBlue = getResources().getColor(R.color.ktv_grade_view_bg_blue);
+            colorOfContentGray = getResources().getColor(R.color.ktv_grade_view_content_gray);
         }
+        mDefaultBackgroundPaint.setColor(colorOfBgBlue);
+        mGradeSeparatorIndicatorPaint.setColor(colorOfContentGray);
+        mGradeSeparatorLabelIndicatorPaint.setColor(colorOfContentGray);
 
         Paint.FontMetrics fontMetrics = mGradeSeparatorLabelIndicatorPaint.getFontMetrics();
         float offsetForLabelX = mGradeSeparatorLabelIndicatorPaint.measureText("S");
@@ -130,7 +131,7 @@ public class GradeView extends View {
         canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBarPaint);
     }
 
-    public void setScore(long score, long cumulativeScore, long perfectScore) {
+    public void setScore(int score, int cumulativeScore, int perfectScore) {
         mCumulativeScore = cumulativeScore;
         mPerfectScore = perfectScore;
 
@@ -158,7 +159,7 @@ public class GradeView extends View {
     }
 
     protected int getCumulativeDrawable() {
-        int res = R.drawable.ktv_ic_grade_c;
+        int res = 0;
 
         if (mCumulativeScore >= mPerfectScore * xRadioOfGradeS) {
             res = R.drawable.ktv_ic_grade_s;
@@ -166,6 +167,8 @@ public class GradeView extends View {
             res = R.drawable.ktv_ic_grade_a;
         } else if (mCumulativeScore >= mPerfectScore * xRadioOfGradeB) {
             res = R.drawable.ktv_ic_grade_b;
+        } else if (mCumulativeScore >= mPerfectScore * xRadioOfGradeC) {
+            res = R.drawable.ktv_ic_grade_c;
         }
 
         return res;

@@ -237,7 +237,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvActivityRoomL
         float density = Resources.getSystem().getDisplayMetrics().density;
         if (heightPixels * 1.0 / widthPixels > 16.0 / 9) { // 2K/Slim/> 16:9 screens
             // TODO(HAI_GUO) Flip/Fold/Split screens and One-handed mode may not supported well
-            params.bottomMargin = (int) (160 * density);
+            params.bottomMargin = (int) (heightPixels * (1.0 - ((16.0 * widthPixels) / (9 * heightPixels))));
             getBinding().rvUserMember.setLayoutParams(params);
         }
 
