@@ -197,6 +197,9 @@
 		DD2A43E228FFCEE7004CEDCF /* AgoraEntScenariosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43E128FFCEE7004CEDCF /* AgoraEntScenariosTests.swift */; };
 		DD2A43EC28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */; };
 		DD2A43EE28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */; };
+		DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC2299F201D00F36349 /* KTVDebugManager.m */; };
+		DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */; };
+		DD5EBDC9299F491F00F36349 /* KTVDebugInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */; };
 		DD64C68C295C142A00EAB750 /* UIButton+EntLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */; };
 		DD84176229090C520026B624 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = DD84168729090C520026B624 /* index.html */; };
 		DD84176329090C520026B624 /* util.js in Resources */ = {isa = PBXBuildFile; fileRef = DD84168929090C520026B624 /* util.js */; };
@@ -592,6 +595,12 @@
 		DD2A43E728FFCEE7004CEDCF /* AgoraEntScenariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AgoraEntScenariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD2A43EB28FFCEE7004CEDCF /* AgoraEntScenariosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITests.swift; sourceTree = "<group>"; };
 		DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraEntScenariosUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		DD5EBDC1299F201D00F36349 /* KTVDebugManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVDebugManager.h; sourceTree = "<group>"; };
+		DD5EBDC2299F201D00F36349 /* KTVDebugManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugManager.m; sourceTree = "<group>"; };
+		DD5EBDC4299F230100F36349 /* KTVDebugViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVDebugViewController.h; sourceTree = "<group>"; };
+		DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugViewController.m; sourceTree = "<group>"; };
+		DD5EBDC7299F491F00F36349 /* KTVDebugInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KTVDebugInfo.h; sourceTree = "<group>"; };
+		DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KTVDebugInfo.m; sourceTree = "<group>"; };
 		DD64C68B295C142A00EAB750 /* UIButton+EntLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+EntLayout.swift"; sourceTree = "<group>"; };
 		DD84168729090C520026B624 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		DD84168929090C520026B624 /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = util.js; sourceTree = "<group>"; };
@@ -851,6 +860,7 @@
 			isa = PBXGroup;
 			children = (
 				E3D1D836298CAA5400BDBAC2 /* FileDownloadCache */,
+				DD5EBDC0299F1FF200F36349 /* Debug */,
 				DD029246295BF0DC00485225 /* Utils */,
 				DD02924A295BF0DC00485225 /* Model */,
 				DD02925C295BF0DC00485225 /* View */,
@@ -1399,6 +1409,19 @@
 				DD2A43ED28FFCEE7004CEDCF /* AgoraEntScenariosUITestsLaunchTests.swift */,
 			);
 			path = AgoraEntScenariosUITests;
+			sourceTree = "<group>";
+		};
+		DD5EBDC0299F1FF200F36349 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				DD5EBDC1299F201D00F36349 /* KTVDebugManager.h */,
+				DD5EBDC2299F201D00F36349 /* KTVDebugManager.m */,
+				DD5EBDC4299F230100F36349 /* KTVDebugViewController.h */,
+				DD5EBDC5299F230100F36349 /* KTVDebugViewController.m */,
+				DD5EBDC7299F491F00F36349 /* KTVDebugInfo.h */,
+				DD5EBDC8299F491F00F36349 /* KTVDebugInfo.m */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		DD84168629090C520026B624 /* Resource */ = {
@@ -2316,6 +2339,7 @@
 				DD220B54295B332C00F57F30 /* AgoraChatRoomBaseAlienCollectionViewCell.swift in Sources */,
 				DD220B67295B332C00F57F30 /* VMUpstageView.swift in Sources */,
 				DD220B3E295B332C00F57F30 /* VoiceRoomViewController.swift in Sources */,
+				DD5EBDC9299F491F00F36349 /* KTVDebugInfo.m in Sources */,
 				DD220B1F295B332C00F57F30 /* Notification+Presentation.swift in Sources */,
 				DDA199E128FFE579009D3E61 /* VLToast.m in Sources */,
 				DDA199F028FFE579009D3E61 /* BaseViewController.m in Sources */,
@@ -2416,6 +2440,7 @@
 				DD220B42295B332C00F57F30 /* VRAllRoomsViewController.swift in Sources */,
 				DD84178929090C520026B624 /* VLMainTabBarController.m in Sources */,
 				DD220B28295B332C00F57F30 /* VoiceRoomIMManager.swift in Sources */,
+				DD5EBDC3299F201D00F36349 /* KTVDebugManager.m in Sources */,
 				DDA199F828FFE579009D3E61 /* NSDictionary+JKSafeAccess.m in Sources */,
 				DD220B1C295B332C00F57F30 /* VRVerifyCodeTextView.swift in Sources */,
 				DDAB07FC29A5C35900BFA14E /* KeyCenter.swift in Sources */,
@@ -2447,6 +2472,7 @@
 				DD220B2F295B332C00F57F30 /* VRRoomEntity.swift in Sources */,
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,
 				DD220B17295B332C00F57F30 /* VoiceRoomPasswordAlert.swift in Sources */,
+				DD5EBDC6299F230100F36349 /* KTVDebugViewController.m in Sources */,
 				DD220B7F295B332C00F57F30 /* HorizontalCardView.swift in Sources */,
 				E36BE99729656C43003FCFBF /* AttributedTextView.m in Sources */,
 				DDA19A0E28FFE579009D3E61 /* VLCache.m in Sources */,
