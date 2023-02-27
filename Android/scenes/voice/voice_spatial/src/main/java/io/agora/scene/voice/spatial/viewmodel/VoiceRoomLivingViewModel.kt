@@ -54,11 +54,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _openBlueBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _closeBlueBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
-        SingleSourceLiveData()
     private val _openRedBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
-        SingleSourceLiveData()
-    private val _closeRedBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _blueRobotAttenuationObservable: SingleSourceLiveData<Resource<Pair<Double, Boolean>>> =
         SingleSourceLiveData()
@@ -117,26 +113,14 @@ class VoiceRoomLivingViewModel : ViewModel() {
     /**打开蓝色机器人空气衰减*/
     fun openBlueBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _openBlueBotAirAbsorbObservable
 
-    /**关闭蓝色机器人空气衰减*/
-    fun closeBlueBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _closeBlueBotAirAbsorbObservable
-
     /**打开红色机器人空气衰减*/
     fun openRedBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _openRedBotAirAbsorbObservable
-
-    /**关闭红色机器人空气衰减*/
-    fun closeRedBotAirAbsorbObservable(): LiveData<Resource<Boolean>> = _closeRedBotAirAbsorbObservable
 
     /**打开蓝色机器人模糊*/
     fun openBlueBotBlurObservable(): LiveData<Resource<Boolean>> = _openBlueBotBlurObservable
 
-    /**关闭蓝色机器人模糊*/
-    fun closeBlueBotBlurObservable(): LiveData<Resource<Boolean>> = _closeBlueBotBlurObservable
-
     /**打开红色机器人模糊*/
     fun openRedBotBlurObservable(): LiveData<Resource<Boolean>> = _openRedBotBlurObservable
-
-    /**关闭红色机器人模糊*/
-    fun closeRedBotBlurObservable(): LiveData<Resource<Boolean>> = _closeRedBotBlurObservable
 
     /**蓝色机器人衰减系数*/
     fun blueRobotAttenuationObservable(): LiveData<Resource<Pair<Double, Boolean>>> = _blueRobotAttenuationObservable

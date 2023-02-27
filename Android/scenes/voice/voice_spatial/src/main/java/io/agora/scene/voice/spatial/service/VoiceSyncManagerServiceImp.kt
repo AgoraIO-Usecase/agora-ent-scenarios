@@ -1271,12 +1271,13 @@ class VoiceSyncManagerServiceImp(
 
     // ----------------------------- 麦位状态 -----------------------------
     private fun innerGenerateDefaultSeatInfo(index: Int, uid: String) : VoiceMicInfoModel {
+        val oldSeatInfo = micSeatMap[index.toString()]
         var mem: VoiceMemberModel? = null
         var micState = MicStatus.Idle
         if (userMap.containsKey(uid)) {
             mem = userMap[uid]
             mem?.micIndex = index
-            micState = MicStatus.Normal
+            micState = oldSeatInfo?.micStatus ?: MicStatus.Normal
         }
         return VoiceMicInfoModel().apply {
             micIndex = index
