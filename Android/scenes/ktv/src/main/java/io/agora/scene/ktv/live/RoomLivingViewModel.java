@@ -1366,7 +1366,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
-            mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
             mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         } else {
@@ -1377,7 +1376,6 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             mainChannelMediaOption.autoSubscribeVideo = true;
             mainChannelMediaOption.autoSubscribeAudio = true;
             mainChannelMediaOption.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE;
-            mainChannelMediaOption.publishMediaPlayerId = mPlayer.getMediaPlayerId();
             mainChannelMediaOption.publishMediaPlayerAudioTrack = false;
             mRtcEngine.updateChannelMediaOptions(mainChannelMediaOption);
         }
