@@ -63,7 +63,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
     private var userDidChanged: ((UInt, VLLoginModel) -> Void)?
     private var seatListDidChanged: ((UInt, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((UInt, VLRoomListModel) -> Void)?
-    private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel) -> Void)?
+    private var chooseSongDidChanged: ((UInt, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)?
 //    private var singingScoreDidChanged: ((Double) -> Void)?
     private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
     private var roomExpiredDidChanged: (() -> Void)?
@@ -617,7 +617,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                        })
     }
 
-    func subscribeChooseSongChanged(_ changedBlock: @escaping (UInt, VLRoomSelSongModel) -> Void) {
+    func subscribeChooseSongChanged(_ changedBlock: @escaping (UInt, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
         chooseSongDidChanged = changedBlock
         _subscribeChooseSong {
         }
@@ -1327,7 +1327,7 @@ extension KTVSyncManagerServiceImp {
                 self.songList = songList
                 self.songList.append(model)
                 self._sortChooseSongList()
-                self.chooseSongDidChanged?(type.rawValue, model)
+                self.chooseSongDidChanged?(type.rawValue, model, self.songList)
 //                self._markCurrentSongIfNeed()
                 agoraPrint("imp song subscribe onUpdated... [\(object.getId())] count: \(self.songList.count)")
             }, onDeleted: { [weak self] object in
@@ -1337,7 +1337,7 @@ extension KTVSyncManagerServiceImp {
                     return
                 }
                 self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
-                self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong)
+                self.chooseSongDidChanged?(KTVSubscribeDeleted.rawValue, origSong, self.songList)
 //               self._markCurrentSongIfNeed()
                 agoraPrint("imp song subscribe onDeleted... [\(object.getId())] count: \(self.songList.count)")
             }, onSubscribed: {

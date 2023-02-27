@@ -276,6 +276,7 @@
 //}
 
 - (void)updateUIWithSong:(VLRoomSelSongModel * __nullable)song onSeat:(BOOL)onSeat {
+    KTVLogInfo(@"VLKTVMVView updateUIWithSong: songName: %@, name: %@", song.songName, song.name);
     self.idleView.hidden = song;
     self.joinChorusView.hidden = !(song && song.isChorus && ![self isPlaying:song]);
     self.karaokeView.lyricsView.draggable = !song.isChorus;
@@ -401,10 +402,75 @@
 - (void)reset {
     [_karaokeView reset];
     [_gradeView reset];
-    [self setSongScore:0];
-    self.isPlayAccompany = YES;
-    [self cleanMusicText];
 }
+
+#pragma mark - AgoraKaraokeScoreDelegate
+
+/// 评分回调
+/// @param score 当前行得分
+/// @param cumulativeScore 累计得分
+/// @param totalScore 当前歌曲总得分
+-(void)agoraKaraokeScoreWithScore:(double)score cumulativeScore:(double)cumulativeScore totalScore:(double)totalScore {
+    double scale = cumulativeScore / totalScore;
+    double realScore = scale * 100;
+    self.scoreLabel.text = [NSString stringWithFormat:@"%.0lf",score];
+    self.totalLines += 1;
+    self.totalScore = cumulativeScore;
+    VLLog(@"Recording: %d lines at totalScore: %f", self.totalLines, cumulativeScore);
+    if ([self.delegate respondsToSelector:@selector(onKTVMVView:scoreDidUpdate:)]) {
+        [self.delegate onKTVMVView:self scoreDidUpdate:realScore];
+    }
+}
+
+- (int)getSongScore {
+    return [self.scoreLabel.text intValue];
+}
+
+- (int)getAvgSongScore
+{
+    if(self.totalLines <= 0) {
+        return 0;
+    }
+    else {
+        return (int)(self.totalScore / self.totalLines);
+    }
+}
+
+#pragma mark private method
+//- (void)_startLrc {
+//    [_lrcView start];
+//    self.totalLines = 0;
+//    self.totalScore = 0.0f;
+//    KTVLogInfo(@"VLKTVMVView _startLrc %@", self.musicTitleLabel.text);
+//}
+
+
+#pragma mark -
+
+//- (void)loadLrcURL:(NSString *)lrcURL {
+//    [_lrcView setLrcUrlWithUrl:lrcURL];
+//}
+//
+//- (void)start {
+//    [_lrcView start];
+//    KTVLogInfo(@"VLKTVMVView start [%@]", self.musicTitleLabel.text);
+//    NSAssert(self.musicTitleLabel.text.length > 0, @"dfd");
+//}
+//
+//- (void)stop {
+//    [_lrcView stop];
+//    KTVLogInfo(@"VLKTVMVView stop [%@]", self.musicTitleLabel.text);
+//}
+//
+//- (void)reset {
+//    KTVLogInfo(@"VLKTVMVView reset [%@]", self.musicTitleLabel.text);
+//    [_lrcView stop];
+//    [_lrcView reset];
+//>>>>>>> dev/scene/ktv_ios_remove_qmui
+//    [self setSongScore:0];
+//    self.isPlayAccompany = YES;
+//    [self cleanMusicText];
+//}
 
 - (UILabel *)musicTitleLabel {
     if (!_musicTitleLabel) {
