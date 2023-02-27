@@ -1,6 +1,5 @@
 package io.agora.scene.show
 
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
@@ -1481,6 +1480,10 @@ class LiveDetailFragment : Fragment() {
         if (isRoomOwner) {
             enableLocalAudio(true)
             mRtcVideoSwitcher.setupLocalVideo(VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoLinkingLayout.videoContainer, 0))
+            refreshStatisticInfo(
+                receiveVideoSize = Size(0, 0),
+                downBitrate = 0
+            )
         } else {
             val channelMediaOptions = ChannelMediaOptions()
             val rtcConnection = mMainRtcConnection
@@ -1496,6 +1499,10 @@ class LiveDetailFragment : Fragment() {
             mRtcVideoSwitcher.setupRemoteVideo(
                 rtcConnection,
                 VideoSwitcher.VideoCanvasContainer(requireActivity(), mBinding.videoLinkingLayout.videoContainer, mRoomInfo.ownerId.toInt())
+            )
+            refreshStatisticInfo(
+                encodeVideoSize = Size(0, 0),
+                upBitrate = 0,
             )
         }
     }
