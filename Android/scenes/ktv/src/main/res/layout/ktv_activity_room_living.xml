@@ -142,7 +142,6 @@
         android:layout_marginStart="5dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
-        android:visibility="gone"
         android:padding="5dp"
         android:src="@mipmap/ic_more"
         app:layout_constraintBottom_toBottomOf="parent"
