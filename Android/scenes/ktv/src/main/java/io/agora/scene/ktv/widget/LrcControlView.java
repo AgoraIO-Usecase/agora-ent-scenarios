@@ -63,9 +63,9 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
 
     protected KaraokeView mKaraokeView;
 
-    protected double mCumulativeScore;
+    protected int mCumulativeScore;
 
-    public double getCumulativeScore() {
+    public int getCumulativeScore() {
         return mCumulativeScore;
     }
 
@@ -353,8 +353,8 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         mBinding.tvMusicName.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
         mBinding.ilChorus.tvMusicName2.setText(mMusic.getSongName() + "-" + mMusic.getSinger());
 
-        mBinding.ivCumulativeScoreGrade.setImageResource(R.drawable.ktv_ic_grade_c);
-        mBinding.tvCumulativeScore.setText("0");
+        mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "0"));
         mBinding.gradeView.setScore(0, 0, 0);
     }
 
@@ -387,12 +387,18 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
     }
 
     public void updateScore(double score, double cumulativeScore, double perfectScore) {
-        mCumulativeScore = cumulativeScore;
+        mCumulativeScore = (int) cumulativeScore;
 
-        mBinding.gradeView.setScore((long) score, (long) cumulativeScore, (long) perfectScore);
+        mBinding.gradeView.setScore((int) score, (int) cumulativeScore, (int) perfectScore);
 
-        mBinding.tvCumulativeScore.setText("" + (int) mCumulativeScore);
-        mBinding.ivCumulativeScoreGrade.setImageResource(mBinding.gradeView.getCumulativeDrawable());
+        mBinding.tvCumulativeScore.setText(String.format(getResources().getString(R.string.ktv_score_formatter), "" + mCumulativeScore));
+        int gradeDrawable = mBinding.gradeView.getCumulativeDrawable();
+        if (gradeDrawable == 0) {
+            mBinding.ivCumulativeScoreGrade.setVisibility(INVISIBLE);
+        } else {
+            mBinding.ivCumulativeScoreGrade.setImageResource(gradeDrawable);
+            mBinding.ivCumulativeScoreGrade.setVisibility(VISIBLE);
+        }
 
         if (!mNeedToShowComboView) {
             return;
@@ -401,7 +407,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
         if (mComboControl == null) {
             mComboControl = new ComboControl();
         }
-        mComboControl.checkAndShowCombos(mBinding, score, cumulativeScore);
+        mComboControl.checkAndShowCombos(mBinding, (int) score, (int) cumulativeScore);
     }
 
     private static class ComboControl {
@@ -414,14 +420,16 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             binding.comboView.getRoot().setVisibility(INVISIBLE);
         }
 
-        private void checkAndShowCombos(KtvLayoutLrcControlViewBinding binding, double score, double cumulativeScore) {
+        private void checkAndShowCombos(KtvLayoutLrcControlViewBinding binding, int score, int cumulativeScore) {
             binding.comboView.getRoot().setVisibility(VISIBLE);
 
             showComboAnimation(binding.comboView.getRoot(), score);
             showScoreAnimation((View) binding.comboView.getRoot().getParent(), score);
         }
 
-        private void showComboAnimation(View comboView, double score) {
+        private int mComboOfLastTime;
+
+        private void showComboAnimation(View comboView, int score) {
             int comboIconRes = 0;
 
             if (score >= 90) {
@@ -435,8 +443,15 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener 
             ImageView comboIcon = comboView.findViewById(R.id.combo_icon);
             TextView comboText = comboView.findViewById(R.id.combo_text);
 
+            boolean sameWithLastTime = (comboIconRes == mComboOfLastTime);
+            mComboOfLastTime = comboIconRes;
+
             if (comboIconRes > 0) {
-                mNumberOfCombos++;
+                if (sameWithLastTime) {
+                    mNumberOfCombos++;
+                } else {
+                    mNumberOfCombos = 1;
+                }
                 RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.RESOURCE);
                 OutlineSpan outlineSpan = new OutlineSpan(Color.parseColor("#368CFF"), 10F
                 );
