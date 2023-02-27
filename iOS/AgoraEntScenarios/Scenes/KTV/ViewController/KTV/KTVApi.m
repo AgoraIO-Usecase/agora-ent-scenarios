@@ -139,7 +139,7 @@ AgoraLrcDownloadDelegate
     kWeakSelf(self)
     self.timer = [NSTimer scheduledTimerWithTimeInterval: 0.05 block:^(NSTimer * _Nonnull timer) {
         NSInteger current = [weakself getPlayerCurrentTime];
-//        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
+        printf("recv1 current:   %ld  %ld %ld\n", current, self.playerState, self.config.songCode);
         [self setProgressWith:current];
         if(self.config.role == KTVSingRoleMainSinger){
             //如果超过前奏时间 自动隐藏前奏View
@@ -610,7 +610,7 @@ AgoraLrcDownloadDelegate
     [self.rtcMediaPlayer seekToPosition:position];
     self.totalScore = [view.scoringView getCumulativeScore];
     if([self.delegate respondsToSelector:@selector(didlrcViewDidScrolledWithCumulativeScore:totalScore:)]){
-        [self.delegate didlrcViewDidScrolledWithCumulativeScore:self.totalScore totalScore:self.totalCount];
+        [self.delegate didlrcViewDidScrolledWithCumulativeScore:self.totalScore totalScore:self.totalCount*100];
     }
     
 }
@@ -618,8 +618,10 @@ AgoraLrcDownloadDelegate
 - (void)onKaraokeViewWithView:(KaraokeView *)view didFinishLineWith:(LyricLineModel *)model score:(NSInteger)score cumulativeScore:(NSInteger)cumulativeScore lineIndex:(NSInteger)lineIndex lineCount:(NSInteger)lineCount{
     self.totalLines = lineCount;
     self.totalScore = cumulativeScore;
-    if([self.delegate respondsToSelector:@selector(didlrcViewDidScrollFinishedWithCumulativeScore:totalScore:)]){
-        [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.totalScore totalScore:lineCount * 100];
+    if([self.delegate respondsToSelector:@selector(didlrcViewDidScrollFinishedWithCumulativeScore:totalScore:lineScore:)]){
+        [self.delegate didlrcViewDidScrollFinishedWithCumulativeScore:self.totalScore
+                                                           totalScore:lineCount * 100
+                                                            lineScore:score];
     }
 }
 

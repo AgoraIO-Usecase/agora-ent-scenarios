@@ -953,9 +953,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
 }
 
-- (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore{
+- (void)didlrcViewDidScrollFinishedWithCumulativeScore:(NSInteger)score totalScore:(NSInteger)totalScore lineScore:(NSInteger)lineScore {
     [self.MVView.gradeView setScoreWithCumulativeScore:score totalScore:totalScore];
-    [self.MVView.incentiveView showWithScore:score];
+    [self.MVView.incentiveView showWithScore:lineScore];
 }
 
 - (void)didSongLoadedWith:(LyricModel *)model{

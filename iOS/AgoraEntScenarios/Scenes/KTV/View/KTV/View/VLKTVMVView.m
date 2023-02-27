@@ -96,17 +96,10 @@
 
     CGFloat lY = CGRectGetMaxX(currentPlayImgView.frame);
     CGFloat lH = self.height - lY;
+    [KaraokeView setLogWithPrintToConsole:true writeToFile:true];
     _karaokeView = [[KaraokeView alloc] initWithFrame:CGRectMake(0, lY, self.width, lH - 40)];
-    _karaokeView.delegate = self;
-    _karaokeView.lyricsView.textNormalColor = [UIColor grayColor];
-    _karaokeView.lyricsView.textSelectedColor = [UIColor whiteColor];
-    _karaokeView.lyricsView.textHighlightedColor = [UIColor yellowColor];
-    _karaokeView.lyricsView.textNormalFontSize = [UIFont fontWithName:@"PingFang SC" size:13];
-    _karaokeView.lyricsView.textHighlightFontSize = [UIFont fontWithName:@"PingFang SC" size:16];
     _karaokeView.scoringView.viewHeight = 50;
     _karaokeView.scoringView.topSpaces = 5;
-    _karaokeView.scoringView.localPitchCursorOffsetX = 5;
-    _karaokeView.scoringView.localPitchCursorImage = [UIImage sceneImageWithName:@"t1"];
    // _karaokeView.scoringView.showDebugView = true;
     _karaokeView.backgroundImage = [UIImage imageNamed:@"ktv_top_bgIcon"];
     [self addSubview:_karaokeView];
@@ -407,13 +400,10 @@
 
 - (void)reset {
     [_karaokeView reset];
+    [_gradeView reset];
     [self setSongScore:0];
     self.isPlayAccompany = YES;
     [self cleanMusicText];
-}
-
-- (void)resetTime {
-    [_karaokeView reset];
 }
 
 - (UILabel *)musicTitleLabel {
