@@ -197,6 +197,9 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
 
     public void initReConnectEvent() {
         ktvServiceProtocol.subscribeReConnectEvent(() -> {
+            if (needRePreload && rePreloadConfig != null) {
+                rePreloadRunnable(rePreloadConfig).run();
+            }
             reFetchUserNum();
             reFetchSeatStatus();
             reFetchSongStatus();
@@ -1311,22 +1314,30 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         ktvApiProtocol.loadSong(songCode, new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid),
                 (song, lyricUrl, singRole, singState) -> {
                     if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
+                        // 歌曲load成功
                         if (singRole == KTVSingRole.KTVSingRoleAudience) {
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
                             playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         }
 
-                        // settings
+                        // 重置settings
                         mSetting.setVolMic(100);
                         if (type == KTVSongType.KTVSongTypeSolo) {
                             mSetting.setVolMusic(100);
                         } else {
                             mSetting.setVolMusic(50);
                         }
+
+                        // 播放歌曲
                         ktvApiProtocol.playSong(song);
-                    } else if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
-                        KTVLogger.e(TAG, "KTVLoadSongState.KTVLoadSongStatePreloadFail");
+                    } else {
+                        KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + singState);
+                        if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
+                            needRePreload = true;
+                            rePreloadConfig = new KTVSongConfiguration(type, role, songCode, mainSingerUid, coSingerUid);
+                        }
+                        changeMusic();
                     }
                     return null;
                 }
@@ -1338,6 +1349,50 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
             }
             return null;
         });
+    }
+
+    private Boolean needRePreload = false;
+    private KTVSongConfiguration rePreloadConfig = null;
+    private Runnable rePreloadRunnable(KTVSongConfiguration config) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                KTVLogger.e(TAG, "ktvApiProtocol.rePreloadSong called");
+                ktvApiProtocol.loadSong(config.getSongCode(), new KTVSongConfiguration(
+                                config.getType(), config.getRole(), config.getSongCode(), config.getMainSingerUid(), config.getCoSingerUid()),
+                        (song, lyricUrl, singRole, singState) -> {
+                            if (singState == KTVLoadSongState.KTVLoadSongStateOK) {
+                                // 歌曲load成功
+                                needRePreload = false;
+                                if (singRole == KTVSingRole.KTVSingRoleAudience) {
+                                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                } else if (singRole == KTVSingRole.KTVSingRoleCoSinger) {
+                                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+                                }
+
+                                // 重置settings
+                                mSetting.setVolMic(100);
+                                if (config.getType() == KTVSongType.KTVSongTypeSolo) {
+                                    mSetting.setVolMusic(100);
+                                } else {
+                                    mSetting.setVolMusic(50);
+                                }
+
+                                // 播放歌曲
+                                ktvApiProtocol.playSong(song);
+                            } else {
+                                KTVLogger.e(TAG, "ktvApiProtocol.loadSong failed：" + singState);
+                                if (singState == KTVLoadSongState.KTVLoadSongStatePreloadFail) {
+                                    needRePreload = true;
+                                    rePreloadConfig = config;
+                                }
+                                changeMusic();
+                            }
+                            return null;
+                        }
+                );
+            }
+        };
     }
 
     // ------------------ 歌曲seek ------------------
@@ -1357,6 +1412,7 @@ public class RoomLivingViewModel extends ViewModel implements KTVApi.KTVApiEvent
         chorusPlayingLiveData.setValue(null);
         ktvApiProtocol.stopSong();
         mAudioTrackMode = KTVPlayerTrackMode.KTVPlayerTrackAcc;
+        needRePreload = false;
         if (mRtcEngine == null) {
             return;
         }
