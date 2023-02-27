@@ -379,6 +379,7 @@ class Room3DMicLayout : ConstraintLayout, View.OnClickListener, IRoomMicView {
             }
         }
         activeBot(isBotActive, null)
+        complete?.invoke()
     }
 
     override fun activeBot(active: Boolean, each: ((Int, Pair<PointF, PointF>) -> Unit)?) {

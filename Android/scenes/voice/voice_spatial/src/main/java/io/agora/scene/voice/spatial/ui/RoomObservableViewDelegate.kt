@@ -134,82 +134,38 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         }
-        /**打开蓝色机器人空气衰减*/
+        /**打开/关闭 蓝色机器人空气衰减*/
         roomLivingViewModel.openBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableBlueAbsorb(true)
+                    AgoraRtcEngineController.get().enableBlueAbsorb(data ?: false)
                 }
             })
         }
 
-        /**关闭蓝色机器人空气衰减*/
-        roomLivingViewModel.closeBlueBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableBlueAbsorb(false)
-                }
-            })
-        }
-
-        /**打开红色机器人空气衰减*/
+        /**打开/关闭 红色机器人空气衰减*/
         roomLivingViewModel.openRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableRedAbsorb(true)
+                    AgoraRtcEngineController.get().enableRedAbsorb(data ?: false)
                 }
             })
         }
 
-        /**关闭红色机器人空气衰减*/
-        roomLivingViewModel.closeRedBotAirAbsorbObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableRedAbsorb(false)
-                }
-            })
-        }
-
-        /**打开蓝色机器人模糊*/
+        /**打开/关闭 蓝色机器人模糊*/
         roomLivingViewModel.openBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableBlueBlur(true)
+                    AgoraRtcEngineController.get().enableBlueBlur(data ?: false)
                 }
             })
         }
 
-        /**关闭蓝色机器人模糊*/
-        roomLivingViewModel.closeBlueBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableBlueBlur(false)
-                }
-            })
-        }
-
-        /**打开红色机器人模糊*/
+        /**打开/关闭 红色机器人模糊*/
         roomLivingViewModel.openRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableRedBlur(true)
-                }
-            })
-        }
-
-        /**关闭红色机器人模糊*/
-        roomLivingViewModel.closeRedBotBlurObservable().observe(activity) { response: Resource<Boolean> ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(data: Boolean?) {
-                    if (data != true) return
-                    AgoraRtcEngineController.get().enableRedBlur(false)
+                    AgoraRtcEngineController.get().enableRedBlur(data ?: false)
                 }
             })
         }

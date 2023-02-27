@@ -31,6 +31,6 @@ interface IRoomMicView {
 
     fun myRtcUid(): Int
 
-    /** 更新空间音频麦位位置*/
+    /** 更新空间音频麦位UI位置*/
     fun updateSpatialPosition(info: SeatPositionInfo)
 }
