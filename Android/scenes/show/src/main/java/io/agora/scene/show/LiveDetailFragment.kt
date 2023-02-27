@@ -1633,7 +1633,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.publishCameraTrack = false
             channelMediaOptions.publishMicrophoneTrack = false
             channelMediaOptions.publishCustomAudioTrack = false
-            channelMediaOptions.enableAudioRecordingOrPlayout = false
+//            channelMediaOptions.enableAudioRecordingOrPlayout = false
             channelMediaOptions.autoSubscribeVideo = true
             channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
@@ -1663,7 +1663,7 @@ class LiveDetailFragment : Fragment() {
             channelMediaOptions.publishCustomAudioTrack = false
             channelMediaOptions.enableAudioRecordingOrPlayout = true
             channelMediaOptions.autoSubscribeVideo = true
-            channelMediaOptions.autoSubscribeAudio = false
+            channelMediaOptions.autoSubscribeAudio = true
             channelMediaOptions.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
             val pkRtcConnection = RtcConnection(
